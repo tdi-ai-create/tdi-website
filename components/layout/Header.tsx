@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 
-export function Header() {
+export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
