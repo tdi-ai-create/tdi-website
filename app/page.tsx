@@ -1,170 +1,206 @@
-import { Section, Container, Button, StatCard, TestimonialCard } from '@/components/ui';
+import Link from 'next/link';
 
-const stats = [
-  { number: '87,000+', label: 'educators in our community' },
-  { number: '100+', label: 'hours of PD content' },
-  { number: '21', label: 'states with TDI schools' },
-];
-
-const testimonials = [
-  {
-    quote: "This isn't sit-and-get. Our teachers are actually learning how to work smarter and feel better doing it. I don't have to babysit.",
-    author: "Lisa M.",
-    role: "K-8 School Director",
-    location: "WA",
-  },
-  {
-    quote: "Before, we got eye rolls. Now, we hear: 'When's the team coming next?' That's the clearest sign to me that we're finally doing PD right.",
-    author: "Daniel R.",
-    role: "High School Principal",
-    location: "CA",
-  },
-  {
-    quote: "I used to spend weekends patching together PD plans. TDI gave us ready-to-use tools, real support, and content that hit exactly what our team needed. It saved me so much damn time.",
-    author: "Melissa T.",
-    role: "Assistant Superintendent",
-    location: "NC",
-  },
-];
-
-export default function HomePage() {
+export default function Home() {
   return (
-    <>
+    <main className="min-h-screen">
       {/* Hero Section */}
-      <Section background="white" className="pt-16 md:pt-24">
-        <Container>
-          <div className="max-w-3xl">
-            <h1 className="mb-6">Teachers Deserve More Than Survival</h1>
-            <p className="text-xl mb-8" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              Professional development that actually works—practical strategies, real support, and a community that gets it.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Button href="https://tdi.thinkific.com" external>
-                Explore the Learning Hub
-              </Button>
-              <Button href="/for-schools" variant="secondary">
-                Bring TDI to Your School
-              </Button>
+      <section className="section bg-white">
+        <div className="container-wide">
+          <h1 className="mb-6 max-w-4xl">
+            Teachers Deserve More Than Survival
+          </h1>
+          <p className="text-xl mb-8 max-w-2xl" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
+            You became a teacher to make a difference. Not to drown in lesson plans, sit through pointless PD, and count down to summer. We get it. We've been there.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <a 
+              href="https://tdi.thinkific.com" 
+              className="btn-primary" 
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              Explore the Learning Hub
+            </a>
+            <Link href="/for-schools" className="btn-secondary">
+              Bring TDI to Your School
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Bar */}
+      <section className="section py-12" style={{ backgroundColor: 'var(--tdi-yellow)' }}>
+        <div className="container-wide">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+              <p className="text-5xl font-bold mb-2" style={{ color: 'var(--tdi-charcoal)' }}>87,000+</p>
+              <p style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>educators in our community</p>
+            </div>
+            <div>
+              <p className="text-5xl font-bold mb-2" style={{ color: 'var(--tdi-charcoal)' }}>100+</p>
+              <p style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>hours of on-demand PD</p>
+            </div>
+            <div>
+              <p className="text-5xl font-bold mb-2" style={{ color: 'var(--tdi-charcoal)' }}>21</p>
+              <p style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>states with TDI partner schools</p>
             </div>
           </div>
-        </Container>
-      </Section>
-
-      {/* Stats Section */}
-      <Section background="peach">
-        <Container>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {stats.map((stat, index) => (
-              <StatCard key={index} number={stat.number} label={stat.label} />
-            ))}
-          </div>
-        </Container>
-      </Section>
+        </div>
+      </section>
 
       {/* Problem Section */}
-      <Section background="white">
-        <Container width="default">
-          <h2 className="text-center mb-8">Traditional PD Is Broken</h2>
-          <div className="max-w-2xl mx-auto text-center">
-            <p className="text-lg mb-6">
-              You've sat through the sit-and-get sessions. The ones where someone who hasn't been in a classroom in years reads PowerPoint slides at you. Meanwhile, you're drowning in grading, parent emails, and lesson plans—and somehow you're supposed to "implement with fidelity" by Monday.
+      <section className="section bg-white">
+        <div className="container-default">
+          <h2 className="text-center mb-12">Traditional PD Is Broken</h2>
+          <div className="max-w-3xl mx-auto text-lg">
+            <p className="mb-6">
+              You know the drill. Someone who hasn't been in a classroom in years reads PowerPoint slides at you for three hours. You nod along, check your phone under the table, and forget everything by Monday.
             </p>
-            <p className="text-lg font-semibold">
+            <p className="mb-6">
+              Meanwhile, you're still figuring out how to differentiate for 30 kids, manage behaviors, contact parents, grade papers, and somehow take care of yourself.
+            </p>
+            <p className="font-semibold" style={{ color: 'var(--tdi-teal)' }}>
               Teachers deserve better. So do the leaders trying to support them.
             </p>
           </div>
-        </Container>
-      </Section>
+        </div>
+      </section>
 
       {/* Solution Section */}
-      <Section background="white">
-        <Container>
-          <h2 className="text-center mb-4">PD That Meets You Where You Are</h2>
-          <p className="text-center text-lg mb-12 max-w-2xl mx-auto" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-            Teachers Deserve It was born from burnout. Rae Hughart was that teacher—overwhelmed, exhausted, wondering if she'd make it to June. So she built something different.
+      <section className="section" style={{ backgroundColor: 'var(--tdi-peach)' }}>
+        <div className="container-wide">
+          <h2 className="text-center mb-4">This Isn't Sit-and-Get</h2>
+          <p className="text-center text-lg mb-12 max-w-2xl mx-auto" style={{ opacity: 0.8 }}>
+            TDI was born from burnout. Built by teachers who get it.
           </p>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="card">
-              <h4 className="mb-3">Flipped PD Model</h4>
-              <p className="text-base" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-                Learn on your schedule, not in a stuffy room. Come together for what matters.
-              </p>
-            </div>
-            <div className="card">
-              <h4 className="mb-3">Practical Strategies</h4>
-              <p className="text-base" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-                Ideas you can use tomorrow, not someday. Every course includes ready-to-use tools.
-              </p>
-            </div>
-            <div className="card">
-              <h4 className="mb-3">Wellness Built In</h4>
-              <p className="text-base" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-                Because you can't pour from an empty cup. We address the whole person.
-              </p>
-            </div>
-            <div className="card">
-              <h4 className="mb-3">Real Community</h4>
-              <p className="text-base" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-                87,000+ educators who actually get it—the good days and the "crying in your car" days.
-              </p>
-            </div>
-          </div>
-          
-          <p className="text-center mt-12 text-lg">
-            <strong>For schools:</strong> Measurable outcomes, implementation support, and teachers who actually want to engage.
-          </p>
-        </Container>
-      </Section>
-
-      {/* Testimonials Section */}
-      <Section background="peach">
-        <Container>
-          <h2 className="text-center mb-12">What Educators Are Saying</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <TestimonialCard
-                key={index}
-                quote={testimonial.quote}
-                author={testimonial.author}
-                role={testimonial.role}
-                location={testimonial.location}
-              />
-            ))}
-          </div>
-        </Container>
-      </Section>
-
-      {/* Final CTA Section */}
-      <Section background="white">
-        <Container width="default">
-          <div className="text-center">
-            <h2 className="mb-8">Ready to See What's Possible?</h2>
+            <div className="card text-center">
+              <div className="text-4xl mb-4">🎯</div>
+              <h3 className="text-xl mb-3">Practical Strategies</h3>
+              <p style={{ opacity: 0.8 }}>
+                Stuff you can actually use Monday morning. No fluff, no theory for theory's sake.
+              </p>
+            </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-              <div className="p-8 rounded-xl" style={{ backgroundColor: 'var(--tdi-peach)' }}>
-                <h3 className="text-xl mb-4">For Teachers</h3>
-                <p className="mb-6" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-                  Explore the Learning Hub for free tools, courses, and a community that gets it.
-                </p>
-                <Button href="https://tdi.thinkific.com" external>
-                  Explore the Learning Hub
-                </Button>
-              </div>
-              
-              <div className="p-8 rounded-xl" style={{ backgroundColor: 'var(--tdi-peach)' }}>
-                <h3 className="text-xl mb-4">For School Leaders</h3>
-                <p className="mb-6" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-                  Bring TDI to your school with transparent pricing and implementation support.
-                </p>
-                <Button href="/for-schools/pricing" variant="secondary">
-                  See School Pricing
-                </Button>
-              </div>
+            <div className="card text-center">
+              <div className="text-4xl mb-4">⏰</div>
+              <h3 className="text-xl mb-3">Respects Your Time</h3>
+              <p style={{ opacity: 0.8 }}>
+                Flipped PD model. Learn on your schedule. No more losing Saturdays to workshops.
+              </p>
+            </div>
+            
+            <div className="card text-center">
+              <div className="text-4xl mb-4">💪</div>
+              <h3 className="text-xl mb-3">Wellness Built In</h3>
+              <p style={{ opacity: 0.8 }}>
+                Because you can't pour from an empty cup. Self-care isn't selfish, it's survival.
+              </p>
             </div>
           </div>
-        </Container>
-      </Section>
-    </>
+        </div>
+      </section>
+
+      {/* Two Paths Section */}
+      <section className="section bg-white">
+        <div className="container-wide">
+          <h2 className="text-center mb-12">Two Ways to Work With Us</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Teachers Path */}
+            <div className="card" style={{ borderTop: '4px solid var(--tdi-coral)' }}>
+              <h3 className="text-2xl mb-4">For Teachers</h3>
+              <p className="mb-6" style={{ opacity: 0.8 }}>
+                Jump into the Learning Hub on your own. Hundreds of bite-sized videos, downloadable resources, and a community that actually gets what you're going through.
+              </p>
+              <ul className="mb-6 space-y-2">
+                <li>✓ On-demand courses you finish in one sitting</li>
+                <li>✓ Ready-to-use classroom resources</li>
+                <li>✓ Wellness strategies that actually work</li>
+                <li>✓ Free downloads to get you started</li>
+              </ul>
+              <a 
+                href="https://tdi.thinkific.com" 
+                className="btn-primary inline-block"
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                Explore the Learning Hub
+              </a>
+            </div>
+
+            {/* Schools Path */}
+            <div className="card" style={{ borderTop: '4px solid var(--tdi-teal)' }}>
+              <h3 className="text-2xl mb-4">For Schools & Districts</h3>
+              <p className="mb-6" style={{ opacity: 0.8 }}>
+                Bring TDI to your whole team. We partner with schools to deliver PD that teachers actually want, with outcomes you can measure and report.
+              </p>
+              <ul className="mb-6 space-y-2">
+                <li>✓ Full Learning Hub access for your staff</li>
+                <li>✓ Live workshops and coaching</li>
+                <li>✓ Leadership dashboard with real data</li>
+                <li>✓ Implementation support from day one</li>
+              </ul>
+              <Link href="/for-schools" className="btn-secondary inline-block">
+                Learn About Partnerships
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="section" style={{ backgroundColor: 'var(--tdi-peach)' }}>
+        <div className="container-wide">
+          <h2 className="text-center mb-12">What Educators Are Saying</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="card-testimonial">
+              <p className="text-lg italic mb-4">
+                "I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself."
+              </p>
+              <p className="text-sm font-semibold">Sarah K.</p>
+              <p className="text-sm" style={{ opacity: 0.7 }}>5th Grade Teacher, IL</p>
+            </div>
+            
+            <div className="card-testimonial">
+              <p className="text-lg italic mb-4">
+                "Our teachers are actually excited about PD now. I don't have to chase them down or babysit. They're learning because they want to."
+              </p>
+              <p className="text-sm font-semibold">Lisa M.</p>
+              <p className="text-sm" style={{ opacity: 0.7 }}>K-8 School Director, WA</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
+        <div className="container-default text-center">
+          <h2 className="mb-6" style={{ color: 'white' }}>Ready to Feel Like a Teacher Again?</h2>
+          <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: 'white', opacity: 0.8 }}>
+            Whether you're a teacher looking for support or a leader trying to keep your team from burning out, we've got you.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <a 
+              href="https://tdi.thinkific.com" 
+              className="btn-primary"
+              target="_blank" 
+              rel="noopener noreferrer"
+            >
+              Start Learning Now
+            </a>
+            <Link 
+              href="/for-schools/schedule-call" 
+              className="btn-secondary"
+              style={{ borderColor: 'white', color: 'white' }}
+            >
+              Talk to Our Team
+            </Link>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
