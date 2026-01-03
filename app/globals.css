@@ -1,0 +1,260 @@
+@import "tailwindcss";
+
+/* TDI Brand Colors */
+:root {
+  /* Primary Colors */
+  --tdi-yellow: #F5C542;
+  --tdi-orange: #D4642A;
+  --tdi-coral: #E86B6B;
+  
+  /* Neutral Colors */
+  --tdi-charcoal: #1A1A1A;
+  --tdi-beige: #D9C4B0;
+  --tdi-peach: #F5E6DC;
+  
+  /* Cool Accent Colors */
+  --tdi-sage: #A8C0A8;
+  --tdi-lavender: #9A8AB5;
+  --tdi-lavender-light: #D5CCE6;
+  --tdi-blue-light: #9EC5E0;
+  --tdi-teal: #1A6B6B;
+  --tdi-navy: #1A2A4A;
+  
+  /* Background */
+  --background: #ffffff;
+  --foreground: #1A1A1A;
+}
+
+@theme inline {
+  /* Colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  --color-tdi-yellow: var(--tdi-yellow);
+  --color-tdi-orange: var(--tdi-orange);
+  --color-tdi-coral: var(--tdi-coral);
+  --color-tdi-charcoal: var(--tdi-charcoal);
+  --color-tdi-beige: var(--tdi-beige);
+  --color-tdi-peach: var(--tdi-peach);
+  --color-tdi-sage: var(--tdi-sage);
+  --color-tdi-lavender: var(--tdi-lavender);
+  --color-tdi-lavender-light: var(--tdi-lavender-light);
+  --color-tdi-blue-light: var(--tdi-blue-light);
+  --color-tdi-teal: var(--tdi-teal);
+  --color-tdi-navy: var(--tdi-navy);
+  
+  /* Font */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Base Styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 18px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--tdi-charcoal);
+}
+
+h1 {
+  font-size: 56px;
+}
+
+h2 {
+  font-size: 44px;
+}
+
+h3 {
+  font-size: 32px;
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* Responsive Typography */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 40px;
+  }
+  
+  h2 {
+    font-size: 32px;
+  }
+  
+  h3 {
+    font-size: 26px;
+  }
+  
+  h4 {
+    font-size: 20px;
+  }
+}
+
+/* Links */
+a {
+  color: var(--tdi-teal);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+a:hover {
+  color: var(--tdi-navy);
+  text-decoration: underline;
+}
+
+/* Button Base Styles */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 32px;
+  background-color: var(--tdi-yellow);
+  color: var(--tdi-charcoal);
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  background-color: var(--tdi-orange);
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-decoration: none;
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 30px;
+  background-color: transparent;
+  color: var(--tdi-teal);
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 2px solid var(--tdi-teal);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.btn-secondary:hover {
+  background-color: var(--tdi-teal);
+  color: white;
+  text-decoration: none;
+}
+
+/* Section Utilities */
+.section {
+  padding: 48px 24px;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: 80px 64px;
+  }
+}
+
+.container-narrow {
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.container-default {
+  max-width: 1024px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.container-wide {
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Card Styles */
+.card {
+  background: white;
+  border: 1px solid #E5E5E5;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.card-testimonial {
+  background: var(--tdi-peach);
+  border: none;
+  border-radius: 12px;
+  padding: 32px;
+}
+
+/* Form Elements */
+input[type="text"],
+input[type="email"],
+textarea,
+select {
+  width: 100%;
+  padding: 16px;
+  font-size: 16px;
+  color: var(--tdi-charcoal);
+  background: white;
+  border: 2px solid #E5E5E5;
+  border-radius: 8px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: var(--tdi-teal);
+  box-shadow: 0 0 0 3px rgba(26, 107, 107, 0.1);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(26, 26, 26, 0.4);
+}
+
+label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--tdi-charcoal);
+  margin-bottom: 8px;
+}
