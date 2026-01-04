@@ -93,14 +93,11 @@ export function CoursesSection() {
               Updated Monthly
             </div>
             <div className="relative h-40 overflow-hidden">
-              <div
-                className="w-full h-full flex items-center justify-center"
-                style={{ backgroundColor: '#1e2749' }}
-              >
-                <svg className="w-12 h-12" fill="#ffba06" viewBox="0 0 24 24">
-                  <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
-                </svg>
-              </div>
+              <img
+                src="/images/course-guide.png"
+                alt="Learning Hub Course Guide"
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
             </div>
             <div className="p-4">
               <h3 className="font-bold text-lg mb-2 line-clamp-2" style={{ color: '#1e2749' }}>
