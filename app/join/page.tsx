@@ -133,7 +133,9 @@ export default function JoinPage() {
 
             {/* Card 3: Free Resources */}
             <a
-              href="/resources"
+              href="https://tdi.thinkific.com/collections/downloads"
+              target="_blank"
+              rel="noopener noreferrer"
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
               <div

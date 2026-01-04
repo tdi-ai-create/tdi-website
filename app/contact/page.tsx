@@ -208,7 +208,7 @@ export default function ContactPage() {
 
             {/* Read the Blog */}
             <a
-              href="https://teachersdeserveit.substack.com"
+              href="https://raehughart.substack.com"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
@@ -230,7 +230,7 @@ export default function ContactPage() {
 
             {/* Listen to the Podcast */}
             <a
-              href="https://open.spotify.com/show/1ZDo7psMhu9TTomUBKxVvO"
+              href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
