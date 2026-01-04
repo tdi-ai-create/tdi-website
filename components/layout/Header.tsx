@@ -24,7 +24,7 @@ export function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-6">
             <Link 
               href="/what-we-offer" 
               className="text-base font-medium hover:opacity-70 transition-opacity"
@@ -40,12 +40,30 @@ export function Header() {
               For Schools
             </Link>
             <Link 
-              href="/pricing" 
+              href="/for-schools/pricing" 
               className="text-base font-medium hover:opacity-70 transition-opacity"
               style={{ color: 'var(--tdi-charcoal)' }}
             >
               Pricing
             </Link>
+            <a 
+              href="https://raehughart.substack.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-base font-medium hover:opacity-70 transition-opacity"
+              style={{ color: 'var(--tdi-charcoal)' }}
+            >
+              Blog
+            </a>
+            <a 
+              href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-base font-medium hover:opacity-70 transition-opacity"
+              style={{ color: 'var(--tdi-charcoal)' }}
+            >
+              Podcast
+            </a>
             <Link 
               href="/about" 
               className="text-base font-medium hover:opacity-70 transition-opacity"
@@ -106,13 +124,33 @@ export function Header() {
                 For Schools
               </Link>
               <Link 
-                href="/pricing" 
+                href="/for-schools/pricing" 
                 className="text-base font-medium py-2"
                 style={{ color: 'var(--tdi-charcoal)' }}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Pricing
               </Link>
+              <a 
+                href="https://raehughart.substack.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-base font-medium py-2"
+                style={{ color: 'var(--tdi-charcoal)' }}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Blog
+              </a>
+              <a 
+                href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-base font-medium py-2"
+                style={{ color: 'var(--tdi-charcoal)' }}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Podcast
+              </a>
               <Link 
                 href="/about" 
                 className="text-base font-medium py-2"
@@ -137,3 +175,4 @@ export function Header() {
     </header>
   );
 }
+
