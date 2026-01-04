@@ -65,7 +65,7 @@ export default function JoinPage() {
             >
               <div
                 className="h-[160px] flex items-center justify-center p-6"
-                style={{ backgroundColor: '#FEF3C7' }}
+                style={{ backgroundColor: '#ffba06' }}
               >
                 {/* Substack/Newsletter Icon */}
                 <svg
@@ -137,7 +137,7 @@ export default function JoinPage() {
             >
               <div
                 className="h-[160px] flex items-center justify-center p-6"
-                style={{ backgroundColor: '#FEF9E7' }}
+                style={{ backgroundColor: '#ffba06' }}
               >
                 {/* Download Icon */}
                 <svg
@@ -257,17 +257,26 @@ export default function JoinPage() {
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
               <div
-                className="h-[180px] flex items-center justify-center p-6"
-                style={{ backgroundColor: '#C7D7F5' }}
+                className="h-[160px] flex items-center justify-center p-6"
+                style={{ backgroundColor: '#80a4ed' }}
               >
+                {/* Team/Group Icon */}
+                <svg
+                  className="w-16 h-16"
+                  fill="white"
+                  viewBox="0 0 24 24"
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                >
+                  <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                </svg>
+              </div>
+              <div className="bg-white p-5">
                 <h3
-                  className="text-xl font-bold text-center uppercase tracking-wide"
+                  className="text-lg font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
                   Bring TDI to Your Team
                 </h3>
-              </div>
-              <div className="bg-white p-5">
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
                   Whole-school PD designed for real implementation.
                 </p>
@@ -283,17 +292,26 @@ export default function JoinPage() {
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
               <div
-                className="h-[180px] flex items-center justify-center p-6"
+                className="h-[160px] flex items-center justify-center p-6"
                 style={{ backgroundColor: '#80a4ed' }}
               >
+                {/* Compass/Explore Icon */}
+                <svg
+                  className="w-16 h-16"
+                  fill="white"
+                  viewBox="0 0 24 24"
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                >
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5.5-2.5l7.51-3.49L17.5 6.5 9.99 9.99 6.5 17.5zm5.5-6.6c.61 0 1.1.49 1.1 1.1s-.49 1.1-1.1 1.1-1.1-.49-1.1-1.1.49-1.1 1.1-1.1z"/>
+                </svg>
+              </div>
+              <div className="bg-white p-5">
                 <h3
-                  className="text-xl font-bold text-center uppercase tracking-wide"
+                  className="text-lg font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
                   Explore What's Possible
                 </h3>
-              </div>
-              <div className="bg-white p-5">
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
                   See pricing options and partnership models.
                 </p>
@@ -309,17 +327,26 @@ export default function JoinPage() {
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
               <div
-                className="h-[180px] flex items-center justify-center p-6"
-                style={{ backgroundColor: '#E0E9F9' }}
+                className="h-[160px] flex items-center justify-center p-6"
+                style={{ backgroundColor: '#80a4ed' }}
               >
+                {/* Chat/Message Icon */}
+                <svg
+                  className="w-16 h-16"
+                  fill="white"
+                  viewBox="0 0 24 24"
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                >
+                  <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                </svg>
+              </div>
+              <div className="bg-white p-5">
                 <h3
-                  className="text-xl font-bold text-center uppercase tracking-wide"
+                  className="text-lg font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
                   Chat with a Member of the Team
                 </h3>
-              </div>
-              <div className="bg-white p-5">
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
                   Have questions? Let's talk.
                 </p>
