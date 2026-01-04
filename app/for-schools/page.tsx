@@ -233,7 +233,7 @@ export default function ForSchoolsPage() {
               </div>
               <div className="bg-white p-4 flex-1 flex flex-col">
                 <h3
-                  className="text-sm font-bold mb-2 uppercase tracking-wide"
+                  className="text-xs font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749', textDecoration: 'none' }}
                 >
                   Principals
@@ -263,7 +263,7 @@ export default function ForSchoolsPage() {
               </div>
               <div className="bg-white p-4 flex-1 flex flex-col">
                 <h3
-                  className="text-sm font-bold mb-2 uppercase tracking-wide"
+                  className="text-xs font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749', textDecoration: 'none' }}
                 >
                   Supers
@@ -293,7 +293,7 @@ export default function ForSchoolsPage() {
               </div>
               <div className="bg-white p-4 flex-1 flex flex-col">
                 <h3
-                  className="text-sm font-bold mb-2 uppercase tracking-wide"
+                  className="text-xs font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749', textDecoration: 'none' }}
                 >
                   Curriculum
@@ -323,7 +323,7 @@ export default function ForSchoolsPage() {
               </div>
               <div className="bg-white p-4 flex-1 flex flex-col">
                 <h3
-                  className="text-sm font-bold mb-2 uppercase tracking-wide"
+                  className="text-xs font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749', textDecoration: 'none' }}
                 >
                   HR
