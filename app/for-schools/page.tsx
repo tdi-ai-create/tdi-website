@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { CoursesSection } from '@/components/CoursesSection';
 
 export const metadata = {
   title: 'For Schools | Teachers Deserve It',
@@ -452,6 +453,8 @@ export default function ForSchoolsPage() {
           </div>
         </div>
       </section>
+
+      <CoursesSection />
 
       {/* Final CTA */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#80a4ed' }}>

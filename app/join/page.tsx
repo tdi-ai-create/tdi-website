@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { CoursesSection } from '@/components/CoursesSection';
 
 export default function JoinPage() {
   return (
@@ -380,6 +381,8 @@ export default function JoinPage() {
           Join the TDI Movement on Facebook
         </a>
       </div>
+
+      <CoursesSection />
 
       {/* Budget CTA */}
       <section className="section" style={{ backgroundColor: '#80a4ed' }}>
