@@ -59,14 +59,6 @@ export function Header() {
                 </Link>
               )
             ))}
-            <a
-              href="https://tdi.thinkific.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary text-sm"
-            >
-              Learning Hub
-            </a>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -120,15 +112,6 @@ export function Header() {
                   </Link>
                 )
               ))}
-              <a
-                href="https://tdi.thinkific.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary text-sm text-center"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Learning Hub
-              </a>
             </div>
           </nav>
         )}
