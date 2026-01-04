@@ -66,11 +66,11 @@ export function TDICalculator() {
 
   const getHappinessFact = () => {
     if (teacherHappiness <= 3) {
-      return "Schools with morale below 4 see 23% higher turnover. That's $20,000 per teacher to replace. — Learning Policy Institute";
+      return "Schools with morale below 4 see 23% higher turnover. That's $20,000 per teacher to replace. (Learning Policy Institute)";
     } else if (teacherHappiness <= 5) {
-      return "53% of teachers report burnout. TDI partners report stress dropping from 9/10 to 5-6/10 within one semester. — RAND 2025";
+      return "53% of teachers report burnout. TDI partners report stress dropping from 9/10 to 5-6/10 within one semester. (RAND 2025)";
     } else if (teacherHappiness <= 7) {
-      return "Teachers with moderate satisfaction are 2x more likely to stay when given sustained support vs. one-time PD. — RAND";
+      return "Teachers with moderate satisfaction are 2x more likely to stay when given sustained support vs. one-time PD. (RAND)";
     } else {
       return "High-morale schools still lose teachers to burnout. Proactive support prevents backslide.";
     }
@@ -78,9 +78,9 @@ export function TDICalculator() {
 
   const getPerformanceFact = () => {
     if (studentPerformance <= 40) {
-      return "When teachers reclaim 4+ hours/week, they provide 2x more small-group instruction. Research shows 8-12 percentile point gains. — Chetty et al.";
+      return "When teachers reclaim 4+ hours/week, they provide 2x more small-group instruction. Research shows 8-12 percentile point gains. (Chetty et al.)";
     } else if (studentPerformance <= 60) {
-      return "Teacher effectiveness is the #1 in-school factor for student achievement. A strong teacher can mean one full grade level of additional growth. — Hanushek";
+      return "Teacher effectiveness is the #1 in-school factor for student achievement. A strong teacher can mean one full grade level of additional growth. (Hanushek)";
     } else if (studentPerformance <= 75) {
       return "Schools above 60% benchmark see accelerated gains when teachers have time for differentiation and intervention.";
     } else {
@@ -90,7 +90,7 @@ export function TDICalculator() {
 
   const getRatingFact = () => {
     if (stateRating === 'F' || stateRating === 'D') {
-      return "Schools that invest in sustained teacher development are 2x more likely to improve their state rating within 3 years. — TDI Partner Data";
+      return "Schools that invest in sustained teacher development are 2x more likely to improve their state rating within 3 years. (TDI Partner Data)";
     } else if (stateRating === 'C') {
       return "C-rated schools often have the talent but lack systems. TDI provides the structure to unlock what's already there.";
     } else if (stateRating === 'B') {
@@ -104,7 +104,7 @@ export function TDICalculator() {
     <>
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 max-w-2xl mx-auto">
         {/* Header */}
-        <div className="px-6 py-5 text-center" style={{ backgroundColor: 'var(--tdi-teal)' }}>
+        <div className="px-6 py-5 text-center" style={{ backgroundColor: 'var(--tdi-navy)' }}>
           <h3 className="text-xl font-bold mb-1" style={{ color: 'white' }}>What's Possible for Your School?</h3>
           <p className="text-sm" style={{ color: 'white', opacity: 0.8 }}>Tell us where you are. We'll show you where you could be.</p>
         </div>
@@ -118,7 +118,7 @@ export function TDICalculator() {
               <label className="text-sm font-bold text-gray-700">
                 Current PD spend per teacher
               </label>
-              <span className="text-lg font-black" style={{ color: 'var(--tdi-teal)' }}>${pdBudget.toLocaleString()}</span>
+              <span className="text-lg font-black" style={{ color: 'var(--tdi-navy)' }}>${pdBudget.toLocaleString()}</span>
             </div>
             <input
               type="range"
@@ -128,7 +128,7 @@ export function TDICalculator() {
               value={pdBudget}
               onChange={(e) => { setPdBudget(parseInt(e.target.value)); handleSliderChange(); }}
               className="w-full h-2 rounded-full appearance-none cursor-pointer"
-              style={{ background: `linear-gradient(to right, var(--tdi-teal) 0%, var(--tdi-teal) ${(pdBudget - 500) / 4500 * 100}%, #e5e7eb ${(pdBudget - 500) / 4500 * 100}%, #e5e7eb 100%)` }}
+              style={{ background: `linear-gradient(to right, var(--tdi-navy) 0%, var(--tdi-navy) ${(pdBudget - 500) / 4500 * 100}%, #e5e7eb ${(pdBudget - 500) / 4500 * 100}%, #e5e7eb 100%)` }}
             />
             <p className="text-xs text-gray-500 italic">{getBudgetFact()}</p>
           </div>
@@ -271,7 +271,7 @@ export function TDICalculator() {
 
             {submitted ? (
               <div className="text-center py-4">
-                <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--tdi-teal)' }}>
+                <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--tdi-navy)' }}>
                   You're in!
                 </h3>
                 <p style={{ opacity: 0.7 }}>
@@ -300,7 +300,7 @@ export function TDICalculator() {
                   <button 
                     type="submit" 
                     className="w-full py-3 rounded-lg font-bold transition-all"
-                    style={{ backgroundColor: 'var(--tdi-teal)', color: 'white' }}
+                    style={{ backgroundColor: 'var(--tdi-navy)', color: 'white' }}
                   >
                     Join 87,000+ Educators
                   </button>

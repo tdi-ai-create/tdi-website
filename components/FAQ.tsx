@@ -62,7 +62,7 @@ export function FAQ() {
                 <span className="font-semibold">{faq.question}</span>
                 <span 
                   className="flex-shrink-0 text-2xl"
-                  style={{ color: 'var(--tdi-teal)' }}
+                  style={{ color: 'var(--tdi-navy)' }}
                 >
                   {openIndex === index ? '−' : '+'}
                 </span>
@@ -82,7 +82,7 @@ export function FAQ() {
             <a 
               href="/contact" 
               className="font-semibold underline"
-              style={{ color: 'var(--tdi-teal)' }}
+              style={{ color: 'var(--tdi-navy)' }}
             >
               Get in touch
             </a>
