@@ -36,33 +36,127 @@ export default function AboutPage() {
       </section>
 
       {/* How It Started */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
-            How It Started
-          </h2>
+      <section className="relative py-20 md:py-28 overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: 'url("/images/about-teacher-pointing.png")',
+            backgroundPosition: 'center top'
+          }}
+        />
 
-          <div className="max-w-3xl mx-auto">
-            <p className="text-lg mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
-              Teachers Deserve It was born from burnout.
-            </p>
-            <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
-              Rae Hughart was a passionate, high-performing educator who was ready to walk away from the classroom. The system wasn't built to sustain passionate teachers. It was built to stretch them thin.
-            </p>
-            <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
-              So she started asking new questions:
-            </p>
-            <div className="pl-6 border-l-4 mb-6" style={{ borderColor: '#ffba06' }}>
-              <p className="italic mb-2" style={{ color: '#1e2749' }}>What if professional development didn't take up your entire weekend?</p>
-              <p className="italic mb-2" style={{ color: '#1e2749' }}>What if creativity wasn't a luxury, but the norm?</p>
-              <p className="italic" style={{ color: '#1e2749' }}>What if we gave teachers the tools they actually needed to thrive?</p>
+        {/* Dark Gradient Overlay */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(to right, rgba(30, 39, 73, 0.95) 0%, rgba(30, 39, 73, 0.85) 50%, rgba(30, 39, 73, 0.7) 100%)'
+          }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 container-default">
+          <div className="max-w-6xl mx-auto">
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+              {/* Left: The Story */}
+              <div className="text-left">
+                <h2 className="text-3xl md:text-4xl font-bold mb-8" style={{ color: '#ffffff' }}>
+                  How It Started
+                </h2>
+                <p className="text-xl mb-6 font-semibold" style={{ color: '#ffba06' }}>
+                  Teachers Deserve It was born from burnout.
+                </p>
+                <p className="mb-6" style={{ color: '#ffffff', opacity: 0.9 }}>
+                  Rae Hughart was a passionate, high-performing educator who was ready to walk away from the classroom. The system was not built to sustain passionate teachers. It was built to stretch them thin.
+                </p>
+                <p className="mb-6" style={{ color: '#ffffff', opacity: 0.9 }}>
+                  So she started asking new questions:
+                </p>
+                <div className="pl-6 border-l-4 mb-6" style={{ borderColor: '#ffba06' }}>
+                  <p className="italic mb-2" style={{ color: '#ffffff', opacity: 0.9 }}>What if PD did not take up your entire weekend?</p>
+                  <p className="italic mb-2" style={{ color: '#ffffff', opacity: 0.9 }}>What if creativity was not a luxury?</p>
+                  <p className="italic" style={{ color: '#ffffff', opacity: 0.9 }}>What if teachers had tools to actually thrive?</p>
+                </div>
+                <p className="mb-8" style={{ color: '#ffffff', opacity: 0.9 }}>
+                  What started as a personal mission quickly became a movement. Today, TDI serves <span style={{ color: '#ffba06' }} className="font-semibold">87,000+ educators</span> across <span style={{ color: '#ffba06' }} className="font-semibold">21 states</span>.
+                </p>
+              </div>
+
+              {/* Right: The Blueprint */}
+              <div className="text-left">
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
+                  <h3 className="text-xl font-bold mb-6" style={{ color: '#ffba06' }}>
+                    The TDI Blueprint
+                  </h3>
+                  <div className="space-y-4">
+                    <div className="flex items-start gap-4">
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: '#ffba06' }}
+                      >
+                        <span className="font-bold" style={{ color: '#1e2749' }}>1</span>
+                      </div>
+                      <div>
+                        <p className="font-semibold" style={{ color: '#ffffff' }}>Respect Teachers' Time</p>
+                        <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>PD that fits into real life, not consumes it</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: '#ffba06' }}
+                      >
+                        <span className="font-bold" style={{ color: '#1e2749' }}>2</span>
+                      </div>
+                      <div>
+                        <p className="font-semibold" style={{ color: '#ffffff' }}>Deliver Real Strategies</p>
+                        <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>Practical tools that work Monday morning</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: '#ffba06' }}
+                      >
+                        <span className="font-bold" style={{ color: '#1e2749' }}>3</span>
+                      </div>
+                      <div>
+                        <p className="font-semibold" style={{ color: '#ffffff' }}>Prioritize Wellness</p>
+                        <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>Sustainable teaching starts with supported teachers</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-4">
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: '#ffba06' }}
+                      >
+                        <span className="font-bold" style={{ color: '#1e2749' }}>4</span>
+                      </div>
+                      <div>
+                        <p className="font-semibold" style={{ color: '#ffffff' }}>Measure What Matters</p>
+                        <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>Real impact, not just attendance sheets</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Admin Outcomes */}
+                  <div className="mt-6 pt-6 border-t border-white/20">
+                    <p className="text-sm font-semibold mb-3" style={{ color: '#ffba06' }}>For Administrators:</p>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Staff Retention</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Culture Building</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Measurable ROI</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Scalable PD</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Teacher Morale</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
-            <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
-              And what started as a personal mission quickly became a movement.
-            </p>
-            <p className="text-lg font-semibold" style={{ color: '#1e2749' }}>
-              Today, TDI serves 87,000+ educators across 21 states, proving that teachers don't have to choose between doing great work and having a life.
-            </p>
+
           </div>
         </div>
       </section>
