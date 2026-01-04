@@ -35,6 +35,26 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Stats Section */}
+      <section className="py-16" style={{ backgroundColor: '#80a4ed' }}>
+        <div className="container-default">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>38%</p>
+              <p style={{ color: '#ffffff', opacity: 0.9 }}>increase in strategy implementation</p>
+            </div>
+            <div>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>95%</p>
+              <p style={{ color: '#ffffff', opacity: 0.9 }}>of teachers saved planning time</p>
+            </div>
+            <div>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>87K+</p>
+              <p style={{ color: '#ffffff', opacity: 0.9 }}>educators in our community</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* How It Started */}
       <section className="relative py-20 md:py-28 overflow-hidden">
         {/* Background Image */}
@@ -157,26 +177,6 @@ export default function AboutPage() {
 
             </div>
 
-          </div>
-        </div>
-      </section>
-
-      {/* Stats Section */}
-      <section className="py-16" style={{ backgroundColor: '#80a4ed' }}>
-        <div className="container-default">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-            <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>38%</p>
-              <p style={{ color: '#ffffff', opacity: 0.9 }}>increase in strategy implementation</p>
-            </div>
-            <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>95%</p>
-              <p style={{ color: '#ffffff', opacity: 0.9 }}>of teachers saved planning time</p>
-            </div>
-            <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>87K+</p>
-              <p style={{ color: '#ffffff', opacity: 0.9 }}>educators in our community</p>
-            </div>
           </div>
         </div>
       </section>
