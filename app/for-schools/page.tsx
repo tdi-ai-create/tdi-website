@@ -220,7 +220,7 @@ export default function ForSchoolsPage() {
             {/* Principals */}
             <a
               href="/contact"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all h-full flex flex-col"
             >
               <div className="h-[160px] overflow-hidden">
                 <img
@@ -230,14 +230,14 @@ export default function ForSchoolsPage() {
                   style={{ filter: 'grayscale(100%)' }}
                 />
               </div>
-              <div className="bg-white p-4">
+              <div className="bg-white p-4 flex-1 flex flex-col">
                 <h3
                   className="text-base font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
                   Principals
                 </h3>
-                <p className="text-sm mb-2" style={{ color: '#1e2749', opacity: 0.7 }}>
+                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7 }}>
                   PD your teachers won't dread. Results you can see in classrooms.
                 </p>
                 <span className="font-semibold text-sm" style={{ color: '#80a4ed' }}>
@@ -249,7 +249,7 @@ export default function ForSchoolsPage() {
             {/* Superintendents */}
             <a
               href="/contact"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all h-full flex flex-col"
             >
               <div className="h-[160px] overflow-hidden">
                 <img
@@ -259,14 +259,14 @@ export default function ForSchoolsPage() {
                   style={{ filter: 'grayscale(100%)' }}
                 />
               </div>
-              <div className="bg-white p-4">
+              <div className="bg-white p-4 flex-1 flex flex-col">
                 <h3
                   className="text-base font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
                   Superintendents
                 </h3>
-                <p className="text-sm mb-2" style={{ color: '#1e2749', opacity: 0.7 }}>
+                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7 }}>
                   District-wide scale, board-ready outcomes, and budget flexibility.
                 </p>
                 <span className="font-semibold text-sm" style={{ color: '#80a4ed' }}>
@@ -278,7 +278,7 @@ export default function ForSchoolsPage() {
             {/* Curriculum Directors */}
             <a
               href="/contact"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all h-full flex flex-col"
             >
               <div className="h-[160px] overflow-hidden">
                 <img
@@ -288,15 +288,15 @@ export default function ForSchoolsPage() {
                   style={{ filter: 'grayscale(100%)' }}
                 />
               </div>
-              <div className="bg-white p-4">
+              <div className="bg-white p-4 flex-1 flex flex-col">
                 <h3
                   className="text-base font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
                   Curriculum Directors
                 </h3>
-                <p className="text-sm mb-2" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  PD that integrates with existing initiatives and shows measurable implementation.
+                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  PD that integrates with your initiatives and shows implementation.
                 </p>
                 <span className="font-semibold text-sm" style={{ color: '#80a4ed' }}>
                   Let's talk →
@@ -307,7 +307,7 @@ export default function ForSchoolsPage() {
             {/* HR Directors */}
             <a
               href="/contact"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all h-full flex flex-col"
             >
               <div className="h-[160px] overflow-hidden">
                 <img
@@ -317,15 +317,15 @@ export default function ForSchoolsPage() {
                   style={{ filter: 'grayscale(100%)' }}
                 />
               </div>
-              <div className="bg-white p-4">
+              <div className="bg-white p-4 flex-1 flex flex-col">
                 <h3
                   className="text-base font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
                   HR Directors
                 </h3>
-                <p className="text-sm mb-2" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  Data that ties teacher support to retention and turnover reduction.
+                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  Data that ties teacher support to retention and turnover.
                 </p>
                 <span className="font-semibold text-sm" style={{ color: '#80a4ed' }}>
                   Let's talk →
