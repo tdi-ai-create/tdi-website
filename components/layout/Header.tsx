@@ -1,81 +1,60 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { useState } from 'react';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const navLinks = [
+    { href: '/join', label: 'Join' },
+    { href: '/for-schools', label: 'For Schools' },
+    { href: '/for-schools/pricing', label: 'Pricing' },
+    { href: 'https://raehughart.substack.com', label: 'Blog', external: true },
+    { href: 'https://podcasts.apple.com/us/podcast/teachers-deserve-it', label: 'Podcast', external: true },
+    { href: '/about', label: 'About' },
+    { href: '/contact', label: 'Contact' },
+  ];
+
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
-      <div className="container-wide px-6 md:px-16">
-        <div className="flex items-center justify-between h-20">
+      <div className="container-wide">
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="flex items-center">
-            <Image 
-              src="/images/logo.png" 
-              alt="Teachers Deserve It" 
-              width={160}
-              height={48}
-              className="h-12 w-auto"
-              priority
-            />
+          <Link href="/" className="font-bold text-xl" style={{ color: 'var(--tdi-charcoal)' }}>
+            Teachers Deserve It
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-6">
-            <Link 
-              href="/what-we-offer" 
-              className="text-base font-medium hover:opacity-70 transition-opacity"
-              style={{ color: 'var(--tdi-charcoal)' }}
-            >
-              What We Offer
-            </Link>
-            <Link 
-              href="/for-schools" 
-              className="text-base font-medium hover:opacity-70 transition-opacity"
-              style={{ color: 'var(--tdi-charcoal)' }}
-            >
-              For Schools
-            </Link>
-            <Link 
-              href="/for-schools/pricing" 
-              className="text-base font-medium hover:opacity-70 transition-opacity"
-              style={{ color: 'var(--tdi-charcoal)' }}
-            >
-              Pricing
-            </Link>
-            <a 
-              href="https://raehughart.substack.com" 
-              target="_blank" 
+            {navLinks.map((link) => (
+              link.external ? (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium hover:opacity-70 transition-opacity"
+                  style={{ color: 'var(--tdi-charcoal)' }}
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-sm font-medium hover:opacity-70 transition-opacity"
+                  style={{ color: 'var(--tdi-charcoal)' }}
+                >
+                  {link.label}
+                </Link>
+              )
+            ))}
+            <a
+              href="https://tdi.thinkific.com"
+              target="_blank"
               rel="noopener noreferrer"
-              className="text-base font-medium hover:opacity-70 transition-opacity"
-              style={{ color: 'var(--tdi-charcoal)' }}
-            >
-              Blog
-            </a>
-            <a 
-              href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-base font-medium hover:opacity-70 transition-opacity"
-              style={{ color: 'var(--tdi-charcoal)' }}
-            >
-              Podcast
-            </a>
-            <Link 
-              href="/about" 
-              className="text-base font-medium hover:opacity-70 transition-opacity"
-              style={{ color: 'var(--tdi-charcoal)' }}
-            >
-              About
-            </Link>
-            <a 
-              href="https://tdi.thinkific.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="btn-primary text-sm py-3 px-6"
+              className="btn-primary text-sm"
             >
               Learning Hub
             </a>
@@ -88,11 +67,11 @@ export function Header() {
             aria-label="Toggle menu"
           >
             <svg
-              className="w-6 h-6"
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-6 w-6"
               fill="none"
-              stroke="currentColor"
               viewBox="0 0 24 24"
-              style={{ color: 'var(--tdi-charcoal)' }}
+              stroke="currentColor"
             >
               {mobileMenuOpen ? (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -103,76 +82,48 @@ export function Header() {
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Nav */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-100">
-            <nav className="flex flex-col gap-4">
-              <Link 
-                href="/what-we-offer" 
-                className="text-base font-medium py-2"
-                style={{ color: 'var(--tdi-charcoal)' }}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                What We Offer
-              </Link>
-              <Link 
-                href="/for-schools" 
-                className="text-base font-medium py-2"
-                style={{ color: 'var(--tdi-charcoal)' }}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                For Schools
-              </Link>
-              <Link 
-                href="/for-schools/pricing" 
-                className="text-base font-medium py-2"
-                style={{ color: 'var(--tdi-charcoal)' }}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Pricing
-              </Link>
-              <a 
-                href="https://raehughart.substack.com" 
-                target="_blank" 
+          <nav className="md:hidden py-4 border-t border-gray-100">
+            <div className="flex flex-col gap-4">
+              {navLinks.map((link) => (
+                link.external ? (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm font-medium"
+                    style={{ color: 'var(--tdi-charcoal)' }}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </a>
+                ) : (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="text-sm font-medium"
+                    style={{ color: 'var(--tdi-charcoal)' }}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                )
+              ))}
+              <a
+                href="https://tdi.thinkific.com"
+                target="_blank"
                 rel="noopener noreferrer"
-                className="text-base font-medium py-2"
-                style={{ color: 'var(--tdi-charcoal)' }}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Blog
-              </a>
-              <a 
-                href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-base font-medium py-2"
-                style={{ color: 'var(--tdi-charcoal)' }}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Podcast
-              </a>
-              <Link 
-                href="/about" 
-                className="text-base font-medium py-2"
-                style={{ color: 'var(--tdi-charcoal)' }}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                About
-              </Link>
-              <a 
-                href="https://tdi.thinkific.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="btn-primary text-center mt-2"
+                className="btn-primary text-sm text-center"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Learning Hub
               </a>
-            </nav>
-          </div>
+            </div>
+          </nav>
         )}
       </div>
     </header>
   );
 }
-

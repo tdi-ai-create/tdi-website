@@ -1,189 +1,144 @@
 'use client';
 
 import { useState } from 'react';
-import { Section, Container, Button, Input, Textarea, Select } from '@/components/ui';
-import { Instagram, Linkedin, Facebook, Mail } from 'lucide-react';
-
-const roleOptions = [
-  { value: 'teacher', label: 'Teacher' },
-  { value: 'principal', label: 'Principal' },
-  { value: 'assistant-principal', label: 'Assistant Principal' },
-  { value: 'superintendent', label: 'Superintendent' },
-  { value: 'curriculum-director', label: 'Curriculum Director' },
-  { value: 'hr-director', label: 'HR Director' },
-  { value: 'instructional-coach', label: 'Instructional Coach' },
-  { value: 'other', label: 'Other' },
-];
 
 export default function ContactPage() {
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    role: '',
+    message: ''
+  });
+  const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('submitting');
-
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-
-    try {
-      // Replace with your actual Formspree endpoint
-      const response = await fetch('https://formspree.io/f/mojvkpqp', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          Accept: 'application/json',
-        },
-      });
-
-      if (response.ok) {
-        setStatus('success');
-        form.reset();
-      } else {
-        setStatus('error');
-      }
-    } catch {
-      setStatus('error');
-    }
+    // TODO: Connect to form handling service
+    console.log('Form submitted:', formData);
+    setSubmitted(true);
   };
 
   return (
-    <>
-      {/* Hero Section */}
-      <Section background="white" className="pt-16 md:pt-24">
-        <Container width="default">
-          <div className="text-center">
-            <h1 className="mb-4">Get in Touch</h1>
-            <p className="text-xl" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              Questions, ideas, or just want to say hi? We'd love to hear from you.
-            </p>
-          </div>
-        </Container>
-      </Section>
+    <main className="min-h-screen">
+      {/* Hero */}
+      <section className="section" style={{ backgroundColor: 'var(--tdi-teal)' }}>
+        <div className="container-default text-center">
+          <h1 className="mb-4" style={{ color: 'white' }}>Get in Touch</h1>
+          <p className="text-xl max-w-2xl mx-auto" style={{ color: 'white', opacity: 0.9 }}>
+            Questions? Ideas? Just want to say hi? We'd love to hear from you.
+          </p>
+        </div>
+      </section>
 
-      {/* Contact Form & Info */}
-      <Section background="white" className="pt-0">
-        <Container width="default">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            {/* Form */}
-            <div>
-              {status === 'success' ? (
-                <div className="p-8 rounded-xl text-center" style={{ backgroundColor: 'var(--tdi-peach)' }}>
-                  <div className="text-4xl mb-4">✅</div>
-                  <h3 className="mb-2">Thanks for reaching out!</h3>
-                  <p style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-                    We'll get back to you within 1-2 business days.
-                  </p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <Input
-                    label="Name"
-                    name="name"
+      {/* Contact Form */}
+      <section className="section bg-white">
+        <div className="container-default">
+          <div className="max-w-xl mx-auto">
+            {submitted ? (
+              <div className="text-center py-12">
+                <h2 className="mb-4">Thanks for reaching out!</h2>
+                <p style={{ opacity: 0.7 }}>
+                  We'll get back to you within 24 hours.
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-semibold mb-2">
+                    Your Name
+                  </label>
+                  <input
                     type="text"
-                    placeholder="Your name"
+                    id="name"
                     required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500"
                   />
-                  
-                  <Input
-                    label="Email"
-                    name="email"
+                </div>
+
+                <div>
+                  <label htmlFor="email" className="block text-sm font-semibold mb-2">
+                    Email Address
+                  </label>
+                  <input
                     type="email"
-                    placeholder="your@email.com"
+                    id="email"
                     required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500"
                   />
-                  
-                  <Select
-                    label="Your Role"
-                    name="role"
-                    options={roleOptions}
-                    placeholder="Select your role"
-                    required
-                  />
-                  
-                  <Textarea
-                    label="Message"
-                    name="message"
-                    placeholder="How can we help?"
+                </div>
+
+                <div>
+                  <label htmlFor="role" className="block text-sm font-semibold mb-2">
+                    I am a...
+                  </label>
+                  <select
+                    id="role"
+                    value={formData.role}
+                    onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500"
+                  >
+                    <option value="">Select one</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="paraprofessional">Paraprofessional</option>
+                    <option value="principal">Principal</option>
+                    <option value="assistant-principal">Assistant Principal</option>
+                    <option value="curriculum-director">Curriculum Director</option>
+                    <option value="superintendent">Superintendent</option>
+                    <option value="district-admin">District Administrator</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label htmlFor="message" className="block text-sm font-semibold mb-2">
+                    Your Message
+                  </label>
+                  <textarea
+                    id="message"
                     rows={5}
                     required
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500"
                   />
-
-                  <Button type="submit" disabled={status === 'submitting'}>
-                    {status === 'submitting' ? 'Sending...' : 'Send Message'}
-                  </Button>
-
-                  {status === 'error' && (
-                    <p className="text-sm" style={{ color: 'var(--tdi-coral)' }}>
-                      Something went wrong. Please try again or email us directly.
-                    </p>
-                  )}
-                </form>
-              )}
-            </div>
-
-            {/* Contact Info */}
-            <div>
-              <h3 className="mb-6">Other Ways to Reach Us</h3>
-              
-              <div className="space-y-6">
-                <div>
-                  <h4 className="mb-2">Email</h4>
-                  <a 
-                    href="mailto:info@teachersdeserveit.com"
-                    className="flex items-center gap-2"
-                  >
-                    <Mail className="w-5 h-5" />
-                    info@teachersdeserveit.com
-                  </a>
                 </div>
 
-                <div>
-                  <h4 className="mb-3">Social</h4>
-                  <div className="flex gap-4">
-                    <a
-                      href="https://www.instagram.com/teachersdeserveit/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-3 rounded-lg hover:bg-gray-100 transition-colors"
-                      aria-label="Instagram"
-                    >
-                      <Instagram className="w-6 h-6" />
-                    </a>
-                    <a
-                      href="https://www.linkedin.com/in/rae-hughart/"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-3 rounded-lg hover:bg-gray-100 transition-colors"
-                      aria-label="LinkedIn"
-                    >
-                      <Linkedin className="w-6 h-6" />
-                    </a>
-                    <a
-                      href="https://www.facebook.com/profile.php?id=61568079585675"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-3 rounded-lg hover:bg-gray-100 transition-colors"
-                      aria-label="Facebook"
-                    >
-                      <Facebook className="w-6 h-6" />
-                    </a>
-                  </div>
-                </div>
+                <button type="submit" className="btn-primary w-full">
+                  Send Message
+                </button>
+              </form>
+            )}
 
-                <div className="p-6 rounded-xl" style={{ backgroundColor: 'var(--tdi-peach)' }}>
-                  <h4 className="mb-2">For School Partnerships</h4>
-                  <p className="mb-4" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-                    Ready to discuss bringing TDI to your school or district?
-                  </p>
-                  <Button href="/for-schools/schedule-call" variant="secondary">
-                    Schedule a Call
-                  </Button>
-                </div>
-              </div>
+            <div className="mt-12 pt-8 border-t border-gray-200">
+              <p className="text-center mb-4" style={{ opacity: 0.7 }}>
+                Prefer email? Reach us directly at:
+              </p>
+              <p className="text-center">
+                <a 
+                  href="mailto:hello@teachersdeserveit.com" 
+                  className="font-semibold"
+                  style={{ color: 'var(--tdi-teal)' }}
+                >
+                  hello@teachersdeserveit.com
+                </a>
+              </p>
             </div>
           </div>
-        </Container>
-      </Section>
-    </>
+        </div>
+      </section>
+
+      {/* Response Time */}
+      <section className="section" style={{ backgroundColor: 'var(--tdi-peach)' }}>
+        <div className="container-default text-center">
+          <p className="text-lg">
+            We respond to all inquiries within <strong>24 hours</strong>.
+          </p>
+        </div>
+      </section>
+    </main>
   );
 }
