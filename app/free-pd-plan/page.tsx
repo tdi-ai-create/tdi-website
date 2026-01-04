@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 
 interface FormData {
@@ -32,6 +32,7 @@ interface FormData {
 }
 
 export default function FreePDPlanPage() {
+  const formRef = useRef<HTMLDivElement>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
     staffCount: '',
@@ -117,6 +118,12 @@ export default function FreePDPlanPage() {
       updateFormData(field, currentValues.filter(v => v !== value));
     } else {
       updateFormData(field, [...currentValues, value]);
+    }
+  };
+
+  const scrollToForm = () => {
+    if (formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   };
 
@@ -814,7 +821,7 @@ export default function FreePDPlanPage() {
       </section>
 
       {/* Form Section */}
-      <section className="py-12 md:py-16" style={{ backgroundColor: '#f5f5f5' }}>
+      <section ref={formRef} className="py-12 md:py-16" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -870,7 +877,10 @@ export default function FreePDPlanPage() {
                   <div className="flex justify-between mt-8 pt-6 border-t" style={{ borderColor: '#e5e5e5' }}>
                     {currentStep > 1 ? (
                       <button
-                        onClick={() => setCurrentStep(currentStep - 1)}
+                        onClick={() => {
+                          setCurrentStep(currentStep - 1);
+                          scrollToForm();
+                        }}
                         className="px-6 py-3 rounded-lg font-semibold border-2 transition-all hover:bg-gray-50"
                         style={{ borderColor: '#1e2749', color: '#1e2749' }}
                       >
@@ -880,7 +890,14 @@ export default function FreePDPlanPage() {
                       <div />
                     )}
                     <button
-                      onClick={() => currentStep < totalSteps ? setCurrentStep(currentStep + 1) : handleSubmit()}
+                      onClick={() => {
+                        if (currentStep < totalSteps) {
+                          setCurrentStep(currentStep + 1);
+                          scrollToForm();
+                        } else {
+                          handleSubmit();
+                        }
+                      }}
                       disabled={!canProceed() || isSubmitting}
                       className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                       style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
