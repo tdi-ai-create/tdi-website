@@ -1,147 +1,322 @@
-import { Metadata } from 'next';
-import { Section, Container, Button, StatCard } from '@/components/ui';
-
-export const metadata: Metadata = {
-  title: 'About',
-  description: "TDI was founded by a burned-out teacher who asked: what if PD actually worked? Now serving 87,000+ educators in 21 states. Meet the team behind the movement.",
-};
-
-const stats = [
-  { number: '38%', label: 'increase in strategy implementation' },
-  { number: '95%', label: 'of teachers saved planning time' },
-  { number: '87,000+', label: 'educators in our community' },
-];
-
-const values = [
-  { emoji: '💪', text: 'Empowerment over overwhelm' },
-  { emoji: '🎯', text: 'Strategy over survival' },
-  { emoji: '👑', text: 'Leadership at every level' },
-  { emoji: '💚', text: 'Wellness as non-negotiable' },
-  { emoji: '✨', text: "Creativity that fits your time, not takes all of it" },
-];
-
-const team = [
-  { name: 'Rae Hughart', role: 'CEO & Founder' },
-  { name: 'Omar Garcia', role: 'CFO' },
-  { name: 'Kristin Williams', role: 'CMO' },
-];
+import Link from 'next/link';
 
 export default function AboutPage() {
   return (
-    <>
-      {/* Hero Section */}
-      <Section background="white" className="pt-16 md:pt-24">
-        <Container width="default">
-          <div className="text-center">
-            <h1 className="mb-4">We Believe Teaching Shouldn't Feel Like Survival</h1>
-            <p className="text-xl" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              We're on a mission to build a system that actually supports the educators inside it.
-            </p>
-          </div>
-        </Container>
-      </Section>
+    <main>
+      {/* Hero Section with Background Image */}
+      <section className="relative py-20 md:py-28 overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: "url('/images/hero-about.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
 
-      {/* Rae's Story */}
-      <Section background="pink">
-        <Container width="default">
-          <h2 className="text-center mb-8">How It Started</h2>
-          <div className="max-w-2xl mx-auto">
-            <p className="text-lg mb-6">
+        {/* Navy Gradient Overlay */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(180deg, rgba(30, 39, 73, 0.65) 0%, rgba(30, 39, 73, 0.85) 100%)'
+          }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 container-default text-center">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#ffffff' }}>
+            We Believe Teaching Shouldn't Feel Like Survival
+          </h1>
+          <p className="text-lg max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
+            We're on a mission to build a system that actually supports the educators inside it.
+          </p>
+        </div>
+      </section>
+
+      {/* How It Started */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="container-default">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
+            How It Started
+          </h2>
+
+          <div className="max-w-3xl mx-auto">
+            <p className="text-lg mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
               Teachers Deserve It was born from burnout.
             </p>
-            <p className="text-lg mb-6">
+            <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
               Rae Hughart was a passionate, high-performing educator who was ready to walk away from the classroom. The system wasn't built to sustain passionate teachers. It was built to stretch them thin.
             </p>
-            <p className="text-lg mb-6">
+            <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
               So she started asking new questions:
             </p>
-            <div className="pl-6 border-l-4 mb-6" style={{ borderColor: 'var(--tdi-yellow)' }}>
-              <p className="text-lg italic mb-2">What if professional development didn't take up your entire weekend?</p>
-              <p className="text-lg italic mb-2">What if creativity wasn't a luxury, but the norm?</p>
-              <p className="text-lg italic">What if we gave teachers the tools they actually needed to thrive?</p>
+            <div className="pl-6 border-l-4 mb-6" style={{ borderColor: '#ffba06' }}>
+              <p className="italic mb-2" style={{ color: '#1e2749' }}>What if professional development didn't take up your entire weekend?</p>
+              <p className="italic mb-2" style={{ color: '#1e2749' }}>What if creativity wasn't a luxury, but the norm?</p>
+              <p className="italic" style={{ color: '#1e2749' }}>What if we gave teachers the tools they actually needed to thrive?</p>
             </div>
-            <p className="text-lg mb-6">
+            <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
               And what started as a personal mission quickly became a movement.
             </p>
-            <p className="text-lg font-semibold">
+            <p className="text-lg font-semibold" style={{ color: '#1e2749' }}>
               Today, TDI serves 87,000+ educators across 21 states, proving that teachers don't have to choose between doing great work and having a life.
             </p>
           </div>
-        </Container>
-      </Section>
+        </div>
+      </section>
 
       {/* Stats Section */}
-      <Section background="white">
-        <Container>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {stats.map((stat, index) => (
-              <StatCard key={index} number={stat.number} label={stat.label} />
-            ))}
+      <section className="py-16" style={{ backgroundColor: '#80a4ed' }}>
+        <div className="container-default">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>38%</p>
+              <p style={{ color: '#ffffff', opacity: 0.9 }}>increase in strategy implementation</p>
+            </div>
+            <div>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>95%</p>
+              <p style={{ color: '#ffffff', opacity: 0.9 }}>of teachers saved planning time</p>
+            </div>
+            <div>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>87K+</p>
+              <p style={{ color: '#ffffff', opacity: 0.9 }}>educators in our community</p>
+            </div>
           </div>
-          <p className="text-center mt-8" style={{ color: 'var(--tdi-charcoal)', opacity: 0.7 }}>
-            Administrators report stronger morale, greater trust, and improved retention after TDI Support Sessions.
-          </p>
-        </Container>
-      </Section>
+        </div>
+      </section>
 
-      {/* Values Section */}
-      <Section background="pink">
-        <Container width="default">
-          <h2 className="text-center mb-8">What We Stand For</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {values.map((value, index) => (
-              <div key={index} className="flex items-center gap-3 p-4 bg-white rounded-lg">
-                <span className="text-2xl">{value.emoji}</span>
-                <span className="font-medium">{value.text}</span>
+      {/* Meet Rae Section */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-default">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
+            Meet the Founder
+          </h2>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
+            {/* Photo */}
+            <div className="flex justify-center">
+              <img
+                src="/images/rae-headshot.png"
+                alt="Rae Hughart"
+                className="rounded-2xl shadow-lg w-full max-w-md"
+                style={{ filter: 'grayscale(100%)' }}
+              />
+            </div>
+
+            {/* Bio */}
+            <div>
+              <h3 className="text-2xl font-bold mb-2" style={{ color: '#1e2749' }}>Rae Hughart</h3>
+              <p className="text-lg mb-4" style={{ color: '#80a4ed' }}>CEO & Founder</p>
+
+              <p className="mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
+                Rae Hughart is an award-winning educator, internationally recognized speaker, and bestselling author dedicated to transforming how we support teachers.
+              </p>
+              <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
+                After experiencing burnout firsthand, she founded Teachers Deserve It to create sustainable professional development that respects educators' time while delivering real results.
+              </p>
+
+              {/* Links */}
+              <div className="space-y-3">
+                <a
+                  href="https://www.youtube.com/watch?v=OLzaa7Hv3mo&list=PPSV"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 font-semibold transition-colors hover:opacity-80"
+                  style={{ color: '#1e2749' }}
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                  Watch the TEDx Talk
+                </a>
+
+                <a
+                  href="https://www.amazon.com/stores/Rae-Hughart/author/B07D7STZCJ"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 font-semibold transition-colors hover:opacity-80"
+                  style={{ color: '#1e2749' }}
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2L3 7l1.63 1.27A2 2 0 0 0 4 10v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-.63-1.73L21 7l-9-5zM6 10h12v8H6v-8zm6-5.5L17.5 8H6.5L12 4.5z"/>
+                  </svg>
+                  Books on Amazon
+                </a>
               </div>
-            ))}
+
+              {/* Social Links */}
+              <div className="flex gap-4 mt-6">
+                <a
+                  href="https://www.instagram.com/teachersdeserveit/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                  style={{ backgroundColor: '#1e2749' }}
+                >
+                  <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                  </svg>
+                </a>
+                <a
+                  href="https://www.linkedin.com/in/rae-hughart/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                  style={{ backgroundColor: '#1e2749' }}
+                >
+                  <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                </a>
+                <a
+                  href="https://twitter.com/RaeHughart"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                  style={{ backgroundColor: '#1e2749' }}
+                >
+                  <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </a>
+                <a
+                  href="https://www.facebook.com/profile.php?id=61568079585675"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                  style={{ backgroundColor: '#1e2749' }}
+                >
+                  <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
+                    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
           </div>
-        </Container>
-      </Section>
+        </div>
+      </section>
 
       {/* Team Section */}
-      <Section background="white">
-        <Container width="default">
-          <h2 className="text-center mb-4">The Team Behind TDI</h2>
-          <p className="text-center mb-12" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-            We're a diverse team of passionate professionals dedicated to supporting educators and enhancing the teaching experience.
+      <section className="py-16 md:py-20 bg-white">
+        <div className="container-default">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+            The Team Behind TDI
+          </h2>
+          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+            A diverse team of passionate professionals dedicated to supporting educators and enhancing the teaching experience.
           </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-3xl mx-auto">
-            {team.map((member, index) => (
-              <div key={index} className="text-center">
-                <div 
-                  className="w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl"
-                  style={{ backgroundColor: 'var(--tdi-gray)' }}
-                >
-                  👤
-                </div>
-                <h4 className="mb-1">{member.name}</h4>
-                <p className="text-sm" style={{ color: 'var(--tdi-charcoal)', opacity: 0.7 }}>
-                  {member.role}
-                </p>
-              </div>
-            ))}
-          </div>
-          
-          <p className="text-center mt-8 text-sm" style={{ color: 'var(--tdi-charcoal)', opacity: 0.7 }}>
-            Plus content creators, district liaisons, and administrative support. All working toward one goal: helping teachers thrive.
-          </p>
-        </Container>
-      </Section>
 
-      {/* CTA Section */}
-      <Section background="pink">
-        <Container width="default">
-          <div className="text-center">
-            <h2 className="mb-4">Want to See What TDI Can Do for Your School?</h2>
-            <p className="text-lg mb-8" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              Whether you're a teacher ready to take back your time or a district leader searching for sustainable PD that actually sticks, we're here to help.
-            </p>
-            <Button href="/contact">Contact the Team</Button>
+          {/* Leadership Row */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-8">
+            <div className="text-center p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+              <div
+                className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center"
+                style={{ backgroundColor: '#ffba06' }}
+              >
+                <svg className="w-8 h-8" fill="#1e2749" viewBox="0 0 24 24">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+              <h4 className="font-bold" style={{ color: '#1e2749' }}>Rae Hughart</h4>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>CEO & Founder</p>
+            </div>
+            <div className="text-center p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+              <div
+                className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center"
+                style={{ backgroundColor: '#80a4ed' }}
+              >
+                <svg className="w-8 h-8" fill="white" viewBox="0 0 24 24">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+              <h4 className="font-bold" style={{ color: '#1e2749' }}>Omar Garcia</h4>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>CFO</p>
+            </div>
+            <div className="text-center p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+              <div
+                className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center"
+                style={{ backgroundColor: '#80a4ed' }}
+              >
+                <svg className="w-8 h-8" fill="white" viewBox="0 0 24 24">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+              <h4 className="font-bold" style={{ color: '#1e2749' }}>Kristin Williams</h4>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>CMO</p>
+            </div>
           </div>
-        </Container>
-      </Section>
-    </>
+
+          {/* Extended Team */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            <div className="text-center p-4">
+              <h4 className="font-semibold text-sm" style={{ color: '#1e2749' }}>Rachel Patragas</h4>
+              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Director of Creative Solutions</p>
+            </div>
+            <div className="text-center p-4">
+              <h4 className="font-semibold text-sm" style={{ color: '#1e2749' }}>Ian R Bowen</h4>
+              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
+            </div>
+            <div className="text-center p-4">
+              <h4 className="font-semibold text-sm" style={{ color: '#1e2749' }}>Erin Light</h4>
+              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
+            </div>
+            <div className="text-center p-4">
+              <h4 className="font-semibold text-sm" style={{ color: '#1e2749' }}>Katie Welch</h4>
+              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
+            </div>
+            <div className="text-center p-4">
+              <h4 className="font-semibold text-sm" style={{ color: '#1e2749' }}>Sue Thompson</h4>
+              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
+            </div>
+            <div className="text-center p-4">
+              <h4 className="font-semibold text-sm" style={{ color: '#1e2749' }}>Tyson Gardin</h4>
+              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
+            </div>
+            <div className="text-center p-4">
+              <h4 className="font-semibold text-sm" style={{ color: '#1e2749' }}>Walter Cullin Jr</h4>
+              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
+            </div>
+            <div className="text-center p-4">
+              <h4 className="font-semibold text-sm" style={{ color: '#1e2749' }}>Paige Roberts</h4>
+              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
+            </div>
+          </div>
+
+          <p className="text-center mt-8 text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>
+            Plus district liaisons and administrative support, all working toward one goal: helping teachers thrive.
+          </p>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#80a4ed' }}>
+        <div className="container-default text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#ffffff' }}>
+            Want to See What TDI Can Do for Your School?
+          </h2>
+          <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
+            Whether you're a teacher ready to take back your time or a district leader searching for sustainable PD that actually sticks, we're here to help.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/free-pd-plan"
+              className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            >
+              Get Your Free PD Plan
+            </a>
+            <a
+              href="/contact"
+              className="px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-white/10"
+              style={{ borderColor: '#ffffff', color: '#ffffff' }}
+            >
+              Schedule a Call
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
   );
 }
