@@ -177,6 +177,10 @@ export default function AboutPage() {
                       <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Teacher Morale</span>
                     </div>
                   </div>
+
+                  <p className="text-sm italic mt-4" style={{ color: '#ffffff', opacity: 0.8 }}>
+                    We stand behind our work with a 30-day turnaround guarantee on custom requests for partner schools.
+                  </p>
                 </div>
               </div>
 
