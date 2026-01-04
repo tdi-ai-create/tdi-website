@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { TDICalculator } from '@/components/calculators';
 
 export default function Home() {
   return (
@@ -150,8 +151,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonials */}
+      {/* Impact Calculator Section */}
       <section className="section" style={{ backgroundColor: 'var(--tdi-peach)' }}>
+        <div className="container-wide">
+          <div className="max-w-4xl mx-auto">
+            <TDICalculator />
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="section bg-white">
         <div className="container-wide">
           <h2 className="text-center mb-12">What Educators Are Saying</h2>
 
