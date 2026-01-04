@@ -156,10 +156,10 @@ export default function Home() {
                   <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>1</span>
                 </div>
                 <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  A Need Emerges
+                  Listen
                 </h3>
                 <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
-                  Teachers or partner schools identify a pain point
+                  Teachers identify what they need
                 </p>
               </div>
 
@@ -177,10 +177,10 @@ export default function Home() {
                   <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>2</span>
                 </div>
                 <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Experts Assemble
+                  Collaborate
                 </h3>
                 <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
-                  Specialists and practitioners collaborate on solutions
+                  Experts and practitioners team up
                 </p>
               </div>
 
@@ -198,10 +198,10 @@ export default function Home() {
                   <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>3</span>
                 </div>
                 <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Research &<br />Design
+                  Design
                 </h3>
                 <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
-                  Grounded in current research, shaped into tools
+                  Research-backed, actionable tools
                 </p>
               </div>
 
@@ -219,10 +219,10 @@ export default function Home() {
                   <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>4</span>
                 </div>
                 <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Publish<br />to Hub
+                  Publish
                 </h3>
                 <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
-                  Courses and resources go live
+                  Live in the Learning Hub
                 </p>
               </div>
 
@@ -240,10 +240,10 @@ export default function Home() {
                   <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>5</span>
                 </div>
                 <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Delivered
+                  Deliver
                 </h3>
                 <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
-                  Targeted, ready-to-use resources
+                  Ready to use Monday morning
                 </p>
               </div>
 
