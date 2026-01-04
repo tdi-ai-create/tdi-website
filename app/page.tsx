@@ -289,13 +289,43 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 10: Calculator */}
-      <section className="section" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="container-wide">
+      {/* SECTION 10: Calculator with Parallax Background */}
+      <section className="relative py-16 md:py-24 overflow-hidden">
+        {/* Parallax Background Image */}
+        <div
+          className="absolute inset-0 parallax-calc-bg"
+          style={{
+            backgroundImage: "url('/images/calculator-background.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
+          }}
+        />
+
+        {/* Dark Overlay for readability */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundColor: 'rgba(30, 39, 73, 0.85)'
+          }}
+        />
+
+        {/* Calculator Content */}
+        <div className="relative z-10 container-default">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#ffffff' }}>
+            See What's Possible for Your School
+          </h2>
+          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
+            Input your school's current state and see the potential impact of partnering with TDI.
+          </p>
+
+          {/* Calculator Component */}
           <TDICalculator />
-          <p className="text-center text-sm mt-4" style={{ opacity: 0.6 }}>
+
+          <p className="text-center text-sm mt-4" style={{ color: '#ffffff', opacity: 0.6 }}>
             80% of schools we work with secure external funding for PD.{' '}
-            <Link href="/funding" className="underline">See how</Link>
+            <Link href="/funding" className="underline" style={{ color: '#ffffff' }}>See how</Link>
           </p>
         </div>
       </section>

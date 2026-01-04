@@ -243,3 +243,17 @@ label {
   color: var(--tdi-charcoal);
   margin-bottom: 8px;
 }
+
+/* Parallax background for calculator */
+@media (min-width: 768px) {
+  .parallax-calc-bg {
+    background-attachment: fixed;
+  }
+}
+
+/* Disable fixed attachment on mobile for performance */
+@media (max-width: 767px) {
+  .parallax-calc-bg {
+    background-attachment: scroll;
+  }
+}
