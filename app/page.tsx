@@ -156,10 +156,10 @@ export default function Home() {
                   <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>1</span>
                 </div>
                 <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Listen
+                  A Need Emerges
                 </h3>
                 <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
-                  We hear what teachers actually need
+                  Teachers or partner schools identify a pain point
                 </p>
               </div>
 
@@ -177,10 +177,10 @@ export default function Home() {
                   <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>2</span>
                 </div>
                 <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Design
+                  Experts Assemble
                 </h3>
                 <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
-                  Practical solutions that fit real life
+                  Specialists and practitioners collaborate on solutions
                 </p>
               </div>
 
@@ -198,10 +198,10 @@ export default function Home() {
                   <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>3</span>
                 </div>
                 <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Test
+                  Research & Design
                 </h3>
                 <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
-                  Real classrooms, real feedback
+                  Grounded in current research, shaped into tools
                 </p>
               </div>
 
@@ -219,10 +219,10 @@ export default function Home() {
                   <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>4</span>
                 </div>
                 <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Refine
+                  Publish to Hub
                 </h3>
                 <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
-                  Improve until it works perfectly
+                  Courses and resources go live
                 </p>
               </div>
 
@@ -240,13 +240,20 @@ export default function Home() {
                   <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>5</span>
                 </div>
                 <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Deliver
+                  Delivered
                 </h3>
                 <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
-                  Ready to use Monday morning
+                  Targeted, ready-to-use resources
                 </p>
               </div>
 
+            </div>
+
+            {/* 30-day guarantee note */}
+            <div className="text-center">
+              <p className="text-center mt-8 text-sm font-medium" style={{ color: '#ffba06', backgroundColor: '#1e2749', display: 'inline-block', padding: '8px 16px', borderRadius: '9999px', marginLeft: 'auto', marginRight: 'auto' }}>
+                Partner schools: 30-day turnaround guarantee on custom requests
+              </p>
             </div>
           </div>
         </div>
