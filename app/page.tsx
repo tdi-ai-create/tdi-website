@@ -132,10 +132,9 @@ export default function Home() {
             <div className="absolute top-12 left-[10%] right-[10%] h-1 hidden md:block" style={{ backgroundColor: '#e5e7eb' }}>
               {/* Animated Pulse */}
               <div
-                className="absolute top-0 left-0 h-full w-20 rounded-full"
+                className="absolute top-0 left-0 h-full w-20 rounded-full animate-travel-pulse"
                 style={{
-                  background: 'linear-gradient(90deg, transparent, #ffba06, transparent)',
-                  animation: 'travelPulse 3s ease-in-out infinite'
+                  background: 'linear-gradient(90deg, transparent, #ffba06, transparent)'
                 }}
               />
             </div>
@@ -145,8 +144,7 @@ export default function Home() {
 
               {/* Bubble 1 */}
               <div
-                className="group flex flex-col items-center text-center"
-                style={{ animation: 'float 3s ease-in-out infinite' }}
+                className="group flex flex-col items-center text-center animate-float"
               >
                 <div
                   className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-lg relative z-10"
@@ -167,8 +165,7 @@ export default function Home() {
 
               {/* Bubble 2 */}
               <div
-                className="group flex flex-col items-center text-center"
-                style={{ animation: 'float 3s ease-in-out infinite', animationDelay: '0.3s' }}
+                className="group flex flex-col items-center text-center animate-float-delay-1"
               >
                 <div
                   className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-lg relative z-10"
@@ -189,8 +186,7 @@ export default function Home() {
 
               {/* Bubble 3 */}
               <div
-                className="group flex flex-col items-center text-center"
-                style={{ animation: 'float 3s ease-in-out infinite', animationDelay: '0.6s' }}
+                className="group flex flex-col items-center text-center animate-float-delay-2"
               >
                 <div
                   className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-lg relative z-10"
@@ -211,8 +207,7 @@ export default function Home() {
 
               {/* Bubble 4 */}
               <div
-                className="group flex flex-col items-center text-center"
-                style={{ animation: 'float 3s ease-in-out infinite', animationDelay: '0.9s' }}
+                className="group flex flex-col items-center text-center animate-float-delay-3"
               >
                 <div
                   className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-lg relative z-10"
@@ -233,8 +228,7 @@ export default function Home() {
 
               {/* Bubble 5 */}
               <div
-                className="group flex flex-col items-center text-center"
-                style={{ animation: 'float 3s ease-in-out infinite', animationDelay: '1.2s' }}
+                className="group flex flex-col items-center text-center animate-float-delay-4"
               >
                 <div
                   className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-lg relative z-10"
@@ -255,36 +249,6 @@ export default function Home() {
 
             </div>
           </div>
-
-          {/* CSS Animations */}
-          <style jsx>{`
-            @keyframes float {
-              0%, 100% {
-                transform: translateY(0px);
-              }
-              50% {
-                transform: translateY(-8px);
-              }
-            }
-
-            @keyframes travelPulse {
-              0% {
-                left: -10%;
-                opacity: 0;
-              }
-              10% {
-                opacity: 1;
-              }
-              90% {
-                opacity: 1;
-              }
-              100% {
-                left: 100%;
-                opacity: 0;
-              }
-            }
-          `}</style>
-
         </div>
       </section>
 
