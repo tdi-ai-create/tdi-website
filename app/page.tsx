@@ -281,14 +281,24 @@ export default function Home() {
                 <li>Podcast episodes for your commute</li>
                 <li>Free downloadable resources for teachers and paras</li>
               </ul>
-              <a
-                href="https://tdi.thinkific.com"
-                className="btn-primary inline-block"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/free-pd-plan"
+                className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:scale-105"
+                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
               >
-                Explore the Learning Hub
-              </a>
+                Get Your Free PD Plan
+              </Link>
+              <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
+                Or{' '}
+                <a
+                  href="https://tdi.thinkific.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline"
+                >
+                  explore the Learning Hub
+                </a>
+              </p>
             </div>
 
             {/* Schools Path */}
@@ -408,9 +418,22 @@ export default function Home() {
           <p className="text-sm mb-8" style={{ color: '#1e2749', opacity: 0.6 }}>
             Join 87,000+ educators who've already taken the first step.
           </p>
-          <Link href="/join" className="btn-primary inline-block" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
-            Join the Movement
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/free-pd-plan"
+              className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            >
+              Get Your Free PD Plan
+            </Link>
+            <Link
+              href="/contact"
+              className="inline-block px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-white/20"
+              style={{ borderColor: '#1e2749', color: '#1e2749', backgroundColor: 'transparent' }}
+            >
+              Schedule a Call
+            </Link>
+          </div>
         </div>
       </section>
     </main>

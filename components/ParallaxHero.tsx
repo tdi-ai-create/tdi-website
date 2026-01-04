@@ -86,16 +86,29 @@ export function ParallaxHero() {
               Join 87,000+ educators who are done accepting the status quo.
             </p>
 
-            <a
-              href="/join"
-              className="inline-block px-6 py-3 rounded-lg font-bold text-base transition-all hover:scale-105"
-              style={{
-                backgroundColor: '#ffba06',
-                color: '#1e2749',
-              }}
-            >
-              Join the Movement
-            </a>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <a
+                href="/free-pd-plan"
+                className="inline-block px-6 py-3 rounded-lg font-bold text-base transition-all hover:scale-105"
+                style={{
+                  backgroundColor: '#ffba06',
+                  color: '#1e2749',
+                }}
+              >
+                Get Your Free PD Plan
+              </a>
+              <a
+                href="/contact"
+                className="inline-block px-6 py-3 rounded-lg font-bold text-base border-2 transition-all hover:bg-white/10"
+                style={{
+                  borderColor: '#ffffff',
+                  color: '#ffffff',
+                  backgroundColor: 'transparent',
+                }}
+              >
+                Schedule a Call
+              </a>
+            </div>
           </div>
         </div>
       </div>
