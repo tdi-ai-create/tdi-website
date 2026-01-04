@@ -16,167 +16,152 @@ export default function JoinPage() {
       {/* Free Ways to Get Started */}
       <section className="section bg-white">
         <div className="container-default">
-          <h2 className="text-center mb-4">Free Ways to Get Started</h2>
-          <p className="text-center mb-12" style={{ opacity: 0.7 }}>
+          <h2 className="text-center mb-2">Free Ways to Get Started</h2>
+          <p className="text-center mb-12" style={{ opacity: 0.6 }}>
             No commitment. Just value.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
 
-            {/* Card 1: Blog/Newsletter */}
+            {/* Card 1: Blog/Newsletter - Light Yellow */}
             <a
               href="https://raehughart.substack.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative rounded-xl overflow-hidden h-[400px] flex flex-col shadow-lg hover:shadow-xl transition-shadow"
+              className="flex flex-col items-center group"
             >
-              {/* Background Image */}
               <div
-                className="absolute inset-0 bg-cover bg-center transition-transform group-hover:scale-105"
-                style={{ backgroundImage: "url('/images/card-blog.png')" }}
-              />
-              {/* Dark Overlay */}
-              <div className="absolute inset-0 bg-black/40" />
-
-              {/* Title - Centered on image */}
-              <div className="relative z-10 flex-1 flex items-center justify-center p-6">
-                <h3 className="text-2xl font-bold text-white text-center">
+                className="w-full h-[280px] rounded-3xl flex items-center justify-center p-8 transition-transform group-hover:scale-105"
+                style={{ backgroundColor: '#FEF3C7' }}
+              >
+                <h3
+                  className="text-xl md:text-2xl font-bold text-center uppercase tracking-wide"
+                  style={{ color: '#1e2749' }}
+                >
                   Weekly Strategies in Your Inbox
                 </h3>
               </div>
-
-              {/* White Box with Details */}
-              <div className="relative z-10 bg-white p-5">
-                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.8 }}>
-                  3x/week, practical ideas you can use immediately. Join 87,000+ educators already getting them.
-                </p>
-                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
-                  Read the latest →
-                </span>
-              </div>
+              <p className="mt-4 text-center text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                3x/week, practical ideas you can use immediately. Join 87,000+ educators.
+              </p>
             </a>
 
-            {/* Card 2: Podcast */}
+            {/* Card 2: Podcast - Yellow */}
             <a
               href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274"
               target="_blank"
               rel="noopener noreferrer"
-              className="group relative rounded-xl overflow-hidden h-[400px] flex flex-col shadow-lg hover:shadow-xl transition-shadow"
+              className="flex flex-col items-center group"
             >
-              {/* Background Image */}
               <div
-                className="absolute inset-0 bg-cover bg-center transition-transform group-hover:scale-105"
-                style={{ backgroundImage: "url('/images/card-podcast.png')" }}
-              />
-              {/* Dark Overlay */}
-              <div className="absolute inset-0 bg-black/40" />
-
-              {/* Title - Centered on image */}
-              <div className="relative z-10 flex-1 flex items-center justify-center p-6">
-                <h3 className="text-2xl font-bold text-white text-center">
+                className="w-full h-[280px] rounded-3xl flex items-center justify-center p-8 transition-transform group-hover:scale-105"
+                style={{ backgroundColor: '#ffba06' }}
+              >
+                <h3
+                  className="text-xl md:text-2xl font-bold text-center uppercase tracking-wide"
+                  style={{ color: '#1e2749' }}
+                >
                   Listen While You Commute
                 </h3>
               </div>
-
-              {/* White Box with Details */}
-              <div className="relative z-10 bg-white p-5">
-                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.8 }}>
-                  The Sustainable Teaching podcast. Real talk about sustainable teaching from people who get it.
-                </p>
-                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
-                  Start listening →
-                </span>
-              </div>
+              <p className="mt-4 text-center text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                The Sustainable Teaching podcast. Real talk from people who get it.
+              </p>
             </a>
 
-            {/* Card 3: Free Resources */}
+            {/* Card 3: Free Resources - Lightest Yellow */}
             <a
               href="/resources"
-              className="group relative rounded-xl overflow-hidden h-[400px] flex flex-col shadow-lg hover:shadow-xl transition-shadow"
+              className="flex flex-col items-center group"
             >
-              {/* Background Image */}
               <div
-                className="absolute inset-0 bg-cover bg-center transition-transform group-hover:scale-105"
-                style={{ backgroundImage: "url('/images/card-resources.png')" }}
-              />
-              {/* Dark Overlay */}
-              <div className="absolute inset-0 bg-black/40" />
-
-              {/* Title - Centered on image */}
-              <div className="relative z-10 flex-1 flex items-center justify-center p-6">
-                <h3 className="text-2xl font-bold text-white text-center">
-                  Grab a Free Resource
+                className="w-full h-[280px] rounded-3xl flex items-center justify-center p-8 transition-transform group-hover:scale-105"
+                style={{ backgroundColor: '#FEF9E7' }}
+              >
+                <h3
+                  className="text-xl md:text-2xl font-bold text-center uppercase tracking-wide"
+                  style={{ color: '#1e2749' }}
+                >
+                  Grab Your Ready to Use Free Resource
                 </h3>
               </div>
-
-              {/* White Box with Details */}
-              <div className="relative z-10 bg-white p-5">
-                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.8 }}>
-                  Ready-to-use downloads for your classroom, for teachers and paras alike.
-                </p>
-                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
-                  Browse downloads →
-                </span>
-              </div>
+              <p className="mt-4 text-center text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Ready-to-use downloads for teachers and paras alike.
+              </p>
             </a>
 
           </div>
         </div>
       </section>
 
-      {/* For Teachers */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-gray)' }}>
+      {/* For Teachers & Paraprofessionals */}
+      <section className="section" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
-          <h2 className="text-center mb-4">For Teachers</h2>
-          <p className="text-center mb-12" style={{ opacity: 0.7 }}>
+          <h2 className="text-center mb-2">For Teachers & Paraprofessionals</h2>
+          <p className="text-center mb-12" style={{ opacity: 0.6 }}>
             PD that respects your time and actually helps.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-            <a 
-              href="https://tdi.thinkific.com" 
-              target="_blank" 
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+
+            {/* Card 1: Go Deeper */}
+            <a
+              href="https://raehughart.substack.com"
+              target="_blank"
               rel="noopener noreferrer"
-              className="card hover:shadow-lg transition-shadow"
-              style={{ borderTop: '4px solid var(--tdi-coral)' }}
+              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow"
+              style={{ borderTop: '4px solid #F96767' }}
             >
-              <h3 className="text-xl mb-3">Learning Hub All-Access</h3>
-              <p className="mb-4" style={{ opacity: 0.7 }}>
+              <h3
+                className="text-xl font-bold mb-3 underline"
+                style={{ color: '#1e2749' }}
+              >
+                Go Deeper with Exclusive Content
+              </h3>
+              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Premium strategies, behind-the-scenes access, and a community of educators who are done settling for the status quo.
+              </p>
+              <span className="font-semibold text-sm" style={{ color: '#F96767' }}>
+                See premium options →
+              </span>
+            </a>
+
+            {/* Card 2: Learning Hub */}
+            <a
+              href="https://tdi.thinkific.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow"
+              style={{ borderTop: '4px solid #F96767' }}
+            >
+              <h3
+                className="text-xl font-bold mb-3"
+                style={{ color: '#1e2749' }}
+              >
+                Learning Hub All-Access
+              </h3>
+              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
                 100+ hours of on-demand PD. Bite-sized videos you can finish in one sitting. Strategies you'll actually use Monday morning.
               </p>
-              <span className="inline-block font-semibold" style={{ color: 'var(--tdi-coral)' }}>
+              <span className="font-semibold text-sm" style={{ color: '#F96767' }}>
                 Explore the Learning Hub →
               </span>
             </a>
 
-            <a 
-              href="https://raehughart.substack.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="card hover:shadow-lg transition-shadow"
-              style={{ borderTop: '4px solid var(--tdi-coral)' }}
-            >
-              <h3 className="text-xl mb-3">Go Deeper with Exclusive Content</h3>
-              <p className="mb-4" style={{ opacity: 0.7 }}>
-                Premium strategies, behind-the-scenes access, and a community of educators who are done settling for the status quo.
-              </p>
-              <span className="inline-block font-semibold" style={{ color: 'var(--tdi-coral)' }}>
-                See premium options →
-              </span>
-            </a>
           </div>
 
-          {/* Request for Your School */}
+          {/* Request for School CTA */}
           <div className="mt-12 text-center">
-            <p className="mb-4" style={{ opacity: 0.7 }}>
+            <p className="mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
               Love what you see? Think your whole school could benefit?
             </p>
-            <Link 
-              href="/for-schools/request" 
-              className="btn-secondary inline-block"
+            <a
+              href="/for-schools/request"
+              className="inline-block px-6 py-3 rounded-lg font-semibold border-2 transition-all hover:bg-gray-100"
+              style={{ borderColor: '#1e2749', color: '#1e2749' }}
             >
               Request TDI for Your School
-            </Link>
+            </a>
           </div>
         </div>
       </section>
