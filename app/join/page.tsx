@@ -38,7 +38,7 @@ export default function JoinPage() {
             </a>
 
             <a 
-              href="https://podcasts.apple.com/us/podcast/teachers-deserve-it" 
+              href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" 
               target="_blank" 
               rel="noopener noreferrer"
               className="card hover:shadow-lg transition-shadow"

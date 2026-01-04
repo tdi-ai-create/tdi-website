@@ -160,7 +160,7 @@ export default function Home() {
                 target="_blank" 
                 rel="noopener noreferrer"
               >
-                Join 87K+ Educators in the Hub
+                Explore the Learning Hub
               </a>
             </div>
 

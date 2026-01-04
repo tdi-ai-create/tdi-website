@@ -1,17 +1,19 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
+    { href: '/', label: 'Home' },
     { href: '/join', label: 'Join' },
     { href: '/for-schools', label: 'For Schools' },
     { href: '/for-schools/pricing', label: 'Pricing' },
     { href: 'https://raehughart.substack.com', label: 'Blog', external: true },
-    { href: 'https://podcasts.apple.com/us/podcast/teachers-deserve-it', label: 'Podcast', external: true },
+    { href: 'https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274', label: 'Podcast', external: true },
     { href: '/about', label: 'About' },
     { href: '/contact', label: 'Contact' },
   ];
@@ -21,8 +23,15 @@ export function Header() {
       <div className="container-wide">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link href="/" className="font-bold text-xl" style={{ color: 'var(--tdi-charcoal)' }}>
-            Teachers Deserve It
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/images/logo.png"
+              alt="Teachers Deserve It"
+              width={160}
+              height={48}
+              className="h-12 w-auto"
+              priority
+            />
           </Link>
 
           {/* Desktop Nav */}
