@@ -64,17 +64,26 @@ export default function JoinPage() {
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
               <div
-                className="h-[180px] flex items-center justify-center p-6"
+                className="h-[160px] flex items-center justify-center p-6"
                 style={{ backgroundColor: '#FEF3C7' }}
               >
+                {/* Substack/Newsletter Icon */}
+                <svg
+                  className="w-16 h-16"
+                  fill="white"
+                  viewBox="0 0 24 24"
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                >
+                  <path d="M22 4H2v2h20V4zm0 4H2v10l10 4 10-4V8zm-10 9.18L6 15.62v-5.24l6 2.4 6-2.4v5.24l-6 1.56z"/>
+                </svg>
+              </div>
+              <div className="bg-white p-5">
                 <h3
-                  className="text-xl font-bold text-center uppercase tracking-wide"
+                  className="text-lg font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
                   Weekly Strategies in Your Inbox
                 </h3>
-              </div>
-              <div className="bg-white p-5">
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
                   3x/week, practical ideas you can use immediately. Join 87,000+ educators already getting them.
                 </p>
@@ -92,17 +101,26 @@ export default function JoinPage() {
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
               <div
-                className="h-[180px] flex items-center justify-center p-6"
+                className="h-[160px] flex items-center justify-center p-6"
                 style={{ backgroundColor: '#ffba06' }}
               >
+                {/* Headphones/Podcast Icon */}
+                <svg
+                  className="w-16 h-16"
+                  fill="white"
+                  viewBox="0 0 24 24"
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                >
+                  <path d="M12 1c-4.97 0-9 4.03-9 9v7c0 1.66 1.34 3 3 3h3v-8H5v-2c0-3.87 3.13-7 7-7s7 3.13 7 7v2h-4v8h3c1.66 0 3-1.34 3-3v-7c0-4.97-4.03-9-9-9z"/>
+                </svg>
+              </div>
+              <div className="bg-white p-5">
                 <h3
-                  className="text-xl font-bold text-center uppercase tracking-wide"
+                  className="text-lg font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
                   Listen While You Commute
                 </h3>
-              </div>
-              <div className="bg-white p-5">
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
                   The Sustainable Teaching podcast. Real talk about sustainable teaching from people who get it.
                 </p>
@@ -118,17 +136,26 @@ export default function JoinPage() {
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
               <div
-                className="h-[180px] flex items-center justify-center p-6"
+                className="h-[160px] flex items-center justify-center p-6"
                 style={{ backgroundColor: '#FEF9E7' }}
               >
+                {/* Download Icon */}
+                <svg
+                  className="w-16 h-16"
+                  fill="white"
+                  viewBox="0 0 24 24"
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                >
+                  <path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>
+                </svg>
+              </div>
+              <div className="bg-white p-5">
                 <h3
-                  className="text-xl font-bold text-center uppercase tracking-wide"
+                  className="text-lg font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
                   Grab a Free Resource
                 </h3>
-              </div>
-              <div className="bg-white p-5">
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
                   Ready-to-use downloads for your classroom, for teachers and paras alike.
                 </p>
