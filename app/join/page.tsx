@@ -1,15 +1,48 @@
+'use client';
+
 import Link from 'next/link';
 
 export default function JoinPage() {
   return (
     <main className="min-h-screen">
-      {/* Hero */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
-        <div className="container-default text-center">
-          <h1 className="mb-4" style={{ color: 'white' }}>Join the Movement</h1>
-          <p className="text-xl max-w-2xl mx-auto" style={{ color: 'white', opacity: 0.9 }}>
-            Find your path. Whether you're a teacher looking for support or a leader building a healthier school, we're here to help.
-          </p>
+      {/* Hero Section with Parallax */}
+      <section className="relative h-[400px] md:h-[450px] overflow-hidden">
+        {/* Parallax Background Image */}
+        <div
+          className="absolute inset-0 parallax-bg"
+          style={{
+            backgroundImage: "url('/images/hero-join.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
+          }}
+        />
+
+        {/* Navy Gradient Overlay */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(180deg, rgba(30, 39, 73, 0.75) 0%, rgba(30, 39, 73, 0.85) 100%)'
+          }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 h-full flex items-center justify-center">
+          <div className="text-center px-4 max-w-3xl mx-auto">
+            <h1
+              className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
+              style={{ color: '#ffffff' }}
+            >
+              Join the Movement
+            </h1>
+            <p
+              className="text-lg md:text-xl"
+              style={{ color: '#ffffff', opacity: 0.9 }}
+            >
+              Find your path. Whether you're a teacher looking for support or a leader building a healthier school, we're here to help.
+            </p>
+          </div>
         </div>
       </section>
 

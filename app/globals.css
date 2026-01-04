@@ -257,3 +257,14 @@ label {
     background-attachment: scroll;
   }
 }
+
+/* General parallax effect */
+.parallax-bg {
+  background-attachment: fixed;
+}
+
+@media (max-width: 767px) {
+  .parallax-bg {
+    background-attachment: scroll;
+  }
+}
