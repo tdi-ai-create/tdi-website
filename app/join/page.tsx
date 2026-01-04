@@ -202,65 +202,92 @@ export default function JoinPage() {
       {/* For School Leaders */}
       <section className="section bg-white">
         <div className="container-default">
-          <h2 className="text-center mb-4">For School Leaders</h2>
-          <p className="text-center mb-12" style={{ opacity: 0.7 }}>
-            Support your whole building, teachers and paraprofessionals, with PD they'll actually use.
+          <h2 className="text-center mb-2">For School Leaders</h2>
+          <p className="text-center mb-12" style={{ opacity: 0.6 }}>
+            Support your whole building with PD they'll actually use.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <Link 
-              href="/for-schools" 
-              className="card hover:shadow-lg transition-shadow"
-              style={{ borderTop: '4px solid var(--tdi-navy)' }}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+
+            {/* Card 1: Bring TDI - Light Blue */}
+            <Link
+              href="/for-schools"
+              className="flex flex-col items-center group"
             >
-              <h3 className="text-xl mb-3">Bring TDI to Your Team</h3>
-              <p className="mb-4" style={{ opacity: 0.7 }}>
-                PD your teachers will thank you for. Implementation support from day one. Outcomes you can measure and report.
+              <div
+                className="w-full h-[280px] rounded-3xl flex items-center justify-center p-8 transition-transform group-hover:scale-105"
+                style={{ backgroundColor: '#C7D7F5' }}
+              >
+                <h3
+                  className="text-xl md:text-2xl font-bold text-center uppercase tracking-wide"
+                  style={{ color: '#1e2749' }}
+                >
+                  Bring TDI to Your Team
+                </h3>
+              </div>
+              <p className="mt-4 text-center text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                PD your teachers will thank you for. Implementation support from day one.
               </p>
-              <span className="inline-block font-semibold" style={{ color: 'var(--tdi-navy)' }}>
-                Learn about partnerships →
-              </span>
             </Link>
 
-            <Link 
-              href="/calculator" 
-              className="card hover:shadow-lg transition-shadow"
-              style={{ borderTop: '4px solid var(--tdi-navy)' }}
+            {/* Card 2: Calculator - Blue */}
+            <Link
+              href="/calculator"
+              className="flex flex-col items-center group"
             >
-              <h3 className="text-xl mb-3">See What's Possible</h3>
-              <p className="mb-4" style={{ opacity: 0.7 }}>
-                Try the impact calculator. Input your school's current state and see projected improvements in budget, morale, and outcomes.
+              <div
+                className="w-full h-[280px] rounded-3xl flex items-center justify-center p-8 transition-transform group-hover:scale-105"
+                style={{ backgroundColor: '#80a4ed' }}
+              >
+                <h3
+                  className="text-xl md:text-2xl font-bold text-center uppercase tracking-wide"
+                  style={{ color: '#1e2749' }}
+                >
+                  See What's Possible
+                </h3>
+              </div>
+              <p className="mt-4 text-center text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Try the impact calculator. See projected improvements in budget, morale, and outcomes.
               </p>
-              <span className="inline-block font-semibold" style={{ color: 'var(--tdi-navy)' }}>
-                Try the calculator →
-              </span>
             </Link>
 
-            <Link 
-              href="/for-schools/schedule-call" 
-              className="card hover:shadow-lg transition-shadow"
-              style={{ borderTop: '4px solid var(--tdi-navy)' }}
+            {/* Card 3: Schedule Call - Lightest Blue */}
+            <Link
+              href="/for-schools/schedule-call"
+              className="flex flex-col items-center group"
             >
-              <h3 className="text-xl mb-3">Let's Talk</h3>
-              <p className="mb-4" style={{ opacity: 0.7 }}>
-                Schedule a conversation with our team. No pitch, no pressure. Just a real discussion about what your school needs.
+              <div
+                className="w-full h-[280px] rounded-3xl flex items-center justify-center p-8 transition-transform group-hover:scale-105"
+                style={{ backgroundColor: '#E0E9F9' }}
+              >
+                <h3
+                  className="text-xl md:text-2xl font-bold text-center uppercase tracking-wide"
+                  style={{ color: '#1e2749' }}
+                >
+                  Let's Talk
+                </h3>
+              </div>
+              <p className="mt-4 text-center text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Schedule a conversation. No pitch, no pressure. Just a real discussion.
               </p>
-              <span className="inline-block font-semibold" style={{ color: 'var(--tdi-navy)' }}>
-                Schedule a conversation →
-              </span>
             </Link>
+
           </div>
         </div>
       </section>
 
-      {/* Funding Callout */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-yellow)' }}>
+      {/* Budget CTA */}
+      <section className="section" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
-          <h2 className="mb-4">Think You Don't Have Budget?</h2>
-          <p className="text-lg mb-6 max-w-2xl mx-auto" style={{ opacity: 0.8 }}>
+          <h2 className="mb-4" style={{ color: '#1e2749' }}>Think You Don't Have Budget?</h2>
+          <p className="text-lg mb-6 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
             80% of schools we work with secure external funds to cover PD. We help you find the funding and draft the language.
           </p>
-          <Link href="/funding" className="btn-primary inline-block">
+          <Link
+            href="/funding"
+            className="inline-block px-8 py-4 rounded-lg font-semibold transition-all hover:opacity-90"
+            style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
+          >
             See How Funding Works
           </Link>
         </div>
