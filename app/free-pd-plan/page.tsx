@@ -59,6 +59,54 @@ export default function FreePDPlanPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const totalSteps = 5;
 
+  const stepInfo = [
+    {
+      number: 1,
+      label: "Let's get to know your team",
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+      ),
+    },
+    {
+      number: 2,
+      label: "Understanding your challenges",
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      ),
+    },
+    {
+      number: 3,
+      label: "Defining your goals",
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+      ),
+    },
+    {
+      number: 4,
+      label: "Your current reality",
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+      ),
+    },
+    {
+      number: 5,
+      label: "Almost there!",
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        </svg>
+      ),
+    },
+  ];
+
   const updateFormData = (field: keyof FormData, value: string | number | string[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
@@ -719,58 +767,160 @@ export default function FreePDPlanPage() {
           <p className="text-lg max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
             Answer a few questions and we'll send you a custom PD evaluation plan within 24 hours.
           </p>
+          <div className="flex flex-wrap justify-center gap-6 mt-6">
+            <div className="flex items-center gap-2" style={{ color: '#ffffff', opacity: 0.9 }}>
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm">500+ schools assessed</span>
+            </div>
+            <div className="flex items-center gap-2" style={{ color: '#ffffff', opacity: 0.9 }}>
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+              </svg>
+              <span className="text-sm">4 minutes to complete</span>
+            </div>
+            <div className="flex items-center gap-2" style={{ color: '#ffffff', opacity: 0.9 }}>
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+              </svg>
+              <span className="text-sm">Custom plan in 24 hours</span>
+            </div>
+          </div>
         </div>
       </section>
 
       {/* Form Section */}
       <section className="py-12 md:py-16" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="container-default max-w-2xl mx-auto px-4">
+        <div className="container-default">
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-          {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="flex justify-between text-sm mb-2" style={{ color: '#1e2749' }}>
-              <span>Step {currentStep} of {totalSteps}</span>
-              <span>{Math.round((currentStep / totalSteps) * 100)}% complete</span>
-            </div>
-            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div
-                className="h-2 rounded-full transition-all duration-300"
-                style={{
-                  width: `${(currentStep / totalSteps) * 100}%`,
-                  backgroundColor: '#ffba06'
-                }}
-              />
+              {/* Main Form - takes 2 columns */}
+              <div className="lg:col-span-2 px-4 lg:px-0">
+                {/* Progress Bar */}
+                <div className="mb-8">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                    >
+                      {stepInfo[currentStep - 1].icon}
+                    </div>
+                    <div>
+                      <p className="font-semibold" style={{ color: '#1e2749' }}>
+                        {stepInfo[currentStep - 1].label}
+                      </p>
+                      <p className="text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>
+                        Step {currentStep} of {totalSteps}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="h-2 bg-gray-200 rounded-full">
+                    <div
+                      className="h-2 rounded-full transition-all duration-300"
+                      style={{
+                        width: `${(currentStep / totalSteps) * 100}%`,
+                        backgroundColor: '#ffba06'
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Form Card */}
+                <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg">
+                  {renderStepContent()}
+
+                  {/* Reassurance on final step */}
+                  {currentStep === 5 && (
+                    <div className="flex items-center gap-2 mt-6 p-3 rounded-lg" style={{ backgroundColor: '#E8F0FD' }}>
+                      <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="#1e2749" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                      <p className="text-sm" style={{ color: '#1e2749' }}>
+                        Your information is secure and never shared. We'll send your custom plan within 24 hours.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Navigation */}
+                  <div className="flex justify-between mt-8 pt-6 border-t" style={{ borderColor: '#e5e5e5' }}>
+                    {currentStep > 1 ? (
+                      <button
+                        onClick={() => setCurrentStep(currentStep - 1)}
+                        className="px-6 py-3 rounded-lg font-semibold border-2 transition-all hover:bg-gray-50"
+                        style={{ borderColor: '#1e2749', color: '#1e2749' }}
+                      >
+                        Back
+                      </button>
+                    ) : (
+                      <div />
+                    )}
+                    <button
+                      onClick={() => currentStep < totalSteps ? setCurrentStep(currentStep + 1) : handleSubmit()}
+                      disabled={!canProceed() || isSubmitting}
+                      className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                      style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                    >
+                      {isSubmitting ? 'Submitting...' : currentStep === totalSteps ? 'Get My Plan' : 'Next'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sidebar - takes 1 column, desktop only */}
+              <div className="hidden lg:block">
+                <div className="bg-white rounded-2xl p-6 shadow-sm sticky top-24">
+                  <h3 className="font-bold mb-4" style={{ color: '#1e2749' }}>
+                    Your Custom PD Plan includes:
+                  </h3>
+                  <ul className="space-y-3">
+                    <li className="flex items-start gap-3">
+                      <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="#ffba06" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>Gap analysis based on your answers</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="#ffba06" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>Recommended starting phase</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="#ffba06" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>Budget-friendly options</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="#ffba06" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>Timeline suggestions</span>
+                    </li>
+                    <li className="flex items-start gap-3">
+                      <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="none" stroke="#ffba06" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      <span className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>Next steps tailored to your school</span>
+                    </li>
+                  </ul>
+
+                  {/* Testimonial */}
+                  <div className="mt-6 pt-6 border-t border-gray-100">
+                    <p className="text-sm italic mb-3" style={{ color: '#1e2749', opacity: 0.8 }}>
+                      "This assessment helped us identify exactly where to start. Within 3 months, our teachers were actually excited about PD."
+                    </p>
+                    <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>Lisa M.</p>
+                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>K-8 School Director, WA</p>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
-
-          {/* Form Card */}
-          <div className="bg-white rounded-2xl p-6 md:p-8 shadow-lg">
-            {renderStepContent()}
-
-            {/* Navigation */}
-            <div className="flex justify-between mt-8 pt-6 border-t" style={{ borderColor: '#e5e5e5' }}>
-              {currentStep > 1 ? (
-                <button
-                  onClick={() => setCurrentStep(currentStep - 1)}
-                  className="px-6 py-3 rounded-lg font-semibold border-2 transition-all hover:bg-gray-50"
-                  style={{ borderColor: '#1e2749', color: '#1e2749' }}
-                >
-                  Back
-                </button>
-              ) : (
-                <div />
-              )}
-              <button
-                onClick={() => currentStep < totalSteps ? setCurrentStep(currentStep + 1) : handleSubmit()}
-                disabled={!canProceed() || isSubmitting}
-                className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
-                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-              >
-                {isSubmitting ? 'Submitting...' : currentStep === totalSteps ? 'Get My Plan' : 'Next'}
-              </button>
-            </div>
-          </div>
-
         </div>
       </section>
     </main>
