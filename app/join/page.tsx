@@ -13,7 +13,7 @@ export default function JoinPage() {
           style={{
             backgroundImage: "url('/images/hero-join.png')",
             backgroundSize: 'cover',
-            backgroundPosition: 'center center',
+            backgroundPosition: '30% center',
             backgroundRepeat: 'no-repeat',
             backgroundAttachment: 'fixed',
           }}
@@ -213,7 +213,8 @@ export default function JoinPage() {
                 className="text-xl font-bold mb-3"
                 style={{ color: '#1e2749' }}
               >
-                Learning Hub All-Access
+                Learning Hub
+                <span className="block">All-Access</span>
               </h3>
               <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
                 100+ hours of on-demand PD. Bite-sized videos you can finish in one sitting. Strategies you'll actually use Monday morning.
