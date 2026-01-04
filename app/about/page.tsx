@@ -385,6 +385,18 @@ export default function AboutPage() {
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                   </svg>
                 </div>
+                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Rachel Patragas</p>
+                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Director of Creative Solutions</p>
+              </div>
+              <div className="text-center p-3">
+                <div
+                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
+                  style={{ backgroundColor: '#80a4ed' }}
+                >
+                  <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                </div>
                 <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Erin Light</p>
                 <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
               </div>
