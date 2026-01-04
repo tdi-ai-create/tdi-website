@@ -83,7 +83,7 @@ export function EmailPopup({ trigger = 'time', delay = 30000 }: EmailPopupProps)
 
         {submitted ? (
           <div className="text-center py-4">
-            <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--tdi-teal)' }}>
+            <h3 className="text-2xl font-bold mb-2" style={{ color: 'var(--tdi-navy)' }}>
               You're in!
             </h3>
             <p style={{ opacity: 0.7 }}>
@@ -107,12 +107,12 @@ export function EmailPopup({ trigger = 'time', delay = 30000 }: EmailPopupProps)
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
               />
               <button 
                 type="submit" 
                 className="w-full py-3 rounded-lg font-bold transition-all"
-                style={{ backgroundColor: 'var(--tdi-teal)', color: 'white' }}
+                style={{ backgroundColor: 'var(--tdi-navy)', color: 'white' }}
               >
                 Join 87,000+ Educators
               </button>

@@ -58,7 +58,7 @@ export function TDICalculatorLarge() {
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 mb-8">
         
         {/* Sliders */}
-        <div className="px-8 py-6 border-b border-gray-100" style={{ backgroundColor: 'var(--tdi-peach)' }}>
+        <div className="px-8 py-6 border-b border-gray-100" style={{ backgroundColor: 'var(--tdi-pink)' }}>
           <div className="grid grid-cols-3 gap-8">
             {/* Teachers */}
             <div>
@@ -72,9 +72,9 @@ export function TDICalculatorLarge() {
                 value={teachers}
                 onChange={(e) => setTeachers(parseInt(e.target.value))}
                 className="w-full h-3 rounded-full appearance-none cursor-pointer"
-                style={{ background: `linear-gradient(to right, var(--tdi-teal) 0%, var(--tdi-teal) ${(teachers - 10) / 490 * 100}%, #d1d5db ${(teachers - 10) / 490 * 100}%, #d1d5db 100%)` }}
+                style={{ background: `linear-gradient(to right, var(--tdi-navy) 0%, var(--tdi-navy) ${(teachers - 10) / 490 * 100}%, #d1d5db ${(teachers - 10) / 490 * 100}%, #d1d5db 100%)` }}
               />
-              <div className="text-center mt-3 text-3xl font-black" style={{ color: 'var(--tdi-teal)' }}>{teachers}</div>
+              <div className="text-center mt-3 text-3xl font-black" style={{ color: 'var(--tdi-navy)' }}>{teachers}</div>
             </div>
 
             {/* Class Size */}
@@ -89,9 +89,9 @@ export function TDICalculatorLarge() {
                 value={classSize}
                 onChange={(e) => setClassSize(parseInt(e.target.value))}
                 className="w-full h-3 rounded-full appearance-none cursor-pointer"
-                style={{ background: `linear-gradient(to right, var(--tdi-teal) 0%, var(--tdi-teal) ${(classSize - 15) / 20 * 100}%, #d1d5db ${(classSize - 15) / 20 * 100}%, #d1d5db 100%)` }}
+                style={{ background: `linear-gradient(to right, var(--tdi-navy) 0%, var(--tdi-navy) ${(classSize - 15) / 20 * 100}%, #d1d5db ${(classSize - 15) / 20 * 100}%, #d1d5db 100%)` }}
               />
-              <div className="text-center mt-3 text-3xl font-black" style={{ color: 'var(--tdi-teal)' }}>{classSize}</div>
+              <div className="text-center mt-3 text-3xl font-black" style={{ color: 'var(--tdi-navy)' }}>{classSize}</div>
             </div>
 
             {/* Years */}
@@ -106,9 +106,9 @@ export function TDICalculatorLarge() {
                 value={years}
                 onChange={(e) => setYears(parseInt(e.target.value))}
                 className="w-full h-3 rounded-full appearance-none cursor-pointer"
-                style={{ background: `linear-gradient(to right, var(--tdi-teal) 0%, var(--tdi-teal) ${(years - 1) / 4 * 100}%, #d1d5db ${(years - 1) / 4 * 100}%, #d1d5db 100%)` }}
+                style={{ background: `linear-gradient(to right, var(--tdi-navy) 0%, var(--tdi-navy) ${(years - 1) / 4 * 100}%, #d1d5db ${(years - 1) / 4 * 100}%, #d1d5db 100%)` }}
               />
-              <div className="text-center mt-3 text-3xl font-black" style={{ color: 'var(--tdi-teal)' }}>{years}</div>
+              <div className="text-center mt-3 text-3xl font-black" style={{ color: 'var(--tdi-navy)' }}>{years}</div>
             </div>
           </div>
         </div>
@@ -337,9 +337,9 @@ export function TDICalculatorLarge() {
           onClick={() => setShowDetails(!showDetails)}
           className="text-sm font-semibold px-6 py-3 rounded-full transition-all"
           style={{ 
-            backgroundColor: showDetails ? 'var(--tdi-teal)' : 'white', 
-            color: showDetails ? 'white' : 'var(--tdi-teal)',
-            border: '2px solid var(--tdi-teal)'
+            backgroundColor: showDetails ? 'var(--tdi-navy)' : 'white', 
+            color: showDetails ? 'white' : 'var(--tdi-navy)',
+            border: '2px solid var(--tdi-navy)'
           }}
         >
           {showDetails ? '▼ Hide Detailed Breakdown' : '▶ Show Detailed Breakdown'}

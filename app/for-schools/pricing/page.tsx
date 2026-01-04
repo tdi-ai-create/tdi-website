@@ -90,7 +90,7 @@ export default function PricingPage() {
       </Section>
 
       {/* Pricing Model Explanation */}
-      <Section background="peach">
+      <Section background="pink">
         <Container width="default">
           <div className="text-center">
             <h2 className="mb-6">How Our Pricing Works</h2>
@@ -147,7 +147,7 @@ export default function PricingPage() {
       </Section>
 
       {/* What's Included */}
-      <Section background="peach">
+      <Section background="pink">
         <Container width="default">
           <h2 className="text-center mb-8">What's Included in All Phases</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -207,7 +207,7 @@ export default function PricingPage() {
       </Section>
 
       {/* Final CTA Section */}
-      <Section background="peach">
+      <Section background="pink">
         <Container width="default">
           <div className="text-center">
             <h2 className="mb-4">Not Sure Which Phase Is Right for Your School?</h2>

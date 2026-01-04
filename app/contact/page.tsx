@@ -21,7 +21,7 @@ export default function ContactPage() {
   return (
     <main className="min-h-screen">
       {/* Hero */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-teal)' }}>
+      <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
         <div className="container-default text-center">
           <h1 className="mb-4" style={{ color: 'white' }}>Get in Touch</h1>
           <p className="text-xl max-w-2xl mx-auto" style={{ color: 'white', opacity: 0.9 }}>
@@ -53,7 +53,7 @@ export default function ContactPage() {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
                   />
                 </div>
 
@@ -67,7 +67,7 @@ export default function ContactPage() {
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
                   />
                 </div>
 
@@ -79,7 +79,7 @@ export default function ContactPage() {
                     id="role"
                     value={formData.role}
                     onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
                   >
                     <option value="">Select one</option>
                     <option value="teacher">Teacher</option>
@@ -103,7 +103,7 @@ export default function ContactPage() {
                     required
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500"
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
                   />
                 </div>
 
@@ -121,7 +121,7 @@ export default function ContactPage() {
                 <a 
                   href="mailto:hello@teachersdeserveit.com" 
                   className="font-semibold"
-                  style={{ color: 'var(--tdi-teal)' }}
+                  style={{ color: 'var(--tdi-navy)' }}
                 >
                   hello@teachersdeserveit.com
                 </a>
@@ -132,7 +132,7 @@ export default function ContactPage() {
       </section>
 
       {/* Response Time */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-peach)' }}>
+      <section className="section" style={{ backgroundColor: 'var(--tdi-pink)' }}>
         <div className="container-default text-center">
           <p className="text-lg">
             We respond to all inquiries within <strong>24 hours</strong>.

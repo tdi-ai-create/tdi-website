@@ -2,23 +2,18 @@
 
 /* TDI Brand Colors */
 :root {
-  /* Primary Colors */
   --tdi-yellow: #F9B91B;
-  --tdi-coral: #F96767;
-
-  /* Neutral Colors */
-  --tdi-charcoal: #1A1A1A;
+  --tdi-blue: #8FADD3;
   --tdi-white: #FFFFFF;
   --tdi-gray: #F5F5F5;
-  --tdi-pink: #E8D5D5;
-
-  /* Cool Accent Colors */
-  --tdi-blue: #8FADD3;
   --tdi-navy: #1E2A4A;
+  --tdi-coral: #F96767;
+  --tdi-pink: #E8D5D5;
+  --tdi-charcoal: #2D2D2D;
 
   /* Background */
   --background: #ffffff;
-  --foreground: #1A1A1A;
+  --foreground: #2D2D2D;
 }
 
 @theme inline {
@@ -129,7 +124,7 @@ a:hover {
 }
 
 .btn-primary:hover {
-  background-color: var(--tdi-orange);
+  background-color: var(--tdi-coral);
   color: white;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);

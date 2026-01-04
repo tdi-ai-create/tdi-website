@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 
-type SectionBackground = 'white' | 'peach' | 'navy';
+type SectionBackground = 'white' | 'pink' | 'navy';
 
 interface SectionProps {
   children: React.ReactNode;
@@ -17,13 +17,13 @@ export function Section({
 }: SectionProps) {
   const bgStyles = {
     white: 'bg-white',
-    peach: '',
+    pink: '',
     navy: '',
   };
 
   const inlineStyles = {
     white: {},
-    peach: { backgroundColor: 'var(--tdi-peach)' },
+    pink: { backgroundColor: 'var(--tdi-pink)' },
     navy: { backgroundColor: 'var(--tdi-navy)', color: 'white' },
   };
 

@@ -32,7 +32,7 @@ export default function JoinPage() {
               <p style={{ opacity: 0.7 }}>
                 3x/week, practical ideas you can use immediately. Join 87,000+ educators already getting them.
               </p>
-              <span className="inline-block mt-4 font-semibold" style={{ color: 'var(--tdi-teal)' }}>
+              <span className="inline-block mt-4 font-semibold" style={{ color: 'var(--tdi-navy)' }}>
                 Read the latest →
               </span>
             </a>
@@ -47,7 +47,7 @@ export default function JoinPage() {
               <p style={{ opacity: 0.7 }}>
                 The Teachers Deserve It podcast — real talk about sustainable teaching from people who get it.
               </p>
-              <span className="inline-block mt-4 font-semibold" style={{ color: 'var(--tdi-teal)' }}>
+              <span className="inline-block mt-4 font-semibold" style={{ color: 'var(--tdi-navy)' }}>
                 Start listening →
               </span>
             </a>
@@ -57,7 +57,7 @@ export default function JoinPage() {
               <p style={{ opacity: 0.7 }}>
                 Ready-to-use downloads for your classroom — for teachers and paras alike.
               </p>
-              <span className="inline-block mt-4 font-semibold" style={{ color: 'var(--tdi-teal)' }}>
+              <span className="inline-block mt-4 font-semibold" style={{ color: 'var(--tdi-navy)' }}>
                 Browse downloads →
               </span>
             </Link>
@@ -66,7 +66,7 @@ export default function JoinPage() {
       </section>
 
       {/* For Teachers */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-peach)' }}>
+      <section className="section" style={{ backgroundColor: 'var(--tdi-pink)' }}>
         <div className="container-default">
           <h2 className="text-center mb-4">For Teachers</h2>
           <p className="text-center mb-12" style={{ opacity: 0.7 }}>
@@ -134,13 +134,13 @@ export default function JoinPage() {
             <Link 
               href="/for-schools" 
               className="card hover:shadow-lg transition-shadow"
-              style={{ borderTop: '4px solid var(--tdi-teal)' }}
+              style={{ borderTop: '4px solid var(--tdi-navy)' }}
             >
               <h3 className="text-xl mb-3">Bring TDI to Your Team</h3>
               <p className="mb-4" style={{ opacity: 0.7 }}>
                 PD your teachers will thank you for. Implementation support from day one. Outcomes you can measure and report.
               </p>
-              <span className="inline-block font-semibold" style={{ color: 'var(--tdi-teal)' }}>
+              <span className="inline-block font-semibold" style={{ color: 'var(--tdi-navy)' }}>
                 Learn about partnerships →
               </span>
             </Link>
@@ -148,13 +148,13 @@ export default function JoinPage() {
             <Link 
               href="/calculator" 
               className="card hover:shadow-lg transition-shadow"
-              style={{ borderTop: '4px solid var(--tdi-teal)' }}
+              style={{ borderTop: '4px solid var(--tdi-navy)' }}
             >
               <h3 className="text-xl mb-3">See What's Possible</h3>
               <p className="mb-4" style={{ opacity: 0.7 }}>
                 Try the impact calculator. Input your school's current state and see projected improvements in budget, morale, and outcomes.
               </p>
-              <span className="inline-block font-semibold" style={{ color: 'var(--tdi-teal)' }}>
+              <span className="inline-block font-semibold" style={{ color: 'var(--tdi-navy)' }}>
                 Try the calculator →
               </span>
             </Link>
@@ -162,13 +162,13 @@ export default function JoinPage() {
             <Link 
               href="/for-schools/schedule-call" 
               className="card hover:shadow-lg transition-shadow"
-              style={{ borderTop: '4px solid var(--tdi-teal)' }}
+              style={{ borderTop: '4px solid var(--tdi-navy)' }}
             >
               <h3 className="text-xl mb-3">Let's Talk</h3>
               <p className="mb-4" style={{ opacity: 0.7 }}>
                 Schedule a conversation with our team. No pitch, no pressure — just a real discussion about what your school needs.
               </p>
-              <span className="inline-block font-semibold" style={{ color: 'var(--tdi-teal)' }}>
+              <span className="inline-block font-semibold" style={{ color: 'var(--tdi-navy)' }}>
                 Schedule a conversation →
               </span>
             </Link>

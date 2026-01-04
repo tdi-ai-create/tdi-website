@@ -12,7 +12,7 @@ export default function SecurityPage() {
       </section>
 
       {/* Trust Badges */}
-      <section className="section py-12" style={{ backgroundColor: 'var(--tdi-teal)' }}>
+      <section className="section py-12" style={{ backgroundColor: 'var(--tdi-navy)' }}>
         <div className="container-wide">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
@@ -78,7 +78,7 @@ export default function SecurityPage() {
       </section>
 
       {/* For Schools */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-peach)' }}>
+      <section className="section" style={{ backgroundColor: 'var(--tdi-pink)' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto">
             <h2 className="mb-8">For Schools & Districts</h2>
@@ -123,7 +123,7 @@ export default function SecurityPage() {
             <h2 className="mb-8">What We Collect (And Don't)</h2>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="card" style={{ borderTop: '4px solid var(--tdi-teal)' }}>
+              <div className="card" style={{ borderTop: '4px solid var(--tdi-navy)' }}>
                 <h3 className="text-xl mb-4">What We Collect</h3>
                 <ul className="space-y-2" style={{ opacity: 0.7 }}>
                   <li>Email address (for newsletters and accounts)</li>

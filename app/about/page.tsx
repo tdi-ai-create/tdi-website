@@ -42,7 +42,7 @@ export default function AboutPage() {
       </Section>
 
       {/* Rae's Story */}
-      <Section background="peach">
+      <Section background="pink">
         <Container width="default">
           <h2 className="text-center mb-8">How It Started</h2>
           <div className="max-w-2xl mx-auto">
@@ -85,7 +85,7 @@ export default function AboutPage() {
       </Section>
 
       {/* Values Section */}
-      <Section background="peach">
+      <Section background="pink">
         <Container width="default">
           <h2 className="text-center mb-8">What We Stand For</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -112,7 +112,7 @@ export default function AboutPage() {
               <div key={index} className="text-center">
                 <div 
                   className="w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl"
-                  style={{ backgroundColor: 'var(--tdi-peach)' }}
+                  style={{ backgroundColor: 'var(--tdi-pink)' }}
                 >
                   👤
                 </div>
@@ -131,7 +131,7 @@ export default function AboutPage() {
       </Section>
 
       {/* CTA Section */}
-      <Section background="peach">
+      <Section background="pink">
         <Container width="default">
           <div className="text-center">
             <h2 className="mb-4">Want to See What TDI Can Do for Your School?</h2>

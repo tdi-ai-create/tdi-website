@@ -37,7 +37,7 @@ export default function ScheduleCallPage() {
       </Section>
 
       {/* What to Expect */}
-      <Section background="peach">
+      <Section background="pink">
         <Container width="default">
           <h2 className="text-center mb-8">What Happens on the Call</h2>
           <div className="max-w-2xl mx-auto">

@@ -59,7 +59,7 @@ export default function WhatWeOfferPage() {
       </Section>
 
       {/* What You Get Section */}
-      <Section background="peach">
+      <Section background="pink">
         <Container>
           <h2 className="text-center mb-12">Inside the Learning Hub</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -99,7 +99,7 @@ export default function WhatWeOfferPage() {
       </Section>
 
       {/* Stats Section */}
-      <Section background="peach">
+      <Section background="pink">
         <Container>
           <h2 className="text-center mb-12">Results Educators Are Seeing</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -126,7 +126,7 @@ export default function WhatWeOfferPage() {
       </Section>
 
       {/* Final CTA */}
-      <Section background="peach">
+      <Section background="pink">
         <Container width="default">
           <div className="text-center">
             <h2 className="mb-8">Ready to Explore?</h2>

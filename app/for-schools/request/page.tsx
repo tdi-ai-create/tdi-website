@@ -23,7 +23,7 @@ export default function RequestForSchoolPage() {
   return (
     <main className="min-h-screen">
       {/* Hero */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-teal)' }}>
+      <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
         <div className="container-default text-center">
           <h1 className="mb-4" style={{ color: 'white' }}>Request TDI for Your School</h1>
           <p className="text-xl max-w-2xl mx-auto" style={{ color: 'white', opacity: 0.9 }}>
@@ -48,7 +48,7 @@ export default function RequestForSchoolPage() {
               </div>
             ) : (
               <>
-                <div className="mb-8 p-4 rounded-lg" style={{ backgroundColor: 'var(--tdi-peach)' }}>
+                <div className="mb-8 p-4 rounded-lg" style={{ backgroundColor: 'var(--tdi-pink)' }}>
                   <p className="text-sm" style={{ opacity: 0.8 }}>
                     <strong>How this works:</strong> Fill out the form below, and we'll send a friendly email to your school leader introducing TDI and offering a no-pressure conversation about supporting your staff.
                   </p>
@@ -65,7 +65,7 @@ export default function RequestForSchoolPage() {
                       required
                       value={formData.teacherName}
                       onChange={(e) => setFormData({ ...formData, teacherName: e.target.value })}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
                     />
                   </div>
 
@@ -79,7 +79,7 @@ export default function RequestForSchoolPage() {
                       required
                       value={formData.teacherEmail}
                       onChange={(e) => setFormData({ ...formData, teacherEmail: e.target.value })}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
                     />
                   </div>
 
@@ -93,7 +93,7 @@ export default function RequestForSchoolPage() {
                       required
                       value={formData.schoolName}
                       onChange={(e) => setFormData({ ...formData, schoolName: e.target.value })}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
                     />
                   </div>
 
@@ -107,7 +107,7 @@ export default function RequestForSchoolPage() {
                       required
                       value={formData.principalName}
                       onChange={(e) => setFormData({ ...formData, principalName: e.target.value })}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
                     />
                   </div>
 
@@ -121,7 +121,7 @@ export default function RequestForSchoolPage() {
                       required
                       value={formData.principalEmail}
                       onChange={(e) => setFormData({ ...formData, principalEmail: e.target.value })}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
                     />
                   </div>
 
@@ -134,7 +134,7 @@ export default function RequestForSchoolPage() {
                       rows={4}
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-teal-500"
+                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
                       placeholder="E.g., Our staff is burned out and we need PD that actually helps..."
                     />
                   </div>

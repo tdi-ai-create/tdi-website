@@ -100,7 +100,7 @@ export default function ForSchoolsPage() {
       </Section>
 
       {/* Problem Section */}
-      <Section background="peach">
+      <Section background="pink">
         <Container width="default">
           <h2 className="text-center mb-8">You Already Know Traditional PD Isn't Working</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
@@ -173,7 +173,7 @@ export default function ForSchoolsPage() {
       </Section>
 
       {/* Stats Section */}
-      <Section background="peach">
+      <Section background="pink">
         <Container>
           <h2 className="text-center mb-12">Results Schools Are Seeing</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -225,7 +225,7 @@ export default function ForSchoolsPage() {
       </Section>
 
       {/* Testimonials Section */}
-      <Section background="peach">
+      <Section background="pink">
         <Container>
           <h2 className="text-center mb-12">What School Leaders Are Saying</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -271,7 +271,7 @@ export default function ForSchoolsPage() {
       </Section>
 
       {/* Final CTA Section */}
-      <Section background="peach">
+      <Section background="pink">
         <Container width="default">
           <div className="text-center">
             <h2 className="mb-4">Ready to See What TDI Can Do for Your School?</h2>

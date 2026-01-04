@@ -41,7 +41,7 @@ export function TDICalculatorMedium() {
   return (
     <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
       {/* Header */}
-      <div className="px-6 py-5 text-center" style={{ backgroundColor: 'var(--tdi-teal)', color: 'white' }}>
+      <div className="px-6 py-5 text-center" style={{ backgroundColor: 'var(--tdi-navy)', color: 'white' }}>
         <h3 className="text-2xl font-bold mb-1">See What's Possible for Your School</h3>
         <p className="text-sm opacity-80">Adjust the sliders to match your school</p>
       </div>
@@ -61,9 +61,9 @@ export function TDICalculatorMedium() {
               value={teachers}
               onChange={(e) => setTeachers(parseInt(e.target.value))}
               className="w-full h-2 rounded-full appearance-none cursor-pointer"
-              style={{ background: `linear-gradient(to right, var(--tdi-teal) 0%, var(--tdi-teal) ${(teachers - 10) / 490 * 100}%, #e5e7eb ${(teachers - 10) / 490 * 100}%, #e5e7eb 100%)` }}
+              style={{ background: `linear-gradient(to right, var(--tdi-navy) 0%, var(--tdi-navy) ${(teachers - 10) / 490 * 100}%, #e5e7eb ${(teachers - 10) / 490 * 100}%, #e5e7eb 100%)` }}
             />
-            <div className="text-center mt-2 text-2xl font-bold" style={{ color: 'var(--tdi-teal)' }}>{teachers}</div>
+            <div className="text-center mt-2 text-2xl font-bold" style={{ color: 'var(--tdi-navy)' }}>{teachers}</div>
           </div>
 
           {/* Class Size Slider */}
@@ -78,9 +78,9 @@ export function TDICalculatorMedium() {
               value={classSize}
               onChange={(e) => setClassSize(parseInt(e.target.value))}
               className="w-full h-2 rounded-full appearance-none cursor-pointer"
-              style={{ background: `linear-gradient(to right, var(--tdi-teal) 0%, var(--tdi-teal) ${(classSize - 15) / 20 * 100}%, #e5e7eb ${(classSize - 15) / 20 * 100}%, #e5e7eb 100%)` }}
+              style={{ background: `linear-gradient(to right, var(--tdi-navy) 0%, var(--tdi-navy) ${(classSize - 15) / 20 * 100}%, #e5e7eb ${(classSize - 15) / 20 * 100}%, #e5e7eb 100%)` }}
             />
-            <div className="text-center mt-2 text-2xl font-bold" style={{ color: 'var(--tdi-teal)' }}>{classSize}</div>
+            <div className="text-center mt-2 text-2xl font-bold" style={{ color: 'var(--tdi-navy)' }}>{classSize}</div>
           </div>
 
           {/* Years Slider */}
@@ -95,9 +95,9 @@ export function TDICalculatorMedium() {
               value={years}
               onChange={(e) => setYears(parseInt(e.target.value))}
               className="w-full h-2 rounded-full appearance-none cursor-pointer"
-              style={{ background: `linear-gradient(to right, var(--tdi-teal) 0%, var(--tdi-teal) ${(years - 1) / 4 * 100}%, #e5e7eb ${(years - 1) / 4 * 100}%, #e5e7eb 100%)` }}
+              style={{ background: `linear-gradient(to right, var(--tdi-navy) 0%, var(--tdi-navy) ${(years - 1) / 4 * 100}%, #e5e7eb ${(years - 1) / 4 * 100}%, #e5e7eb 100%)` }}
             />
-            <div className="text-center mt-2 text-2xl font-bold" style={{ color: 'var(--tdi-teal)' }}>{years}</div>
+            <div className="text-center mt-2 text-2xl font-bold" style={{ color: 'var(--tdi-navy)' }}>{years}</div>
           </div>
         </div>
       </div>

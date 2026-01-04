@@ -4,7 +4,7 @@ export default function FundingPage() {
   return (
     <main className="min-h-screen">
       {/* Hero */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-teal)' }}>
+      <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
         <div className="container-default text-center">
           <p className="text-sm uppercase tracking-wider mb-4" style={{ color: 'white', opacity: 0.8 }}>
             Professional Development
@@ -52,7 +52,7 @@ export default function FundingPage() {
                 <span>Teachers roll their eyes, and you're left apologizing for wasted hours.</span>
               </li>
             </ul>
-            <p className="text-lg font-semibold" style={{ color: 'var(--tdi-teal)' }}>
+            <p className="text-lg font-semibold" style={{ color: 'var(--tdi-navy)' }}>
               It doesn't have to be that way.
             </p>
           </div>
@@ -60,7 +60,7 @@ export default function FundingPage() {
       </section>
 
       {/* How TDI Makes It Easy */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-peach)' }}>
+      <section className="section" style={{ backgroundColor: 'var(--tdi-pink)' }}>
         <div className="container-default">
           <h2 className="text-center mb-12">How TDI Makes It Easy</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -195,7 +195,7 @@ export default function FundingPage() {
       </section>
 
       {/* Second Testimonial */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-peach)' }}>
+      <section className="section" style={{ backgroundColor: 'var(--tdi-pink)' }}>
         <div className="container-default">
           <div className="max-w-2xl mx-auto text-center">
             <p className="text-2xl italic mb-6" style={{ color: 'var(--tdi-charcoal)' }}>
@@ -217,7 +217,7 @@ export default function FundingPage() {
             <p className="text-lg mb-6">
               TDI does the heavy lifting — aligning your PD plan to opportunities, drafting ready-to-use language, and supporting your final submission.
             </p>
-            <p className="text-lg font-semibold" style={{ color: 'var(--tdi-teal)' }}>
+            <p className="text-lg font-semibold" style={{ color: 'var(--tdi-navy)' }}>
               That means your teachers and paras get the support they deserve — without your team carrying the burden of research or paperwork.
             </p>
           </div>
