@@ -221,6 +221,7 @@ export default function ForSchoolsPage() {
             <a
               href="/contact"
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all h-full flex flex-col"
+              style={{ textDecoration: 'none' }}
             >
               <div className="h-[160px] overflow-hidden">
                 <img
@@ -232,15 +233,15 @@ export default function ForSchoolsPage() {
               </div>
               <div className="bg-white p-4 flex-1 flex flex-col">
                 <h3
-                  className="text-base font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749' }}
+                  className="text-sm font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749', textDecoration: 'none' }}
                 >
                   Principals
                 </h3>
-                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7 }}>
+                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, textDecoration: 'none' }}>
                   PD your teachers won't dread. Results you can see in classrooms.
                 </p>
-                <span className="font-semibold text-sm" style={{ color: '#80a4ed' }}>
+                <span className="font-semibold text-sm" style={{ color: '#80a4ed', textDecoration: 'none' }}>
                   Let's talk →
                 </span>
               </div>
@@ -250,6 +251,7 @@ export default function ForSchoolsPage() {
             <a
               href="/contact"
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all h-full flex flex-col"
+              style={{ textDecoration: 'none' }}
             >
               <div className="h-[160px] overflow-hidden">
                 <img
@@ -261,15 +263,15 @@ export default function ForSchoolsPage() {
               </div>
               <div className="bg-white p-4 flex-1 flex flex-col">
                 <h3
-                  className="text-base font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749' }}
+                  className="text-sm font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749', textDecoration: 'none' }}
                 >
-                  Superintendents
+                  Supers
                 </h3>
-                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7 }}>
+                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, textDecoration: 'none' }}>
                   District-wide scale, board-ready outcomes, and budget flexibility.
                 </p>
-                <span className="font-semibold text-sm" style={{ color: '#80a4ed' }}>
+                <span className="font-semibold text-sm" style={{ color: '#80a4ed', textDecoration: 'none' }}>
                   Let's talk →
                 </span>
               </div>
@@ -279,6 +281,7 @@ export default function ForSchoolsPage() {
             <a
               href="/contact"
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all h-full flex flex-col"
+              style={{ textDecoration: 'none' }}
             >
               <div className="h-[160px] overflow-hidden">
                 <img
@@ -290,15 +293,15 @@ export default function ForSchoolsPage() {
               </div>
               <div className="bg-white p-4 flex-1 flex flex-col">
                 <h3
-                  className="text-base font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749' }}
+                  className="text-sm font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749', textDecoration: 'none' }}
                 >
-                  Curriculum Directors
+                  Curriculum
                 </h3>
-                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7 }}>
+                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, textDecoration: 'none' }}>
                   PD that integrates with your initiatives and shows implementation.
                 </p>
-                <span className="font-semibold text-sm" style={{ color: '#80a4ed' }}>
+                <span className="font-semibold text-sm" style={{ color: '#80a4ed', textDecoration: 'none' }}>
                   Let's talk →
                 </span>
               </div>
@@ -308,6 +311,7 @@ export default function ForSchoolsPage() {
             <a
               href="/contact"
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all h-full flex flex-col"
+              style={{ textDecoration: 'none' }}
             >
               <div className="h-[160px] overflow-hidden">
                 <img
@@ -319,15 +323,15 @@ export default function ForSchoolsPage() {
               </div>
               <div className="bg-white p-4 flex-1 flex flex-col">
                 <h3
-                  className="text-base font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749' }}
+                  className="text-sm font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749', textDecoration: 'none' }}
                 >
-                  HR Directors
+                  HR
                 </h3>
-                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7 }}>
+                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, textDecoration: 'none' }}>
                   Data that ties teacher support to retention and turnover.
                 </p>
-                <span className="font-semibold text-sm" style={{ color: '#80a4ed' }}>
+                <span className="font-semibold text-sm" style={{ color: '#80a4ed', textDecoration: 'none' }}>
                   Let's talk →
                 </span>
               </div>
