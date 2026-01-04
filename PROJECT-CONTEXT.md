@@ -106,11 +106,11 @@ Navy → Blue → White → Gray → Blue → Navy (creates visual rhythm)
 
 **About (app/about/page.tsx)**
 - Hero with background image
-- How It Started section
-- Stats section
-- Meet the Founder (Rae bio, TEDx, Amazon book, social links)
-- Team section (integrated below Rae)
-- Final CTA
+- How It Started (background image with left-right gradient, 2-column: story + TDI Blueprint)
+- Stats section (blue background)
+- Meet the Founder (Rae bio, TEDx, Amazon book, social links with TikTok)
+- Team section (integrated below Rae with yellow/blue icons)
+- Final CTA (dual buttons)
 
 ### KEY IMAGE FILES
 
@@ -124,20 +124,16 @@ Located in /public/images/:
 - leader-superintendent.png
 - leader-curriculum.png
 - leader-hr.png
+- about-teacher-pointing.png (How It Started background)
 
 ---
 
 ## PENDING TASKS
 
-### IMMEDIATE (About Page)
-1. Footer: Move "Free PD Plan" from Quick Links to Resources
-2. "How It Started" section: Add gradient background + TDI Blueprint
-
 ### SITE-WIDE CLEANUP
 - Verify all em-dashes removed
 - Verify all emojis removed
 - Verify Free PD Plan CTAs on all school-leader pages
-- Footer: Verify Free PD Plan in Resources
 
 ### DEPLOYMENT
 - Vercel deployment limit resets daily
