@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 
-export function Header() {
+export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -47,7 +47,7 @@ export function Header() {
               Pricing
             </Link>
             <Link 
-              href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="text-base font-medium hover:opacity-70 transition-opacity" style={{ color: 'var(--tdi-charcoal)' }}>Blog</a><Link href="/about" 
+              href="/about" 
               className="text-base font-medium hover:opacity-70 transition-opacity"
               style={{ color: 'var(--tdi-charcoal)' }}
             >
@@ -114,7 +114,7 @@ export function Header() {
                 Pricing
               </Link>
               <Link 
-                href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="text-base font-medium hover:opacity-70 transition-opacity" style={{ color: 'var(--tdi-charcoal)' }}>Blog</a><Link href="/about" 
+                href="/about" 
                 className="text-base font-medium py-2"
                 style={{ color: 'var(--tdi-charcoal)' }}
                 onClick={() => setMobileMenuOpen(false)}
