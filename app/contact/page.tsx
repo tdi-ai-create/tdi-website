@@ -27,7 +27,7 @@ export default function ContactPage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: 'url("/images/hero-contact.png")',
-            backgroundPosition: 'center 30%',
+            backgroundPosition: 'center 60%',
             backgroundAttachment: 'fixed',
           }}
         />
