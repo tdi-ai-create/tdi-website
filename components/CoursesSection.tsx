@@ -76,6 +76,43 @@ export function CoursesSection() {
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+
+          {/* Featured: Course Guide - Always Displayed */}
+          <a
+            href="https://tdi.thinkific.com/products/digital_downloads/CourseGuide"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative"
+            style={{ textDecoration: 'none' }}
+          >
+            {/* Featured Badge */}
+            <div
+              className="absolute top-3 left-3 z-10 px-3 py-1 rounded-full text-xs font-bold"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            >
+              Updated Monthly
+            </div>
+            <div className="relative h-40 overflow-hidden">
+              <div
+                className="w-full h-full flex items-center justify-center"
+                style={{ backgroundColor: '#1e2749' }}
+              >
+                <svg className="w-12 h-12" fill="#ffba06" viewBox="0 0 24 24">
+                  <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+                </svg>
+              </div>
+            </div>
+            <div className="p-4">
+              <h3 className="font-bold text-lg mb-2 line-clamp-2" style={{ color: '#1e2749' }}>
+                Learning Hub Course Guide
+              </h3>
+              <p className="text-sm line-clamp-2" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Your complete guide to everything available in the TDI Learning Hub. Updated monthly.
+              </p>
+            </div>
+          </a>
+
+          {/* Random Courses */}
           {courses.map((course) => (
             <a
               key={course.id}
