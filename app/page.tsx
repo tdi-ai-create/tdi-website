@@ -27,71 +27,71 @@ export default function Home() {
       </section>
 
       {/* SECTION 2: Stats Bar */}
-      <section className="section py-12" style={{ backgroundColor: 'var(--tdi-yellow)' }}>
+      <section className="section py-12" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-wide">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
-              <p className="text-4xl font-bold mb-1" style={{ color: 'var(--tdi-charcoal)' }}>87,000+</p>
-              <p className="text-lg" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>Educators in Our Community</p>
+              <p className="text-4xl font-bold mb-1" style={{ color: '#ffffff' }}>87,000+</p>
+              <p className="text-lg" style={{ color: '#ffffff', opacity: 0.8 }}>Educators in Our Community</p>
             </div>
             <div>
-              <p className="text-4xl font-bold mb-1" style={{ color: 'var(--tdi-charcoal)' }}>100+</p>
-              <p className="text-lg" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>Hours of On-Demand PD</p>
+              <p className="text-4xl font-bold mb-1" style={{ color: '#ffffff' }}>100+</p>
+              <p className="text-lg" style={{ color: '#ffffff', opacity: 0.8 }}>Hours of On-Demand PD</p>
             </div>
             <div>
-              <p className="text-4xl font-bold mb-1" style={{ color: 'var(--tdi-charcoal)' }}>21</p>
-              <p className="text-lg" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>States with TDI Partner Schools</p>
+              <p className="text-4xl font-bold mb-1" style={{ color: '#ffffff' }}>21</p>
+              <p className="text-lg" style={{ color: '#ffffff', opacity: 0.8 }}>States with TDI Partner Schools</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* SECTION 3: Testimonials (moved up) */}
-      <section className="section bg-white">
+      <section className="section" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-wide">
-          <h2 className="text-center mb-12">What Educators Are Saying</h2>
+          <h2 className="text-center mb-12" style={{ color: '#1e2749' }}>What Educators Are Saying</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="card-testimonial">
-              <p className="text-lg italic mb-4">
+            <div className="rounded-xl p-8" style={{ backgroundColor: '#80a4ed' }}>
+              <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
                 "I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself."
               </p>
-              <p className="text-sm font-semibold">Ms. K., 5th Grade Teacher</p>
+              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>Ms. K., 5th Grade Teacher</p>
             </div>
 
-            <div className="card-testimonial">
-              <p className="text-lg italic mb-4">
+            <div className="rounded-xl p-8" style={{ backgroundColor: '#80a4ed' }}>
+              <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
                 "Our teachers are actually excited about PD now. I don't have to chase them down or babysit. They're learning because they want to."
               </p>
-              <p className="text-sm font-semibold">Ms. M., K-8 School Director</p>
+              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>Ms. M., K-8 School Director</p>
             </div>
 
-            <div className="card-testimonial">
-              <p className="text-lg italic mb-4">
+            <div className="rounded-xl p-8" style={{ backgroundColor: '#80a4ed' }}>
+              <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
                 "This was the first PD I didn't have to apologize for. Our teachers actually thanked me."
               </p>
-              <p className="text-sm font-semibold">School Principal</p>
+              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>School Principal</p>
             </div>
 
-            <div className="card-testimonial">
-              <p className="text-lg italic mb-4">
+            <div className="rounded-xl p-8" style={{ backgroundColor: '#80a4ed' }}>
+              <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
                 "TDI helped us unlock funding we didn't even know was possible."
               </p>
-              <p className="text-sm font-semibold">District Leader</p>
+              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>District Leader</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* SECTION 4: Problem Section */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-gray)' }}>
+      <section className="section" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="mb-6">Traditional Educator Learning Is Broken</h2>
-            <p className="text-lg mb-4" style={{ opacity: 0.8 }}>
+            <h2 className="mb-6 whitespace-nowrap" style={{ color: '#1e2749' }}>Traditional Educator Learning Is Broken</h2>
+            <p className="text-lg mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
               Someone who hasn't been in a classroom in years reads PowerPoints at you for three hours. You nod along, check your phone under the table, and forget everything by Monday.
             </p>
-            <p className="text-lg font-semibold" style={{ color: 'var(--tdi-navy)' }}>
+            <p className="text-lg font-semibold" style={{ color: '#1e2749' }}>
               Teachers deserve better. So do the leaders trying to support them.
             </p>
           </div>
@@ -99,7 +99,7 @@ export default function Home() {
       </section>
 
       {/* SECTION 5: Solution Section */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-pink)' }}>
+      <section className="section" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-wide">
           <h2 className="text-center mb-4">This Isn't Sit-and-Get</h2>
           <p className="text-center text-lg mb-12 max-w-2xl mx-auto" style={{ opacity: 0.8 }}>
@@ -188,18 +188,18 @@ export default function Home() {
       </section>
 
       {/* SECTION 7: Two Ways to Work With Us */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-gray)' }}>
+      <section className="section" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-wide">
-          <h2 className="text-center mb-12">Two Ways to Work With Us</h2>
+          <h2 className="text-center mb-12" style={{ color: '#1e2749' }}>Two Ways to Work With Us</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Teachers Path */}
-            <div className="card" style={{ borderTop: '4px solid var(--tdi-coral)' }}>
-              <h3 className="text-2xl mb-4">For Teachers</h3>
-              <p className="mb-6" style={{ opacity: 0.8 }}>
+            <div className="card" style={{ backgroundColor: '#ffffff', borderTop: '4px solid #1e2749', color: '#1e2749' }}>
+              <h3 className="text-2xl mb-4" style={{ color: '#1e2749' }}>For Teachers</h3>
+              <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
                 Action-focused tools to help you be more efficient and effective in your classroom. Access ready-to-use strategies, weekly blog insights, podcast episodes, and downloadable resources.
               </p>
-              <ul className="mb-6 space-y-2">
+              <ul className="mb-6 space-y-2" style={{ color: '#1e2749' }}>
                 <li>Classroom tools you can use Monday morning</li>
                 <li>Weekly strategies from our blog</li>
                 <li>Podcast episodes for your commute</li>
@@ -216,12 +216,12 @@ export default function Home() {
             </div>
 
             {/* Schools Path */}
-            <div className="card" style={{ borderTop: '4px solid var(--tdi-navy)' }}>
-              <h3 className="text-2xl mb-4">For Schools & Districts</h3>
-              <p className="mb-6" style={{ opacity: 0.8 }}>
+            <div className="card" style={{ backgroundColor: '#ffffff', borderTop: '4px solid #1e2749', color: '#1e2749' }}>
+              <h3 className="text-2xl mb-4" style={{ color: '#1e2749' }}>For Schools & Districts</h3>
+              <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
                 Use the TDI Blueprint to transform your building. We partner with you to achieve measurable implementation, improved teacher happiness scores, and student growth.
               </p>
-              <ul className="mb-6 space-y-2">
+              <ul className="mb-6 space-y-2" style={{ color: '#1e2749' }}>
                 <li>Measurable PD implementation, not just seat time</li>
                 <li>Improved teacher satisfaction and retention</li>
                 <li>Student achievement gains you can report</li>
@@ -230,11 +230,11 @@ export default function Home() {
               <Link href="/for-schools" className="btn-secondary inline-block">
                 Learn About the TDI Blueprint
               </Link>
-              <p className="text-sm mt-4" style={{ opacity: 0.6 }}>
+              <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
                 80% of schools we work with secure external funding.{' '}
                 <Link href="/funding" className="underline">See how</Link>
               </p>
-              <p className="text-sm mt-2" style={{ opacity: 0.6 }}>
+              <p className="text-sm mt-2" style={{ color: '#1e2749', opacity: 0.6 }}>
                 Your data is protected.{' '}
                 <Link href="/security" className="underline">See our security practices</Link>
               </p>
@@ -307,7 +307,7 @@ export default function Home() {
       </section>
 
       {/* SECTION 10: Calculator */}
-      <section className="section bg-white">
+      <section className="section" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-wide">
           <TDICalculator />
           <p className="text-center text-sm mt-4" style={{ opacity: 0.6 }}>
@@ -321,16 +321,16 @@ export default function Home() {
       <FAQ />
 
       {/* SECTION 12: Final CTA */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
+      <section className="section" style={{ backgroundColor: '#ffba06' }}>
         <div className="container-default text-center">
-          <h2 className="mb-4" style={{ color: 'white' }}>Ready to Feel Like a Teacher Again?</h2>
-          <p className="text-lg mb-2 max-w-xl mx-auto" style={{ color: 'white', opacity: 0.8 }}>
+          <h2 className="mb-4" style={{ color: '#1e2749' }}>Ready to Feel Like a Teacher Again?</h2>
+          <p className="text-lg mb-2 max-w-xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
             Whether you're a teacher looking for support or a leader trying to keep your team from burning out, we've got you.
           </p>
-          <p className="text-sm mb-8" style={{ color: 'white', opacity: 0.6 }}>
+          <p className="text-sm mb-8" style={{ color: '#1e2749', opacity: 0.6 }}>
             Join 87,000+ educators who've already taken the first step.
           </p>
-          <Link href="/join" className="btn-primary inline-block" style={{ backgroundColor: 'var(--tdi-yellow)', color: 'var(--tdi-charcoal)' }}>
+          <Link href="/join" className="btn-primary inline-block" style={{ backgroundColor: '#1e2749', color: '#ffffff' }}>
             Join the Movement
           </Link>
         </div>

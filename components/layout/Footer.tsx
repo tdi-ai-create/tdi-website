@@ -16,13 +16,13 @@ export function Footer() {
   };
 
   return (
-    <footer style={{ backgroundColor: 'var(--tdi-charcoal)' }}>
+    <footer style={{ backgroundColor: '#1e2749' }}>
       {/* Main Footer */}
       <div className="container-wide py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="md:col-span-1">
-            <h3 className="text-xl font-bold mb-4" style={{ color: 'white' }}>
+            <h3 className="text-xl font-bold mb-4 whitespace-nowrap" style={{ color: '#ffffff' }}>
               Teachers Deserve It
             </h3>
             <p className="text-sm mb-4" style={{ color: 'white', opacity: 0.7 }}>
@@ -73,7 +73,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
-                  Newsletter
+                  Blog
                 </a>
               </li>
               <li>

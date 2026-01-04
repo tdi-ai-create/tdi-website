@@ -26,7 +26,7 @@ const faqs: FAQItem[] = [
   },
   {
     question: "How much time does this take?",
-    answer: "That's up to you. Most of our courses are 30-60 minutes and designed to be completed in one sitting. For school partnerships, we work around your calendar with no multi-day workshops that pull teachers away from students."
+    answer: "Courses range from 20-45 minutes and are action-driven to ensure easy implementation for the educator. Learn on your schedule, apply it the next day."
   },
   {
     question: "Do you offer live workshops or just online content?",
@@ -35,6 +35,14 @@ const faqs: FAQItem[] = [
   {
     question: "How does TDI develop its content?",
     answer: "Every resource starts with a real need from teachers or partner schools. We recruit specialists and practitioners to collaborate on solutions, ground everything in current research, and shape it into actionable tools. Courses, downloads, and resource packets go live in the Learning Hub. For partner schools, we guarantee 30-day turnaround on custom requests. The result: targeted, ready-to-use resources when educators need them."
+  },
+  {
+    question: "Can paraprofessionals learn with TDI?",
+    answer: "Absolutely. Our content is designed for everyone who works directly with students. Paraprofessionals play a critical role in schools, and they deserve quality professional development too. When schools partner with us, we encourage including the whole building."
+  },
+  {
+    question: "Does TDI support all types of educators?",
+    answer: "Yes. TDI supports the whole education ecosystem. Whether you're an elementary teacher, middle school specialist, high school instructor, art teacher, music teacher, PE teacher, paraprofessional, or instructional coach, our strategies are designed to be adaptable and relevant to your role."
   }
 ];
 
