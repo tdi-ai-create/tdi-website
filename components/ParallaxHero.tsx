@@ -9,7 +9,7 @@ export function ParallaxHero() {
     const handleScroll = () => {
       if (foregroundRef.current) {
         const scrollY = window.scrollY;
-        foregroundRef.current.style.transform = `translateY(${scrollY * 0.5}px)`;
+        foregroundRef.current.style.transform = `translateY(${scrollY * -0.5}px)`;
       }
     };
 
