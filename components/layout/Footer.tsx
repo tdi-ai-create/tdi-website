@@ -134,6 +134,12 @@ export function Footer() {
               <p className="text-xs mt-3" style={{ color: 'white', opacity: 0.5 }}>
                 Questions? <a href="mailto:hello@teachersdeserveit.com" className="underline">Email us</a>
               </p>
+              <div className="flex items-center gap-2 text-sm mt-4" style={{ color: '#ffffff', opacity: 0.7 }}>
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                </svg>
+                <span>Your data is secure. We never sell your information.</span>
+              </div>
             </div>
           </div>
         </div>
@@ -158,6 +164,9 @@ export function Footer() {
               </Link>
             </div>
           </div>
+          <p className="text-sm mt-4 text-center" style={{ color: '#ffffff', opacity: 0.7 }}>
+            TDI is committed to accessibility. We strive to ensure our website is usable by all educators, including those using assistive technologies.
+          </p>
         </div>
       </div>
     </footer>
