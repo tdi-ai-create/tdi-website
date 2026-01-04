@@ -42,15 +42,15 @@ export default function AboutPage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: 'url("/images/about-teacher-pointing.png")',
-            backgroundPosition: 'center top'
+            backgroundPosition: 'right center'
           }}
         />
 
-        {/* Dark Gradient Overlay */}
+        {/* Dark Gradient Overlay - darker on left for text */}
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to right, rgba(30, 39, 73, 0.95) 0%, rgba(30, 39, 73, 0.85) 50%, rgba(30, 39, 73, 0.7) 100%)'
+            background: 'linear-gradient(to right, rgba(30, 39, 73, 0.97) 0%, rgba(30, 39, 73, 0.92) 40%, rgba(30, 39, 73, 0.75) 70%, rgba(30, 39, 73, 0.6) 100%)'
           }}
         />
 
@@ -143,7 +143,7 @@ export default function AboutPage() {
 
                   {/* Admin Outcomes */}
                   <div className="mt-6 pt-6 border-t border-white/20">
-                    <p className="text-sm font-semibold mb-3" style={{ color: '#ffba06' }}>For Administrators:</p>
+                    <p className="text-sm font-semibold mb-3" style={{ color: '#ffba06' }}>Built for District Success:</p>
                     <div className="flex flex-wrap gap-2">
                       <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Staff Retention</span>
                       <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Culture Building</span>
@@ -301,87 +301,184 @@ export default function AboutPage() {
             </div>
           </div>
 
-          {/* Team List - Below Rae's Bio */}
-          <div className="mt-16 max-w-4xl mx-auto">
-            <h3 className="text-2xl font-bold text-center mb-2" style={{ color: '#1e2749' }}>
-              The Team That Makes It Possible
-            </h3>
-            <p className="text-center mb-8" style={{ color: '#1e2749', opacity: 0.7 }}>
-              A passionate group of educators, creators, and leaders working toward one goal: helping teachers thrive.
-            </p>
+        </div>
+      </section>
 
-            {/* Leadership */}
-            <div className="flex flex-wrap justify-center gap-x-8 gap-y-4 mb-6">
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5" fill="#ffba06" viewBox="0 0 24 24">
+      {/* The Team */}
+      <section className="py-20" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-default">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+            The Team That Makes It Possible
+          </h2>
+          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+            A passionate group of educators, strategists, and creatives committed to transforming professional development.
+          </p>
+
+          {/* Executive Team with Bios */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-12">
+
+            {/* Omar Garcia */}
+            <div className="bg-white rounded-xl p-6 text-center shadow-sm">
+              <div
+                className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{ backgroundColor: '#ffba06' }}
+              >
+                <svg className="w-10 h-10" fill="#1e2749" viewBox="0 0 24 24">
                   <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                 </svg>
-                <span style={{ color: '#1e2749' }}><strong>Omar Garcia</strong>, CFO</span>
               </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5" fill="#ffba06" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-                <span style={{ color: '#1e2749' }}><strong>Kristin Williams</strong>, CMO</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5" fill="#ffba06" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-                <span style={{ color: '#1e2749' }}><strong>Rachel Patragas</strong>, Director of Creative Solutions</span>
-              </div>
+              <h4 className="font-bold text-lg mb-1" style={{ color: '#1e2749' }}>Omar Garcia</h4>
+              <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Chief Financial Officer</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Brings financial strategy and operational excellence to ensure TDI delivers sustainable, measurable impact for districts.
+              </p>
             </div>
 
-            {/* Content Creators */}
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4" fill="#80a4ed" viewBox="0 0 24 24">
+            {/* Kristin Williams */}
+            <div className="bg-white rounded-xl p-6 text-center shadow-sm">
+              <div
+                className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{ backgroundColor: '#ffba06' }}
+              >
+                <svg className="w-10 h-10" fill="#1e2749" viewBox="0 0 24 24">
                   <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                 </svg>
-                <span className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>Ian R Bowen</span>
               </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4" fill="#80a4ed" viewBox="0 0 24 24">
+              <h4 className="font-bold text-lg mb-1" style={{ color: '#1e2749' }}>Kristin Williams</h4>
+              <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Chief Marketing Officer</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Leads community engagement and brand strategy, connecting TDI with the 87,000+ educators who trust our mission.
+              </p>
+            </div>
+
+            {/* Olivia Smith */}
+            <div className="bg-white rounded-xl p-6 text-center shadow-sm">
+              <div
+                className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{ backgroundColor: '#ffba06' }}
+              >
+                <svg className="w-10 h-10" fill="#1e2749" viewBox="0 0 24 24">
                   <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                 </svg>
-                <span className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>Erin Light</span>
               </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4" fill="#80a4ed" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-                <span className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>Katie Welch</span>
+              <h4 className="font-bold text-lg mb-1" style={{ color: '#1e2749' }}>Olivia Smith</h4>
+              <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Executive Communication Coordinator</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Ensures seamless communication between TDI and our partner districts, keeping every stakeholder informed and aligned.
+              </p>
+            </div>
+
+          </div>
+
+          {/* Extended Team */}
+          <div className="bg-white rounded-xl p-8 max-w-4xl mx-auto">
+            <h3 className="font-bold text-lg mb-6 text-center" style={{ color: '#1e2749' }}>
+              Content Creators and Contributors
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center p-3">
+                <div
+                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
+                  style={{ backgroundColor: '#80a4ed' }}
+                >
+                  <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                </div>
+                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Rachel Patragas</p>
+                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Director of Creative Solutions</p>
               </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4" fill="#80a4ed" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-                <span className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>Sue Thompson</span>
+              <div className="text-center p-3">
+                <div
+                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
+                  style={{ backgroundColor: '#80a4ed' }}
+                >
+                  <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                </div>
+                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Ian R Bowen</p>
+                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
               </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4" fill="#80a4ed" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-                <span className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>Tyson Gardin</span>
+              <div className="text-center p-3">
+                <div
+                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
+                  style={{ backgroundColor: '#80a4ed' }}
+                >
+                  <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                </div>
+                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Erin Light</p>
+                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
               </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4" fill="#80a4ed" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-                <span className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>Walter Cullin Jr</span>
+              <div className="text-center p-3">
+                <div
+                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
+                  style={{ backgroundColor: '#80a4ed' }}
+                >
+                  <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                </div>
+                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Katie Welch</p>
+                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
               </div>
-              <div className="flex items-center gap-2">
-                <svg className="w-4 h-4" fill="#80a4ed" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-                <span className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>Paige Roberts</span>
+              <div className="text-center p-3">
+                <div
+                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
+                  style={{ backgroundColor: '#80a4ed' }}
+                >
+                  <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                </div>
+                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Sue Thompson</p>
+                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
+              </div>
+              <div className="text-center p-3">
+                <div
+                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
+                  style={{ backgroundColor: '#80a4ed' }}
+                >
+                  <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                </div>
+                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Tyson Gardin</p>
+                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
+              </div>
+              <div className="text-center p-3">
+                <div
+                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
+                  style={{ backgroundColor: '#80a4ed' }}
+                >
+                  <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                </div>
+                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Walter Cullin Jr</p>
+                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
+              </div>
+              <div className="text-center p-3">
+                <div
+                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
+                  style={{ backgroundColor: '#80a4ed' }}
+                >
+                  <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
+                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                  </svg>
+                </div>
+                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Paige Roberts</p>
+                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
               </div>
             </div>
 
             <p className="text-center mt-6 text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>
-              Plus district liaisons and administrative support.
+              Plus district liaisons and facilitators nationwide.
             </p>
           </div>
+
         </div>
       </section>
 
