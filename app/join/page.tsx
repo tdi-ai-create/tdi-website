@@ -21,46 +21,105 @@ export default function JoinPage() {
             No commitment. Just value.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <a 
-              href="https://raehughart.substack.com" 
-              target="_blank" 
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+
+            {/* Card 1: Blog/Newsletter */}
+            <a
+              href="https://raehughart.substack.com"
+              target="_blank"
               rel="noopener noreferrer"
-              className="card hover:shadow-lg transition-shadow"
+              className="group relative rounded-xl overflow-hidden h-[400px] flex flex-col shadow-lg hover:shadow-xl transition-shadow"
             >
-              <h3 className="text-xl mb-3">Weekly Strategies in Your Inbox</h3>
-              <p style={{ opacity: 0.7 }}>
-                3x/week, practical ideas you can use immediately. Join 87,000+ educators already getting them.
-              </p>
-              <span className="inline-block mt-4 font-semibold" style={{ color: 'var(--tdi-navy)' }}>
-                Read the latest →
-              </span>
+              {/* Background Image */}
+              <div
+                className="absolute inset-0 bg-cover bg-center transition-transform group-hover:scale-105"
+                style={{ backgroundImage: "url('/images/card-blog.png')" }}
+              />
+              {/* Dark Overlay */}
+              <div className="absolute inset-0 bg-black/40" />
+
+              {/* Title - Centered on image */}
+              <div className="relative z-10 flex-1 flex items-center justify-center p-6">
+                <h3 className="text-2xl font-bold text-white text-center">
+                  Weekly Strategies in Your Inbox
+                </h3>
+              </div>
+
+              {/* White Box with Details */}
+              <div className="relative z-10 bg-white p-5">
+                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.8 }}>
+                  3x/week, practical ideas you can use immediately. Join 87,000+ educators already getting them.
+                </p>
+                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
+                  Read the latest →
+                </span>
+              </div>
             </a>
 
-            <a 
-              href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" 
-              target="_blank" 
+            {/* Card 2: Podcast */}
+            <a
+              href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274"
+              target="_blank"
               rel="noopener noreferrer"
-              className="card hover:shadow-lg transition-shadow"
+              className="group relative rounded-xl overflow-hidden h-[400px] flex flex-col shadow-lg hover:shadow-xl transition-shadow"
             >
-              <h3 className="text-xl mb-3">Listen While You Commute</h3>
-              <p style={{ opacity: 0.7 }}>
-                The Sustainable Teaching podcast. Real talk about sustainable teaching from people who get it.
-              </p>
-              <span className="inline-block mt-4 font-semibold" style={{ color: 'var(--tdi-navy)' }}>
-                Start listening →
-              </span>
+              {/* Background Image */}
+              <div
+                className="absolute inset-0 bg-cover bg-center transition-transform group-hover:scale-105"
+                style={{ backgroundImage: "url('/images/card-podcast.png')" }}
+              />
+              {/* Dark Overlay */}
+              <div className="absolute inset-0 bg-black/40" />
+
+              {/* Title - Centered on image */}
+              <div className="relative z-10 flex-1 flex items-center justify-center p-6">
+                <h3 className="text-2xl font-bold text-white text-center">
+                  Listen While You Commute
+                </h3>
+              </div>
+
+              {/* White Box with Details */}
+              <div className="relative z-10 bg-white p-5">
+                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.8 }}>
+                  The Sustainable Teaching podcast. Real talk about sustainable teaching from people who get it.
+                </p>
+                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
+                  Start listening →
+                </span>
+              </div>
             </a>
 
-            <Link href="/resources" className="card hover:shadow-lg transition-shadow">
-              <h3 className="text-xl mb-3">Grab a Free Resource</h3>
-              <p style={{ opacity: 0.7 }}>
-                Ready-to-use downloads for your classroom, for teachers and paras alike.
-              </p>
-              <span className="inline-block mt-4 font-semibold" style={{ color: 'var(--tdi-navy)' }}>
-                Browse downloads →
-              </span>
-            </Link>
+            {/* Card 3: Free Resources */}
+            <a
+              href="/resources"
+              className="group relative rounded-xl overflow-hidden h-[400px] flex flex-col shadow-lg hover:shadow-xl transition-shadow"
+            >
+              {/* Background Image */}
+              <div
+                className="absolute inset-0 bg-cover bg-center transition-transform group-hover:scale-105"
+                style={{ backgroundImage: "url('/images/card-resources.png')" }}
+              />
+              {/* Dark Overlay */}
+              <div className="absolute inset-0 bg-black/40" />
+
+              {/* Title - Centered on image */}
+              <div className="relative z-10 flex-1 flex items-center justify-center p-6">
+                <h3 className="text-2xl font-bold text-white text-center">
+                  Grab a Free Resource
+                </h3>
+              </div>
+
+              {/* White Box with Details */}
+              <div className="relative z-10 bg-white p-5">
+                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.8 }}>
+                  Ready-to-use downloads for your classroom, for teachers and paras alike.
+                </p>
+                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
+                  Browse downloads →
+                </span>
+              </div>
+            </a>
+
           </div>
         </div>
       </section>
