@@ -541,11 +541,11 @@ export default function AboutPage() {
             </p>
 
             {/* Become a Content Creator */}
-            <div className="mt-8 p-6 rounded-xl text-center max-w-2xl mx-auto" style={{ backgroundColor: '#1e2749' }}>
-              <h4 className="font-bold text-lg mb-2" style={{ color: '#ffba06' }}>
+            <div className="mt-8 p-6 rounded-xl text-center max-w-2xl mx-auto border" style={{ backgroundColor: '#ffffff', borderColor: '#e5e7eb' }}>
+              <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>
                 Interested in Becoming a Content Creator?
               </h4>
-              <p className="text-sm mb-4" style={{ color: '#ffffff', opacity: 0.9 }}>
+              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
                 We are always looking for passionate educators to join our team. Review our content creator guide and reach out to get started.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -553,15 +553,15 @@ export default function AboutPage() {
                   href="https://drive.google.com/file/d/1q499mCTZxd8RJDidRZ7iKr9Ei3xssP9b/view?usp=sharing"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-block px-5 py-2 rounded-lg font-medium text-sm transition-all hover:scale-105"
-                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                  className="inline-block px-5 py-2 rounded-lg font-medium text-sm border-2 transition-all hover:bg-gray-50"
+                  style={{ borderColor: '#1e2749', color: '#1e2749' }}
                 >
                   View Content Creator Guide
                 </a>
                 <a
                   href="mailto:Rachel@Teachersdeserveit.com"
-                  className="inline-block px-5 py-2 rounded-lg font-medium text-sm border-2 transition-all hover:bg-white/10"
-                  style={{ borderColor: '#ffba06', color: '#ffba06' }}
+                  className="inline-block px-5 py-2 rounded-lg font-medium text-sm border-2 transition-all hover:bg-gray-50"
+                  style={{ borderColor: '#1e2749', color: '#1e2749' }}
                 >
                   Email Rachel
                 </a>
