@@ -205,7 +205,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      {/* Built for Every Leader - Navy background with icon cards */}
+      {/* Built for Every Leader */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#ffffff' }}>
@@ -222,18 +222,13 @@ export default function ForSchoolsPage() {
               href="/contact"
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
-              <div
-                className="h-[120px] flex items-center justify-center p-4"
-                style={{ backgroundColor: '#80a4ed' }}
-              >
-                <svg
-                  className="w-14 h-14"
-                  fill="white"
-                  viewBox="0 0 24 24"
-                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
-                >
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
+              <div className="h-[160px] overflow-hidden">
+                <img
+                  src="/images/leader-principal.png"
+                  alt="Principal"
+                  className="w-full h-full object-cover object-top transition-transform group-hover:scale-105"
+                  style={{ filter: 'grayscale(100%)' }}
+                />
               </div>
               <div className="bg-white p-4">
                 <h3
@@ -256,18 +251,13 @@ export default function ForSchoolsPage() {
               href="/contact"
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
-              <div
-                className="h-[120px] flex items-center justify-center p-4"
-                style={{ backgroundColor: '#80a4ed' }}
-              >
-                <svg
-                  className="w-14 h-14"
-                  fill="white"
-                  viewBox="0 0 24 24"
-                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
-                >
-                  <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
-                </svg>
+              <div className="h-[160px] overflow-hidden">
+                <img
+                  src="/images/leader-superintendent.png"
+                  alt="Superintendent"
+                  className="w-full h-full object-cover object-top transition-transform group-hover:scale-105"
+                  style={{ filter: 'grayscale(100%)' }}
+                />
               </div>
               <div className="bg-white p-4">
                 <h3
@@ -290,18 +280,13 @@ export default function ForSchoolsPage() {
               href="/contact"
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
-              <div
-                className="h-[120px] flex items-center justify-center p-4"
-                style={{ backgroundColor: '#80a4ed' }}
-              >
-                <svg
-                  className="w-14 h-14"
-                  fill="white"
-                  viewBox="0 0 24 24"
-                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
-                >
-                  <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
-                </svg>
+              <div className="h-[160px] overflow-hidden">
+                <img
+                  src="/images/leader-curriculum.png"
+                  alt="Curriculum Director"
+                  className="w-full h-full object-cover object-center transition-transform group-hover:scale-105"
+                  style={{ filter: 'grayscale(100%)' }}
+                />
               </div>
               <div className="bg-white p-4">
                 <h3
@@ -324,18 +309,13 @@ export default function ForSchoolsPage() {
               href="/contact"
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
-              <div
-                className="h-[120px] flex items-center justify-center p-4"
-                style={{ backgroundColor: '#80a4ed' }}
-              >
-                <svg
-                  className="w-14 h-14"
-                  fill="white"
-                  viewBox="0 0 24 24"
-                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
-                >
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-                </svg>
+              <div className="h-[160px] overflow-hidden">
+                <img
+                  src="/images/leader-hr.png"
+                  alt="HR Director"
+                  className="w-full h-full object-cover object-top transition-transform group-hover:scale-105"
+                  style={{ filter: 'grayscale(100%)' }}
+                />
               </div>
               <div className="bg-white p-4">
                 <h3
