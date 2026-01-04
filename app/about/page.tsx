@@ -330,7 +330,7 @@ export default function AboutPage() {
               <h4 className="font-bold text-lg mb-1" style={{ color: '#1e2749' }}>Omar Garcia</h4>
               <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Chief Financial Officer</p>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Brings financial strategy and operational excellence to ensure TDI delivers sustainable, measurable impact for districts.
+                Drives financial strategy and operational systems that allow TDI to scale sustainably while delivering measurable ROI for every partner district.
               </p>
             </div>
 
@@ -347,7 +347,7 @@ export default function AboutPage() {
               <h4 className="font-bold text-lg mb-1" style={{ color: '#1e2749' }}>Kristin Williams</h4>
               <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Chief Marketing Officer</p>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Marketing strategist and fractional CMO with eight years helping businesses turn real customer connection into real results. Brings cross-industry expertise to help TDI become the face of meaningful change in American education.
+                Shapes the voice and visibility of TDI, turning eight years of cross-industry marketing expertise into meaningful connections with educators nationwide.
               </p>
             </div>
 
@@ -364,7 +364,7 @@ export default function AboutPage() {
               <h4 className="font-bold text-lg mb-1" style={{ color: '#1e2749' }}>Olivia Smith</h4>
               <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Executive Communication Coordinator</p>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Ensures seamless communication between TDI and our partner districts, keeping every stakeholder informed and aligned.
+                Keeps TDI and our partner districts aligned at every step, ensuring seamless communication from first conversation to lasting impact.
               </p>
             </div>
 
