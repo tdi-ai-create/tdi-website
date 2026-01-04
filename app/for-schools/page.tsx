@@ -438,7 +438,7 @@ export default function ForSchoolsPage() {
             {/* Bottom Text */}
             <div className="mt-10 text-center">
               <p className="text-xl md:text-2xl font-semibold" style={{ color: '#1e2749' }}>
-                Personalized support and feedback that drives real change—daily, weekly, monthly.
+                Personalized support and feedback that drives real change, daily, weekly, monthly.
               </p>
             </div>
 
