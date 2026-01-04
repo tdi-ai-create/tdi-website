@@ -75,9 +75,9 @@ export default function AboutPage() {
                   So she started asking new questions:
                 </p>
                 <div className="pl-6 border-l-4 mb-6" style={{ borderColor: '#ffba06' }}>
-                  <p className="italic mb-2" style={{ color: '#ffffff', opacity: 0.9 }}>What if PD did not take up your entire weekend?</p>
-                  <p className="italic mb-2" style={{ color: '#ffffff', opacity: 0.9 }}>What if creativity was not a luxury?</p>
-                  <p className="italic" style={{ color: '#ffffff', opacity: 0.9 }}>What if teachers had tools to actually thrive?</p>
+                  <p className="italic mb-2" style={{ color: '#ffffff', opacity: 0.9 }}>What if PD did not have to be planned by district or building leadership at the last minute?</p>
+                  <p className="italic mb-2" style={{ color: '#ffffff', opacity: 0.9 }}>What if choice could be easily incorporated into educator learning?</p>
+                  <p className="italic" style={{ color: '#ffffff', opacity: 0.9 }}>What if teachers could learn about topics directly addressing needs found on their to-do list?</p>
                 </div>
                 <p className="mb-8" style={{ color: '#ffffff', opacity: 0.9 }}>
                   What started as a personal mission quickly became a movement. Today, TDI serves <span style={{ color: '#ffba06' }} className="font-semibold">87,000+ educators</span> across <span style={{ color: '#ffba06' }} className="font-semibold">21 states</span>.
@@ -347,7 +347,7 @@ export default function AboutPage() {
               <h4 className="font-bold text-lg mb-1" style={{ color: '#1e2749' }}>Kristin Williams</h4>
               <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Chief Marketing Officer</p>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Leads community engagement and brand strategy, connecting TDI with the 87,000+ educators who trust our mission.
+                Marketing strategist and fractional CMO with eight years helping businesses turn real customer connection into real results. Brings cross-industry expertise to help TDI become the face of meaningful change in American education.
               </p>
             </div>
 
