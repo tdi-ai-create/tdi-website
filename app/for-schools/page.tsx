@@ -215,15 +215,15 @@ export default function ForSchoolsPage() {
             No matter your role, TDI meets you where you are.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
 
             {/* Principals */}
             <a
               href="/contact"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all h-full flex flex-col"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col"
               style={{ textDecoration: 'none' }}
             >
-              <div className="h-[160px] overflow-hidden">
+              <div className="h-[140px] overflow-hidden">
                 <img
                   src="/images/leader-principal.png"
                   alt="Principal"
@@ -232,16 +232,16 @@ export default function ForSchoolsPage() {
                 />
               </div>
               <div className="bg-white p-4 flex-1 flex flex-col">
-                <h3
-                  className="text-xs font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749', textDecoration: 'none' }}
+                <p
+                  className="font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749', fontSize: '11px', letterSpacing: '0.05em' }}
                 >
                   Principals
-                </h3>
-                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, textDecoration: 'none' }}>
+                </p>
+                <p className="text-xs mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, lineHeight: '1.4' }}>
                   PD your teachers won't dread. Results you can see in classrooms.
                 </p>
-                <span className="font-semibold text-sm" style={{ color: '#80a4ed', textDecoration: 'none' }}>
+                <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
                   Let's talk →
                 </span>
               </div>
@@ -250,10 +250,10 @@ export default function ForSchoolsPage() {
             {/* Superintendents */}
             <a
               href="/contact"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all h-full flex flex-col"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col"
               style={{ textDecoration: 'none' }}
             >
-              <div className="h-[160px] overflow-hidden">
+              <div className="h-[140px] overflow-hidden">
                 <img
                   src="/images/leader-superintendent.png"
                   alt="Superintendent"
@@ -262,16 +262,16 @@ export default function ForSchoolsPage() {
                 />
               </div>
               <div className="bg-white p-4 flex-1 flex flex-col">
-                <h3
-                  className="text-xs font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749', textDecoration: 'none' }}
+                <p
+                  className="font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749', fontSize: '11px', letterSpacing: '0.05em' }}
                 >
-                  Supers
-                </h3>
-                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, textDecoration: 'none' }}>
-                  District-wide scale, board-ready outcomes, and budget flexibility.
+                  Superintendents
                 </p>
-                <span className="font-semibold text-sm" style={{ color: '#80a4ed', textDecoration: 'none' }}>
+                <p className="text-xs mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, lineHeight: '1.4' }}>
+                  District-wide scale, board-ready outcomes, budget flexibility.
+                </p>
+                <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
                   Let's talk →
                 </span>
               </div>
@@ -280,10 +280,10 @@ export default function ForSchoolsPage() {
             {/* Curriculum Directors */}
             <a
               href="/contact"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all h-full flex flex-col"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col"
               style={{ textDecoration: 'none' }}
             >
-              <div className="h-[160px] overflow-hidden">
+              <div className="h-[140px] overflow-hidden">
                 <img
                   src="/images/leader-curriculum.png"
                   alt="Curriculum Director"
@@ -292,16 +292,16 @@ export default function ForSchoolsPage() {
                 />
               </div>
               <div className="bg-white p-4 flex-1 flex flex-col">
-                <h3
-                  className="text-xs font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749', textDecoration: 'none' }}
+                <p
+                  className="font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749', fontSize: '11px', letterSpacing: '0.05em' }}
                 >
                   Curriculum
-                </h3>
-                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, textDecoration: 'none' }}>
+                </p>
+                <p className="text-xs mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, lineHeight: '1.4' }}>
                   PD that integrates with your initiatives and shows implementation.
                 </p>
-                <span className="font-semibold text-sm" style={{ color: '#80a4ed', textDecoration: 'none' }}>
+                <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
                   Let's talk →
                 </span>
               </div>
@@ -310,10 +310,10 @@ export default function ForSchoolsPage() {
             {/* HR Directors */}
             <a
               href="/contact"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all h-full flex flex-col"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col"
               style={{ textDecoration: 'none' }}
             >
-              <div className="h-[160px] overflow-hidden">
+              <div className="h-[140px] overflow-hidden">
                 <img
                   src="/images/leader-hr.png"
                   alt="HR Director"
@@ -322,16 +322,16 @@ export default function ForSchoolsPage() {
                 />
               </div>
               <div className="bg-white p-4 flex-1 flex flex-col">
-                <h3
-                  className="text-xs font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749', textDecoration: 'none' }}
+                <p
+                  className="font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749', fontSize: '11px', letterSpacing: '0.05em' }}
                 >
-                  HR
-                </h3>
-                <p className="text-sm mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, textDecoration: 'none' }}>
+                  HR Directors
+                </p>
+                <p className="text-xs mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, lineHeight: '1.4' }}>
                   Data that ties teacher support to retention and turnover.
                 </p>
-                <span className="font-semibold text-sm" style={{ color: '#80a4ed', textDecoration: 'none' }}>
+                <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
                   Let's talk →
                 </span>
               </div>
