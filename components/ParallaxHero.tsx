@@ -1,5 +1,7 @@
 'use client';
 
+// Hero v2 - background position 60%
+
 import { useEffect, useRef } from 'react';
 
 export function ParallaxHero() {
