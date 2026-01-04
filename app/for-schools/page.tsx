@@ -344,114 +344,98 @@ export default function ForSchoolsPage() {
             Start small, prove impact, scale when you're ready.
           </p>
 
+          {/* Timeline */}
           <div className="max-w-5xl mx-auto">
 
-            {/* Main Layout: IGNITE large on left, small teasers stacked on right */}
-            <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            {/* Timeline connector line - visible on desktop */}
+            <div className="hidden md:block relative">
+              <div
+                className="absolute top-[24px] left-[16.67%] right-[16.67%] h-1 rounded-full"
+                style={{ backgroundColor: '#80a4ed' }}
+              />
+            </div>
 
-              {/* IGNITE - Large Featured Card (takes 3 columns) */}
-              <div className="lg:col-span-3 bg-white rounded-2xl p-8 shadow-lg" style={{ border: '3px solid #ffba06' }}>
-                <div className="flex items-center gap-3 mb-4">
-                  <div
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold"
-                    style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                  >
-                    1
-                  </div>
+            {/* Timeline Steps */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+
+              {/* Phase 1: IGNITE - Full Details */}
+              <div className="flex flex-col items-center text-center">
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4 relative z-10"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                >
+                  1
+                </div>
+                <div className="bg-white rounded-2xl p-6 shadow-md w-full" style={{ border: '2px solid #ffba06' }}>
                   <span
-                    className="px-3 py-1 text-xs font-bold rounded-full"
+                    className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-3"
                     style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
                   >
                     START HERE
                   </span>
+                  <h3 className="text-xl font-bold mb-1" style={{ color: '#1e2749' }}>IGNITE</h3>
+                  <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.6 }}>Leadership + Pilot Group</p>
+                  <p className="text-2xl font-bold mb-4" style={{ color: '#1e2749' }}>~$33,600<span className="text-sm font-normal">/year</span></p>
+
+                  <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                    Build buy-in with leadership and a pilot group. <strong>95% report saving planning time.</strong>
+                  </p>
+
+                  <ul className="text-sm text-left space-y-2 mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    <li>• 2 On-Campus PD Days</li>
+                    <li>• 4 Virtual Strategy Sessions</li>
+                    <li>• 2 Executive Impact Sessions</li>
+                    <li>• Learning Hub for pilot group</li>
+                    <li>• Leadership Dashboard</li>
+                  </ul>
+
+                  <a
+                    href="/contact"
+                    className="block text-center py-3 rounded-lg font-bold transition-all hover:scale-105"
+                    style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                  >
+                    Start the Conversation
+                  </a>
                 </div>
-
-                <h3 className="text-2xl font-bold mb-1" style={{ color: '#1e2749' }}>IGNITE</h3>
-                <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.6 }}>Leadership + Pilot Group</p>
-
-                <p className="text-3xl font-bold mb-2" style={{ color: '#1e2749' }}>
-                  ~$33,600<span className="text-base font-normal">/year</span>
-                </p>
-                <p className="text-sm mb-6" style={{ color: '#1e2749', opacity: 0.6 }}>
-                  For a typical 60-staff school
-                </p>
-
-                <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
-                  Build buy-in with your leadership team and a pilot group. <strong>95% of pilot teachers report saving planning time.</strong>
-                </p>
-
-                <ul className="space-y-2 mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
-                  <li className="flex items-start gap-2">
-                    <span style={{ color: '#ffba06' }}>✓</span>
-                    <span>2 On-Campus PD Days</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span style={{ color: '#ffba06' }}>✓</span>
-                    <span>4 Virtual Strategy Sessions</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span style={{ color: '#ffba06' }}>✓</span>
-                    <span>2 Executive Impact Sessions</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span style={{ color: '#ffba06' }}>✓</span>
-                    <span>Learning Hub for pilot group</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <span style={{ color: '#ffba06' }}>✓</span>
-                    <span>Leadership Dashboard</span>
-                  </li>
-                </ul>
-
-                <a
-                  href="/contact"
-                  className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:scale-105"
-                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                >
-                  Start the Conversation
-                </a>
               </div>
 
-              {/* Right Column: Small Teaser Cards (takes 2 columns) */}
-              <div className="lg:col-span-2 flex flex-col gap-6">
-
-                {/* ACCELERATE Teaser */}
-                <div className="bg-white rounded-xl p-5 shadow-sm flex-1">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
-                      style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}
-                    >
-                      2
-                    </div>
-                    <h3 className="text-base font-bold" style={{ color: '#1e2749' }}>ACCELERATE</h3>
-                  </div>
+              {/* Phase 2: ACCELERATE - Small Teaser */}
+              <div className="flex flex-col items-center text-center">
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4 relative z-10"
+                  style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}
+                >
+                  2
+                </div>
+                <div className="bg-white rounded-2xl p-5 shadow-sm w-full">
+                  <h3 className="text-lg font-bold mb-1" style={{ color: '#1e2749' }}>ACCELERATE</h3>
+                  <p className="text-xs mb-3" style={{ color: '#1e2749', opacity: 0.6 }}>Full Staff Rollout</p>
                   <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                    Full staff rollout with Learning Hub for everyone. Schools see <strong>38% increase in strategy implementation</strong> at this phase.
+                    Expand to your entire staff. Schools see <strong>38% increase in strategy implementation</strong> at this phase.
                   </p>
                 </div>
+              </div>
 
-                {/* SUSTAIN Teaser */}
-                <div className="bg-white rounded-xl p-5 shadow-sm flex-1">
-                  <div className="flex items-center gap-2 mb-3">
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold"
-                      style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}
-                    >
-                      3
-                    </div>
-                    <h3 className="text-base font-bold" style={{ color: '#1e2749' }}>SUSTAIN</h3>
-                  </div>
+              {/* Phase 3: SUSTAIN - Small Teaser */}
+              <div className="flex flex-col items-center text-center">
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4 relative z-10"
+                  style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}
+                >
+                  3
+                </div>
+                <div className="bg-white rounded-2xl p-5 shadow-sm w-full">
+                  <h3 className="text-lg font-bold mb-1" style={{ color: '#1e2749' }}>SUSTAIN</h3>
+                  <p className="text-xs mb-3" style={{ color: '#1e2749', opacity: 0.6 }}>Embedded Systems</p>
                   <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                     Embed lasting change with advanced analytics and <strong>24/7 support from Desi</strong>, our AI teaching assistant.
                   </p>
                 </div>
-
               </div>
 
             </div>
 
-            {/* Bottom CTA */}
+            {/* Bottom Text */}
             <div className="mt-10 text-center">
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>
                 Every school's journey is different. Let's find the right starting point for yours.
