@@ -90,6 +90,9 @@ export default function AboutPage() {
                 <p className="text-xl mb-6 font-semibold" style={{ color: '#ffba06' }}>
                   Teachers Deserve It was born from burnout.
                 </p>
+                <p className="mb-4" style={{ color: '#ffffff', opacity: 0.9 }}>
+                  We all knew the feeling. Walking into another teacher institute day, grabbing a donut from the principal's table, and settling into the auditorium for sessions that had nothing to do with what we actually needed in our classrooms. Hours of "someday you'll use this" and "maybe someone will do the homework after this 6-hour workshop." None of it helped us be better for our students on Monday.
+                </p>
                 <p className="mb-6" style={{ color: '#ffffff', opacity: 0.9 }}>
                   Rae Hughart was a passionate, high-performing educator who was ready to walk away from the classroom. The system was not built to sustain passionate teachers. It was built to stretch them thin.
                 </p>
