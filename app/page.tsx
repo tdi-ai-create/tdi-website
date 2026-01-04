@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { TDICalculator } from '@/components/calculators/TDICalculator';
 import { FAQ } from '@/components/FAQ';
 import { ParallaxHero } from '@/components/ParallaxHero';
+import { CoursesSection } from '@/components/CoursesSection';
 
 export default function Home() {
   return (
@@ -226,50 +227,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 8: Most Popular Courses */}
-      <section className="section bg-white">
-        <div className="container-default">
-          <h2 className="text-center mb-4">What Educators Are Learning Right Now</h2>
-          <p className="text-center mb-12" style={{ opacity: 0.7 }}>
-            The strategies teachers and paras are using to take back their time and their classrooms.
-          </p>
-
-          <div className="max-w-2xl mx-auto space-y-6">
-            <div className="p-6 rounded-lg border border-gray-200">
-              <h3 className="text-lg font-semibold mb-2">Classroom Management That Actually Works</h3>
-              <p style={{ opacity: 0.7 }}>
-                Practical systems for building a classroom culture where students want to be, without losing your voice or your sanity.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-lg border border-gray-200">
-              <h3 className="text-lg font-semibold mb-2">The Sustainable Teacher</h3>
-              <p style={{ opacity: 0.7 }}>
-                How to set boundaries, protect your time, and actually leave school at a reasonable hour without feeling guilty.
-              </p>
-            </div>
-
-            <div className="p-6 rounded-lg border border-gray-200">
-              <h3 className="text-lg font-semibold mb-2">Differentiation Without the Overwhelm</h3>
-              <p style={{ opacity: 0.7 }}>
-                Real strategies for meeting every student where they are, even when you have 30 kids and no aide.
-              </p>
-            </div>
-          </div>
-
-          <div className="text-center mt-8">
-            <a
-              href="https://tdi.thinkific.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-semibold underline"
-              style={{ color: 'var(--tdi-navy)' }}
-            >
-              Explore all 100+ hours in the Learning Hub
-            </a>
-          </div>
-        </div>
-      </section>
+      {/* SECTION 8: Dynamic Courses from Thinkific */}
+      <CoursesSection />
 
       {/* SECTION 9: Substack/Newsletter Section */}
       <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
