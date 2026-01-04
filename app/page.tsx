@@ -115,59 +115,176 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 6: How We Build Content (NEW) */}
-      <section className="section bg-white">
-        <div className="container-wide">
-          <h2 className="text-center mb-4">How We Build What Teachers Need</h2>
-          <p className="text-center text-lg mb-12" style={{ color: 'var(--tdi-navy)' }}>
-            Research-Backed. Expert-Designed. Educator-Focused.
+      {/* How We Build What Teachers Need */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-default">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+            How We Build What Teachers Need
+          </h2>
+          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+            A process designed by educators, for educators.
           </p>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 max-w-5xl mx-auto">
-            <div className="text-center p-4">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-white" style={{ backgroundColor: 'var(--tdi-navy)' }}>1</div>
-              <h4 className="text-lg font-semibold mb-2">A Need Emerges</h4>
-              <p className="text-sm" style={{ opacity: 0.7 }}>
-                Teachers or partner schools identify a pain point or topic they need support with
-              </p>
+          {/* Floating Bubbles Container */}
+          <div className="relative max-w-5xl mx-auto px-4">
+
+            {/* Connecting Line with Traveling Pulse */}
+            <div className="absolute top-12 left-[10%] right-[10%] h-1 hidden md:block" style={{ backgroundColor: '#e5e7eb' }}>
+              {/* Animated Pulse */}
+              <div
+                className="absolute top-0 left-0 h-full w-20 rounded-full"
+                style={{
+                  background: 'linear-gradient(90deg, transparent, #ffba06, transparent)',
+                  animation: 'travelPulse 3s ease-in-out infinite'
+                }}
+              />
             </div>
 
-            <div className="text-center p-4">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-white" style={{ backgroundColor: 'var(--tdi-navy)' }}>2</div>
-              <h4 className="text-lg font-semibold mb-2">Experts Assemble</h4>
-              <p className="text-sm" style={{ opacity: 0.7 }}>
-                TDI recruits specialists and practitioners in the field to collaborate on solutions
-              </p>
-            </div>
+            {/* Bubbles Row */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-4">
 
-            <div className="text-center p-4">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-white" style={{ backgroundColor: 'var(--tdi-navy)' }}>3</div>
-              <h4 className="text-lg font-semibold mb-2">Research & Design</h4>
-              <p className="text-sm" style={{ opacity: 0.7 }}>
-                Solutions are grounded in current research and shaped into actionable tools
-              </p>
-            </div>
+              {/* Bubble 1 */}
+              <div
+                className="group flex flex-col items-center text-center"
+                style={{ animation: 'float 3s ease-in-out infinite' }}
+              >
+                <div
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-lg relative z-10"
+                  style={{
+                    backgroundColor: '#1e2749',
+                    boxShadow: '0 4px 15px rgba(30, 39, 73, 0.3)'
+                  }}
+                >
+                  <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>1</span>
+                </div>
+                <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
+                  Listen
+                </h3>
+                <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
+                  We hear what teachers actually need
+                </p>
+              </div>
 
-            <div className="text-center p-4">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-white" style={{ backgroundColor: 'var(--tdi-navy)' }}>4</div>
-              <h4 className="text-lg font-semibold mb-2">Publish to the Hub</h4>
-              <p className="text-sm" style={{ opacity: 0.7 }}>
-                Courses, downloads, and resource packets go live in the TDI Learning Hub
-              </p>
-            </div>
+              {/* Bubble 2 */}
+              <div
+                className="group flex flex-col items-center text-center"
+                style={{ animation: 'float 3s ease-in-out infinite', animationDelay: '0.3s' }}
+              >
+                <div
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-lg relative z-10"
+                  style={{
+                    backgroundColor: '#1e2749',
+                    boxShadow: '0 4px 15px rgba(30, 39, 73, 0.3)'
+                  }}
+                >
+                  <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>2</span>
+                </div>
+                <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
+                  Design
+                </h3>
+                <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
+                  Practical solutions that fit real life
+                </p>
+              </div>
 
-            <div className="text-center p-4">
-              <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 font-bold text-white" style={{ backgroundColor: 'var(--tdi-navy)' }}>5</div>
-              <h4 className="text-lg font-semibold mb-2">Delivered to Teachers</h4>
-              <p className="text-sm" style={{ opacity: 0.7 }}>
-                Educators access targeted, ready-to-use resources when they need them
-              </p>
+              {/* Bubble 3 */}
+              <div
+                className="group flex flex-col items-center text-center"
+                style={{ animation: 'float 3s ease-in-out infinite', animationDelay: '0.6s' }}
+              >
+                <div
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-lg relative z-10"
+                  style={{
+                    backgroundColor: '#1e2749',
+                    boxShadow: '0 4px 15px rgba(30, 39, 73, 0.3)'
+                  }}
+                >
+                  <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>3</span>
+                </div>
+                <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
+                  Test
+                </h3>
+                <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
+                  Real classrooms, real feedback
+                </p>
+              </div>
+
+              {/* Bubble 4 */}
+              <div
+                className="group flex flex-col items-center text-center"
+                style={{ animation: 'float 3s ease-in-out infinite', animationDelay: '0.9s' }}
+              >
+                <div
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-lg relative z-10"
+                  style={{
+                    backgroundColor: '#1e2749',
+                    boxShadow: '0 4px 15px rgba(30, 39, 73, 0.3)'
+                  }}
+                >
+                  <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>4</span>
+                </div>
+                <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
+                  Refine
+                </h3>
+                <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
+                  Improve until it works perfectly
+                </p>
+              </div>
+
+              {/* Bubble 5 */}
+              <div
+                className="group flex flex-col items-center text-center"
+                style={{ animation: 'float 3s ease-in-out infinite', animationDelay: '1.2s' }}
+              >
+                <div
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-lg relative z-10"
+                  style={{
+                    backgroundColor: '#1e2749',
+                    boxShadow: '0 4px 15px rgba(30, 39, 73, 0.3)'
+                  }}
+                >
+                  <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>5</span>
+                </div>
+                <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
+                  Deliver
+                </h3>
+                <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
+                  Ready to use Monday morning
+                </p>
+              </div>
+
             </div>
           </div>
 
-          <p className="text-center text-sm mt-8" style={{ color: 'var(--tdi-coral)', fontWeight: 600 }}>
-            Partner schools: 30-day turnaround guarantee on custom requests
-          </p>
+          {/* CSS Animations */}
+          <style jsx>{`
+            @keyframes float {
+              0%, 100% {
+                transform: translateY(0px);
+              }
+              50% {
+                transform: translateY(-8px);
+              }
+            }
+
+            @keyframes travelPulse {
+              0% {
+                left: -10%;
+                opacity: 0;
+              }
+              10% {
+                opacity: 1;
+              }
+              90% {
+                opacity: 1;
+              }
+              100% {
+                left: 100%;
+                opacity: 0;
+              }
+            }
+          `}</style>
+
         </div>
       </section>
 
