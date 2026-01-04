@@ -132,7 +132,7 @@ export function Footer() {
         <div className="container-wide py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <p className="text-sm" style={{ color: 'white', opacity: 0.5 }}>
-              © {new Date().getFullYear()} Teachers Deserve It. All rights reserved.
+              © 2025 Teachers Deserve It. All rights reserved.
             </p>
             <div className="flex gap-6">
               <Link href="/privacy" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
