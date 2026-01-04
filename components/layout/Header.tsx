@@ -47,7 +47,7 @@ export function Header() {
               Pricing
             </Link>
             <Link 
-              href="/about" 
+              href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="text-base font-medium hover:opacity-70 transition-opacity" style={{ color: 'var(--tdi-charcoal)' }}>Blog</a><Link href="/about" 
               className="text-base font-medium hover:opacity-70 transition-opacity"
               style={{ color: 'var(--tdi-charcoal)' }}
             >
@@ -114,7 +114,7 @@ export function Header() {
                 Pricing
               </Link>
               <Link 
-                href="/about" 
+                href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="text-base font-medium hover:opacity-70 transition-opacity" style={{ color: 'var(--tdi-charcoal)' }}>Blog</a><Link href="/about" 
                 className="text-base font-medium py-2"
                 style={{ color: 'var(--tdi-charcoal)' }}
                 onClick={() => setMobileMenuOpen(false)}
