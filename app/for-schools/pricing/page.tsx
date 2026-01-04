@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 const pricingTiers = [
   {
     name: 'IGNITE',
-    phase: 'Phase 1 — Leadership + Pilot Group',
+    phase: 'Phase 1: Leadership + Pilot Group',
     price: '~$33,600',
     description: 'Start with buy-in. Build momentum with leadership and a pilot group before full rollout.',
     features: [
@@ -23,7 +23,7 @@ const pricingTiers = [
   },
   {
     name: 'ACCELERATE',
-    phase: 'Phase 2 — Full Staff Rollout',
+    phase: 'Phase 2: Full Staff Rollout',
     price: '~$54,240',
     description: 'Expand to your entire staff with proven strategies and deeper support.',
     features: [
@@ -37,7 +37,7 @@ const pricingTiers = [
   },
   {
     name: 'SUSTAIN',
-    phase: 'Phase 3 — Embedded Systems',
+    phase: 'Phase 3: Embedded Systems',
     price: '~$84,240',
     description: 'Embed lasting change with advanced tools and ongoing support.',
     features: [
@@ -95,7 +95,7 @@ export default function PricingPage() {
           <div className="text-center">
             <h2 className="mb-6">How Our Pricing Works</h2>
             <p className="text-lg mb-8">
-              TDI uses a phased partnership model—not a one-and-done workshop. Start with leadership buy-in and a pilot group, then scale to full staff when you're ready. Each phase builds on the last.
+              TDI uses a phased partnership model, not a one-and-done workshop. Start with leadership buy-in and a pilot group, then scale to full staff when you're ready. Each phase builds on the last.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
               <div>
@@ -212,7 +212,7 @@ export default function PricingPage() {
           <div className="text-center">
             <h2 className="mb-4">Not Sure Which Phase Is Right for Your School?</h2>
             <p className="text-lg mb-8" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              Let's talk through your goals, staff size, and timeline. No pressure—just a conversation to see if TDI is the right fit.
+              Let's talk through your goals, staff size, and timeline. No pressure, just a conversation to see if TDI is the right fit.
             </p>
             <Button href="/for-schools/schedule-call">Schedule a Call</Button>
           </div>

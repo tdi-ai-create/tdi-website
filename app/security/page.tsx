@@ -12,7 +12,7 @@ export default function SecurityPage() {
       </section>
 
       {/* Trust Badges */}
-      <section className="section py-12" style={{ backgroundColor: 'var(--tdi-navy)' }}>
+      <section className="section py-12" style={{ backgroundColor: 'var(--tdi-blue)' }}>
         <div className="container-wide">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
@@ -78,7 +78,7 @@ export default function SecurityPage() {
       </section>
 
       {/* For Schools */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-pink)' }}>
+      <section className="section" style={{ backgroundColor: 'var(--tdi-gray)' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto">
             <h2 className="mb-8">For Schools & Districts</h2>

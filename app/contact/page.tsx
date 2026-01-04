@@ -132,7 +132,7 @@ export default function ContactPage() {
       </section>
 
       {/* Response Time */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-pink)' }}>
+      <section className="section" style={{ backgroundColor: 'var(--tdi-gray)' }}>
         <div className="container-default text-center">
           <p className="text-lg">
             We respond to all inquiries within <strong>24 hours</strong>.

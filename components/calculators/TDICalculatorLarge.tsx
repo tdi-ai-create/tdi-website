@@ -58,7 +58,7 @@ export function TDICalculatorLarge() {
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 mb-8">
         
         {/* Sliders */}
-        <div className="px-8 py-6 border-b border-gray-100" style={{ backgroundColor: 'var(--tdi-pink)' }}>
+        <div className="px-8 py-6 border-b border-gray-100" style={{ backgroundColor: 'var(--tdi-gray)' }}>
           <div className="grid grid-cols-3 gap-8">
             {/* Teachers */}
             <div>

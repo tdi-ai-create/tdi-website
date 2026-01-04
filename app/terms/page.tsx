@@ -6,7 +6,7 @@ export default function TermsPage() {
         <div className="container-default">
           <h1 style={{ color: 'white' }}>Terms of Service</h1>
           <p className="mt-4" style={{ color: 'white', opacity: 0.8 }}>
-            Last updated: January 2026
+            Last updated: January 2025
           </p>
         </div>
       </section>

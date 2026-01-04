@@ -50,14 +50,14 @@ export default function AboutPage() {
               Teachers Deserve It was born from burnout.
             </p>
             <p className="text-lg mb-6">
-              Rae Hughart was a passionate, high-performing educator—who was ready to walk away from the classroom. The system wasn't built to sustain passionate teachers. It was built to stretch them thin.
+              Rae Hughart was a passionate, high-performing educator who was ready to walk away from the classroom. The system wasn't built to sustain passionate teachers. It was built to stretch them thin.
             </p>
             <p className="text-lg mb-6">
               So she started asking new questions:
             </p>
             <div className="pl-6 border-l-4 mb-6" style={{ borderColor: 'var(--tdi-yellow)' }}>
               <p className="text-lg italic mb-2">What if professional development didn't take up your entire weekend?</p>
-              <p className="text-lg italic mb-2">What if creativity wasn't a luxury—but the norm?</p>
+              <p className="text-lg italic mb-2">What if creativity wasn't a luxury, but the norm?</p>
               <p className="text-lg italic">What if we gave teachers the tools they actually needed to thrive?</p>
             </div>
             <p className="text-lg mb-6">
@@ -112,7 +112,7 @@ export default function AboutPage() {
               <div key={index} className="text-center">
                 <div 
                   className="w-32 h-32 rounded-full mx-auto mb-4 flex items-center justify-center text-4xl"
-                  style={{ backgroundColor: 'var(--tdi-pink)' }}
+                  style={{ backgroundColor: 'var(--tdi-gray)' }}
                 >
                   👤
                 </div>
@@ -125,7 +125,7 @@ export default function AboutPage() {
           </div>
           
           <p className="text-center mt-8 text-sm" style={{ color: 'var(--tdi-charcoal)', opacity: 0.7 }}>
-            Plus content creators, district liaisons, and administrative support—all working toward one goal: helping teachers thrive.
+            Plus content creators, district liaisons, and administrative support. All working toward one goal: helping teachers thrive.
           </p>
         </Container>
       </Section>
@@ -136,7 +136,7 @@ export default function AboutPage() {
           <div className="text-center">
             <h2 className="mb-4">Want to See What TDI Can Do for Your School?</h2>
             <p className="text-lg mb-8" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              Whether you're a teacher ready to take back your time or a district leader searching for sustainable PD that actually sticks—we're here to help.
+              Whether you're a teacher ready to take back your time or a district leader searching for sustainable PD that actually sticks, we're here to help.
             </p>
             <Button href="/contact">Contact the Team</Button>
           </div>

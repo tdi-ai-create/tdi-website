@@ -40,7 +40,7 @@ export default function RequestForSchoolPage() {
               <div className="text-center py-12">
                 <h2 className="mb-4">Thank you!</h2>
                 <p className="mb-6" style={{ opacity: 0.7 }}>
-                  We've received your request. We'll reach out to your school leader with information about how TDI can support your whole building — teachers and paraprofessionals alike.
+                  We've received your request. We'll reach out to your school leader with information about how TDI can support your whole building, including teachers and paraprofessionals.
                 </p>
                 <p style={{ opacity: 0.7 }}>
                   In the meantime, keep exploring the Learning Hub and sharing what you're learning with your colleagues.
@@ -48,7 +48,7 @@ export default function RequestForSchoolPage() {
               </div>
             ) : (
               <>
-                <div className="mb-8 p-4 rounded-lg" style={{ backgroundColor: 'var(--tdi-pink)' }}>
+                <div className="mb-8 p-4 rounded-lg" style={{ backgroundColor: 'var(--tdi-gray)' }}>
                   <p className="text-sm" style={{ opacity: 0.8 }}>
                     <strong>How this works:</strong> Fill out the form below, and we'll send a friendly email to your school leader introducing TDI and offering a no-pressure conversation about supporting your staff.
                   </p>

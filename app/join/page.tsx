@@ -8,7 +8,7 @@ export default function JoinPage() {
         <div className="container-default text-center">
           <h1 className="mb-4" style={{ color: 'white' }}>Join the Movement</h1>
           <p className="text-xl max-w-2xl mx-auto" style={{ color: 'white', opacity: 0.9 }}>
-            Find your path — whether you're a teacher looking for support or a leader building a healthier school.
+            Find your path. Whether you're a teacher looking for support or a leader building a healthier school, we're here to help.
           </p>
         </div>
       </section>
@@ -45,7 +45,7 @@ export default function JoinPage() {
             >
               <h3 className="text-xl mb-3">Listen While You Commute</h3>
               <p style={{ opacity: 0.7 }}>
-                The Teachers Deserve It podcast — real talk about sustainable teaching from people who get it.
+                The Sustainable Teaching podcast. Real talk about sustainable teaching from people who get it.
               </p>
               <span className="inline-block mt-4 font-semibold" style={{ color: 'var(--tdi-navy)' }}>
                 Start listening →
@@ -55,7 +55,7 @@ export default function JoinPage() {
             <Link href="/resources" className="card hover:shadow-lg transition-shadow">
               <h3 className="text-xl mb-3">Grab a Free Resource</h3>
               <p style={{ opacity: 0.7 }}>
-                Ready-to-use downloads for your classroom — for teachers and paras alike.
+                Ready-to-use downloads for your classroom, for teachers and paras alike.
               </p>
               <span className="inline-block mt-4 font-semibold" style={{ color: 'var(--tdi-navy)' }}>
                 Browse downloads →
@@ -66,7 +66,7 @@ export default function JoinPage() {
       </section>
 
       {/* For Teachers */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-pink)' }}>
+      <section className="section" style={{ backgroundColor: 'var(--tdi-gray)' }}>
         <div className="container-default">
           <h2 className="text-center mb-4">For Teachers</h2>
           <p className="text-center mb-12" style={{ opacity: 0.7 }}>
@@ -127,7 +127,7 @@ export default function JoinPage() {
         <div className="container-default">
           <h2 className="text-center mb-4">For School Leaders</h2>
           <p className="text-center mb-12" style={{ opacity: 0.7 }}>
-            Support your whole building — teachers and paraprofessionals — with PD they'll actually use.
+            Support your whole building, teachers and paraprofessionals, with PD they'll actually use.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
@@ -166,7 +166,7 @@ export default function JoinPage() {
             >
               <h3 className="text-xl mb-3">Let's Talk</h3>
               <p className="mb-4" style={{ opacity: 0.7 }}>
-                Schedule a conversation with our team. No pitch, no pressure — just a real discussion about what your school needs.
+                Schedule a conversation with our team. No pitch, no pressure. Just a real discussion about what your school needs.
               </p>
               <span className="inline-block font-semibold" style={{ color: 'var(--tdi-navy)' }}>
                 Schedule a conversation →

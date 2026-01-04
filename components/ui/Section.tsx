@@ -23,7 +23,7 @@ export function Section({
 
   const inlineStyles = {
     white: {},
-    pink: { backgroundColor: 'var(--tdi-pink)' },
+    pink: { backgroundColor: 'var(--tdi-gray)' },
     navy: { backgroundColor: 'var(--tdi-navy)', color: 'white' },
   };
 

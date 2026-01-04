@@ -8,7 +8,6 @@
   --tdi-gray: #F5F5F5;
   --tdi-navy: #1E2A4A;
   --tdi-coral: #F96767;
-  --tdi-pink: #E8D5D5;
   --tdi-charcoal: #2D2D2D;
 
   /* Background */
@@ -26,7 +25,6 @@
   --color-tdi-charcoal: var(--tdi-charcoal);
   --color-tdi-white: var(--tdi-white);
   --color-tdi-gray: var(--tdi-gray);
-  --color-tdi-pink: var(--tdi-pink);
   --color-tdi-blue: var(--tdi-blue);
   --color-tdi-navy: var(--tdi-navy);
 
@@ -203,7 +201,7 @@ a:hover {
 }
 
 .card-testimonial {
-  background: var(--tdi-pink);
+  background: var(--tdi-gray);
   border: none;
   border-radius: 12px;
   padding: 32px;

@@ -3,7 +3,7 @@ import { Section, Container } from '@/components/ui';
 
 export const metadata: Metadata = {
   title: 'Schedule a Call',
-  description: 'Book a 30-minute call to explore TDI school partnerships. No pressure, no pitch deck—just a conversation about what your teachers need.',
+  description: 'Book a 30-minute call to explore TDI school partnerships. No pressure, no pitch deck. Just a conversation about what your teachers need.',
 };
 
 export default function ScheduleCallPage() {
@@ -15,7 +15,7 @@ export default function ScheduleCallPage() {
           <div className="text-center mb-12">
             <h1 className="mb-4">Let's Talk About Your School</h1>
             <p className="text-xl" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              A 30-minute conversation to explore if TDI is the right fit—no pressure, no pitch deck.
+              A 30-minute conversation to explore if TDI is the right fit. No pressure, no pitch deck.
             </p>
           </div>
         </Container>

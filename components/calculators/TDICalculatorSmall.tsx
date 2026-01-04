@@ -74,7 +74,7 @@ export function TDICalculatorSmall() {
       <div className="px-6 pb-6 space-y-4">
         
         {/* Teachers Row */}
-        <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: 'var(--tdi-pink)' }}>
+        <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: 'var(--tdi-gray)' }}>
           <span className="text-sm font-medium text-gray-700">👩‍🏫 Teachers exiting burnout</span>
           <span 
             className="text-2xl font-black transition-transform duration-200"
@@ -85,7 +85,7 @@ export function TDICalculatorSmall() {
         </div>
         
         {/* Retention Row */}
-        <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: 'var(--tdi-pink)' }}>
+        <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: 'var(--tdi-gray)' }}>
           <span className="text-sm font-medium text-gray-700">🏫 Teachers you won't have to replace</span>
           <span 
             className="text-2xl font-black transition-transform duration-200"
@@ -96,7 +96,7 @@ export function TDICalculatorSmall() {
         </div>
 
         {/* Lessons Row */}
-        <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: 'var(--tdi-pink)' }}>
+        <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: 'var(--tdi-gray)' }}>
           <span className="text-sm font-medium text-gray-700">🎒 Lessons improved for students</span>
           <span 
             className="text-2xl font-black transition-transform duration-200"
@@ -107,7 +107,7 @@ export function TDICalculatorSmall() {
         </div>
 
         {/* Sundays Row */}
-        <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: 'var(--tdi-pink)' }}>
+        <div className="flex items-center justify-between p-3 rounded-lg" style={{ backgroundColor: 'var(--tdi-gray)' }}>
           <span className="text-sm font-medium text-gray-700">☀️ Sundays given back to teachers</span>
           <span 
             className="text-2xl font-black transition-transform duration-200"

@@ -36,7 +36,7 @@ const testimonials = [
 const pricingTiers = [
   {
     name: 'IGNITE',
-    phase: 'Phase 1 — Leadership + Pilot Group',
+    phase: 'Phase 1: Leadership + Pilot Group',
     price: '~$33,600',
     description: 'Start with buy-in. Build momentum with leadership and a pilot group before full rollout.',
     features: [
@@ -50,7 +50,7 @@ const pricingTiers = [
   },
   {
     name: 'ACCELERATE',
-    phase: 'Phase 2 — Full Staff Rollout',
+    phase: 'Phase 2: Full Staff Rollout',
     price: '~$54,240',
     description: 'Expand to your entire staff with proven strategies and deeper support.',
     features: [
@@ -64,7 +64,7 @@ const pricingTiers = [
   },
   {
     name: 'SUSTAIN',
-    phase: 'Phase 3 — Embedded Systems',
+    phase: 'Phase 3: Embedded Systems',
     price: '~$84,240',
     description: 'Embed lasting change with advanced tools and ongoing support.',
     features: [
@@ -87,7 +87,7 @@ export default function ForSchoolsPage() {
           <div className="max-w-3xl">
             <h1 className="mb-6">Give Your Teachers What They Deserve</h1>
             <p className="text-xl mb-8" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              Professional development that actually works—with outcomes you can measure and report.
+              Professional development that actually works, with outcomes you can measure and report.
             </p>
             <div className="flex flex-wrap gap-4">
               <Button href="/for-schools/pricing">See Pricing</Button>
@@ -141,13 +141,13 @@ export default function ForSchoolsPage() {
             <div className="card">
               <h4 className="mb-3">Measurable Outcomes Dashboard</h4>
               <p style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-                Track engagement, completion, and implementation rates. Report real data to your board—not attendance sheets.
+                Track engagement, completion, and implementation rates. Report real data to your board, not attendance sheets.
               </p>
             </div>
             <div className="card">
               <h4 className="mb-3">Personalized Teacher Feedback</h4>
               <p style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-                Every teacher receives direct, personalized feedback during visits—positive, uplifting, and connected to solutions.
+                Every teacher receives direct, personalized feedback during visits. Positive, uplifting, and connected to solutions.
               </p>
             </div>
             <div className="card">
@@ -248,7 +248,7 @@ export default function ForSchoolsPage() {
           <div className="text-center mb-12">
             <h2 className="mb-4">Transparent Pricing for Schools</h2>
             <p className="text-lg max-w-2xl mx-auto" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              We don't hide our pricing behind a sales call. Our phased approach grows with your school—start with leadership and a pilot group, then expand when you're ready.
+              We don't hide our pricing behind a sales call. Our phased approach grows with your school. Start with leadership and a pilot group, then expand when you're ready.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -276,7 +276,7 @@ export default function ForSchoolsPage() {
           <div className="text-center">
             <h2 className="mb-4">Ready to See What TDI Can Do for Your School?</h2>
             <p className="text-lg mb-8" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              Let's talk through your goals, staff size, and timeline. No pressure—just a conversation.
+              Let's talk through your goals, staff size, and timeline. No pressure, just a conversation.
             </p>
             <div className="flex flex-wrap justify-center gap-4">
               <Button href="/for-schools/schedule-call">Schedule a Call</Button>

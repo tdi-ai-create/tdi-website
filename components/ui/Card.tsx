@@ -54,7 +54,7 @@ export function TestimonialCard({
         "{quote}"
       </blockquote>
       <cite className="not-italic text-sm" style={{ color: 'var(--tdi-charcoal)', opacity: 0.7 }}>
-        — {author}, {role}{location ? `, ${location}` : ''}
+        {author}, {role}{location ? `, ${location}` : ''}
       </cite>
     </Card>
   );

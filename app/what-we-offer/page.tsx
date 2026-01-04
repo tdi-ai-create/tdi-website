@@ -14,7 +14,7 @@ const features = [
   },
   {
     title: 'Practical, Ready-to-Use Strategies',
-    description: "Every course includes tools you can implement tomorrow—not 'someday.'",
+    description: "Every course includes tools you can implement tomorrow, not 'someday.'",
     icon: '🛠️',
   },
   {
@@ -49,7 +49,7 @@ export default function WhatWeOfferPage() {
           <div className="text-center">
             <h1 className="mb-4">Professional Development That Respects Your Time</h1>
             <p className="text-xl mb-8" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              On-demand courses, practical strategies, and a community of 87,000+ educators—all built by teachers who've been in your shoes.
+              On-demand courses, practical strategies, and a community of 87,000+ educators. All built by teachers who've been in your shoes.
             </p>
             <Button href="https://tdi.thinkific.com" external>
               Explore the Learning Hub
@@ -116,7 +116,7 @@ export default function WhatWeOfferPage() {
           <div className="text-center">
             <h2 className="mb-4">Want TDI for Your Whole School?</h2>
             <p className="text-lg mb-8" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              We partner with schools and districts to bring sustainable PD at scale—with implementation support, progress tracking, and outcomes you can report to your board.
+              We partner with schools and districts to bring sustainable PD at scale, with implementation support, progress tracking, and outcomes you can report to your board.
             </p>
             <Button href="/for-schools" variant="secondary">
               See School Partnership Options

@@ -11,7 +11,7 @@ export default function FundingPage() {
           </p>
           <h1 className="mb-4" style={{ color: 'white' }}>Without the Price Tag</h1>
           <p className="text-xl max-w-2xl mx-auto" style={{ color: 'white', opacity: 0.9 }}>
-            Teachers Deserve It helps schools deliver PD that teachers love — and we help secure the funding to pay for it.
+            Teachers Deserve It helps schools deliver PD that teachers love, and we help secure the funding to pay for it.
           </p>
         </div>
       </section>
@@ -40,15 +40,15 @@ export default function FundingPage() {
             <p className="text-lg mb-6">You're asked to deliver PD that inspires. But all too often:</p>
             <ul className="space-y-3 text-lg mb-8">
               <li className="flex items-start gap-3">
-                <span style={{ color: 'var(--tdi-coral)' }}>—</span>
+                <span style={{ color: 'var(--tdi-coral)' }}>•</span>
                 <span>PD eats staff time without changing practice.</span>
               </li>
               <li className="flex items-start gap-3">
-                <span style={{ color: 'var(--tdi-coral)' }}>—</span>
+                <span style={{ color: 'var(--tdi-coral)' }}>•</span>
                 <span>Budgets are already stretched too thin.</span>
               </li>
               <li className="flex items-start gap-3">
-                <span style={{ color: 'var(--tdi-coral)' }}>—</span>
+                <span style={{ color: 'var(--tdi-coral)' }}>•</span>
                 <span>Teachers roll their eyes, and you're left apologizing for wasted hours.</span>
               </li>
             </ul>
@@ -60,14 +60,14 @@ export default function FundingPage() {
       </section>
 
       {/* How TDI Makes It Easy */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-pink)' }}>
+      <section className="section" style={{ backgroundColor: 'var(--tdi-gray)' }}>
         <div className="container-default">
           <h2 className="text-center mb-12">How TDI Makes It Easy</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div className="card">
               <h3 className="text-xl mb-3">We Design a Plan</h3>
               <p style={{ opacity: 0.7 }}>
-                Built around your staff's priorities and goals — for teachers and paraprofessionals alike.
+                Built around your staff's priorities and goals, for teachers and paraprofessionals alike.
               </p>
             </div>
             <div className="card">
@@ -99,7 +99,7 @@ export default function FundingPage() {
             <p className="text-2xl italic mb-6" style={{ color: 'var(--tdi-charcoal)' }}>
               "This was the first PD I didn't have to apologize for. Our teachers actually thanked me."
             </p>
-            <p className="font-semibold">— School Principal</p>
+            <p className="font-semibold">School Principal</p>
           </div>
         </div>
       </section>
@@ -114,7 +114,7 @@ export default function FundingPage() {
               <div>
                 <h3 className="text-xl mb-2" style={{ color: 'white' }}>Discovery & Alignment</h3>
                 <p style={{ color: 'white', opacity: 0.8 }}>
-                  We start by listening — learning your district's goals, challenges, and timelines. Then we align those priorities with available grant opportunities.
+                  We start by listening. We learn your district's goals, challenges, and timelines. Then we align those priorities with available grant opportunities.
                 </p>
               </div>
             </div>
@@ -132,7 +132,7 @@ export default function FundingPage() {
               <div>
                 <h3 className="text-xl mb-2" style={{ color: 'white' }}>Grant Mapping</h3>
                 <p style={{ color: 'white', opacity: 0.8 }}>
-                  We provide a curated list of grants aligned to your plan — with deadlines, requirements, and best-fit matches.
+                  We provide a curated list of grants aligned to your plan, with deadlines, requirements, and best-fit matches.
                 </p>
               </div>
             </div>
@@ -195,13 +195,13 @@ export default function FundingPage() {
       </section>
 
       {/* Second Testimonial */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-pink)' }}>
+      <section className="section" style={{ backgroundColor: 'var(--tdi-gray)' }}>
         <div className="container-default">
           <div className="max-w-2xl mx-auto text-center">
             <p className="text-2xl italic mb-6" style={{ color: 'var(--tdi-charcoal)' }}>
               "TDI helped us unlock funding we didn't even know was possible."
             </p>
-            <p className="font-semibold">— District Leader</p>
+            <p className="font-semibold">District Leader</p>
           </div>
         </div>
       </section>
@@ -215,10 +215,10 @@ export default function FundingPage() {
               Schools across the country qualify for multiple grants designed to support professional learning.
             </p>
             <p className="text-lg mb-6">
-              TDI does the heavy lifting — aligning your PD plan to opportunities, drafting ready-to-use language, and supporting your final submission.
+              TDI does the heavy lifting: aligning your PD plan to opportunities, drafting ready-to-use language, and supporting your final submission.
             </p>
             <p className="text-lg font-semibold" style={{ color: 'var(--tdi-navy)' }}>
-              That means your teachers and paras get the support they deserve — without your team carrying the burden of research or paperwork.
+              That means your teachers and paras get the support they deserve, without your team carrying the burden of research or paperwork.
             </p>
           </div>
         </div>
