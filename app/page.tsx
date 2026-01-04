@@ -198,7 +198,7 @@ export default function Home() {
                   <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>3</span>
                 </div>
                 <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Research & Design
+                  Research &<br />Design
                 </h3>
                 <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
                   Grounded in current research, shaped into tools
@@ -219,7 +219,7 @@ export default function Home() {
                   <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>4</span>
                 </div>
                 <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Publish to Hub
+                  Publish<br />to Hub
                 </h3>
                 <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
                   Courses and resources go live
