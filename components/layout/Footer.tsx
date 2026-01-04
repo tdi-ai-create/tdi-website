@@ -92,6 +92,11 @@ export function Footer() {
                     Free PD Plan
                   </Link>
                 </li>
+                <li>
+                  <a href="https://www.facebook.com/groups/tdimovement" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                    Free FB Community
+                  </a>
+                </li>
               </ul>
             </div>
 
