@@ -29,12 +29,11 @@ export async function GET() {
 
     const data = await response.json();
 
-    // Thinkific API only returns published courses, so no filter needed
-    const courses = (data.items || [])
+    const publishedCourses = data.items
       .sort(() => Math.random() - 0.5)
-      .slice(0, 5); // Get 5 random courses (plus 1 featured = 6 total)
+      .slice(0, 5);
 
-    return NextResponse.json(courses);
+    return NextResponse.json(publishedCourses);
   } catch (error) {
     console.error('Error fetching courses:', error);
     return NextResponse.json(
