@@ -8,30 +8,59 @@ export const metadata = {
 export default function ForSchoolsPage() {
   return (
     <main>
-      {/* Hero Section */}
-      <section className="py-20 md:py-28" style={{ backgroundColor: '#1e2749' }}>
-        <div className="container-default text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6" style={{ color: '#ffffff' }}>
-            Give Your Teachers What They Deserve
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
-            Professional development that actually works, with outcomes you can measure and report.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/for-schools/pricing"
-              className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
-              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+      {/* Hero Section with Parallax */}
+      <section className="relative h-[400px] md:h-[450px] overflow-hidden">
+        {/* Parallax Background Image */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: "url('/images/hero-for-schools.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center 20%',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
+          }}
+        />
+
+        {/* Light Navy Gradient Overlay */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(180deg, rgba(30, 39, 73, 0.5) 0%, rgba(30, 39, 73, 0.65) 100%)'
+          }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 h-full flex items-center justify-center">
+          <div className="text-center px-4 max-w-3xl mx-auto">
+            <h1
+              className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6"
+              style={{ color: '#ffffff' }}
             >
-              See Pricing
-            </Link>
-            <Link
-              href="/contact"
-              className="px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-white/10"
-              style={{ borderColor: '#ffffff', color: '#ffffff' }}
+              Give Your Teachers What They Deserve
+            </h1>
+            <p
+              className="text-lg md:text-xl mb-8"
+              style={{ color: '#ffffff', opacity: 0.9 }}
             >
-              Schedule a Call
-            </Link>
+              Professional development that actually works, with outcomes you can measure and report.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="/for-schools/pricing"
+                className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
+                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+              >
+                See Pricing
+              </a>
+              <a
+                href="/contact"
+                className="px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-white/10"
+                style={{ borderColor: '#ffffff', color: '#ffffff' }}
+              >
+                Schedule a Call
+              </a>
+            </div>
           </div>
         </div>
       </section>
