@@ -56,7 +56,7 @@ export function ParallaxHero() {
         className="relative z-10 h-full flex items-center justify-start will-change-transform"
       >
         <div className="ml-8 md:ml-16 lg:ml-20 xl:ml-24">
-          <div className="max-w-sm md:max-w-md">
+          <div className="max-w-md md:max-w-lg">
             <h1
               className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight"
               style={{ color: '#ffffff' }}
