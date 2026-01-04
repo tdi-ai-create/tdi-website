@@ -131,6 +131,10 @@ export default function ContactPage() {
                 <button type="submit" className="btn-primary w-full">
                   Send Message
                 </button>
+
+                <p className="text-xs mt-3 text-center" style={{ color: '#1e2749', opacity: 0.6 }}>
+                  Your data is encrypted and never sold. We respect your privacy.
+                </p>
               </form>
             )}
 
