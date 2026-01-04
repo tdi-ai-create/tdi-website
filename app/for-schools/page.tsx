@@ -373,9 +373,9 @@ export default function ForSchoolsPage() {
                 >
                   1
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-md w-full" style={{ border: '2px solid #ffba06' }}>
+                <div className="bg-white rounded-2xl p-6 shadow-md w-full h-full flex flex-col" style={{ border: '2px solid #ffba06' }}>
                   <span
-                    className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-3"
+                    className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-3 self-center"
                     style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
                   >
                     START HERE
@@ -383,14 +383,19 @@ export default function ForSchoolsPage() {
                   <h3 className="text-xl font-bold mb-2" style={{ color: '#1e2749' }}>IGNITE</h3>
                   <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.6 }}>Leadership + Pilot Group</p>
                   <p className="text-2xl font-bold mb-4" style={{ color: '#1e2749' }}>~$33,600<span className="text-sm font-normal">/year</span></p>
-                  <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
-                    Build buy-in with leadership and a pilot group. Prove impact before full rollout.
-                  </p>
-                  <ul className="text-sm text-left space-y-2 mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
+
+                  {/* Impact Stat */}
+                  <div className="rounded-lg p-3 mb-4" style={{ backgroundColor: '#FEF9E7' }}>
+                    <p className="text-2xl font-bold" style={{ color: '#1e2749' }}>95%</p>
+                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>of pilot teachers report time saved</p>
+                  </div>
+
+                  <ul className="text-sm text-left space-y-2 flex-1" style={{ color: '#1e2749', opacity: 0.8 }}>
                     <li>• 2 On-Campus PD Days</li>
                     <li>• 4 Virtual Strategy Sessions</li>
                     <li>• Learning Hub for pilot group</li>
                     <li>• Leadership Dashboard</li>
+                    <li>• Board-ready progress reports</li>
                   </ul>
                 </div>
               </div>
@@ -403,18 +408,29 @@ export default function ForSchoolsPage() {
                 >
                   2
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm w-full">
+                <div className="bg-white rounded-2xl p-6 shadow-sm w-full h-full flex flex-col">
                   <span
-                    className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-3"
+                    className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-3 self-center"
                     style={{ backgroundColor: '#E8F0FD', color: '#1e2749' }}
                   >
                     WHEN YOU'RE READY
                   </span>
                   <h3 className="text-xl font-bold mb-2" style={{ color: '#1e2749' }}>ACCELERATE</h3>
-                  <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.6 }}>Full Staff Rollout</p>
-                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                    Expand to your entire staff with proven strategies. Everyone gets access to the Learning Hub, plus deeper virtual support.
-                  </p>
+                  <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.6 }}>Full Staff Rollout</p>
+
+                  {/* Impact Stat */}
+                  <div className="rounded-lg p-3 mb-4" style={{ backgroundColor: '#E8F0FD' }}>
+                    <p className="text-2xl font-bold" style={{ color: '#1e2749' }}>38%</p>
+                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>increase in strategy implementation</p>
+                  </div>
+
+                  <ul className="text-sm text-left space-y-2 flex-1" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    <li>• Everything in IGNITE</li>
+                    <li>• Learning Hub for ALL staff</li>
+                    <li>• 6 Executive Impact Sessions</li>
+                    <li>• Teachers Deserve It book per staff</li>
+                    <li>• Retention tracking tools</li>
+                  </ul>
                 </div>
               </div>
 
@@ -426,21 +442,48 @@ export default function ForSchoolsPage() {
                 >
                   3
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm w-full">
+                <div className="bg-white rounded-2xl p-6 shadow-sm w-full h-full flex flex-col">
                   <span
-                    className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-3"
+                    className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-3 self-center"
                     style={{ backgroundColor: '#E8F0FD', color: '#1e2749' }}
                   >
                     LONG-TERM PARTNERSHIP
                   </span>
                   <h3 className="text-xl font-bold mb-2" style={{ color: '#1e2749' }}>SUSTAIN</h3>
-                  <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.6 }}>Embedded Systems</p>
-                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                    Embed lasting change with advanced tools, AI assistant, and ongoing support. TDI becomes part of your school's DNA.
-                  </p>
+                  <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.6 }}>Embedded Systems</p>
+
+                  {/* Impact Stat */}
+                  <div className="rounded-lg p-3 mb-4" style={{ backgroundColor: '#E8F0FD' }}>
+                    <p className="text-2xl font-bold" style={{ color: '#1e2749' }}>24/7</p>
+                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>support with Desi AI Assistant</p>
+                  </div>
+
+                  <ul className="text-sm text-left space-y-2 flex-1" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    <li>• Everything in ACCELERATE</li>
+                    <li>• 12 Virtual PD Sessions</li>
+                    <li>• Desi AI Assistant for teachers</li>
+                    <li>• Advanced analytics dashboard</li>
+                    <li>• Multi-year retention data</li>
+                  </ul>
                 </div>
               </div>
 
+            </div>
+
+            {/* Bottom Stats Bar */}
+            <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+              <div className="text-center">
+                <p className="text-lg font-bold" style={{ color: '#1e2749' }}>Reduce Turnover</p>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>Teachers who feel supported stay longer</p>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-bold" style={{ color: '#1e2749' }}>Prove ROI</p>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>Data your board actually wants to see</p>
+              </div>
+              <div className="text-center">
+                <p className="text-lg font-bold" style={{ color: '#1e2749' }}>Save Time</p>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>Planning hours cut nearly in half</p>
+              </div>
             </div>
 
             {/* CTA */}
