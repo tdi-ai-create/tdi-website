@@ -539,6 +539,34 @@ export default function AboutPage() {
             <p className="text-center mt-6 text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>
               Plus district liaisons and facilitators nationwide.
             </p>
+
+            {/* Become a Content Creator */}
+            <div className="mt-8 p-6 rounded-xl text-center max-w-2xl mx-auto" style={{ backgroundColor: '#1e2749' }}>
+              <h4 className="font-bold text-lg mb-2" style={{ color: '#ffba06' }}>
+                Interested in Becoming a Content Creator?
+              </h4>
+              <p className="text-sm mb-4" style={{ color: '#ffffff', opacity: 0.9 }}>
+                We are always looking for passionate educators to join our team. Review our content creator guide and reach out to get started.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                <a
+                  href="https://drive.google.com/file/d/1q499mCTZxd8RJDidRZ7iKr9Ei3xssP9b/view?usp=sharing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-5 py-2 rounded-lg font-medium text-sm transition-all hover:scale-105"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                >
+                  View Content Creator Guide
+                </a>
+                <a
+                  href="mailto:Rachel@Teachersdeserveit.com"
+                  className="inline-block px-5 py-2 rounded-lg font-medium text-sm border-2 transition-all hover:bg-white/10"
+                  style={{ borderColor: '#ffba06', color: '#ffba06' }}
+                >
+                  Email Rachel
+                </a>
+              </div>
+            </div>
           </div>
 
         </div>

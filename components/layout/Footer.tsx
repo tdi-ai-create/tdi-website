@@ -97,6 +97,11 @@ export function Footer() {
                     Free FB Community
                   </a>
                 </li>
+                <li>
+                  <a href="https://drive.google.com/file/d/1q499mCTZxd8RJDidRZ7iKr9Ei3xssP9b/view?usp=sharing" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                    Become a Creator
+                  </a>
+                </li>
               </ul>
             </div>
 
