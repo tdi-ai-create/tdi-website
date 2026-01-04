@@ -47,9 +47,16 @@ export default function ForSchoolsPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="/contact"
+                href="/free-pd-plan"
                 className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
                 style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+              >
+                Get Your Free PD Plan
+              </a>
+              <a
+                href="/contact"
+                className="px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-white/10"
+                style={{ borderColor: '#ffffff', color: '#ffffff' }}
               >
                 Schedule a Call
               </a>
@@ -390,11 +397,11 @@ export default function ForSchoolsPage() {
                   </ul>
 
                   <a
-                    href="/contact"
+                    href="/free-pd-plan"
                     className="block text-center py-3 rounded-lg font-bold transition-all hover:scale-105"
                     style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
                   >
-                    Start the Conversation
+                    Get Your Free PD Plan
                   </a>
                 </div>
               </div>
@@ -455,13 +462,22 @@ export default function ForSchoolsPage() {
           <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
             Let's talk through your goals, staff size, and timeline. No pressure, just a conversation.
           </p>
-          <Link
-            href="/contact"
-            className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
-            style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-          >
-            Schedule a Call
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/free-pd-plan"
+              className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            >
+              Get Your Free PD Plan
+            </a>
+            <a
+              href="/contact"
+              className="px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-white/10"
+              style={{ borderColor: '#ffffff', color: '#ffffff' }}
+            >
+              Schedule a Call
+            </a>
+          </div>
         </div>
       </section>
     </main>

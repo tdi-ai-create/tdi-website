@@ -254,7 +254,7 @@ export default function JoinPage() {
 
             {/* Card 1: Bring TDI */}
             <a
-              href="/for-schools"
+              href="/free-pd-plan"
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
               <div
