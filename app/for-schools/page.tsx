@@ -1,292 +1,371 @@
-import { Metadata } from 'next';
-import { Section, Container, Button, StatCard, TestimonialCard, PricingCard } from '@/components/ui';
+import Link from 'next/link';
 
-export const metadata: Metadata = {
-  title: 'For Schools',
-  description: 'Professional development with measurable outcomes. Track engagement, reduce burnout, improve retention. Phased pricing starting at ~$33,600/year.',
+export const metadata = {
+  title: 'For Schools | Teachers Deserve It',
+  description: 'Professional development that actually works, with outcomes you can measure and report.',
 };
-
-const stats = [
-  { number: '38%', label: 'increase in strategy implementation' },
-  { number: '95%', label: 'of teachers said TDI saved them planning time' },
-  { number: '21', label: 'states with TDI partner schools' },
-];
-
-const testimonials = [
-  {
-    quote: "This isn't sit-and-get. Our teachers are actually learning how to work smarter and feel better doing it. I don't have to babysit.",
-    author: "Lisa M.",
-    role: "K-8 School Director",
-    location: "WA",
-  },
-  {
-    quote: "Before, we got eye rolls. Now, we hear: 'When's the team coming next?' That's the clearest sign to me that we're finally doing PD right.",
-    author: "Daniel R.",
-    role: "High School Principal",
-    location: "CA",
-  },
-  {
-    quote: "TDI didn't just drop a slide deck and bounce. Every part of the experience felt personal. Our staff felt understood, and I finally felt like I wasn't on an island trying to figure this out alone.",
-    author: "Julie H.",
-    role: "Principal",
-    location: "MI",
-  },
-];
-
-const pricingTiers = [
-  {
-    name: 'IGNITE',
-    phase: 'Phase 1: Leadership + Pilot Group',
-    price: '~$33,600',
-    description: 'Start with buy-in. Build momentum with leadership and a pilot group before full rollout.',
-    features: [
-      '2 On-Campus PD Days',
-      '4 Virtual Strategy Sessions',
-      '2 Executive Impact Sessions',
-      'Learning Hub access for pilot group',
-      'Leadership Dashboard',
-      'Implementation support',
-    ],
-  },
-  {
-    name: 'ACCELERATE',
-    phase: 'Phase 2: Full Staff Rollout',
-    price: '~$54,240',
-    description: 'Expand to your entire staff with proven strategies and deeper support.',
-    features: [
-      'Everything in IGNITE',
-      'Learning Hub for ALL staff',
-      '6 Executive Impact Sessions',
-      'Teachers Deserve It book per staff',
-      'Expanded virtual support',
-    ],
-    featured: true,
-  },
-  {
-    name: 'SUSTAIN',
-    phase: 'Phase 3: Embedded Systems',
-    price: '~$84,240',
-    description: 'Embed lasting change with advanced tools and ongoing support.',
-    features: [
-      'Everything in ACCELERATE',
-      '12 Virtual PD Sessions',
-      '4 Leadership Executive Sessions',
-      'Desi AI Assistant',
-      'Advanced analytics',
-      'Priority support',
-    ],
-  },
-];
 
 export default function ForSchoolsPage() {
   return (
-    <>
+    <main>
       {/* Hero Section */}
-      <Section background="white" className="pt-16 md:pt-24">
-        <Container>
-          <div className="max-w-3xl">
-            <h1 className="mb-6">Give Your Teachers What They Deserve</h1>
-            <p className="text-xl mb-8" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              Professional development that actually works, with outcomes you can measure and report.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Button href="/for-schools/pricing">See Pricing</Button>
-              <Button href="/for-schools/schedule-call" variant="secondary">
-                Schedule a Call
-              </Button>
-            </div>
+      <section className="py-20 md:py-28" style={{ backgroundColor: '#1e2749' }}>
+        <div className="container-default text-center">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6" style={{ color: '#ffffff' }}>
+            Give Your Teachers What They Deserve
+          </h1>
+          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
+            Professional development that actually works, with outcomes you can measure and report.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/for-schools/pricing"
+              className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            >
+              See Pricing
+            </Link>
+            <Link
+              href="/contact"
+              className="px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-white/10"
+              style={{ borderColor: '#ffffff', color: '#ffffff' }}
+            >
+              Schedule a Call
+            </Link>
           </div>
-        </Container>
-      </Section>
+        </div>
+      </section>
 
-      {/* Problem Section */}
-      <Section background="pink">
-        <Container width="default">
-          <h2 className="text-center mb-8">You Already Know Traditional PD Isn't Working</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">😒</span>
-              <p><strong>Teachers dread it.</strong> The eye rolls start before the session does.</p>
+      {/* Stats Section - MOVED UP */}
+      <section className="py-16" style={{ backgroundColor: '#ffba06' }}>
+        <div className="container-default">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#1e2749' }}>38%</p>
+              <p style={{ color: '#1e2749', opacity: 0.8 }}>increase in strategy implementation</p>
             </div>
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">📊</span>
-              <p><strong>No measurable outcomes.</strong> You can't prove ROI to your board.</p>
+            <div>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#1e2749' }}>95%</p>
+              <p style={{ color: '#1e2749', opacity: 0.8 }}>of teachers said TDI saved them planning time</p>
             </div>
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">🚪</span>
-              <p><strong>Burnout is driving turnover.</strong> You're losing good teachers faster than you can hire.</p>
-            </div>
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">☁️</span>
-              <p><strong>Wellness programs feel "fluffy."</strong> No data, no accountability, no change.</p>
+            <div>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#1e2749' }}>21</p>
+              <p style={{ color: '#1e2749', opacity: 0.8 }}>states with TDI partner schools</p>
             </div>
           </div>
-          <p className="text-center mt-8 text-lg font-semibold">
+        </div>
+      </section>
+
+      {/* Pain Points - EMOJIS REMOVED */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="container-default">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+            You Already Know Traditional PD Isn't Working
+          </h2>
+          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
             You need something different. So do your teachers.
           </p>
-        </Container>
-      </Section>
 
-      {/* Solution Section */}
-      <Section background="white">
-        <Container>
-          <h2 className="text-center mb-12">What Schools Get with TDI</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="card">
-              <h4 className="mb-3">On-Demand + Live PD Hybrid</h4>
-              <p style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+            <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+              <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Teachers dread it.</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                The eye rolls start before the session does.
+              </p>
+            </div>
+            <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+              <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>No measurable outcomes.</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                You can't prove ROI to your board.
+              </p>
+            </div>
+            <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+              <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Burnout drives turnover.</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                You're losing good teachers faster than you can hire.
+              </p>
+            </div>
+            <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+              <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Wellness feels fluffy.</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                No data, no accountability, no change.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* What Schools Get */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-default">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
+            What Schools Get with TDI
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="bg-white p-6 rounded-xl shadow-sm" style={{ borderTop: '4px solid #ffba06' }}>
+              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Flexible Learning</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Teachers learn on their schedule. Come together for what matters: discussion, practice, implementation.
               </p>
             </div>
-            <div className="card">
-              <h4 className="mb-3">Measurable Outcomes Dashboard</h4>
-              <p style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
+            <div className="bg-white p-6 rounded-xl shadow-sm" style={{ borderTop: '4px solid #ffba06' }}>
+              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Measurable Outcomes</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Track engagement, completion, and implementation rates. Report real data to your board, not attendance sheets.
               </p>
             </div>
-            <div className="card">
-              <h4 className="mb-3">Personalized Teacher Feedback</h4>
-              <p style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
+            <div className="bg-white p-6 rounded-xl shadow-sm" style={{ borderTop: '4px solid #ffba06' }}>
+              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Personalized Feedback</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Every teacher receives direct, personalized feedback during visits. Positive, uplifting, and connected to solutions.
               </p>
             </div>
-            <div className="card">
-              <h4 className="mb-3">Wellness That Ties to Retention</h4>
-              <p style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
+            <div className="bg-white p-6 rounded-xl shadow-sm" style={{ borderTop: '4px solid #ffba06' }}>
+              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Wellness That Works</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Address burnout before it becomes a resignation letter. Teachers who feel supported stay longer.
               </p>
             </div>
-            <div className="card">
-              <h4 className="mb-3">Implementation Support from Day One</h4>
-              <p style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
+            <div className="bg-white p-6 rounded-xl shadow-sm" style={{ borderTop: '4px solid #ffba06' }}>
+              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Implementation Support</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 We don't just hand you a login. Dedicated support to ensure your teachers actually use and benefit from the platform.
               </p>
             </div>
-            <div className="card">
-              <h4 className="mb-3">Phased Approach</h4>
-              <p style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
+            <div className="bg-white p-6 rounded-xl shadow-sm" style={{ borderTop: '4px solid #ffba06' }}>
+              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Phased Approach</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Start with leadership and a pilot group. Scale to full staff when you're ready. No giant leap required.
               </p>
             </div>
           </div>
-        </Container>
-      </Section>
+        </div>
+      </section>
 
-      {/* Stats Section */}
-      <Section background="pink">
-        <Container>
-          <h2 className="text-center mb-12">Results Schools Are Seeing</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {stats.map((stat, index) => (
-              <StatCard key={index} number={stat.number} label={stat.label} />
-            ))}
-          </div>
-        </Container>
-      </Section>
+      {/* Testimonials - MOVED UP */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#80a4ed' }}>
+        <div className="container-default">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#ffffff' }}>
+            What School Leaders Are Saying
+          </h2>
 
-      {/* Who It's For Section */}
-      <Section background="white">
-        <Container>
-          <h2 className="text-center mb-12">Built for Every Leader in the Building</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="card text-center">
-              <div className="text-4xl mb-4">👩‍💼</div>
-              <h4 className="mb-2">Principals</h4>
-              <p className="text-sm" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-                Looking for PD your teachers won't dread? Something you can actually see working in classrooms?
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="bg-white p-6 rounded-xl">
+              <p className="mb-4 italic" style={{ color: '#1e2749' }}>
+                "This isn't sit-and-get. Our teachers are actually learning how to work smarter and feel better doing it."
               </p>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Lisa M.</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>K-8 School Director, WA</p>
             </div>
-            <div className="card text-center">
-              <div className="text-4xl mb-4">🏛️</div>
-              <h4 className="mb-2">Superintendents</h4>
-              <p className="text-sm" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-                Need district-wide scale, board-ready outcomes, and budget flexibility?
+            <div className="bg-white p-6 rounded-xl">
+              <p className="mb-4 italic" style={{ color: '#1e2749' }}>
+                "Before, we got eye rolls. Now, we hear: 'When's the team coming next?' That's when you know PD is finally working."
               </p>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Daniel R.</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>High School Principal, CA</p>
             </div>
-            <div className="card text-center">
-              <div className="text-4xl mb-4">📚</div>
-              <h4 className="mb-2">Curriculum Directors</h4>
-              <p className="text-sm" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-                Want PD that integrates with your existing initiatives and shows measurable implementation?
+            <div className="bg-white p-6 rounded-xl">
+              <p className="mb-4 italic" style={{ color: '#1e2749' }}>
+                "TDI didn't just drop a slide deck and bounce. Every part of the experience felt personal. Our staff felt understood."
               </p>
-            </div>
-            <div className="card text-center">
-              <div className="text-4xl mb-4">❤️</div>
-              <h4 className="mb-2">HR Directors</h4>
-              <p className="text-sm" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-                Focused on retention and wellness? Looking for data that ties teacher support to turnover reduction?
-              </p>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Julie H.</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Principal, MI</p>
             </div>
           </div>
-          <p className="text-center mt-8 text-lg">
-            All paths lead to the same place: a call with our team to find the right fit.
+        </div>
+      </section>
+
+      {/* Built for Every Leader - EMOJIS REMOVED, CTAs ADDED */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="container-default">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+            Built for Every Leader in the Building
+          </h2>
+          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+            No matter your role, TDI meets you where you are.
           </p>
-        </Container>
-      </Section>
 
-      {/* Testimonials Section */}
-      <Section background="pink">
-        <Container>
-          <h2 className="text-center mb-12">What School Leaders Are Saying</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <TestimonialCard
-                key={index}
-                quote={testimonial.quote}
-                author={testimonial.author}
-                role={testimonial.role}
-                location={testimonial.location}
-              />
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+            <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f5f5f5' }}>
+              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Principals</h3>
+              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                PD your teachers won't dread. Results you can see in classrooms.
+              </p>
+              <Link
+                href="/contact"
+                className="text-sm font-semibold"
+                style={{ color: '#80a4ed' }}
+              >
+                Let's talk →
+              </Link>
+            </div>
+            <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f5f5f5' }}>
+              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Superintendents</h3>
+              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                District-wide scale, board-ready outcomes, and budget flexibility.
+              </p>
+              <Link
+                href="/contact"
+                className="text-sm font-semibold"
+                style={{ color: '#80a4ed' }}
+              >
+                Let's talk →
+              </Link>
+            </div>
+            <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f5f5f5' }}>
+              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Curriculum Directors</h3>
+              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                PD that integrates with existing initiatives and shows measurable implementation.
+              </p>
+              <Link
+                href="/contact"
+                className="text-sm font-semibold"
+                style={{ color: '#80a4ed' }}
+              >
+                Let's talk →
+              </Link>
+            </div>
+            <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f5f5f5' }}>
+              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>HR Directors</h3>
+              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Data that ties teacher support to retention and turnover reduction.
+              </p>
+              <Link
+                href="/contact"
+                className="text-sm font-semibold"
+                style={{ color: '#80a4ed' }}
+              >
+                Let's talk →
+              </Link>
+            </div>
           </div>
-        </Container>
-      </Section>
+        </div>
+      </section>
 
-      {/* Pricing Preview Section */}
-      <Section background="white">
-        <Container>
-          <div className="text-center mb-12">
-            <h2 className="mb-4">Transparent Pricing for Schools</h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              We don't hide our pricing behind a sales call. Our phased approach grows with your school. Start with leadership and a pilot group, then expand when you're ready.
-            </p>
+      {/* Pricing Section */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-default">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+            Transparent Pricing for Schools
+          </h2>
+          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+            We don't hide our pricing behind a sales call. Our phased approach grows with your school.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {/* IGNITE */}
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h3 className="font-bold text-xl mb-1" style={{ color: '#1e2749' }}>IGNITE</h3>
+              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>Phase 1: Leadership + Pilot Group</p>
+              <p className="text-3xl font-bold mb-4" style={{ color: '#1e2749' }}>~$33,600<span className="text-sm font-normal">/year</span></p>
+              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Start with buy-in. Build momentum with leadership and a pilot group before full rollout.
+              </p>
+              <ul className="text-sm space-y-2 mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
+                <li>• 2 On-Campus PD Days</li>
+                <li>• 4 Virtual Strategy Sessions</li>
+                <li>• 2 Executive Impact Sessions</li>
+                <li>• Learning Hub access for pilot group</li>
+                <li>• Leadership Dashboard</li>
+              </ul>
+              <Link
+                href="/contact"
+                className="block text-center py-3 rounded-lg font-semibold transition-all hover:opacity-90"
+                style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
+              >
+                Schedule a Call
+              </Link>
+            </div>
+
+            {/* ACCELERATE */}
+            <div className="bg-white p-6 rounded-xl shadow-md relative" style={{ border: '2px solid #ffba06' }}>
+              <span
+                className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 text-xs font-bold rounded-full"
+                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+              >
+                Most Popular
+              </span>
+              <h3 className="font-bold text-xl mb-1" style={{ color: '#1e2749' }}>ACCELERATE</h3>
+              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>Phase 2: Full Staff Rollout</p>
+              <p className="text-3xl font-bold mb-4" style={{ color: '#1e2749' }}>~$54,240<span className="text-sm font-normal">/year</span></p>
+              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Expand to your entire staff with proven strategies and deeper support.
+              </p>
+              <ul className="text-sm space-y-2 mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
+                <li>• Everything in IGNITE</li>
+                <li>• Learning Hub for ALL staff</li>
+                <li>• 6 Executive Impact Sessions</li>
+                <li>• Teachers Deserve It book per staff</li>
+                <li>• Expanded virtual support</li>
+              </ul>
+              <Link
+                href="/contact"
+                className="block text-center py-3 rounded-lg font-semibold transition-all hover:scale-105"
+                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+              >
+                Schedule a Call
+              </Link>
+            </div>
+
+            {/* SUSTAIN */}
+            <div className="bg-white p-6 rounded-xl shadow-sm">
+              <h3 className="font-bold text-xl mb-1" style={{ color: '#1e2749' }}>SUSTAIN</h3>
+              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>Phase 3: Embedded Systems</p>
+              <p className="text-3xl font-bold mb-4" style={{ color: '#1e2749' }}>~$84,240<span className="text-sm font-normal">/year</span></p>
+              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Embed lasting change with advanced tools and ongoing support.
+              </p>
+              <ul className="text-sm space-y-2 mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
+                <li>• Everything in ACCELERATE</li>
+                <li>• 12 Virtual PD Sessions</li>
+                <li>• 4 Leadership Executive Sessions</li>
+                <li>• Desi AI Assistant</li>
+                <li>• Priority support</li>
+              </ul>
+              <Link
+                href="/contact"
+                className="block text-center py-3 rounded-lg font-semibold transition-all hover:opacity-90"
+                style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
+              >
+                Schedule a Call
+              </Link>
+            </div>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {pricingTiers.map((tier, index) => (
-              <PricingCard
-                key={index}
-                name={tier.name}
-                phase={tier.phase}
-                price={tier.price}
-                description={tier.description}
-                features={tier.features}
-                featured={tier.featured}
-              />
-            ))}
-          </div>
-          <p className="text-center mt-8 text-sm" style={{ color: 'var(--tdi-charcoal)', opacity: 0.6 }}>
+
+          <p className="text-center mt-8 text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>
             *Pricing shown is for a typical 60-staff school. Varies based on staff size and customization.
           </p>
-        </Container>
-      </Section>
+        </div>
+      </section>
 
-      {/* Final CTA Section */}
-      <Section background="pink">
-        <Container width="default">
-          <div className="text-center">
-            <h2 className="mb-4">Ready to See What TDI Can Do for Your School?</h2>
-            <p className="text-lg mb-8" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-              Let's talk through your goals, staff size, and timeline. No pressure, just a conversation.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button href="/for-schools/schedule-call">Schedule a Call</Button>
-              <Button href="/for-schools/pricing" variant="secondary">
-                See Full Pricing Details
-              </Button>
-            </div>
+      {/* Final CTA */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
+        <div className="container-default text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#ffffff' }}>
+            Ready to See What TDI Can Do for Your School?
+          </h2>
+          <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
+            Let's talk through your goals, staff size, and timeline. No pressure, just a conversation.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              href="/contact"
+              className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            >
+              Schedule a Call
+            </Link>
+            <Link
+              href="/for-schools/pricing"
+              className="px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-white/10"
+              style={{ borderColor: '#ffffff', color: '#ffffff' }}
+            >
+              See Full Pricing Details
+            </Link>
           </div>
-        </Container>
-      </Section>
-    </>
+        </div>
+      </section>
+    </main>
   );
 }
