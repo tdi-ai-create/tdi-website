@@ -46,7 +46,7 @@ export function ParallaxHero() {
 
       {/* Text Content */}
       <div className="relative z-10 h-full flex items-center">
-        <div className="container-default px-6 md:px-8">
+        <div className="container-default px-6 md:px-8 ml-0">
           <div className="max-w-lg">
             <h1
               className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight whitespace-nowrap"
