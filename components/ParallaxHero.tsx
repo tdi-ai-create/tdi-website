@@ -39,6 +39,7 @@ export function ParallaxHero() {
           backgroundSize: 'cover',
           backgroundPosition: 'right 15%',
           backgroundRepeat: 'no-repeat',
+          backgroundAttachment: 'fixed',
         }}
       />
 

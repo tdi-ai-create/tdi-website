@@ -13,6 +13,7 @@ export default function AboutPage() {
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
           }}
         />
 
@@ -62,7 +63,8 @@ export default function AboutPage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: 'url("/images/about-teacher-pointing.png")',
-            backgroundPosition: 'right center'
+            backgroundPosition: 'right center',
+            backgroundAttachment: 'fixed',
           }}
         />
 

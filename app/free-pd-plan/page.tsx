@@ -775,6 +775,7 @@ export default function FreePDPlanPage() {
             backgroundSize: 'cover',
             backgroundPosition: 'center 70%',
             backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
           }}
         />
 
