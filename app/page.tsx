@@ -1,46 +1,29 @@
 import Link from 'next/link';
 import { TDICalculator } from '@/components/calculators/TDICalculator';
 import { FAQ } from '@/components/FAQ';
+import { ParallaxHero } from '@/components/ParallaxHero';
 
 export default function Home() {
   return (
     <main className="min-h-screen">
       {/* SECTION 1: Hero */}
-      <section className="section bg-white">
-        <div className="container-wide">
-          <h1 className="mb-4 whitespace-nowrap">
-            Teachers Deserve More Than Survival
-          </h1>
-          <p className="text-lg font-semibold mb-6" style={{ color: 'var(--tdi-navy)' }}>
-            Research-Backed. Expert-Designed. Educator-Focused.
-          </p>
-          <p className="text-xl mb-8 max-w-2xl" style={{ color: 'var(--tdi-charcoal)', opacity: 0.8 }}>
-            You became a teacher to make a difference. Not to drown in lesson plans, sit through pointless PD, and count down to summer. We get it. We've been there.
-          </p>
-          <p className="text-sm mb-4" style={{ opacity: 0.6 }}>
-            Join 87,000+ educators who are done accepting the status quo.
-          </p>
-          <Link href="/join" className="btn-primary inline-block">
-            Join the Movement
-          </Link>
-        </div>
-      </section>
+      <ParallaxHero />
 
       {/* SECTION 2: Stats Bar */}
-      <section className="section py-12" style={{ backgroundColor: '#1e2749' }}>
+      <section className="py-12 md:py-16" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-wide">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
-              <p className="text-4xl font-bold mb-1" style={{ color: '#ffffff' }}>87,000+</p>
-              <p className="text-lg" style={{ color: '#ffffff', opacity: 0.8 }}>Educators in Our Community</p>
+              <p className="text-4xl md:text-5xl font-bold mb-2" style={{ color: '#ffffff' }}>87,000+</p>
+              <p style={{ color: '#ffffff', opacity: 0.8 }}>Educators in Our Community</p>
             </div>
             <div>
-              <p className="text-4xl font-bold mb-1" style={{ color: '#ffffff' }}>100+</p>
-              <p className="text-lg" style={{ color: '#ffffff', opacity: 0.8 }}>Hours of On-Demand PD</p>
+              <p className="text-4xl md:text-5xl font-bold mb-2" style={{ color: '#ffffff' }}>100+</p>
+              <p style={{ color: '#ffffff', opacity: 0.8 }}>Hours of On-Demand PD</p>
             </div>
             <div>
-              <p className="text-4xl font-bold mb-1" style={{ color: '#ffffff' }}>21</p>
-              <p className="text-lg" style={{ color: '#ffffff', opacity: 0.8 }}>States with TDI Partner Schools</p>
+              <p className="text-4xl md:text-5xl font-bold mb-2" style={{ color: '#ffffff' }}>21</p>
+              <p style={{ color: '#ffffff', opacity: 0.8 }}>States with TDI Partner Schools</p>
             </div>
           </div>
         </div>
