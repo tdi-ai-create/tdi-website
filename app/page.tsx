@@ -304,7 +304,7 @@ export default function Home() {
       <FAQ />
 
       {/* SECTION 12: Final CTA */}
-      <section className="section" style={{ backgroundColor: '#ffba06' }}>
+      <section className="section" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
           <h2 className="mb-4" style={{ color: '#1e2749' }}>Ready to Feel Like a Teacher Again?</h2>
           <p className="text-lg mb-2 max-w-xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
@@ -313,7 +313,7 @@ export default function Home() {
           <p className="text-sm mb-8" style={{ color: '#1e2749', opacity: 0.6 }}>
             Join 87,000+ educators who've already taken the first step.
           </p>
-          <Link href="/join" className="btn-primary inline-block" style={{ backgroundColor: '#1e2749', color: '#ffffff' }}>
+          <Link href="/join" className="btn-primary inline-block" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
             Join the Movement
           </Link>
         </div>
