@@ -44,10 +44,10 @@ export function ParallaxHero() {
         }}
       />
 
-      {/* Text Content */}
-      <div className="relative z-10 h-full flex items-center">
-        <div className="container-default px-6 md:px-8">
-          <div className="max-w-lg">
+      {/* Text - Positioned LEFT side */}
+      <div className="relative z-10 h-full flex items-center justify-start">
+        <div className="ml-8 md:ml-16 lg:ml-20 xl:ml-24">
+          <div className="max-w-sm md:max-w-md">
             <h1
               className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight whitespace-nowrap"
               style={{
