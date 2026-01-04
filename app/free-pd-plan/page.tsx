@@ -758,16 +758,38 @@ export default function FreePDPlanPage() {
 
   return (
     <main className="min-h-screen">
-      {/* Hero */}
-      <section className="py-12 md:py-16" style={{ backgroundColor: '#1e2749' }}>
-        <div className="container-default text-center">
+      {/* Hero Section with Background Image */}
+      <section className="relative py-16 md:py-20 overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: "url('/images/hero-pd-plan.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center top',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+
+        {/* Navy Gradient Overlay */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(180deg, rgba(30, 39, 73, 0.6) 0%, rgba(30, 39, 73, 0.8) 100%)'
+          }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 container-default text-center">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#ffffff' }}>
             Get Your Free PD Evaluation Plan
           </h1>
-          <p className="text-lg max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
+          <p className="text-lg max-w-2xl mx-auto mb-6" style={{ color: '#ffffff', opacity: 0.9 }}>
             Answer a few questions and we'll send you a custom PD evaluation plan within 24 hours.
           </p>
-          <div className="flex flex-wrap justify-center gap-6 mt-6">
+
+          {/* Stats */}
+          <div className="flex flex-wrap justify-center gap-6">
             <div className="flex items-center gap-2" style={{ color: '#ffffff', opacity: 0.9 }}>
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
