@@ -159,6 +159,150 @@ export default function ContactPage() {
           </p>
         </div>
       </section>
+
+      {/* Next Steps */}
+      <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-default">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+            More Ways to Connect
+          </h2>
+          <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+            Explore our resources and join the TDI community.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+
+            {/* Take the PD Quiz */}
+            <a
+              href="/free-pd-plan"
+              className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
+              style={{ textDecoration: 'none' }}
+            >
+              <div
+                className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{ backgroundColor: '#ffba06' }}
+              >
+                <svg className="w-7 h-7" fill="#1e2749" viewBox="0 0 24 24">
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+                </svg>
+              </div>
+              <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Take the PD Quiz</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Get a personalized professional development plan in minutes.
+              </p>
+            </a>
+
+            {/* Explore the TDI Blueprint */}
+            <a
+              href="/for-schools"
+              className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
+              style={{ textDecoration: 'none' }}
+            >
+              <div
+                className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{ backgroundColor: '#ffba06' }}
+              >
+                <svg className="w-7 h-7" fill="#1e2749" viewBox="0 0 24 24">
+                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                </svg>
+              </div>
+              <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Explore the TDI Blueprint</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                See how we partner with districts to transform PD.
+              </p>
+            </a>
+
+            {/* Read the Blog */}
+            <a
+              href="https://teachersdeserveit.substack.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
+              style={{ textDecoration: 'none' }}
+            >
+              <div
+                className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{ backgroundColor: '#ffba06' }}
+              >
+                <svg className="w-7 h-7" fill="#1e2749" viewBox="0 0 24 24">
+                  <path d="M19 5v14H5V5h14m0-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.86 8.86l-3 3.87L9 13.14 6 17h12l-3.86-5.14z"/>
+                </svg>
+              </div>
+              <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Read the Blog</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Weekly insights for educators who refuse to burn out.
+              </p>
+            </a>
+
+            {/* Listen to the Podcast */}
+            <a
+              href="https://open.spotify.com/show/1ZDo7psMhu9TTomUBKxVvO"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
+              style={{ textDecoration: 'none' }}
+            >
+              <div
+                className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{ backgroundColor: '#ffba06' }}
+              >
+                <svg className="w-7 h-7" fill="#1e2749" viewBox="0 0 24 24">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+              </div>
+              <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Listen to the Podcast</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Real conversations about teaching, wellness, and surviving the system.
+              </p>
+            </a>
+
+            {/* Order the Book */}
+            <a
+              href="https://www.amazon.com/stores/Rae-Hughart/author/B07B52NR1F"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
+              style={{ textDecoration: 'none' }}
+            >
+              <div
+                className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{ backgroundColor: '#ffba06' }}
+              >
+                <svg className="w-7 h-7" fill="#1e2749" viewBox="0 0 24 24">
+                  <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
+                </svg>
+              </div>
+              <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Order the Book</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Get your copy of Teachers Deserve It on Amazon.
+              </p>
+            </a>
+
+            {/* Watch the TEDx Talk */}
+            <a
+              href="https://www.youtube.com/watch?v=OLzaa7Hv3mo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
+              style={{ textDecoration: 'none' }}
+            >
+              <div
+                className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center"
+                style={{ backgroundColor: '#ffba06' }}
+              >
+                <svg className="w-7 h-7" fill="#1e2749" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </div>
+              <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Watch the TEDx Talk</h3>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                See the talk that sparked a movement.
+              </p>
+            </a>
+
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
