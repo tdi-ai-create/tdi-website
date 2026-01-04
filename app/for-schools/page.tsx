@@ -65,21 +65,21 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      {/* Stats Section - MOVED UP */}
-      <section className="py-16" style={{ backgroundColor: '#ffba06' }}>
+      {/* Stats Section */}
+      <section className="py-16" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#1e2749' }}>38%</p>
-              <p style={{ color: '#1e2749', opacity: 0.8 }}>increase in strategy implementation</p>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>38%</p>
+              <p style={{ color: '#ffffff', opacity: 0.9 }}>increase in strategy implementation</p>
             </div>
             <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#1e2749' }}>95%</p>
-              <p style={{ color: '#1e2749', opacity: 0.8 }}>of teachers said TDI saved them planning time</p>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>95%</p>
+              <p style={{ color: '#ffffff', opacity: 0.9 }}>of teachers said TDI saved them planning time</p>
             </div>
             <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#1e2749' }}>21</p>
-              <p style={{ color: '#1e2749', opacity: 0.8 }}>states with TDI partner schools</p>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>21</p>
+              <p style={{ color: '#ffffff', opacity: 0.9 }}>states with TDI partner schools</p>
             </div>
           </div>
         </div>
@@ -96,25 +96,25 @@ export default function ForSchoolsPage() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+            <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f5f5f5' }}>
               <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Teachers dread it.</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 The eye rolls start before the session does.
               </p>
             </div>
-            <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+            <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f5f5f5' }}>
               <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>No measurable outcomes.</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 You can't prove ROI to your board.
               </p>
             </div>
-            <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+            <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f5f5f5' }}>
               <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Burnout drives turnover.</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 You're losing good teachers faster than you can hire.
               </p>
             </div>
-            <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+            <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f5f5f5' }}>
               <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Wellness feels fluffy.</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 No data, no accountability, no change.
@@ -125,9 +125,9 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* What Schools Get */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#ffffff' }}>
             What Schools Get with TDI
           </h2>
 
@@ -172,29 +172,29 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      {/* Testimonials - MOVED UP */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#80a4ed' }}>
+      {/* Testimonials */}
+      <section className="py-16 md:py-20 bg-white">
         <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#ffffff' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
             What School Leaders Are Saying
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <div className="bg-white p-6 rounded-xl">
+            <div className="p-6 rounded-xl" style={{ backgroundColor: '#E8F0FD' }}>
               <p className="mb-4 italic" style={{ color: '#1e2749' }}>
                 "This isn't sit-and-get. Our teachers are actually learning how to work smarter and feel better doing it."
               </p>
               <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Lisa M.</p>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>K-8 School Director, WA</p>
             </div>
-            <div className="bg-white p-6 rounded-xl">
+            <div className="p-6 rounded-xl" style={{ backgroundColor: '#E8F0FD' }}>
               <p className="mb-4 italic" style={{ color: '#1e2749' }}>
                 "Before, we got eye rolls. Now, we hear: 'When's the team coming next?' That's when you know PD is finally working."
               </p>
               <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Daniel R.</p>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>High School Principal, CA</p>
             </div>
-            <div className="bg-white p-6 rounded-xl">
+            <div className="p-6 rounded-xl" style={{ backgroundColor: '#E8F0FD' }}>
               <p className="mb-4 italic" style={{ color: '#1e2749' }}>
                 "TDI didn't just drop a slide deck and bounce. Every part of the experience felt personal. Our staff felt understood."
               </p>
@@ -205,69 +205,154 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      {/* Built for Every Leader - EMOJIS REMOVED, CTAs ADDED */}
-      <section className="py-16 md:py-20 bg-white">
+      {/* Built for Every Leader - Navy background with icon cards */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#ffffff' }}>
             Built for Every Leader in the Building
           </h2>
-          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
             No matter your role, TDI meets you where you are.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f5f5f5' }}>
-              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Principals</h3>
-              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
-                PD your teachers won't dread. Results you can see in classrooms.
-              </p>
-              <Link
-                href="/contact"
-                className="text-sm font-semibold"
-                style={{ color: '#80a4ed' }}
+
+            {/* Principals */}
+            <a
+              href="/contact"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+            >
+              <div
+                className="h-[120px] flex items-center justify-center p-4"
+                style={{ backgroundColor: '#80a4ed' }}
               >
-                Let's talk →
-              </Link>
-            </div>
-            <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f5f5f5' }}>
-              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Superintendents</h3>
-              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
-                District-wide scale, board-ready outcomes, and budget flexibility.
-              </p>
-              <Link
-                href="/contact"
-                className="text-sm font-semibold"
-                style={{ color: '#80a4ed' }}
+                <svg
+                  className="w-14 h-14"
+                  fill="white"
+                  viewBox="0 0 24 24"
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                >
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+              <div className="bg-white p-4">
+                <h3
+                  className="text-base font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749' }}
+                >
+                  Principals
+                </h3>
+                <p className="text-sm mb-2" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  PD your teachers won't dread. Results you can see in classrooms.
+                </p>
+                <span className="font-semibold text-sm" style={{ color: '#80a4ed' }}>
+                  Let's talk →
+                </span>
+              </div>
+            </a>
+
+            {/* Superintendents */}
+            <a
+              href="/contact"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+            >
+              <div
+                className="h-[120px] flex items-center justify-center p-4"
+                style={{ backgroundColor: '#80a4ed' }}
               >
-                Let's talk →
-              </Link>
-            </div>
-            <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f5f5f5' }}>
-              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Curriculum Directors</h3>
-              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
-                PD that integrates with existing initiatives and shows measurable implementation.
-              </p>
-              <Link
-                href="/contact"
-                className="text-sm font-semibold"
-                style={{ color: '#80a4ed' }}
+                <svg
+                  className="w-14 h-14"
+                  fill="white"
+                  viewBox="0 0 24 24"
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                >
+                  <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>
+                </svg>
+              </div>
+              <div className="bg-white p-4">
+                <h3
+                  className="text-base font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749' }}
+                >
+                  Superintendents
+                </h3>
+                <p className="text-sm mb-2" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  District-wide scale, board-ready outcomes, and budget flexibility.
+                </p>
+                <span className="font-semibold text-sm" style={{ color: '#80a4ed' }}>
+                  Let's talk →
+                </span>
+              </div>
+            </a>
+
+            {/* Curriculum Directors */}
+            <a
+              href="/contact"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+            >
+              <div
+                className="h-[120px] flex items-center justify-center p-4"
+                style={{ backgroundColor: '#80a4ed' }}
               >
-                Let's talk →
-              </Link>
-            </div>
-            <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f5f5f5' }}>
-              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>HR Directors</h3>
-              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Data that ties teacher support to retention and turnover reduction.
-              </p>
-              <Link
-                href="/contact"
-                className="text-sm font-semibold"
-                style={{ color: '#80a4ed' }}
+                <svg
+                  className="w-14 h-14"
+                  fill="white"
+                  viewBox="0 0 24 24"
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                >
+                  <path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>
+                </svg>
+              </div>
+              <div className="bg-white p-4">
+                <h3
+                  className="text-base font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749' }}
+                >
+                  Curriculum Directors
+                </h3>
+                <p className="text-sm mb-2" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  PD that integrates with existing initiatives and shows measurable implementation.
+                </p>
+                <span className="font-semibold text-sm" style={{ color: '#80a4ed' }}>
+                  Let's talk →
+                </span>
+              </div>
+            </a>
+
+            {/* HR Directors */}
+            <a
+              href="/contact"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
+            >
+              <div
+                className="h-[120px] flex items-center justify-center p-4"
+                style={{ backgroundColor: '#80a4ed' }}
               >
-                Let's talk →
-              </Link>
-            </div>
+                <svg
+                  className="w-14 h-14"
+                  fill="white"
+                  viewBox="0 0 24 24"
+                  style={{ filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }}
+                >
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+              </div>
+              <div className="bg-white p-4">
+                <h3
+                  className="text-base font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749' }}
+                >
+                  HR Directors
+                </h3>
+                <p className="text-sm mb-2" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  Data that ties teacher support to retention and turnover reduction.
+                </p>
+                <span className="font-semibold text-sm" style={{ color: '#80a4ed' }}>
+                  Let's talk →
+                </span>
+              </div>
+            </a>
+
           </div>
         </div>
       </section>
