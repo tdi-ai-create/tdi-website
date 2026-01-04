@@ -25,7 +25,7 @@ export function ParallaxHero() {
         style={{
           backgroundImage: "url('/images/hero-rae-background.png')",
           backgroundSize: 'cover',
-          backgroundPosition: 'right 50%',
+          backgroundPosition: 'right 60%',
           backgroundRepeat: 'no-repeat',
           filter: 'blur(5px)',
           transform: 'scale(1.05)',
@@ -39,7 +39,7 @@ export function ParallaxHero() {
         style={{
           backgroundImage: "url('/images/hero-rae-cutout.png')",
           backgroundSize: 'cover',
-          backgroundPosition: 'right 50%',
+          backgroundPosition: 'right 60%',
           backgroundRepeat: 'no-repeat',
         }}
       />
