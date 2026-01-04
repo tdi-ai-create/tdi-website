@@ -49,7 +49,7 @@ export function ParallaxHero() {
         <div className="container-default">
           <div className="max-w-lg">
             <h1
-              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight"
+              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight whitespace-nowrap"
               style={{
                 color: '#ffffff',
                 textShadow: '2px 2px 8px rgba(0,0,0,0.7)'
