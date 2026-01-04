@@ -3,23 +3,23 @@
 /* TDI Brand Colors */
 :root {
   /* Primary Colors */
-  --tdi-yellow: #F5C542;
-  --tdi-orange: #D4642A;
-  --tdi-coral: #E86B6B;
-  
+  --tdi-yellow: #F9B91B;
+  --tdi-coral: #F96767;
+
   /* Neutral Colors */
   --tdi-charcoal: #1A1A1A;
-  --tdi-beige: #D9C4B0;
-  --tdi-peach: #F5E6DC;
-  
+  --tdi-white: #FFFFFF;
+  --tdi-gray: #F5F5F5;
+  --tdi-pink: #E8D5D5;
+
   /* Cool Accent Colors */
-  --tdi-sage: #A8C0A8;
-  --tdi-lavender: #9A8AB5;
-  --tdi-lavender-light: #D5CCE6;
-  --tdi-blue-light: #9EC5E0;
-  --tdi-teal: #1A6B6B;
-  --tdi-navy: #1A2A4A;
-  
+  --tdi-blue: #8FADD3;
+  --tdi-navy: #1E2A4A;
+
+  /* Legacy mappings for compatibility */
+  --tdi-teal: #1E2A4A;
+  --tdi-peach: #F5F5F5;
+
   /* Background */
   --background: #ffffff;
   --foreground: #1A1A1A;
@@ -29,20 +29,18 @@
   /* Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  
+
   --color-tdi-yellow: var(--tdi-yellow);
-  --color-tdi-orange: var(--tdi-orange);
   --color-tdi-coral: var(--tdi-coral);
   --color-tdi-charcoal: var(--tdi-charcoal);
-  --color-tdi-beige: var(--tdi-beige);
-  --color-tdi-peach: var(--tdi-peach);
-  --color-tdi-sage: var(--tdi-sage);
-  --color-tdi-lavender: var(--tdi-lavender);
-  --color-tdi-lavender-light: var(--tdi-lavender-light);
-  --color-tdi-blue-light: var(--tdi-blue-light);
-  --color-tdi-teal: var(--tdi-teal);
+  --color-tdi-white: var(--tdi-white);
+  --color-tdi-gray: var(--tdi-gray);
+  --color-tdi-pink: var(--tdi-pink);
+  --color-tdi-blue: var(--tdi-blue);
   --color-tdi-navy: var(--tdi-navy);
-  
+  --color-tdi-teal: var(--tdi-teal);
+  --color-tdi-peach: var(--tdi-peach);
+
   /* Font */
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }

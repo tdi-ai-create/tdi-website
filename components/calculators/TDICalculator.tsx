@@ -104,9 +104,9 @@ export function TDICalculator() {
     <>
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 max-w-2xl mx-auto">
         {/* Header */}
-        <div className="px-6 py-5 text-center" style={{ backgroundColor: 'var(--tdi-teal)', color: 'white' }}>
-          <h3 className="text-xl font-bold mb-1">What's Possible for Your School?</h3>
-          <p className="text-sm opacity-80">Tell us where you are. We'll show you where you could be.</p>
+        <div className="px-6 py-5 text-center" style={{ backgroundColor: 'var(--tdi-teal)' }}>
+          <h3 className="text-xl font-bold mb-1" style={{ color: 'white' }}>What's Possible for Your School?</h3>
+          <p className="text-sm" style={{ color: 'white', opacity: 0.8 }}>Tell us where you are. We'll show you where you could be.</p>
         </div>
 
         {/* Input Sliders */}

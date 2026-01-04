@@ -10,11 +10,11 @@ interface FAQItem {
 const faqs: FAQItem[] = [
   {
     question: "What makes TDI different from other PD?",
-    answer: "TDI uses a flipped model — you learn strategies on your own time through bite-sized videos, then we focus live sessions on implementation and problem-solving. No more sitting through hours of PowerPoints. Our content is created by teachers who've been in the trenches, not consultants who haven't been in a classroom in years."
+    answer: "TDI uses a flipped model. You learn strategies on your own time through bite-sized videos, then we focus live sessions on implementation and problem-solving. No more sitting through hours of PowerPoints. Our content is created by teachers who've been in the trenches, not consultants who haven't been in a classroom in years."
   },
   {
     question: "Is this just for teachers, or can paraprofessionals participate too?",
-    answer: "Both! Our content is designed for everyone who works directly with students. When schools partner with us, we encourage including the whole building — teachers and paras alike. Everyone deserves support."
+    answer: "Both! Our content is designed for everyone who works directly with students. When schools partner with us, we encourage including the whole building, teachers and paras alike. Everyone deserves support."
   },
   {
     question: "How much does it cost?",
@@ -22,15 +22,19 @@ const faqs: FAQItem[] = [
   },
   {
     question: "We don't have budget for PD. Can you still help?",
-    answer: "Yes! We specialize in helping schools identify and apply for grants — Title II, state funds, foundation grants, and more. We'll align your PD plan with funding opportunities and even draft the grant language for you."
+    answer: "Yes! We specialize in helping schools identify and apply for grants including Title II, state funds, foundation grants, and more. We'll align your PD plan with funding opportunities and even draft the grant language for you."
   },
   {
     question: "How much time does this take?",
-    answer: "That's up to you. Most of our courses are 30-60 minutes and designed to be completed in one sitting. For school partnerships, we work around your calendar — no multi-day workshops that pull teachers away from students."
+    answer: "That's up to you. Most of our courses are 30-60 minutes and designed to be completed in one sitting. For school partnerships, we work around your calendar with no multi-day workshops that pull teachers away from students."
   },
   {
     question: "Do you offer live workshops or just online content?",
     answer: "Both. School partners get access to live workshops, coaching sessions, and ongoing support in addition to the full Learning Hub. Individual teachers can start with on-demand content anytime."
+  },
+  {
+    question: "How does TDI develop its content?",
+    answer: "Every resource starts with a real need from teachers or partner schools. We recruit specialists and practitioners to collaborate on solutions, ground everything in current research, and shape it into actionable tools. Courses, downloads, and resource packets go live in the Learning Hub. For partner schools, we guarantee 30-day turnaround on custom requests. The result: targeted, ready-to-use resources when educators need them."
   }
 ];
 
