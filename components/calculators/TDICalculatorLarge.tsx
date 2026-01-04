@@ -7,7 +7,7 @@ export function TDICalculatorLarge() {
   const [teachers, setTeachers] = useState(50);
   const [classSize, setClassSize] = useState(25);
   const [years, setYears] = useState(3);
-  const [showCascade, setShowCascade] = useState(true);
+  const [showDetails, setShowDetails] = useState(false);
   const [animatingValues, setAnimatingValues] = useState(false);
 
   useEffect(() => {
@@ -17,136 +17,46 @@ export function TDICalculatorLarge() {
   }, [teachers, classSize, years]);
 
   // All Calculations
-  const coachingTouchpoints = teachers * years * 4;
-  const communityConnections = teachers * years * 12;
-  const resourcesAccessed = teachers * years * 45;
+  const tdiInvestment = (33600 + Math.max(0, (teachers - 50) * 150)) * years;
+  const costPerTeacher = Math.round(tdiInvestment / teachers / years);
+  const typicalPDSpend = teachers * 3000 * years;
   
-  const weeklyTeamHours = teachers * 5;
-  const annualHours = weeklyTeamHours * 52;
-  const totalHours = annualHours * years;
+  const totalHours = teachers * 5 * 52 * years;
   const sundaysBack = Math.round(totalHours / 6);
-  const lessonsImproved = teachers * years * 40;
+  const feedbackMoments = teachers * years * 24;
   
   const teachersAtRiskBefore = Math.round(teachers * 0.53);
   const teachersExitingBurnout = Math.round(teachersAtRiskBefore * 0.40);
   const teachersNowThriving = teachers - (teachersAtRiskBefore - teachersExitingBurnout);
-  const burnoutDaysAvoided = teachersExitingBurnout * years * 15;
+  
+  const students = teachers * classSize;
+  const lessonsImproved = teachers * years * 40;
+  const checkIns = students * years * 4;
+  const smallGroupHours = Math.round((teachers * years * 40 * 45) / 60);
+  const studentsHittingBenchmark = Math.round(students * 0.12 * years);
+  const studentsGainingGround = Math.round(students * 0.15 * years);
   
   const wouldHaveLeft = Math.max(1, Math.round(teachers * 0.16 * years));
   const teachersRetained = Math.max(1, Math.round(wouldHaveLeft * 0.60));
-  const retentionSavings = teachersRetained * 20000;
+  const hiringCostsAvoided = teachersRetained * 20000;
+  const crisisDaysAvoided = teachersExitingBurnout * years * 15;
   const experienceYearsKept = teachersRetained * 8;
-  const hiringHoursAvoided = teachersRetained * 40;
-  
-  const students = teachers * classSize;
-  const totalStudentYears = students * years;
-  const extraHoursPerStudent = Math.round((annualHours / students) * 10) / 10;
-  const smallGroupMinutes = teachers * years * 40 * 45;
-  const personalCheckins = students * years * 4;
-  
-  const studentsGainingGround = Math.round(students * 0.15 * years);
-  const studentsHittingBenchmark = Math.round(students * 0.12 * years);
-  const collegeReadyBoost = Math.round(students * 0.08 * years);
-  const lifetimeEarningsM = Math.round((students * years * 8928) / 1000000 * 10) / 10;
-  
-  const tdiInvestment = (33600 + Math.max(0, (teachers - 50) * 150)) * years;
-  const netImpact = retentionSavings - tdiInvestment;
-
-  const cascadeLevels = [
-    {
-      icon: "🎯",
-      title: "TDI Support",
-      color: "#0d9488",
-      bgLight: "#f0fdfa",
-      mainValue: teachers,
-      mainLabel: "teachers empowered",
-      metrics: [
-        { value: coachingTouchpoints, label: "coaching moments" },
-        { value: communityConnections, label: "peer connections" },
-        { value: resourcesAccessed, label: "resources accessed" }
-      ]
-    },
-    {
-      icon: "⚡",
-      title: "Efficiency Unlocked", 
-      color: "#0891b2",
-      bgLight: "#ecfeff",
-      mainValue: totalHours.toLocaleString(),
-      mainLabel: "hours reclaimed",
-      metrics: [
-        { value: weeklyTeamHours, label: "hrs saved/week" },
-        { value: sundaysBack, label: "Sundays back" },
-        { value: lessonsImproved.toLocaleString(), label: "lessons improved" }
-      ]
-    },
-    {
-      icon: "💚",
-      title: "Wellbeing Restored",
-      color: "#10b981", 
-      bgLight: "#ecfdf5",
-      mainValue: teachersExitingBurnout,
-      mainLabel: "exit burnout zone",
-      metrics: [
-        { value: teachersNowThriving, label: "now thriving" },
-        { value: burnoutDaysAvoided, label: "crisis days avoided" },
-        { value: teachersAtRiskBefore, label: "were at-risk" }
-      ]
-    },
-    {
-      icon: "🏠",
-      title: "Teachers Stay",
-      color: "#14b8a6",
-      bgLight: "#f0fdfa", 
-      mainValue: teachersRetained,
-      mainLabel: "teachers retained",
-      metrics: [
-        { value: `$${(retentionSavings / 1000).toFixed(0)}k`, label: "savings" },
-        { value: experienceYearsKept, label: "yrs experience kept" },
-        { value: hiringHoursAvoided, label: "hiring hrs avoided" }
-      ]
-    },
-    {
-      icon: "🎒",
-      title: "Students Reached",
-      color: "#06b6d4",
-      bgLight: "#ecfeff",
-      mainValue: totalStudentYears.toLocaleString(),
-      mainLabel: "student-years impacted",
-      metrics: [
-        { value: extraHoursPerStudent, label: "extra hrs/student" },
-        { value: personalCheckins.toLocaleString(), label: "1:1 check-ins" },
-        { value: `${Math.round(smallGroupMinutes / 60).toLocaleString()}`, label: "small group hrs" }
-      ]
-    },
-    {
-      icon: "📈",
-      title: "Achievement Lifted",
-      color: "#0ea5e9",
-      bgLight: "#f0f9ff",
-      mainValue: studentsGainingGround,
-      mainLabel: "students gaining ground",
-      metrics: [
-        { value: studentsHittingBenchmark, label: "hit new benchmarks" },
-        { value: collegeReadyBoost, label: "college-ready boost" },
-        { value: `$${lifetimeEarningsM}M`, label: "lifetime earnings↑" }
-      ]
-    }
-  ];
 
   return (
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--tdi-charcoal)' }}>
-          See Your School's Ripple Effect
+          See What's Possible for Your School
         </h1>
         <p className="text-lg" style={{ color: 'var(--tdi-charcoal)', opacity: 0.7 }}>
-          Every slider move changes everything below. This is your impact.
+          Adjust the sliders to match your school. Watch the impact unfold.
         </p>
       </div>
 
-      {/* Calculator Card */}
+      {/* Main Calculator Card */}
       <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 mb-8">
+        
         {/* Sliders */}
         <div className="px-8 py-6 border-b border-gray-100" style={{ backgroundColor: 'var(--tdi-peach)' }}>
           <div className="grid grid-cols-3 gap-8">
@@ -203,75 +113,202 @@ export function TDICalculatorLarge() {
           </div>
         </div>
 
-        {/* 4 Big Numbers */}
-        <div className="px-8 py-6">
-          <div className="grid grid-cols-4 gap-4">
-            <div className="text-center p-5 rounded-xl" style={{ backgroundColor: 'var(--tdi-peach)' }}>
-              <div 
-                className="text-4xl font-black mb-1 transition-transform duration-200"
-                style={{ color: 'var(--tdi-teal)', transform: animatingValues ? 'scale(1.05)' : 'scale(1)' }}
-              >
-                {totalHours.toLocaleString()}
-              </div>
-              <div className="text-sm text-gray-600 font-medium">Hours Saved</div>
-            </div>
-            
-            <div className="text-center p-5 rounded-xl" style={{ backgroundColor: 'var(--tdi-peach)' }}>
-              <div 
-                className="text-4xl font-black mb-1 transition-transform duration-200"
-                style={{ color: 'var(--tdi-teal)', transform: animatingValues ? 'scale(1.05)' : 'scale(1)' }}
-              >
-                {teachersRetained}
-              </div>
-              <div className="text-sm text-gray-600 font-medium">Teachers Stay</div>
-            </div>
-            
-            <div className="text-center p-5 rounded-xl" style={{ backgroundColor: 'var(--tdi-peach)' }}>
-              <div 
-                className="text-4xl font-black mb-1 transition-transform duration-200"
-                style={{ color: 'var(--tdi-teal)', transform: animatingValues ? 'scale(1.05)' : 'scale(1)' }}
-              >
-                {totalStudentYears.toLocaleString()}
-              </div>
-              <div className="text-sm text-gray-600 font-medium">Students Reached</div>
-            </div>
-            
-            <div className="text-center p-5 rounded-xl" style={{ backgroundColor: netImpact >= 0 ? '#ecfdf5' : '#fef2f2' }}>
-              <div 
-                className="text-4xl font-black mb-1 transition-transform duration-200"
-                style={{ color: netImpact >= 0 ? '#10b981' : '#ef4444', transform: animatingValues ? 'scale(1.05)' : 'scale(1)' }}
-              >
-                {netImpact >= 0 ? '+' : ''}${(netImpact / 1000).toFixed(0)}k
-              </div>
-              <div className="text-sm text-gray-600 font-medium">Net ROI</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Investment Bar */}
-        <div className="px-8 pb-6">
-          <div className="rounded-xl p-5" style={{ backgroundColor: 'var(--tdi-navy)' }}>
-            <div className="flex justify-between items-center text-white">
-              <div className="text-center">
-                <div className="text-xs opacity-60 uppercase tracking-wide">Your Investment</div>
-                <div className="text-2xl font-bold">${tdiInvestment.toLocaleString()}</div>
-              </div>
-              <div className="text-3xl opacity-40">→</div>
-              <div className="text-center">
-                <div className="text-xs opacity-60 uppercase tracking-wide">Retention Savings Alone</div>
-                <div className="text-2xl font-bold" style={{ color: '#6ee7b7' }}>${retentionSavings.toLocaleString()}</div>
-              </div>
-              <div className="text-3xl opacity-40">=</div>
-              <div className="text-center">
-                <div className="text-xs opacity-60 uppercase tracking-wide">Net Return</div>
+        {/* Four Categories */}
+        <div className="px-8 py-6 space-y-6">
+          
+          {/* BUDGET */}
+          <div className="rounded-xl p-5" style={{ backgroundColor: '#f0fdf4', borderLeft: '4px solid #10b981' }}>
+            <h4 className="text-base font-bold text-gray-700 mb-4 flex items-center gap-2">
+              💰 BUDGET
+            </h4>
+            <div className="grid grid-cols-4 gap-4">
+              <div>
                 <div 
                   className="text-3xl font-black transition-transform duration-200"
-                  style={{ color: netImpact >= 0 ? '#6ee7b7' : '#fca5a5', transform: animatingValues ? 'scale(1.05)' : 'scale(1)' }}
+                  style={{ color: '#10b981', transform: animatingValues ? 'scale(1.03)' : 'scale(1)' }}
                 >
-                  {netImpact >= 0 ? '+' : ''}${netImpact.toLocaleString()}
+                  ${costPerTeacher}
                 </div>
+                <div className="text-sm text-gray-600">per teacher/year</div>
+              </div>
+              <div>
+                <div 
+                  className="text-3xl font-black transition-transform duration-200"
+                  style={{ color: '#10b981', transform: animatingValues ? 'scale(1.03)' : 'scale(1)' }}
+                >
+                  ${(tdiInvestment / 1000).toFixed(0)}k
+                </div>
+                <div className="text-sm text-gray-600">total {years}-year cost</div>
+              </div>
+              <div>
+                <div 
+                  className="text-3xl font-black transition-transform duration-200"
+                  style={{ color: '#10b981', transform: animatingValues ? 'scale(1.03)' : 'scale(1)' }}
+                >
+                  ${(hiringCostsAvoided / 1000).toFixed(0)}k
+                </div>
+                <div className="text-sm text-gray-600">hiring costs avoided</div>
+              </div>
+              <div>
+                <div className="text-3xl font-black" style={{ color: '#10b981' }}>✓</div>
+                <div className="text-sm text-gray-600">Title II eligible</div>
               </div>
             </div>
+            <p className="text-sm text-gray-500 mt-4 italic">
+              Most districts spend $2,000–$5,000 per teacher annually on PD that doesn't stick. This replaces those costs.
+            </p>
+          </div>
+
+          {/* YOUR TEACHERS */}
+          <div className="rounded-xl p-5" style={{ backgroundColor: '#fef3c7', borderLeft: '4px solid #f59e0b' }}>
+            <h4 className="text-base font-bold text-gray-700 mb-4 flex items-center gap-2">
+              👩‍🏫 YOUR TEACHERS
+            </h4>
+            <div className="grid grid-cols-4 gap-4">
+              <div>
+                <div 
+                  className="text-3xl font-black transition-transform duration-200"
+                  style={{ color: '#d97706', transform: animatingValues ? 'scale(1.03)' : 'scale(1)' }}
+                >
+                  {teachersExitingBurnout}
+                </div>
+                <div className="text-sm text-gray-600">exit burnout zone</div>
+              </div>
+              <div>
+                <div 
+                  className="text-3xl font-black transition-transform duration-200"
+                  style={{ color: '#d97706', transform: animatingValues ? 'scale(1.03)' : 'scale(1)' }}
+                >
+                  9→5
+                </div>
+                <div className="text-sm text-gray-600">stress level drop</div>
+              </div>
+              <div>
+                <div 
+                  className="text-3xl font-black transition-transform duration-200"
+                  style={{ color: '#d97706', transform: animatingValues ? 'scale(1.03)' : 'scale(1)' }}
+                >
+                  {sundaysBack}
+                </div>
+                <div className="text-sm text-gray-600">Sundays given back</div>
+              </div>
+              <div>
+                <div 
+                  className="text-3xl font-black transition-transform duration-200"
+                  style={{ color: '#d97706', transform: animatingValues ? 'scale(1.03)' : 'scale(1)' }}
+                >
+                  {feedbackMoments.toLocaleString()}
+                </div>
+                <div className="text-sm text-gray-600">feedback moments</div>
+              </div>
+            </div>
+          </div>
+
+          {/* YOUR STUDENTS */}
+          <div className="rounded-xl p-5" style={{ backgroundColor: '#e0f2fe', borderLeft: '4px solid #0ea5e9' }}>
+            <h4 className="text-base font-bold text-gray-700 mb-4 flex items-center gap-2">
+              🎒 YOUR STUDENTS
+            </h4>
+            <div className="grid grid-cols-4 gap-4">
+              <div>
+                <div 
+                  className="text-3xl font-black transition-transform duration-200"
+                  style={{ color: '#0284c7', transform: animatingValues ? 'scale(1.03)' : 'scale(1)' }}
+                >
+                  {lessonsImproved.toLocaleString()}
+                </div>
+                <div className="text-sm text-gray-600">lessons improved</div>
+              </div>
+              <div>
+                <div 
+                  className="text-3xl font-black transition-transform duration-200"
+                  style={{ color: '#0284c7', transform: animatingValues ? 'scale(1.03)' : 'scale(1)' }}
+                >
+                  {checkIns.toLocaleString()}
+                </div>
+                <div className="text-sm text-gray-600">1:1 check-ins enabled</div>
+              </div>
+              <div>
+                <div 
+                  className="text-3xl font-black transition-transform duration-200"
+                  style={{ color: '#0284c7', transform: animatingValues ? 'scale(1.03)' : 'scale(1)' }}
+                >
+                  {smallGroupHours.toLocaleString()}
+                </div>
+                <div className="text-sm text-gray-600">small group hours</div>
+              </div>
+              <div>
+                <div 
+                  className="text-3xl font-black transition-transform duration-200"
+                  style={{ color: '#0284c7', transform: animatingValues ? 'scale(1.03)' : 'scale(1)' }}
+                >
+                  {studentsHittingBenchmark}
+                </div>
+                <div className="text-sm text-gray-600">hitting new benchmarks</div>
+              </div>
+            </div>
+          </div>
+
+          {/* YOUR SCHOOL */}
+          <div className="rounded-xl p-5" style={{ backgroundColor: '#fae8ff', borderLeft: '4px solid #c026d3' }}>
+            <h4 className="text-base font-bold text-gray-700 mb-4 flex items-center gap-2">
+              🏫 YOUR SCHOOL
+            </h4>
+            <div className="grid grid-cols-4 gap-4">
+              <div>
+                <div 
+                  className="text-3xl font-black transition-transform duration-200"
+                  style={{ color: '#a21caf', transform: animatingValues ? 'scale(1.03)' : 'scale(1)' }}
+                >
+                  {crisisDaysAvoided}
+                </div>
+                <div className="text-sm text-gray-600">crisis days avoided</div>
+              </div>
+              <div>
+                <div 
+                  className="text-3xl font-black transition-transform duration-200"
+                  style={{ color: '#a21caf', transform: animatingValues ? 'scale(1.03)' : 'scale(1)' }}
+                >
+                  {teachersRetained}
+                </div>
+                <div className="text-sm text-gray-600">teachers you keep</div>
+              </div>
+              <div>
+                <div 
+                  className="text-3xl font-black transition-transform duration-200"
+                  style={{ color: '#a21caf', transform: animatingValues ? 'scale(1.03)' : 'scale(1)' }}
+                >
+                  {experienceYearsKept}
+                </div>
+                <div className="text-sm text-gray-600">years experience kept</div>
+              </div>
+              <div>
+                <div 
+                  className="text-3xl font-black transition-transform duration-200"
+                  style={{ color: '#a21caf', transform: animatingValues ? 'scale(1.03)' : 'scale(1)' }}
+                >
+                  {teachersNowThriving}
+                </div>
+                <div className="text-sm text-gray-600">teachers thriving</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        {/* What You'll Tell Your Board */}
+        <div className="px-8 pb-6">
+          <div className="rounded-xl p-5" style={{ backgroundColor: 'var(--tdi-navy)' }}>
+            <h4 className="text-base font-bold text-white mb-3 flex items-center gap-2">
+              📋 WHAT YOU'LL TELL YOUR BOARD
+            </h4>
+            <p className="text-white opacity-90 leading-relaxed">
+              "We invested <span className="font-bold">${tdiInvestment.toLocaleString()}</span> over {years} year{years > 1 ? 's' : ''} in teacher development through TDI. 
+              We avoided approximately <span className="font-bold">${hiringCostsAvoided.toLocaleString()}</span> in replacement hiring costs. 
+              Teacher wellness scores improved, with <span className="font-bold">{teachersExitingBurnout} teachers</span> exiting burnout risk. 
+              This translated to <span className="font-bold">{lessonsImproved.toLocaleString()} improved lessons</span> and 
+              <span className="font-bold"> {studentsHittingBenchmark} students</span> hitting new benchmarks."
+            </p>
           </div>
         </div>
 
@@ -288,99 +325,111 @@ export function TDICalculatorLarge() {
               onClick={() => window.print()}
               className="btn-secondary px-8 py-4 text-lg"
             >
-              Download PDF
+              Download Board Summary
             </button>
           </div>
         </div>
       </div>
 
-      {/* Cascade Toggle */}
+      {/* Show More Details Toggle */}
       <div className="text-center mb-6">
         <button 
-          onClick={() => setShowCascade(!showCascade)}
+          onClick={() => setShowDetails(!showDetails)}
           className="text-sm font-semibold px-6 py-3 rounded-full transition-all"
           style={{ 
-            backgroundColor: showCascade ? 'var(--tdi-teal)' : 'var(--tdi-peach)', 
-            color: showCascade ? 'white' : 'var(--tdi-charcoal)' 
+            backgroundColor: showDetails ? 'var(--tdi-teal)' : 'white', 
+            color: showDetails ? 'white' : 'var(--tdi-teal)',
+            border: '2px solid var(--tdi-teal)'
           }}
         >
-          {showCascade ? '▼ Hide Impact Cascade' : '▶ Show Full Impact Cascade'}
+          {showDetails ? '▼ Hide Detailed Breakdown' : '▶ Show Detailed Breakdown'}
         </button>
       </div>
 
-      {/* Impact Cascade */}
-      {showCascade && (
-        <div className="space-y-4">
-          <div className="text-center mb-6">
-            <p className="text-sm font-bold text-gray-400 uppercase tracking-widest">The Ripple Effect</p>
-          </div>
-
-          {cascadeLevels.map((level, index) => (
-            <div key={index} className="relative">
-              {/* Connector Line */}
-              {index < cascadeLevels.length - 1 && (
-                <div 
-                  className="absolute left-8 top-full w-1 h-4 z-0" 
-                  style={{ background: `linear-gradient(180deg, ${level.color}60, ${cascadeLevels[index + 1].color}60)` }} 
-                />
-              )}
-              
-              <div
-                className="relative z-10 bg-white rounded-xl p-5 shadow-md border border-gray-100 transition-all hover:shadow-lg"
-                style={{ borderLeft: `4px solid ${level.color}` }}
-              >
-                <div className="flex gap-4">
-                  {/* Icon */}
-                  <div 
-                    className="w-14 h-14 rounded-xl flex items-center justify-center text-2xl flex-shrink-0"
-                    style={{ backgroundColor: `${level.color}15` }}
-                  >
-                    {level.icon}
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1">
-                    <div className="flex items-baseline gap-3 mb-3">
-                      <span className="text-sm font-bold text-gray-500 uppercase">{level.title}</span>
-                    </div>
-                    
-                    <div className="flex items-baseline gap-2 mb-3">
-                      <span 
-                        className="text-3xl font-black transition-transform duration-200"
-                        style={{ color: level.color, transform: animatingValues ? 'scale(1.02)' : 'scale(1)' }}
-                      >
-                        {level.mainValue}
-                      </span>
-                      <span className="text-base text-gray-600">{level.mainLabel}</span>
-                    </div>
-
-                    {/* Metrics Grid */}
-                    <div className="grid grid-cols-3 gap-3">
-                      {level.metrics.map((m, mi) => (
-                        <div 
-                          key={mi}
-                          className="rounded-lg px-3 py-2 border-l-2 transition-all duration-200"
-                          style={{ 
-                            backgroundColor: `${level.color}08`,
-                            borderColor: `${level.color}50`,
-                            transform: animatingValues ? 'translateY(-1px)' : 'translateY(0)'
-                          }}
-                        >
-                          <div 
-                            className="text-lg font-bold leading-tight"
-                            style={{ color: level.color }}
-                          >
-                            {m.value}
-                          </div>
-                          <div className="text-xs text-gray-500">{m.label}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+      {/* Expanded Details */}
+      {showDetails && (
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100 p-8">
+          <h3 className="text-xl font-bold mb-6 text-center" style={{ color: 'var(--tdi-charcoal)' }}>
+            Detailed Impact Breakdown
+          </h3>
+          
+          <div className="grid grid-cols-2 gap-6">
+            {/* Teacher Efficiency */}
+            <div className="p-4 rounded-xl border border-gray-200">
+              <h4 className="font-bold text-gray-700 mb-3">⚡ Teacher Efficiency</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li className="flex justify-between">
+                  <span>Hours saved per week (team)</span>
+                  <span className="font-bold">{teachers * 5}</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Total hours saved</span>
+                  <span className="font-bold">{totalHours.toLocaleString()}</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Planning time reduction</span>
+                  <span className="font-bold">12→6 hrs/week</span>
+                </li>
+              </ul>
             </div>
-          ))}
+
+            {/* Wellbeing */}
+            <div className="p-4 rounded-xl border border-gray-200">
+              <h4 className="font-bold text-gray-700 mb-3">💚 Teacher Wellbeing</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li className="flex justify-between">
+                  <span>Teachers at burnout risk (before)</span>
+                  <span className="font-bold">{teachersAtRiskBefore}</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Teachers exiting burnout</span>
+                  <span className="font-bold">{teachersExitingBurnout}</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Stress level change</span>
+                  <span className="font-bold">9/10 → 5/10</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Retention */}
+            <div className="p-4 rounded-xl border border-gray-200">
+              <h4 className="font-bold text-gray-700 mb-3">🏠 Teacher Retention</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li className="flex justify-between">
+                  <span>Would have left (industry avg)</span>
+                  <span className="font-bold">{wouldHaveLeft}</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Teachers retained with TDI</span>
+                  <span className="font-bold">{teachersRetained}</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Cost per replacement</span>
+                  <span className="font-bold">$20,000</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Student Impact */}
+            <div className="p-4 rounded-xl border border-gray-200">
+              <h4 className="font-bold text-gray-700 mb-3">📈 Student Outcomes</h4>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li className="flex justify-between">
+                  <span>Total students impacted</span>
+                  <span className="font-bold">{(students * years).toLocaleString()}</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Students gaining ground</span>
+                  <span className="font-bold">{studentsGainingGround}</span>
+                </li>
+                <li className="flex justify-between">
+                  <span>Research-backed gain potential</span>
+                  <span className="font-bold">8-12 percentile pts</span>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
       )}
 
