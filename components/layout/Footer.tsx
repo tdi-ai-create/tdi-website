@@ -87,11 +87,6 @@ export function Footer() {
                     Impact Calculator
                   </Link>
                 </li>
-                <li>
-                  <Link href="/for-schools/pricing" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
-                    Pricing
-                  </Link>
-                </li>
               </ul>
             </div>
 

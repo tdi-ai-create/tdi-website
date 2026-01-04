@@ -289,7 +289,7 @@ export default function JoinPage() {
 
             {/* Card 2: Explore What's Possible */}
             <a
-              href="/for-schools/pricing"
+              href="/contact"
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
               <div
@@ -314,10 +314,10 @@ export default function JoinPage() {
                   Explore What's Possible
                 </h3>
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  See pricing options and partnership models.
+                  Let's discuss partnership models for your school.
                 </p>
                 <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
-                  View pricing →
+                  Get in touch →
                 </span>
               </div>
             </a>

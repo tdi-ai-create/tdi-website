@@ -47,16 +47,9 @@ export default function ForSchoolsPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="/for-schools/pricing"
+                href="/contact"
                 className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
                 style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-              >
-                See Pricing
-              </a>
-              <a
-                href="/contact"
-                className="px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-white/10"
-                style={{ borderColor: '#ffffff', color: '#ffffff' }}
               >
                 Schedule a Call
               </a>
@@ -472,22 +465,13 @@ export default function ForSchoolsPage() {
               <p className="mb-6" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Every school's journey is different. Let's find the right starting point for yours.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <a
-                  href="/contact"
-                  className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
-                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                >
-                  Start the Conversation
-                </a>
-                <a
-                  href="/for-schools/pricing"
-                  className="px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-gray-100"
-                  style={{ borderColor: '#1e2749', color: '#1e2749' }}
-                >
-                  See Full Pricing Details
-                </a>
-              </div>
+              <a
+                href="/contact"
+                className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
+                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+              >
+                Start the Conversation
+              </a>
             </div>
 
           </div>
@@ -503,22 +487,13 @@ export default function ForSchoolsPage() {
           <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
             Let's talk through your goals, staff size, and timeline. No pressure, just a conversation.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/contact"
-              className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
-              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-            >
-              Schedule a Call
-            </Link>
-            <Link
-              href="/for-schools/pricing"
-              className="px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-white/10"
-              style={{ borderColor: '#ffffff', color: '#ffffff' }}
-            >
-              See Full Pricing Details
-            </Link>
-          </div>
+          <Link
+            href="/contact"
+            className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
+            style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+          >
+            Schedule a Call
+          </Link>
         </div>
       </section>
     </main>
