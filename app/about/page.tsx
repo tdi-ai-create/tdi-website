@@ -63,7 +63,7 @@ export default function AboutPage() {
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: 'url("/images/about-teacher-pointing.png")',
-            backgroundPosition: 'right center',
+            backgroundPosition: 'right 30%',
             backgroundAttachment: 'fixed',
           }}
         />
