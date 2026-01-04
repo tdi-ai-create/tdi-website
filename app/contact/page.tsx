@@ -58,7 +58,7 @@ export default function ContactPage() {
               <div className="text-center py-12">
                 <h2 className="mb-4">Thanks for reaching out!</h2>
                 <p style={{ opacity: 0.7 }}>
-                  We'll get back to you within 24 hours.
+                  We'll be in touch soon.
                 </p>
               </div>
             ) : (
@@ -148,15 +148,6 @@ export default function ContactPage() {
               </p>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Response Time */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-gray)' }}>
-        <div className="container-default text-center">
-          <p className="text-lg">
-            We respond to all inquiries within <strong>24 hours</strong>.
-          </p>
         </div>
       </section>
 
