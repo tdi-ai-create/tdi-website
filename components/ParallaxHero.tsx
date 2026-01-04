@@ -32,14 +32,6 @@ export function ParallaxHero() {
         }}
       />
 
-      {/* ONLY a subtle dark gradient on left for text - NO BLUE */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: 'linear-gradient(90deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.3) 35%, rgba(0,0,0,0) 55%)'
-        }}
-      />
-
       {/* Foreground Rae Cutout - MUST MATCH background position exactly */}
       <div
         ref={foregroundRef}
@@ -52,10 +44,10 @@ export function ParallaxHero() {
         }}
       />
 
-      {/* Text - Positioned LEFT with padding */}
+      {/* Text Content */}
       <div className="relative z-10 h-full flex items-center">
-        <div className="pl-8 md:pl-16 lg:pl-24 xl:pl-32">
-          <div className="max-w-md">
+        <div className="container-default">
+          <div className="max-w-lg">
             <h1
               className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight"
               style={{
