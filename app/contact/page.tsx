@@ -205,26 +205,6 @@ export default function ContactPage() {
               </p>
             </a>
 
-            {/* Explore the TDI Blueprint */}
-            <a
-              href="/for-schools"
-              className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow"
-              style={{ textDecoration: 'none' }}
-            >
-              <div
-                className="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center"
-                style={{ backgroundColor: '#ffba06' }}
-              >
-                <svg className="w-7 h-7" fill="#1e2749" viewBox="0 0 24 24">
-                  <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                </svg>
-              </div>
-              <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Explore the TDI Blueprint</h3>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                See how we partner with districts to transform PD.
-              </p>
-            </a>
-
             {/* Read the Blog */}
             <a
               href="https://teachersdeserveit.substack.com"
