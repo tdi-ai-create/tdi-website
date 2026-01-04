@@ -773,7 +773,7 @@ export default function FreePDPlanPage() {
           style={{
             backgroundImage: "url('/images/hero-pd-plan.png')",
             backgroundSize: 'cover',
-            backgroundPosition: 'center 60%',
+            backgroundPosition: 'center 80%',
             backgroundRepeat: 'no-repeat',
           }}
         />
