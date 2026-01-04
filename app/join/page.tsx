@@ -6,7 +6,7 @@ export default function JoinPage() {
   return (
     <main className="min-h-screen">
       {/* Hero Section with Parallax */}
-      <section className="relative h-[400px] md:h-[450px] overflow-hidden">
+      <section className="relative h-[320px] md:h-[360px] overflow-hidden">
         {/* Parallax Background Image */}
         <div
           className="absolute inset-0 parallax-bg"
@@ -23,7 +23,7 @@ export default function JoinPage() {
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(180deg, rgba(30, 39, 73, 0.75) 0%, rgba(30, 39, 73, 0.85) 100%)'
+            background: 'linear-gradient(180deg, rgba(30, 39, 73, 0.5) 0%, rgba(30, 39, 73, 0.6) 100%)'
           }}
         />
 
@@ -56,71 +56,86 @@ export default function JoinPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
 
-            {/* Card 1: Blog/Newsletter - Light Yellow */}
+            {/* Card 1: Blog/Newsletter */}
             <a
               href="https://raehughart.substack.com"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-col items-center group"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
               <div
-                className="w-full h-[280px] rounded-3xl flex items-center justify-center p-8 transition-transform group-hover:scale-105"
+                className="h-[180px] flex items-center justify-center p-6"
                 style={{ backgroundColor: '#FEF3C7' }}
               >
                 <h3
-                  className="text-xl md:text-2xl font-bold text-center uppercase tracking-wide"
+                  className="text-xl font-bold text-center uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
                   Weekly Strategies in Your Inbox
                 </h3>
               </div>
-              <p className="mt-4 text-center text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                3x/week, practical ideas you can use immediately. Join 87,000+ educators.
-              </p>
+              <div className="bg-white p-5">
+                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  3x/week, practical ideas you can use immediately. Join 87,000+ educators already getting them.
+                </p>
+                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
+                  Read the latest →
+                </span>
+              </div>
             </a>
 
-            {/* Card 2: Podcast - Yellow */}
+            {/* Card 2: Podcast */}
             <a
               href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex flex-col items-center group"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
               <div
-                className="w-full h-[280px] rounded-3xl flex items-center justify-center p-8 transition-transform group-hover:scale-105"
+                className="h-[180px] flex items-center justify-center p-6"
                 style={{ backgroundColor: '#ffba06' }}
               >
                 <h3
-                  className="text-xl md:text-2xl font-bold text-center uppercase tracking-wide"
+                  className="text-xl font-bold text-center uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
                   Listen While You Commute
                 </h3>
               </div>
-              <p className="mt-4 text-center text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                The Sustainable Teaching podcast. Real talk from people who get it.
-              </p>
+              <div className="bg-white p-5">
+                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  The Sustainable Teaching podcast. Real talk about sustainable teaching from people who get it.
+                </p>
+                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
+                  Start listening →
+                </span>
+              </div>
             </a>
 
-            {/* Card 3: Free Resources - Lightest Yellow */}
+            {/* Card 3: Free Resources */}
             <a
               href="/resources"
-              className="flex flex-col items-center group"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
               <div
-                className="w-full h-[280px] rounded-3xl flex items-center justify-center p-8 transition-transform group-hover:scale-105"
+                className="h-[180px] flex items-center justify-center p-6"
                 style={{ backgroundColor: '#FEF9E7' }}
               >
                 <h3
-                  className="text-xl md:text-2xl font-bold text-center uppercase tracking-wide"
+                  className="text-xl font-bold text-center uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
-                  Grab Your Ready to Use Free Resource
+                  Grab a Free Resource
                 </h3>
               </div>
-              <p className="mt-4 text-center text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Ready-to-use downloads for teachers and paras alike.
-              </p>
+              <div className="bg-white p-5">
+                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  Ready-to-use downloads for your classroom, for teachers and paras alike.
+                </p>
+                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
+                  Browse downloads →
+                </span>
+              </div>
             </a>
 
           </div>
@@ -143,10 +158,10 @@ export default function JoinPage() {
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow"
-              style={{ borderTop: '4px solid #F96767' }}
+              style={{ borderTop: '4px solid #ffba06' }}
             >
               <h3
-                className="text-xl font-bold mb-3 underline"
+                className="text-xl font-bold mb-3"
                 style={{ color: '#1e2749' }}
               >
                 Go Deeper with Exclusive Content
@@ -154,7 +169,7 @@ export default function JoinPage() {
               <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Premium strategies, behind-the-scenes access, and a community of educators who are done settling for the status quo.
               </p>
-              <span className="font-semibold text-sm" style={{ color: '#F96767' }}>
+              <span className="font-semibold text-sm" style={{ color: '#ffba06' }}>
                 See premium options →
               </span>
             </a>
@@ -165,7 +180,7 @@ export default function JoinPage() {
               target="_blank"
               rel="noopener noreferrer"
               className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow"
-              style={{ borderTop: '4px solid #F96767' }}
+              style={{ borderTop: '4px solid #ffba06' }}
             >
               <h3
                 className="text-xl font-bold mb-3"
@@ -176,7 +191,7 @@ export default function JoinPage() {
               <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
                 100+ hours of on-demand PD. Bite-sized videos you can finish in one sitting. Strategies you'll actually use Monday morning.
               </p>
-              <span className="font-semibold text-sm" style={{ color: '#F96767' }}>
+              <span className="font-semibold text-sm" style={{ color: '#ffba06' }}>
                 Explore the Learning Hub →
               </span>
             </a>
@@ -204,73 +219,88 @@ export default function JoinPage() {
         <div className="container-default">
           <h2 className="text-center mb-2">For School Leaders</h2>
           <p className="text-center mb-12" style={{ opacity: 0.6 }}>
-            Support your whole building with PD they'll actually use.
+            Support your whole building, teachers and paraprofessionals, with PD they'll actually use.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
 
-            {/* Card 1: Bring TDI - Light Blue */}
-            <Link
+            {/* Card 1: Bring TDI */}
+            <a
               href="/for-schools"
-              className="flex flex-col items-center group"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
               <div
-                className="w-full h-[280px] rounded-3xl flex items-center justify-center p-8 transition-transform group-hover:scale-105"
+                className="h-[180px] flex items-center justify-center p-6"
                 style={{ backgroundColor: '#C7D7F5' }}
               >
                 <h3
-                  className="text-xl md:text-2xl font-bold text-center uppercase tracking-wide"
+                  className="text-xl font-bold text-center uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
                   Bring TDI to Your Team
                 </h3>
               </div>
-              <p className="mt-4 text-center text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                PD your teachers will thank you for. Implementation support from day one.
-              </p>
-            </Link>
+              <div className="bg-white p-5">
+                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  Whole-school PD designed for real implementation.
+                </p>
+                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
+                  Learn more →
+                </span>
+              </div>
+            </a>
 
-            {/* Card 2: Calculator - Blue */}
-            <Link
-              href="/calculator"
-              className="flex flex-col items-center group"
+            {/* Card 2: Explore What's Possible */}
+            <a
+              href="/for-schools/pricing"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
               <div
-                className="w-full h-[280px] rounded-3xl flex items-center justify-center p-8 transition-transform group-hover:scale-105"
+                className="h-[180px] flex items-center justify-center p-6"
                 style={{ backgroundColor: '#80a4ed' }}
               >
                 <h3
-                  className="text-xl md:text-2xl font-bold text-center uppercase tracking-wide"
+                  className="text-xl font-bold text-center uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
-                  See What's Possible
+                  Explore What's Possible
                 </h3>
               </div>
-              <p className="mt-4 text-center text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Try the impact calculator. See projected improvements in budget, morale, and outcomes.
-              </p>
-            </Link>
+              <div className="bg-white p-5">
+                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  See pricing options and partnership models.
+                </p>
+                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
+                  View pricing →
+                </span>
+              </div>
+            </a>
 
-            {/* Card 3: Schedule Call - Lightest Blue */}
-            <Link
-              href="/for-schools/schedule-call"
-              className="flex flex-col items-center group"
+            {/* Card 3: Chat with Team */}
+            <a
+              href="/contact"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all"
             >
               <div
-                className="w-full h-[280px] rounded-3xl flex items-center justify-center p-8 transition-transform group-hover:scale-105"
+                className="h-[180px] flex items-center justify-center p-6"
                 style={{ backgroundColor: '#E0E9F9' }}
               >
                 <h3
-                  className="text-xl md:text-2xl font-bold text-center uppercase tracking-wide"
+                  className="text-xl font-bold text-center uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
-                  Let's Talk
+                  Chat with a Member of the Team
                 </h3>
               </div>
-              <p className="mt-4 text-center text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Schedule a conversation. No pitch, no pressure. Just a real discussion.
-              </p>
-            </Link>
+              <div className="bg-white p-5">
+                <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  Have questions? Let's talk.
+                </p>
+                <span className="font-semibold text-sm" style={{ color: '#1e2749' }}>
+                  Contact us →
+                </span>
+              </div>
+            </a>
 
           </div>
         </div>
