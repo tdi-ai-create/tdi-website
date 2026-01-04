@@ -8,8 +8,8 @@ export default function Home() {
       {/* SECTION 1: Hero */}
       <section className="section bg-white">
         <div className="container-wide">
-          <h1 className="mb-4 max-w-4xl">
-            Teachers Deserve More Than<br />Survival
+          <h1 className="mb-4 whitespace-nowrap">
+            Teachers Deserve More Than Survival
           </h1>
           <p className="text-lg font-semibold mb-6" style={{ color: 'var(--tdi-navy)' }}>
             Research-Backed. Expert-Designed. Educator-Focused.
