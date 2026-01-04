@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { TDICalculatorMedium } from '@/components/calculators/TDICalculatorMedium';
 
 export default function Home() {
   return (
@@ -14,10 +13,10 @@ export default function Home() {
             You became a teacher to make a difference. Not to drown in lesson plans, sit through pointless PD, and count down to summer. We get it. We've been there.
           </p>
           <div className="flex flex-wrap gap-4">
-            <a 
-              href="https://tdi.thinkific.com" 
-              className="btn-primary" 
-              target="_blank" 
+            <a
+              href="https://tdi.thinkific.com"
+              className="btn-primary"
+              target="_blank"
               rel="noopener noreferrer"
             >
               Explore the Learning Hub
@@ -74,7 +73,7 @@ export default function Home() {
           <p className="text-center text-lg mb-12 max-w-2xl mx-auto" style={{ opacity: 0.8 }}>
             TDI was born from burnout. Built by teachers who get it.
           </p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="card text-center">
               <div className="text-4xl mb-4">🎯</div>
@@ -83,7 +82,7 @@ export default function Home() {
                 Stuff you can actually use Monday morning. No fluff, no theory for theory's sake.
               </p>
             </div>
-            
+
             <div className="card text-center">
               <div className="text-4xl mb-4">⏰</div>
               <h3 className="text-xl mb-3">Respects Your Time</h3>
@@ -91,7 +90,7 @@ export default function Home() {
                 Flipped PD model. Learn on your schedule. No more losing Saturdays to workshops.
               </p>
             </div>
-            
+
             <div className="card text-center">
               <div className="text-4xl mb-4">💪</div>
               <h3 className="text-xl mb-3">Wellness Built In</h3>
@@ -107,7 +106,7 @@ export default function Home() {
       <section className="section bg-white">
         <div className="container-wide">
           <h2 className="text-center mb-12">Two Ways to Work With Us</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {/* Teachers Path */}
             <div className="card" style={{ borderTop: '4px solid var(--tdi-coral)' }}>
@@ -121,10 +120,10 @@ export default function Home() {
                 <li>✓ Wellness strategies that actually work</li>
                 <li>✓ Free downloads to get you started</li>
               </ul>
-              <a 
-                href="https://tdi.thinkific.com" 
+              <a
+                href="https://tdi.thinkific.com"
                 className="btn-primary inline-block"
-                target="_blank" 
+                target="_blank"
                 rel="noopener noreferrer"
               >
                 Explore the Learning Hub
@@ -151,20 +150,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Impact Calculator Section */}
+      {/* Testimonials */}
       <section className="section" style={{ backgroundColor: 'var(--tdi-peach)' }}>
         <div className="container-wide">
-          <div className="max-w-4xl mx-auto">
-            <TDICalculatorMedium />
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="section bg-white">
-        <div className="container-wide">
           <h2 className="text-center mb-12">What Educators Are Saying</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="card-testimonial">
               <p className="text-lg italic mb-4">
@@ -173,7 +163,7 @@ export default function Home() {
               <p className="text-sm font-semibold">Sarah K.</p>
               <p className="text-sm" style={{ opacity: 0.7 }}>5th Grade Teacher, IL</p>
             </div>
-            
+
             <div className="card-testimonial">
               <p className="text-lg italic mb-4">
                 "Our teachers are actually excited about PD now. I don't have to chase them down or babysit. They're learning because they want to."
@@ -193,16 +183,16 @@ export default function Home() {
             Whether you're a teacher looking for support or a leader trying to keep your team from burning out, we've got you.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <a 
-              href="https://tdi.thinkific.com" 
+            <a
+              href="https://tdi.thinkific.com"
               className="btn-primary"
-              target="_blank" 
+              target="_blank"
               rel="noopener noreferrer"
             >
               Start Learning Now
             </a>
-            <Link 
-              href="/for-schools/schedule-call" 
+            <Link
+              href="/for-schools/schedule-call"
               className="btn-secondary"
               style={{ borderColor: 'white', color: 'white' }}
             >
