@@ -20,12 +20,32 @@ export default function ContactPage() {
 
   return (
     <main className="min-h-screen">
-      {/* Hero */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
-        <div className="container-default text-center">
-          <h1 className="mb-4" style={{ color: 'white' }}>Get in Touch</h1>
-          <p className="text-xl max-w-2xl mx-auto" style={{ color: 'white', opacity: 0.9 }}>
-            Questions? Ideas? Just want to say hi? We'd love to hear from you.
+      {/* Hero Section */}
+      <section className="relative py-20 md:py-28 overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: 'url("/images/hero-contact.png")',
+            backgroundPosition: 'center'
+          }}
+        />
+
+        {/* Navy Gradient Overlay */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(135deg, rgba(30, 39, 73, 0.92) 0%, rgba(30, 39, 73, 0.85) 100%)'
+          }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 container-default text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6" style={{ color: '#ffffff' }}>
+            Get In Touch
+          </h1>
+          <p className="text-xl max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
+            Whether you have questions about our programs, want to explore a partnership, or just want to say hello, we would love to hear from you.
           </p>
         </div>
       </section>
