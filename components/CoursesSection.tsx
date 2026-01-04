@@ -87,7 +87,7 @@ export function CoursesSection() {
           >
             {/* Featured Badge */}
             <div
-              className="absolute top-3 left-3 z-10 px-3 py-1 rounded-full text-xs font-bold"
+              className="absolute top-3 right-3 z-10 px-3 py-1 rounded-full text-xs font-bold"
               style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
             >
               Updated Monthly
