@@ -1,239 +1,253 @@
-import Link from 'next/link';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Funding Options | Teachers Deserve It',
+  description: 'Discover how 80% of schools fund TDI professional development through grants like Title II, ESSER, and state-specific opportunities.',
+};
+
+const fundingSources = [
+  {
+    name: 'Title II-A',
+    description: 'Federal funds specifically designated for improving teacher quality and professional development.',
+    bestFor: 'All schools',
+    typical: '$5,000 - $50,000+',
+  },
+  {
+    name: 'ESSER / ARP',
+    description: 'COVID relief funds that can be used for teacher support, retention initiatives, and PD through 2024.',
+    bestFor: 'Schools with remaining ESSER allocation',
+    typical: 'Varies widely',
+  },
+  {
+    name: 'Title I',
+    description: 'Schools with high percentages of low-income students can use these funds for staff development.',
+    bestFor: 'Title I schools',
+    typical: '$10,000 - $100,000+',
+  },
+  {
+    name: 'State-Specific Grants',
+    description: 'Many states offer dedicated PD funding, teacher retention grants, or innovation funds.',
+    bestFor: 'Varies by state',
+    typical: '$2,500 - $25,000',
+  },
+  {
+    name: 'Foundation Grants',
+    description: 'Local education foundations and community organizations often fund teacher development initiatives.',
+    bestFor: 'Community-connected schools',
+    typical: '$1,000 - $10,000',
+  },
+  {
+    name: 'General Fund / PD Budget',
+    description: 'Your existing professional development allocation—TDI often costs less than traditional PD.',
+    bestFor: 'All schools',
+    typical: 'Existing budget',
+  },
+];
 
 export default function FundingPage() {
   return (
-    <main className="min-h-screen">
-      {/* Hero */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
-        <div className="container-default text-center">
-          <p className="text-sm uppercase tracking-wider mb-4" style={{ color: 'white', opacity: 0.8 }}>
-            Professional Development
+    <main>
+      {/* Hero with Parallax Image */}
+      <section className="relative py-24 md:py-32 overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-fixed"
+          style={{
+            backgroundImage: 'url(/images/hero-funding.png)',
+          }}
+        />
+        {/* Dark Overlay */}
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: 'rgba(30, 39, 73, 0.85)' }}
+        />
+
+        {/* Content */}
+        <div className="container-default relative z-10 text-center">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#ffffff' }}>
+            Funding Your PD Shouldn't Be This Hard
+          </h1>
+          <p className="max-w-2xl mx-auto text-lg" style={{ color: '#ffffff', opacity: 0.9 }}>
+            80% of the schools we work with secure external funding for TDI. We'll help you find yours.
           </p>
-          <h1 className="mb-4" style={{ color: 'white' }}>Without the Price Tag</h1>
-          <p className="text-xl max-w-2xl mx-auto" style={{ color: 'white', opacity: 0.9 }}>
-            Teachers Deserve It helps schools deliver PD that teachers love, and we help secure the funding to pay for it.
+        </div>
+      </section>
+
+      {/* The Problem */}
+      <section className="py-16" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-default max-w-3xl text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: '#1e2749' }}>
+            Cost Should Never Stop a School
+          </h2>
+          <p className="text-lg mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
+            We've heard it too many times: "We'd love to work with TDI, but we just don't have the budget."
+          </p>
+          <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
+            Here's the truth: the money is often already there. It's just buried in grant applications, federal allocations, and funding streams you might not know about. That's where we come in.
           </p>
         </div>
       </section>
 
-      {/* Stats Bar */}
-      <section className="section py-12" style={{ backgroundColor: 'var(--tdi-navy)' }}>
-        <div className="container-wide">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-center">
+      {/* Stats Banner */}
+      <section className="py-12" style={{ backgroundColor: '#1e2749' }}>
+        <div className="container-default">
+          <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
-              <p className="text-5xl font-bold mb-2" style={{ color: 'var(--tdi-yellow)' }}>80%</p>
-              <p style={{ color: 'white', opacity: 0.8 }}>of schools we work with secure external funds to cover PD</p>
-            </div>
-            <div>
-              <p className="text-5xl font-bold mb-2" style={{ color: 'var(--tdi-yellow)' }}>30%</p>
-              <p style={{ color: 'white', opacity: 0.8 }}>increase in teacher implementation of new strategies</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* The Challenge */}
-      <section className="section bg-white">
-        <div className="container-default">
-          <h2 className="text-center mb-8">The Challenge You're Facing</h2>
-          <div className="max-w-2xl mx-auto">
-            <p className="text-lg mb-6">You're asked to deliver PD that inspires. But all too often:</p>
-            <ul className="space-y-3 text-lg mb-8">
-              <li className="flex items-start gap-3">
-                <span style={{ color: 'var(--tdi-coral)' }}>•</span>
-                <span>PD eats staff time without changing practice.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span style={{ color: 'var(--tdi-coral)' }}>•</span>
-                <span>Budgets are already stretched too thin.</span>
-              </li>
-              <li className="flex items-start gap-3">
-                <span style={{ color: 'var(--tdi-coral)' }}>•</span>
-                <span>Teachers roll their eyes, and you're left apologizing for wasted hours.</span>
-              </li>
-            </ul>
-            <p className="text-lg font-semibold" style={{ color: 'var(--tdi-navy)' }}>
-              It doesn't have to be that way.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* How TDI Makes It Easy */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-gray)' }}>
-        <div className="container-default">
-          <h2 className="text-center mb-12">How TDI Makes It Easy</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="card">
-              <h3 className="text-xl mb-3">We Design a Plan</h3>
-              <p style={{ opacity: 0.7 }}>
-                Built around your staff's priorities and goals, for teachers and paraprofessionals alike.
-              </p>
-            </div>
-            <div className="card">
-              <h3 className="text-xl mb-3">We Find the Funding</h3>
-              <p style={{ opacity: 0.7 }}>
-                We align your plan with local, state, and national grants and draft the language for you.
-              </p>
-            </div>
-            <div className="card">
-              <h3 className="text-xl mb-3">We Deliver the PD</h3>
-              <p style={{ opacity: 0.7 }}>
-                Teacher-approved, immediately actionable strategies that improve classrooms and culture.
-              </p>
-            </div>
-            <div className="card">
-              <h3 className="text-xl mb-3">We Stay With You</h3>
-              <p style={{ opacity: 0.7 }}>
-                Reporting and renewal support keeps funding flowing year after year.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonial */}
-      <section className="section bg-white">
-        <div className="container-default">
-          <div className="max-w-2xl mx-auto text-center">
-            <p className="text-2xl italic mb-6" style={{ color: 'var(--tdi-charcoal)' }}>
-              "This was the first PD I didn't have to apologize for. Our teachers actually thanked me."
-            </p>
-            <p className="font-semibold">James T., School Principal</p>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
-        <div className="container-default">
-          <h2 className="text-center mb-12" style={{ color: 'white' }}>How It Works</h2>
-          <div className="max-w-3xl mx-auto space-y-8">
-            <div className="flex gap-6">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: 'var(--tdi-yellow)', color: 'var(--tdi-charcoal)' }}>1</div>
-              <div>
-                <h3 className="text-xl mb-2" style={{ color: 'white' }}>Discovery & Alignment</h3>
-                <p style={{ color: 'white', opacity: 0.8 }}>
-                  We start by listening. We learn your district's goals, challenges, and timelines. Then we align those priorities with available grant opportunities.
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-6">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: 'var(--tdi-yellow)', color: 'var(--tdi-charcoal)' }}>2</div>
-              <div>
-                <h3 className="text-xl mb-2" style={{ color: 'white' }}>Build Your Options</h3>
-                <p style={{ color: 'white', opacity: 0.8 }}>
-                  We create two paths: a Baseline Package that fits within your current budget, and a Dream Package fully supported by grant funding.
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-6">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: 'var(--tdi-yellow)', color: 'var(--tdi-charcoal)' }}>3</div>
-              <div>
-                <h3 className="text-xl mb-2" style={{ color: 'white' }}>Grant Mapping</h3>
-                <p style={{ color: 'white', opacity: 0.8 }}>
-                  We provide a curated list of grants aligned to your plan, with deadlines, requirements, and best-fit matches.
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-6">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: 'var(--tdi-yellow)', color: 'var(--tdi-charcoal)' }}>4</div>
-              <div>
-                <h3 className="text-xl mb-2" style={{ color: 'white' }}>Grant-Ready Language</h3>
-                <p style={{ color: 'white', opacity: 0.8 }}>
-                  We prepare outcomes, impact data, and budget justification that can be dropped directly into applications.
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-6">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: 'var(--tdi-yellow)', color: 'var(--tdi-charcoal)' }}>5</div>
-              <div>
-                <h3 className="text-xl mb-2" style={{ color: 'white' }}>Application Support</h3>
-                <p style={{ color: 'white', opacity: 0.8 }}>
-                  You submit (as required by funders), while we edit, refine, and provide supplemental materials.
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-6">
-              <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: 'var(--tdi-yellow)', color: 'var(--tdi-charcoal)' }}>6</div>
-              <div>
-                <h3 className="text-xl mb-2" style={{ color: 'white' }}>Delivery & Renewal</h3>
-                <p style={{ color: 'white', opacity: 0.8 }}>
-                  Once funded, we align the PD calendar with the grant cycle. We make reporting simple so you can secure renewal funding year after year.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Administrators Choose TDI */}
-      <section className="section bg-white">
-        <div className="container-default">
-          <h2 className="text-center mb-12">Why Administrators Choose TDI</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto text-center">
-            <div>
-              <h3 className="text-xl mb-3">Less Work on Your Plate</h3>
-              <p style={{ opacity: 0.7 }}>
-                We handle the grant research, language, and alignment.
-              </p>
+              <p className="text-4xl md:text-5xl font-bold" style={{ color: '#ffba06' }}>80%</p>
+              <p className="mt-2" style={{ color: '#ffffff', opacity: 0.8 }}>of partner schools secure external funding</p>
             </div>
             <div>
-              <h3 className="text-xl mb-3">Data You Can Report</h3>
-              <p style={{ opacity: 0.7 }}>
-                Outcomes tied directly to student impact and district goals.
-              </p>
+              <p className="text-4xl md:text-5xl font-bold" style={{ color: '#ffba06' }}>$0</p>
+              <p className="mt-2" style={{ color: '#ffffff', opacity: 0.8 }}>cost to explore funding options with us</p>
             </div>
             <div>
-              <h3 className="text-xl mb-3">Staff Retention & Morale</h3>
-              <p style={{ opacity: 0.7 }}>
-                Teachers and paras feel supported instead of burned out.
-              </p>
+              <p className="text-4xl md:text-5xl font-bold" style={{ color: '#ffba06' }}>100%</p>
+              <p className="mt-2" style={{ color: '#ffffff', opacity: 0.8 }}>of the paperwork headache—we help</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Second Testimonial */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-gray)' }}>
+      {/* Funding Sources */}
+      <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
-          <div className="max-w-2xl mx-auto text-center">
-            <p className="text-2xl italic mb-6" style={{ color: 'var(--tdi-charcoal)' }}>
-              "TDI helped us unlock funding we didn't even know was possible."
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#1e2749' }}>
+              Common Funding Sources
+            </h2>
+            <p className="max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+              These are the most common ways schools fund TDI partnerships. Not sure which applies to you? We'll figure it out together.
             </p>
-            <p className="font-semibold">Patricia L., District Leader</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            {fundingSources.map((source, index) => (
+              <div
+                key={index}
+                className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
+                style={{ border: '1px solid #e5e7eb' }}
+              >
+                <h3 className="text-lg font-bold mb-2" style={{ color: '#1e2749' }}>
+                  {source.name}
+                </h3>
+                <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  {source.description}
+                </p>
+                <div className="pt-4 border-t" style={{ borderColor: '#e5e7eb' }}>
+                  <p className="text-xs" style={{ color: '#1e2749', opacity: 0.5 }}>
+                    <span className="font-semibold">Best for:</span> {source.bestFor}
+                  </p>
+                  <p className="text-xs mt-1" style={{ color: '#1e2749', opacity: 0.5 }}>
+                    <span className="font-semibold">Typical range:</span> {source.typical}
+                  </p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Why Funding Isn't the Barrier */}
-      <section className="section bg-white">
-        <div className="container-default">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-center mb-8">Why Funding Isn't the Barrier</h2>
-            <p className="text-lg mb-6">
-              Schools across the country qualify for multiple grants designed to support professional learning.
+      {/* How We Help */}
+      <section className="py-16" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-default max-w-4xl">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#1e2749' }}>
+              We Do the Heavy Lifting
+            </h2>
+            <p style={{ color: '#1e2749', opacity: 0.7 }}>
+              You've got enough on your plate. Here's how we help with funding:
             </p>
-            <p className="text-lg mb-6">
-              TDI does the heavy lifting: aligning your PD plan to opportunities, drafting ready-to-use language, and supporting your final submission.
-            </p>
-            <p className="text-lg font-semibold" style={{ color: 'var(--tdi-navy)' }}>
-              That means your teachers and paras get the support they deserve, without your team carrying the burden of research or paperwork.
-            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="flex gap-4">
+              <div
+                className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: '#ffba06' }}
+              >
+                <span className="font-bold" style={{ color: '#1e2749' }}>1</span>
+              </div>
+              <div>
+                <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Identify Your Options</h3>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  We review your school's profile and identify which funding sources you're eligible for.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div
+                className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: '#ffba06' }}
+              >
+                <span className="font-bold" style={{ color: '#1e2749' }}>2</span>
+              </div>
+              <div>
+                <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Provide Documentation</h3>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  Need a proposal for your board? Grant language for an application? We've got templates ready.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div
+                className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: '#ffba06' }}
+              >
+                <span className="font-bold" style={{ color: '#1e2749' }}>3</span>
+              </div>
+              <div>
+                <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Support Your Application</h3>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  We'll review your grant application, provide research citations, and help you make the case.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <div
+                className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: '#ffba06' }}
+              >
+                <span className="font-bold" style={{ color: '#1e2749' }}>4</span>
+              </div>
+              <div>
+                <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Flexible Timing</h3>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  Funding cycles don't always align with school years. We work with your timeline.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
+      <section className="py-16" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default text-center">
-          <h2 className="mb-4" style={{ color: 'white' }}>Design Your Plan</h2>
-          <p className="text-lg mb-8 max-w-xl mx-auto" style={{ color: 'white', opacity: 0.8 }}>
-            Your teachers deserve PD that works. Your district deserves funding that makes it possible. Let's make both happen.
+          <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#ffffff' }}>
+            Let's Find Your Funding
+          </h2>
+          <p className="mb-8 max-w-xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
+            Schedule a free call and we'll help you identify the best funding options for your school. No obligation, no pressure.
           </p>
-          <Link href="/for-schools/schedule-call" className="btn-primary inline-block">
-            Schedule a Conversation
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/contact"
+              className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover-glow"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            >
+              Schedule a Funding Call
+            </a>
+            <a
+              href="/for-schools"
+              className="inline-block px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover-lift"
+              style={{ borderColor: '#ffffff', color: '#ffffff' }}
+            >
+              Learn About Partnerships
+            </a>
+          </div>
         </div>
       </section>
     </main>
