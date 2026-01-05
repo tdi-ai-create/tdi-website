@@ -157,7 +157,7 @@ export default function Home() {
           <div className="relative max-w-5xl mx-auto px-4">
 
             {/* Connecting Line with Traveling Pulse */}
-            <div className="absolute top-12 left-[10%] right-[10%] h-1 hidden md:block" style={{ backgroundColor: '#e5e7eb' }}>
+            <div className="absolute top-12 left-[10%] right-[10%] h-1 hidden md:block z-0" style={{ backgroundColor: '#e5e7eb' }}>
               {/* Animated Pulse */}
               <div
                 className="absolute top-0 left-0 h-full w-20 rounded-full animate-travel-pulse"
@@ -171,7 +171,7 @@ export default function Home() {
             <div className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-4">
 
               {/* Step 1 - Listen */}
-              <div className="flex flex-col items-center text-center group">
+              <div className="flex flex-col items-center text-center group relative z-10">
                 <div
                   className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold mb-3 transition-all group-hover:scale-110"
                   style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
@@ -189,7 +189,7 @@ export default function Home() {
               </div>
 
               {/* Step 2 - Collaborate */}
-              <div className="flex flex-col items-center text-center group">
+              <div className="flex flex-col items-center text-center group relative z-10">
                 <div
                   className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold mb-3 transition-all group-hover:scale-110"
                   style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
@@ -206,7 +206,7 @@ export default function Home() {
               </div>
 
               {/* Step 3 - Design */}
-              <div className="flex flex-col items-center text-center group">
+              <div className="flex flex-col items-center text-center group relative z-10">
                 <div
                   className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold mb-3 transition-all group-hover:scale-110"
                   style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
@@ -223,7 +223,7 @@ export default function Home() {
               </div>
 
               {/* Step 4 - Publish */}
-              <div className="flex flex-col items-center text-center group">
+              <div className="flex flex-col items-center text-center group relative z-10">
                 <div
                   className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold mb-3 transition-all group-hover:scale-110"
                   style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
@@ -240,7 +240,7 @@ export default function Home() {
               </div>
 
               {/* Step 5 - Deliver */}
-              <div className="flex flex-col items-center text-center group">
+              <div className="flex flex-col items-center text-center group relative z-10">
                 <div
                   className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold mb-3 transition-all group-hover:scale-110"
                   style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
