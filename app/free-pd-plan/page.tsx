@@ -199,12 +199,10 @@ export default function FreePDPlanPage() {
   }) => (
     <div
       onClick={onChange}
-      className={`p-4 rounded-lg cursor-pointer transition-all flex items-center gap-3 ${
-        checked ? 'ring-2' : ''
-      }`}
+      className="p-4 rounded-lg cursor-pointer transition-all flex items-center gap-3"
       style={{
         backgroundColor: '#f9fafb',
-        ringColor: checked ? '#ffba06' : 'transparent'
+        boxShadow: checked ? '0 0 0 2px #ffba06' : 'none'
       }}
     >
       <div
@@ -236,12 +234,10 @@ export default function FreePDPlanPage() {
   }) => (
     <div
       onClick={onChange}
-      className={`p-4 rounded-lg cursor-pointer transition-all flex items-center gap-3 ${
-        checked ? 'ring-2' : ''
-      }`}
+      className="p-4 rounded-lg cursor-pointer transition-all flex items-center gap-3"
       style={{
         backgroundColor: '#f9fafb',
-        ringColor: checked ? '#ffba06' : 'transparent'
+        boxShadow: checked ? '0 0 0 2px #ffba06' : 'none'
       }}
     >
       <div
