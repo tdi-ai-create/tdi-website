@@ -52,10 +52,10 @@ export default function ContactPage() {
       </section>
 
       {/* Personal Greeting */}
-      <section className="py-12" style={{ backgroundColor: '#ffffff' }}>
+      <section className="py-6" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <div className="max-w-2xl mx-auto">
-            <div className="flex flex-col md:flex-row items-center gap-6 mb-10 p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+            <div className="flex flex-col md:flex-row items-center gap-6 mb-4 p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
               {/* Rae's Photo */}
               <div className="flex-shrink-0">
                 <img
@@ -83,7 +83,7 @@ export default function ContactPage() {
       </section>
 
       {/* FAQ Callout */}
-      <div className="container-default pb-8" style={{ backgroundColor: '#ffffff' }}>
+      <div className="container-default pb-4" style={{ backgroundColor: '#ffffff' }}>
         <div className="max-w-2xl mx-auto">
           <a
             href="/faq"
@@ -112,19 +112,6 @@ export default function ContactPage() {
       <section className="section bg-white">
         <div className="container-default">
           <div className="max-w-xl mx-auto">
-            {/* FAQ Helper */}
-            <div className="text-center mb-8 p-4 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
-              <p style={{ color: '#1e2749' }}>
-                Before you reach out, you might find your answer in our{' '}
-                <a
-                  href="/faq"
-                  className="font-semibold underline hover:opacity-80 transition-opacity"
-                  style={{ color: '#ffba06' }}
-                >
-                  Frequently Asked Questions
-                </a>
-              </p>
-            </div>
             {submitted ? (
               <div className="text-center py-12">
                 <h2 className="mb-4">Thanks for reaching out!</h2>
