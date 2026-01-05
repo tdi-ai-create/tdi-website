@@ -28,7 +28,7 @@ export default function AboutPage() {
         {/* Content */}
         <div className="relative z-10 container-default text-center">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#ffffff' }}>
-            We Believe Teaching Shouldn't Feel Like Survival
+            We Believe Teaching<br />Shouldn't Feel Like Survival
           </h1>
           <p className="text-lg max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
             We're on a mission to build a system that actually supports the educators inside it.
