@@ -346,7 +346,11 @@ export default function Home() {
                   <span style={{ color: '#1e2749' }}>Student achievement gains you can report</span>
                 </li>
               </ul>
-              <Link href="/for-schools" className="btn-secondary inline-block">
+              <Link
+                href="/for-schools"
+                className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover-glow"
+                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+              >
                 Learn About the TDI Blueprint
               </Link>
               <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
