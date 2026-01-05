@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 
 export const metadata: Metadata = {
   title: 'Funding Options | Teachers Deserve It',
-  description: '80% of schools we work with secure external funding for TDI. We find the funding—you focus on your teachers.',
+  description: '80% of schools we work with find over $35K in funding for TDI. We find the funding—you focus on your teachers.',
 };
 
 export default function FundingPage() {
@@ -32,7 +32,7 @@ export default function FundingPage() {
             We Find the Funding.<br />You Focus on Teaching.
           </h1>
           <p className="max-w-2xl mx-auto text-lg" style={{ color: '#ffffff', opacity: 0.9 }}>
-            80% of schools we partner with secure external funding for TDI. Tell us about your school—we'll handle the rest.
+            80% of schools we partner with find over $35K in funding for TDI. Tell us about your school—we'll handle the rest.
           </p>
         </div>
       </section>
@@ -133,7 +133,7 @@ export default function FundingPage() {
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
               <p className="text-5xl md:text-6xl font-bold" style={{ color: '#1e2749' }}>80%</p>
-              <p className="mt-2 font-medium" style={{ color: '#1e2749', opacity: 0.8 }}>of partners secure funding</p>
+              <p className="mt-2 font-medium" style={{ color: '#1e2749', opacity: 0.8 }}>find over $35K in funding</p>
             </div>
             <div>
               <p className="text-5xl md:text-6xl font-bold" style={{ color: '#1e2749' }}>$0</p>
