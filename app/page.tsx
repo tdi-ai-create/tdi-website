@@ -406,7 +406,7 @@ export default function Home() {
       </section>
 
       {/* SECTION 11: FAQ */}
-      <FAQ />
+      <FAQ limit={6} showSeeAll={true} />
 
       {/* SECTION 12: Final CTA */}
       <section className="section" style={{ backgroundColor: '#80a4ed' }}>

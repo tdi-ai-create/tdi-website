@@ -8,13 +8,10 @@ interface FAQItem {
 }
 
 const faqs: FAQItem[] = [
+  // Priority questions (shown on homepage)
   {
     question: "What makes TDI different from other PD?",
     answer: "TDI uses a flipped model. You learn strategies on your own time through bite-sized videos, then we focus live sessions on implementation and problem-solving. No more sitting through hours of PowerPoints. Our content is created by teachers who've been in the trenches, not consultants who haven't been in a classroom in years."
-  },
-  {
-    question: "How is this different from other PD I've sat through?",
-    answer: "Traditional PD is often theory-heavy, one-size-fits-all, and disconnected from your actual classroom. TDI is built by teachers who've been in your shoes. Every strategy is practical, immediately applicable, and respects your time. No more 'someday you'll use this.' Everything we create answers one question: Will this help a teacher be better for their students on Monday?"
   },
   {
     question: "Is this just another thing on my plate?",
@@ -29,16 +26,17 @@ const faqs: FAQItem[] = [
     answer: "Many teachers start with TDI on their own and see results that speak for themselves. When administrators see improved classroom management, reduced stress, and better student outcomes, they often become advocates. We also offer resources specifically for sharing TDI's value with school leadership, and our team is happy to connect with your admin directly."
   },
   {
-    question: "Is this just for teachers, or can paraprofessionals participate too?",
-    answer: "Both! Our content is designed for everyone who works directly with students. When schools partner with us, we encourage including the whole building, teachers and paras alike. Everyone deserves support."
-  },
-  {
     question: "How much does it cost?",
     answer: "Individual teachers can access the Learning Hub starting at $25/month. For schools and districts, pricing depends on your team size and goals. The good news? 80% of schools we work with secure external funding to cover the cost. We'll help you find it."
   },
   {
     question: "We don't have budget for PD. Can you still help?",
     answer: "Yes! We specialize in helping schools identify and apply for grants including Title II, state funds, foundation grants, and more. We'll align your PD plan with funding opportunities and even draft the grant language for you."
+  },
+  // Additional questions (shown on /faq page)
+  {
+    question: "Is this just for teachers, or can paraprofessionals participate too?",
+    answer: "Both! Our content is designed for everyone who works directly with students. When schools partner with us, we encourage including the whole building, teachers and paras alike. Everyone deserves support."
   },
   {
     question: "How much time does this take?",
@@ -53,17 +51,20 @@ const faqs: FAQItem[] = [
     answer: "Every resource starts with a real need from teachers or partner schools. We recruit specialists and practitioners to collaborate on solutions, ground everything in current research, and shape it into actionable tools. Courses, downloads, and resource packets go live in the Learning Hub. For partner schools, we guarantee 30-day turnaround on custom requests. The result: targeted, ready-to-use resources when educators need them."
   },
   {
-    question: "Can paraprofessionals learn with TDI?",
-    answer: "Absolutely. Our content is designed for everyone who works directly with students. Paraprofessionals play a critical role in schools, and they deserve quality professional development too. When schools partner with us, we encourage including the whole building."
-  },
-  {
     question: "Does TDI support all types of educators?",
     answer: "Yes. TDI supports the whole education ecosystem. Whether you're an elementary teacher, middle school specialist, high school instructor, art teacher, music teacher, PE teacher, paraprofessional, or instructional coach, our strategies are designed to be adaptable and relevant to your role."
   }
 ];
 
-export function FAQ() {
+interface FAQProps {
+  limit?: number;
+  showSeeAll?: boolean;
+}
+
+export function FAQ({ limit, showSeeAll = false }: FAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+
+  const displayedQuestions = limit ? faqs.slice(0, limit) : faqs;
 
   return (
     <section className="section bg-white">
@@ -74,9 +75,9 @@ export function FAQ() {
         </p>
 
         <div className="max-w-3xl mx-auto space-y-4">
-          {faqs.map((faq, index) => (
-            <div 
-              key={index} 
+          {displayedQuestions.map((faq, index) => (
+            <div
+              key={index}
               className="border border-gray-200 rounded-lg overflow-hidden"
             >
               <button
@@ -84,7 +85,7 @@ export function FAQ() {
                 className="w-full px-6 py-4 text-left flex justify-between items-center gap-4 hover:bg-gray-50 transition-colors"
               >
                 <span className="font-semibold">{faq.question}</span>
-                <span 
+                <span
                   className="flex-shrink-0 text-2xl"
                   style={{ color: 'var(--tdi-navy)' }}
                 >
@@ -100,11 +101,26 @@ export function FAQ() {
           ))}
         </div>
 
+        {showSeeAll && (
+          <div className="text-center mt-8">
+            <a
+              href="/faq"
+              className="inline-flex items-center gap-2 font-semibold transition-all hover:opacity-80"
+              style={{ color: '#ffba06' }}
+            >
+              See all frequently asked questions
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </a>
+          </div>
+        )}
+
         <div className="text-center mt-8">
           <p style={{ opacity: 0.7 }}>
             Still have questions?{' '}
-            <a 
-              href="/contact" 
+            <a
+              href="/contact"
               className="font-semibold underline"
               style={{ color: 'var(--tdi-navy)' }}
             >
