@@ -91,7 +91,7 @@ export default function FAQPage() {
           className="absolute inset-0 bg-cover bg-fixed"
           style={{
             backgroundImage: 'url(/images/hero-faq.png)',
-            backgroundPosition: 'center 90%',
+            backgroundPosition: 'center 110%',
           }}
         />
         {/* Dark Overlay */}
