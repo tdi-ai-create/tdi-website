@@ -640,6 +640,34 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* General CTA Section */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
+        <div className="container-default text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#ffffff' }}>
+            Ready to See What TDI Can Do for You?
+          </h2>
+          <p className="max-w-2xl mx-auto mb-8" style={{ color: '#ffffff', opacity: 0.8 }}>
+            Whether you're a teacher looking for strategies that actually work, or a leader who wants PD your team will thank you for, we're here to help.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <a
+              href="/free-pd-plan"
+              className="inline-flex items-center justify-center px-8 py-4 rounded-lg font-bold text-lg transition-all hover-glow"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            >
+              Get Your Free PD Plan
+            </a>
+            <a
+              href="/for-schools"
+              className="inline-flex items-center justify-center px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover-lift"
+              style={{ borderColor: '#ffffff', color: '#ffffff' }}
+            >
+              Explore School Partnerships
+            </a>
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
