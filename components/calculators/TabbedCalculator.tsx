@@ -9,7 +9,7 @@ import { JoyCalculator } from './JoyCalculator';
 
 export function TabbedCalculator() {
   const [mainTab, setMainTab] = useState<'schools' | 'teachers'>('schools');
-  const [adminTab, setAdminTab] = useState<'success' | 'budget'>('success');
+  const [adminTab, setAdminTab] = useState<'success' | 'budget'>('budget');
   const [teacherTab, setTeacherTab] = useState<'burnout' | 'guilt' | 'joy'>('burnout');
 
   return (
