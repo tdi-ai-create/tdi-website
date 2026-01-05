@@ -46,7 +46,7 @@ export function ParallaxHero() {
       {/* Mobile: Full solid overlay */}
       <div
         className="absolute inset-0 md:hidden"
-        style={{ backgroundColor: 'rgba(30, 39, 73, 0.95)' }}
+        style={{ backgroundColor: 'rgba(30, 39, 73, 0.90)' }}
       />
 
       {/* Desktop: Gradient Overlay */}
