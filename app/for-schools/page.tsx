@@ -77,7 +77,7 @@ export default function ForSchoolsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
               <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>38%</p>
-              <p style={{ color: '#ffffff', opacity: 0.9 }}>increase in strategy implementation</p>
+              <p style={{ color: '#ffffff', opacity: 0.9 }}>more strategies actually used in classrooms</p>
             </div>
             <div>
               <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>95%</p>
@@ -111,7 +111,7 @@ export default function ForSchoolsPage() {
             <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f5f5f5' }}>
               <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>No measurable outcomes.</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                You can't prove ROI to your board.
+                You can't show the impact to your board.
               </p>
             </div>
             <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f5f5f5' }}>
@@ -147,7 +147,7 @@ export default function ForSchoolsPage() {
             <div className="bg-white p-6 rounded-xl shadow-sm" style={{ borderTop: '4px solid #ffba06' }}>
               <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Measurable Outcomes</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Track engagement, completion, and implementation rates. Report real data to your board, not attendance sheets.
+                Track engagement, completion, and how much actually gets used. Report real data to your board, not attendance sheets.
               </p>
             </div>
             <div className="bg-white p-6 rounded-xl shadow-sm" style={{ borderTop: '4px solid #ffba06' }}>
@@ -305,7 +305,7 @@ export default function ForSchoolsPage() {
                   Curriculum
                 </p>
                 <p className="text-xs mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, lineHeight: '1.4' }}>
-                  PD that integrates with your initiatives and shows implementation.
+                  PD that works with what you're already doing—and actually gets used.
                 </p>
                 <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
                   Let's talk →
@@ -436,7 +436,7 @@ export default function ForSchoolsPage() {
                   <h3 className="text-2xl font-bold" style={{ color: '#1e2749' }}>ACCELERATE</h3>
                   <p className="text-sm font-medium mb-4" style={{ color: '#ffba06' }}>Full Implementation</p>
                   <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                    Expand to your entire staff. Schools see <strong>38% increase in strategy implementation</strong> at this phase.
+                    Expand to your entire staff. Schools see <strong>38% more strategies actually used in classrooms</strong> at this phase.
                   </p>
                 </div>
               </div>
