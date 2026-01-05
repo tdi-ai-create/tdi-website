@@ -51,6 +51,37 @@ export default function ContactPage() {
         </div>
       </section>
 
+      {/* Personal Greeting */}
+      <section className="py-12" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-default">
+          <div className="max-w-2xl mx-auto">
+            <div className="flex flex-col md:flex-row items-center gap-6 mb-10 p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+              {/* Rae's Photo */}
+              <div className="flex-shrink-0">
+                <img
+                  src="/images/rae-headshot.png"
+                  alt="Rae Hughart, Founder of Teachers Deserve It"
+                  className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover"
+                  style={{ border: '4px solid #ffba06' }}
+                />
+              </div>
+              {/* Message */}
+              <div className="text-center md:text-left">
+                <p className="text-lg mb-2" style={{ color: '#1e2749' }}>
+                  "I read every message that comes through. Whether you have a question, an idea, or just want to say hi, I'd love to hear from you."
+                </p>
+                <p className="font-bold" style={{ color: '#1e2749' }}>
+                  Rae Hughart
+                </p>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>
+                  Founder, Teachers Deserve It
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Contact Form */}
       <section className="section bg-white">
         <div className="container-default">
