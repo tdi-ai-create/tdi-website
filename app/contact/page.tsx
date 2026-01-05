@@ -337,7 +337,7 @@ export default function ContactPage() {
               </div>
               <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Listen to the Podcast</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Real conversations about teaching, wellness, and building sustainable schools.
+                Real conversations about teaching, wellness, and building<br />sustainable schools.
               </p>
             </a>
 
