@@ -139,7 +139,7 @@ export default function ForSchoolsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
             <div className="bg-white p-6 rounded-xl shadow-sm" style={{ borderTop: '4px solid #ffba06' }}>
-              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Flexible Learning</h3>
+              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Flexible<br />Learning</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Teachers learn on their schedule. Come together for what matters: discussion, practice, implementation.
               </p>
