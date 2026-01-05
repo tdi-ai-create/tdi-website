@@ -505,9 +505,22 @@ export default function ForSchoolsPage() {
                   <span style={{ color: '#1e2749' }}>Flexible partnership structures to fit your budget</span>
                 </li>
               </ul>
-              <p className="text-sm italic pt-2" style={{ color: '#1e2749', opacity: 0.8 }}>
-                We believe cost should never stop a school from giving the best to their staff.
-              </p>
+              {/* Mission Statement - More Prominent */}
+              <div className="mt-8 pt-6 border-t" style={{ borderColor: '#e5e7eb' }}>
+                <p className="text-lg md:text-xl font-semibold mb-4" style={{ color: '#1e2749' }}>
+                  We believe cost should never stop a school from giving the best to their staff.
+                </p>
+                <a
+                  href="/contact"
+                  className="inline-flex items-center gap-2 font-semibold transition-all hover:opacity-80"
+                  style={{ color: '#ffba06' }}
+                >
+                  Let's find funding together
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
         </div>
