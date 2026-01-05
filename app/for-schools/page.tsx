@@ -116,8 +116,8 @@ export default function ForSchoolsPage() {
                       <path d="M8 16c1.5-2 6.5-2 8 0" stroke="#ffffff" strokeWidth="2" fill="none" strokeLinecap="round"/>
                     </svg>
                   </div>
-                  <h3 className="font-bold text-base mb-1" style={{ color: '#1e2749' }}>Teachers dread it.</h3>
-                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  <h3 className="font-bold text-sm mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>Teachers dread it.</h3>
+                  <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                     The eye rolls start before the session does.
                   </p>
                 </div>
@@ -132,8 +132,8 @@ export default function ForSchoolsPage() {
                       <line x1="4" y1="4" x2="20" y2="20" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round"/>
                     </svg>
                   </div>
-                  <h3 className="font-bold text-base mb-1" style={{ color: '#1e2749' }}>No measurable outcomes.</h3>
-                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  <h3 className="font-bold text-sm mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>No measurable outcomes.</h3>
+                  <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                     You can't show the impact to your board.
                   </p>
                 </div>
@@ -162,8 +162,8 @@ export default function ForSchoolsPage() {
                       <path d="M12 10l4 3-4 3V10z" fill="#ffffff"/>
                     </svg>
                   </div>
-                  <h3 className="font-bold text-base mb-1" style={{ color: '#1e2749' }}>Burnout drives turnover.</h3>
-                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  <h3 className="font-bold text-sm mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>Burnout drives turnover.</h3>
+                  <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                     You're losing good teachers faster than you can hire.
                   </p>
                 </div>
@@ -176,8 +176,8 @@ export default function ForSchoolsPage() {
                       <text x="12" y="15" textAnchor="middle" fill="#ffffff" fontSize="8" fontWeight="bold">?</text>
                     </svg>
                   </div>
-                  <h3 className="font-bold text-base mb-1" style={{ color: '#1e2749' }}>Wellness feels fluffy.</h3>
-                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  <h3 className="font-bold text-sm mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>Wellness feels fluffy.</h3>
+                  <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                     No data, no accountability, no change.
                   </p>
                 </div>
@@ -211,8 +211,8 @@ export default function ForSchoolsPage() {
                     <path d="M8 16c1.5-2 6.5-2 8 0" stroke="#ffffff" strokeWidth="2" fill="none" strokeLinecap="round"/>
                   </svg>
                 </div>
-                <h3 className="font-bold text-base mb-1" style={{ color: '#1e2749' }}>Teachers dread it.</h3>
-                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                <h3 className="font-bold text-sm mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>Teachers dread it.</h3>
+                <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                   The eye rolls start before the session does.
                 </p>
               </div>
@@ -226,8 +226,8 @@ export default function ForSchoolsPage() {
                     <line x1="4" y1="4" x2="20" y2="20" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round"/>
                   </svg>
                 </div>
-                <h3 className="font-bold text-base mb-1" style={{ color: '#1e2749' }}>No measurable outcomes.</h3>
-                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                <h3 className="font-bold text-sm mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>No measurable outcomes.</h3>
+                <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                   You can't show the impact to your board.
                 </p>
               </div>
@@ -239,8 +239,8 @@ export default function ForSchoolsPage() {
                     <path d="M12 10l4 3-4 3V10z" fill="#ffffff"/>
                   </svg>
                 </div>
-                <h3 className="font-bold text-base mb-1" style={{ color: '#1e2749' }}>Burnout drives turnover.</h3>
-                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                <h3 className="font-bold text-sm mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>Burnout drives turnover.</h3>
+                <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                   You're losing good teachers faster than you can hire.
                 </p>
               </div>
@@ -252,8 +252,8 @@ export default function ForSchoolsPage() {
                     <text x="12" y="15" textAnchor="middle" fill="#ffffff" fontSize="8" fontWeight="bold">?</text>
                   </svg>
                 </div>
-                <h3 className="font-bold text-base mb-1" style={{ color: '#1e2749' }}>Wellness feels fluffy.</h3>
-                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                <h3 className="font-bold text-sm mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>Wellness feels fluffy.</h3>
+                <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                   No data, no accountability, no change.
                 </p>
               </div>
