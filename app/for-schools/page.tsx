@@ -72,20 +72,20 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
+      <section className="py-16" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#1e2749' }}>38%</p>
-              <p style={{ color: '#1e2749', opacity: 0.8 }}>more strategies actually used in classrooms</p>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>38%</p>
+              <p style={{ color: '#ffffff', opacity: 0.8 }}>more strategies actually used in classrooms</p>
             </div>
             <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#1e2749' }}>95%</p>
-              <p style={{ color: '#1e2749', opacity: 0.8 }}>of teachers said TDI saved them planning time</p>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>95%</p>
+              <p style={{ color: '#ffffff', opacity: 0.8 }}>of teachers said TDI saved them planning time</p>
             </div>
             <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#1e2749' }}>21</p>
-              <p style={{ color: '#1e2749', opacity: 0.8 }}>states with TDI partner schools</p>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>21</p>
+              <p style={{ color: '#ffffff', opacity: 0.8 }}>states with TDI partner schools</p>
             </div>
           </div>
         </div>
