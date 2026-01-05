@@ -225,7 +225,7 @@ export default function FundingPage() {
         <div className="container-default text-center">
           <p style={{ color: '#1e2749', opacity: 0.7 }}>
             <span className="font-semibold" style={{ color: '#1e2749' }}>Common funding sources we help with:</span>{' '}
-            Title II-A • Title I • ESSER/ARP • State Grants • Foundation Grants • General PD Budgets
+            Title II-A • Title I • ESSER/ARP • State Grants • Foundation Grants • General PD Budgets • Private & Public Funding Sources
           </p>
         </div>
       </section>
