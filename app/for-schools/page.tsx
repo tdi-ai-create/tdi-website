@@ -103,7 +103,7 @@ export default function ForSchoolsPage() {
 
           {/* Desktop Layout: Cards around central stat */}
           <div className="hidden lg:block max-w-5xl mx-auto">
-            <div className="grid grid-cols-3 gap-4 items-center">
+            <div className="grid gap-4 items-center" style={{ gridTemplateColumns: '1.3fr 1fr 1.3fr' }}>
               {/* Left Column - 2 cards stacked */}
               <div className="flex flex-col gap-4">
                 {/* Card 1: Teachers dread it */}
@@ -142,11 +142,11 @@ export default function ForSchoolsPage() {
               {/* Center - 44% Stat */}
               <div className="flex items-center justify-center">
                 <div
-                  className="w-52 h-52 rounded-full flex flex-col items-center justify-center animate-fade-in shadow-xl cursor-pointer transition-all duration-300 hover:scale-105"
+                  className="w-44 h-44 rounded-full flex flex-col items-center justify-center animate-fade-in shadow-xl cursor-pointer transition-all duration-300 hover:scale-105"
                   style={{ backgroundColor: '#1e2749' }}
                 >
-                  <span className="text-5xl font-bold mb-1" style={{ color: '#ffba06' }}>44%</span>
-                  <span className="text-sm text-center px-4 leading-tight" style={{ color: '#ffffff', opacity: 0.9 }}>
+                  <span className="text-4xl font-bold mb-1" style={{ color: '#ffba06' }}>44%</span>
+                  <span className="text-xs text-center px-3 leading-tight" style={{ color: '#ffffff', opacity: 0.9 }}>
                     of teachers leave<br />within 5 years
                   </span>
                 </div>
