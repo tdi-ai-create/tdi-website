@@ -219,6 +219,38 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Our Impact Section */}
+      <section className="py-16" style={{ backgroundColor: '#ffba06' }}>
+        <div className="container-default">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-10" style={{ color: '#1e2749' }}>
+            Our Impact So Far
+          </h2>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>87,000+</p>
+              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Educators in Our Community</p>
+            </div>
+            <div>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>21</p>
+              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>States with Partner Schools</p>
+            </div>
+            <div>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>65%</p>
+              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Implementation Rate</p>
+            </div>
+            <div>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>4.8/5</p>
+              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Average Course Rating</p>
+            </div>
+          </div>
+
+          <p className="text-center text-sm mt-8 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
+            Industry average PD implementation is just 10%. Our teachers actually use what they learn because it's built for Monday morning, not "someday."
+          </p>
+        </div>
+      </section>
+
       {/* Meet Rae Section */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
