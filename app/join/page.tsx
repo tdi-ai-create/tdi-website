@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { CoursesSection } from '@/components/CoursesSection';
+import { TabbedCalculator } from '@/components/calculators';
 
 export default function JoinPage() {
   return (
@@ -365,6 +366,19 @@ export default function JoinPage() {
       </section>
 
       <CoursesSection />
+
+      {/* Calculator Section */}
+      <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-default">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+            What Could Change for You?
+          </h2>
+          <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+            See the potential impact on your stress, time, and joy in teaching.
+          </p>
+          <TabbedCalculator />
+        </div>
+      </section>
 
       {/* Budget CTA */}
       <section className="section" style={{ backgroundColor: '#80a4ed' }}>
