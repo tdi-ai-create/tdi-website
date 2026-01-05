@@ -190,6 +190,35 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* TEDx Video */}
+      <section className="py-12" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-default">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-6">
+              <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: '#ffba06' }}>
+                Watch Rae's Story
+              </p>
+              <h3 className="text-xl font-bold mt-2" style={{ color: '#1e2749' }}>
+                TEDx Talk: Why Teachers Deserve Better
+              </h3>
+            </div>
+            <div className="relative w-full rounded-xl overflow-hidden shadow-lg" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src="https://www.youtube.com/embed/OLzaa7Hv3mo"
+                title="Rae Hughart TEDx Talk"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            <p className="text-center text-sm mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
+              This talk has inspired thousands of educators to rethink professional development.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Meet Rae Section */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
