@@ -337,7 +337,7 @@ export default function AboutPage() {
     </svg>
   </a>
   <a
-    href="https://www.linkedin.com/in/raehughart/"
+    href="https://www.linkedin.com/in/rae-hughart/"
     target="_blank"
     rel="noopener noreferrer"
     className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
