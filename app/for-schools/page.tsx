@@ -47,22 +47,26 @@ export default function ForSchoolsPage() {
             >
               Professional development that actually works, with outcomes you can measure and report.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            {/* Hero CTAs */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
               <a
-                href="/free-pd-plan"
-                className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
+                href="#blueprint"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-lg font-bold text-lg transition-all hover-glow"
                 style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
               >
-                Get Your Free PD Plan
+                Explore the TDI Blueprint
               </a>
               <a
                 href="/contact"
-                className="px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-white/10"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover-lift"
                 style={{ borderColor: '#ffffff', color: '#ffffff' }}
               >
                 Schedule a Call
               </a>
             </div>
+            <p className="text-sm mt-4 text-center" style={{ color: '#ffffff', opacity: 0.7 }}>
+              Ready to talk? Skip ahead and connect with our team directly.
+            </p>
           </div>
         </div>
       </section>
@@ -344,7 +348,7 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* Partnership Journey */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
+      <section id="blueprint" className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
             A Partnership That Grows With You
