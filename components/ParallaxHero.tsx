@@ -29,7 +29,7 @@ export function ParallaxHero() {
   }, []);
 
   return (
-    <section className="relative h-[450px] sm:h-[500px] md:h-[550px] lg:h-[650px] overflow-hidden">
+    <section className="relative h-[600px] lg:h-[650px] overflow-hidden">
       {/* Background Image - Parallax layer */}
       <div
         ref={backgroundRef}
@@ -59,14 +59,14 @@ export function ParallaxHero() {
         <div className="ml-8 md:ml-16 lg:ml-20 xl:ml-24">
           <div className="max-w-md md:max-w-lg">
             <h1
-              className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight"
+              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight"
               style={{ color: '#ffffff' }}
             >
               Teachers Deserve More Than Survival
             </h1>
 
             <p
-              className="text-xs sm:text-sm md:text-base lg:text-lg font-semibold mb-4"
+              className="text-base md:text-lg font-semibold mb-4"
               style={{ color: '#ffba06' }}
             >
               Research-Backed. Expert-Designed. Educator-Focused. Admin-Approved.
