@@ -315,7 +315,7 @@ export default function ContactPage() {
               </div>
               <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Read the Blog</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Weekly insights for educators who refuse to burn out.
+                Weekly insights for educators<br />who refuse to burn out.
               </p>
             </a>
 
