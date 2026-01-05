@@ -53,7 +53,7 @@ export default function Home() {
               </div>
               <h4 className="font-bold mb-2 h-14 flex items-center justify-center" style={{ color: '#1e2749' }}>Action-Focused Strategies</h4>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Tools you can actually use Monday morning. No fluff, no theory for theory's sake.
+                Tools you can use Monday morning. No fluff, no theory for theory's sake.
               </p>
             </div>
             <div className="text-center flex flex-col items-center">
@@ -64,7 +64,7 @@ export default function Home() {
               </div>
               <h4 className="font-bold mb-2 h-14 flex items-center justify-center" style={{ color: '#1e2749' }}>Respects Your Time</h4>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Flipped PD model. Learn on your schedule. No more losing Saturdays to workshops.
+                Flipped PD model. Learn on your schedule. No more losing Saturdays.
               </p>
             </div>
             <div className="text-center flex flex-col items-center">
@@ -75,7 +75,7 @@ export default function Home() {
               </div>
               <h4 className="font-bold mb-2 h-14 flex items-center justify-center" style={{ color: '#1e2749' }}>Wellness Built In</h4>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Because you can't pour from an empty cup. Self-care isn't selfish, it's survival.
+                You can't pour from an empty cup. Self-care isn't selfish, it's survival.
               </p>
             </div>
           </div>
