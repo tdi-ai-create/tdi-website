@@ -269,7 +269,7 @@ export default function ContactPage() {
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                 </svg>
               </div>
-              <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Take the PD Quiz</h3>
+              <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Take the<br />PD Quiz</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Get a personalized professional development plan in minutes.
               </p>
