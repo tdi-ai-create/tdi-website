@@ -16,7 +16,7 @@ export default function Home() {
           {/* Problem */}
           <div className="max-w-3xl mx-auto text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-6" style={{ color: '#1e2749' }}>
-              Traditional Educator Learning Is Broken
+              Traditional PD Wastes Time and Money
             </h2>
             <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
               Someone who hasn't been in a classroom in years reads PowerPoints at you for three hours. You nod along, check your phone under the table, and forget everything by Monday.
@@ -36,10 +36,10 @@ export default function Home() {
           {/* Solution */}
           <div className="text-center mb-10">
             <h3 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#1e2749' }}>
-              This Isn't Sit-and-Get
+              Learning That Actually Gets Implemented
             </h3>
             <p className="text-lg max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
-              TDI was born from burnout. Built by teachers who get it.
+              Born from burnout. Built by teachers. Trusted by schools.
             </p>
           </div>
 
@@ -91,8 +91,8 @@ export default function Home() {
               <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.9 }}>Educators in Our Community</p>
             </div>
             <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#ffffff' }}>4.8/5</p>
-              <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.9 }}>Average Course Rating</p>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#ffffff' }}>65%</p>
+              <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.9 }}>Implementation Rate</p>
             </div>
             <div>
               <p className="text-3xl md:text-4xl font-bold" style={{ color: '#ffffff' }}>94%</p>
@@ -147,10 +147,10 @@ export default function Home() {
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
-            How We Build What Teachers Need
+            How TDI Develops Solutions
           </h2>
           <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
-            A process designed by educators, for educators.
+            Built by educators. Implemented by schools.
           </p>
 
           {/* Floating Bubbles Container */}
@@ -450,7 +450,7 @@ export default function Home() {
       {/* SECTION 12: Final CTA */}
       <section className="section" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
-          <h2 className="mb-4" style={{ color: '#1e2749' }}>Ready to Feel Like a Teacher Again?</h2>
+          <h2 className="mb-4" style={{ color: '#1e2749' }}>Ready to Reimagine PD?</h2>
           <p className="text-lg mb-2 max-w-xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
             Whether you're a teacher looking for support or a leader trying to keep your team from burning out, we've got you.
           </p>

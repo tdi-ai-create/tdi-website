@@ -69,7 +69,7 @@ export function ParallaxHero() {
               className="text-base md:text-lg font-semibold mb-4"
               style={{ color: '#ffba06' }}
             >
-              Research-Backed. Expert-Designed. Educator-Focused.
+              Research-Backed. Expert-Designed. Educator-Focused. Admin-Approved.
             </p>
 
             <p
