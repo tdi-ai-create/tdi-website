@@ -96,7 +96,7 @@ export default function Home() {
             </div>
             <div>
               <p className="text-3xl md:text-4xl font-bold" style={{ color: '#ffffff' }}>94%</p>
-              <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.9 }}>Would Recommend to a Colleague</p>
+              <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.9 }}>Would Recommend</p>
             </div>
             <div>
               <p className="text-3xl md:text-4xl font-bold" style={{ color: '#ffffff' }}>21</p>
