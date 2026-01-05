@@ -611,7 +611,7 @@ export default function ForSchoolsPage() {
             className="rounded-xl p-6 md:p-8 max-w-4xl mx-auto"
             style={{ backgroundColor: '#1e2749' }}
           >
-            <h3 className="text-xl md:text-2xl font-bold mb-4" style={{ color: '#ffba06' }}>
+            <h3 className="text-xl md:text-2xl font-bold mb-4" style={{ color: '#ffffff' }}>
               We Help You Find Funding
             </h3>
             <div className="space-y-4">
