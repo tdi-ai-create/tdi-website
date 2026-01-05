@@ -201,8 +201,7 @@ export default function FreePDPlanPage() {
       onClick={onChange}
       className="p-4 rounded-lg cursor-pointer transition-all flex items-center gap-3"
       style={{
-        backgroundColor: '#f9fafb',
-        boxShadow: checked ? '0 0 0 2px #ffba06' : 'none'
+        backgroundColor: '#f9fafb'
       }}
     >
       <div
@@ -236,8 +235,7 @@ export default function FreePDPlanPage() {
       onClick={onChange}
       className="p-4 rounded-lg cursor-pointer transition-all flex items-center gap-3"
       style={{
-        backgroundColor: '#f9fafb',
-        boxShadow: checked ? '0 0 0 2px #ffba06' : 'none'
+        backgroundColor: '#f9fafb'
       }}
     >
       <div
