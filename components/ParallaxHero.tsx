@@ -30,10 +30,21 @@ export function ParallaxHero() {
 
   return (
     <section className="relative h-[600px] lg:h-[650px] overflow-hidden pt-32 sm:pt-24 md:pt-20">
-      {/* Background Image - Parallax layer */}
+      {/* Background Image - Mobile (smaller file) */}
+      <div
+        className="absolute inset-0 md:hidden"
+        style={{
+          backgroundImage: "url('/images/hero-rae-background-mobile.webp')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      />
+
+      {/* Background Image - Desktop (parallax layer) */}
       <div
         ref={backgroundRef}
-        className="absolute inset-0 will-change-transform"
+        className="absolute inset-0 will-change-transform hidden md:block"
         style={{
           backgroundImage: "url('/images/hero-rae-background.webp')",
           backgroundSize: 'cover',
