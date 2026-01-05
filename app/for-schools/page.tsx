@@ -81,7 +81,7 @@ export default function ForSchoolsPage() {
             </div>
             <div>
               <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>95%</p>
-              <p style={{ color: '#ffffff', opacity: 0.8 }}>of teachers said TDI saved them planning time</p>
+              <p style={{ color: '#ffffff', opacity: 0.8 }}>of teachers said TDI saved<br />them planning time</p>
             </div>
             <div>
               <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>21</p>
