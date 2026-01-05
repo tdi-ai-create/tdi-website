@@ -12,9 +12,10 @@ export default function FundingPage() {
       <section className="relative py-24 md:py-32 overflow-hidden">
         {/* Background Image */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-fixed"
+          className="absolute inset-0 bg-cover bg-fixed"
           style={{
             backgroundImage: 'url(/images/hero-funding.png)',
+            backgroundPosition: 'center 20%',
           }}
         />
         {/* Dark Overlay */}
