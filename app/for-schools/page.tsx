@@ -555,7 +555,7 @@ export default function ForSchoolsPage() {
             <a
               href="/free-pd-plan"
               className="px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
-              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+              style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
             >
               Get Your Free PD Plan
             </a>
