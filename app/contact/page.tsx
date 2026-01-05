@@ -359,7 +359,7 @@ export default function ContactPage() {
               </div>
               <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Order the Book</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Get your copy of Teachers Deserve It on Amazon.
+                Get your copy of Teachers Deserve It<br />on Amazon.
               </p>
             </a>
 
