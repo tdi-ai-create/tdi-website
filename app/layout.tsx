@@ -22,11 +22,20 @@ export const metadata: Metadata = {
     siteName: "Teachers Deserve It",
     title: "Teachers Deserve It | Professional Development That Actually Works",
     description: "Join 87,000+ educators with PD that respects your time. Practical strategies, wellness support, and a community that gets it.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Teachers Deserve It",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Teachers Deserve It | Professional Development That Actually Works",
     description: "Join 87,000+ educators with PD that respects your time. Practical strategies, wellness support, and a community that gets it.",
+    images: ["/og-image.png"],
   },
   robots: {
     index: true,
