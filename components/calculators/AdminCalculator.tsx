@@ -19,29 +19,6 @@ export function AdminCalculator() {
 
   return (
     <div className="space-y-8">
-      {/* Input: Staff Morale */}
-      <div>
-        <label className="block text-sm font-semibold mb-3" style={{ color: '#1e2749' }}>
-          How would you rate your staff morale right now?
-        </label>
-        <input
-          type="range"
-          min="1"
-          max="10"
-          value={morale}
-          onChange={(e) => setMorale(parseInt(e.target.value))}
-          className="w-full h-2 rounded-full appearance-none cursor-pointer"
-          style={{
-            background: `linear-gradient(to right, #ffba06 0%, #ffba06 ${(morale - 1) / 9 * 100}%, #e5e7eb ${(morale - 1) / 9 * 100}%, #e5e7eb 100%)`
-          }}
-        />
-        <div className="flex justify-between mt-2">
-          <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>1 - Crisis</span>
-          <span className="text-lg font-bold" style={{ color: '#1e2749' }}>{morale}/10 <span className="text-sm font-normal">({getMoraleLabel(morale)})</span></span>
-          <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>10 - Thriving</span>
-        </div>
-      </div>
-
       {/* Input: Student Benchmark */}
       <div>
         <label className="block text-sm font-semibold mb-3" style={{ color: '#1e2749' }}>
@@ -62,6 +39,29 @@ export function AdminCalculator() {
           <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>20%</span>
           <span className="text-lg font-bold" style={{ color: '#1e2749' }}>{benchmark}%</span>
           <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>90%</span>
+        </div>
+      </div>
+
+      {/* Input: Staff Morale */}
+      <div>
+        <label className="block text-sm font-semibold mb-3" style={{ color: '#1e2749' }}>
+          How would you rate your staff morale right now?
+        </label>
+        <input
+          type="range"
+          min="1"
+          max="10"
+          value={morale}
+          onChange={(e) => setMorale(parseInt(e.target.value))}
+          className="w-full h-2 rounded-full appearance-none cursor-pointer"
+          style={{
+            background: `linear-gradient(to right, #ffba06 0%, #ffba06 ${(morale - 1) / 9 * 100}%, #e5e7eb ${(morale - 1) / 9 * 100}%, #e5e7eb 100%)`
+          }}
+        />
+        <div className="flex justify-between mt-2">
+          <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>1 - Crisis</span>
+          <span className="text-lg font-bold" style={{ color: '#1e2749' }}>{morale}/10 <span className="text-sm font-normal">({getMoraleLabel(morale)})</span></span>
+          <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>10 - Thriving</span>
         </div>
       </div>
 
