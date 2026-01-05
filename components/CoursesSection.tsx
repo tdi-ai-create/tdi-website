@@ -43,7 +43,7 @@ export function CoursesSection() {
             What Educators Are Learning Right Now
           </h2>
           <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
-            Join thousands of teachers and paraprofessionals building practical skills they can use tomorrow.
+            Join thousands of teachers and paraprofessionals<br />building practical skills they can use tomorrow.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -72,7 +72,7 @@ export function CoursesSection() {
           What Educators Are Learning Right Now
         </h2>
         <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
-          Join thousands of teachers and paraprofessionals building practical skills they can use tomorrow.
+          Join thousands of teachers and paraprofessionals<br />building practical skills they can use tomorrow.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
