@@ -248,7 +248,7 @@ export default function AboutPage() {
           </div>
 
           <p className="text-center text-sm mt-8 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
-            Industry average PD implementation is just 10%. Our teachers actually use what they learn because it's built for Monday morning, not "someday."
+            Industry average PD implementation is just 10%.<br />Our teachers actually use what they learn because<br />it's built for Monday morning, not "someday."
           </p>
         </div>
       </section>
