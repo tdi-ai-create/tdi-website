@@ -238,7 +238,7 @@ export default function FundingPage() {
             Ready to Find Your Funding?
           </h2>
           <p className="mb-8 max-w-xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
-            One conversation. No obligation. We'll tell you exactly what's possible for your school.
+            One conversation. No obligation.<br />We'll tell you exactly what's possible for your school.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
