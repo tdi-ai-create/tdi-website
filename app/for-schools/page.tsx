@@ -530,7 +530,7 @@ export default function ForSchoolsPage() {
       <CoursesSection />
 
       {/* Calculator Section */}
-      <section className="py-16" style={{ backgroundColor: '#ffffff' }}>
+      <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
             See the Potential Impact
