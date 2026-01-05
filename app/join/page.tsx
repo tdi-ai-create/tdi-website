@@ -42,7 +42,7 @@ export default function JoinPage() {
               className="text-lg md:text-xl"
               style={{ color: '#ffffff', opacity: 0.9 }}
             >
-              Find your path. Whether you're a teacher looking for support or a leader building a healthier school, we're here to help.
+              Find your path. Whether you're a teacher looking for support or<br />a leader building a healthier school, we're here to help.
             </p>
           </div>
         </div>
