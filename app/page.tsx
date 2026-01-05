@@ -10,47 +10,71 @@ export default function Home() {
       {/* SECTION 1: Hero */}
       <ParallaxHero />
 
-      {/* SECTION 2: Problem Section */}
-      <section className="section" style={{ backgroundColor: '#ffffff' }}>
+      {/* SECTION 2: Problem + Solution Section */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="mb-6 whitespace-nowrap" style={{ color: '#1e2749' }}>Traditional Educator Learning Is Broken</h2>
-            <p className="text-lg mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
+          {/* Problem */}
+          <div className="max-w-3xl mx-auto text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-6" style={{ color: '#1e2749' }}>
+              Traditional Educator Learning Is Broken
+            </h2>
+            <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
               Someone who hasn't been in a classroom in years reads PowerPoints at you for three hours. You nod along, check your phone under the table, and forget everything by Monday.
             </p>
-            <p className="text-lg font-semibold" style={{ color: '#1e2749' }}>
+            <p className="text-lg mt-4" style={{ color: '#1e2749', opacity: 0.8 }}>
               Teachers deserve better. So do the leaders trying to support them.
             </p>
           </div>
-        </div>
-      </section>
 
-      {/* SECTION 3: Solution Section */}
-      <section className="section" style={{ backgroundColor: '#80a4ed' }}>
-        <div className="container-wide">
-          <h2 className="text-center mb-4">This Isn't Sit-and-Get</h2>
-          <p className="text-center text-lg mb-12 max-w-2xl mx-auto" style={{ opacity: 0.8 }}>
-            TDI was born from burnout. Built by teachers who get it.
-          </p>
+          {/* Divider */}
+          <div className="flex items-center justify-center gap-4 mb-12">
+            <div className="h-px w-16" style={{ backgroundColor: '#ffba06' }}></div>
+            <span className="text-sm font-semibold uppercase tracking-wide" style={{ color: '#ffba06' }}>Here's the difference</span>
+            <div className="h-px w-16" style={{ backgroundColor: '#ffba06' }}></div>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="card text-center">
-              <h3 className="text-xl mb-3">Action-Focused Strategies</h3>
-              <p style={{ opacity: 0.8 }}>
+          {/* Solution */}
+          <div className="text-center mb-10">
+            <h3 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#1e2749' }}>
+              This Isn't Sit-and-Get
+            </h3>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
+              TDI was born from burnout. Built by teachers who get it.
+            </p>
+          </div>
+
+          {/* Solution Features */}
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#ffba06' }}>
+                <svg className="w-6 h-6" fill="#1e2749" viewBox="0 0 24 24">
+                  <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+              </div>
+              <h4 className="font-bold mb-2" style={{ color: '#1e2749' }}>Action-Focused Strategies</h4>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Tools you can actually use Monday morning. No fluff, no theory for theory's sake.
               </p>
             </div>
-
-            <div className="card text-center">
-              <h3 className="text-xl mb-3">Respects Your Time</h3>
-              <p style={{ opacity: 0.8 }}>
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#ffba06' }}>
+                <svg className="w-6 h-6" fill="#1e2749" viewBox="0 0 24 24">
+                  <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                </svg>
+              </div>
+              <h4 className="font-bold mb-2" style={{ color: '#1e2749' }}>Respects Your Time</h4>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Flipped PD model. Learn on your schedule. No more losing Saturdays to workshops.
               </p>
             </div>
-
-            <div className="card text-center">
-              <h3 className="text-xl mb-3">Wellness Built In</h3>
-              <p style={{ opacity: 0.8 }}>
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#ffba06' }}>
+                <svg className="w-6 h-6" fill="#1e2749" viewBox="0 0 24 24">
+                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+              </div>
+              <h4 className="font-bold mb-2" style={{ color: '#1e2749' }}>Wellness Built In</h4>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Because you can't pour from an empty cup. Self-care isn't selfish, it's survival.
               </p>
             </div>
