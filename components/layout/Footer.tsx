@@ -1,20 +1,6 @@
-'use client';
-
 import Link from 'next/link';
-import { useState } from 'react';
 
 export function Footer() {
-  const [email, setEmail] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Connect to email service
-    console.log('Footer email submitted:', email);
-    setSubmitted(true);
-    setEmail('');
-  };
-
   return (
     <footer style={{ backgroundColor: '#1e2749' }}>
       {/* Main Footer */}
@@ -105,41 +91,45 @@ export function Footer() {
               </ul>
             </div>
 
-            {/* Email Signup */}
-            <div className="sm:col-span-2 lg:col-span-1">
-              <h4 className="font-semibold mb-4" style={{ color: 'white' }}>Stay Connected</h4>
-              {submitted ? (
-                <p className="text-sm" style={{ color: 'var(--tdi-yellow)' }}>
-                  Thanks for joining!
-                </p>
-              ) : (
-                <form onSubmit={handleSubmit} className="space-y-3">
-                  <input
-                    type="email"
-                    required
-                    placeholder="Your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-3 py-2 rounded text-sm text-gray-900"
-                  />
-                  <button
-                    type="submit"
-                    className="w-full px-3 py-2 rounded text-sm font-semibold transition-all"
-                    style={{ backgroundColor: 'var(--tdi-yellow)', color: 'var(--tdi-charcoal)' }}
-                  >
-                    Join 87K+ Educators
-                  </button>
-                </form>
-              )}
-              <p className="text-xs mt-3" style={{ color: 'white', opacity: 0.5 }}>
-                Questions? <a href="mailto:hello@teachersdeserveit.com" className="underline">Email us</a>
+            {/* Stay Connected */}
+            <div>
+              <h4 className="font-bold text-lg mb-4" style={{ color: '#ffffff' }}>Stay Connected</h4>
+              <form
+                action="https://formsubmit.co/Olivia@teachersdeserveit.com"
+                method="POST"
+                className="space-y-3"
+              >
+                {/* FormSubmit.co configuration */}
+                <input type="hidden" name="_subject" value="New Email Signup from TDI Website" />
+                <input type="hidden" name="_captcha" value="false" />
+                <input type="hidden" name="_template" value="table" />
+                <input type="hidden" name="_next" value="https://teachersdeserveit.vercel.app/?signup=success" />
+
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Your email"
+                  required
+                  className="w-full px-4 py-3 rounded-lg text-gray-900"
+                  style={{ backgroundColor: '#ffffff' }}
+                />
+                <button
+                  type="submit"
+                  className="w-full px-4 py-3 rounded-lg font-bold transition-all hover-glow"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                >
+                  Join 87K+ Educators
+                </button>
+              </form>
+              <p className="text-sm mt-4" style={{ color: '#ffffff', opacity: 0.6 }}>
+                Questions? <a href="mailto:hello@teachersdeserveit.com" className="underline hover:opacity-80">Email us</a>
               </p>
-              <div className="flex items-center gap-2 text-sm mt-4" style={{ color: '#ffffff', opacity: 0.7 }}>
+              <p className="text-xs mt-2 flex items-center gap-2" style={{ color: '#ffffff', opacity: 0.5 }}>
                 <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
                 </svg>
-                <span>Your data is secure. We never sell your information.</span>
-              </div>
+                Your data is secure. We never sell your information.
+              </p>
             </div>
           </div>
         </div>
