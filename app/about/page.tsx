@@ -372,7 +372,7 @@ export default function AboutPage() {
             The Team That Makes It Possible
           </h2>
           <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
-            A passionate group of educators, strategists, and creatives committed to transforming professional development.
+            A passionate group of educators, strategists, and creatives<br />committed to transforming professional development.
           </p>
 
           {/* Executive Team with Bios */}
