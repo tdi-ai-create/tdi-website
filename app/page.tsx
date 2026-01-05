@@ -396,7 +396,7 @@ export default function Home() {
             See What's Possible
           </h2>
           <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
-            Whether you're a school leader or a teacher, explore the potential impact of partnering with TDI.
+            Whether you're a school leader or a teacher,<br />explore the potential impact of partnering with TDI.
           </p>
 
           {/* Calculator Component */}
