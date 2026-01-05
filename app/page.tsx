@@ -11,24 +11,24 @@ export default function Home() {
       <ParallaxHero />
 
       {/* SECTION 2: Stats Bar */}
-      <section className="py-8" style={{ backgroundColor: '#ffba06' }}>
+      <section className="py-8" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>87,000+</p>
-              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Educators in Our Community</p>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#ffffff' }}>87,000+</p>
+              <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.9 }}>Educators in Our Community</p>
             </div>
             <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>4.8/5</p>
-              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Average Course Rating</p>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#ffffff' }}>4.8/5</p>
+              <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.9 }}>Average Course Rating</p>
             </div>
             <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>94%</p>
-              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Would Recommend to a Colleague</p>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#ffffff' }}>94%</p>
+              <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.9 }}>Would Recommend to a Colleague</p>
             </div>
             <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>21</p>
-              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>States with Partner Schools</p>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#ffffff' }}>21</p>
+              <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.9 }}>States with Partner Schools</p>
             </div>
           </div>
         </div>
