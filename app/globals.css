@@ -374,3 +374,19 @@ label {
   transform: translateY(-2px);
   box-shadow: 0 4px 16px rgba(255, 186, 6, 0.4);
 }
+
+/* Fade-in animation */
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
