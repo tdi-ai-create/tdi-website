@@ -3,12 +3,12 @@
 import { useState } from 'react';
 
 export function BurnoutCalculator() {
-  const [stress, setStress] = useState(7);
+  const [stress, setStress] = useState(5);
 
   // Calculate projected stress reduction over time
-  const month3 = Math.max(3, stress - 2);
-  const month6 = Math.max(2, stress - 3);
-  const month12 = Math.max(2, stress - 4);
+  const month3 = Math.max(2, stress - 1);
+  const month6 = Math.max(2, stress - 2);
+  const month12 = Math.max(1, stress - 3);
 
   const getStressEmoji = (value: number) => {
     if (value >= 9) return '😰';
@@ -34,19 +34,28 @@ export function BurnoutCalculator() {
         </label>
         <input
           type="range"
-          min="4"
+          min="1"
           max="10"
           value={stress}
           onChange={(e) => setStress(parseInt(e.target.value))}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #ef4444 0%, #ef4444 ${(stress - 4) / 6 * 100}%, #e5e7eb ${(stress - 4) / 6 * 100}%, #e5e7eb 100%)`
+            background: `linear-gradient(to right, #ef4444 0%, #ef4444 ${(stress - 1) / 9 * 100}%, #e5e7eb ${(stress - 1) / 9 * 100}%, #e5e7eb 100%)`
           }}
         />
-        <div className="flex justify-between mt-2">
-          <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>4 - Manageable</span>
-          <span className="text-2xl">{getStressEmoji(stress)} <span className="text-lg font-bold" style={{ color: '#1e2749' }}>{stress}/10</span></span>
-          <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>10 - Crisis</span>
+        <div className="flex justify-between items-start mt-2">
+          <div className="text-left">
+            <span className="block text-lg font-bold" style={{ color: '#22c55e' }}>1</span>
+            <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>I'm doing great</span>
+          </div>
+          <div className="text-center">
+            <span className="text-2xl">{getStressEmoji(stress)}</span>
+            <span className="block text-xl font-bold" style={{ color: '#1e2749' }}>{stress}/10</span>
+          </div>
+          <div className="text-right">
+            <span className="block text-lg font-bold" style={{ color: '#ef4444' }}>10</span>
+            <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>I'm in crisis</span>
+          </div>
         </div>
       </div>
 

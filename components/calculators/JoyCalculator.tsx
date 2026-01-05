@@ -36,10 +36,19 @@ export function JoyCalculator() {
             background: `linear-gradient(to right, #f59e0b 0%, #f59e0b ${(joy - 1) / 9 * 100}%, #e5e7eb ${(joy - 1) / 9 * 100}%, #e5e7eb 100%)`
           }}
         />
-        <div className="flex justify-between mt-2">
-          <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>1 - None</span>
-          <span className="text-2xl">{getJoyEmoji(joy)} <span className="text-lg font-bold" style={{ color: '#1e2749' }}>{joy}/10</span></span>
-          <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>10 - Abundant</span>
+        <div className="flex justify-between items-start mt-2">
+          <div className="text-left">
+            <span className="block text-lg font-bold" style={{ color: '#ef4444' }}>1</span>
+            <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>None at all</span>
+          </div>
+          <div className="text-center">
+            <span className="text-2xl">{getJoyEmoji(joy)}</span>
+            <span className="block text-xl font-bold" style={{ color: '#1e2749' }}>{joy}/10</span>
+          </div>
+          <div className="text-right">
+            <span className="block text-lg font-bold" style={{ color: '#22c55e' }}>10</span>
+            <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>I love it</span>
+          </div>
         </div>
       </div>
 

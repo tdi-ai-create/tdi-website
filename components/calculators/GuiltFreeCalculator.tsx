@@ -31,19 +31,27 @@ export function GuiltFreeCalculator() {
         </label>
         <input
           type="range"
-          min="2"
+          min="0"
           max="20"
           value={workHours}
           onChange={(e) => setWorkHours(parseInt(e.target.value))}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #8b5cf6 0%, #8b5cf6 ${(workHours - 2) / 18 * 100}%, #e5e7eb ${(workHours - 2) / 18 * 100}%, #e5e7eb 100%)`
+            background: `linear-gradient(to right, #8b5cf6 0%, #8b5cf6 ${workHours / 20 * 100}%, #e5e7eb ${workHours / 20 * 100}%, #e5e7eb 100%)`
           }}
         />
-        <div className="flex justify-between mt-2">
-          <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>2 hrs</span>
-          <span className="text-lg font-bold" style={{ color: '#1e2749' }}>{workHours} hrs/week</span>
-          <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>20 hrs</span>
+        <div className="flex justify-between items-start mt-2">
+          <div className="text-left">
+            <span className="block text-lg font-bold" style={{ color: '#22c55e' }}>0</span>
+            <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>None</span>
+          </div>
+          <div className="text-center">
+            <span className="block text-xl font-bold" style={{ color: '#1e2749' }}>{workHours} hrs/week</span>
+          </div>
+          <div className="text-right">
+            <span className="block text-lg font-bold" style={{ color: '#ef4444' }}>20+</span>
+            <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Way too many</span>
+          </div>
         </div>
       </div>
 
