@@ -829,6 +829,16 @@ export default function FreePDPlanPage() {
 
               {/* Main Form - takes 2 columns */}
               <div className="lg:col-span-2 px-4 lg:px-0">
+                {/* Time Estimate Badge */}
+                <div className="flex items-center justify-center gap-2 mb-6">
+                  <svg className="w-5 h-5" fill="#ffba06" viewBox="0 0 24 24">
+                    <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                  </svg>
+                  <span className="text-sm font-medium" style={{ color: '#1e2749' }}>
+                    Takes about 4 minutes
+                  </span>
+                </div>
+
                 {/* Progress Bar */}
                 <div className="mb-8">
                   <div className="flex items-center gap-3 mb-3">
@@ -838,10 +848,15 @@ export default function FreePDPlanPage() {
                     >
                       {stepInfo[currentStep - 1].icon}
                     </div>
-                    <div>
-                      <p className="font-semibold" style={{ color: '#1e2749' }}>
-                        {stepInfo[currentStep - 1].label}
-                      </p>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <p className="font-semibold" style={{ color: '#1e2749' }}>
+                          {stepInfo[currentStep - 1].label}
+                        </p>
+                        <span className="text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>
+                          {Math.round((currentStep / totalSteps) * 100)}% complete
+                        </span>
+                      </div>
                       <p className="text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>
                         Step {currentStep} of {totalSteps}
                       </p>
