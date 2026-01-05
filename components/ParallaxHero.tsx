@@ -29,7 +29,7 @@ export function ParallaxHero() {
   }, []);
 
   return (
-    <section className="relative h-[600px] lg:h-[650px] overflow-hidden">
+    <section className="relative h-[600px] lg:h-[650px] overflow-hidden pt-24 sm:pt-20 md:pt-16">
       {/* Background Image - Parallax layer */}
       <div
         ref={backgroundRef}
