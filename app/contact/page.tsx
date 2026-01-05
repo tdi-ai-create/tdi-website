@@ -379,7 +379,7 @@ export default function ContactPage() {
               </div>
               <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>See Pricing & Funding Options</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Explore partnership models and learn how 80% of schools secure external funding.
+                Explore partnership models and learn how 80% of schools secure<br />external funding.
               </p>
             </a>
 
