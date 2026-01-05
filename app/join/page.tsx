@@ -158,7 +158,7 @@ export default function JoinPage() {
                   className="text-lg font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
-                  Grab a Free Resource
+                  Free<br />Resource
                 </h3>
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
                   Ready-to-use downloads for your classroom, for teachers and paras alike.
