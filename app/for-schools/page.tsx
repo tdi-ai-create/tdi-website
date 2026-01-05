@@ -348,7 +348,7 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* Partnership Journey */}
-      <section id="blueprint" className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
+      <section id="blueprint" className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
             A Partnership That Grows With You
