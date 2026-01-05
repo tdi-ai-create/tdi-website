@@ -527,6 +527,20 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
+      {/* FAQ Callout for Admins */}
+      <div className="text-center py-8" style={{ backgroundColor: '#ffffff' }}>
+        <p style={{ color: '#1e2749', opacity: 0.8 }}>
+          Have questions about implementation, pricing, or funding?{' '}
+          <a
+            href="/faq"
+            className="font-semibold underline hover:opacity-80 transition-opacity"
+            style={{ color: '#ffba06' }}
+          >
+            Check our FAQ
+          </a>
+        </p>
+      </div>
+
       <CoursesSection />
 
       {/* Calculator Section */}

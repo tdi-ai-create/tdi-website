@@ -82,7 +82,12 @@ export function Footer() {
                     Podcast
                   </a>
                 </li>
-                                <li>
+                <li>
+                  <Link href="/faq" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
+                    FAQ
+                  </Link>
+                </li>
+                <li>
                   <Link href="/free-pd-plan" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Free PD Plan
                   </Link>

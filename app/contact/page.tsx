@@ -112,6 +112,19 @@ export default function ContactPage() {
       <section className="section bg-white">
         <div className="container-default">
           <div className="max-w-xl mx-auto">
+            {/* FAQ Helper */}
+            <div className="text-center mb-8 p-4 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
+              <p style={{ color: '#1e2749' }}>
+                Before you reach out, you might find your answer in our{' '}
+                <a
+                  href="/faq"
+                  className="font-semibold underline hover:opacity-80 transition-opacity"
+                  style={{ color: '#ffba06' }}
+                >
+                  Frequently Asked Questions
+                </a>
+              </p>
+            </div>
             {submitted ? (
               <div className="text-center py-12">
                 <h2 className="mb-4">Thanks for reaching out!</h2>
