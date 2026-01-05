@@ -460,8 +460,8 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/free-pd-plan"
-              className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover-glow"
-              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+              className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover-lift"
+              style={{ backgroundColor: '#ffffff', color: '#1e2749' }}
             >
               Get Your Free PD Plan
             </Link>
