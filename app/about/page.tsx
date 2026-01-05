@@ -39,22 +39,18 @@ export default function AboutPage() {
       {/* Stats Section */}
       <section className="py-16" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>38%</p>
-              <p style={{ color: '#ffffff', opacity: 0.9 }}>increase in strategy implementation</p>
-            </div>
-            <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>95%</p>
-              <p style={{ color: '#ffffff', opacity: 0.9 }}>of teachers saved planning time</p>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center max-w-5xl mx-auto">
             <div>
               <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>87K+</p>
               <p style={{ color: '#ffffff', opacity: 0.9 }}>educators in our community</p>
             </div>
+            <div className="md:col-span-1">
+              <p className="text-3xl md:text-4xl font-bold mb-2 whitespace-nowrap" style={{ color: '#ffffff' }}>Improved Retention</p>
+              <p className="text-sm" style={{ color: '#ffffff', opacity: 0.9 }}>Administrators report stronger morale, greater trust, and improved retention after TDI Support Sessions</p>
+            </div>
             <div>
-              <p className="text-4xl md:text-5xl font-bold mb-2" style={{ color: '#ffffff' }}>Improved Retention</p>
-              <p style={{ color: '#ffffff', opacity: 0.9 }}>Administrators report stronger morale, greater trust, and improved retention after TDI Support Sessions</p>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>95%</p>
+              <p style={{ color: '#ffffff', opacity: 0.9 }}>of teachers saved planning time</p>
             </div>
           </div>
         </div>
