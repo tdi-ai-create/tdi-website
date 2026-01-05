@@ -235,7 +235,7 @@ export default function Home() {
                   className="text-sm max-w-32 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
                   style={{ color: '#1e2749', opacity: 0.7 }}
                 >
-                  Live in the Learning Hub
+                  Live in the<br />Learning Hub
                 </p>
               </div>
 
