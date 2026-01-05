@@ -15,7 +15,7 @@ export default function FundingPage() {
           className="absolute inset-0 bg-cover bg-fixed"
           style={{
             backgroundImage: 'url(/images/hero-funding.png)',
-            backgroundPosition: 'center 60%',
+            backgroundPosition: 'center 90%',
           }}
         />
         {/* Dark Overlay */}
