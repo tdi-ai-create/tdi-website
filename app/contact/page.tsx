@@ -293,7 +293,7 @@ export default function ContactPage() {
               </div>
               <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Join the Free FB Community</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Connect with thousands of educators who get it.
+                Connect with thousands<br />of educators who get it.
               </p>
             </a>
 
