@@ -473,7 +473,7 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* Funding & Pricing Support */}
-      <section className="py-12 md:py-16" style={{ backgroundColor: '#f5f5f5' }}>
+      <section className="py-12 md:py-16" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <div
             className="rounded-xl p-6 md:p-8 max-w-4xl mx-auto"
