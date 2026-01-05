@@ -35,7 +35,7 @@ export function ParallaxHero() {
         ref={backgroundRef}
         className="absolute inset-0 will-change-transform"
         style={{
-          backgroundImage: "url('/images/hero-rae-background.png')",
+          backgroundImage: "url('/images/hero-rae-background.webp')",
           backgroundSize: 'cover',
           backgroundPosition: 'right 15%',
           backgroundRepeat: 'no-repeat',

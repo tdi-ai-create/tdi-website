@@ -374,7 +374,7 @@ export default function Home() {
         <div
           className="absolute inset-0 parallax-calc-bg"
           style={{
-            backgroundImage: "url('/images/calculator-background.png')",
+            backgroundImage: "url('/images/calculator-background.webp')",
             backgroundSize: 'cover',
             backgroundPosition: 'center center',
             backgroundRepeat: 'no-repeat',

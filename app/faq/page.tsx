@@ -90,7 +90,7 @@ export default function FAQPage() {
         <div
           className="absolute inset-0 bg-cover bg-fixed"
           style={{
-            backgroundImage: 'url(/images/hero-faq.png)',
+            backgroundImage: 'url(/images/hero-faq.webp)',
             backgroundPosition: 'center 110%',
           }}
         />

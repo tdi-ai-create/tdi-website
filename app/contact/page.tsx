@@ -26,7 +26,7 @@ export default function ContactPage() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: 'url("/images/hero-contact.png")',
+            backgroundImage: 'url("/images/hero-contact.webp")',
             backgroundPosition: 'center 100%',
             backgroundAttachment: 'fixed',
           }}
@@ -59,7 +59,7 @@ export default function ContactPage() {
               {/* Rae's Photo */}
               <div className="flex-shrink-0">
                 <img
-                  src="/images/rae-headshot.png"
+                  src="/images/rae-headshot.webp"
                   alt="Rae Hughart, Founder of Teachers Deserve It"
                   className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover"
                   style={{ border: '4px solid #ffba06' }}

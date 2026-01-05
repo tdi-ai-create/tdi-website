@@ -777,7 +777,7 @@ export default function FreePDPlanPage() {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: "url('/images/hero-pd-plan.png')",
+            backgroundImage: "url('/images/hero-pd-plan.webp')",
             backgroundSize: 'cover',
             backgroundPosition: 'center 70%',
             backgroundRepeat: 'no-repeat',

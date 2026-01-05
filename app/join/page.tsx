@@ -13,7 +13,7 @@ export default function JoinPage() {
         <div
           className="absolute inset-0 parallax-bg"
           style={{
-            backgroundImage: "url('/images/hero-join.png')",
+            backgroundImage: "url('/images/hero-join.webp')",
             backgroundSize: 'cover',
             backgroundPosition: '30% center',
             backgroundRepeat: 'no-repeat',
@@ -434,7 +434,7 @@ export default function JoinPage() {
         <div
           className="absolute inset-0 parallax-calc-bg"
           style={{
-            backgroundImage: "url('/images/calculator-background.png')",
+            backgroundImage: "url('/images/calculator-background.webp')",
             backgroundSize: 'cover',
             backgroundPosition: 'center center',
             backgroundRepeat: 'no-repeat',

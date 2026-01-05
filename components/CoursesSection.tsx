@@ -94,7 +94,7 @@ export function CoursesSection() {
             </div>
             <div className="relative h-40 overflow-hidden">
               <img
-                src="/images/course-guide.png"
+                src="/images/course-guide.webp"
                 alt="Learning Hub Course Guide"
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />

@@ -16,7 +16,7 @@ export default function ForSchoolsPage() {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: "url('/images/hero-for-schools.png')",
+            backgroundImage: "url('/images/hero-for-schools.webp')",
             backgroundSize: 'cover',
             backgroundPosition: 'center 20%',
             backgroundRepeat: 'no-repeat',
@@ -363,7 +363,7 @@ export default function ForSchoolsPage() {
             >
               <div className="h-[140px] overflow-hidden">
                 <img
-                  src="/images/leader-principal.png"
+                  src="/images/leader-principal.webp"
                   alt="Principal"
                   className="w-full h-full object-cover object-top transition-transform group-hover:scale-105"
                   style={{ filter: 'grayscale(100%)' }}
@@ -393,7 +393,7 @@ export default function ForSchoolsPage() {
             >
               <div className="h-[140px] overflow-hidden">
                 <img
-                  src="/images/leader-superintendent.png"
+                  src="/images/leader-superintendent.webp"
                   alt="Superintendent"
                   className="w-full h-full object-cover object-top transition-transform group-hover:scale-105"
                   style={{ filter: 'grayscale(100%)' }}
@@ -423,7 +423,7 @@ export default function ForSchoolsPage() {
             >
               <div className="h-[140px] overflow-hidden">
                 <img
-                  src="/images/leader-curriculum.png"
+                  src="/images/leader-curriculum.webp"
                   alt="Curriculum Director"
                   className="w-full h-full object-cover object-center transition-transform group-hover:scale-105"
                   style={{ filter: 'grayscale(100%)' }}
@@ -453,7 +453,7 @@ export default function ForSchoolsPage() {
             >
               <div className="h-[140px] overflow-hidden">
                 <img
-                  src="/images/leader-hr.png"
+                  src="/images/leader-hr.webp"
                   alt="HR Director"
                   className="w-full h-full object-cover object-top transition-transform group-hover:scale-105"
                   style={{ filter: 'grayscale(100%)' }}

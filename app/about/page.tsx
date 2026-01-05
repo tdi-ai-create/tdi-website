@@ -9,7 +9,7 @@ export default function AboutPage() {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: "url('/images/hero-about.png')",
+            backgroundImage: "url('/images/hero-about.webp')",
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
@@ -62,7 +62,7 @@ export default function AboutPage() {
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: 'url("/images/about-teacher-pointing.png")',
+            backgroundImage: 'url("/images/about-teacher-pointing.webp")',
             backgroundPosition: 'right 15%',
             backgroundAttachment: 'fixed',
           }}
@@ -264,7 +264,7 @@ export default function AboutPage() {
             {/* Photo */}
             <div className="flex justify-center">
               <img
-                src="/images/rae-headshot.png"
+                src="/images/rae-headshot.webp"
                 alt="Rae Hughart"
                 className="rounded-2xl shadow-lg w-full max-w-md"
                 style={{ filter: 'grayscale(100%)' }}

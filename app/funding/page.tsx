@@ -14,7 +14,7 @@ export default function FundingPage() {
         <div
           className="absolute inset-0 bg-cover bg-fixed"
           style={{
-            backgroundImage: 'url(/images/hero-funding.png)',
+            backgroundImage: 'url(/images/hero-funding.webp)',
             backgroundPosition: 'center 100%',
           }}
         />
