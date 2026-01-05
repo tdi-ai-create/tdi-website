@@ -357,18 +357,6 @@ export default function ForSchoolsPage() {
             Start small, prove impact, scale when you're ready.
           </p>
 
-          <div
-            className="flex items-center justify-center gap-3 p-4 rounded-lg my-8 max-w-2xl mx-auto"
-            style={{ backgroundColor: '#ffffff', border: '2px solid #ffba06' }}
-          >
-            <svg className="w-6 h-6 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
-            <p className="font-medium" style={{ color: '#1e2749' }}>
-              Our Promise: 30-day turnaround on custom content requests for partner schools
-            </p>
-          </div>
-
           {/* Timeline */}
           <div className="max-w-5xl mx-auto">
 
@@ -458,6 +446,19 @@ export default function ForSchoolsPage() {
                 </div>
               </div>
 
+            </div>
+
+            {/* 30-day Promise */}
+            <div
+              className="flex items-center justify-center gap-3 p-4 rounded-lg mt-8 max-w-2xl mx-auto"
+              style={{ backgroundColor: '#ffffff', border: '2px solid #ffba06' }}
+            >
+              <svg className="w-6 h-6 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+              </svg>
+              <p className="font-medium" style={{ color: '#1e2749' }}>
+                Our Promise: 30-day turnaround on custom content requests for partner schools
+              </p>
             </div>
 
             {/* Bottom Text */}
