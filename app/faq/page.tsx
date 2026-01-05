@@ -90,7 +90,7 @@ export default function FAQPage() {
         <div
           className="absolute inset-0 bg-cover bg-center bg-fixed"
           style={{
-            backgroundImage: 'url(/images/hero-faq.jpg)',
+            backgroundImage: 'url(/images/hero-faq.png)',
           }}
         />
         {/* Dark Overlay */}
