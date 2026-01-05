@@ -36,7 +36,7 @@ const faqs = [
       },
       {
         q: 'How much time does this take?',
-        a: 'That\'s up to you. Most courses are broken into 10-15 minute modules you can do during lunch or your commute. Partner schools get structured implementation time built into their PD calendar. No Saturdays required.',
+        a: 'That\'s up to you. Courses are broken into 3-5 minute sections, with full courses taking 20-45 minutes to explore. Easy to fit into lunch, planning periods, or your commute. Partner schools get structured implementation time built into their PD calendar. No Saturdays required.',
       },
     ],
   },
