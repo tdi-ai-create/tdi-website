@@ -195,7 +195,7 @@ export default function JoinPage() {
                 className="text-xl font-bold mb-3"
                 style={{ color: '#1e2749' }}
               >
-                Go Deeper with Exclusive Content
+                Exclusive<br />Content
               </h3>
               <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Premium strategies, behind-the-scenes access, and a community of educators who are done settling for the status quo.
