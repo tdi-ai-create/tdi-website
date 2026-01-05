@@ -157,7 +157,7 @@ export default function ForSchoolsPage() {
               </p>
             </div>
             <div className="bg-white p-6 rounded-xl shadow-sm" style={{ borderTop: '4px solid #ffba06' }}>
-              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Wellness That Works</h3>
+              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Wellness<br />That Works</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Address burnout before it becomes a resignation letter. Teachers who feel supported stay longer.
               </p>
