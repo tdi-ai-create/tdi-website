@@ -512,7 +512,7 @@ export default function ForSchoolsPage() {
                   We believe cost should never stop a school from giving the best to their staff.
                 </p>
                 <a
-                  href="/contact"
+                  href="/funding"
                   className="inline-flex items-center gap-2 font-semibold transition-all hover:opacity-80"
                   style={{ color: '#ffba06' }}
                 >
