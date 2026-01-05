@@ -77,7 +77,7 @@ export default function ForSchoolsPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
               <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>38%</p>
-              <p style={{ color: '#ffffff', opacity: 0.8 }}>more strategies actually used in classrooms</p>
+              <p style={{ color: '#ffffff', opacity: 0.8 }}>more strategies actually<br />used in classrooms</p>
             </div>
             <div>
               <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>95%</p>
