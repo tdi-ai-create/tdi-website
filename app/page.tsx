@@ -299,11 +299,25 @@ export default function Home() {
               <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
                 Action-focused tools to help you be more efficient and effective in your classroom. Access ready-to-use strategies, weekly blog insights, podcast episodes, and downloadable resources.
               </p>
-              <ul className="mb-6 space-y-2" style={{ color: '#1e2749' }}>
-                <li>Classroom tools you can use Monday morning</li>
-                <li>Weekly strategies from our blog</li>
-                <li>Podcast episodes for your commute</li>
-                <li>Free downloadable resources for teachers and paras</li>
+              <ul className="space-y-2 mb-6">
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  <span style={{ color: '#1e2749' }}>Classroom tools you can use Monday morning</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  <span style={{ color: '#1e2749' }}>Weekly strategies from our blog and podcast</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  <span style={{ color: '#1e2749' }}>Free resources for teachers and paras</span>
+                </li>
               </ul>
               <Link
                 href="/free-pd-plan"
@@ -331,11 +345,25 @@ export default function Home() {
               <p className="mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
                 Use the TDI Blueprint to transform your building. We partner with you to achieve measurable implementation, improved teacher happiness scores, and student growth.
               </p>
-              <ul className="mb-6 space-y-2" style={{ color: '#1e2749' }}>
-                <li>Measurable PD implementation, not just seat time</li>
-                <li>Improved teacher satisfaction and retention</li>
-                <li>Student achievement gains you can report</li>
-                <li>Full support for teachers and paraprofessionals</li>
+              <ul className="space-y-2 mb-6">
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  <span style={{ color: '#1e2749' }}>PD that actually gets used in classrooms</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  <span style={{ color: '#1e2749' }}>Improved teacher satisfaction and retention</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                  </svg>
+                  <span style={{ color: '#1e2749' }}>Student achievement gains you can report</span>
+                </li>
               </ul>
               <Link href="/for-schools" className="btn-secondary inline-block">
                 Learn About the TDI Blueprint
