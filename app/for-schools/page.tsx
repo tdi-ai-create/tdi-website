@@ -72,27 +72,27 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-16" style={{ backgroundColor: '#80a4ed' }}>
+      <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
             <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>38%</p>
-              <p style={{ color: '#ffffff', opacity: 0.9 }}>more strategies actually used in classrooms</p>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#1e2749' }}>38%</p>
+              <p style={{ color: '#1e2749', opacity: 0.8 }}>more strategies actually used in classrooms</p>
             </div>
             <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>95%</p>
-              <p style={{ color: '#ffffff', opacity: 0.9 }}>of teachers said TDI saved them planning time</p>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#1e2749' }}>95%</p>
+              <p style={{ color: '#1e2749', opacity: 0.8 }}>of teachers said TDI saved them planning time</p>
             </div>
             <div>
-              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>21</p>
-              <p style={{ color: '#ffffff', opacity: 0.9 }}>states with TDI partner schools</p>
+              <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#1e2749' }}>21</p>
+              <p style={{ color: '#1e2749', opacity: 0.8 }}>states with TDI partner schools</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Pain Points - EMOJIS REMOVED */}
-      <section className="py-16 md:py-20 bg-white">
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
             You Already Know Traditional PD Isn't Working
@@ -131,9 +131,9 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* What Schools Get */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#ffffff' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
             What Schools Get with TDI
           </h2>
 
@@ -179,7 +179,7 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 md:py-20 bg-white">
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
             What School Leaders Are Saying
@@ -212,12 +212,12 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* Built for Every Leader */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#ffffff' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
             Built for Every Leader in the Building
           </h2>
-          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
+          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
             No matter your role, TDI meets you where you are.
           </p>
 
@@ -348,7 +348,7 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* Partnership Journey */}
-      <section id="blueprint" className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
+      <section id="blueprint" className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
             A Partnership That Grows With You
@@ -473,7 +473,7 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* Funding & Pricing Support */}
-      <section className="py-12 md:py-16 bg-white">
+      <section className="py-12 md:py-16" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <div
             className="rounded-xl p-6 md:p-8 max-w-4xl mx-auto"
@@ -530,7 +530,7 @@ export default function ForSchoolsPage() {
       <CoursesSection />
 
       {/* Calculator Section */}
-      <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
+      <section className="py-16" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
             See the Potential Impact
@@ -543,7 +543,7 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#80a4ed' }}>
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#ffffff' }}>
             Ready to See What TDI Can Do for Your School?
