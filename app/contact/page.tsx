@@ -335,7 +335,7 @@ export default function ContactPage() {
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
               </div>
-              <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Listen to the Podcast</h3>
+              <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Listen to<br />Our Podcast</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Real conversations about teaching, wellness, and building<br />sustainable schools.
               </p>
