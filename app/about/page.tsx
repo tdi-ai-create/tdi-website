@@ -84,29 +84,27 @@ export default function AboutPage() {
 
               {/* Left: The Story */}
               <div className="text-left">
-                <h2 className="text-3xl md:text-4xl font-bold mb-8" style={{ color: '#ffffff' }}>
+                <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: '#ffffff' }}>
                   How It Started
                 </h2>
-                <p className="text-xl mb-6 font-semibold" style={{ color: '#ffba06' }}>
-                  Teachers Deserve It was born from burnout.
-                </p>
-                <p className="mb-4" style={{ color: '#ffffff', opacity: 0.9 }}>
-                  We all knew the feeling. Walking into another teacher institute day, grabbing a donut from the principal's table, and settling into the auditorium for sessions that had nothing to do with what we actually needed in our classrooms. Hours of "someday you'll use this" and "maybe someone will do the homework after this 6-hour workshop." None of it helped us be better for our students on Monday.
-                </p>
-                <p className="mb-6" style={{ color: '#ffffff', opacity: 0.9 }}>
-                  Rae Hughart was a passionate, high-performing educator who was ready to walk away from the classroom. The system was not built to sustain passionate teachers. It was built to stretch them thin.
-                </p>
-                <p className="mb-6" style={{ color: '#ffffff', opacity: 0.9 }}>
-                  So she started asking new questions:
-                </p>
-                <div className="pl-6 border-l-4 mb-6" style={{ borderColor: '#ffba06' }}>
-                  <p className="italic mb-2" style={{ color: '#ffffff', opacity: 0.9 }}>What if PD did not have to be planned by district or building leadership at the last minute?</p>
-                  <p className="italic mb-2" style={{ color: '#ffffff', opacity: 0.9 }}>What if choice could be easily incorporated into educator learning?</p>
-                  <p className="italic" style={{ color: '#ffffff', opacity: 0.9 }}>What if teachers could learn about topics directly addressing needs found on their to-do list?</p>
+
+                <div className="space-y-4" style={{ color: '#ffffff' }}>
+                  <p className="text-xl font-semibold" style={{ color: '#ffba06' }}>
+                    Teachers Deserve It was born from burnout.
+                  </p>
+
+                  <p style={{ opacity: 0.85 }}>
+                    We all knew the feeling... Walking into another teacher institute day (or teacher work day) and you're greeted with donuts. As you settle into the auditorium for sessions, you're not surprised to see a full agenda, with limited breaks, and a 45-minute lunch. The topics? Ones that have nothing to do with what you actually needed in your classrooms. Hours of "someday you'll use this" and "you'll need time for outside planning."
+                  </p>
+
+                  <p className="font-semibold" style={{ opacity: 0.9 }}>
+                    None of it helped us be better for our students on Monday.
+                  </p>
+
+                  <p style={{ opacity: 0.85 }}>
+                    That system was not built with teachers in mind. TDI was - with teachers at its core, in every decision we make, building a movement that's changing education from the inside out.
+                  </p>
                 </div>
-                <p className="mb-8" style={{ color: '#ffffff', opacity: 0.9 }}>
-                  What started as a personal mission quickly became a movement. Today, TDI serves <span style={{ color: '#ffba06' }} className="font-semibold">87,000+ educators</span> across <span style={{ color: '#ffba06' }} className="font-semibold">21 states</span>.
-                </p>
               </div>
 
               {/* Right: The Blueprint */}
