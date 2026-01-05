@@ -68,7 +68,7 @@ export function ParallaxHero() {
               className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight"
               style={{ color: '#ffffff' }}
             >
-              Teachers Deserve More Than Survival
+              Teachers<br className="md:hidden" /> Deserve<br className="md:hidden" /> More Than<br className="md:hidden" /> Survival
             </h1>
 
             <p
