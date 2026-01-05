@@ -543,7 +543,7 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#ffffff' }}>
             Ready to See What TDI Can Do for Your School?
