@@ -33,7 +33,7 @@ export default function FundingPage() {
             We Find the Funding.<br />You Focus on Teaching.
           </h1>
           <p className="max-w-2xl mx-auto text-lg" style={{ color: '#ffffff', opacity: 0.9 }}>
-            80% of schools we partner with find over $35K in funding for TDI.<br />Tell us about your school. We'll handle the rest.
+            80% of schools we partner with find over $35K in funding for TDI.<br />Tell us about your school. <strong>We'll handle the rest.</strong>
           </p>
         </div>
       </section>
