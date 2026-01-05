@@ -398,8 +398,8 @@ export default function ForSchoolsPage() {
                   >
                     START HERE
                   </span>
-                  <h3 className="text-xl font-bold mb-1" style={{ color: '#1e2749' }}>IGNITE</h3>
-                  <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.6 }}>Leadership + Pilot Group</p>
+                  <h3 className="text-2xl font-bold" style={{ color: '#1e2749' }}>IGNITE</h3>
+                  <p className="text-sm font-medium mb-4" style={{ color: '#ffba06' }}>Getting Started</p>
                   <p className="text-2xl font-bold mb-4" style={{ color: '#1e2749' }}>~$33,600<span className="text-sm font-normal">/year</span></p>
 
                   <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
@@ -433,8 +433,8 @@ export default function ForSchoolsPage() {
                   2
                 </div>
                 <div className="bg-white rounded-2xl p-5 shadow-sm w-full">
-                  <h3 className="text-lg font-bold mb-1" style={{ color: '#1e2749' }}>ACCELERATE</h3>
-                  <p className="text-xs mb-3" style={{ color: '#1e2749', opacity: 0.6 }}>Full Staff Rollout</p>
+                  <h3 className="text-2xl font-bold" style={{ color: '#1e2749' }}>ACCELERATE</h3>
+                  <p className="text-sm font-medium mb-4" style={{ color: '#ffba06' }}>Full Implementation</p>
                   <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                     Expand to your entire staff. Schools see <strong>38% increase in strategy implementation</strong> at this phase.
                   </p>
@@ -450,8 +450,8 @@ export default function ForSchoolsPage() {
                   3
                 </div>
                 <div className="bg-white rounded-2xl p-5 shadow-sm w-full">
-                  <h3 className="text-lg font-bold mb-1" style={{ color: '#1e2749' }}>SUSTAIN</h3>
-                  <p className="text-xs mb-3" style={{ color: '#1e2749', opacity: 0.6 }}>Embedded Systems</p>
+                  <h3 className="text-2xl font-bold" style={{ color: '#1e2749' }}>SUSTAIN</h3>
+                  <p className="text-sm font-medium mb-4" style={{ color: '#ffba06' }}>Long-Term Partnership</p>
                   <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                     Embed lasting change with advanced analytics and <strong>24/7 support from Desi</strong>, our AI teaching assistant.
                   </p>
