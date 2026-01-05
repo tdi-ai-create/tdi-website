@@ -72,17 +72,6 @@ export function AdminCalculator() {
         </h4>
 
         <div className="space-y-4">
-          {/* Morale Output */}
-          <div className="p-4 rounded-lg" style={{ backgroundColor: '#ffffff' }}>
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-semibold" style={{ color: '#1e2749' }}>Staff Morale</span>
-              <span className="font-bold" style={{ color: '#ffba06' }}>{morale}/10 → {projectedMorale}/10</span>
-            </div>
-            <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
-              TDI partners report morale gains of 2-3 points within one semester
-            </p>
-          </div>
-
           {/* Benchmark Output */}
           <div className="p-4 rounded-lg" style={{ backgroundColor: '#ffffff' }}>
             <div className="flex justify-between items-center mb-2">
@@ -91,6 +80,17 @@ export function AdminCalculator() {
             </div>
             <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
               Effective PD implementation correlates with 4-8 percentile point gains (Hanushek)
+            </p>
+          </div>
+
+          {/* Morale Output */}
+          <div className="p-4 rounded-lg" style={{ backgroundColor: '#ffffff' }}>
+            <div className="flex justify-between items-center mb-2">
+              <span className="font-semibold" style={{ color: '#1e2749' }}>Staff Morale</span>
+              <span className="font-bold" style={{ color: '#ffba06' }}>{morale}/10 → {projectedMorale}/10</span>
+            </div>
+            <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+              TDI partners report morale gains of 2-3 points within one semester
             </p>
           </div>
 
