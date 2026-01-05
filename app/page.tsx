@@ -10,7 +10,55 @@ export default function Home() {
       {/* SECTION 1: Hero */}
       <ParallaxHero />
 
-      {/* SECTION 2: Stats Bar */}
+      {/* SECTION 2: Problem Section */}
+      <section className="section" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-default">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="mb-6 whitespace-nowrap" style={{ color: '#1e2749' }}>Traditional Educator Learning Is Broken</h2>
+            <p className="text-lg mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
+              Someone who hasn't been in a classroom in years reads PowerPoints at you for three hours. You nod along, check your phone under the table, and forget everything by Monday.
+            </p>
+            <p className="text-lg font-semibold" style={{ color: '#1e2749' }}>
+              Teachers deserve better. So do the leaders trying to support them.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 3: Solution Section */}
+      <section className="section" style={{ backgroundColor: '#80a4ed' }}>
+        <div className="container-wide">
+          <h2 className="text-center mb-4">This Isn't Sit-and-Get</h2>
+          <p className="text-center text-lg mb-12 max-w-2xl mx-auto" style={{ opacity: 0.8 }}>
+            TDI was born from burnout. Built by teachers who get it.
+          </p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="card text-center">
+              <h3 className="text-xl mb-3">Action-Focused Strategies</h3>
+              <p style={{ opacity: 0.8 }}>
+                Tools you can actually use Monday morning. No fluff, no theory for theory's sake.
+              </p>
+            </div>
+
+            <div className="card text-center">
+              <h3 className="text-xl mb-3">Respects Your Time</h3>
+              <p style={{ opacity: 0.8 }}>
+                Flipped PD model. Learn on your schedule. No more losing Saturdays to workshops.
+              </p>
+            </div>
+
+            <div className="card text-center">
+              <h3 className="text-xl mb-3">Wellness Built In</h3>
+              <p style={{ opacity: 0.8 }}>
+                Because you can't pour from an empty cup. Self-care isn't selfish, it's survival.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 4: Stats Bar */}
       <section className="py-8" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
@@ -34,7 +82,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 3: Testimonials (moved up) */}
+      {/* SECTION 5: Testimonials */}
       <section className="section" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-wide">
           <h2 className="text-center mb-12" style={{ color: '#1e2749' }}>What Educators Are Saying</h2>
@@ -71,55 +119,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 4: Problem Section */}
-      <section className="section" style={{ backgroundColor: '#ffffff' }}>
-        <div className="container-default">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="mb-6 whitespace-nowrap" style={{ color: '#1e2749' }}>Traditional Educator Learning Is Broken</h2>
-            <p className="text-lg mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
-              Someone who hasn't been in a classroom in years reads PowerPoints at you for three hours. You nod along, check your phone under the table, and forget everything by Monday.
-            </p>
-            <p className="text-lg font-semibold" style={{ color: '#1e2749' }}>
-              Teachers deserve better. So do the leaders trying to support them.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 5: Solution Section */}
-      <section className="section" style={{ backgroundColor: '#80a4ed' }}>
-        <div className="container-wide">
-          <h2 className="text-center mb-4">This Isn't Sit-and-Get</h2>
-          <p className="text-center text-lg mb-12 max-w-2xl mx-auto" style={{ opacity: 0.8 }}>
-            TDI was born from burnout. Built by teachers who get it.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="card text-center">
-              <h3 className="text-xl mb-3">Action-Focused Strategies</h3>
-              <p style={{ opacity: 0.8 }}>
-                Tools you can actually use Monday morning. No fluff, no theory for theory's sake.
-              </p>
-            </div>
-
-            <div className="card text-center">
-              <h3 className="text-xl mb-3">Respects Your Time</h3>
-              <p style={{ opacity: 0.8 }}>
-                Flipped PD model. Learn on your schedule. No more losing Saturdays to workshops.
-              </p>
-            </div>
-
-            <div className="card text-center">
-              <h3 className="text-xl mb-3">Wellness Built In</h3>
-              <p style={{ opacity: 0.8 }}>
-                Because you can't pour from an empty cup. Self-care isn't selfish, it's survival.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How We Build What Teachers Need */}
+      {/* SECTION 6: How We Build What Teachers Need */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
@@ -329,42 +329,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 8: Dynamic Courses from Thinkific */}
-      <CoursesSection />
-
-      {/* SECTION 9: Substack/Newsletter Section */}
-      <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
-        <div className="container-default text-center">
-          <h2 className="mb-4" style={{ color: 'white' }}>Practical Strategies, 3x a Week</h2>
-          <p className="text-lg mb-6 max-w-xl mx-auto" style={{ color: 'white', opacity: 0.8 }}>
-            Join 87,000+ educators getting real strategies delivered to their inbox. Not theory, not fluff, just stuff that works.
-          </p>
-          <a
-            href="https://raehughart.substack.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-primary inline-block"
-          >
-            Join 87,000+ Educators
-          </a>
-          <div className="mt-4">
-            <a
-              href="https://www.facebook.com/groups/tdimovement"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-medium hover:underline"
-              style={{ color: '#ffba06' }}
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
-              </svg>
-              Or join our free Facebook community
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* SECTION 10: Calculator with Parallax Background */}
+      {/* SECTION 8: Calculator with Parallax Background */}
       <section className="relative py-16 md:py-24 overflow-hidden">
         {/* Parallax Background Image */}
         <div
@@ -402,6 +367,41 @@ export default function Home() {
             80% of schools we work with secure external funding for PD.{' '}
             <Link href="/funding" className="underline" style={{ color: '#ffffff' }}>See how</Link>
           </p>
+        </div>
+      </section>
+
+      {/* SECTION 9: Dynamic Courses from Thinkific */}
+      <CoursesSection />
+
+      {/* SECTION 10: Substack/Newsletter Section */}
+      <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
+        <div className="container-default text-center">
+          <h2 className="mb-4" style={{ color: 'white' }}>Practical Strategies, 3x a Week</h2>
+          <p className="text-lg mb-6 max-w-xl mx-auto" style={{ color: 'white', opacity: 0.8 }}>
+            Join 87,000+ educators getting real strategies delivered to their inbox. Not theory, not fluff, just stuff that works.
+          </p>
+          <a
+            href="https://raehughart.substack.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-primary inline-block"
+          >
+            Join 87,000+ Educators
+          </a>
+          <div className="mt-4">
+            <a
+              href="https://www.facebook.com/groups/tdimovement"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm font-medium hover:underline"
+              style={{ color: '#ffba06' }}
+            >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+              </svg>
+              Or join our free Facebook community
+            </a>
+          </div>
         </div>
       </section>
 
