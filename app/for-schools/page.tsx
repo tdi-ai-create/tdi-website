@@ -225,7 +225,7 @@ export default function ForSchoolsPage() {
 
             {/* Principals */}
             <a
-              href="/contact"
+              href="/free-pd-plan"
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col"
               style={{ textDecoration: 'none' }}
             >
@@ -248,7 +248,7 @@ export default function ForSchoolsPage() {
                   PD your teachers won't dread. Results you can see in classrooms.
                 </p>
                 <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
-                  Let's talk →
+                  Take the PD Quiz →
                 </span>
               </div>
             </a>
@@ -285,7 +285,7 @@ export default function ForSchoolsPage() {
 
             {/* Curriculum Directors */}
             <a
-              href="/contact"
+              href="/free-pd-plan"
               className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col"
               style={{ textDecoration: 'none' }}
             >
@@ -308,7 +308,7 @@ export default function ForSchoolsPage() {
                   PD that works with what you're already doing—and actually gets used.
                 </p>
                 <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
-                  Let's talk →
+                  Take the PD Quiz →
                 </span>
               </div>
             </a>
