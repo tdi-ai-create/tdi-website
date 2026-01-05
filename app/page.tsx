@@ -45,35 +45,35 @@ export default function Home() {
 
           {/* Solution Features */}
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="text-center">
+            <div className="text-center flex flex-col items-center">
               <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#ffba06' }}>
                 <svg className="w-6 h-6" fill="#1e2749" viewBox="0 0 24 24">
                   <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
               </div>
-              <h4 className="font-bold mb-2" style={{ color: '#1e2749' }}>Action-Focused Strategies</h4>
+              <h4 className="font-bold mb-2 h-14 flex items-center justify-center" style={{ color: '#1e2749' }}>Action-Focused Strategies</h4>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Tools you can actually use Monday morning. No fluff, no theory for theory's sake.
               </p>
             </div>
-            <div className="text-center">
+            <div className="text-center flex flex-col items-center">
               <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#ffba06' }}>
                 <svg className="w-6 h-6" fill="#1e2749" viewBox="0 0 24 24">
                   <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
                 </svg>
               </div>
-              <h4 className="font-bold mb-2" style={{ color: '#1e2749' }}>Respects Your Time</h4>
+              <h4 className="font-bold mb-2 h-14 flex items-center justify-center" style={{ color: '#1e2749' }}>Respects Your Time</h4>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Flipped PD model. Learn on your schedule. No more losing Saturdays to workshops.
               </p>
             </div>
-            <div className="text-center">
+            <div className="text-center flex flex-col items-center">
               <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#ffba06' }}>
                 <svg className="w-6 h-6" fill="#1e2749" viewBox="0 0 24 24">
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                 </svg>
               </div>
-              <h4 className="font-bold mb-2" style={{ color: '#1e2749' }}>Wellness Built In</h4>
+              <h4 className="font-bold mb-2 h-14 flex items-center justify-center" style={{ color: '#1e2749' }}>Wellness Built In</h4>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Because you can't pour from an empty cup. Self-care isn't selfish, it's survival.
               </p>
