@@ -367,6 +367,51 @@ export default function JoinPage() {
 
       <CoursesSection />
 
+      {/* Testimonials Section */}
+      <section className="py-12" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-default">
+          <div className="max-w-3xl mx-auto">
+            <h3 className="text-xl font-bold text-center mb-8" style={{ color: '#1e2749' }}>
+              What Teachers Are Saying
+            </h3>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Testimonial 1 */}
+              <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+                <p className="text-sm mb-4" style={{ color: '#1e2749' }}>
+                  "I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself."
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
+                    SK
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Sarah K.</p>
+                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>5th Grade Teacher, Illinois</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 2 */}
+              <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+                <p className="text-sm mb-4" style={{ color: '#1e2749' }}>
+                  "I used to spend my entire Sunday planning. Now I batch everything in 2 hours. TDI gave me my weekends back."
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
+                    MR
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Marcus R.</p>
+                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>High School Math, Texas</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Calculator Section */}
       <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
