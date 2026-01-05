@@ -300,13 +300,15 @@ export default function Home() {
                   <span style={{ color: '#1e2749' }}>Free resources for teachers and paras</span>
                 </li>
               </ul>
-              <Link
-                href="/free-pd-plan"
+              <a
+                href="https://raehughart.substack.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover-glow"
                 style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
               >
                 Get Your Free PD Plan
-              </Link>
+              </a>
               <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
                 Or{' '}
                 <a
