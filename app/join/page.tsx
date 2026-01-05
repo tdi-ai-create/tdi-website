@@ -350,7 +350,7 @@ export default function JoinPage() {
                   className="text-lg font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
-                  Chat with a Member of the Team
+                  Schedule a Conversation
                 </h3>
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
                   Have questions? Let's talk.
