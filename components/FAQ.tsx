@@ -13,6 +13,22 @@ const faqs: FAQItem[] = [
     answer: "TDI uses a flipped model. You learn strategies on your own time through bite-sized videos, then we focus live sessions on implementation and problem-solving. No more sitting through hours of PowerPoints. Our content is created by teachers who've been in the trenches, not consultants who haven't been in a classroom in years."
   },
   {
+    question: "How is this different from other PD I've sat through?",
+    answer: "Traditional PD is often theory-heavy, one-size-fits-all, and disconnected from your actual classroom. TDI is built by teachers who've been in your shoes. Every strategy is practical, immediately applicable, and respects your time. No more 'someday you'll use this.' Everything we create answers one question: Will this help a teacher be better for their students on Monday?"
+  },
+  {
+    question: "Is this just another thing on my plate?",
+    answer: "We get it. Teachers are already stretched thin. TDI is designed to save you time, not add to your workload. Our resources are ready to use Monday morning with zero prep required. Most educators tell us they actually reclaim hours each week by implementing our strategies. This is about working smarter, not harder."
+  },
+  {
+    question: "I'm already burned out. Do I have the energy for this?",
+    answer: "If you're burned out, you're exactly who we built this for. TDI started because our founder hit that wall too. We don't ask you to do more. We help you do things differently so you can breathe again. Start small. One strategy. One course. Many teachers tell us that's all it took to feel a shift."
+  },
+  {
+    question: "What if my admin won't support it?",
+    answer: "Many teachers start with TDI on their own and see results that speak for themselves. When administrators see improved classroom management, reduced stress, and better student outcomes, they often become advocates. We also offer resources specifically for sharing TDI's value with school leadership, and our team is happy to connect with your admin directly."
+  },
+  {
     question: "Is this just for teachers, or can paraprofessionals participate too?",
     answer: "Both! Our content is designed for everyone who works directly with students. When schools partner with us, we encourage including the whole building, teachers and paras alike. Everyone deserves support."
   },
