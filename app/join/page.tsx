@@ -375,7 +375,7 @@ export default function JoinPage() {
               What Teachers Are Saying
             </h3>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid md:grid-cols-3 gap-6">
               {/* Testimonial 1 */}
               <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
                 <p className="text-sm mb-4" style={{ color: '#1e2749' }}>
@@ -404,6 +404,22 @@ export default function JoinPage() {
                   <div>
                     <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Marcus R.</p>
                     <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>High School Math Teacher</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonial 3 */}
+              <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+                <p className="text-sm mb-4" style={{ color: '#1e2749' }}>
+                  "TDI didn't just drop a slide deck and bounce. Every part of the experience felt personal. Our staff felt understood, and I finally felt like I wasn't on an island trying to figure this out alone."
+                </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center font-bold" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
+                    JH
+                  </div>
+                  <div>
+                    <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Julie H.</p>
+                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>K-8 Principal</p>
                   </div>
                 </div>
               </div>
