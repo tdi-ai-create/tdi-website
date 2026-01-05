@@ -45,7 +45,7 @@ export default function ForSchoolsPage() {
               className="text-lg md:text-xl mb-8"
               style={{ color: '#ffffff', opacity: 0.9 }}
             >
-              Professional development that actually works, with outcomes you can measure and report.
+              Professional development that actually works,<br />with outcomes you can measure and report.
             </p>
             {/* Hero CTAs */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
