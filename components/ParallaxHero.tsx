@@ -29,7 +29,7 @@ export function ParallaxHero() {
   }, []);
 
   return (
-    <section className="relative h-[600px] lg:h-[650px] overflow-hidden pt-24 sm:pt-20 md:pt-16">
+    <section className="relative h-[600px] lg:h-[650px] overflow-hidden pt-32 sm:pt-24 md:pt-20">
       {/* Background Image - Parallax layer */}
       <div
         ref={backgroundRef}
@@ -43,9 +43,15 @@ export function ParallaxHero() {
         }}
       />
 
-      {/* Navy Gradient Overlay */}
+      {/* Mobile: Full solid overlay */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 md:hidden"
+        style={{ backgroundColor: 'rgba(30, 39, 73, 0.85)' }}
+      />
+
+      {/* Desktop: Gradient Overlay */}
+      <div
+        className="absolute inset-0 hidden md:block"
         style={{
           background: 'linear-gradient(90deg, rgba(30, 39, 73, 0.9) 0%, rgba(30, 39, 73, 0.7) 35%, rgba(30, 39, 73, 0.3) 55%, transparent 70%)'
         }}
