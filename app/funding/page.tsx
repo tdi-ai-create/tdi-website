@@ -200,7 +200,7 @@ export default function FundingPage() {
               </div>
               <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>We Do the Research</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                We identify Title II, ESSER, state grants, and other options.
+                We identify Title II, ESSER, state grants,<br />and other options.
               </p>
             </div>
 
