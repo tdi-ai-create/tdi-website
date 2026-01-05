@@ -117,7 +117,7 @@ export default function ForSchoolsPage() {
                     </svg>
                   </div>
                   <h3 className="font-bold text-[10px] mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>Teachers dread it.</h3>
-                  <p className="text-[9px] whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                     The eye rolls start before the session does.
                   </p>
                 </div>
@@ -133,7 +133,7 @@ export default function ForSchoolsPage() {
                     </svg>
                   </div>
                   <h3 className="font-bold text-[10px] mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>No measurable outcomes.</h3>
-                  <p className="text-[9px] whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                     You can't show the impact to your board.
                   </p>
                 </div>
@@ -163,7 +163,7 @@ export default function ForSchoolsPage() {
                     </svg>
                   </div>
                   <h3 className="font-bold text-[10px] mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>Burnout drives turnover.</h3>
-                  <p className="text-[9px] whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                     You're losing good teachers faster than you can hire.
                   </p>
                 </div>
@@ -177,7 +177,7 @@ export default function ForSchoolsPage() {
                     </svg>
                   </div>
                   <h3 className="font-bold text-[10px] mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>Wellness feels fluffy.</h3>
-                  <p className="text-[9px] whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                     No data, no accountability, no change.
                   </p>
                 </div>
@@ -212,7 +212,7 @@ export default function ForSchoolsPage() {
                   </svg>
                 </div>
                 <h3 className="font-bold text-[10px] mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>Teachers dread it.</h3>
-                <p className="text-[9px] whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
+                <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                   The eye rolls start before the session does.
                 </p>
               </div>
@@ -227,7 +227,7 @@ export default function ForSchoolsPage() {
                   </svg>
                 </div>
                 <h3 className="font-bold text-[10px] mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>No measurable outcomes.</h3>
-                <p className="text-[9px] whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
+                <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                   You can't show the impact to your board.
                 </p>
               </div>
@@ -240,7 +240,7 @@ export default function ForSchoolsPage() {
                   </svg>
                 </div>
                 <h3 className="font-bold text-[10px] mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>Burnout drives turnover.</h3>
-                <p className="text-[9px] whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
+                <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                   You're losing good teachers faster than you can hire.
                 </p>
               </div>
@@ -253,7 +253,7 @@ export default function ForSchoolsPage() {
                   </svg>
                 </div>
                 <h3 className="font-bold text-[10px] mb-1 whitespace-nowrap" style={{ color: '#1e2749' }}>Wellness feels fluffy.</h3>
-                <p className="text-[9px] whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
+                <p className="text-xs whitespace-nowrap" style={{ color: '#1e2749', opacity: 0.7 }}>
                   No data, no accountability, no change.
                 </p>
               </div>
