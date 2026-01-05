@@ -57,26 +57,26 @@ export function BudgetImpactCalculator() {
         </label>
         <input
           type="range"
-          min="5"
-          max="50"
+          min="0"
+          max="100"
           value={implementation}
           onChange={(e) => setImplementation(parseInt(e.target.value))}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #ffba06 0%, #ffba06 ${(implementation - 5) / 45 * 100}%, #e5e7eb ${(implementation - 5) / 45 * 100}%, #e5e7eb 100%)`
+            background: `linear-gradient(to right, #ffba06 0%, #ffba06 ${implementation}%, #e5e7eb ${implementation}%, #e5e7eb 100%)`
           }}
         />
         <div className="flex justify-between items-start mt-2">
           <div className="text-left">
-            <span className="block text-lg font-bold" style={{ color: '#ef4444' }}>5%</span>
-            <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Almost none</span>
+            <span className="block text-lg font-bold" style={{ color: '#ef4444' }}>0%</span>
+            <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>None of it</span>
           </div>
           <div className="text-center">
             <span className="block text-xl font-bold" style={{ color: '#1e2749' }}>{implementation}%</span>
           </div>
           <div className="text-right">
-            <span className="block text-lg font-bold" style={{ color: '#22c55e' }}>50%</span>
-            <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Above average</span>
+            <span className="block text-lg font-bold" style={{ color: '#22c55e' }}>100%</span>
+            <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>All of it</span>
           </div>
         </div>
       </div>
