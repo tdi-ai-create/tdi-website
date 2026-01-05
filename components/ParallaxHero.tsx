@@ -86,7 +86,7 @@ export function ParallaxHero() {
             </p>
 
             <p
-              className="text-xs md:text-sm mb-6"
+              className="text-xs md:text-sm mb-6 font-bold"
               style={{ color: '#ffffff', opacity: 0.8 }}
             >
               Join 87,000+ educators who are done accepting the status quo.
