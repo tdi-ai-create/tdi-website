@@ -85,7 +85,7 @@ export default function ForSchoolsPage() {
             </div>
             <div>
               <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>21</p>
-              <p style={{ color: '#ffffff', opacity: 0.8 }}>states with TDI partner schools</p>
+              <p style={{ color: '#ffffff', opacity: 0.8 }}>states with TDI educators<br />+ partner schools</p>
             </div>
           </div>
         </div>
