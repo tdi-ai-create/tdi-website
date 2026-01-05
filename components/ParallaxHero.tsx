@@ -76,7 +76,13 @@ export function ParallaxHero() {
               className="text-sm md:text-base mb-2 leading-relaxed"
               style={{ color: '#ffffff', opacity: 0.9 }}
             >
-              You became a teacher to make a difference. Not to drown in lesson plans, sit through pointless PD, and count down to summer. We get it. We've been there.
+              You became a teacher to make a difference. Not to drown in lesson plans, sit through pointless PD, and count down to summer.
+            </p>
+            <p
+              className="text-sm md:text-base mb-2 leading-relaxed font-semibold"
+              style={{ color: '#ffffff', opacity: 0.9 }}
+            >
+              We get it. We've been there.
             </p>
 
             <p
