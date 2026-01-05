@@ -444,8 +444,8 @@ export default function JoinPage() {
       {/* Budget CTA */}
       <section className="section" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
-          <h2 className="mb-4" style={{ color: '#1e2749' }}>Think You Don't Have Budget?</h2>
-          <p className="text-lg mb-6 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
+          <h2 className="mb-4" style={{ color: '#ffffff' }}>Think You Don't Have Budget?</h2>
+          <p className="text-lg mb-6 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
             80% of schools we work with secure external funds to cover PD. We help you find the funding and draft the language.
           </p>
           <Link
