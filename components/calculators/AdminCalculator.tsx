@@ -120,14 +120,23 @@ export function AdminCalculator() {
           </div>
         </div>
 
-        {/* CTA */}
-        <a
-          href="/contact"
-          className="block w-full text-center mt-6 px-6 py-3 rounded-lg font-bold transition-all hover-glow"
-          style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-        >
-          Schedule a Conversation
-        </a>
+        {/* CTAs */}
+        <div className="flex flex-col sm:flex-row gap-3 mt-6">
+          <a
+            href="/free-pd-plan"
+            className="flex-1 text-center px-6 py-3 rounded-lg font-bold transition-all hover-glow"
+            style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+          >
+            Get Your Free PD Plan
+          </a>
+          <a
+            href="/contact"
+            className="flex-1 text-center px-6 py-3 rounded-lg font-bold transition-all hover-lift border-2"
+            style={{ borderColor: '#1e2749', color: '#1e2749' }}
+          >
+            Schedule a Call
+          </a>
+        </div>
 
         {/* Sources */}
         <p className="text-xs text-center mt-4" style={{ color: '#1e2749', opacity: 0.5 }}>

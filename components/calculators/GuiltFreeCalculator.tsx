@@ -116,14 +116,27 @@ export function GuiltFreeCalculator() {
           </div>
         </div>
 
-        {/* CTA */}
-        <a
-          href="/free-pd-plan"
-          className="block w-full text-center mt-4 px-6 py-3 rounded-lg font-bold transition-all hover-glow"
-          style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-        >
-          Reclaim Your Time
-        </a>
+        {/* CTAs */}
+        <div className="flex flex-col sm:flex-row gap-3 mt-4">
+          <a
+            href="https://tdi.thinkific.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 text-center px-6 py-3 rounded-lg font-bold transition-all hover-glow"
+            style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+          >
+            Explore the Learning Hub
+          </a>
+          <a
+            href="https://raehughart.substack.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 text-center px-6 py-3 rounded-lg font-bold transition-all hover-lift border-2"
+            style={{ borderColor: '#1e2749', color: '#1e2749' }}
+          >
+            Get Free Weekly Strategies
+          </a>
+        </div>
       </div>
     </div>
   );
