@@ -428,13 +428,34 @@ export default function JoinPage() {
         </div>
       </section>
 
-      {/* Calculator Section */}
-      <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="container-default">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+      {/* Calculator Section with Parallax Background */}
+      <section className="relative py-16 md:py-24 overflow-hidden">
+        {/* Parallax Background Image */}
+        <div
+          className="absolute inset-0 parallax-calc-bg"
+          style={{
+            backgroundImage: "url('/images/calculator-background.png')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center center',
+            backgroundRepeat: 'no-repeat',
+            backgroundAttachment: 'fixed',
+          }}
+        />
+
+        {/* Dark Overlay for readability */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundColor: 'rgba(30, 39, 73, 0.85)'
+          }}
+        />
+
+        {/* Calculator Content */}
+        <div className="relative z-10 container-default">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: '#ffffff' }}>
             What Could Change for You?
           </h2>
-          <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+          <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
             See the potential impact on your stress, time, and joy in teaching.
           </p>
           <TabbedCalculator />
