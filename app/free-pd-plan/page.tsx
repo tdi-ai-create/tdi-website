@@ -969,7 +969,7 @@ export default function FreePDPlanPage() {
                       "This assessment helped us identify exactly where to start. Within 3 months, our teachers were actually excited about PD."
                     </p>
                     <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>Lisa M.</p>
-                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>K-8 School Director, WA</p>
+                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>K-8 School Director</p>
                   </div>
                 </div>
               </div>

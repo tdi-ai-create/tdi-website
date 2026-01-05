@@ -387,7 +387,7 @@ export default function JoinPage() {
                   </div>
                   <div>
                     <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Sarah K.</p>
-                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>5th Grade Teacher, Illinois</p>
+                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>5th Grade Teacher</p>
                   </div>
                 </div>
               </div>
@@ -403,7 +403,7 @@ export default function JoinPage() {
                   </div>
                   <div>
                     <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Marcus R.</p>
-                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>High School Math, Texas</p>
+                    <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>High School Math Teacher</p>
                   </div>
                 </div>
               </div>

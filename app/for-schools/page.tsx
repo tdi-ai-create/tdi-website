@@ -191,14 +191,14 @@ export default function ForSchoolsPage() {
                 "This isn't sit-and-get. Our teachers are actually learning how to work smarter and feel better doing it."
               </p>
               <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Lisa M.</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>K-8 School Director, WA</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>K-8 School Director</p>
             </div>
             <div className="p-6 rounded-xl" style={{ backgroundColor: '#E8F0FD' }}>
               <p className="mb-4 italic" style={{ color: '#1e2749' }}>
                 "Before, we got eye rolls. Now, we hear: 'When's the team coming next?' That's when you know PD is finally working."
               </p>
               <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Daniel R.</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>High School Principal, CA</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>High School Principal</p>
             </div>
             <div className="p-6 rounded-xl" style={{ backgroundColor: '#E8F0FD' }}>
               <p className="mb-4 italic" style={{ color: '#1e2749' }}>

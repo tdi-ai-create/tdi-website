@@ -99,7 +99,7 @@ export default function FundingPage() {
             <p className="text-2xl italic mb-6" style={{ color: 'var(--tdi-charcoal)' }}>
               "This was the first PD I didn't have to apologize for. Our teachers actually thanked me."
             </p>
-            <p className="font-semibold">School Principal</p>
+            <p className="font-semibold">James T., School Principal</p>
           </div>
         </div>
       </section>
@@ -201,7 +201,7 @@ export default function FundingPage() {
             <p className="text-2xl italic mb-6" style={{ color: 'var(--tdi-charcoal)' }}>
               "TDI helped us unlock funding we didn't even know was possible."
             </p>
-            <p className="font-semibold">District Leader</p>
+            <p className="font-semibold">Patricia L., District Leader</p>
           </div>
         </div>
       </section>

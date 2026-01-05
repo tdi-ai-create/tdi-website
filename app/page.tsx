@@ -116,28 +116,28 @@ export default function Home() {
               <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
                 "I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself."
               </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>Ms. K., 5th Grade Teacher</p>
+              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>Sarah K., 5th Grade Teacher</p>
             </div>
 
             <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
               <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
                 "Our teachers are actually excited about PD now. I don't have to chase them down or babysit. They're learning because they want to."
               </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>Ms. M., K-8 School Director</p>
+              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>Michelle M., K-8 School Director</p>
             </div>
 
             <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
               <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
                 "This was the first PD I didn't have to apologize for. Our teachers actually thanked me."
               </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>School Principal</p>
+              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>James T., School Principal</p>
             </div>
 
             <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
               <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
                 "TDI helped us unlock funding we didn't even know was possible."
               </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>District Leader</p>
+              <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>Patricia L., District Leader</p>
             </div>
           </div>
         </div>

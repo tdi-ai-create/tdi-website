@@ -118,7 +118,7 @@ export function BurnoutCalculator() {
         {/* Testimonial */}
         <p className="text-sm italic mt-4 p-3 rounded-lg" style={{ backgroundColor: '#ffffff', color: '#1e2749', opacity: 0.8 }}>
           "I went from crying in my car to actually looking forward to Mondays."
-          <span className="block text-xs mt-1 not-italic" style={{ opacity: 0.6 }}>— Teacher, Illinois</span>
+          <span className="block text-xs mt-1 not-italic" style={{ opacity: 0.6 }}>— Amanda R., Middle School Teacher</span>
         </p>
 
         {/* CTAs */}
