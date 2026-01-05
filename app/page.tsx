@@ -170,107 +170,88 @@ export default function Home() {
             {/* Bubbles Row */}
             <div className="flex flex-col md:flex-row justify-between items-center gap-8 md:gap-4">
 
-              {/* Bubble 1 */}
-              <div
-                className="group flex flex-col items-center text-center animate-float"
-              >
+              {/* Step 1 - Listen */}
+              <div className="flex flex-col items-center text-center group">
                 <div
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-lg relative z-10"
-                  style={{
-                    backgroundColor: '#1e2749',
-                    boxShadow: '0 4px 15px rgba(30, 39, 73, 0.3)'
-                  }}
+                  className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold mb-3 transition-all group-hover:scale-110"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
                 >
-                  <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>1</span>
+                  1
                 </div>
-                <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Listen
-                </h3>
-                <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
+                <h4 className="font-bold mb-1" style={{ color: '#1e2749' }}>Listen</h4>
+                {/* Description - always visible on mobile, hover on desktop */}
+                <p
+                  className="text-sm max-w-32 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
+                  style={{ color: '#1e2749', opacity: 0.7 }}
+                >
                   Teachers identify what they need
                 </p>
               </div>
 
-              {/* Bubble 2 */}
-              <div
-                className="group flex flex-col items-center text-center animate-float-delay-1"
-              >
+              {/* Step 2 - Collaborate */}
+              <div className="flex flex-col items-center text-center group">
                 <div
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-lg relative z-10"
-                  style={{
-                    backgroundColor: '#1e2749',
-                    boxShadow: '0 4px 15px rgba(30, 39, 73, 0.3)'
-                  }}
+                  className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold mb-3 transition-all group-hover:scale-110"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
                 >
-                  <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>2</span>
+                  2
                 </div>
-                <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Collaborate
-                </h3>
-                <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
+                <h4 className="font-bold mb-1" style={{ color: '#1e2749' }}>Collaborate</h4>
+                <p
+                  className="text-sm max-w-32 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
+                  style={{ color: '#1e2749', opacity: 0.7 }}
+                >
                   Experts and practitioners team up
                 </p>
               </div>
 
-              {/* Bubble 3 */}
-              <div
-                className="group flex flex-col items-center text-center animate-float-delay-2"
-              >
+              {/* Step 3 - Design */}
+              <div className="flex flex-col items-center text-center group">
                 <div
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-lg relative z-10"
-                  style={{
-                    backgroundColor: '#1e2749',
-                    boxShadow: '0 4px 15px rgba(30, 39, 73, 0.3)'
-                  }}
+                  className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold mb-3 transition-all group-hover:scale-110"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
                 >
-                  <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>3</span>
+                  3
                 </div>
-                <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Design
-                </h3>
-                <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
+                <h4 className="font-bold mb-1" style={{ color: '#1e2749' }}>Design</h4>
+                <p
+                  className="text-sm max-w-32 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
+                  style={{ color: '#1e2749', opacity: 0.7 }}
+                >
                   Research-backed, actionable tools
                 </p>
               </div>
 
-              {/* Bubble 4 */}
-              <div
-                className="group flex flex-col items-center text-center animate-float-delay-3"
-              >
+              {/* Step 4 - Publish */}
+              <div className="flex flex-col items-center text-center group">
                 <div
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-lg relative z-10"
-                  style={{
-                    backgroundColor: '#1e2749',
-                    boxShadow: '0 4px 15px rgba(30, 39, 73, 0.3)'
-                  }}
+                  className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold mb-3 transition-all group-hover:scale-110"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
                 >
-                  <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>4</span>
+                  4
                 </div>
-                <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Publish
-                </h3>
-                <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
+                <h4 className="font-bold mb-1" style={{ color: '#1e2749' }}>Publish</h4>
+                <p
+                  className="text-sm max-w-32 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
+                  style={{ color: '#1e2749', opacity: 0.7 }}
+                >
                   Live in the Learning Hub
                 </p>
               </div>
 
-              {/* Bubble 5 */}
-              <div
-                className="group flex flex-col items-center text-center animate-float-delay-4"
-              >
+              {/* Step 5 - Deliver */}
+              <div className="flex flex-col items-center text-center group">
                 <div
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 transition-all duration-300 cursor-pointer group-hover:scale-110 group-hover:shadow-lg relative z-10"
-                  style={{
-                    backgroundColor: '#1e2749',
-                    boxShadow: '0 4px 15px rgba(30, 39, 73, 0.3)'
-                  }}
+                  className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold mb-3 transition-all group-hover:scale-110"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
                 >
-                  <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>5</span>
+                  5
                 </div>
-                <h3 className="font-bold text-sm md:text-base mb-1 transition-colors group-hover:text-yellow-500" style={{ color: '#1e2749' }}>
-                  Deliver
-                </h3>
-                <p className="text-xs md:text-sm max-w-[120px] opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ color: '#1e2749' }}>
+                <h4 className="font-bold mb-1" style={{ color: '#1e2749' }}>Deliver</h4>
+                <p
+                  className="text-sm max-w-32 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
+                  style={{ color: '#1e2749', opacity: 0.7 }}
+                >
                   Ready to use Monday morning
                 </p>
               </div>
