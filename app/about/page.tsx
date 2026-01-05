@@ -39,7 +39,7 @@ export default function AboutPage() {
       {/* Stats Section */}
       <section className="py-16" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
               <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>38%</p>
               <p style={{ color: '#ffffff', opacity: 0.9 }}>increase in strategy implementation</p>
@@ -51,6 +51,10 @@ export default function AboutPage() {
             <div>
               <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>87K+</p>
               <p style={{ color: '#ffffff', opacity: 0.9 }}>educators in our community</p>
+            </div>
+            <div>
+              <p className="text-4xl md:text-5xl font-bold mb-2" style={{ color: '#ffffff' }}>Improved Retention</p>
+              <p style={{ color: '#ffffff', opacity: 0.9 }}>Administrators report stronger morale, greater trust, and improved retention after TDI Support Sessions</p>
             </div>
           </div>
         </div>
@@ -103,6 +107,10 @@ export default function AboutPage() {
 
                   <p style={{ opacity: 0.85 }}>
                     That system was not built with teachers in mind. TDI was - with teachers at its core, in every decision we make, building a movement that's changing education from the inside out.
+                  </p>
+
+                  <p style={{ opacity: 0.85 }}>
+                    School leaders noticed too. Principals started asking: how do we bring this to our whole building? How do we keep our best teachers from leaving?
                   </p>
                 </div>
               </div>
