@@ -131,9 +131,9 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* What Schools Get */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#ffffff' }}>
             What Schools Get with TDI
           </h2>
 
