@@ -138,6 +138,36 @@ export default function ContactPage() {
               </form>
             )}
 
+            {/* What Happens Next */}
+            <div className="mt-8 p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+              <h4 className="font-bold mb-3" style={{ color: '#1e2749' }}>
+                What Happens Next?
+              </h4>
+              <ol className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>1</span>
+                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    <strong>We'll respond within 24 hours</strong> (usually much faster)
+                  </p>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>2</span>
+                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    <strong>We'll schedule a quick call</strong> to understand your needs
+                  </p>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>3</span>
+                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    <strong>We'll share a personalized plan</strong> based on your goals
+                  </p>
+                </li>
+              </ol>
+              <p className="text-xs mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
+                No pressure, no sales pitch. Just a conversation about what's possible.
+              </p>
+            </div>
+
             <div className="mt-12 pt-8 border-t border-gray-200">
               <p className="text-center mb-4" style={{ opacity: 0.7 }}>
                 Prefer email? Reach us directly at:
