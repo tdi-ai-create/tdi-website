@@ -212,12 +212,12 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* Built for Every Leader */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#ffffff' }}>
             Built for Every Leader in the Building
           </h2>
-          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
+          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
             No matter your role, TDI meets you where you are.
           </p>
 
