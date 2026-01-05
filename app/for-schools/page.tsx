@@ -92,47 +92,47 @@ export default function ForSchoolsPage() {
       </section>
 
       {/* Pain Points - Redesigned with Central Stat */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
+      <section className="py-12 md:py-14" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
             You Already Know Traditional PD Isn't Working
           </h2>
-          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+          <p className="text-center mb-8 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
             You need something different. So do your teachers.
           </p>
 
           {/* Desktop Layout: Cards around central stat */}
-          <div className="hidden lg:block max-w-6xl mx-auto">
-            <div className="grid grid-cols-3 gap-6 items-center">
+          <div className="hidden lg:block max-w-5xl mx-auto">
+            <div className="grid grid-cols-3 gap-4 items-center">
               {/* Left Column - 2 cards stacked */}
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-4">
                 {/* Card 1: Teachers dread it */}
-                <div className="p-6 rounded-xl text-center shadow-md" style={{ backgroundColor: '#f8f9fa' }}>
-                  <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center rounded-full" style={{ backgroundColor: '#80a4ed' }}>
-                    <svg className="w-6 h-6" fill="#ffffff" viewBox="0 0 24 24">
+                <div className="p-4 rounded-xl text-center shadow-md cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-lg" style={{ backgroundColor: '#f8f9fa' }}>
+                  <div className="w-10 h-10 mx-auto mb-2 flex items-center justify-center rounded-full" style={{ backgroundColor: '#80a4ed' }}>
+                    <svg className="w-5 h-5" fill="#ffffff" viewBox="0 0 24 24">
                       <circle cx="12" cy="12" r="10" fill="none" stroke="#ffffff" strokeWidth="2"/>
                       <circle cx="8" cy="10" r="1.5" fill="#ffffff"/>
                       <circle cx="16" cy="10" r="1.5" fill="#ffffff"/>
                       <path d="M8 16c1.5-2 6.5-2 8 0" stroke="#ffffff" strokeWidth="2" fill="none" strokeLinecap="round"/>
                     </svg>
                   </div>
-                  <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Teachers dread it.</h3>
+                  <h3 className="font-bold text-base mb-1" style={{ color: '#1e2749' }}>Teachers dread it.</h3>
                   <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                     The eye rolls start before the session does.
                   </p>
                 </div>
 
                 {/* Card 2: No measurable outcomes */}
-                <div className="p-6 rounded-xl text-center shadow-md" style={{ backgroundColor: '#f8f9fa' }}>
-                  <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center rounded-full" style={{ backgroundColor: '#80a4ed' }}>
-                    <svg className="w-6 h-6" fill="#ffffff" viewBox="0 0 24 24">
+                <div className="p-4 rounded-xl text-center shadow-md cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-lg" style={{ backgroundColor: '#f8f9fa' }}>
+                  <div className="w-10 h-10 mx-auto mb-2 flex items-center justify-center rounded-full" style={{ backgroundColor: '#80a4ed' }}>
+                    <svg className="w-5 h-5" fill="#ffffff" viewBox="0 0 24 24">
                       <rect x="3" y="14" width="4" height="6" rx="1" fill="#ffffff"/>
                       <rect x="10" y="10" width="4" height="10" rx="1" fill="#ffffff"/>
                       <rect x="17" y="6" width="4" height="14" rx="1" fill="#ffffff"/>
                       <line x1="4" y1="4" x2="20" y2="20" stroke="#ffffff" strokeWidth="2.5" strokeLinecap="round"/>
                     </svg>
                   </div>
-                  <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>No measurable outcomes.</h3>
+                  <h3 className="font-bold text-base mb-1" style={{ color: '#1e2749' }}>No measurable outcomes.</h3>
                   <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                     You can't show the impact to your board.
                   </p>
@@ -142,41 +142,41 @@ export default function ForSchoolsPage() {
               {/* Center - 44% Stat */}
               <div className="flex items-center justify-center">
                 <div
-                  className="w-64 h-64 rounded-full flex flex-col items-center justify-center animate-fade-in shadow-xl"
+                  className="w-52 h-52 rounded-full flex flex-col items-center justify-center animate-fade-in shadow-xl cursor-pointer transition-all duration-300 hover:scale-105"
                   style={{ backgroundColor: '#1e2749' }}
                 >
-                  <span className="text-6xl font-bold mb-2" style={{ color: '#ffba06' }}>44%</span>
-                  <span className="text-base text-center px-6 leading-tight" style={{ color: '#ffffff', opacity: 0.9 }}>
+                  <span className="text-5xl font-bold mb-1" style={{ color: '#ffba06' }}>44%</span>
+                  <span className="text-sm text-center px-4 leading-tight" style={{ color: '#ffffff', opacity: 0.9 }}>
                     of teachers leave<br />within 5 years
                   </span>
                 </div>
               </div>
 
               {/* Right Column - 2 cards stacked */}
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-4">
                 {/* Card 3: Burnout drives turnover */}
-                <div className="p-6 rounded-xl text-center shadow-md" style={{ backgroundColor: '#f8f9fa' }}>
-                  <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center rounded-full" style={{ backgroundColor: '#80a4ed' }}>
-                    <svg className="w-6 h-6" fill="#ffffff" viewBox="0 0 24 24">
+                <div className="p-4 rounded-xl text-center shadow-md cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-lg" style={{ backgroundColor: '#f8f9fa' }}>
+                  <div className="w-10 h-10 mx-auto mb-2 flex items-center justify-center rounded-full" style={{ backgroundColor: '#80a4ed' }}>
+                    <svg className="w-5 h-5" fill="#ffffff" viewBox="0 0 24 24">
                       <path d="M19 6H5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H5V8h14v8z" fill="#ffffff"/>
                       <path d="M12 10l4 3-4 3V10z" fill="#ffffff"/>
                     </svg>
                   </div>
-                  <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Burnout drives turnover.</h3>
+                  <h3 className="font-bold text-base mb-1" style={{ color: '#1e2749' }}>Burnout drives turnover.</h3>
                   <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                     You're losing good teachers faster than you can hire.
                   </p>
                 </div>
 
                 {/* Card 4: Wellness feels fluffy */}
-                <div className="p-6 rounded-xl text-center shadow-md" style={{ backgroundColor: '#f8f9fa' }}>
-                  <div className="w-12 h-12 mx-auto mb-3 flex items-center justify-center rounded-full" style={{ backgroundColor: '#80a4ed' }}>
-                    <svg className="w-6 h-6" fill="#ffffff" viewBox="0 0 24 24">
+                <div className="p-4 rounded-xl text-center shadow-md cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-lg" style={{ backgroundColor: '#f8f9fa' }}>
+                  <div className="w-10 h-10 mx-auto mb-2 flex items-center justify-center rounded-full" style={{ backgroundColor: '#80a4ed' }}>
+                    <svg className="w-5 h-5" fill="#ffffff" viewBox="0 0 24 24">
                       <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4s1.79-4 4-4h.71C7.37 7.69 9.48 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3s-1.34 3-3 3z" fill="#ffffff"/>
                       <text x="12" y="15" textAnchor="middle" fill="#ffffff" fontSize="8" fontWeight="bold">?</text>
                     </svg>
                   </div>
-                  <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Wellness feels fluffy.</h3>
+                  <h3 className="font-bold text-base mb-1" style={{ color: '#1e2749' }}>Wellness feels fluffy.</h3>
                   <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                     No data, no accountability, no change.
                   </p>
@@ -188,21 +188,21 @@ export default function ForSchoolsPage() {
           {/* Mobile/Tablet Layout: Stacked */}
           <div className="lg:hidden max-w-md mx-auto">
             {/* Central Stat - Mobile */}
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-center mb-6">
               <div
-                className="w-48 h-48 rounded-full flex flex-col items-center justify-center animate-fade-in shadow-xl"
+                className="w-44 h-44 rounded-full flex flex-col items-center justify-center animate-fade-in shadow-xl cursor-pointer transition-all duration-300 hover:scale-105"
                 style={{ backgroundColor: '#1e2749' }}
               >
-                <span className="text-5xl font-bold mb-1" style={{ color: '#ffba06' }}>44%</span>
-                <span className="text-sm text-center px-4 leading-tight" style={{ color: '#ffffff', opacity: 0.9 }}>
+                <span className="text-4xl font-bold mb-1" style={{ color: '#ffba06' }}>44%</span>
+                <span className="text-xs text-center px-4 leading-tight" style={{ color: '#ffffff', opacity: 0.9 }}>
                   of teachers leave<br />within 5 years
                 </span>
               </div>
             </div>
 
             {/* Cards - Mobile */}
-            <div className="flex flex-col gap-4">
-              <div className="p-5 rounded-xl text-center shadow-md" style={{ backgroundColor: '#f8f9fa' }}>
+            <div className="flex flex-col gap-3">
+              <div className="p-4 rounded-xl text-center shadow-md cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-lg" style={{ backgroundColor: '#f8f9fa' }}>
                 <div className="w-10 h-10 mx-auto mb-2 flex items-center justify-center rounded-full" style={{ backgroundColor: '#80a4ed' }}>
                   <svg className="w-5 h-5" fill="#ffffff" viewBox="0 0 24 24">
                     <circle cx="12" cy="12" r="10" fill="none" stroke="#ffffff" strokeWidth="2"/>
@@ -217,7 +217,7 @@ export default function ForSchoolsPage() {
                 </p>
               </div>
 
-              <div className="p-5 rounded-xl text-center shadow-md" style={{ backgroundColor: '#f8f9fa' }}>
+              <div className="p-4 rounded-xl text-center shadow-md cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-lg" style={{ backgroundColor: '#f8f9fa' }}>
                 <div className="w-10 h-10 mx-auto mb-2 flex items-center justify-center rounded-full" style={{ backgroundColor: '#80a4ed' }}>
                   <svg className="w-5 h-5" fill="#ffffff" viewBox="0 0 24 24">
                     <rect x="3" y="14" width="4" height="6" rx="1" fill="#ffffff"/>
@@ -232,7 +232,7 @@ export default function ForSchoolsPage() {
                 </p>
               </div>
 
-              <div className="p-5 rounded-xl text-center shadow-md" style={{ backgroundColor: '#f8f9fa' }}>
+              <div className="p-4 rounded-xl text-center shadow-md cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-lg" style={{ backgroundColor: '#f8f9fa' }}>
                 <div className="w-10 h-10 mx-auto mb-2 flex items-center justify-center rounded-full" style={{ backgroundColor: '#80a4ed' }}>
                   <svg className="w-5 h-5" fill="#ffffff" viewBox="0 0 24 24">
                     <path d="M19 6H5c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H5V8h14v8z" fill="#ffffff"/>
@@ -245,7 +245,7 @@ export default function ForSchoolsPage() {
                 </p>
               </div>
 
-              <div className="p-5 rounded-xl text-center shadow-md" style={{ backgroundColor: '#f8f9fa' }}>
+              <div className="p-4 rounded-xl text-center shadow-md cursor-pointer transition-all duration-300 hover:scale-[1.03] hover:shadow-lg" style={{ backgroundColor: '#f8f9fa' }}>
                 <div className="w-10 h-10 mx-auto mb-2 flex items-center justify-center rounded-full" style={{ backgroundColor: '#80a4ed' }}>
                   <svg className="w-5 h-5" fill="#ffffff" viewBox="0 0 24 24">
                     <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4s1.79-4 4-4h.71C7.37 7.69 9.48 6 12 6c3.04 0 5.5 2.46 5.5 5.5v.5H19c1.66 0 3 1.34 3 3s-1.34 3-3 3z" fill="#ffffff"/>
