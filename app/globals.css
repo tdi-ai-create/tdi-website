@@ -323,3 +323,48 @@ label {
 .animate-travel-pulse {
   animation: travelPulse 3s ease-in-out infinite;
 }
+
+/* Hover Animations */
+
+/* Button lift effect */
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(30, 39, 73, 0.15);
+}
+
+/* Button scale effect */
+.hover-scale {
+  transition: transform 0.2s ease;
+}
+.hover-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Color shift for links */
+.hover-color-shift {
+  transition: color 0.2s ease, opacity 0.2s ease;
+}
+.hover-color-shift:hover {
+  opacity: 0.8;
+}
+
+/* Card hover effect */
+.hover-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(30, 39, 73, 0.12);
+}
+
+/* Subtle glow for primary buttons */
+.hover-glow {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hover-glow:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(255, 186, 6, 0.4);
+}

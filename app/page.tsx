@@ -40,28 +40,28 @@ export default function Home() {
           <h2 className="text-center mb-12" style={{ color: '#1e2749' }}>What Educators Are Saying</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="rounded-xl p-8" style={{ backgroundColor: '#80a4ed' }}>
+            <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
               <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
                 "I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself."
               </p>
               <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>Ms. K., 5th Grade Teacher</p>
             </div>
 
-            <div className="rounded-xl p-8" style={{ backgroundColor: '#80a4ed' }}>
+            <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
               <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
                 "Our teachers are actually excited about PD now. I don't have to chase them down or babysit. They're learning because they want to."
               </p>
               <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>Ms. M., K-8 School Director</p>
             </div>
 
-            <div className="rounded-xl p-8" style={{ backgroundColor: '#80a4ed' }}>
+            <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
               <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
                 "This was the first PD I didn't have to apologize for. Our teachers actually thanked me."
               </p>
               <p className="text-sm font-semibold" style={{ color: '#ffffff' }}>School Principal</p>
             </div>
 
-            <div className="rounded-xl p-8" style={{ backgroundColor: '#80a4ed' }}>
+            <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
               <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
                 "TDI helped us unlock funding we didn't even know was possible."
               </p>
@@ -283,7 +283,7 @@ export default function Home() {
               </ul>
               <Link
                 href="/free-pd-plan"
-                className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:scale-105"
+                className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover-glow"
                 style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
               >
                 Get Your Free PD Plan
@@ -421,14 +421,14 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/free-pd-plan"
-              className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
+              className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover-glow"
               style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
             >
               Get Your Free PD Plan
             </Link>
             <Link
               href="/contact"
-              className="inline-block px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-white/20"
+              className="inline-block px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover-lift"
               style={{ borderColor: '#1e2749', color: '#1e2749', backgroundColor: 'transparent' }}
             >
               Schedule a Call

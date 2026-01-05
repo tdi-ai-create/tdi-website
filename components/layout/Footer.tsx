@@ -36,32 +36,32 @@ export function Footer() {
               <h4 className="font-semibold mb-4" style={{ color: 'white' }}>Quick Links</h4>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/join" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                  <Link href="/join" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Join the Movement
                   </Link>
                 </li>
                 <li>
-                  <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                  <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Learning Hub
                   </a>
                 </li>
                 <li>
-                  <Link href="/for-schools" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                  <Link href="/for-schools" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     For Schools
                   </Link>
                 </li>
                 <li>
-                  <Link href="/funding" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                  <Link href="/funding" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Funding Options
                   </Link>
                 </li>
                 <li>
-                  <Link href="/about" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                  <Link href="/about" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     About
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contact" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                  <Link href="/contact" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Contact
                   </Link>
                 </li>
@@ -73,32 +73,32 @@ export function Footer() {
               <h4 className="font-semibold mb-4" style={{ color: 'white' }}>Resources</h4>
               <ul className="space-y-2">
                 <li>
-                  <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                  <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Blog
                   </a>
                 </li>
                 <li>
-                  <a href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                  <a href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Podcast
                   </a>
                 </li>
                 <li>
-                  <Link href="/calculator" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                  <Link href="/calculator" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Impact Calculator
                   </Link>
                 </li>
                 <li>
-                  <Link href="/free-pd-plan" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                  <Link href="/free-pd-plan" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Free PD Plan
                   </Link>
                 </li>
                 <li>
-                  <a href="https://www.facebook.com/groups/tdimovement" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                  <a href="https://www.facebook.com/groups/tdimovement" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Free FB Community
                   </a>
                 </li>
                 <li>
-                  <a href="https://drive.google.com/file/d/1q499mCTZxd8RJDidRZ7iKr9Ei3xssP9b/view?usp=sharing" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                  <a href="https://drive.google.com/file/d/1q499mCTZxd8RJDidRZ7iKr9Ei3xssP9b/view?usp=sharing" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Become a Creator
                   </a>
                 </li>

@@ -42,7 +42,7 @@ export function Header() {
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm font-medium hover:opacity-70 transition-opacity"
+                  className="text-sm font-medium hover-color-shift"
                   style={{ color: 'var(--tdi-charcoal)' }}
                 >
                   {link.label}
@@ -51,7 +51,7 @@ export function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm font-medium hover:opacity-70 transition-opacity"
+                  className="text-sm font-medium hover-color-shift"
                   style={{ color: 'var(--tdi-charcoal)' }}
                 >
                   {link.label}

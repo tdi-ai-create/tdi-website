@@ -82,7 +82,7 @@ export function CoursesSection() {
             href="https://tdi.thinkific.com/products/digital_downloads/CourseGuide"
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group relative"
+            className="bg-white rounded-xl overflow-hidden shadow-sm hover-card group relative"
             style={{ textDecoration: 'none' }}
           >
             {/* Featured Badge */}
@@ -116,7 +116,7 @@ export function CoursesSection() {
               href={`https://${subdomain}.thinkific.com/courses/${course.slug}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group"
+              className="bg-white rounded-xl overflow-hidden shadow-sm hover-card group"
               style={{ textDecoration: 'none' }}
             >
               <div className="relative h-40 overflow-hidden">
@@ -157,7 +157,7 @@ export function CoursesSection() {
             href={`https://${subdomain}.thinkific.com`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
+            className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover-glow"
             style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
           >
             View All Courses
