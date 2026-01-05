@@ -11,7 +11,7 @@ const faqs = [
     questions: [
       {
         q: 'What makes TDI different from other PD?',
-        a: 'TDI was built by teachers who got tired of sitting through PD that had nothing to do with real classroom challenges. Everything we create is action-focused—designed to be used Monday morning, not "someday." We also respect your time with a flipped model that lets you learn on your schedule.',
+        a: 'TDI was built by teachers who got tired of sitting through PD that had nothing to do with real classroom challenges. Everything we create is action-focused, designed to be used Monday morning, not "someday." We also respect your time with a flipped model that lets you learn on your schedule.',
       },
       {
         q: 'How is this different from other PD I\'ve sat through?',
@@ -28,11 +28,11 @@ const faqs = [
     questions: [
       {
         q: 'Is this just another thing on my plate?',
-        a: 'We get it—teachers are stretched thin. TDI is designed to save you time, not add to your load. Our strategies focus on working smarter: better systems, more efficient planning, and sustainable practices that reduce the Sunday Scaries.',
+        a: 'We get it. Teachers are stretched thin. TDI is designed to save you time, not add to your load. Our strategies focus on working smarter: better systems, more efficient planning, and sustainable practices that reduce the Sunday Scaries.',
       },
       {
         q: 'I\'m already burned out. Do I have the energy for this?',
-        a: 'If you\'re burned out, you\'re exactly who we built this for. TDI isn\'t about doing more—it\'s about doing better with less effort. Start small. Even one strategy that saves you 30 minutes a week adds up to 18 hours over a semester.',
+        a: 'If you\'re burned out, you\'re exactly who we built this for. TDI isn\'t about doing more. It\'s about doing better with less effort. Start small. Even one strategy that saves you 30 minutes a week adds up to 18 hours over a semester.',
       },
       {
         q: 'How much time does this take?',
@@ -71,7 +71,7 @@ const faqs = [
     questions: [
       {
         q: 'Is this just for teachers, or can paraprofessionals participate too?',
-        a: 'Paras are essential—and often overlooked in PD. TDI content is designed for all educators, including paraprofessionals, instructional aides, and support staff. Partner schools can include their full team.',
+        a: 'Paras are essential, and often overlooked in PD. TDI content is designed for all educators, including paraprofessionals, instructional aides, and support staff. Partner schools can include their full team.',
       },
       {
         q: 'Does TDI support all types of educators?',
@@ -106,7 +106,7 @@ export default function FAQPage() {
             Frequently Asked Questions
           </h1>
           <p className="max-w-2xl mx-auto text-lg" style={{ color: '#ffffff', opacity: 0.9 }}>
-            Got questions? We've got answers. If you don't see what you're looking for, reach out—we're real people who actually respond.
+            Got questions? We've got answers. If you don't see what you're looking for, reach out. We're real people who actually respond.
           </p>
         </div>
       </section>
