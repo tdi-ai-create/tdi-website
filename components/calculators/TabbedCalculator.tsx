@@ -58,41 +58,57 @@ export function TabbedCalculator() {
               What Could Change for You
             </h3>
             <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
-              Choose what matters most to you right now.
+              Choose an assessment to see your personalized results.
             </p>
 
-            {/* Teacher Sub-Tabs */}
-            <div className="flex gap-2 mb-6">
-              <button
-                onClick={() => setTeacherTab('burnout')}
-                className="flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all"
-                style={{
-                  backgroundColor: teacherTab === 'burnout' ? '#ef4444' : '#f3f4f6',
-                  color: teacherTab === 'burnout' ? '#ffffff' : '#1e2749'
-                }}
-              >
-                🔥 Burnout
-              </button>
-              <button
-                onClick={() => setTeacherTab('guilt')}
-                className="flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all"
-                style={{
-                  backgroundColor: teacherTab === 'guilt' ? '#8b5cf6' : '#f3f4f6',
-                  color: teacherTab === 'guilt' ? '#ffffff' : '#1e2749'
-                }}
-              >
-                😅 Guilt-Free
-              </button>
-              <button
-                onClick={() => setTeacherTab('joy')}
-                className="flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all"
-                style={{
-                  backgroundColor: teacherTab === 'joy' ? '#f59e0b' : '#f3f4f6',
-                  color: teacherTab === 'joy' ? '#ffffff' : '#1e2749'
-                }}
-              >
-                💛 Joy
-              </button>
+            {/* Teacher Assessment Toggle */}
+            <div className="mb-6">
+              <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#1e2749', opacity: 0.5 }}>
+                Select Your Assessment
+              </p>
+              <div className="p-1 rounded-xl" style={{ backgroundColor: '#e5e7eb' }}>
+                <div className="flex gap-1">
+                  <button
+                    onClick={() => setTeacherTab('burnout')}
+                    className="flex-1 py-3 px-2 rounded-lg text-sm font-semibold transition-all"
+                    style={{
+                      backgroundColor: teacherTab === 'burnout' ? '#ffffff' : 'transparent',
+                      color: '#1e2749',
+                      boxShadow: teacherTab === 'burnout' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
+                    }}
+                  >
+                    <span className="block text-lg mb-1">🔥</span>
+                    <span className="block">Burnout</span>
+                    <span className="block text-xs font-normal" style={{ opacity: 0.6 }}>Stress levels</span>
+                  </button>
+                  <button
+                    onClick={() => setTeacherTab('guilt')}
+                    className="flex-1 py-3 px-2 rounded-lg text-sm font-semibold transition-all"
+                    style={{
+                      backgroundColor: teacherTab === 'guilt' ? '#ffffff' : 'transparent',
+                      color: '#1e2749',
+                      boxShadow: teacherTab === 'guilt' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
+                    }}
+                  >
+                    <span className="block text-lg mb-1">😅</span>
+                    <span className="block">Guilt-Free</span>
+                    <span className="block text-xs font-normal" style={{ opacity: 0.6 }}>Work-life balance</span>
+                  </button>
+                  <button
+                    onClick={() => setTeacherTab('joy')}
+                    className="flex-1 py-3 px-2 rounded-lg text-sm font-semibold transition-all"
+                    style={{
+                      backgroundColor: teacherTab === 'joy' ? '#ffffff' : 'transparent',
+                      color: '#1e2749',
+                      boxShadow: teacherTab === 'joy' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
+                    }}
+                  >
+                    <span className="block text-lg mb-1">💛</span>
+                    <span className="block">Joy</span>
+                    <span className="block text-xs font-normal" style={{ opacity: 0.6 }}>Teaching passion</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* Teacher Calculator Content */}
