@@ -37,12 +37,12 @@ export function CoursesSection() {
 
   if (loading) {
     return (
-      <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
+      <section className="py-16" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#ffffff' }}>
             What Educators Are Learning Right Now
           </h2>
-          <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+          <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
             Join thousands of teachers building practical skills they can use tomorrow.
           </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
@@ -66,12 +66,12 @@ export function CoursesSection() {
   }
 
   return (
-    <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
+    <section className="py-16" style={{ backgroundColor: '#80a4ed' }}>
       <div className="container-default">
-        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+        <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#ffffff' }}>
           What Educators Are Learning Right Now
         </h2>
-        <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+        <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
           Join thousands of teachers building practical skills they can use tomorrow.
         </p>
 
