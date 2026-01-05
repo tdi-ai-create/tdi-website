@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { TDICalculator } from '@/components/calculators/TDICalculator';
+import { TabbedCalculator } from '@/components/calculators/TabbedCalculator';
 import { FAQ } from '@/components/FAQ';
 import { ParallaxHero } from '@/components/ParallaxHero';
 import { CoursesSection } from '@/components/CoursesSection';
@@ -389,14 +389,14 @@ export default function Home() {
         {/* Calculator Content */}
         <div className="relative z-10 container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#ffffff' }}>
-            See What's Possible for Your School
+            See What's Possible
           </h2>
           <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
-            Input your school's current state and see the potential impact of partnering with TDI.
+            Whether you're a school leader or a teacher, explore the potential impact of partnering with TDI.
           </p>
 
           {/* Calculator Component */}
-          <TDICalculator />
+          <TabbedCalculator />
 
           <p className="text-center text-sm mt-4" style={{ color: '#ffffff', opacity: 0.6 }}>
             80% of schools we work with secure external funding for PD.{' '}
