@@ -121,7 +121,7 @@ export default function JoinPage() {
                   className="text-lg font-bold mb-2 uppercase tracking-wide"
                   style={{ color: '#1e2749' }}
                 >
-                  Listen While You Commute
+                  Listen<br />& Learn
                 </h3>
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
                   The Sustainable Teaching podcast. Real talk about sustainable teaching from people who get it.
