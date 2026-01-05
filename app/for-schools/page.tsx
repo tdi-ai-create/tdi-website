@@ -609,13 +609,13 @@ export default function ForSchoolsPage() {
         <div className="container-default">
           <div
             className="rounded-xl p-6 md:p-8 max-w-4xl mx-auto"
-            style={{ backgroundColor: '#f5f5f5' }}
+            style={{ backgroundColor: '#1e2749' }}
           >
-            <h3 className="text-xl md:text-2xl font-bold mb-4" style={{ color: '#1e2749' }}>
+            <h3 className="text-xl md:text-2xl font-bold mb-4" style={{ color: '#ffba06' }}>
               We Help You Find Funding
             </h3>
             <div className="space-y-4">
-              <p style={{ color: '#1e2749' }}>
+              <p style={{ color: '#ffffff' }}>
                 Most partner schools fund TDI through Title II-A, ESSER, or local professional development budgets. Our team will help you identify the right funding source for your school.
               </p>
               <ul className="space-y-2">
@@ -623,24 +623,24 @@ export default function ForSchoolsPage() {
                   <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                   </svg>
-                  <span style={{ color: '#1e2749' }}>Bulk pricing available for Learning Hub memberships</span>
+                  <span style={{ color: '#ffffff' }}>Bulk pricing available for Learning Hub memberships</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                   </svg>
-                  <span style={{ color: '#1e2749' }}>Guidance on Title II-A, ESSER, and grant applications</span>
+                  <span style={{ color: '#ffffff' }}>Guidance on Title II-A, ESSER, and grant applications</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                   </svg>
-                  <span style={{ color: '#1e2749' }}>Flexible partnership structures to fit your budget</span>
+                  <span style={{ color: '#ffffff' }}>Flexible partnership structures to fit your budget</span>
                 </li>
               </ul>
               {/* Mission Statement - More Prominent */}
-              <div className="mt-8 pt-6 border-t" style={{ borderColor: '#e5e7eb' }}>
-                <p className="text-lg md:text-xl font-semibold mb-4" style={{ color: '#1e2749' }}>
+              <div className="mt-8 pt-6 border-t" style={{ borderColor: 'rgba(255, 255, 255, 0.2)' }}>
+                <p className="text-lg md:text-xl font-semibold mb-4" style={{ color: '#ffffff' }}>
                   We believe cost should never stop a school from giving the best to their staff.
                 </p>
                 <a
