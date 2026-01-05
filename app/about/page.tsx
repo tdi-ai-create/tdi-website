@@ -46,7 +46,7 @@ export default function AboutPage() {
             </div>
             <div className="md:col-span-1">
               <p className="text-3xl md:text-4xl font-bold mb-2 whitespace-nowrap" style={{ color: '#ffffff' }}>Improved Retention</p>
-              <p className="text-sm" style={{ color: '#ffffff', opacity: 0.9 }}>Administrators report stronger morale, greater<br />trust, and improved retention<br />after TDI Support Sessions</p>
+              <p className="text-sm" style={{ color: '#ffffff', opacity: 0.9 }}>Administrators report stronger morale,<br />greater trust, and improved retention<br />after TDI Support Sessions</p>
             </div>
             <div>
               <p className="text-5xl md:text-6xl font-bold mb-2" style={{ color: '#ffffff' }}>95%</p>
