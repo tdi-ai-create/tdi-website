@@ -197,23 +197,29 @@ export default function FreePDPlanPage() {
     checked: boolean;
     onChange: () => void;
   }) => (
-    <label
+    <div
       onClick={onChange}
-      className="flex flex-row items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all hover:border-gray-300"
+      className={`p-4 rounded-lg cursor-pointer transition-all flex items-center gap-3 ${
+        checked ? 'ring-2' : ''
+      }`}
       style={{
-        borderColor: checked ? '#ffba06' : '#e5e5e5',
-        backgroundColor: checked ? '#fffbeb' : 'white'
+        backgroundColor: '#f9fafb',
+        ringColor: checked ? '#ffba06' : 'transparent'
       }}
     >
-      <div className="w-5 h-5 flex-shrink-0 rounded-full border-2 flex items-center justify-center"
-        style={{ borderColor: checked ? '#ffba06' : '#ccc' }}
+      <div
+        className="w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center"
+        style={{
+          borderColor: checked ? '#ffba06' : '#d1d5db',
+          backgroundColor: checked ? '#ffba06' : 'transparent'
+        }}
       >
         {checked && (
-          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#ffba06' }} />
+          <div className="w-2 h-2 rounded-full bg-white" />
         )}
       </div>
-      <span className="text-sm" style={{ color: '#1e2749' }}>{label}</span>
-    </label>
+      <span style={{ color: '#1e2749' }}>{label}</span>
+    </div>
   );
 
   // Checkbox component
@@ -228,16 +234,22 @@ export default function FreePDPlanPage() {
     checked: boolean;
     onChange: () => void;
   }) => (
-    <label
+    <div
       onClick={onChange}
-      className="flex flex-row items-center gap-3 p-4 rounded-lg border-2 cursor-pointer transition-all hover:border-gray-300"
+      className={`p-4 rounded-lg cursor-pointer transition-all flex items-center gap-3 ${
+        checked ? 'ring-2' : ''
+      }`}
       style={{
-        borderColor: checked ? '#ffba06' : '#e5e5e5',
-        backgroundColor: checked ? '#fffbeb' : 'white'
+        backgroundColor: '#f9fafb',
+        ringColor: checked ? '#ffba06' : 'transparent'
       }}
     >
-      <div className="w-5 h-5 flex-shrink-0 rounded border-2 flex items-center justify-center"
-        style={{ borderColor: checked ? '#ffba06' : '#ccc', backgroundColor: checked ? '#ffba06' : 'white' }}
+      <div
+        className="w-5 h-5 rounded border-2 flex-shrink-0 flex items-center justify-center"
+        style={{
+          borderColor: checked ? '#ffba06' : '#d1d5db',
+          backgroundColor: checked ? '#ffba06' : 'transparent'
+        }}
       >
         {checked && (
           <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -245,8 +257,8 @@ export default function FreePDPlanPage() {
           </svg>
         )}
       </div>
-      <span className="text-sm" style={{ color: '#1e2749' }}>{label}</span>
-    </label>
+      <span style={{ color: '#1e2749' }}>{label}</span>
+    </div>
   );
 
   // Scale selector component
