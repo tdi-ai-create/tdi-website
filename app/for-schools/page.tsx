@@ -169,7 +169,7 @@ export default function ForSchoolsPage() {
               </p>
             </div>
             <div className="bg-white p-6 rounded-xl shadow-sm" style={{ borderTop: '4px solid #ffba06' }}>
-              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Phased Approach</h3>
+              <h3 className="font-bold text-lg mb-3" style={{ color: '#1e2749' }}>Phased<br />Approach</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Start with leadership and a pilot group. Scale to full staff when you're ready. No giant leap required.
               </p>
