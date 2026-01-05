@@ -63,7 +63,7 @@ export function TabbedCalculator() {
 
             {/* Teacher Assessment Toggle */}
             <div className="mb-6">
-              <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#1e2749', opacity: 0.5 }}>
+              <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#1e2749' }}>
                 Select Your Assessment
               </p>
               <div className="p-1 rounded-xl" style={{ backgroundColor: '#e5e7eb' }}>
@@ -77,8 +77,7 @@ export function TabbedCalculator() {
                       boxShadow: teacherTab === 'burnout' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
                     }}
                   >
-                    <span className="block text-lg mb-1">🔥</span>
-                    <span className="block">Burnout</span>
+                    <span className="block font-bold">Burnout</span>
                     <span className="block text-xs font-normal" style={{ opacity: 0.6 }}>Stress levels</span>
                   </button>
                   <button
@@ -90,8 +89,7 @@ export function TabbedCalculator() {
                       boxShadow: teacherTab === 'guilt' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
                     }}
                   >
-                    <span className="block text-lg mb-1">😅</span>
-                    <span className="block">Guilt-Free</span>
+                    <span className="block font-bold">Guilt-Free</span>
                     <span className="block text-xs font-normal" style={{ opacity: 0.6 }}>Work-life balance</span>
                   </button>
                   <button
@@ -103,8 +101,7 @@ export function TabbedCalculator() {
                       boxShadow: teacherTab === 'joy' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
                     }}
                   >
-                    <span className="block text-lg mb-1">💛</span>
-                    <span className="block">Joy</span>
+                    <span className="block font-bold">Joy</span>
                     <span className="block text-xs font-normal" style={{ opacity: 0.6 }}>Teaching passion</span>
                   </button>
                 </div>
