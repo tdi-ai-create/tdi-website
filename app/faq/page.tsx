@@ -84,13 +84,27 @@ const faqs = [
 export default function FAQPage() {
   return (
     <main>
-      {/* Hero */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
-        <div className="container-default text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#ffffff' }}>
+      {/* Hero with Parallax Image */}
+      <section className="relative py-24 md:py-32 overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-fixed"
+          style={{
+            backgroundImage: 'url(/images/hero-faq.jpg)',
+          }}
+        />
+        {/* Dark Overlay */}
+        <div
+          className="absolute inset-0"
+          style={{ backgroundColor: 'rgba(30, 39, 73, 0.85)' }}
+        />
+
+        {/* Content */}
+        <div className="container-default relative z-10 text-center">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#ffffff' }}>
             Frequently Asked Questions
           </h1>
-          <p className="max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
+          <p className="max-w-2xl mx-auto text-lg" style={{ color: '#ffffff', opacity: 0.9 }}>
             Got questions? We've got answers. If you don't see what you're looking for, reach out—we're real people who actually respond.
           </p>
         </div>
