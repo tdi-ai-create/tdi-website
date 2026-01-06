@@ -37,7 +37,10 @@ export function BurnoutCalculator() {
           min="1"
           max="10"
           value={stress}
-          onChange={(e) => setStress(parseInt(e.target.value))}
+          onChange={(e) => {
+            setStress(parseInt(e.target.value));
+            window.dispatchEvent(new CustomEvent('calculator-engaged'));
+          }}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
             background: `linear-gradient(to right, #ef4444 0%, #ef4444 ${(stress - 1) / 9 * 100}%, #e5e7eb ${(stress - 1) / 9 * 100}%, #e5e7eb 100%)`

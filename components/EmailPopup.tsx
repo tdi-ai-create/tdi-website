@@ -3,11 +3,10 @@
 import { useState, useEffect } from 'react';
 
 interface EmailPopupProps {
-  trigger?: 'time' | 'scroll' | 'exit' | 'manual';
   delay?: number; // milliseconds for time trigger
 }
 
-export function EmailPopup({ trigger = 'time', delay = 30000 }: EmailPopupProps) {
+export function EmailPopup({ delay = 30000 }: EmailPopupProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -21,25 +20,34 @@ export function EmailPopup({ trigger = 'time', delay = 30000 }: EmailPopupProps)
       return;
     }
 
-    if (trigger === 'time') {
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-      }, delay);
-      return () => clearTimeout(timer);
-    }
+    let triggered = false;
 
-    if (trigger === 'scroll') {
-      const handleScroll = () => {
-        const scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
-        if (scrollPercent > 50) {
-          setIsOpen(true);
-          window.removeEventListener('scroll', handleScroll);
-        }
-      };
-      window.addEventListener('scroll', handleScroll);
-      return () => window.removeEventListener('scroll', handleScroll);
-    }
-  }, [trigger, delay]);
+    const showPopup = () => {
+      if (!triggered) {
+        triggered = true;
+        setIsOpen(true);
+        window.removeEventListener('scroll', handleScroll);
+        clearTimeout(timer);
+      }
+    };
+
+    // Time trigger - 30 seconds
+    const timer = setTimeout(showPopup, delay);
+
+    // Scroll trigger - 50% scroll
+    const handleScroll = () => {
+      const scrollPercent = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+      if (scrollPercent > 50) {
+        showPopup();
+      }
+    };
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [delay]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

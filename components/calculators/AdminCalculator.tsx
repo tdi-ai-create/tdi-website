@@ -29,7 +29,10 @@ export function AdminCalculator() {
           min="20"
           max="90"
           value={benchmark}
-          onChange={(e) => setBenchmark(parseInt(e.target.value))}
+          onChange={(e) => {
+            setBenchmark(parseInt(e.target.value));
+            window.dispatchEvent(new CustomEvent('calculator-engaged'));
+          }}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
             background: `linear-gradient(to right, #ffba06 0%, #ffba06 ${(benchmark - 20) / 70 * 100}%, #e5e7eb ${(benchmark - 20) / 70 * 100}%, #e5e7eb 100%)`
@@ -52,7 +55,10 @@ export function AdminCalculator() {
           min="1"
           max="10"
           value={morale}
-          onChange={(e) => setMorale(parseInt(e.target.value))}
+          onChange={(e) => {
+            setMorale(parseInt(e.target.value));
+            window.dispatchEvent(new CustomEvent('calculator-engaged'));
+          }}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
             background: `linear-gradient(to right, #ffba06 0%, #ffba06 ${(morale - 1) / 9 * 100}%, #e5e7eb ${(morale - 1) / 9 * 100}%, #e5e7eb 100%)`

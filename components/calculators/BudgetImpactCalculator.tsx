@@ -31,7 +31,10 @@ export function BudgetImpactCalculator() {
           max="200000"
           step="5000"
           value={budget}
-          onChange={(e) => setBudget(parseInt(e.target.value))}
+          onChange={(e) => {
+            setBudget(parseInt(e.target.value));
+            window.dispatchEvent(new CustomEvent('calculator-engaged'));
+          }}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
             background: `linear-gradient(to right, #ffba06 0%, #ffba06 ${(budget - 10000) / 190000 * 100}%, #e5e7eb ${(budget - 10000) / 190000 * 100}%, #e5e7eb 100%)`
@@ -60,7 +63,10 @@ export function BudgetImpactCalculator() {
           min="0"
           max="100"
           value={implementation}
-          onChange={(e) => setImplementation(parseInt(e.target.value))}
+          onChange={(e) => {
+            setImplementation(parseInt(e.target.value));
+            window.dispatchEvent(new CustomEvent('calculator-engaged'));
+          }}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
             background: `linear-gradient(to right, #ffba06 0%, #ffba06 ${implementation}%, #e5e7eb ${implementation}%, #e5e7eb 100%)`

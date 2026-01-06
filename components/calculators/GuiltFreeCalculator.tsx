@@ -34,7 +34,10 @@ export function GuiltFreeCalculator() {
           min="0"
           max="20"
           value={workHours}
-          onChange={(e) => setWorkHours(parseInt(e.target.value))}
+          onChange={(e) => {
+            setWorkHours(parseInt(e.target.value));
+            window.dispatchEvent(new CustomEvent('calculator-engaged'));
+          }}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
             background: `linear-gradient(to right, #8b5cf6 0%, #8b5cf6 ${workHours / 20 * 100}%, #e5e7eb ${workHours / 20 * 100}%, #e5e7eb 100%)`
@@ -64,7 +67,10 @@ export function GuiltFreeCalculator() {
           {guiltLabels.map((label, i) => (
             <button
               key={i}
-              onClick={() => setGuiltLevel(i + 1)}
+              onClick={() => {
+                setGuiltLevel(i + 1);
+                window.dispatchEvent(new CustomEvent('calculator-engaged'));
+              }}
               className={`flex-1 py-2 px-1 rounded-lg text-xs font-semibold transition-all ${
                 guiltLevel === i + 1 ? 'text-white' : ''
               }`}

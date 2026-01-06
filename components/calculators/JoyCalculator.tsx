@@ -30,7 +30,10 @@ export function JoyCalculator() {
           min="1"
           max="10"
           value={joy}
-          onChange={(e) => setJoy(parseInt(e.target.value))}
+          onChange={(e) => {
+            setJoy(parseInt(e.target.value));
+            window.dispatchEvent(new CustomEvent('calculator-engaged'));
+          }}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
             background: `linear-gradient(to right, #f59e0b 0%, #f59e0b ${(joy - 1) / 9 * 100}%, #e5e7eb ${(joy - 1) / 9 * 100}%, #e5e7eb 100%)`
