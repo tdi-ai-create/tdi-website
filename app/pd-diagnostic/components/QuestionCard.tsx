@@ -1,13 +1,11 @@
 'use client';
 
-type QuadrantType = 'A' | 'B' | 'C' | 'D';
-
 interface QuestionCardProps {
   id: number;
   index: number;
   question: string;
   options: {
-    value: QuadrantType;
+    value: string;
     label: string;
   }[];
   selectedValue: string | undefined;
@@ -23,21 +21,12 @@ export default function QuestionCard({
   onAnswer,
 }: QuestionCardProps) {
   return (
-    <div
-      className="p-6 rounded-xl shadow-sm transition-all hover:shadow-md"
-      style={{
-        backgroundColor: '#ffffff',
-        border: selectedValue ? '2px solid #80a4ed' : '2px solid #E0E9F9',
-      }}
-    >
-      <p className="font-semibold mb-4" style={{ color: '#1e2749' }}>
-        <span
-          className="inline-block w-8 h-8 rounded-full text-center leading-8 mr-3 text-sm font-bold"
-          style={{ backgroundColor: selectedValue ? '#80a4ed' : '#1e2749', color: '#ffffff' }}
-        >
+    <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+      <p className="font-semibold text-slate-800 mb-4 flex items-start gap-3">
+        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#1B4965] text-white text-sm font-bold flex-shrink-0">
           {index + 1}
         </span>
-        {question}
+        <span className="pt-1">{question}</span>
       </p>
       <div className="space-y-2 ml-11">
         {options.map((option) => (
