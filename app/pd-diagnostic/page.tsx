@@ -128,21 +128,21 @@ const results: Record<QuadrantType, {
 };
 
 export default function PDDiagnosticPage() {
-  const [answers, setAnswers] = useState<Record<number, string>>({});
+  const [answers, setAnswers] = useState<Record<number, QuadrantType>>({});
   const [showResults, setShowResults] = useState(false);
-  const [resultType, setResultType] = useState<string | null>(null);
+  const [resultType, setResultType] = useState<QuadrantType | null>(null);
 
-  const handleAnswer = (questionId: number, value: string) => {
+  const handleAnswer = (questionId: number, value: QuadrantType) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
   };
 
-  const calculateResult = (answers: Record<number, string>) => {
+  const calculateResult = (answers: Record<number, QuadrantType>): QuadrantType => {
     const counts = { A: 0, B: 0, C: 0, D: 0 };
     Object.values(answers).forEach(answer => {
-      counts[answer as keyof typeof counts]++;
+      counts[answer]++;
     });
     const maxCount = Math.max(...Object.values(counts));
-    return Object.entries(counts).find(([_, count]) => count === maxCount)?.[0] || 'A';
+    return (Object.entries(counts).find(([_, count]) => count === maxCount)?.[0] || 'A') as QuadrantType;
   };
 
   const handleSubmit = () => {
@@ -183,7 +183,7 @@ export default function PDDiagnosticPage() {
 
       {showResults && resultType && (
         <DiagnosticResults
-          result={resultType as QuadrantType}
+          result={resultType}
           quadrantInfo={results}
           onRetake={handleRetake}
         />
