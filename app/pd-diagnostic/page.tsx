@@ -3,98 +3,98 @@
 import { useState } from 'react';
 import PDQuadrant from '@/components/PDQuadrant';
 
-type QuadrantType = 'compliance' | 'inspiration' | 'fragmented' | 'embedded';
+type QuadrantType = 'A' | 'B' | 'C' | 'D';
 
 interface Question {
   id: number;
   question: string;
   options: {
-    text: string;
-    type: QuadrantType;
+    value: QuadrantType;
+    label: string;
   }[];
 }
 
 const questions: Question[] = [
   {
     id: 1,
-    question: "How are PD topics typically selected at your school?",
+    question: "When PD ends, where does instructional support live the following week?",
     options: [
-      { text: "Based on district mandates or compliance requirements", type: "compliance" },
-      { text: "By bringing in outside speakers on trending topics", type: "inspiration" },
-      { text: "Teachers choose from a menu of unconnected options", type: "fragmented" },
-      { text: "Aligned to school goals with teacher input on delivery", type: "embedded" },
-    ],
+      { value: "A", label: "Nowhere — teachers are on their own" },
+      { value: "B", label: "In the momentum from the session" },
+      { value: "C", label: "With instructional coaches (for some staff)" },
+      { value: "D", label: "Built into ongoing coaching, PLCs, and role-specific support" }
+    ]
   },
   {
     id: 2,
-    question: "What happens after a PD session ends?",
+    question: "Is PD concentrated on specific days or distributed throughout the year?",
     options: [
-      { text: "Teachers return to classrooms with no follow-up", type: "compliance" },
-      { text: "Excitement fades within a week", type: "inspiration" },
-      { text: "Some teachers try things, others don't—no tracking", type: "fragmented" },
-      { text: "Ongoing coaching and check-ins support implementation", type: "embedded" },
-    ],
+      { value: "A", label: "Concentrated on designated PD days" },
+      { value: "B", label: "Intensive whole-staff sessions with limited follow-up" },
+      { value: "C", label: "Ongoing for core teams, limited for others" },
+      { value: "D", label: "Ongoing and accessible for all staff year-round" }
+    ]
   },
   {
     id: 3,
-    question: "How do teachers generally feel about PD at your school?",
+    question: "Which staff groups receive the most consistent PD support?",
     options: [
-      { text: "It's something to endure, not engage with", type: "compliance" },
-      { text: "They enjoy the day but question the relevance", type: "inspiration" },
-      { text: "Mixed—depends on the topic and presenter", type: "fragmented" },
-      { text: "They see it as valuable and connected to their work", type: "embedded" },
-    ],
+      { value: "A", label: "Core instructional staff only" },
+      { value: "B", label: "Everyone receives the same content" },
+      { value: "C", label: "Core staff get coaching; others get minimal support" },
+      { value: "D", label: "All staff receive role-specific, aligned support" }
+    ]
   },
   {
     id: 4,
-    question: "How would you describe your PD calendar?",
+    question: "Do specialists, paraprofessionals, and support staff receive role-specific learning?",
     options: [
-      { text: "Filled with required trainings and box-checking", type: "compliance" },
-      { text: "A few big events with motivational speakers", type: "inspiration" },
-      { text: "A scattered mix of topics with no clear thread", type: "fragmented" },
-      { text: "Strategically sequenced with built-in practice time", type: "embedded" },
-    ],
+      { value: "A", label: "Rarely or inconsistently" },
+      { value: "B", label: "They attend the same sessions as teachers" },
+      { value: "C", label: "Sometimes, but not systematically" },
+      { value: "D", label: "Yes, with clear alignment to classroom expectations" }
+    ]
   },
   {
     id: 5,
-    question: "When you evaluate PD success, what do you measure?",
+    question: "Can leadership see evidence of PD application in classrooms?",
     options: [
-      { text: "Attendance and completion certificates", type: "compliance" },
-      { text: "Post-session satisfaction surveys", type: "inspiration" },
-      { text: "We don't have a consistent way to measure", type: "fragmented" },
-      { text: "Classroom implementation and student outcomes", type: "embedded" },
-    ],
+      { value: "A", label: "Limited or inconsistent evidence" },
+      { value: "B", label: "Strong evidence immediately after PD, then fades" },
+      { value: "C", label: "Clear evidence in coached classrooms only" },
+      { value: "D", label: "Consistent evidence across most classrooms" }
+    ]
   },
   {
     id: 6,
-    question: "How much of what's taught in PD actually gets used in classrooms?",
+    question: "Is there a shared instructional and behavioral language across roles?",
     options: [
-      { text: "Very little—teachers do what they were already doing", type: "compliance" },
-      { text: "Initial enthusiasm, but it rarely sticks", type: "inspiration" },
-      { text: "Inconsistent—depends on the individual teacher", type: "fragmented" },
-      { text: "Most strategies are implemented with support", type: "embedded" },
-    ],
+      { value: "A", label: "Varies significantly by role and classroom" },
+      { value: "B", label: "Shared at a conceptual level, inconsistent in practice" },
+      { value: "C", label: "Strong among core staff, weak elsewhere" },
+      { value: "D", label: "Yes, used consistently building-wide" }
+    ]
   },
   {
     id: 7,
-    question: "How is PD connected to your school improvement goals?",
+    question: "What happens when implementation stalls?",
     options: [
-      { text: "It's not—PD and goals exist separately", type: "compliance" },
-      { text: "Loosely—we hope inspiration translates to results", type: "inspiration" },
-      { text: "Some sessions align, others are disconnected", type: "fragmented" },
-      { text: "Every PD session directly supports our priorities", type: "embedded" },
-    ],
+      { value: "A", label: "Nothing systematic — it stays stalled" },
+      { value: "B", label: "We schedule another PD session" },
+      { value: "C", label: "Coaching helps some teachers, others struggle" },
+      { value: "D", label: "Support systems are already in place to address it" }
+    ]
   },
   {
     id: 8,
-    question: "What role do teachers play in shaping PD?",
+    question: "Would most staff describe PD as relevant to their daily work?",
     options: [
-      { text: "None—decisions come from above", type: "compliance" },
-      { text: "They're the audience, not the planners", type: "inspiration" },
-      { text: "Some input, but no systematic process", type: "fragmented" },
-      { text: "Active partners in design and delivery", type: "embedded" },
-    ],
-  },
+      { value: "A", label: "Not really — it feels like a requirement" },
+      { value: "B", label: "Inspiring in the moment, hard to apply later" },
+      { value: "C", label: "Core staff say yes, others say no" },
+      { value: "D", label: "Yes, most staff find it directly applicable" }
+    ]
+  }
 ];
 
 const quadrantInfo: Record<QuadrantType, {
@@ -103,8 +103,8 @@ const quadrantInfo: Record<QuadrantType, {
   predictions: string[];
   color: string;
 }> = {
-  compliance: {
-    name: "Compliance-Driven",
+  A: {
+    name: "Compliance-Focused PD",
     description: "Your PD structure prioritizes meeting requirements over building capacity. Sessions check boxes but rarely change practice. Teachers feel talked at, not invested in.",
     predictions: [
       "High teacher turnover due to feeling undervalued",
@@ -112,10 +112,10 @@ const quadrantInfo: Record<QuadrantType, {
       "Cynicism toward any new initiative",
       "Stagnant student outcomes despite PD investment",
     ],
-    color: "#ef4444",
+    color: "#E8E8E8",
   },
-  inspiration: {
-    name: "Inspiration-Based",
+  B: {
+    name: "Inspiration-Driven PD",
     description: "Your PD brings energy and excitement through dynamic speakers and events. Teachers leave feeling motivated—but without systems to sustain change, that energy dissipates quickly.",
     predictions: [
       "Initial enthusiasm followed by return to old habits",
@@ -123,21 +123,21 @@ const quadrantInfo: Record<QuadrantType, {
       "Disconnection between PD days and daily instruction",
       "Budget spent on events with little lasting ROI",
     ],
-    color: "#f59e0b",
+    color: "#D4E4ED",
   },
-  fragmented: {
-    name: "Fragmented",
-    description: "Your PD offers variety but lacks coherence. Teachers experience a buffet of unconnected sessions. Some find value; many feel overwhelmed by competing priorities.",
+  C: {
+    name: "Fragmented Growth",
+    description: "Your PD offers variety but lacks coherence. Strong pockets exist, but the experience is uneven. Some staff get coaching and support; others are left behind.",
     predictions: [
       "Initiative fatigue among staff",
       "Inconsistent practices across classrooms",
       "Difficulty measuring what's working",
       "Teachers feeling 'trained' but not supported",
     ],
-    color: "#8b5cf6",
+    color: "#DDE3E8",
   },
-  embedded: {
-    name: "Embedded & Sustained",
+  D: {
+    name: "Embedded Practice",
     description: "Your PD is strategically aligned, job-embedded, and supported by ongoing coaching. Teachers are partners in the process, and implementation is the expectation—not the exception.",
     predictions: [
       "High implementation rates (60%+ of strategies used)",
@@ -145,7 +145,7 @@ const quadrantInfo: Record<QuadrantType, {
       "Measurable impact on student outcomes",
       "Culture of continuous improvement",
     ],
-    color: "#22c55e",
+    color: "#1B4965",
   },
 };
 
@@ -160,10 +160,10 @@ export default function PDDiagnosticPage() {
 
   const calculateResult = () => {
     const counts: Record<QuadrantType, number> = {
-      compliance: 0,
-      inspiration: 0,
-      fragmented: 0,
-      embedded: 0,
+      A: 0,
+      B: 0,
+      C: 0,
+      D: 0,
     };
 
     Object.values(answers).forEach(type => {
@@ -173,7 +173,7 @@ export default function PDDiagnosticPage() {
     const maxCount = Math.max(...Object.values(counts));
     const resultType = (Object.keys(counts) as QuadrantType[]).find(
       key => counts[key] === maxCount
-    ) || 'fragmented';
+    ) || 'C';
 
     setResult(resultType);
     setShowResults(true);
@@ -185,14 +185,6 @@ export default function PDDiagnosticPage() {
   };
 
   const allAnswered = Object.keys(answers).length === questions.length;
-
-  // Map result type to quadrant ID for PDQuadrant component
-  const quadrantIdMap: Record<QuadrantType, 'A' | 'B' | 'C' | 'D'> = {
-    compliance: 'A',
-    inspiration: 'B',
-    fragmented: 'C',
-    embedded: 'D',
-  };
 
   return (
     <main>
@@ -265,18 +257,18 @@ export default function PDDiagnosticPage() {
                       <input
                         type="radio"
                         name={`question-${q.id}`}
-                        checked={answers[q.id] === option.type}
-                        onChange={() => handleAnswer(q.id, option.type)}
+                        checked={answers[q.id] === option.value}
+                        onChange={() => handleAnswer(q.id, option.value)}
                         className="mt-1 w-4 h-4 accent-amber-500"
                       />
                       <span
                         className="text-sm transition-colors"
                         style={{
-                          color: answers[q.id] === option.type ? '#1e2749' : '#6b7280',
-                          fontWeight: answers[q.id] === option.type ? 600 : 400,
+                          color: answers[q.id] === option.value ? '#1e2749' : '#6b7280',
+                          fontWeight: answers[q.id] === option.value ? 600 : 400,
                         }}
                       >
-                        {option.text}
+                        {option.label}
                       </span>
                     </label>
                   ))}
@@ -354,7 +346,7 @@ export default function PDDiagnosticPage() {
 
                 {/* Quadrant Visual with Highlight */}
                 <div className="mb-8 p-6 rounded-xl" style={{ backgroundColor: '#f9fafb' }}>
-                  <PDQuadrant highlightQuadrant={quadrantIdMap[result]} />
+                  <PDQuadrant highlightQuadrant={result} />
                 </div>
 
                 {/* CTA */}
