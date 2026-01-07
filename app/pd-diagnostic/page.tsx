@@ -1,98 +1,91 @@
 'use client';
 
 import { useState } from 'react';
-import PDQuadrant from '@/components/PDQuadrant';
+import DiagnosticHero from './components/DiagnosticHero';
+import DiagnosticForm from './components/DiagnosticForm';
+import DiagnosticResults from './components/DiagnosticResults';
 
 type QuadrantType = 'A' | 'B' | 'C' | 'D';
 
-interface Question {
-  id: number;
-  question: string;
-  options: {
-    value: QuadrantType;
-    label: string;
-  }[];
-}
-
-const questions: Question[] = [
+const questions = [
   {
     id: 1,
     question: "When PD ends, where does instructional support live the following week?",
     options: [
-      { value: "A", label: "Nowhere — teachers are on their own" },
-      { value: "B", label: "In the momentum from the session" },
-      { value: "C", label: "With instructional coaches (for some staff)" },
-      { value: "D", label: "Built into ongoing coaching, PLCs, and role-specific support" }
+      { value: "A" as QuadrantType, label: "Nowhere — teachers are on their own" },
+      { value: "B" as QuadrantType, label: "In the momentum from the session" },
+      { value: "C" as QuadrantType, label: "With instructional coaches (for some staff)" },
+      { value: "D" as QuadrantType, label: "Built into ongoing coaching, PLCs, and role-specific support" }
     ]
   },
   {
     id: 2,
     question: "Is PD concentrated on specific days or distributed throughout the year?",
     options: [
-      { value: "A", label: "Concentrated on designated PD days" },
-      { value: "B", label: "Intensive whole-staff sessions with limited follow-up" },
-      { value: "C", label: "Ongoing for core teams, limited for others" },
-      { value: "D", label: "Ongoing and accessible for all staff year-round" }
+      { value: "A" as QuadrantType, label: "Concentrated on designated PD days" },
+      { value: "B" as QuadrantType, label: "Intensive whole-staff sessions with limited follow-up" },
+      { value: "C" as QuadrantType, label: "Ongoing for core teams, limited for others" },
+      { value: "D" as QuadrantType, label: "Ongoing and accessible for all staff year-round" }
     ]
   },
   {
     id: 3,
     question: "Which staff groups receive the most consistent PD support?",
     options: [
-      { value: "A", label: "Core instructional staff only" },
-      { value: "B", label: "Everyone receives the same content" },
-      { value: "C", label: "Core staff get coaching; others get minimal support" },
-      { value: "D", label: "All staff receive role-specific, aligned support" }
+      { value: "A" as QuadrantType, label: "Core instructional staff only" },
+      { value: "B" as QuadrantType, label: "Everyone receives the same content" },
+      { value: "C" as QuadrantType, label: "Core staff get coaching; others get minimal support" },
+      { value: "D" as QuadrantType, label: "All staff receive role-specific, aligned support" }
     ]
   },
   {
     id: 4,
     question: "Do specialists, paraprofessionals, and support staff receive role-specific learning?",
     options: [
-      { value: "A", label: "Rarely or inconsistently" },
-      { value: "B", label: "They attend the same sessions as teachers" },
-      { value: "C", label: "Sometimes, but not systematically" },
-      { value: "D", label: "Yes, with clear alignment to classroom expectations" }
+      { value: "A" as QuadrantType, label: "Rarely or inconsistently" },
+      { value: "B" as QuadrantType, label: "They attend the same sessions as teachers" },
+      { value: "C" as QuadrantType, label: "Sometimes, but not systematically" },
+      { value: "D" as QuadrantType, label: "Yes, with clear alignment to classroom expectations" }
     ]
   },
   {
     id: 5,
     question: "Can leadership see evidence of PD application in classrooms?",
     options: [
-      { value: "A", label: "Limited or inconsistent evidence" },
-      { value: "B", label: "Strong evidence immediately after PD, then fades" },
-      { value: "C", label: "Clear evidence in coached classrooms only" },
-      { value: "D", label: "Consistent evidence across most classrooms" }
+      { value: "A" as QuadrantType, label: "Limited or inconsistent evidence" },
+      { value: "B" as QuadrantType, label: "Strong evidence immediately after PD, then fades" },
+      { value: "C" as QuadrantType, label: "Clear evidence in coached classrooms only" },
+      { value: "D" as QuadrantType, label: "Consistent evidence across most classrooms" }
     ]
   },
   {
     id: 6,
     question: "Is there a shared instructional and behavioral language across roles?",
     options: [
-      { value: "A", label: "Varies significantly by role and classroom" },
-      { value: "B", label: "Shared at a conceptual level, inconsistent in practice" },
-      { value: "C", label: "Strong among core staff, weak elsewhere" },
-      { value: "D", label: "Yes, used consistently building-wide" }
+      { value: "A" as QuadrantType, label: "Varies significantly by role and classroom" },
+      { value: "B" as QuadrantType, label: "Shared at a conceptual level, inconsistent in practice" },
+      { value: "C" as QuadrantType, label: "Strong among core staff, weak elsewhere" },
+      { value: "D" as QuadrantType, label: "Yes, used consistently building-wide" }
     ]
   },
   {
     id: 7,
     question: "What happens when implementation stalls?",
     options: [
-      { value: "A", label: "Nothing systematic — it stays stalled" },
-      { value: "B", label: "We schedule another PD session" },
-      { value: "C", label: "Coaching helps some teachers, others struggle" },
-      { value: "D", label: "Support systems are already in place to address it" }
+      { value: "A" as QuadrantType, label: "Nothing systematic — it stays stalled" },
+      { value: "B" as QuadrantType, label: "We schedule another PD session" },
+      { value: "C" as QuadrantType, label: "Coaching helps some teachers, others struggle" },
+      { value: "D" as QuadrantType, label: "Support systems are already in place to address it" }
     ]
   },
   {
     id: 8,
     question: "Would most staff describe PD as relevant to their daily work?",
     options: [
-      { value: "A", label: "Not really — it feels like a requirement" },
-      { value: "B", label: "Inspiring in the moment, hard to apply later" },
-      { value: "C", label: "Core staff say yes, others say no" },
-      { value: "D", label: "Yes, most staff find it directly applicable" }
+      { value: "A" as QuadrantType, label: "Not really — it feels like a requirement" },
+      { value: "B" as QuadrantType, label: "Inspiring in the moment, hard to apply later" },
+      { value: "C" as QuadrantType, label: "Core staff say yes, others say no" },
+      { value: "D" as QuadrantType, label: "Yes, most staff find it directly applicable" }
     ]
   }
 ];
@@ -139,8 +132,8 @@ export default function PDDiagnosticPage() {
   const [showResults, setShowResults] = useState(false);
   const [result, setResult] = useState<QuadrantType | null>(null);
 
-  const handleAnswer = (questionId: number, type: QuadrantType) => {
-    setAnswers(prev => ({ ...prev, [questionId]: type }));
+  const handleAnswer = (questionId: number, value: QuadrantType) => {
+    setAnswers(prev => ({ ...prev, [questionId]: value }));
   };
 
   // A = Compliance-Focused, B = Inspiration-Driven, C = Fragmented Growth, D = Embedded Practice
@@ -164,239 +157,33 @@ export default function PDDiagnosticPage() {
     }, 100);
   };
 
+  const handleRetake = () => {
+    setAnswers({});
+    setShowResults(false);
+    setResult(null);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const allAnswered = Object.keys(answers).length === questions.length;
 
   return (
     <main>
-      {/* Hero Section */}
-      <section className="relative py-20 md:py-28 overflow-hidden">
-        {/* Background */}
-        <div
-          className="absolute inset-0 bg-cover bg-center"
-          style={{
-            backgroundImage: 'url(/images/hero-workshop.webp)',
-          }}
-        />
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: 'rgba(30, 39, 73, 0.9)' }}
-        />
+      <DiagnosticHero />
 
-        {/* Content */}
-        <div className="container-default relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#ffffff' }}>
-              The 4 Types of PD
-            </h1>
-            <p className="text-xl md:text-2xl font-semibold mb-6" style={{ color: '#ffba06' }}>
-              A Self-Assessment for School Leaders
-            </p>
-            <p className="text-base md:text-lg mb-8" style={{ color: '#ffffff', opacity: 0.9 }}>
-              Not all professional development is created equal. Research shows that PD structures fall into four distinct quadrants—each with predictable outcomes for teacher practice and student achievement.
-            </p>
+      <DiagnosticForm
+        questions={questions}
+        answers={answers}
+        onAnswer={handleAnswer}
+        onSubmit={calculateResult}
+        allAnswered={allAnswered}
+      />
 
-            {/* 2x2 Quadrant Visual */}
-            <div className="bg-white rounded-xl p-6 md:p-8 shadow-xl max-w-xl mx-auto mb-8">
-              <PDQuadrant />
-            </div>
-
-            <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.8 }}>
-              Most leaders can identify their position immediately.<br />
-              Take the diagnostic below to confirm.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Diagnostic Section */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="container-default max-w-3xl">
-          <h2 className="text-2xl md:text-3xl font-bold mb-2 text-center" style={{ color: '#1e2749' }}>
-            PD Structure Diagnostic
-          </h2>
-          <p className="text-center mb-8" style={{ color: '#1e2749', opacity: 0.7 }}>
-            Answer each question honestly based on your current reality, not aspirations.
-          </p>
-
-          <div className="space-y-6">
-            {questions.map((q, index) => (
-              <div
-                key={q.id}
-                className="p-6 rounded-xl shadow-sm transition-all hover:shadow-md"
-                style={{
-                  backgroundColor: '#ffffff',
-                  border: answers[q.id] ? '2px solid #80a4ed' : '2px solid #E0E9F9',
-                }}
-              >
-                <p className="font-semibold mb-4" style={{ color: '#1e2749' }}>
-                  <span
-                    className="inline-block w-8 h-8 rounded-full text-center leading-8 mr-3 text-sm font-bold"
-                    style={{ backgroundColor: answers[q.id] ? '#80a4ed' : '#1e2749', color: '#ffffff' }}
-                  >
-                    {index + 1}
-                  </span>
-                  {q.question}
-                </p>
-                <div className="space-y-3 ml-11">
-                  {q.options.map((option, optIndex) => (
-                    <label
-                      key={optIndex}
-                      className="flex items-start gap-3 cursor-pointer group p-3 rounded-lg transition-all hover:bg-gray-50"
-                      style={{
-                        backgroundColor: answers[q.id] === option.value ? '#E0E9F9' : 'transparent',
-                      }}
-                    >
-                      {/* Custom Radio Circle */}
-                      <div
-                        className="mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all"
-                        style={{
-                          borderColor: answers[q.id] === option.value ? '#80a4ed' : '#d1d5db',
-                          backgroundColor: answers[q.id] === option.value ? '#80a4ed' : 'transparent',
-                        }}
-                      >
-                        {answers[q.id] === option.value && (
-                          <div className="w-2 h-2 rounded-full bg-white" />
-                        )}
-                      </div>
-                      <input
-                        type="radio"
-                        name={`question-${q.id}`}
-                        checked={answers[q.id] === option.value}
-                        onChange={() => handleAnswer(q.id, option.value)}
-                        className="sr-only"
-                      />
-                      <span
-                        className="text-sm transition-colors"
-                        style={{
-                          color: '#1e2749',
-                          fontWeight: answers[q.id] === option.value ? 600 : 400,
-                          opacity: answers[q.id] === option.value ? 1 : 0.8,
-                        }}
-                      >
-                        {option.label}
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Submit Button */}
-          <div className="mt-10 text-center">
-            <button
-              onClick={calculateResult}
-              disabled={!allAnswered}
-              className={`px-10 py-4 rounded-xl font-bold text-lg transition-all ${allAnswered ? 'hover:scale-105 hover:shadow-lg' : ''}`}
-              style={{
-                backgroundColor: allAnswered ? '#1e2749' : '#E0E9F9',
-                color: allAnswered ? '#ffffff' : '#9ca3af',
-                cursor: allAnswered ? 'pointer' : 'not-allowed',
-              }}
-            >
-              See My Results
-            </button>
-            {!allAnswered && (
-              <p className="text-sm mt-3" style={{ color: '#1e2749', opacity: 0.6 }}>
-                Answer all {questions.length} questions to see your results
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
-
-      {/* Results Section */}
       {showResults && result && (
-        <section id="results" className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
-          <div className="container-default max-w-3xl">
-            <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-              {/* Result Header */}
-              <div
-                className="p-8 text-center"
-                style={{ backgroundColor: quadrantInfo[result].color }}
-              >
-                <p
-                  className="text-sm font-semibold uppercase tracking-wide mb-2"
-                  style={{ color: result === 'D' ? 'rgba(255,255,255,0.8)' : 'rgba(30,39,73,0.6)' }}
-                >
-                  Your PD Structure
-                </p>
-                <h3
-                  className="text-3xl md:text-4xl font-bold mb-2"
-                  style={{ color: result === 'D' ? '#ffffff' : '#1e2749' }}
-                >
-                  {quadrantInfo[result].name}
-                </h3>
-                <p
-                  className="text-base italic"
-                  style={{ color: result === 'D' ? 'rgba(255,255,255,0.8)' : 'rgba(30,39,73,0.7)' }}
-                >
-                  {quadrantInfo[result].tagline}
-                </p>
-              </div>
-
-              {/* Result Content */}
-              <div className="p-8">
-                <p className="text-base md:text-lg mb-6" style={{ color: '#1e2749' }}>
-                  {quadrantInfo[result].description}
-                </p>
-
-                <div className="mb-8 p-5 rounded-xl" style={{ backgroundColor: '#E0E9F9' }}>
-                  <h4 className="font-bold mb-2" style={{ color: '#1e2749' }}>
-                    What This Commonly Predicts:
-                  </h4>
-                  <p style={{ color: '#1e2749', opacity: 0.85 }}>
-                    {quadrantInfo[result].predicts}
-                  </p>
-                </div>
-
-                {/* Quadrant Visual with Highlight */}
-                <div className="mb-8 p-6 rounded-xl" style={{ backgroundColor: '#C7D7F5' }}>
-                  <PDQuadrant highlightQuadrant={result} />
-                </div>
-
-                {/* CTA */}
-                <div className="border-t pt-8" style={{ borderColor: '#E0E9F9' }}>
-                  <p className="text-center font-semibold mb-6" style={{ color: '#1e2749' }}>
-                    Want to explore what shifting to Embedded Practice would require?
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <a
-                      href="/contact"
-                      className="inline-block px-8 py-4 rounded-xl font-bold text-center transition-all hover:scale-105 hover:shadow-lg"
-                      style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
-                    >
-                      Schedule a Call
-                    </a>
-                    <a
-                      href="/for-schools"
-                      className="inline-block px-8 py-4 rounded-xl font-bold text-center border-2 transition-all hover:scale-105"
-                      style={{ borderColor: '#80a4ed', color: '#1e2749', backgroundColor: '#ffffff' }}
-                    >
-                      Explore Our Approach
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Retake Option */}
-            <div className="text-center mt-8">
-              <button
-                onClick={() => {
-                  setAnswers({});
-                  setShowResults(false);
-                  setResult(null);
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="text-sm underline transition-opacity hover:opacity-70"
-                style={{ color: '#1e2749' }}
-              >
-                Retake the Diagnostic
-              </button>
-            </div>
-          </div>
-        </section>
+        <DiagnosticResults
+          result={result}
+          quadrantInfo={quadrantInfo}
+          onRetake={handleRetake}
+        />
       )}
     </main>
   );
