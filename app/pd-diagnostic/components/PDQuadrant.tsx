@@ -115,7 +115,27 @@ export default function PDQuadrant({
       </div>
 
       {/* The 2x2 Grid */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-2 gap-3 relative">
+        {/* Subtle progression arrow - dashed line from bottom-left to top-right */}
+        <svg
+          className="absolute inset-0 pointer-events-none z-0"
+          style={{ opacity: 0.15 }}
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+        >
+          <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+              <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
+            </marker>
+          </defs>
+          <line
+            x1="15" y1="85" x2="85" y2="15"
+            stroke="#64748b"
+            strokeWidth="1"
+            strokeDasharray="4,4"
+            markerEnd="url(#arrowhead)"
+          />
+        </svg>
         {/* Top Row: Inspiration (B) | Embedded (D) */}
         {[quadrantData[0], quadrantData[1]].map((quad) => (
           <div
