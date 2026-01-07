@@ -71,7 +71,7 @@ export default function DiagnosticResults({
 
             {/* Quadrant Visual with Highlight */}
             <div className="mb-8 p-6 rounded-xl" style={{ backgroundColor: '#C7D7F5' }}>
-              <PDQuadrant highlightQuadrant={result} />
+              <PDQuadrant highlightQuadrant={result} interactive={false} />
             </div>
 
             {/* CTA */}
