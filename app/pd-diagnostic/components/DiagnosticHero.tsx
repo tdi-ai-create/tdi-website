@@ -25,7 +25,7 @@ export default function DiagnosticHero() {
             A Self-Assessment for School Leaders
           </p>
           <p className="text-base md:text-lg mb-8" style={{ color: '#ffffff', opacity: 0.9 }}>
-            Not all professional development is created equal. Research shows that PD structures fall into four distinct quadrants—each with predictable outcomes for teacher practice and student achievement.
+            Not all professional development is created equal. Research shows that PD structures fall into four distinct quadrants... each with predictable outcomes for teacher practice and student achievement.
           </p>
 
           {/* 2x2 Quadrant Visual */}
