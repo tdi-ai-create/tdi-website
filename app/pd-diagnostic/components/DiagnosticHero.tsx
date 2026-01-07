@@ -2,44 +2,56 @@ import PDQuadrant from './PDQuadrant';
 
 export default function DiagnosticHero() {
   return (
-    <section className="relative py-20 md:py-28 overflow-hidden">
-      {/* Background */}
+    <section className="relative min-h-[500px] md:min-h-[600px] flex items-center py-16 md:py-24">
+
+      {/* Background Image */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 z-0"
         style={{
-          backgroundImage: 'url(/images/hero-workshop.webp)',
+          backgroundImage: 'url(/images/hero-schools.png)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
         }}
       />
+
+      {/* Gradient Overlay */}
       <div
-        className="absolute inset-0"
-        style={{ backgroundColor: 'rgba(30, 39, 73, 0.9)' }}
+        className="absolute inset-0 z-10"
+        style={{
+          background: 'linear-gradient(135deg, rgba(30, 39, 73, 0.92) 0%, rgba(27, 73, 101, 0.88) 50%, rgba(30, 39, 73, 0.85) 100%)',
+        }}
       />
 
       {/* Content */}
-      <div className="container-default relative z-10">
+      <div className="container-default relative z-20">
         <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4" style={{ color: '#ffffff' }}>
+
+          {/* Title */}
+          <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
             The 4 Types of PD
           </h1>
-          <p className="text-xl md:text-2xl font-semibold mb-6" style={{ color: '#ffba06' }}>
-            A Self-Assessment for School Leaders
-          </p>
-          <p className="text-base md:text-lg mb-8" style={{ color: '#ffffff', opacity: 0.9 }}>
-            Not all professional development is created equal.<br />
-            Research shows that PD structures fall into four distinct quadrants... each with predictable outcomes for teacher practice and student achievement.
+
+          {/* Subtitle */}
+          <p className="text-lg md:text-xl text-white/80 mb-6">
+            A Self-Assessment for School and District Leaders
           </p>
 
-          {/* 2x2 Quadrant Visual */}
-          <div className="bg-white rounded-xl p-6 md:p-8 shadow-xl max-w-xl mx-auto mb-8">
-            <PDQuadrant />
+          {/* Intro Text */}
+          <p className="text-base md:text-lg text-white/70 mb-10 max-w-2xl mx-auto">
+            Is your current PD structure producing the outcomes you expect?
+            This diagnostic helps you see where your PD sits — and what that typically predicts for growth, retention, and culture.
+          </p>
+
+          {/* The Quadrant Visual */}
+          <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-6 md:p-10 shadow-2xl">
+            <PDQuadrant interactive={true} />
           </div>
 
-          <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.8 }}>
-            Most leaders can identify their position immediately.
+          {/* Scroll prompt */}
+          <p className="text-white/60 text-sm mt-8 animate-pulse">
+            ↓ Take the diagnostic below to confirm your position
           </p>
-          <p className="text-lg md:text-xl font-bold mt-2" style={{ color: '#ffffff' }}>
-            Take the diagnostic below to confirm.
-          </p>
+
         </div>
       </div>
     </section>
