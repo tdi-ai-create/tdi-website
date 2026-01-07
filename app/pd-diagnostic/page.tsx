@@ -158,22 +158,17 @@ export default function PDDiagnosticPage() {
     setAnswers(prev => ({ ...prev, [questionId]: type }));
   };
 
+  // A = Compliance-Focused, B = Inspiration-Driven, C = Fragmented Growth, D = Embedded Practice
   const calculateResult = () => {
-    const counts: Record<QuadrantType, number> = {
-      A: 0,
-      B: 0,
-      C: 0,
-      D: 0,
-    };
+    const counts = { A: 0, B: 0, C: 0, D: 0 };
 
-    Object.values(answers).forEach(type => {
-      counts[type]++;
+    Object.values(answers).forEach(answer => {
+      counts[answer as keyof typeof counts]++;
     });
 
+    // Find the type with highest count
     const maxCount = Math.max(...Object.values(counts));
-    const resultType = (Object.keys(counts) as QuadrantType[]).find(
-      key => counts[key] === maxCount
-    ) || 'C';
+    const resultType = Object.entries(counts).find(([_, count]) => count === maxCount)?.[0] as QuadrantType || 'A';
 
     setResult(resultType);
     setShowResults(true);
