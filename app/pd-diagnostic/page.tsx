@@ -209,21 +209,30 @@ export default function PDDiagnosticPage() {
       </section>
 
       {/* Diagnostic Section */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default max-w-3xl">
-          <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center" style={{ color: '#1e2749' }}>
+          <h2 className="text-2xl md:text-3xl font-bold mb-2 text-center" style={{ color: '#1e2749' }}>
             PD Structure Diagnostic
           </h2>
+          <p className="text-center mb-8" style={{ color: '#1e2749', opacity: 0.7 }}>
+            Answer each question honestly based on your current reality, not aspirations.
+          </p>
 
-          <div className="space-y-8">
+          <div className="space-y-6">
             {questions.map((q, index) => (
               <div
                 key={q.id}
-                className="p-6 rounded-xl border"
-                style={{ borderColor: answers[q.id] ? '#ffba06' : '#e5e7eb' }}
+                className="p-6 rounded-xl shadow-sm transition-all hover:shadow-md"
+                style={{
+                  backgroundColor: '#ffffff',
+                  border: answers[q.id] ? '2px solid #80a4ed' : '2px solid #E0E9F9',
+                }}
               >
                 <p className="font-semibold mb-4" style={{ color: '#1e2749' }}>
-                  <span className="inline-block w-8 h-8 rounded-full text-center leading-8 mr-3 text-sm font-bold" style={{ backgroundColor: '#1e2749', color: '#ffffff' }}>
+                  <span
+                    className="inline-block w-8 h-8 rounded-full text-center leading-8 mr-3 text-sm font-bold"
+                    style={{ backgroundColor: answers[q.id] ? '#80a4ed' : '#1e2749', color: '#ffffff' }}
+                  >
                     {index + 1}
                   </span>
                   {q.question}
@@ -232,20 +241,36 @@ export default function PDDiagnosticPage() {
                   {q.options.map((option, optIndex) => (
                     <label
                       key={optIndex}
-                      className="flex items-start gap-3 cursor-pointer group"
+                      className="flex items-start gap-3 cursor-pointer group p-3 rounded-lg transition-all hover:bg-gray-50"
+                      style={{
+                        backgroundColor: answers[q.id] === option.value ? '#E0E9F9' : 'transparent',
+                      }}
                     >
+                      {/* Custom Radio Circle */}
+                      <div
+                        className="mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all"
+                        style={{
+                          borderColor: answers[q.id] === option.value ? '#80a4ed' : '#d1d5db',
+                          backgroundColor: answers[q.id] === option.value ? '#80a4ed' : 'transparent',
+                        }}
+                      >
+                        {answers[q.id] === option.value && (
+                          <div className="w-2 h-2 rounded-full bg-white" />
+                        )}
+                      </div>
                       <input
                         type="radio"
                         name={`question-${q.id}`}
                         checked={answers[q.id] === option.value}
                         onChange={() => handleAnswer(q.id, option.value)}
-                        className="mt-1 w-4 h-4 accent-amber-500"
+                        className="sr-only"
                       />
                       <span
                         className="text-sm transition-colors"
                         style={{
-                          color: answers[q.id] === option.value ? '#1e2749' : '#6b7280',
+                          color: '#1e2749',
                           fontWeight: answers[q.id] === option.value ? 600 : 400,
+                          opacity: answers[q.id] === option.value ? 1 : 0.8,
                         }}
                       >
                         {option.label}
@@ -262,17 +287,17 @@ export default function PDDiagnosticPage() {
             <button
               onClick={calculateResult}
               disabled={!allAnswered}
-              className="px-8 py-4 rounded-lg font-bold text-lg transition-all"
+              className={`px-10 py-4 rounded-xl font-bold text-lg transition-all ${allAnswered ? 'hover:scale-105 hover:shadow-lg' : ''}`}
               style={{
-                backgroundColor: allAnswered ? '#ffba06' : '#e5e7eb',
-                color: allAnswered ? '#1e2749' : '#9ca3af',
+                backgroundColor: allAnswered ? '#1e2749' : '#E0E9F9',
+                color: allAnswered ? '#ffffff' : '#9ca3af',
                 cursor: allAnswered ? 'pointer' : 'not-allowed',
               }}
             >
               See My Results
             </button>
             {!allAnswered && (
-              <p className="text-sm mt-3" style={{ color: '#6b7280' }}>
+              <p className="text-sm mt-3" style={{ color: '#1e2749', opacity: 0.6 }}>
                 Answer all {questions.length} questions to see your results
               </p>
             )}
@@ -316,37 +341,37 @@ export default function PDDiagnosticPage() {
                   {quadrantInfo[result].description}
                 </p>
 
-                <div className="mb-8 p-4 rounded-lg" style={{ backgroundColor: '#f9fafb' }}>
+                <div className="mb-8 p-5 rounded-xl" style={{ backgroundColor: '#E0E9F9' }}>
                   <h4 className="font-bold mb-2" style={{ color: '#1e2749' }}>
                     What This Commonly Predicts:
                   </h4>
-                  <p style={{ color: '#1e2749', opacity: 0.8 }}>
+                  <p style={{ color: '#1e2749', opacity: 0.85 }}>
                     {quadrantInfo[result].predicts}
                   </p>
                 </div>
 
                 {/* Quadrant Visual with Highlight */}
-                <div className="mb-8 p-6 rounded-xl" style={{ backgroundColor: '#f9fafb' }}>
+                <div className="mb-8 p-6 rounded-xl" style={{ backgroundColor: '#C7D7F5' }}>
                   <PDQuadrant highlightQuadrant={result} />
                 </div>
 
                 {/* CTA */}
-                <div className="border-t pt-8" style={{ borderColor: '#e5e7eb' }}>
+                <div className="border-t pt-8" style={{ borderColor: '#E0E9F9' }}>
                   <p className="text-center font-semibold mb-6" style={{ color: '#1e2749' }}>
-                    Want to explore what shifting to Embedded & Sustained would require?
+                    Want to explore what shifting to Embedded Practice would require?
                   </p>
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <a
                       href="/contact"
-                      className="inline-block px-8 py-4 rounded-lg font-bold text-center transition-all hover-glow"
-                      style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                      className="inline-block px-8 py-4 rounded-xl font-bold text-center transition-all hover:scale-105 hover:shadow-lg"
+                      style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
                     >
                       Schedule a Call
                     </a>
                     <a
                       href="/for-schools"
-                      className="inline-block px-8 py-4 rounded-lg font-bold text-center border-2 transition-all hover-lift"
-                      style={{ borderColor: '#1e2749', color: '#1e2749' }}
+                      className="inline-block px-8 py-4 rounded-xl font-bold text-center border-2 transition-all hover:scale-105"
+                      style={{ borderColor: '#80a4ed', color: '#1e2749', backgroundColor: '#ffffff' }}
                     >
                       Explore Our Approach
                     </a>
