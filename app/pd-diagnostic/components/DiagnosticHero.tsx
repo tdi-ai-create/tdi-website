@@ -34,7 +34,9 @@ export default function DiagnosticHero() {
           </div>
 
           <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.8 }}>
-            Most leaders can identify their position immediately.<br />
+            Most leaders can identify their position immediately.
+          </p>
+          <p className="text-lg md:text-xl font-bold mt-2" style={{ color: '#ffffff' }}>
             Take the diagnostic below to confirm.
           </p>
         </div>
