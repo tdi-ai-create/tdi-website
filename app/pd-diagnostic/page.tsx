@@ -182,7 +182,7 @@ export default function PDDiagnosticPage() {
 
             {/* Intro Text */}
             <p className="text-lg text-white/80 mb-12 max-w-2xl mx-auto">
-              Is your current PD structure producing the outcomes you expect?
+              Is your current PD structure producing the outcomes you expect?<br />
               This diagnostic helps you see where your PD sits — and what that typically predicts for growth, retention, and culture.
             </p>
 
