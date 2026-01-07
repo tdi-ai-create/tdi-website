@@ -99,52 +99,37 @@ const questions: Question[] = [
 
 const quadrantInfo: Record<QuadrantType, {
   name: string;
+  tagline: string;
   description: string;
-  predictions: string[];
+  predicts: string;
   color: string;
 }> = {
   A: {
     name: "Compliance-Focused PD",
-    description: "Your PD structure prioritizes meeting requirements over building capacity. Sessions check boxes but rarely change practice. Teachers feel talked at, not invested in.",
-    predictions: [
-      "High teacher turnover due to feeling undervalued",
-      "Low implementation of new strategies (under 10%)",
-      "Cynicism toward any new initiative",
-      "Stagnant student outcomes despite PD investment",
-    ],
+    tagline: "Meets requirements, limited classroom translation",
+    description: "Your PD structure is primarily event-based and focused on core instructional staff. PD is delivered on designated days, aligned to required initiatives and accountability timelines.",
+    predicts: "Strong compliance stability with slower progress in consistency, retention, and schoolwide culture. Implementation varies widely by role, and specialists often operate with different expectations.",
     color: "#E8E8E8",
   },
   B: {
     name: "Inspiration-Driven PD",
-    description: "Your PD brings energy and excitement through dynamic speakers and events. Teachers leave feeling motivated—but without systems to sustain change, that energy dissipates quickly.",
-    predictions: [
-      "Initial enthusiasm followed by return to old habits",
-      "Teachers asking 'when's the next speaker?' instead of implementing",
-      "Disconnection between PD days and daily instruction",
-      "Budget spent on events with little lasting ROI",
-    ],
+    tagline: "High energy, short-term lift",
+    description: "Your whole-staff PD days are designed to build shared understanding and motivation. Sessions are engaging and idea-rich, but follow-through support is limited.",
+    predicts: "Temporary momentum followed by inconsistent implementation. Strong initial satisfaction that declines as daily pressures return, often leading to repeated cycles of retraining.",
     color: "#D4E4ED",
   },
   C: {
     name: "Fragmented Growth",
-    description: "Your PD offers variety but lacks coherence. Strong pockets exist, but the experience is uneven. Some staff get coaching and support; others are left behind.",
-    predictions: [
-      "Initiative fatigue among staff",
-      "Inconsistent practices across classrooms",
-      "Difficulty measuring what's working",
-      "Teachers feeling 'trained' but not supported",
-    ],
+    tagline: "Strong pockets, uneven experience",
+    description: "You have ongoing coaching or PLC systems for select teams—typically in core subject areas. Specialists and support staff receive minimal aligned PD.",
+    predicts: "Targeted growth in coached areas alongside significant variation in expectations across classrooms. Islands of excellence with inconsistent instructional language building-wide.",
     color: "#DDE3E8",
   },
   D: {
     name: "Embedded Practice",
-    description: "Your PD is strategically aligned, job-embedded, and supported by ongoing coaching. Teachers are partners in the process, and implementation is the expectation—not the exception.",
-    predictions: [
-      "High implementation rates (60%+ of strategies used)",
-      "Improved teacher retention and morale",
-      "Measurable impact on student outcomes",
-      "Culture of continuous improvement",
-    ],
+    tagline: "Consistent support, sustained outcomes",
+    description: "Your PD is ongoing, accessible year-round, and tailored by role. All staff share common instructional frameworks supported beyond designated PD days.",
+    predicts: "Sustainable improvement, stronger culture, and progress without initiative overload. Consistent expectations across classrooms with clear evidence of PD application.",
     color: "#1B4965",
   },
 };
@@ -305,12 +290,24 @@ export default function PDDiagnosticPage() {
                 className="p-8 text-center"
                 style={{ backgroundColor: quadrantInfo[result].color }}
               >
-                <p className="text-sm font-semibold uppercase tracking-wide mb-2" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                <p
+                  className="text-sm font-semibold uppercase tracking-wide mb-2"
+                  style={{ color: result === 'D' ? 'rgba(255,255,255,0.8)' : 'rgba(30,39,73,0.6)' }}
+                >
                   Your PD Structure
                 </p>
-                <h3 className="text-3xl md:text-4xl font-bold" style={{ color: '#ffffff' }}>
+                <h3
+                  className="text-3xl md:text-4xl font-bold mb-2"
+                  style={{ color: result === 'D' ? '#ffffff' : '#1e2749' }}
+                >
                   {quadrantInfo[result].name}
                 </h3>
+                <p
+                  className="text-base italic"
+                  style={{ color: result === 'D' ? 'rgba(255,255,255,0.8)' : 'rgba(30,39,73,0.7)' }}
+                >
+                  {quadrantInfo[result].tagline}
+                </p>
               </div>
 
               {/* Result Content */}
@@ -319,24 +316,13 @@ export default function PDDiagnosticPage() {
                   {quadrantInfo[result].description}
                 </p>
 
-                <div className="mb-8">
-                  <h4 className="font-bold mb-4" style={{ color: '#1e2749' }}>
+                <div className="mb-8 p-4 rounded-lg" style={{ backgroundColor: '#f9fafb' }}>
+                  <h4 className="font-bold mb-2" style={{ color: '#1e2749' }}>
                     What This Commonly Predicts:
                   </h4>
-                  <ul className="space-y-3">
-                    {quadrantInfo[result].predictions.map((prediction, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <svg
-                          className="w-5 h-5 mt-0.5 flex-shrink-0"
-                          fill={quadrantInfo[result].color}
-                          viewBox="0 0 24 24"
-                        >
-                          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                        </svg>
-                        <span style={{ color: '#1e2749', opacity: 0.8 }}>{prediction}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <p style={{ color: '#1e2749', opacity: 0.8 }}>
+                    {quadrantInfo[result].predicts}
+                  </p>
                 </div>
 
                 {/* Quadrant Visual with Highlight */}
