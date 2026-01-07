@@ -18,7 +18,7 @@ const quadrantData: QuadrantData[] = [
     tagline: 'High energy, short-term lift',
     hoverDetail: 'Strong momentum after PD days, but application fades as daily pressures return.',
     textColor: 'text-slate-800',
-    taglineColor: 'text-slate-600',
+    taglineColor: 'text-slate-500',
   },
   {
     id: 'D',
@@ -34,7 +34,7 @@ const quadrantData: QuadrantData[] = [
     tagline: 'Meets requirements, limited translation',
     hoverDetail: 'Strong documentation, but implementation varies widely. Teachers often on their own after PD ends.',
     textColor: 'text-slate-800',
-    taglineColor: 'text-slate-600',
+    taglineColor: 'text-slate-500',
   },
   {
     id: 'C',
@@ -42,7 +42,7 @@ const quadrantData: QuadrantData[] = [
     tagline: 'Strong pockets, uneven experience',
     hoverDetail: 'Coaching works for some teams, but specialists and support staff receive minimal aligned support.',
     textColor: 'text-slate-800',
-    taglineColor: 'text-slate-600',
+    taglineColor: 'text-slate-500',
   }
 ];
 
@@ -64,13 +64,13 @@ const getBackgroundStyle = (id: string) => {
 const getShadow = (id: string) => {
   switch (id) {
     case 'D':
-      return '0 20px 40px -12px rgba(27, 73, 101, 0.35)';
+      return '0 10px 30px -8px rgba(27, 73, 101, 0.4)';
     case 'B':
-      return '0 20px 40px -12px rgba(191, 219, 254, 0.5)';
+      return '0 10px 30px -8px rgba(191, 219, 254, 0.5)';
     case 'A':
-      return '0 20px 40px -12px rgba(156, 163, 175, 0.4)';
+      return '0 10px 30px -8px rgba(156, 163, 175, 0.4)';
     case 'C':
-      return '0 20px 40px -12px rgba(148, 163, 184, 0.4)';
+      return '0 10px 30px -8px rgba(148, 163, 184, 0.4)';
     default:
       return '';
   }
@@ -94,192 +94,126 @@ export default function PDQuadrant({
       background: getBackgroundStyle(quad.id),
       boxShadow: getShadow(quad.id),
       transform: isHovered && interactive
-        ? 'translateY(-8px) scale(1.02)'
+        ? 'translateY(-4px) scale(1.02)'
         : isHighlighted
         ? 'scale(1.03)'
         : isOtherHighlighted
-        ? 'scale(0.95)'
+        ? 'scale(0.97)'
         : 'none',
-      opacity: isOtherHighlighted ? 0.4 : 1,
-      zIndex: isHighlighted ? 10 : 1,
+      opacity: isOtherHighlighted ? 0.5 : 1,
     };
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-4">
-      {/* Title */}
-      <h3 className="text-2xl md:text-3xl font-bold text-center mb-8 text-[#1B4965]">
-        The 4 Types of PD
-      </h3>
+    <div className="w-full max-w-2xl mx-auto">
+      {/* Title removed - it's redundant since page already has title */}
 
-      {/* Main Grid Container */}
-      <div className="relative">
+      {/* Y-Axis Label - ABOVE the grid, clearly visible */}
+      <div className="flex justify-between items-center mb-2 px-4">
+        <span className="text-xs font-medium text-slate-400">Whole-Staff</span>
+        <span></span>
+      </div>
 
-        {/* Y-Axis Label - Left Side */}
-        <div className="hidden md:flex absolute -left-20 top-0 bottom-0 items-center">
-          <div className="transform -rotate-90 whitespace-nowrap">
-            <span className="text-sm font-semibold tracking-widest text-slate-400 uppercase">
-              Staff Coverage
-            </span>
+      {/* The 2x2 Grid */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Top Row: Inspiration (B) | Embedded (D) */}
+        {[quadrantData[0], quadrantData[1]].map((quad) => (
+          <div
+            key={quad.id}
+            className={`
+              relative overflow-hidden rounded-2xl p-5 md:p-6
+              flex flex-col justify-center items-center text-center
+              transition-all duration-300 ease-out
+              ${interactive ? 'cursor-pointer' : ''}
+              ${highlightQuadrant === quad.id ? 'ring-4 ring-blue-500 ring-offset-2' : ''}
+            `}
+            style={{
+              minHeight: '160px',
+              ...getQuadrantStyles(quad)
+            }}
+            onMouseEnter={() => interactive && setHoveredQuadrant(quad.id)}
+            onMouseLeave={() => interactive && setHoveredQuadrant(null)}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+
+            <h4 className={`text-sm md:text-base font-bold leading-tight mb-2 ${quad.textColor} relative z-10`}>
+              {quad.name}
+            </h4>
+            <p className={`text-xs md:text-sm ${quad.taglineColor} italic relative z-10`}>
+              {quad.tagline}
+            </p>
+
+            {interactive && hoveredQuadrant === quad.id && (
+              <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-black/60 to-transparent">
+                <p className="text-xs text-white/90 leading-relaxed">
+                  {quad.hoverDetail}
+                </p>
+              </div>
+            )}
           </div>
+        ))}
+
+        {/* Bottom Row: Compliance (A) | Fragmented (C) */}
+        {[quadrantData[2], quadrantData[3]].map((quad) => (
+          <div
+            key={quad.id}
+            className={`
+              relative overflow-hidden rounded-2xl p-5 md:p-6
+              flex flex-col justify-center items-center text-center
+              transition-all duration-300 ease-out
+              ${interactive ? 'cursor-pointer' : ''}
+              ${highlightQuadrant === quad.id ? 'ring-4 ring-blue-500 ring-offset-2' : ''}
+            `}
+            style={{
+              minHeight: '160px',
+              ...getQuadrantStyles(quad)
+            }}
+            onMouseEnter={() => interactive && setHoveredQuadrant(quad.id)}
+            onMouseLeave={() => interactive && setHoveredQuadrant(null)}
+          >
+            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
+
+            <h4 className={`text-sm md:text-base font-bold leading-tight mb-2 ${quad.textColor} relative z-10`}>
+              {quad.name}
+            </h4>
+            <p className={`text-xs md:text-sm ${quad.taglineColor} italic relative z-10`}>
+              {quad.tagline}
+            </p>
+
+            {interactive && hoveredQuadrant === quad.id && (
+              <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-slate-800/70 to-transparent">
+                <p className="text-xs text-white/90 leading-relaxed">
+                  {quad.hoverDetail}
+                </p>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      {/* Bottom Y-Axis Label */}
+      <div className="flex justify-between items-center mt-2 px-4">
+        <span className="text-xs font-medium text-slate-400">Core-Focused</span>
+        <span></span>
+      </div>
+
+      {/* X-Axis Labels - Clean row below */}
+      <div className="flex justify-between items-center mt-4 pt-4 border-t border-slate-200">
+        <div className="text-center flex-1">
+          <span className="text-xs font-medium text-slate-400 block">Event-Based</span>
         </div>
-
-        {/* Y-Axis Range Labels */}
-        <div className="hidden md:block absolute -left-6 top-8 text-xs text-slate-400 font-medium transform -rotate-90 origin-center">
-          Whole-Staff
+        <div className="text-center px-4">
+          <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">PD Structure →</span>
         </div>
-        <div className="hidden md:block absolute -left-6 bottom-8 text-xs text-slate-400 font-medium transform -rotate-90 origin-center">
-          Core-Focused
+        <div className="text-center flex-1">
+          <span className="text-xs font-medium text-slate-400 block">System-Based</span>
         </div>
-
-        {/* The 2x2 Grid */}
-        <div className="grid grid-cols-2 gap-4 md:gap-5">
-
-          {/* Top Row: Inspiration (B) | Embedded (D) */}
-          {[quadrantData[0], quadrantData[1]].map((quad) => (
-            <div
-              key={quad.id}
-              className={`
-                relative overflow-hidden rounded-2xl p-6 md:p-8
-                flex flex-col justify-center items-center text-center
-                transition-all duration-300 ease-out
-                ${interactive ? 'cursor-pointer' : ''}
-                ${highlightQuadrant === quad.id ? 'ring-4 ring-blue-500 ring-offset-4' : ''}
-              `}
-              style={{
-                minHeight: '220px',
-                ...getQuadrantStyles(quad)
-              }}
-              onMouseEnter={() => interactive && setHoveredQuadrant(quad.id)}
-              onMouseLeave={() => interactive && setHoveredQuadrant(null)}
-            >
-              {/* Subtle shine effect */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 50%)',
-                }}
-              />
-
-              <h4 className={`text-base md:text-lg font-bold leading-tight mb-3 ${quad.textColor} relative z-10`}>
-                {quad.name}
-              </h4>
-              <p className={`text-sm ${quad.taglineColor} italic relative z-10`}>
-                {quad.tagline}
-              </p>
-
-              {/* Hover detail - appears on hover */}
-              {interactive && (
-                <div
-                  className="absolute inset-x-0 bottom-0 p-4 transition-all duration-300"
-                  style={{
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%)',
-                    opacity: hoveredQuadrant === quad.id ? 1 : 0,
-                    transform: hoveredQuadrant === quad.id ? 'translateY(0)' : 'translateY(16px)',
-                  }}
-                >
-                  <p className="text-xs text-white/90 leading-relaxed">
-                    {quad.hoverDetail}
-                  </p>
-                </div>
-              )}
-            </div>
-          ))}
-
-          {/* Bottom Row: Compliance (A) | Fragmented (C) */}
-          {[quadrantData[2], quadrantData[3]].map((quad) => (
-            <div
-              key={quad.id}
-              className={`
-                relative overflow-hidden rounded-2xl p-6 md:p-8
-                flex flex-col justify-center items-center text-center
-                transition-all duration-300 ease-out
-                ${interactive ? 'cursor-pointer' : ''}
-                ${highlightQuadrant === quad.id ? 'ring-4 ring-blue-500 ring-offset-4' : ''}
-              `}
-              style={{
-                minHeight: '220px',
-                ...getQuadrantStyles(quad)
-              }}
-              onMouseEnter={() => interactive && setHoveredQuadrant(quad.id)}
-              onMouseLeave={() => interactive && setHoveredQuadrant(null)}
-            >
-              {/* Subtle shine effect */}
-              <div
-                className="absolute inset-0 pointer-events-none"
-                style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 50%)',
-                }}
-              />
-
-              <h4 className={`text-base md:text-lg font-bold leading-tight mb-3 ${quad.textColor} relative z-10`}>
-                {quad.name}
-              </h4>
-              <p className={`text-sm ${quad.taglineColor} italic relative z-10`}>
-                {quad.tagline}
-              </p>
-
-              {/* Hover detail */}
-              {interactive && (
-                <div
-                  className="absolute inset-x-0 bottom-0 p-4 transition-all duration-300"
-                  style={{
-                    background: 'linear-gradient(to top, rgba(30,39,73,0.8) 0%, transparent 100%)',
-                    opacity: hoveredQuadrant === quad.id ? 1 : 0,
-                    transform: hoveredQuadrant === quad.id ? 'translateY(0)' : 'translateY(16px)',
-                  }}
-                >
-                  <p className="text-xs text-white/90 leading-relaxed">
-                    {quad.hoverDetail}
-                  </p>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* X-Axis Labels - Below Grid */}
-        <div className="mt-8 flex justify-between items-center px-2">
-          <span className="text-xs text-slate-400 font-medium">Event-Based</span>
-          <span className="text-sm font-semibold tracking-widest text-slate-400 uppercase">
-            PD Structure
-          </span>
-          <span className="text-xs text-slate-400 font-medium">System-Based</span>
-        </div>
-
-        {/* Diagonal Arrow (subtle) */}
-        <svg
-          className="absolute inset-0 pointer-events-none"
-          style={{ opacity: 0.1 }}
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-        >
-          <defs>
-            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-              <polygon points="0 0, 10 3.5, 0 7" fill="#64748b" />
-            </marker>
-          </defs>
-          <line
-            x1="18" y1="82" x2="82" y2="18"
-            stroke="#64748b"
-            strokeWidth="0.8"
-            strokeDasharray="3,3"
-            markerEnd="url(#arrowhead)"
-          />
-        </svg>
       </div>
 
       {/* Footer Note */}
-      <p className="text-center text-sm mt-8 text-slate-500 italic">
+      <p className="text-center text-xs mt-6 text-slate-400 italic">
         Most schools don't start in Embedded Practice — they move there over time.
       </p>
-
-      {/* Mobile hint */}
-      {interactive && (
-        <p className="text-center text-xs mt-2 text-slate-400 md:hidden">
-          Tap a quadrant to learn more
-        </p>
-      )}
     </div>
   );
 }
