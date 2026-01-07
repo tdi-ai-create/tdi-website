@@ -1,14 +1,7 @@
-'use client';
-
-import QuestionCard from './QuestionCard';
-
 interface Question {
   id: number;
   question: string;
-  options: {
-    value: string;
-    label: string;
-  }[];
+  options: { value: string; label: string }[];
 }
 
 interface DiagnosticFormProps {
@@ -27,41 +20,57 @@ export default function DiagnosticForm({
   allAnswered,
 }: DiagnosticFormProps) {
   return (
-    <div>
-      <div className="space-y-6">
-        {questions.map((q, index) => (
-          <QuestionCard
-            key={q.id}
-            id={q.id}
-            index={index}
-            question={q.question}
-            options={q.options}
-            selectedValue={answers[q.id]}
-            onAnswer={onAnswer}
-          />
-        ))}
-      </div>
+    <div className="space-y-8">
+      {questions.map((question, index) => (
+        <div key={question.id} className="bg-white rounded-2xl p-6 shadow-sm">
+          <p className="text-lg font-semibold text-slate-800 mb-4">
+            <span className="text-slate-400 mr-2">{index + 1}.</span>
+            {question.question}
+          </p>
+          <div className="space-y-2">
+            {question.options.map((option) => (
+              <label
+                key={option.value}
+                className={`
+                  flex items-center gap-4 p-4 rounded-xl cursor-pointer
+                  transition-all duration-200
+                  ${answers[question.id] === option.value
+                    ? 'bg-blue-50 border-2 border-blue-500'
+                    : 'bg-slate-50 border-2 border-transparent hover:bg-slate-100'
+                  }
+                `}
+              >
+                <input
+                  type="radio"
+                  name={`question-${question.id}`}
+                  value={option.value}
+                  checked={answers[question.id] === option.value}
+                  onChange={() => onAnswer(question.id, option.value)}
+                  className="w-5 h-5 text-blue-600 flex-shrink-0"
+                />
+                <span className="text-slate-700">{option.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      ))}
 
       {/* Submit Button */}
-      <div className="mt-10 text-center">
+      <div className="text-center pt-8">
         <button
           onClick={onSubmit}
           disabled={!allAnswered}
           className={`
-            px-10 py-4 rounded-full font-semibold text-lg transition-all
+            px-10 py-4 rounded-full font-semibold text-lg
+            transition-all duration-200
             ${allAnswered
-              ? 'bg-[#1B4965] text-white hover:bg-[#143a52] shadow-lg hover:shadow-xl'
+              ? 'bg-[#1B4965] text-white hover:bg-[#143a52] cursor-pointer'
               : 'bg-slate-200 text-slate-400 cursor-not-allowed'
             }
           `}
         >
-          See My Results
+          {allAnswered ? 'See My Results' : `Answer all ${questions.length} questions to continue`}
         </button>
-        {!allAnswered && (
-          <p className="text-sm mt-3 text-slate-500">
-            Answer all {questions.length} questions to see your results
-          </p>
-        )}
       </div>
     </div>
   );
