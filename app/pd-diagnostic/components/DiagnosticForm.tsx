@@ -46,7 +46,7 @@ export default function DiagnosticForm({
                   value={option.value}
                   checked={answers[question.id] === option.value}
                   onChange={() => onAnswer(question.id, option.value)}
-                  className="w-5 h-5 text-blue-600 flex-shrink-0"
+                  className="w-5 h-5 text-blue-600 flex-shrink-0 mr-3"
                 />
                 <span className="text-slate-700">{option.label}</span>
               </label>
