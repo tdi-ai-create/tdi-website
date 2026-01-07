@@ -39,44 +39,21 @@ export default function QuestionCard({
         </span>
         {question}
       </p>
-      <div className="space-y-3 ml-11">
-        {options.map((option, optIndex) => (
+      <div className="space-y-2 ml-11">
+        {options.map((option) => (
           <label
-            key={optIndex}
-            className="flex items-start gap-3 cursor-pointer group p-3 rounded-lg transition-all hover:bg-gray-50"
-            style={{
-              backgroundColor: selectedValue === option.value ? '#E0E9F9' : 'transparent',
-            }}
+            key={option.value}
+            className="flex items-center gap-3 cursor-pointer p-3 rounded-lg hover:bg-slate-50 transition-colors border border-transparent hover:border-slate-200"
           >
-            {/* Custom Radio Circle */}
-            <div
-              className="mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all"
-              style={{
-                borderColor: selectedValue === option.value ? '#80a4ed' : '#d1d5db',
-                backgroundColor: selectedValue === option.value ? '#80a4ed' : 'transparent',
-              }}
-            >
-              {selectedValue === option.value && (
-                <div className="w-2 h-2 rounded-full bg-white" />
-              )}
-            </div>
             <input
               type="radio"
               name={`question-${id}`}
+              value={option.value}
               checked={selectedValue === option.value}
               onChange={() => onAnswer(id, option.value)}
-              className="sr-only"
+              className="w-5 h-5 text-blue-600 accent-blue-600 flex-shrink-0"
             />
-            <span
-              className="text-sm transition-colors"
-              style={{
-                color: '#1e2749',
-                fontWeight: selectedValue === option.value ? 600 : 400,
-                opacity: selectedValue === option.value ? 1 : 0.8,
-              }}
-            >
-              {option.label}
-            </span>
+            <span className="text-slate-700 text-sm md:text-base">{option.label}</span>
           </label>
         ))}
       </div>
