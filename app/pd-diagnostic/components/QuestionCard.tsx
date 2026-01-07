@@ -10,8 +10,8 @@ interface QuestionCardProps {
     value: QuadrantType;
     label: string;
   }[];
-  selectedValue: QuadrantType | undefined;
-  onAnswer: (questionId: number, value: QuadrantType) => void;
+  selectedValue: string | undefined;
+  onAnswer: (questionId: number, value: string) => void;
 }
 
 export default function QuestionCard({

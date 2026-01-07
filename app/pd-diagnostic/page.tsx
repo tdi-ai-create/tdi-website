@@ -128,18 +128,18 @@ const results: Record<QuadrantType, {
 };
 
 export default function PDDiagnosticPage() {
-  const [answers, setAnswers] = useState<Record<number, QuadrantType>>({});
+  const [answers, setAnswers] = useState<Record<number, string>>({});
   const [showResults, setShowResults] = useState(false);
   const [resultType, setResultType] = useState<QuadrantType | null>(null);
 
-  const handleAnswer = (questionId: number, value: QuadrantType) => {
+  const handleAnswer = (questionId: number, value: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
   };
 
-  const calculateResult = (answers: Record<number, QuadrantType>): QuadrantType => {
+  const calculateResult = (answers: Record<number, string>): QuadrantType => {
     const counts = { A: 0, B: 0, C: 0, D: 0 };
     Object.values(answers).forEach(answer => {
-      counts[answer]++;
+      counts[answer as keyof typeof counts]++;
     });
     const maxCount = Math.max(...Object.values(counts));
     return (Object.entries(counts).find(([_, count]) => count === maxCount)?.[0] || 'A') as QuadrantType;

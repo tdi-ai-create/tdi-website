@@ -15,8 +15,8 @@ interface Question {
 
 interface DiagnosticFormProps {
   questions: Question[];
-  answers: Record<number, QuadrantType>;
-  onAnswer: (questionId: number, value: QuadrantType) => void;
+  answers: Record<number, string>;
+  onAnswer: (questionId: number, value: string) => void;
   onSubmit: () => void;
   allAnswered: boolean;
 }
