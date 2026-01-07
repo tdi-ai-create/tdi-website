@@ -176,7 +176,7 @@ export default function PDDiagnosticPage() {
             </h1>
 
             {/* Subtitle */}
-            <p className="text-xl md:text-2xl text-white/90 mb-6">
+            <p className="text-xl md:text-2xl text-white/90 font-bold mb-6">
               A Self-Assessment for School and District Leaders
             </p>
 
