@@ -90,7 +90,7 @@ const questions = [
   }
 ];
 
-const quadrantInfo: Record<QuadrantType, {
+const results: Record<QuadrantType, {
   name: string;
   tagline: string;
   description: string;
@@ -128,27 +128,30 @@ const quadrantInfo: Record<QuadrantType, {
 };
 
 export default function PDDiagnosticPage() {
-  const [answers, setAnswers] = useState<Record<number, QuadrantType>>({});
+  const [answers, setAnswers] = useState<Record<number, string>>({});
   const [showResults, setShowResults] = useState(false);
-  const [result, setResult] = useState<QuadrantType | null>(null);
+  const [resultType, setResultType] = useState<string | null>(null);
 
-  const handleAnswer = (questionId: number, value: QuadrantType) => {
+  const handleAnswer = (questionId: number, value: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
   };
 
-  // A = Compliance-Focused, B = Inspiration-Driven, C = Fragmented Growth, D = Embedded Practice
-  const calculateResult = () => {
+  const calculateResult = (answers: Record<number, string>) => {
     const counts = { A: 0, B: 0, C: 0, D: 0 };
-
     Object.values(answers).forEach(answer => {
       counts[answer as keyof typeof counts]++;
     });
-
-    // Find the type with highest count
     const maxCount = Math.max(...Object.values(counts));
-    const resultType = Object.entries(counts).find(([_, count]) => count === maxCount)?.[0] as QuadrantType || 'A';
+    return Object.entries(counts).find(([_, count]) => count === maxCount)?.[0] || 'A';
+  };
 
-    setResult(resultType);
+  const handleSubmit = () => {
+    if (Object.keys(answers).length < questions.length) {
+      return;
+    }
+
+    const result = calculateResult(answers);
+    setResultType(result);
     setShowResults(true);
 
     // Scroll to results
@@ -160,7 +163,7 @@ export default function PDDiagnosticPage() {
   const handleRetake = () => {
     setAnswers({});
     setShowResults(false);
-    setResult(null);
+    setResultType(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -174,14 +177,14 @@ export default function PDDiagnosticPage() {
         questions={questions}
         answers={answers}
         onAnswer={handleAnswer}
-        onSubmit={calculateResult}
+        onSubmit={handleSubmit}
         allAnswered={allAnswered}
       />
 
-      {showResults && result && (
+      {showResults && resultType && (
         <DiagnosticResults
-          result={result}
-          quadrantInfo={quadrantInfo}
+          result={resultType as QuadrantType}
+          quadrantInfo={results}
           onRetake={handleRetake}
         />
       )}
