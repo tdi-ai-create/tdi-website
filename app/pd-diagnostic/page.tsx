@@ -253,6 +253,13 @@ export default function PDDiagnosticPage() {
         if (state.showResults) {
           setShowResults(true);
           setEmailSubmitted(true);
+          // Scroll to results on refresh (delay to override ScrollToTop)
+          setTimeout(() => {
+            const resultsSection = document.getElementById('results');
+            if (resultsSection) {
+              resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }, 500);
         }
       }
     } catch {
@@ -290,6 +297,13 @@ export default function PDDiagnosticPage() {
         submitDiagnosticResult(result);
         setEmailSubmitted(true);
         setShowResults(true);
+        // Scroll to results
+        setTimeout(() => {
+          const resultsSection = document.getElementById('results');
+          if (resultsSection) {
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 150);
       }
     }
   }, [allQuestionsAnswered, showResults, isReturningUser]);
@@ -400,22 +414,23 @@ export default function PDDiagnosticPage() {
     setEmailSubmitted(true);
     setShowResults(true);
     setIsSubmitting(false);
+
+    // Scroll to results after state updates
+    setTimeout(() => {
+      const resultsSection = document.getElementById('results');
+      if (resultsSection) {
+        resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 150);
   };
 
-  // Track results view and scroll to results
+  // Track results view
   useEffect(() => {
     if (showResults && resultType) {
       sendGAEvent('diagnostic_results_viewed', {
         event_category: 'PD Diagnostic',
         event_label: resultData[resultType].name,
       });
-      // Scroll to results section
-      setTimeout(() => {
-        const resultsSection = document.getElementById('results');
-        if (resultsSection) {
-          resultsSection.scrollIntoView({ behavior: 'smooth' });
-        }
-      }, 100);
     }
   }, [showResults, resultType]);
 
