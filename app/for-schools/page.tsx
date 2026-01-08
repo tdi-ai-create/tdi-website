@@ -50,18 +50,18 @@ export default function ForSchoolsPage() {
             {/* Hero CTAs */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
               <a
-                href="/pd-diagnostic"
-                className="px-6 py-3 rounded-full font-semibold transition-all hover:shadow-lg"
+                href="#blueprint"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-lg font-bold text-lg transition-all hover-glow"
                 style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
               >
-                Take the Free Diagnostic
+                Explore the TDI Blueprint
               </a>
               <a
-                href="/contact"
-                className="font-semibold transition-colors hover:opacity-80"
-                style={{ color: '#80a4ed' }}
+                href="/pd-diagnostic"
+                className="inline-flex items-center justify-center px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover-lift"
+                style={{ borderColor: '#ffffff', color: '#ffffff' }}
               >
-                Or schedule a call →
+                Take the Free Diagnostic
               </a>
             </div>
             <p className="text-sm mt-4 text-center" style={{ color: '#ffffff', opacity: 0.7 }}>
