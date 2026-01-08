@@ -737,6 +737,11 @@ export default function PDDiagnosticPage() {
           <section id="results" className="py-16 md:py-24 bg-white">
             <div className="container mx-auto px-4">
               <div className="max-w-2xl mx-auto">
+                {/* Results Header */}
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-12" style={{ color: '#ffba06' }}>
+                  Results are In
+                </h1>
+
                 {/* Their PD Type */}
                 <div className="text-center mb-8">
                   <p className="text-sm font-medium uppercase tracking-wide mb-2" style={{ color: '#80a4ed' }}>
