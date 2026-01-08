@@ -45,7 +45,7 @@ const resources = [
     external: true,
   },
   {
-    title: 'Order Our Book',
+    title: 'Order\nOur Book',
     description: 'Get your copy of Teachers Deserve It\non Amazon.',
     href: 'https://www.amazon.com/Teachers-Deserve-Rae-Hughart/dp/1951600649',
     icon: BookMarked,
