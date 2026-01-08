@@ -892,7 +892,7 @@ export default function PDDiagnosticPage() {
           </section>
 
           {/* Testimonials Section - Teachers */}
-          <section className="py-16 md:py-20 bg-[#1e2749]">
+          <section className="pt-8 pb-16 md:pt-10 md:pb-20 bg-[#1e2749]">
             <div className="container mx-auto px-4">
               <div className="max-w-5xl mx-auto">
                 <h3 className="text-2xl md:text-3xl font-bold text-white text-center mb-10">
