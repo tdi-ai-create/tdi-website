@@ -152,7 +152,7 @@ export default function PDDiagnosticPage() {
         <div
           className="absolute inset-0 z-0"
           style={{
-            background: 'linear-gradient(135deg, #1e2749 0%, #1B4965 50%, #1e3a5f 100%)',
+            background: 'linear-gradient(135deg, #1e2749 0%, #1e2749 50%, #1e3a5f 100%)',
           }}
         />
 
@@ -202,7 +202,7 @@ export default function PDDiagnosticPage() {
       </section>
 
       {/* DIAGNOSTIC FORM SECTION */}
-      <section className="py-16 md:py-24 bg-[#1B4965]">
+      <section className="py-16 md:py-24 bg-[#1e2749]">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
             <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-4">
@@ -249,13 +249,13 @@ export default function PDDiagnosticPage() {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <a
                     href="/contact"
-                    className="inline-block px-8 py-4 bg-[#1B4965] text-white font-semibold rounded-full hover:bg-[#143a52] transition-colors"
+                    className="inline-block px-8 py-4 bg-[#1e2749] text-white font-semibold rounded-full hover:bg-[#151d38] transition-colors"
                   >
                     Schedule a Conversation
                   </a>
                   <a
                     href="/downloads/PD_Outcome_Diagnostic.pdf"
-                    className="inline-block px-8 py-4 bg-white text-[#1B4965] font-semibold rounded-full border-2 border-[#1B4965] hover:bg-slate-50 transition-colors"
+                    className="inline-block px-8 py-4 bg-white text-[#1e2749] font-semibold rounded-full border-2 border-[#1e2749] hover:bg-slate-50 transition-colors"
                   >
                     Download Full Framework
                   </a>
