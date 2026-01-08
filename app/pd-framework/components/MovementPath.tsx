@@ -85,9 +85,6 @@ export default function MovementPath() {
               <p className="text-sm italic mb-2" style={{ color: '#1e2749', opacity: 0.8 }}>
                 "We started as Compliance-Focused. Eighteen months later, our teachers describe our PD as 'actually useful.' We're not perfect, but we're moving."
               </p>
-              <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>
-                [TESTIMONIAL NEEDED]
-              </p>
               <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>
                 School Administrator
               </p>
@@ -96,9 +93,6 @@ export default function MovementPath() {
             <div className="bg-white rounded-xl p-4 shadow-sm">
               <p className="text-sm italic mb-2" style={{ color: '#1e2749', opacity: 0.8 }}>
                 "I used to dread PD days. Now I actually look forward to them because I know I'll walk away with something I can use tomorrow."
-              </p>
-              <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>
-                [TESTIMONIAL NEEDED]
               </p>
               <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>
                 Classroom Teacher
