@@ -527,7 +527,7 @@ export default function PDDiagnosticPage() {
                   {/* Testimonial */}
                   <div className="max-w-2xl mx-auto p-4 rounded-xl bg-white/10 backdrop-blur-sm">
                     <p className="text-sm italic mb-2 text-white/90">
-                      &quot;This diagnostic helped us see exactly where our PD was falling short. Within 10 minutes, we had a clear picture of what needed to change.&quot;
+                      &quot;This diagnostic helped us see exactly where our PD was falling short. Within 10 minutes,<br />we had a clear picture of what needed to change.&quot;
                     </p>
                     <p className="text-xs font-medium text-white/60">
                       - K-8 Principal, Illinois
