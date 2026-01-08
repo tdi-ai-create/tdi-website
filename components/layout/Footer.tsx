@@ -74,6 +74,11 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/pd-diagnostic" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
+                    PD Diagnostic
+                  </Link>
+                </li>
+                <li>
                   <Link href="/free-pd-plan" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Free PD Plan
                   </Link>
@@ -87,11 +92,6 @@ export function Footer() {
                   <a href="https://drive.google.com/file/d/1q499mCTZxd8RJDidRZ7iKr9Ei3xssP9b/view?usp=sharing" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Become a Creator
                   </a>
-                </li>
-                <li>
-                  <Link href="/pd-diagnostic" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
-                    PD Diagnostic
-                  </Link>
                 </li>
               </ul>
             </div>
