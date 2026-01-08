@@ -824,7 +824,7 @@ export default function PDDiagnosticPage() {
                       Ready to move from <span style={{ color: '#ffba06' }}>{resultData[resultType].name}</span> to Embedded Practice?
                     </p>
                     <p className="text-white/60 text-sm mb-6">
-                      See the full framework, learn what drives each quadrant, and get a clear roadmap for improvement.
+                      See the full framework, learn what drives each quadrant,<br />and get a clear roadmap for improvement.
                     </p>
                     <Link
                       href={`/pd-framework?utm_source=diagnostic&utm_medium=results&utm_campaign=framework_cta#${resultData[resultType].anchorId}`}
