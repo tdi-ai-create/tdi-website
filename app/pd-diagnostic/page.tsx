@@ -165,7 +165,6 @@ export default function PDDiagnosticPage() {
   // Wizard state
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [diagnosticStarted, setDiagnosticStarted] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [resultType, setResultType] = useState<string | null>(null);
   const [isReturningUser, setIsReturningUser] = useState(false);
@@ -186,7 +185,7 @@ export default function PDDiagnosticPage() {
 
   // Keyboard navigation for wizard
   useEffect(() => {
-    if (!diagnosticStarted || allQuestionsAnswered || showResults) return;
+    if (allQuestionsAnswered || showResults) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       const optionsCount = questions[currentQuestion - 1].options.length;
@@ -216,7 +215,7 @@ export default function PDDiagnosticPage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [diagnosticStarted, allQuestionsAnswered, showResults, currentQuestion, focusedOption]);
+  }, [allQuestionsAnswered, showResults, currentQuestion, focusedOption]);
 
   // Reset focused option when question changes
   useEffect(() => {
@@ -398,20 +397,12 @@ export default function PDDiagnosticPage() {
     }
   };
 
-  const startDiagnostic = () => {
-    setDiagnosticStarted(true);
-    sendGAEvent('diagnostic_started', {
-      event_category: 'PD Diagnostic',
-      event_label: 'Start Button Clicked',
-    });
-  };
-
   const currentQ = questions[currentQuestion - 1];
 
   return (
     <main className="min-h-screen">
-      {/* INTRO SECTION - Shows before diagnostic starts */}
-      {!diagnosticStarted && !showResults && (
+      {/* INTRO SECTION - Always shows unless viewing results */}
+      {!showResults && (
         <>
           {/* Hero Section */}
           <section className="relative min-h-[600px] flex items-center py-16">
@@ -486,26 +477,12 @@ export default function PDDiagnosticPage() {
               </div>
 
               {/* Testimonial */}
-              <div className="max-w-2xl mx-auto p-4 rounded-xl mb-8" style={{ backgroundColor: '#f5f5f5' }}>
+              <div className="max-w-2xl mx-auto p-4 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
                 <p className="text-sm italic mb-2" style={{ color: '#1e2749' }}>
                   &quot;This diagnostic helped us see exactly where our PD was falling short. Within 10 minutes, we had a clear picture of what needed to change.&quot;
                 </p>
                 <p className="text-xs font-medium" style={{ color: '#1e2749', opacity: 0.7 }}>
                   - K-8 Principal, Illinois
-                </p>
-              </div>
-
-              {/* Start Button */}
-              <div className="text-center">
-                <button
-                  onClick={startDiagnostic}
-                  className="px-10 py-4 rounded-full font-semibold text-lg transition-all hover:shadow-lg"
-                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                >
-                  Take the Diagnostic
-                </button>
-                <p className="mt-3 text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>
-                  8 questions - takes about 3 minutes
                 </p>
               </div>
             </div>
@@ -514,10 +491,18 @@ export default function PDDiagnosticPage() {
       )}
 
       {/* WIZARD DIAGNOSTIC - One question at a time */}
-      {diagnosticStarted && !allQuestionsAnswered && !showResults && (
-        <section className="min-h-screen py-16" style={{ backgroundColor: '#1e2749' }}>
+      {!allQuestionsAnswered && !showResults && (
+        <section className="py-16" style={{ backgroundColor: '#1e2749' }}>
           <div className="container mx-auto px-4">
             <div className="max-w-2xl mx-auto">
+              {/* Section Header */}
+              <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-2">
+                Take the Diagnostic
+              </h2>
+              <p className="text-white/60 text-center mb-8">
+                8 questions to discover your PD type
+              </p>
+
               {/* Progress Indicator */}
               <div className="mb-6">
                 <div className="flex justify-between items-center mb-2">
