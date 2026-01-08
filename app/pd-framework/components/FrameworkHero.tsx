@@ -42,7 +42,7 @@ export default function FrameworkHero({ onCtaClick }: FrameworkHeroProps) {
           </Link>
 
           {/* Title */}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-center" style={{ color: '#1e2749' }}>
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-center" style={{ color: '#1e2749' }}>
             You know where your PD sits. Here's how schools move toward sustainable, embedded practice.
           </h1>
         </div>
