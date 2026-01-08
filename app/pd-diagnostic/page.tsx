@@ -823,7 +823,7 @@ export default function PDDiagnosticPage() {
                     <p className="text-white text-2xl md:text-3xl font-bold mb-3">
                       Ready to move from <span style={{ color: '#ffba06' }}>{resultData[resultType].name}</span> to Embedded Practice?
                     </p>
-                    <p className="text-white/60 text-sm mb-6">
+                    <p className="text-white/70 text-lg md:text-xl mb-6">
                       See the full framework, learn what drives each quadrant,<br />and get a clear roadmap for improvement.
                     </p>
                     <Link
