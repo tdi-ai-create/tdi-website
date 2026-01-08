@@ -817,16 +817,24 @@ export default function PDDiagnosticPage() {
                 </div>
 
                 {/* CTAs */}
-                <div className="text-center space-y-4">
-                  {/* Primary CTA */}
-                  <Link
-                    href={`/pd-framework?utm_source=diagnostic&utm_medium=results&utm_campaign=framework_cta#${resultData[resultType].anchorId}`}
-                    onClick={handleFrameworkClick}
-                    className="inline-block px-8 py-4 rounded-full font-semibold transition-all hover:shadow-lg"
-                    style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                  >
-                    Explore the Full PD Framework
-                  </Link>
+                <div className="text-center space-y-6">
+                  {/* Primary CTA Block */}
+                  <div className="bg-[#1e2749] rounded-2xl p-8">
+                    <p className="text-white/80 text-lg mb-2">
+                      Ready to move from <span className="font-semibold text-white">{resultData[resultType].name}</span> to Embedded Practice?
+                    </p>
+                    <p className="text-white/60 text-sm mb-6">
+                      See the full framework, learn what drives each quadrant, and get a clear roadmap for improvement.
+                    </p>
+                    <Link
+                      href={`/pd-framework?utm_source=diagnostic&utm_medium=results&utm_campaign=framework_cta#${resultData[resultType].anchorId}`}
+                      onClick={handleFrameworkClick}
+                      className="inline-block px-10 py-5 rounded-full font-bold text-lg transition-all hover:shadow-xl hover:-translate-y-1"
+                      style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                    >
+                      See the Full PD Framework →
+                    </Link>
+                  </div>
 
                   {/* Secondary CTA */}
                   <div>
