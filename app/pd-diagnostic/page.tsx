@@ -158,8 +158,9 @@ const resultData: Record<string, {
   }
 };
 
-// localStorage key for returning users
+// localStorage keys
 const STORAGE_KEY = 'tdi_diagnostic_user';
+const DIAGNOSTIC_STATE_KEY = 'tdi_diagnostic_state';
 
 export default function PDDiagnosticPage() {
   // Wizard state
@@ -168,6 +169,7 @@ export default function PDDiagnosticPage() {
   const [showResults, setShowResults] = useState(false);
   const [resultType, setResultType] = useState<string | null>(null);
   const [isReturningUser, setIsReturningUser] = useState(false);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   // Email capture state
   const [email, setEmail] = useState('');
@@ -222,12 +224,13 @@ export default function PDDiagnosticPage() {
     setFocusedOption(0);
   }, [currentQuestion]);
 
-  // Check for returning user on mount
+  // Load saved state on mount
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const userData = JSON.parse(stored);
+      // Load user data
+      const storedUser = localStorage.getItem(STORAGE_KEY);
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
         if (userData.email) {
           setEmail(userData.email);
           setName(userData.name || '');
@@ -235,9 +238,27 @@ export default function PDDiagnosticPage() {
           setIsReturningUser(true);
         }
       }
+
+      // Load diagnostic state (answers, results)
+      const storedState = localStorage.getItem(DIAGNOSTIC_STATE_KEY);
+      if (storedState) {
+        const state = JSON.parse(storedState);
+        if (state.answers && Object.keys(state.answers).length > 0) {
+          setAnswers(state.answers);
+          setCurrentQuestion(Math.min(Object.keys(state.answers).length + 1, 8));
+        }
+        if (state.resultType) {
+          setResultType(state.resultType);
+        }
+        if (state.showResults) {
+          setShowResults(true);
+          setEmailSubmitted(true);
+        }
+      }
     } catch {
       // localStorage not available or invalid data
     }
+    setIsHydrated(true);
   }, []);
 
   // Track page view
@@ -272,6 +293,20 @@ export default function PDDiagnosticPage() {
       }
     }
   }, [allQuestionsAnswered, showResults, isReturningUser]);
+
+  // Save diagnostic state to localStorage
+  useEffect(() => {
+    if (!isHydrated) return;
+    try {
+      localStorage.setItem(DIAGNOSTIC_STATE_KEY, JSON.stringify({
+        answers,
+        resultType,
+        showResults,
+      }));
+    } catch {
+      // localStorage not available
+    }
+  }, [answers, resultType, showResults, isHydrated]);
 
   const handleAnswerSelect = (questionId: number, value: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
@@ -408,11 +443,9 @@ export default function PDDiagnosticPage() {
 
   return (
     <main className="min-h-screen">
-      {/* INTRO SECTION - Always shows unless viewing results */}
-      {!showResults && (
-        <>
-          {/* Hero Section */}
-          <section className="relative min-h-[600px] flex items-center py-16">
+      {/* INTRO SECTION - Always shows */}
+      {/* Hero Section */}
+      <section className="relative min-h-[600px] flex items-center py-16">
             {/* Background Image */}
             <div
               className="absolute inset-0 z-0"
@@ -469,33 +502,31 @@ export default function PDDiagnosticPage() {
             </div>
           </section>
 
-          {/* Credibility Signals */}
-          <section className="py-12 bg-white">
-            <div className="container mx-auto px-4">
-              {/* Credibility info */}
-              <div className="max-w-3xl mx-auto mb-8 text-center">
-                <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
-                  Developed by the Teachers Deserve It team - former teachers, content experts, and PD specialists
-                </p>
-                <div className="flex flex-wrap justify-center gap-6 text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  <span>500+ schools assessed</span>
-                  <span>Based on implementation research</span>
-                </div>
-              </div>
-
-              {/* Testimonial */}
-              <div className="max-w-2xl mx-auto p-4 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
-                <p className="text-sm italic mb-2" style={{ color: '#1e2749' }}>
-                  &quot;This diagnostic helped us see exactly where our PD was falling short. Within 10 minutes, we had a clear picture of what needed to change.&quot;
-                </p>
-                <p className="text-xs font-medium" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  - K-8 Principal, Illinois
-                </p>
-              </div>
+      {/* Credibility Signals */}
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          {/* Credibility info */}
+          <div className="max-w-3xl mx-auto mb-8 text-center">
+            <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
+              Developed by the Teachers Deserve It team - former teachers, content experts, and PD specialists
+            </p>
+            <div className="flex flex-wrap justify-center gap-6 text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+              <span>500+ schools assessed</span>
+              <span>Based on implementation research</span>
             </div>
-          </section>
-        </>
-      )}
+          </div>
+
+          {/* Testimonial */}
+          <div className="max-w-2xl mx-auto p-4 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+            <p className="text-sm italic mb-2" style={{ color: '#1e2749' }}>
+              &quot;This diagnostic helped us see exactly where our PD was falling short. Within 10 minutes, we had a clear picture of what needed to change.&quot;
+            </p>
+            <p className="text-xs font-medium" style={{ color: '#1e2749', opacity: 0.7 }}>
+              - K-8 Principal, Illinois
+            </p>
+          </div>
+        </div>
+      </section>
 
       {/* WIZARD DIAGNOSTIC - One question at a time */}
       {!allQuestionsAnswered && !showResults && (
