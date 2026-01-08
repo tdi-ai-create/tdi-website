@@ -14,8 +14,8 @@ export default function CalculatorPage() {
         className="absolute inset-0 z-0"
         style={{
           backgroundImage: "url('/images/hero-rae-background.png')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'right center',
+          backgroundSize: '150%',
+          backgroundPosition: '80% center',
           backgroundRepeat: 'no-repeat',
         }}
       />
