@@ -7,13 +7,32 @@ export const metadata = {
 
 export default function CalculatorPage() {
   return (
-    <main
-      className="min-h-screen flex items-center justify-center py-16 px-4"
-      style={{ backgroundColor: '#1e2749' }}
-    >
-      <div className="w-full max-w-2xl">
+    <main className="relative min-h-screen flex items-center justify-center py-16 px-4">
+
+      {/* Background Image */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: "url('/images/hero-rae-background.png')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      />
+
+      {/* Navy Gradient Overlay */}
+      <div
+        className="absolute inset-0 z-10"
+        style={{
+          background: 'linear-gradient(135deg, rgba(30, 39, 73, 0.92) 0%, rgba(30, 39, 73, 0.85) 100%)'
+        }}
+      />
+
+      {/* Calculator Content */}
+      <div className="relative z-20 w-full max-w-2xl">
         <TabbedCalculator defaultTab="teachers" />
       </div>
+
     </main>
   );
 }
