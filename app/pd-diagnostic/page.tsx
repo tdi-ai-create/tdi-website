@@ -171,7 +171,7 @@ export default function PDDiagnosticPage() {
             {/* Header */}
             <div className="text-center mb-10">
               <div className="inline-block bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
-                <span className="text-white/80 text-sm font-medium">📊 Free Self-Assessment</span>
+                <span className="text-white/80 text-sm font-bold">Free Self-Assessment</span>
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
