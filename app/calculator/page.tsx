@@ -52,7 +52,7 @@ export default function CalculatorPage() {
             className="inline-block px-8 py-3 rounded-full font-bold transition-all hover:shadow-lg hover:-translate-y-1"
             style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
           >
-            Join the Movement
+            Explore More Free Resources
           </Link>
         </div>
       </section>
