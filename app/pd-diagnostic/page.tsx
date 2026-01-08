@@ -252,7 +252,7 @@ export default function PDDiagnosticPage() {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <a
                     href="/contact"
-                    className="inline-block px-8 py-4 bg-[#F9B91B] text-[#1e2749] font-semibold rounded-full hover:bg-white transition-colors"
+                    className="inline-block px-8 py-4 bg-[#F9B91B] text-[#1e2749] font-semibold rounded-full hover:bg-[#F9B91B] transition-colors"
                   >
                     Schedule a Conversation
                   </a>
