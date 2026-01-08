@@ -246,9 +246,9 @@ export default function PDDiagnosticPage() {
 
               {/* CTAs */}
               <div className="mt-12 text-center">
-                <p className="text-slate-600 mb-6">
+                <h3 className="text-2xl md:text-3xl font-bold text-slate-800 mb-6">
                   Want to explore what shifting positions would require?
-                </p>
+                </h3>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <a
                     href="/contact"
