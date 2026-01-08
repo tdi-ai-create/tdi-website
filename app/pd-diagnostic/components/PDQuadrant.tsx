@@ -139,16 +139,16 @@ export default function PDQuadrant({
         })}
       </div>
 
-      {/* Axis Labels - subtle, below the grid */}
+      {/* Axis Labels - below the grid */}
       <div className="mt-8 pt-4 border-t border-slate-200">
-        <div className="flex justify-between text-xs text-slate-400">
+        <div className="flex justify-between text-slate-600">
           <div className="text-center">
-            <div className="font-medium">← Event-Based PD</div>
-            <div className="text-[10px]">Core staff only</div>
+            <div className="text-base font-bold">← Event-Based PD</div>
+            <div className="text-sm font-bold">Core staff only</div>
           </div>
           <div className="text-center">
-            <div className="font-medium">System-Based PD →</div>
-            <div className="text-[10px]">Whole staff supported</div>
+            <div className="text-base font-bold">System-Based PD →</div>
+            <div className="text-sm font-bold">Whole staff supported</div>
           </div>
         </div>
       </div>
