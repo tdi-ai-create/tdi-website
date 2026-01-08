@@ -826,7 +826,7 @@ export default function PDDiagnosticPage() {
                   {/* Primary CTA Block */}
                   <div className="bg-[#1e2749] rounded-2xl p-8">
                     <p className="text-white text-2xl md:text-3xl font-bold mb-3">
-                      Ready to move from <span style={{ color: '#ffba06' }}>{resultData[resultType].name}</span> to Embedded Practice?
+                      Discover how to move from <span style={{ color: '#ffba06' }}>{resultData[resultType].name}</span> to Embedded Practice.
                     </p>
                     <p className="text-white/70 text-lg md:text-xl mb-6">
                       See the full framework, learn what drives each quadrant,<br />and get a clear roadmap for improvement.
