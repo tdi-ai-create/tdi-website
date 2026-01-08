@@ -177,8 +177,51 @@ export default function PDDiagnosticPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [emailSubmitted, setEmailSubmitted] = useState(false);
 
+  // Keyboard navigation state
+  const [focusedOption, setFocusedOption] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
   const allQuestionsAnswered = Object.keys(answers).length === 8;
   const progressPercent = Math.round(((Object.keys(answers).length) / 8) * 100);
+
+  // Keyboard navigation for wizard
+  useEffect(() => {
+    if (!diagnosticStarted || allQuestionsAnswered || showResults) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const optionsCount = questions[currentQuestion - 1].options.length;
+
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setFocusedOption((prev) => (prev + 1) % optionsCount);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setFocusedOption((prev) => (prev - 1 + optionsCount) % optionsCount);
+          break;
+        case 'Enter':
+          e.preventDefault();
+          const selectedValue = questions[currentQuestion - 1].options[focusedOption].value;
+          handleAnswerSelect(currentQuestion, selectedValue);
+          break;
+        case 'Backspace':
+          if (currentQuestion > 1) {
+            e.preventDefault();
+            goToPreviousQuestion();
+          }
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [diagnosticStarted, allQuestionsAnswered, showResults, currentQuestion, focusedOption]);
+
+  // Reset focused option when question changes
+  useEffect(() => {
+    setFocusedOption(0);
+  }, [currentQuestion]);
 
   // Check for returning user on mount
   useEffect(() => {
@@ -240,11 +283,23 @@ export default function PDDiagnosticPage() {
       value: questionId,
     });
 
-    // Auto-advance to next question after a brief delay
+    // Auto-advance to next question with fade animation
     if (questionId < 8) {
+      setIsTransitioning(true);
       setTimeout(() => {
         setCurrentQuestion(questionId + 1);
+        setIsTransitioning(false);
       }, 300);
+    }
+  };
+
+  const goToPreviousQuestion = () => {
+    if (currentQuestion > 1) {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentQuestion(currentQuestion - 1);
+        setIsTransitioning(false);
+      }, 150);
     }
   };
 
@@ -464,7 +519,7 @@ export default function PDDiagnosticPage() {
           <div className="container mx-auto px-4">
             <div className="max-w-2xl mx-auto">
               {/* Progress Indicator */}
-              <div className="mb-8">
+              <div className="mb-6">
                 <div className="flex justify-between items-center mb-2">
                   <span className="text-sm font-medium text-white">
                     Question {currentQuestion} of 8
@@ -484,34 +539,78 @@ export default function PDDiagnosticPage() {
                 </div>
               </div>
 
-              {/* Single Question Display */}
-              <div className="text-center">
+              {/* Question Dots Preview */}
+              <div className="flex justify-center gap-2 mb-8">
+                {questions.map((_, index) => {
+                  const questionNum = index + 1;
+                  const isAnswered = answers[questionNum] !== undefined;
+                  const isCurrent = questionNum === currentQuestion;
+                  return (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        if (isAnswered || questionNum <= Object.keys(answers).length + 1) {
+                          setCurrentQuestion(questionNum);
+                        }
+                      }}
+                      disabled={!isAnswered && questionNum > Object.keys(answers).length + 1}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                        isCurrent
+                          ? 'w-6 bg-yellow-400'
+                          : isAnswered
+                          ? 'bg-yellow-400/60 hover:bg-yellow-400/80 cursor-pointer'
+                          : 'bg-white/20'
+                      } ${!isAnswered && questionNum > Object.keys(answers).length + 1 ? 'cursor-not-allowed' : ''}`}
+                      title={isAnswered ? `Question ${questionNum} (answered)` : `Question ${questionNum}`}
+                    />
+                  );
+                })}
+              </div>
+
+              {/* Single Question Display with Fade Animation */}
+              <div
+                className={`text-center transition-opacity duration-200 ${
+                  isTransitioning ? 'opacity-0' : 'opacity-100'
+                }`}
+              >
                 <h2 className="text-xl md:text-2xl font-bold text-white mb-8">
                   {currentQ.question}
                 </h2>
 
                 <div className="space-y-3">
-                  {currentQ.options.map((option) => (
-                    <button
-                      key={option.value}
-                      onClick={() => handleAnswerSelect(currentQuestion, option.value)}
-                      className={`w-full p-4 rounded-xl text-left transition-all border-2 hover:border-yellow-400 hover:shadow-md ${
-                        answers[currentQuestion] === option.value
-                          ? 'border-yellow-400 bg-yellow-50'
-                          : 'border-gray-200 bg-white'
-                      }`}
-                      style={{ color: '#1e2749' }}
-                    >
-                      {option.label}
-                    </button>
-                  ))}
+                  {currentQ.options.map((option, index) => {
+                    const isSelected = answers[currentQuestion] === option.value;
+                    const isFocused = focusedOption === index;
+                    return (
+                      <button
+                        key={option.value}
+                        onClick={() => handleAnswerSelect(currentQuestion, option.value)}
+                        onMouseEnter={() => setFocusedOption(index)}
+                        className={`w-full p-4 rounded-xl text-left transition-all border-2 ${
+                          isSelected
+                            ? 'border-yellow-400 bg-yellow-50'
+                            : isFocused
+                            ? 'border-yellow-400/70 bg-yellow-50/50 shadow-md'
+                            : 'border-gray-200 bg-white hover:border-yellow-400 hover:shadow-md'
+                        }`}
+                        style={{ color: '#1e2749' }}
+                      >
+                        {option.label}
+                      </button>
+                    );
+                  })}
                 </div>
+
+                {/* Keyboard Hint */}
+                <p className="mt-6 text-xs text-white/40 hidden md:block">
+                  Use arrow keys to navigate, Enter to select
+                </p>
 
                 {/* Back Button */}
                 {currentQuestion > 1 && (
                   <button
-                    onClick={() => setCurrentQuestion(currentQuestion - 1)}
-                    className="mt-8 text-sm font-medium hover:underline text-white/70 hover:text-white"
+                    onClick={goToPreviousQuestion}
+                    className="mt-4 text-sm font-medium hover:underline text-white/70 hover:text-white"
                   >
                     Back to previous question
                   </button>
