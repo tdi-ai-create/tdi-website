@@ -69,7 +69,7 @@ export default function PDQuadrant({
       {/* Prompt */}
       <div className="text-center mb-8">
         <p className="text-lg text-slate-600 font-bold">
-          Which one sounds most like your school?
+          Which one sounds most like your school? (Click the Best Option Below)
         </p>
       </div>
 
