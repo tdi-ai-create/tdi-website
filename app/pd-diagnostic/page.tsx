@@ -513,35 +513,30 @@ export default function PDDiagnosticPage() {
                     }}
                   />
                 </div>
+
+                {/* Credibility Signals */}
+                <div className="mt-10 text-center">
+                  <p className="text-sm mb-4 text-white/80">
+                    Developed by the Teachers Deserve It team - former teachers, content experts, and PD specialists
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-6 text-sm text-white/60 mb-6">
+                    <span>500+ schools assessed</span>
+                    <span>Based on implementation research</span>
+                  </div>
+
+                  {/* Testimonial */}
+                  <div className="max-w-2xl mx-auto p-4 rounded-xl bg-white/10 backdrop-blur-sm">
+                    <p className="text-sm italic mb-2 text-white/90">
+                      &quot;This diagnostic helped us see exactly where our PD was falling short. Within 10 minutes, we had a clear picture of what needed to change.&quot;
+                    </p>
+                    <p className="text-xs font-medium text-white/60">
+                      - K-8 Principal, Illinois
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </section>
-
-      {/* Credibility Signals */}
-      <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          {/* Credibility info */}
-          <div className="max-w-3xl mx-auto mb-8 text-center">
-            <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
-              Developed by the Teachers Deserve It team - former teachers, content experts, and PD specialists
-            </p>
-            <div className="flex flex-wrap justify-center gap-6 text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-              <span>500+ schools assessed</span>
-              <span>Based on implementation research</span>
-            </div>
-          </div>
-
-          {/* Testimonial */}
-          <div className="max-w-2xl mx-auto p-4 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
-            <p className="text-sm italic mb-2" style={{ color: '#1e2749' }}>
-              &quot;This diagnostic helped us see exactly where our PD was falling short. Within 10 minutes, we had a clear picture of what needed to change.&quot;
-            </p>
-            <p className="text-xs font-medium" style={{ color: '#1e2749', opacity: 0.7 }}>
-              - K-8 Principal, Illinois
-            </p>
-          </div>
-        </div>
-      </section>
 
       {/* WIZARD DIAGNOSTIC - One question at a time */}
       {!allQuestionsAnswered && !showResults && (
