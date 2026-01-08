@@ -367,13 +367,20 @@ export default function PDDiagnosticPage() {
     setIsSubmitting(false);
   };
 
-  // Track results view
+  // Track results view and scroll to results
   useEffect(() => {
     if (showResults && resultType) {
       sendGAEvent('diagnostic_results_viewed', {
         event_category: 'PD Diagnostic',
         event_label: resultData[resultType].name,
       });
+      // Scroll to results section
+      setTimeout(() => {
+        const resultsSection = document.getElementById('results');
+        if (resultsSection) {
+          resultsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
     }
   }, [showResults, resultType]);
 
@@ -606,63 +613,73 @@ export default function PDDiagnosticPage() {
         </section>
       )}
 
-      {/* EMAIL GATE - Shows after all questions answered (for new users) */}
-      {allQuestionsAnswered && !emailSubmitted && !isReturningUser && (
-        <section className="min-h-screen py-16 flex items-center" style={{ backgroundColor: '#1e2749' }}>
+      {/* EMAIL CAPTURE - Shows after all questions answered (for new users) */}
+      {allQuestionsAnswered && !isReturningUser && (
+        <section className="py-16" style={{ backgroundColor: '#1e2749' }}>
           <div className="container mx-auto px-4">
             <div className="max-w-xl mx-auto text-center">
-              <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
-                Your results are ready!
-              </h2>
-              <p className="text-white/80 mb-8">
-                Enter your email to see which of the 4 PD types your school is running - and what it means for your teachers.
-              </p>
+              {!emailSubmitted ? (
+                <>
+                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
+                    Your results are ready!
+                  </h2>
+                  <p className="text-white/80 mb-8">
+                    Enter your email to see which of the 4 PD types your school is running - and what it means for your teachers.
+                  </p>
 
-              <form onSubmit={handleEmailSubmit} className="space-y-4">
-                <div>
-                  <input
-                    type="email"
-                    required
-                    placeholder="you@yourschool.edu"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                    style={{ backgroundColor: '#ffffff' }}
-                  />
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    placeholder="Your name (optional)"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                    style={{ backgroundColor: '#ffffff' }}
-                  />
-                </div>
-                <div>
-                  <input
-                    type="text"
-                    placeholder="School name (optional)"
-                    value={schoolName}
-                    onChange={(e) => setSchoolName(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                    style={{ backgroundColor: '#ffffff' }}
-                  />
-                </div>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full px-6 py-3 rounded-full font-semibold transition-all hover:shadow-lg"
-                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                >
-                  {isSubmitting ? 'Loading...' : 'See My Results'}
-                </button>
-              </form>
+                  <form onSubmit={handleEmailSubmit} className="space-y-4">
+                    <div>
+                      <input
+                        type="email"
+                        required
+                        placeholder="you@yourschool.edu"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        style={{ backgroundColor: '#ffffff' }}
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="Your name (optional)"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        style={{ backgroundColor: '#ffffff' }}
+                      />
+                    </div>
+                    <div>
+                      <input
+                        type="text"
+                        placeholder="School name (optional)"
+                        value={schoolName}
+                        onChange={(e) => setSchoolName(e.target.value)}
+                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                        style={{ backgroundColor: '#ffffff' }}
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="w-full px-6 py-3 rounded-full font-semibold transition-all hover:shadow-lg"
+                      style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                    >
+                      {isSubmitting ? 'Loading...' : 'See My Results'}
+                    </button>
+                  </form>
 
-              <p className="mt-4 text-xs text-white/50">
-                We respect your privacy. Unsubscribe anytime.
-              </p>
+                  <p className="mt-4 text-xs text-white/50">
+                    We respect your privacy. Unsubscribe anytime.
+                  </p>
+                </>
+              ) : (
+                <div className="py-4">
+                  <p className="text-white/80 text-sm">
+                    Results sent to <span className="font-medium text-white">{email}</span>
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </section>
