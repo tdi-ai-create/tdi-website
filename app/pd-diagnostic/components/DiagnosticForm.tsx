@@ -64,7 +64,7 @@ export default function DiagnosticForm({
             px-10 py-4 rounded-full font-semibold text-lg
             transition-all duration-200
             ${allAnswered
-              ? 'bg-[#1B4965] text-white hover:bg-[#143a52] cursor-pointer'
+              ? 'bg-[#F9B91B] text-[#1e2749] hover:bg-white cursor-pointer'
               : 'bg-slate-200 text-slate-400 cursor-not-allowed'
             }
           `}
