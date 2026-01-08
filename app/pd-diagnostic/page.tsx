@@ -183,7 +183,7 @@ export default function PDDiagnosticPage() {
               </p>
 
               <p className="text-base text-white/60 max-w-2xl mx-auto">
-                Most leaders can identify their type immediately. This determines what you can expect for teacher retention, student outcomes, and school culture.
+                Most leaders can identify their type <em>immediately</em>. This determines what you can expect for teacher retention, student outcomes, and school culture.
               </p>
             </div>
 
