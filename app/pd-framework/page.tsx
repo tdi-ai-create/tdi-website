@@ -5,8 +5,6 @@ import FrameworkHero from './components/FrameworkHero';
 import MovementPath from './components/MovementPath';
 import TDIPhases from './components/TDIPhases';
 import ToolsGrid from './components/ToolsGrid';
-import LeadCapture from './components/LeadCapture';
-import FinalCTA from './components/FinalCTA';
 
 // GA4 event helper
 const sendGAEvent = (eventName: string, params: Record<string, string | number>) => {
@@ -66,16 +64,6 @@ export default function PDFrameworkPage() {
     });
   };
 
-  // Track lead capture submission
-  const handleLeadSubmit = (email: string, quadrant: string) => {
-    sendGAEvent('lead_capture_submit', {
-      quadrant_selected: quadrant,
-      page: 'pd_framework',
-    });
-    // Note: In production, this would also submit to your email service
-    console.log('Lead captured:', { email, quadrant });
-  };
-
   // Track funding callout click
   const handleFundingClick = () => {
     sendGAEvent('funding_callout_click', {
@@ -96,12 +84,6 @@ export default function PDFrameworkPage() {
 
       {/* Section 4: Tools to Help You */}
       <ToolsGrid onToolClick={handleToolClick} />
-
-      {/* Section 5: Lead Capture */}
-      <LeadCapture onSubmit={handleLeadSubmit} />
-
-      {/* Section 6: Final CTA */}
-      <FinalCTA onCtaClick={handleCtaClick} />
     </main>
   );
 }
