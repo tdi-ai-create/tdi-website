@@ -924,6 +924,45 @@ export default function PDDiagnosticPage() {
               </div>
             </div>
           </section>
+
+          {/* Final CTA Section - Repeated for scrollers */}
+          <section className="py-16 md:py-20 bg-gray-100">
+            <div className="container mx-auto px-4">
+              <div className="max-w-2xl mx-auto text-center">
+                {/* Next Step Label */}
+                <p className="text-xl md:text-2xl font-bold uppercase tracking-widest mb-6" style={{ color: '#ffba06' }}>
+                  Your Next Step
+                </p>
+
+                <p className="text-2xl md:text-3xl font-bold mb-3" style={{ color: '#1e2749' }}>
+                  Discover how to move from <span style={{ color: '#ffba06' }}>{resultData[resultType].name}</span> to Embedded Practice.
+                </p>
+                <p className="text-lg md:text-xl mb-8" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  See the full framework, learn what drives each quadrant,<br />and get a clear roadmap for improvement.
+                </p>
+                <Link
+                  href={`/pd-framework?utm_source=diagnostic&utm_medium=results&utm_campaign=framework_cta_bottom#${resultData[resultType].anchorId}`}
+                  onClick={handleFrameworkClick}
+                  className="inline-block px-10 py-5 rounded-full font-bold text-lg transition-all hover:shadow-xl hover:-translate-y-1"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                >
+                  See the Full PD Framework →
+                </Link>
+
+                {/* Secondary CTA */}
+                <div className="mt-6">
+                  <Link
+                    href="/contact?utm_source=diagnostic&utm_medium=results&utm_campaign=schedule_cta_bottom"
+                    onClick={handleScheduleClick}
+                    className="text-sm font-medium hover:underline"
+                    style={{ color: '#80a4ed' }}
+                  >
+                    Or schedule a call with our team
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
         </>
       )}
     </main>

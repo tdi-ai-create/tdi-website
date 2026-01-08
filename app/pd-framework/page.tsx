@@ -56,10 +56,10 @@ export default function PDFrameworkPage() {
     });
   };
 
-  // Track tool clicks
-  const handleToolClick = (toolName: string) => {
-    sendGAEvent('tool_card_click', {
-      tool_name: toolName,
+  // Track resource card clicks
+  const handleToolClick = (cardName: string) => {
+    sendGAEvent('resource_card_click', {
+      card_name: cardName,
       page: 'pd_framework',
     });
   };
