@@ -4,201 +4,159 @@ import { useState } from 'react';
 
 const quadrants = [
   {
-    id: 'B',
-    name: 'INSPIRATION-DRIVEN PD',
-    tagline: 'High energy, short-term lift',
-    bg: '#E8EEF4', // light slate blue
-  },
-  {
-    id: 'D',
-    name: 'EMBEDDED PRACTICE',
-    tagline: 'Consistent support, sustained outcomes',
-    bg: '#C9D6E3', // slightly darker - the "goal"
-  },
-  {
     id: 'A',
-    name: 'COMPLIANCE-FOCUSED PD',
-    tagline: 'Meets requirements, limited translation',
-    bg: '#F1F3F5', // lightest gray
+    emoji: '📋',
+    name: 'Compliance-Focused',
+    tagline: 'Meets requirements, limited classroom translation',
+    description: 'PD days happen. Boxes get checked. But Monday morning? Teachers are still on their own.',
+    gradient: 'from-slate-100 to-slate-200',
+    borderColor: 'border-slate-300',
+    selectedGradient: 'from-slate-200 to-slate-300',
+  },
+  {
+    id: 'B',
+    emoji: '✨',
+    name: 'Inspiration-Driven',
+    tagline: 'High energy, short-term lift',
+    description: 'Everyone leaves PD days fired up. But by October? Back to old habits.',
+    gradient: 'from-blue-50 to-indigo-100',
+    borderColor: 'border-blue-200',
+    selectedGradient: 'from-blue-100 to-indigo-200',
   },
   {
     id: 'C',
-    name: 'FRAGMENTED GROWTH',
+    emoji: '🧩',
+    name: 'Fragmented Growth',
     tagline: 'Strong pockets, uneven experience',
-    bg: '#E2E8F0', // light slate
+    description: 'Some teams are thriving. Others? Still waiting for support that never comes.',
+    gradient: 'from-amber-50 to-orange-100',
+    borderColor: 'border-amber-200',
+    selectedGradient: 'from-amber-100 to-orange-200',
+  },
+  {
+    id: 'D',
+    emoji: '🎯',
+    name: 'Embedded Practice',
+    tagline: 'Consistent support, sustained outcomes',
+    description: 'PD isn\'t an event — it\'s how your school operates. Everyone grows, all year.',
+    gradient: 'from-emerald-50 to-teal-100',
+    borderColor: 'border-emerald-200',
+    selectedGradient: 'from-emerald-100 to-teal-200',
   },
 ];
 
 export default function PDQuadrant({
   highlightQuadrant,
   interactive = true,
+  onSelect,
 }: {
   highlightQuadrant?: 'A' | 'B' | 'C' | 'D' | null;
   interactive?: boolean;
+  onSelect?: (id: string) => void;
 }) {
   const [hovered, setHovered] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(highlightQuadrant || null);
 
-  const getStyles = (id: string, bg: string) => {
-    const isHighlighted = highlightQuadrant === id;
-    const isDimmed = highlightQuadrant && highlightQuadrant !== id;
-    const isHovered = hovered === id && interactive;
-
-    return {
-      backgroundColor: bg,
-      transform: isHovered ? 'translateY(-2px)' : isHighlighted ? 'scale(1.02)' : 'none',
-      opacity: isDimmed ? 0.4 : 1,
-      boxShadow: isHovered
-        ? '0 8px 20px rgba(0,0,0,0.08)'
-        : isHighlighted
-        ? '0 0 0 3px #3b82f6'
-        : 'none',
-      transition: 'all 0.2s ease',
-    };
+  const handleClick = (id: string) => {
+    if (!interactive) return;
+    setSelected(id);
+    onSelect?.(id);
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto">
+    <div className="w-full max-w-3xl mx-auto">
 
-      {/* MATRIX CONTAINER */}
-      <div className="flex">
+      {/* Prompt */}
+      <div className="text-center mb-8">
+        <p className="text-lg text-slate-600 font-medium">
+          👇 Which one sounds most like your school?
+        </p>
+      </div>
 
-        {/* Y-AXIS LABEL (rotated, on left side) */}
-        <div className="flex flex-col justify-center items-center w-10 mr-3">
-          <span
-            className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest whitespace-nowrap"
-            style={{
-              writingMode: 'vertical-rl',
-              transform: 'rotate(180deg)',
-            }}
-          >
-            Staff Coverage
-          </span>
-        </div>
+      {/* Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {quadrants.map((quad) => {
+          const isSelected = selected === quad.id || highlightQuadrant === quad.id;
+          const isHovered = hovered === quad.id;
+          const isDimmed = (selected || highlightQuadrant) && !isSelected;
 
-        {/* MAIN CONTENT */}
-        <div className="flex-1">
-
-          {/* Y-axis top label */}
-          <div className="flex justify-between items-center mb-2 px-1">
-            <span className="text-[10px] text-slate-400">Whole-Staff</span>
-            <span></span>
-          </div>
-
-          {/* THE 2x2 GRID with arrow overlay */}
-          <div className="relative">
-
-            {/* Grid */}
-            <div className="grid grid-cols-2 gap-3">
-
-              {/* TOP LEFT: Inspiration-Driven (B) */}
-              <div
-                className={`rounded-xl p-5 text-center min-h-[120px] flex flex-col justify-center ${interactive ? 'cursor-pointer' : ''}`}
-                style={getStyles('B', quadrants[0].bg)}
-                onMouseEnter={() => interactive && setHovered('B')}
-                onMouseLeave={() => setHovered(null)}
-              >
-                <h4 className="text-sm font-bold text-slate-700 mb-1">
-                  {quadrants[0].name}
-                </h4>
-                <p className="text-xs text-slate-500 italic">{quadrants[0].tagline}</p>
-              </div>
-
-              {/* TOP RIGHT: Embedded Practice (D) - slightly emphasized */}
-              <div
-                className={`rounded-xl p-5 text-center min-h-[120px] flex flex-col justify-center ${interactive ? 'cursor-pointer' : ''}`}
-                style={getStyles('D', quadrants[1].bg)}
-                onMouseEnter={() => interactive && setHovered('D')}
-                onMouseLeave={() => setHovered(null)}
-              >
-                <h4 className="text-sm font-bold text-slate-700 mb-1">
-                  {quadrants[1].name}
-                </h4>
-                <p className="text-xs text-slate-500 italic">{quadrants[1].tagline}</p>
-              </div>
-
-              {/* BOTTOM LEFT: Compliance-Focused (A) */}
-              <div
-                className={`rounded-xl p-5 text-center min-h-[120px] flex flex-col justify-center ${interactive ? 'cursor-pointer' : ''}`}
-                style={getStyles('A', quadrants[2].bg)}
-                onMouseEnter={() => interactive && setHovered('A')}
-                onMouseLeave={() => setHovered(null)}
-              >
-                <h4 className="text-sm font-bold text-slate-700 mb-1">
-                  {quadrants[2].name}
-                </h4>
-                <p className="text-xs text-slate-500 italic">{quadrants[2].tagline}</p>
-              </div>
-
-              {/* BOTTOM RIGHT: Fragmented Growth (C) */}
-              <div
-                className={`rounded-xl p-5 text-center min-h-[120px] flex flex-col justify-center ${interactive ? 'cursor-pointer' : ''}`}
-                style={getStyles('C', quadrants[3].bg)}
-                onMouseEnter={() => interactive && setHovered('C')}
-                onMouseLeave={() => setHovered(null)}
-              >
-                <h4 className="text-sm font-bold text-slate-700 mb-1">
-                  {quadrants[3].name}
-                </h4>
-                <p className="text-xs text-slate-500 italic">{quadrants[3].tagline}</p>
-              </div>
-
-            </div>
-
-            {/* DIAGONAL ARROW OVERLAY */}
-            <svg
-              className="absolute inset-0 w-full h-full pointer-events-none"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
+          return (
+            <div
+              key={quad.id}
+              onClick={() => handleClick(quad.id)}
+              onMouseEnter={() => setHovered(quad.id)}
+              onMouseLeave={() => setHovered(null)}
+              className={`
+                relative overflow-hidden rounded-2xl p-6
+                border-2 transition-all duration-300 ease-out
+                ${interactive ? 'cursor-pointer' : ''}
+                ${isSelected ? quad.borderColor + ' border-2 shadow-lg' : 'border-transparent'}
+                ${isDimmed ? 'opacity-50 scale-95' : ''}
+                ${isHovered && !isSelected ? 'scale-[1.02] shadow-md' : ''}
+                bg-gradient-to-br ${isSelected ? quad.selectedGradient : quad.gradient}
+              `}
             >
-              <defs>
-                <marker
-                  id="arrowhead"
-                  markerWidth="10"
-                  markerHeight="7"
-                  refX="9"
-                  refY="3.5"
-                  orient="auto"
-                >
-                  <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8" />
-                </marker>
-              </defs>
-              <line
-                x1="15"
-                y1="85"
-                x2="85"
-                y2="15"
-                stroke="#94a3b8"
-                strokeWidth="0.8"
-                strokeDasharray="4,3"
-                markerEnd="url(#arrowhead)"
-                opacity="0.6"
-              />
-            </svg>
+              {/* Selected checkmark */}
+              {isSelected && (
+                <div className="absolute top-3 right-3 w-6 h-6 bg-white rounded-full flex items-center justify-center shadow-sm">
+                  <span className="text-emerald-500 text-sm">✓</span>
+                </div>
+              )}
 
-          </div>
+              {/* Emoji */}
+              <div className="text-3xl mb-3">{quad.emoji}</div>
 
-          {/* Y-axis bottom label */}
-          <div className="flex justify-between items-center mt-2 px-1">
-            <span className="text-[10px] text-slate-400">Core-Focused</span>
-            <span></span>
-          </div>
+              {/* Title */}
+              <h3 className="text-lg font-bold text-slate-800 mb-1">
+                {quad.name}
+              </h3>
 
-          {/* X-AXIS */}
-          <div className="mt-4 pt-3 border-t border-slate-200">
-            <div className="flex justify-between items-center">
-              <span className="text-[10px] text-slate-400">Event-Based</span>
-              <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
-                PD Structure
-              </span>
-              <span className="text-[10px] text-slate-400">System-Based</span>
+              {/* Tagline */}
+              <p className="text-sm text-slate-500 italic mb-3">
+                {quad.tagline}
+              </p>
+
+              {/* Description (shows on hover or always on mobile) */}
+              <p className={`
+                text-sm text-slate-600 leading-relaxed
+                transition-all duration-300
+                ${isHovered || isSelected ? 'opacity-100' : 'opacity-70'}
+              `}>
+                {quad.description}
+              </p>
             </div>
-          </div>
+          );
+        })}
+      </div>
 
+      {/* Axis Labels - subtle, below the grid */}
+      <div className="mt-8 pt-4 border-t border-slate-200">
+        <div className="flex justify-between text-xs text-slate-400">
+          <div className="text-center">
+            <div className="font-medium">← Event-Based PD</div>
+            <div className="text-[10px]">Core staff only</div>
+          </div>
+          <div className="text-center">
+            <div className="font-medium">System-Based PD →</div>
+            <div className="text-[10px]">Whole staff supported</div>
+          </div>
         </div>
       </div>
 
-      {/* Footer */}
-      <p className="text-center text-[11px] text-slate-400 italic mt-5">
+      {/* Selection prompt */}
+      {selected && interactive && (
+        <div className="mt-6 text-center animate-fade-in">
+          <p className="text-slate-600 mb-4">
+            You selected <span className="font-semibold">{quadrants.find(q => q.id === selected)?.name}</span>
+          </p>
+          <p className="text-sm text-slate-500">
+            ↓ Take the full diagnostic below to confirm and see what this predicts
+          </p>
+        </div>
+      )}
+
+      {/* Footer note */}
+      <p className="text-center text-xs text-slate-400 italic mt-6">
         Most schools don't start in Embedded Practice — they move there over time.
       </p>
     </div>

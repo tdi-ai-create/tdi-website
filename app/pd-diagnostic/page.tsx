@@ -147,55 +147,55 @@ export default function PDDiagnosticPage() {
   return (
     <main className="min-h-screen">
       {/* HERO SECTION */}
-      <section className="relative min-h-[700px] flex items-center py-20">
-        {/* Background Image */}
+      <section className="relative min-h-[800px] flex items-center py-16">
+        {/* Background - gradient instead of image for cleaner look */}
         <div
           className="absolute inset-0 z-0"
           style={{
-            backgroundImage: 'url(/images/hero-schools.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            background: 'linear-gradient(135deg, #1e2749 0%, #1B4965 50%, #1e3a5f 100%)',
           }}
         />
 
-        {/* Gradient Overlay - darker for better text contrast */}
+        {/* Subtle pattern overlay */}
         <div
-          className="absolute inset-0 z-10"
+          className="absolute inset-0 z-5 opacity-5"
           style={{
-            background: 'linear-gradient(135deg, rgba(30, 39, 73, 0.95) 0%, rgba(27, 73, 101, 0.92) 100%)',
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
           }}
         />
 
         {/* Content */}
         <div className="container mx-auto px-4 relative z-20">
-          <div className="max-w-4xl mx-auto text-center">
+          <div className="max-w-4xl mx-auto">
 
-            {/* Title - WHITE text for contrast */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
-              The 4 Types of PD
-            </h1>
+            {/* Header */}
+            <div className="text-center mb-10">
+              <div className="inline-block bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
+                <span className="text-white/80 text-sm font-medium">📊 Free Self-Assessment</span>
+              </div>
 
-            {/* Subtitle */}
-            <p className="text-xl md:text-2xl text-white/90 font-bold mb-6">
-              A Self-Assessment for School and District Leaders
-            </p>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+                The 4 Types of PD
+              </h1>
 
-            {/* Intro Text */}
-            <p className="text-lg text-white/80 mb-12 max-w-2xl mx-auto">
-              Is your current PD structure producing the outcomes you expect?<br />
-              This diagnostic helps you see where your PD sits and<br />
-              what that typically predicts for growth, retention, and culture.
-            </p>
+              <p className="text-xl text-white/80 mb-2">
+                Which one is your school running?
+              </p>
 
-            {/* Quadrant Visual in white card */}
-            <div className="bg-white rounded-3xl p-8 md:p-12 shadow-2xl">
-              <PDQuadrant interactive={true} />
+              <p className="text-base text-white/60 max-w-2xl mx-auto">
+                Most leaders can identify their type immediately. This determines what you can expect for teacher retention, student outcomes, and school culture.
+              </p>
             </div>
 
-            {/* Scroll prompt */}
-            <p className="text-white/70 text-base mt-10">
-              ↓ Take the diagnostic below to confirm your position
-            </p>
+            {/* Interactive Quadrant in white card */}
+            <div className="bg-white rounded-3xl p-6 md:p-10 shadow-2xl">
+              <PDQuadrant
+                interactive={true}
+                onSelect={(id) => {
+                  console.log('Selected:', id);
+                }}
+              />
+            </div>
 
           </div>
         </div>
