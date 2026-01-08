@@ -161,9 +161,11 @@ export default function PDQuadrant({
           <p className="text-slate-600 mb-4">
             Your true evaluation shows you are a <span className="font-semibold">{quadrants.find(q => q.id === selected)?.name}</span>
           </p>
-          <p className="text-lg md:text-xl text-slate-700 font-bold">
-            ↓ Take the full diagnostic below to confirm and see what this predicts
-          </p>
+          {interactive && (
+            <p className="text-lg md:text-xl text-slate-700 font-bold">
+              ↓ Take the full diagnostic below to confirm and see what this predicts
+            </p>
+          )}
         </div>
       )}
 
