@@ -88,6 +88,11 @@ export function Footer() {
                     Become a Creator
                   </a>
                 </li>
+                <li>
+                  <Link href="/pd-diagnostic" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
+                    PD Diagnostic
+                  </Link>
+                </li>
               </ul>
             </div>
 
