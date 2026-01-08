@@ -71,12 +71,14 @@ export default function PDQuadrant({
   return (
     <div className="w-full max-w-3xl mx-auto">
 
-      {/* Prompt */}
-      <div className="text-center mb-8">
-        <p className="text-xl md:text-2xl text-slate-700 font-bold">
-          Which one sounds most like your school? (Select One Below)
-        </p>
-      </div>
+      {/* Prompt - only show in interactive mode */}
+      {interactive && (
+        <div className="text-center mb-8">
+          <p className="text-xl md:text-2xl text-slate-700 font-bold">
+            Which one sounds most like your school? (Select One Below)
+          </p>
+        </div>
+      )}
 
       {/* Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
