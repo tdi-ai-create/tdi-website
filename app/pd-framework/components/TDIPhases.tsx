@@ -93,11 +93,32 @@ export default function TDIPhases({ onCtaClick, onFundingClick }: TDIPhasesProps
                   1
                 </div>
                 <div className="bg-white rounded-2xl p-5 shadow-md w-full" style={{ border: '2px solid #ffba06' }}>
+                  <span
+                    className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-3"
+                    style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                  >
+                    START HERE
+                  </span>
                   <h3 className="text-2xl font-bold" style={{ color: '#1e2749' }}>IGNITE</h3>
                   <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Getting Started</p>
-                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                    Build the foundation. Introduce sustainable strategies and get early wins.
+                  <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                    Build buy-in with leadership and a pilot group. <strong>95% report saving planning time.</strong>
                   </p>
+                  <ul className="text-sm text-left space-y-1 mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    <li>• 2 On-Campus PD Days</li>
+                    <li>• 4 Virtual Strategy Sessions</li>
+                    <li>• 2 Executive Impact Sessions</li>
+                    <li>• Learning Hub for pilot group</li>
+                    <li>• Leadership Dashboard</li>
+                  </ul>
+                  <Link
+                    href="/free-pd-plan?utm_source=framework&utm_medium=page&utm_campaign=pdplan"
+                    onClick={() => onCtaClick?.('pdplan_cta', 'ignite_card')}
+                    className="block text-center py-3 rounded-lg font-bold transition-all hover:scale-105"
+                    style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                  >
+                    Get Your Free PD Plan
+                  </Link>
                 </div>
               </div>
 
