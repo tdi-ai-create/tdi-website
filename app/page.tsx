@@ -348,13 +348,25 @@ export default function Home() {
                   <span style={{ color: '#1e2749' }}>Student achievement gains you can report</span>
                 </li>
               </ul>
-              <Link
-                href="/for-schools"
-                className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover-glow"
-                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-              >
-                Learn About the TDI Blueprint
-              </Link>
+              <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Most leaders identify their PD type in under 60 seconds.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                <Link
+                  href="/pd-diagnostic"
+                  className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover-glow"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                >
+                  Take the Free Diagnostic
+                </Link>
+                <Link
+                  href="/contact"
+                  className="font-semibold transition-colors hover:opacity-80"
+                  style={{ color: '#1e2749' }}
+                >
+                  Or schedule a call →
+                </Link>
+              </div>
               <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
                 80% of schools we work with secure external funding.{' '}
                 <Link href="/funding" className="underline">See how</Link>

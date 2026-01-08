@@ -108,6 +108,28 @@ export default function ContactPage() {
         </div>
       </div>
 
+      {/* Not Ready to Talk Yet */}
+      <div className="container-default pb-8" style={{ backgroundColor: '#ffffff' }}>
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-gray-50 rounded-2xl p-6">
+            <h3 className="text-lg font-bold mb-2" style={{ color: '#1e2749' }}>
+              Not Ready to Talk Yet?
+            </h3>
+            <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
+              Take our 2-minute PD Diagnostic first. We'll help you identify your current
+              PD type and recommend where to start.
+            </p>
+            <a
+              href="/pd-diagnostic"
+              className="inline-block px-6 py-2 rounded-full font-semibold text-sm transition-all hover:shadow-lg"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            >
+              Take the Diagnostic →
+            </a>
+          </div>
+        </div>
+      </div>
+
       {/* Contact Form */}
       <section className="section bg-white">
         <div className="container-default">

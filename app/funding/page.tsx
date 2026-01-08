@@ -231,6 +231,26 @@ export default function FundingPage() {
         </div>
       </section>
 
+      {/* Wondering Which Phase to Fund */}
+      <section className="py-8" style={{ backgroundColor: '#ffffff' }}>
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 my-8 max-w-2xl mx-auto text-center">
+          <h3 className="text-lg font-bold mb-2" style={{ color: '#1e2749' }}>
+            Wondering Which Phase to Fund?
+          </h3>
+          <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
+            Our free PD Diagnostic helps you identify where your school is today
+            and which TDI phase makes the most sense for your goals and budget.
+          </p>
+          <a
+            href="/pd-diagnostic"
+            className="inline-block px-6 py-2 rounded-full font-semibold text-sm transition-all hover:shadow-lg"
+            style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+          >
+            Take the Diagnostic
+          </a>
+        </div>
+      </section>
+
       {/* CTA - Standard Admin CTAs */}
       <section className="py-16" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default text-center">

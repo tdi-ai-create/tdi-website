@@ -48,24 +48,24 @@ export default function ForSchoolsPage() {
               Professional development that actually works,<br />with outcomes you can measure and report.
             </p>
             {/* Hero CTAs */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mt-8">
               <a
-                href="#blueprint"
-                className="inline-flex items-center justify-center px-8 py-4 rounded-lg font-bold text-lg transition-all hover-glow"
+                href="/pd-diagnostic"
+                className="px-6 py-3 rounded-full font-semibold transition-all hover:shadow-lg"
                 style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
               >
-                Explore the TDI Blueprint
+                Take the Free Diagnostic
               </a>
               <a
                 href="/contact"
-                className="inline-flex items-center justify-center px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover-lift"
-                style={{ borderColor: '#ffffff', color: '#ffffff' }}
+                className="font-semibold transition-colors hover:opacity-80"
+                style={{ color: '#80a4ed' }}
               >
-                Schedule a Call
+                Or schedule a call →
               </a>
             </div>
             <p className="text-sm mt-4 text-center" style={{ color: '#ffffff', opacity: 0.7 }}>
-              Ready to talk? Skip ahead and connect with our team directly.
+              Most leaders identify their PD type in under 60 seconds.
             </p>
           </div>
         </div>
@@ -601,6 +601,26 @@ export default function ForSchoolsPage() {
             </div>
 
           </div>
+        </div>
+      </section>
+
+      {/* Not Sure Where to Start */}
+      <section className="py-12 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h3 className="text-2xl font-bold mb-4" style={{ color: '#1e2749' }}>
+            Not Sure Where to Start?
+          </h3>
+          <p className="text-lg mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
+            Most school leaders can identify their current PD type in under 2 minutes.
+            Take our free diagnostic to see where you are today and which phase fits your goals.
+          </p>
+          <a
+            href="/pd-diagnostic"
+            className="inline-block px-8 py-3 rounded-full font-semibold transition-all hover:shadow-lg"
+            style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+          >
+            Take the PD Diagnostic
+          </a>
         </div>
       </section>
 
