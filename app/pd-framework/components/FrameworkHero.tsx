@@ -11,9 +11,9 @@ export default function FrameworkHero({ onCtaClick }: FrameworkHeroProps) {
   return (
     <>
       {/* Haven't taken diagnostic banner */}
-      <section className="py-3" style={{ backgroundColor: '#ffba06' }}>
+      <section className="py-4" style={{ backgroundColor: '#ffba06' }}>
         <div className="container mx-auto px-4 text-center">
-          <p className="text-sm font-medium" style={{ color: '#1e2749' }}>
+          <p className="text-lg md:text-xl font-medium" style={{ color: '#1e2749' }}>
             Haven't taken the diagnostic yet?{' '}
             <Link
               href="/pd-diagnostic?utm_source=framework&utm_medium=page&utm_campaign=diagnostic_cta"
