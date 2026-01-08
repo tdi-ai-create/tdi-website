@@ -238,7 +238,7 @@ export default function PDDiagnosticPage() {
 
               {/* Show quadrant with highlight */}
               <div className="mt-12 bg-slate-50 rounded-3xl p-8">
-                <h3 className="text-xl font-semibold text-slate-800 text-center mb-6">
+                <h3 className="text-xl font-bold text-slate-800 text-center mb-6">
                   Your Position on the Framework
                 </h3>
                 <PDQuadrant highlightQuadrant={resultType as 'A' | 'B' | 'C' | 'D'} interactive={false} />
