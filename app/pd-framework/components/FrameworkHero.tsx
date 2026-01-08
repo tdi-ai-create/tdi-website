@@ -36,13 +36,6 @@ export default function FrameworkHero({ onCtaClick }: FrameworkHeroProps) {
             </Link>
           </p>
 
-          {/* Badge */}
-          <div className="inline-block rounded-full px-4 py-2 mb-6" style={{ backgroundColor: '#f5f5f5' }}>
-            <span className="text-sm font-medium" style={{ color: '#1e2749', opacity: 0.7 }}>
-              3 minute read
-            </span>
-          </div>
-
           {/* Title */}
           <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: '#1e2749' }}>
             Now What? Your Path Forward
