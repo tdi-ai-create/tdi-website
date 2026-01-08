@@ -209,7 +209,7 @@ export default function PDDiagnosticPage() {
               PD Structure Diagnostic
             </h2>
             <p className="text-slate-600 text-center mb-12">
-              Answer based on what happens most often... not what is intended.
+              Answer based on what happens most often... <em>not what is intended.</em>
             </p>
 
             <DiagnosticForm
