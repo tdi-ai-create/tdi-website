@@ -375,25 +375,8 @@ export default function AboutPage() {
             A passionate group of educators, strategists, and creatives<br />committed to transforming professional development.
           </p>
 
-          {/* Executive Team with Bios */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto mb-12">
-
-            {/* Omar Garcia */}
-            <div className="bg-white rounded-xl p-6 text-center shadow-sm">
-              <div
-                className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
-                style={{ backgroundColor: '#ffba06' }}
-              >
-                <svg className="w-10 h-10" fill="#1e2749" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-              </div>
-              <h4 className="font-bold text-lg mb-1" style={{ color: '#1e2749' }}>Omar Garcia</h4>
-              <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Chief Financial Officer</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Drives financial strategy and operational systems that allow TDI to scale sustainably while delivering measurable ROI for every partner district.
-              </p>
-            </div>
+          {/* Leadership Team with Bios */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto mb-12">
 
             {/* Kristin Williams */}
             <div className="bg-white rounded-xl p-6 text-center shadow-sm">
@@ -412,7 +395,7 @@ export default function AboutPage() {
               </p>
             </div>
 
-            {/* Olivia Smith */}
+            {/* Omar Garcia */}
             <div className="bg-white rounded-xl p-6 text-center shadow-sm">
               <div
                 className="w-20 h-20 rounded-full mx-auto mb-4 flex items-center justify-center"
@@ -422,16 +405,59 @@ export default function AboutPage() {
                   <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                 </svg>
               </div>
-              <h4 className="font-bold text-lg mb-1" style={{ color: '#1e2749' }}>Olivia Smith</h4>
-              <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Executive Communication Coordinator</p>
+              <h4 className="font-bold text-lg mb-1" style={{ color: '#1e2749' }}>Omar Garcia</h4>
+              <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Chief Financial Officer</p>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Keeps TDI and our partner districts aligned at every step, ensuring seamless communication from first conversation to lasting impact.
+                Drives financial strategy and operational systems that allow TDI to scale sustainably while delivering measurable ROI for every partner district.
               </p>
             </div>
 
           </div>
 
-          {/* Extended Team */}
+          {/* Team Members (no bios, card style like Content Creators) */}
+          <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto mb-12">
+            {/* Rachel Patragas */}
+            <div className="text-center p-3">
+              <div
+                className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
+                style={{ backgroundColor: '#80a4ed' }}
+              >
+                <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Rachel Patragas</p>
+              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Director of Creative Solutions</p>
+            </div>
+
+            {/* Jim Ford (NEW - placeholder with initials) */}
+            <div className="text-center p-3">
+              <div
+                className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
+                style={{ backgroundColor: '#1A6B6B' }}
+              >
+                <span className="text-white font-bold text-sm">JF</span>
+              </div>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Jim Ford</p>
+              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Business Development Coordinator</p>
+            </div>
+
+            {/* Olivia Smith */}
+            <div className="text-center p-3">
+              <div
+                className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
+                style={{ backgroundColor: '#80a4ed' }}
+              >
+                <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Olivia Smith</p>
+              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Executive Communication Coordinator</p>
+            </div>
+          </div>
+
+          {/* Content Creators */}
           <div className="bg-white rounded-xl p-8 max-w-4xl mx-auto">
             <h3 className="font-bold text-lg mb-6 text-center" style={{ color: '#1e2749' }}>
               Content Creators and Contributors
@@ -446,8 +472,8 @@ export default function AboutPage() {
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                   </svg>
                 </div>
-                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Rachel Patragas</p>
-                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Director of Creative Solutions</p>
+                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Ian R Bowen</p>
+                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
               </div>
               <div className="text-center p-3">
                 <div
@@ -494,7 +520,7 @@ export default function AboutPage() {
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                   </svg>
                 </div>
-                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Paige Roberts</p>
+                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Tyson Gardin</p>
                 <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
               </div>
               <div className="text-center p-3">
@@ -518,79 +544,7 @@ export default function AboutPage() {
                     <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
                   </svg>
                 </div>
-                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Kimberelle Martin</p>
-                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
-              </div>
-              <div className="text-center p-3">
-                <div
-                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                  style={{ backgroundColor: '#80a4ed' }}
-                >
-                  <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                  </svg>
-                </div>
-                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Paige Griffin</p>
-                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
-              </div>
-              <div className="text-center p-3">
-                <div
-                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                  style={{ backgroundColor: '#80a4ed' }}
-                >
-                  <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                  </svg>
-                </div>
-                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Kayla Brown</p>
-                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
-              </div>
-              <div className="text-center p-3">
-                <div
-                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                  style={{ backgroundColor: '#80a4ed' }}
-                >
-                  <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                  </svg>
-                </div>
-                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Ian Bowen</p>
-                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
-              </div>
-              <div className="text-center p-3">
-                <div
-                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                  style={{ backgroundColor: '#80a4ed' }}
-                >
-                  <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                  </svg>
-                </div>
-                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Amanda Duffy</p>
-                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
-              </div>
-              <div className="text-center p-3">
-                <div
-                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                  style={{ backgroundColor: '#80a4ed' }}
-                >
-                  <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                  </svg>
-                </div>
-                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Jay Jackson</p>
-                <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
-              </div>
-              <div className="text-center p-3">
-                <div
-                  className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                  style={{ backgroundColor: '#80a4ed' }}
-                >
-                  <svg className="w-6 h-6" fill="white" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                  </svg>
-                </div>
-                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Holly Stuart</p>
+                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Paige Roberts</p>
                 <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Content Creator</p>
               </div>
             </div>
