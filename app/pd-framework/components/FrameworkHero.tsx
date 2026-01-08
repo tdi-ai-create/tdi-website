@@ -9,7 +9,25 @@ interface FrameworkHeroProps {
 
 export default function FrameworkHero({ onCtaClick }: FrameworkHeroProps) {
   return (
-    <section className="py-12 md:py-16 bg-white">
+    <>
+      {/* Haven't taken diagnostic banner */}
+      <section className="py-3" style={{ backgroundColor: '#ffba06' }}>
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-sm font-medium" style={{ color: '#1e2749' }}>
+            Haven't taken the diagnostic yet?{' '}
+            <Link
+              href="/pd-diagnostic?utm_source=framework&utm_medium=page&utm_campaign=diagnostic_cta"
+              onClick={() => onCtaClick?.('diagnostic_cta', 'hero')}
+              className="font-bold underline hover:no-underline"
+              style={{ color: '#1e2749' }}
+            >
+              Start there first →
+            </Link>
+          </p>
+        </div>
+      </section>
+
+      <section className="py-12 md:py-16 bg-white">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto">
           {/* Breadcrumb */}
@@ -23,19 +41,6 @@ export default function FrameworkHero({ onCtaClick }: FrameworkHeroProps) {
             Back to PD Diagnostic
           </Link>
 
-          {/* Haven't taken diagnostic link */}
-          <p className="text-sm mb-8" style={{ color: '#1e2749', opacity: 0.6 }}>
-            Haven't taken the diagnostic yet?{' '}
-            <Link
-              href="/pd-diagnostic?utm_source=framework&utm_medium=page&utm_campaign=diagnostic_cta"
-              onClick={() => onCtaClick?.('diagnostic_cta', 'hero')}
-              className="font-medium underline hover:no-underline"
-              style={{ color: '#80a4ed' }}
-            >
-              Start there first →
-            </Link>
-          </p>
-
           {/* Title */}
           <h1 className="text-4xl md:text-5xl font-bold mb-4" style={{ color: '#1e2749' }}>
             Now What? Your Path Forward
@@ -48,5 +53,6 @@ export default function FrameworkHero({ onCtaClick }: FrameworkHeroProps) {
         </div>
       </div>
     </section>
+    </>
   );
 }
