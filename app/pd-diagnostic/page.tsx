@@ -159,17 +159,39 @@ const resultData: Record<string, {
   }
 };
 
+// localStorage key for returning users
+const STORAGE_KEY = 'tdi_diagnostic_user';
+
 export default function PDDiagnosticPage() {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [showEmailGate, setShowEmailGate] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [resultType, setResultType] = useState<string | null>(null);
+  const [isReturningUser, setIsReturningUser] = useState(false);
 
   // Email capture state
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [schoolName, setSchoolName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Check for returning user on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const userData = JSON.parse(stored);
+        if (userData.email) {
+          setEmail(userData.email);
+          setName(userData.name || '');
+          setSchoolName(userData.schoolName || '');
+          setIsReturningUser(true);
+        }
+      }
+    } catch {
+      // localStorage not available or invalid data
+    }
+  }, []);
 
   // Track page view
   useEffect(() => {
@@ -211,10 +233,50 @@ export default function PDDiagnosticPage() {
   const handleSubmit = () => {
     const result = calculateResult();
     setResultType(result);
-    setShowEmailGate(true);
-    setTimeout(() => {
-      document.getElementById('email-gate')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
+
+    // Skip email gate for returning users
+    if (isReturningUser) {
+      sendGAEvent('diagnostic_returning_user', {
+        event_category: 'PD Diagnostic',
+        event_label: 'Skipped Email Gate',
+      });
+
+      // Still submit to track the new diagnostic result
+      submitDiagnosticResult(result);
+      setShowResults(true);
+      setTimeout(() => {
+        document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      setShowEmailGate(true);
+      setTimeout(() => {
+        document.getElementById('email-gate')?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  };
+
+  // Helper function to submit diagnostic results
+  const submitDiagnosticResult = async (result: string) => {
+    const pdTypeName = resultData[result].name;
+
+    try {
+      await fetch('/api/diagnostic-submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email,
+          name: name || 'Not provided',
+          schoolName: schoolName || 'Not provided',
+          pdType: result,
+          pdTypeName,
+          answers,
+          completedAt: new Date().toISOString(),
+          isReturningUser,
+        }),
+      });
+    } catch (error) {
+      console.error('Submission error:', error);
+    }
   };
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
@@ -230,23 +292,19 @@ export default function PDDiagnosticPage() {
       event_label: pdTypeName,
     });
 
+    // Store user data in localStorage for future visits
     try {
-      await fetch('/api/diagnostic-submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          name: name || 'Not provided',
-          schoolName: schoolName || 'Not provided',
-          pdType: resultType,
-          pdTypeName,
-          answers,
-          completedAt: new Date().toISOString(),
-        }),
-      });
-    } catch (error) {
-      console.error('Submission error:', error);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({
+        email,
+        name,
+        schoolName,
+        submittedAt: new Date().toISOString(),
+      }));
+    } catch {
+      // localStorage not available
     }
+
+    await submitDiagnosticResult(resultType);
 
     setShowEmailGate(false);
     setShowResults(true);
