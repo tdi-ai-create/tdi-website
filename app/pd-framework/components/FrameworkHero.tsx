@@ -43,7 +43,7 @@ export default function FrameworkHero({ onCtaClick }: FrameworkHeroProps) {
 
           {/* Title */}
           <p className="text-base md:text-lg font-medium text-center" style={{ color: '#1e2749', opacity: 0.7 }}>
-            You know where your PD sits. Here's how schools move toward sustainable, embedded practice.
+            You know where your PD sits.<br />Here's how schools move toward sustainable, embedded practice.
           </p>
         </div>
       </div>
