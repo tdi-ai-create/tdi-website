@@ -264,6 +264,36 @@ export default function PDDiagnosticPage() {
                   </a>
                 </div>
               </div>
+
+              {/* Testimonials Section */}
+              <div className="mt-16 pt-12 border-t border-slate-200">
+                <h3 className="text-2xl md:text-3xl font-bold text-slate-800 text-center mb-10">
+                  What School Leaders Are Saying
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-[#E8F0FD] rounded-2xl p-6">
+                    <p className="text-slate-700 italic mb-4">
+                      "This isn't sit-and-get. Our teachers are actually learning how to work smarter and feel better doing it."
+                    </p>
+                    <p className="text-slate-600 font-semibold text-sm">Lisa M.</p>
+                    <p className="text-slate-500 text-sm">K-8 School Director</p>
+                  </div>
+                  <div className="bg-[#E8F0FD] rounded-2xl p-6">
+                    <p className="text-slate-700 italic mb-4">
+                      "Before, we got eye rolls. Now, we hear: 'When's the team coming next?' That's when you know PD is finally working."
+                    </p>
+                    <p className="text-slate-600 font-semibold text-sm">Daniel R.</p>
+                    <p className="text-slate-500 text-sm">High School Principal</p>
+                  </div>
+                  <div className="bg-[#E8F0FD] rounded-2xl p-6">
+                    <p className="text-slate-700 italic mb-4">
+                      "This was the first PD I didn't have to apologize for. Our teachers actually thanked me."
+                    </p>
+                    <p className="text-slate-600 font-semibold text-sm">James T.</p>
+                    <p className="text-slate-500 text-sm">School Principal</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </section>
