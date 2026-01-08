@@ -818,6 +818,11 @@ export default function PDDiagnosticPage() {
 
                 {/* CTAs */}
                 <div className="text-center space-y-6">
+                  {/* Next Step Label */}
+                  <p className="text-sm font-bold uppercase tracking-widest" style={{ color: '#ffba06' }}>
+                    Your Next Step
+                  </p>
+
                   {/* Primary CTA Block */}
                   <div className="bg-[#1e2749] rounded-2xl p-8">
                     <p className="text-white text-2xl md:text-3xl font-bold mb-3">
