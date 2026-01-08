@@ -733,9 +733,30 @@ export default function PDDiagnosticPage() {
             <div className="container mx-auto px-4">
               <div className="max-w-2xl mx-auto">
                 {/* Results Header */}
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-12" style={{ color: '#ffba06' }}>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-center mb-4" style={{ color: '#ffba06' }}>
                   Results are In
                 </h1>
+
+                {/* Curly Arrow */}
+                <div className="flex justify-center mb-8">
+                  <svg width="60" height="80" viewBox="0 0 60 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path
+                      d="M30 5 C15 5, 10 20, 15 35 C20 50, 35 50, 40 35 C45 20, 35 15, 30 25 C25 35, 30 55, 30 70"
+                      stroke="#ffba06"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      fill="none"
+                    />
+                    <path
+                      d="M22 62 L30 75 L38 62"
+                      stroke="#ffba06"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                    />
+                  </svg>
+                </div>
 
                 {/* Their PD Type */}
                 <div className="text-center mb-8">
