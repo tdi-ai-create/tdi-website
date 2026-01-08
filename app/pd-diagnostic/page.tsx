@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import PDQuadrant from './components/PDQuadrant';
-import DiagnosticForm from './components/DiagnosticForm';
 
 // GA4 event helper
 declare global {
@@ -12,7 +11,7 @@ declare global {
   }
 }
 
-const sendGAEvent = (eventName: string, params: Record<string, string | number>) => {
+const sendGAEvent = (eventName: string, params: Record<string, string | number | boolean>) => {
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', eventName, params);
   }
@@ -163,8 +162,10 @@ const resultData: Record<string, {
 const STORAGE_KEY = 'tdi_diagnostic_user';
 
 export default function PDDiagnosticPage() {
+  // Wizard state
+  const [currentQuestion, setCurrentQuestion] = useState(1);
   const [answers, setAnswers] = useState<Record<number, string>>({});
-  const [showEmailGate, setShowEmailGate] = useState(false);
+  const [diagnosticStarted, setDiagnosticStarted] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [resultType, setResultType] = useState<string | null>(null);
   const [isReturningUser, setIsReturningUser] = useState(false);
@@ -174,6 +175,10 @@ export default function PDDiagnosticPage() {
   const [name, setName] = useState('');
   const [schoolName, setSchoolName] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+
+  const allQuestionsAnswered = Object.keys(answers).length === 8;
+  const progressPercent = Math.round(((Object.keys(answers).length) / 8) * 100);
 
   // Check for returning user on mount
   useEffect(() => {
@@ -203,15 +208,30 @@ export default function PDDiagnosticPage() {
 
   // Track diagnostic completion
   useEffect(() => {
-    if (Object.keys(answers).length === questions.length) {
+    if (allQuestionsAnswered && !showResults) {
       sendGAEvent('diagnostic_completed', {
         event_category: 'PD Diagnostic',
         event_label: 'All Questions Answered',
       });
-    }
-  }, [answers]);
 
-  const handleAnswer = (questionId: number, value: string) => {
+      // Calculate result
+      const result = calculateResult();
+      setResultType(result);
+
+      // For returning users, skip email gate
+      if (isReturningUser) {
+        sendGAEvent('diagnostic_returning_user', {
+          event_category: 'PD Diagnostic',
+          event_label: 'Skipped Email Gate',
+        });
+        submitDiagnosticResult(result);
+        setEmailSubmitted(true);
+        setShowResults(true);
+      }
+    }
+  }, [allQuestionsAnswered, showResults, isReturningUser]);
+
+  const handleAnswerSelect = (questionId: number, value: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
 
     sendGAEvent('diagnostic_question_answered', {
@@ -219,6 +239,13 @@ export default function PDDiagnosticPage() {
       event_label: `Question ${questionId}`,
       value: questionId,
     });
+
+    // Auto-advance to next question after a brief delay
+    if (questionId < 8) {
+      setTimeout(() => {
+        setCurrentQuestion(questionId + 1);
+      }, 300);
+    }
   };
 
   const calculateResult = () => {
@@ -228,31 +255,6 @@ export default function PDDiagnosticPage() {
     });
     const maxCount = Math.max(...Object.values(counts));
     return Object.entries(counts).find(([, count]) => count === maxCount)?.[0] || 'A';
-  };
-
-  const handleSubmit = () => {
-    const result = calculateResult();
-    setResultType(result);
-
-    // Skip email gate for returning users
-    if (isReturningUser) {
-      sendGAEvent('diagnostic_returning_user', {
-        event_category: 'PD Diagnostic',
-        event_label: 'Skipped Email Gate',
-      });
-
-      // Still submit to track the new diagnostic result
-      submitDiagnosticResult(result);
-      setShowResults(true);
-      setTimeout(() => {
-        document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    } else {
-      setShowEmailGate(true);
-      setTimeout(() => {
-        document.getElementById('email-gate')?.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
   };
 
   // Helper function to submit diagnostic results
@@ -306,13 +308,9 @@ export default function PDDiagnosticPage() {
 
     await submitDiagnosticResult(resultType);
 
-    setShowEmailGate(false);
+    setEmailSubmitted(true);
     setShowResults(true);
     setIsSubmitting(false);
-
-    setTimeout(() => {
-      document.getElementById('results')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
   };
 
   // Track results view
@@ -345,121 +343,188 @@ export default function PDDiagnosticPage() {
     }
   };
 
-  const allAnswered = Object.keys(answers).length === questions.length;
+  const startDiagnostic = () => {
+    setDiagnosticStarted(true);
+    sendGAEvent('diagnostic_started', {
+      event_category: 'PD Diagnostic',
+      event_label: 'Start Button Clicked',
+    });
+  };
+
+  const currentQ = questions[currentQuestion - 1];
 
   return (
     <main className="min-h-screen">
-      {/* HERO SECTION */}
-      <section className="relative min-h-[800px] flex items-center py-16">
-        {/* Background Image */}
-        <div
-          className="absolute inset-0 z-0"
-          style={{
-            backgroundImage: 'url(/images/hero-schools.png)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-          }}
-        />
+      {/* INTRO SECTION - Shows before diagnostic starts */}
+      {!diagnosticStarted && !showResults && (
+        <>
+          {/* Hero Section */}
+          <section className="relative min-h-[600px] flex items-center py-16">
+            {/* Background Image */}
+            <div
+              className="absolute inset-0 z-0"
+              style={{
+                backgroundImage: 'url(/images/hero-schools.png)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            />
 
-        {/* Gradient Overlay */}
-        <div
-          className="absolute inset-0 z-10"
-          style={{
-            background: 'linear-gradient(135deg, rgba(30, 39, 73, 0.92) 0%, rgba(27, 73, 101, 0.88) 100%)',
-          }}
-        />
+            {/* Gradient Overlay */}
+            <div
+              className="absolute inset-0 z-10"
+              style={{
+                background: 'linear-gradient(135deg, rgba(30, 39, 73, 0.92) 0%, rgba(27, 73, 101, 0.88) 100%)',
+              }}
+            />
 
-        {/* Content */}
-        <div className="container mx-auto px-4 relative z-20">
-          <div className="max-w-4xl mx-auto">
-            {/* Header */}
-            <div className="text-center mb-10">
-              <div className="inline-block bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
-                <span className="text-white/80 text-sm font-bold">Free Self-Assessment</span>
+            {/* Content */}
+            <div className="container mx-auto px-4 relative z-20">
+              <div className="max-w-4xl mx-auto">
+                {/* Header */}
+                <div className="text-center mb-10">
+                  <div className="inline-block bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
+                    <span className="text-white/80 text-sm font-bold">Free Self-Assessment</span>
+                  </div>
+
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+                    The 4 Types of PD
+                  </h1>
+
+                  <p className="text-xl text-white/80 mb-2">
+                    Which one is your school running?
+                  </p>
+
+                  <p className="text-base text-white/60 max-w-2xl mx-auto">
+                    Most leaders can identify their type <em>immediately</em>. This determines what you can expect for teacher retention, student outcomes, and school culture.
+                  </p>
+                </div>
+
+                {/* Interactive Quadrant in white card */}
+                <div className="bg-white rounded-3xl p-6 md:p-10 shadow-2xl">
+                  <PDQuadrant
+                    interactive={true}
+                    onSelect={(id) => {
+                      sendGAEvent('quadrant_selected', {
+                        event_category: 'PD Diagnostic',
+                        event_label: `Quadrant ${id}`,
+                      });
+                    }}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Credibility Signals */}
+          <section className="py-12 bg-white">
+            <div className="container mx-auto px-4">
+              {/* Credibility info */}
+              <div className="max-w-3xl mx-auto mb-8 text-center">
+                <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
+                  Developed by the Teachers Deserve It team - former teachers, content experts, and PD specialists
+                </p>
+                <div className="flex flex-wrap justify-center gap-6 text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  <span>500+ schools assessed</span>
+                  <span>Based on implementation research</span>
+                </div>
               </div>
 
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
-                The 4 Types of PD
-              </h1>
+              {/* Testimonial */}
+              <div className="max-w-2xl mx-auto p-4 rounded-xl mb-8" style={{ backgroundColor: '#f5f5f5' }}>
+                <p className="text-sm italic mb-2" style={{ color: '#1e2749' }}>
+                  &quot;This diagnostic helped us see exactly where our PD was falling short. Within 10 minutes, we had a clear picture of what needed to change.&quot;
+                </p>
+                <p className="text-xs font-medium" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  - K-8 Principal, Illinois
+                </p>
+              </div>
 
-              <p className="text-xl text-white/80 mb-2">
-                Which one is your school running?
-              </p>
-
-              <p className="text-base text-white/60 max-w-2xl mx-auto">
-                Most leaders can identify their type <em>immediately</em>. This determines what you can expect for teacher retention, student outcomes, and school culture.
-              </p>
+              {/* Start Button */}
+              <div className="text-center">
+                <button
+                  onClick={startDiagnostic}
+                  className="px-10 py-4 rounded-full font-semibold text-lg transition-all hover:shadow-lg"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                >
+                  Take the Diagnostic
+                </button>
+                <p className="mt-3 text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>
+                  8 questions - takes about 3 minutes
+                </p>
+              </div>
             </div>
+          </section>
+        </>
+      )}
 
-            {/* Interactive Quadrant in white card */}
-            <div className="bg-white rounded-3xl p-6 md:p-10 shadow-2xl">
-              <PDQuadrant
-                interactive={true}
-                onSelect={(id) => {
-                  sendGAEvent('quadrant_selected', {
-                    event_category: 'PD Diagnostic',
-                    event_label: `Quadrant ${id}`,
-                  });
-                }}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CREDIBILITY SIGNALS */}
-      <section className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          {/* Credibility info */}
-          <div className="max-w-3xl mx-auto mb-8 text-center">
-            <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
-              Developed by the Teachers Deserve It team - former teachers, content experts, and PD specialists
-            </p>
-            <div className="flex flex-wrap justify-center gap-6 text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-              <span>500+ schools assessed</span>
-              <span>Based on implementation research</span>
-            </div>
-          </div>
-
-          {/* Testimonial */}
-          <div className="max-w-2xl mx-auto p-4 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
-            <p className="text-sm italic mb-2" style={{ color: '#1e2749' }}>
-              "This diagnostic helped us see exactly where our PD was falling short. Within 10 minutes, we had a clear picture of what needed to change."
-            </p>
-            <p className="text-xs font-medium" style={{ color: '#1e2749', opacity: 0.7 }}>
-              - K-8 Principal, Illinois
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* DIAGNOSTIC FORM SECTION */}
-      {!showEmailGate && !showResults && (
-        <section className="py-16 md:py-24 bg-[#1e2749]">
+      {/* WIZARD DIAGNOSTIC - One question at a time */}
+      {diagnosticStarted && !allQuestionsAnswered && !showResults && (
+        <section className="min-h-screen py-16" style={{ backgroundColor: '#1e2749' }}>
           <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-3xl md:text-4xl font-bold text-white text-center mb-4">
-                PD Structure Diagnostic
-              </h2>
-              <p className="text-white/80 text-center mb-12">
-                Answer based on what happens most often... <em>not what is intended.</em>
-              </p>
+            <div className="max-w-2xl mx-auto">
+              {/* Progress Indicator */}
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium text-white">
+                    Question {currentQuestion} of 8
+                  </span>
+                  <span className="text-sm text-white/60">
+                    {progressPercent}% complete
+                  </span>
+                </div>
+                <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-500 ease-out"
+                    style={{
+                      backgroundColor: '#ffba06',
+                      width: `${progressPercent}%`,
+                    }}
+                  />
+                </div>
+              </div>
 
-              <DiagnosticForm
-                questions={questions}
-                answers={answers}
-                onAnswer={handleAnswer}
-                onSubmit={handleSubmit}
-                allAnswered={allAnswered}
-              />
+              {/* Single Question Display */}
+              <div className="text-center">
+                <h2 className="text-xl md:text-2xl font-bold text-white mb-8">
+                  {currentQ.question}
+                </h2>
+
+                <div className="space-y-3">
+                  {currentQ.options.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => handleAnswerSelect(currentQuestion, option.value)}
+                      className={`w-full p-4 rounded-xl text-left transition-all border-2 hover:border-yellow-400 hover:shadow-md ${
+                        answers[currentQuestion] === option.value
+                          ? 'border-yellow-400 bg-yellow-50'
+                          : 'border-gray-200 bg-white'
+                      }`}
+                      style={{ color: '#1e2749' }}
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Back Button */}
+                {currentQuestion > 1 && (
+                  <button
+                    onClick={() => setCurrentQuestion(currentQuestion - 1)}
+                    className="mt-8 text-sm font-medium hover:underline text-white/70 hover:text-white"
+                  >
+                    Back to previous question
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </section>
       )}
 
-      {/* EMAIL GATE SECTION */}
-      {showEmailGate && !showResults && (
-        <section id="email-gate" className="py-16 md:py-24 bg-[#1e2749]">
+      {/* EMAIL GATE - Shows after all questions answered (for new users) */}
+      {allQuestionsAnswered && !emailSubmitted && !isReturningUser && (
+        <section className="min-h-screen py-16 flex items-center" style={{ backgroundColor: '#1e2749' }}>
           <div className="container mx-auto px-4">
             <div className="max-w-xl mx-auto text-center">
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
@@ -521,164 +586,162 @@ export default function PDDiagnosticPage() {
 
       {/* RESULTS SECTION */}
       {showResults && resultType && (
-        <section id="results" className="py-16 md:py-24 bg-white">
-          <div className="container mx-auto px-4">
-            <div className="max-w-2xl mx-auto">
-              {/* Their PD Type */}
-              <div className="text-center mb-8">
-                <p className="text-sm font-medium uppercase tracking-wide mb-2" style={{ color: '#80a4ed' }}>
-                  Your School&apos;s PD Type
-                </p>
-                <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e2749' }}>
-                  {resultData[resultType].name}
-                </h2>
-                <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
-                  {resultData[resultType].description}
-                </p>
-              </div>
+        <>
+          <section id="results" className="py-16 md:py-24 bg-white">
+            <div className="container mx-auto px-4">
+              <div className="max-w-2xl mx-auto">
+                {/* Their PD Type */}
+                <div className="text-center mb-8">
+                  <p className="text-sm font-medium uppercase tracking-wide mb-2" style={{ color: '#80a4ed' }}>
+                    Your School&apos;s PD Type
+                  </p>
+                  <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e2749' }}>
+                    {resultData[resultType].name}
+                  </h2>
+                  <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    {resultData[resultType].description}
+                  </p>
+                </div>
 
-              {/* What this means */}
-              <div className="bg-gray-50 rounded-2xl p-6 mb-8 text-left">
-                <h3 className="font-bold mb-3" style={{ color: '#1e2749' }}>
-                  What this means for your school:
-                </h3>
-                <ul className="space-y-2 text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
-                  {resultData[resultType].implications.map((item, index) => (
-                    <li key={index}>- {item}</li>
-                  ))}
-                </ul>
-              </div>
+                {/* What this means */}
+                <div className="bg-gray-50 rounded-2xl p-6 mb-8 text-left">
+                  <h3 className="font-bold mb-3" style={{ color: '#1e2749' }}>
+                    What this means for your school:
+                  </h3>
+                  <ul className="space-y-2 text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    {resultData[resultType].implications.map((item, index) => (
+                      <li key={index}>- {item}</li>
+                    ))}
+                  </ul>
+                </div>
 
-              {/* What this commonly predicts */}
-              <div className="bg-[#1e2749] rounded-2xl p-6 mb-8 text-left">
-                <h3 className="font-semibold text-white mb-3">What This Commonly Predicts</h3>
-                <p className="text-white/80">
-                  {resultData[resultType].predicts}
-                </p>
-              </div>
+                {/* What this commonly predicts */}
+                <div className="bg-[#1e2749] rounded-2xl p-6 mb-8 text-left">
+                  <h3 className="font-semibold text-white mb-3">What This Commonly Predicts</h3>
+                  <p className="text-white/80">
+                    {resultData[resultType].predicts}
+                  </p>
+                </div>
 
-              {/* Show quadrant with highlight */}
-              <div className="bg-slate-50 rounded-3xl p-8 mb-8">
-                <h3 className="text-xl font-bold text-slate-800 text-center mb-6">
-                  Your Position on the Framework
-                </h3>
-                <PDQuadrant highlightQuadrant={resultType as 'A' | 'B' | 'C' | 'D'} interactive={false} />
-              </div>
+                {/* Show quadrant with highlight */}
+                <div className="bg-slate-50 rounded-3xl p-8 mb-8">
+                  <h3 className="text-xl font-bold text-slate-800 text-center mb-6">
+                    Your Position on the Framework
+                  </h3>
+                  <PDQuadrant highlightQuadrant={resultType as 'A' | 'B' | 'C' | 'D'} interactive={false} />
+                </div>
 
-              {/* Grant funding mention */}
-              <div className="mb-8 p-4 rounded-xl" style={{ backgroundColor: '#E8F0FD' }}>
-                <p className="text-sm" style={{ color: '#1e2749' }}>
-                  Think you cannot afford to fix this?{' '}
-                  <span className="font-medium">73% of our partners use grant funding.</span>{' '}
+                {/* Grant funding mention */}
+                <div className="mb-8 p-4 rounded-xl" style={{ backgroundColor: '#E8F0FD' }}>
+                  <p className="text-sm" style={{ color: '#1e2749' }}>
+                    Think you cannot afford to fix this?{' '}
+                    <span className="font-medium">73% of our partners use grant funding.</span>{' '}
+                    <Link
+                      href="/funding?utm_source=diagnostic&utm_medium=results&utm_campaign=funding_cta"
+                      className="font-semibold underline hover:no-underline"
+                      style={{ color: '#80a4ed' }}
+                    >
+                      Explore funding options
+                    </Link>
+                  </p>
+                </div>
+
+                {/* CTAs */}
+                <div className="text-center space-y-4">
+                  {/* Primary CTA */}
                   <Link
-                    href="/funding?utm_source=diagnostic&utm_medium=results&utm_campaign=funding_cta"
-                    className="font-semibold underline hover:no-underline"
-                    style={{ color: '#80a4ed' }}
+                    href={`/pd-framework?utm_source=diagnostic&utm_medium=results&utm_campaign=framework_cta#${resultData[resultType].anchorId}`}
+                    onClick={handleFrameworkClick}
+                    className="inline-block px-8 py-4 rounded-full font-semibold transition-all hover:shadow-lg"
+                    style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
                   >
-                    Explore funding options
+                    Explore the Full PD Framework
                   </Link>
-                </p>
-              </div>
 
-              {/* CTAs */}
-              <div className="text-center space-y-4">
-                {/* Primary CTA */}
-                <Link
-                  href={`/pd-framework?utm_source=diagnostic&utm_medium=results&utm_campaign=framework_cta#${resultData[resultType].anchorId}`}
-                  onClick={handleFrameworkClick}
-                  className="inline-block px-8 py-4 rounded-full font-semibold transition-all hover:shadow-lg"
-                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                >
-                  Explore the Full PD Framework
-                </Link>
-
-                {/* Secondary CTA */}
-                <div>
-                  <Link
-                    href="/contact?utm_source=diagnostic&utm_medium=results&utm_campaign=schedule_cta"
-                    onClick={handleScheduleClick}
-                    className="text-sm font-medium hover:underline"
-                    style={{ color: '#80a4ed' }}
-                  >
-                    Or schedule a call with our team
-                  </Link>
+                  {/* Secondary CTA */}
+                  <div>
+                    <Link
+                      href="/contact?utm_source=diagnostic&utm_medium=results&utm_campaign=schedule_cta"
+                      onClick={handleScheduleClick}
+                      className="text-sm font-medium hover:underline"
+                      style={{ color: '#80a4ed' }}
+                    >
+                      Or schedule a call with our team
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
 
-      {/* Testimonials Section - School Leaders */}
-      {showResults && (
-        <section className="py-16 md:py-20 bg-[#1e2749]">
-          <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto">
-              <h3 className="text-2xl md:text-3xl font-bold text-white text-center mb-10">
-                What School Leaders Are Saying
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-[#E8F0FD] rounded-2xl p-6">
-                  <p className="text-slate-700 italic mb-4">
-                    &quot;This is not sit-and-get. Our teachers are actually learning how to work smarter and feel better doing it.&quot;
-                  </p>
-                  <p className="text-slate-600 font-semibold text-sm">Lisa M.</p>
-                  <p className="text-slate-500 text-sm">K-8 School Director</p>
-                </div>
-                <div className="bg-[#E8F0FD] rounded-2xl p-6">
-                  <p className="text-slate-700 italic mb-4">
-                    &quot;Before, we got eye rolls. Now, we hear: &apos;When&apos;s the team coming next?&apos; That&apos;s when you know PD is finally working.&quot;
-                  </p>
-                  <p className="text-slate-600 font-semibold text-sm">Daniel R.</p>
-                  <p className="text-slate-500 text-sm">High School Principal</p>
-                </div>
-                <div className="bg-[#E8F0FD] rounded-2xl p-6">
-                  <p className="text-slate-700 italic mb-4">
-                    &quot;This was the first PD I did not have to apologize for. Our teachers actually thanked me.&quot;
-                  </p>
-                  <p className="text-slate-600 font-semibold text-sm">James T.</p>
-                  <p className="text-slate-500 text-sm">School Principal</p>
+          {/* Testimonials Section - School Leaders */}
+          <section className="py-16 md:py-20 bg-[#1e2749]">
+            <div className="container mx-auto px-4">
+              <div className="max-w-5xl mx-auto">
+                <h3 className="text-2xl md:text-3xl font-bold text-white text-center mb-10">
+                  What School Leaders Are Saying
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-[#E8F0FD] rounded-2xl p-6">
+                    <p className="text-slate-700 italic mb-4">
+                      &quot;This is not sit-and-get. Our teachers are actually learning how to work smarter and feel better doing it.&quot;
+                    </p>
+                    <p className="text-slate-600 font-semibold text-sm">Lisa M.</p>
+                    <p className="text-slate-500 text-sm">K-8 School Director</p>
+                  </div>
+                  <div className="bg-[#E8F0FD] rounded-2xl p-6">
+                    <p className="text-slate-700 italic mb-4">
+                      &quot;Before, we got eye rolls. Now, we hear: &apos;When is the team coming next?&apos; That is when you know PD is finally working.&quot;
+                    </p>
+                    <p className="text-slate-600 font-semibold text-sm">Daniel R.</p>
+                    <p className="text-slate-500 text-sm">High School Principal</p>
+                  </div>
+                  <div className="bg-[#E8F0FD] rounded-2xl p-6">
+                    <p className="text-slate-700 italic mb-4">
+                      &quot;This was the first PD I did not have to apologize for. Our teachers actually thanked me.&quot;
+                    </p>
+                    <p className="text-slate-600 font-semibold text-sm">James T.</p>
+                    <p className="text-slate-500 text-sm">School Principal</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
 
-      {/* Testimonials Section - Teachers */}
-      {showResults && (
-        <section className="py-16 md:py-20 bg-[#1e2749]">
-          <div className="container mx-auto px-4">
-            <div className="max-w-5xl mx-auto">
-              <h3 className="text-2xl md:text-3xl font-bold text-white text-center mb-10">
-                What Teachers Are Saying
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-[#E8F0FD] rounded-2xl p-6">
-                  <p className="text-slate-700 italic mb-4">
-                    &quot;I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself.&quot;
-                  </p>
-                  <p className="text-slate-600 font-semibold text-sm">Sarah K.</p>
-                  <p className="text-slate-500 text-sm">5th Grade Teacher</p>
-                </div>
-                <div className="bg-[#E8F0FD] rounded-2xl p-6">
-                  <p className="text-slate-700 italic mb-4">
-                    &quot;Our teachers are actually excited about PD now. I do not have to chase them down or babysit. They are learning because they want to.&quot;
-                  </p>
-                  <p className="text-slate-600 font-semibold text-sm">Michelle M.</p>
-                  <p className="text-slate-500 text-sm">K-8 School Director</p>
-                </div>
-                <div className="bg-[#E8F0FD] rounded-2xl p-6">
-                  <p className="text-slate-700 italic mb-4">
-                    &quot;TDI did not just drop a slide deck and bounce. Every part of the experience felt personal. Our staff felt understood.&quot;
-                  </p>
-                  <p className="text-slate-600 font-semibold text-sm">Julie H.</p>
-                  <p className="text-slate-500 text-sm">Principal, MI</p>
+          {/* Testimonials Section - Teachers */}
+          <section className="py-16 md:py-20 bg-[#1e2749]">
+            <div className="container mx-auto px-4">
+              <div className="max-w-5xl mx-auto">
+                <h3 className="text-2xl md:text-3xl font-bold text-white text-center mb-10">
+                  What Teachers Are Saying
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="bg-[#E8F0FD] rounded-2xl p-6">
+                    <p className="text-slate-700 italic mb-4">
+                      &quot;I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself.&quot;
+                    </p>
+                    <p className="text-slate-600 font-semibold text-sm">Sarah K.</p>
+                    <p className="text-slate-500 text-sm">5th Grade Teacher</p>
+                  </div>
+                  <div className="bg-[#E8F0FD] rounded-2xl p-6">
+                    <p className="text-slate-700 italic mb-4">
+                      &quot;Our teachers are actually excited about PD now. I do not have to chase them down or babysit. They are learning because they want to.&quot;
+                    </p>
+                    <p className="text-slate-600 font-semibold text-sm">Michelle M.</p>
+                    <p className="text-slate-500 text-sm">K-8 School Director</p>
+                  </div>
+                  <div className="bg-[#E8F0FD] rounded-2xl p-6">
+                    <p className="text-slate-700 italic mb-4">
+                      &quot;TDI did not just drop a slide deck and bounce. Every part of the experience felt personal. Our staff felt understood.&quot;
+                    </p>
+                    <p className="text-slate-600 font-semibold text-sm">Julie H.</p>
+                    <p className="text-slate-500 text-sm">Principal, MI</p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </>
       )}
     </main>
   );
