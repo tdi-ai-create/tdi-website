@@ -308,28 +308,28 @@ export default function PDDiagnosticPage() {
 
       {/* Testimonials Section - Teachers */}
       {showResults && (
-        <section className="py-16 md:py-20 bg-slate-50">
+        <section className="py-16 md:py-20 bg-[#1e2749]">
           <div className="container mx-auto px-4">
             <div className="max-w-5xl mx-auto">
-              <h3 className="text-2xl md:text-3xl font-bold text-slate-800 text-center mb-10">
+              <h3 className="text-2xl md:text-3xl font-bold text-white text-center mb-10">
                 What Teachers Are Saying
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-white rounded-2xl p-6 shadow-sm">
+                <div className="bg-[#E8F0FD] rounded-2xl p-6">
                   <p className="text-slate-700 italic mb-4">
                     "I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself."
                   </p>
                   <p className="text-slate-600 font-semibold text-sm">Sarah K.</p>
                   <p className="text-slate-500 text-sm">5th Grade Teacher</p>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm">
+                <div className="bg-[#E8F0FD] rounded-2xl p-6">
                   <p className="text-slate-700 italic mb-4">
                     "Our teachers are actually excited about PD now. I don't have to chase them down or babysit. They're learning because they want to."
                   </p>
                   <p className="text-slate-600 font-semibold text-sm">Michelle M.</p>
                   <p className="text-slate-500 text-sm">K-8 School Director</p>
                 </div>
-                <div className="bg-white rounded-2xl p-6 shadow-sm">
+                <div className="bg-[#E8F0FD] rounded-2xl p-6">
                   <p className="text-slate-700 italic mb-4">
                     "TDI didn't just drop a slide deck and bounce. Every part of the experience felt personal. Our staff felt understood."
                   </p>
