@@ -167,7 +167,7 @@ export default function PDQuadrant({
 
       {/* Footer note */}
       <p className="text-center text-xs text-slate-400 italic mt-6">
-        Most schools don't start in Embedded Practice — they move there over time.
+        Most schools don't start in Embedded Practice... they move there over time.
       </p>
     </div>
   );
