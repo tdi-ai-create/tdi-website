@@ -72,36 +72,68 @@ export default function TDIPhases({ onCtaClick, onFundingClick }: TDIPhasesProps
             </div>
           </div>
 
-          {/* Phase Explainers */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            <div className="bg-white/10 rounded-xl p-6 text-center">
-              <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: '#ffba06' }}>
-                <span className="font-bold text-lg" style={{ color: '#1e2749' }}>1</span>
-              </div>
-              <h4 className="font-bold text-white mb-2">IGNITE</h4>
-              <p className="text-sm text-white/70">
-                Build the foundation. Introduce sustainable strategies and get early wins.
-              </p>
+          {/* Phase Explainers - Timeline Style */}
+          <div className="max-w-5xl mx-auto mb-12">
+            {/* Timeline connector line - visible on desktop */}
+            <div className="hidden md:block relative">
+              <div
+                className="absolute top-[24px] left-[16.67%] right-[16.67%] h-1 rounded-full"
+                style={{ backgroundColor: '#80a4ed' }}
+              />
             </div>
 
-            <div className="bg-white/10 rounded-xl p-6 text-center">
-              <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: '#ffba06' }}>
-                <span className="font-bold text-lg" style={{ color: '#1e2749' }}>2</span>
+            {/* Timeline Steps */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+              {/* Phase 1: IGNITE */}
+              <div className="flex flex-col items-center text-center">
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4 relative z-10"
+                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                >
+                  1
+                </div>
+                <div className="bg-white rounded-2xl p-5 shadow-md w-full" style={{ border: '2px solid #ffba06' }}>
+                  <h3 className="text-2xl font-bold" style={{ color: '#1e2749' }}>IGNITE</h3>
+                  <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Getting Started</p>
+                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                    Build the foundation. Introduce sustainable strategies and get early wins.
+                  </p>
+                </div>
               </div>
-              <h4 className="font-bold text-white mb-2">ACCELERATE</h4>
-              <p className="text-sm text-white/70">
-                Deepen implementation. Expand support to all staff roles.
-              </p>
-            </div>
 
-            <div className="bg-white/10 rounded-xl p-6 text-center">
-              <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ backgroundColor: '#ffba06' }}>
-                <span className="font-bold text-lg" style={{ color: '#1e2749' }}>3</span>
+              {/* Phase 2: ACCELERATE */}
+              <div className="flex flex-col items-center text-center">
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4 relative z-10"
+                  style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}
+                >
+                  2
+                </div>
+                <div className="bg-white rounded-2xl p-5 shadow-sm w-full">
+                  <h3 className="text-2xl font-bold" style={{ color: '#1e2749' }}>ACCELERATE</h3>
+                  <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Full Implementation</p>
+                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                    Deepen implementation. Expand support to all staff roles.
+                  </p>
+                </div>
               </div>
-              <h4 className="font-bold text-white mb-2">SUSTAIN</h4>
-              <p className="text-sm text-white/70">
-                Lock it in. Systems run without constant oversight.
-              </p>
+
+              {/* Phase 3: SUSTAIN */}
+              <div className="flex flex-col items-center text-center">
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold mb-4 relative z-10"
+                  style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}
+                >
+                  3
+                </div>
+                <div className="bg-white rounded-2xl p-5 shadow-sm w-full">
+                  <h3 className="text-2xl font-bold" style={{ color: '#1e2749' }}>SUSTAIN</h3>
+                  <p className="text-sm font-medium mb-3" style={{ color: '#ffba06' }}>Long-Term Partnership</p>
+                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                    Lock it in. Systems run without constant oversight.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
