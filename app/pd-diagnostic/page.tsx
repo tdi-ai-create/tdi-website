@@ -688,11 +688,11 @@ export default function PDDiagnosticPage() {
                 </div>
 
                 {/* What this means */}
-                <div className="bg-gray-50 rounded-2xl p-6 mb-8 text-left">
-                  <h3 className="font-bold mb-3" style={{ color: '#1e2749' }}>
+                <div className="bg-[#1e2749] rounded-2xl p-6 mb-8 text-left">
+                  <h3 className="font-semibold text-white mb-3">
                     What this means for your school:
                   </h3>
-                  <ul className="space-y-2 text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+                  <ul className="space-y-2 text-sm text-white/80">
                     {resultData[resultType].implications.map((item, index) => (
                       <li key={index}>- {item}</li>
                     ))}
