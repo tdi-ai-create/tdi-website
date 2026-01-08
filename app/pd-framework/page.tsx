@@ -1,53 +1,53 @@
 'use client';
 
-import { useEffect } from 'react';
-import PDQuadrant from '../pd-diagnostic/components/PDQuadrant';
+import { useEffect, useRef } from 'react';
 import FrameworkHero from './components/FrameworkHero';
-import QuadrantDeepDive from './components/QuadrantDeepDive';
 import MovementPath from './components/MovementPath';
 import TDIPhases from './components/TDIPhases';
 import ToolsGrid from './components/ToolsGrid';
 import LeadCapture from './components/LeadCapture';
 import FinalCTA from './components/FinalCTA';
 
-// Map quadrant IDs to section IDs for scrolling
-const quadrantToSectionId: Record<string, string> = {
-  A: 'compliance',
-  B: 'inspiration',
-  C: 'fragmented',
-  D: 'embedded',
-};
-
 // GA4 event helper
-const sendGAEvent = (eventName: string, params: Record<string, string>) => {
+const sendGAEvent = (eventName: string, params: Record<string, string | number>) => {
   if (typeof window !== 'undefined' && 'gtag' in window) {
     (window as Window & { gtag: (...args: unknown[]) => void }).gtag('event', eventName, params);
   }
 };
 
 export default function PDFrameworkPage() {
+  const scrollDepthsTracked = useRef<Set<number>>(new Set());
+
   // Track page view
   useEffect(() => {
-    sendGAEvent('page_view', {
+    sendGAEvent('framework_page_view', {
       page_title: 'PD Framework',
       page_location: window.location.href,
     });
   }, []);
 
-  // Handle quadrant selection - scroll to deep dive section
-  const handleQuadrantSelect = (quadrantId: string) => {
-    const sectionId = quadrantToSectionId[quadrantId];
-    if (sectionId) {
-      const element = document.getElementById(sectionId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+  // Track scroll depth
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPercent = Math.round((scrollTop / docHeight) * 100);
+
+      const milestones = [25, 50, 75, 100];
+      for (const milestone of milestones) {
+        if (scrollPercent >= milestone && !scrollDepthsTracked.current.has(milestone)) {
+          scrollDepthsTracked.current.add(milestone);
+          sendGAEvent('scroll_depth', {
+            percent_scrolled: milestone,
+            page: 'pd_framework',
+          });
+        }
       }
-      sendGAEvent('quadrant_click', {
-        quadrant_id: quadrantId,
-        location: 'framework_visual',
-      });
-    }
-  };
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Track CTA clicks
   const handleCtaClick = (ctaName: string, ctaLocation: string) => {
@@ -58,75 +58,49 @@ export default function PDFrameworkPage() {
     });
   };
 
-  // Track section expansion
-  const handleSectionExpand = (sectionId: string) => {
-    sendGAEvent('section_expand', {
-      section_id: sectionId,
-      page: 'pd_framework',
-    });
-  };
-
   // Track tool clicks
   const handleToolClick = (toolName: string) => {
-    sendGAEvent('tool_click', {
+    sendGAEvent('tool_card_click', {
       tool_name: toolName,
-      location: 'tools_grid',
       page: 'pd_framework',
     });
   };
 
   // Track lead capture submission
   const handleLeadSubmit = (email: string, quadrant: string) => {
-    sendGAEvent('lead_capture', {
+    sendGAEvent('lead_capture_submit', {
       quadrant_selected: quadrant,
-      location: 'framework_page',
+      page: 'pd_framework',
     });
     // Note: In production, this would also submit to your email service
     console.log('Lead captured:', { email, quadrant });
   };
 
+  // Track funding callout click
+  const handleFundingClick = () => {
+    sendGAEvent('funding_callout_click', {
+      page: 'pd_framework',
+    });
+  };
+
   return (
     <main className="min-h-screen">
-      {/* Section 1: Hero */}
+      {/* Section 1: Minimal Header */}
       <FrameworkHero onCtaClick={handleCtaClick} />
 
-      {/* Section 2: Interactive Framework Visual */}
-      <section className="py-16 md:py-24 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
-              The Four Types of PD
-            </h2>
-            <p className="text-center text-lg mb-8" style={{ color: '#1e2749', opacity: 0.7 }}>
-              Click any quadrant to learn more about it.
-            </p>
-
-            <div className="bg-slate-50 rounded-3xl p-6 md:p-10">
-              <PDQuadrant
-                interactive={true}
-                onSelect={handleQuadrantSelect}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Section 3: Deep Dive Sections */}
-      <QuadrantDeepDive onSectionExpand={handleSectionExpand} />
-
-      {/* Section 4: Movement Path */}
+      {/* Section 2: Movement Path (LEAD WITH THIS) */}
       <MovementPath />
 
-      {/* Section 5: How TDI Helps You Move */}
-      <TDIPhases onCtaClick={handleCtaClick} />
+      {/* Section 3: How TDI Helps You Move */}
+      <TDIPhases onCtaClick={handleCtaClick} onFundingClick={handleFundingClick} />
 
-      {/* Section 6: Tools to Help You */}
+      {/* Section 4: Tools to Help You */}
       <ToolsGrid onToolClick={handleToolClick} />
 
-      {/* Section 7: Lead Capture */}
+      {/* Section 5: Lead Capture */}
       <LeadCapture onSubmit={handleLeadSubmit} />
 
-      {/* Section 8: Final CTA */}
+      {/* Section 6: Final CTA */}
       <FinalCTA onCtaClick={handleCtaClick} />
     </main>
   );

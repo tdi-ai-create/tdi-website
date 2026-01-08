@@ -5,9 +5,10 @@ import { ClipboardCheck, Sparkles, Puzzle, Target, ArrowRight } from 'lucide-rea
 
 interface TDIPhasesProps {
   onCtaClick?: (ctaName: string, ctaLocation: string) => void;
+  onFundingClick?: () => void;
 }
 
-export default function TDIPhases({ onCtaClick }: TDIPhasesProps) {
+export default function TDIPhases({ onCtaClick, onFundingClick }: TDIPhasesProps) {
   return (
     <section className="py-16 md:py-24" style={{ backgroundColor: '#1e2749' }}>
       <div className="container mx-auto px-4">
@@ -136,7 +137,10 @@ export default function TDIPhases({ onCtaClick }: TDIPhasesProps) {
               </div>
               <Link
                 href="/funding?utm_source=framework&utm_medium=page&utm_campaign=funding"
-                onClick={() => onCtaClick?.('funding_cta', 'tdi_phases')}
+                onClick={() => {
+                  onFundingClick?.();
+                  onCtaClick?.('funding_cta', 'tdi_phases');
+                }}
                 className="inline-block px-6 py-3 rounded-full font-semibold transition-all hover:shadow-lg flex-shrink-0"
                 style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
               >
