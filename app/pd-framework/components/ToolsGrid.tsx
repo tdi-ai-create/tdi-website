@@ -19,7 +19,7 @@ const resources = [
   },
   {
     title: 'Join the Free\nFB Community',
-    description: 'Connect with thousands\nof educators who get it.',
+    description: 'Connect with thousands of educators\nwho get it.',
     href: 'https://www.facebook.com/groups/tdimovement',
     icon: Users,
     iconBg: '#1e2749',
