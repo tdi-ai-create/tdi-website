@@ -155,15 +155,14 @@ export default function TDIPhases({ onCtaClick, onFundingClick }: TDIPhasesProps
 
           {/* Funding Callout */}
           <div
-            className="rounded-2xl p-6 md:p-8 mb-8"
-            style={{ backgroundColor: '#ffba06' }}
+            className="rounded-2xl p-6 md:p-8 mb-8 bg-white"
           >
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               <div>
                 <h4 className="font-bold text-lg mb-1" style={{ color: '#1e2749' }}>
                   Wondering about budget?
                 </h4>
-                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                   80% of our partner schools secure external funding to cover PD costs.
                 </p>
               </div>
@@ -174,7 +173,7 @@ export default function TDIPhases({ onCtaClick, onFundingClick }: TDIPhasesProps
                   onCtaClick?.('funding_cta', 'tdi_phases');
                 }}
                 className="inline-block px-6 py-3 rounded-full font-semibold transition-all hover:shadow-lg flex-shrink-0"
-                style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
+                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
               >
                 See funding options →
               </Link>
