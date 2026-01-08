@@ -9,7 +9,7 @@ interface ToolsGridProps {
 
 const resources = [
   {
-    title: 'Take the PD Quiz',
+    title: 'Take the\nPD Quiz',
     description: 'Get a personalized professional development plan in minutes.',
     href: '/free-pd-plan?utm_source=framework&utm_medium=page&utm_campaign=pdplan',
     icon: ClipboardCheck,
