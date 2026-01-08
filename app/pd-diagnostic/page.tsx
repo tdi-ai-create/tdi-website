@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PDQuadrant from './components/PDQuadrant';
 import DiagnosticForm from './components/DiagnosticForm';
 import DiagnosticResults from './components/DiagnosticResults';
@@ -119,6 +119,13 @@ export default function PDDiagnosticPage() {
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [showResults, setShowResults] = useState(false);
   const [resultType, setResultType] = useState<string | null>(null);
+  const [scrollY, setScrollY] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => setScrollY(window.scrollY);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleAnswer = (questionId: number, value: string) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
@@ -149,13 +156,14 @@ export default function PDDiagnosticPage() {
       {/* HERO SECTION */}
       <section className="relative min-h-[800px] flex items-center py-16">
 
-        {/* Background Image */}
+        {/* Background Image with Parallax */}
         <div
           className="absolute inset-0 z-0"
           style={{
             backgroundImage: 'url(/images/hero-schools.png)',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
+            transform: `translateY(${scrollY * 0.5}px)`,
           }}
         />
 
