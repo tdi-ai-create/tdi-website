@@ -15,7 +15,7 @@ export default function CalculatorPage() {
         style={{
           backgroundImage: "url('/images/hero-rae-background.png')",
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: '70% center',
           backgroundRepeat: 'no-repeat',
         }}
       />
