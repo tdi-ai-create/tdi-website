@@ -7,8 +7,12 @@ import { BurnoutCalculator } from './BurnoutCalculator';
 import { GuiltFreeCalculator } from './GuiltFreeCalculator';
 import { JoyCalculator } from './JoyCalculator';
 
-export function TabbedCalculator() {
-  const [mainTab, setMainTab] = useState<'schools' | 'teachers'>('schools');
+interface TabbedCalculatorProps {
+  defaultTab?: 'schools' | 'teachers';
+}
+
+export function TabbedCalculator({ defaultTab = 'schools' }: TabbedCalculatorProps) {
+  const [mainTab, setMainTab] = useState<'schools' | 'teachers'>(defaultTab);
   const [adminTab, setAdminTab] = useState<'success' | 'budget'>('budget');
   const [teacherTab, setTeacherTab] = useState<'burnout' | 'guilt' | 'joy'>('burnout');
   const [hasEngaged, setHasEngaged] = useState(false);
