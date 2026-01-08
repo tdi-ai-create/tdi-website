@@ -18,7 +18,7 @@ const resources = [
     external: false,
   },
   {
-    title: 'Join the Free FB Community',
+    title: 'Join the Free\nFB Community',
     description: 'Connect with thousands of educators who get it.',
     href: 'https://www.facebook.com/groups/tdimovement',
     icon: Users,
@@ -101,7 +101,7 @@ export default function ToolsGrid({ onToolClick }: ToolsGridProps) {
                     >
                       <Icon style={{ color: resource.iconColor }} size={28} />
                     </div>
-                    <h3 className="font-bold text-lg mb-2 group-hover:text-blue-600 transition-colors" style={{ color: '#1e2749' }}>
+                    <h3 className="font-bold text-lg mb-2 group-hover:text-blue-600 transition-colors whitespace-pre-line" style={{ color: '#1e2749' }}>
                       {resource.title}
                     </h3>
                     <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
