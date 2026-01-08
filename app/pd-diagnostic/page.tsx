@@ -800,16 +800,18 @@ export default function PDDiagnosticPage() {
                 </div>
 
                 {/* Grant funding mention */}
-                <div className="mb-8 p-4 rounded-xl" style={{ backgroundColor: '#E8F0FD' }}>
+                <div className="mb-8 p-5 rounded-xl" style={{ backgroundColor: '#E8F0FD' }}>
+                  <p className="text-sm mb-2" style={{ color: '#1e2749' }}>
+                    <span className="font-semibold">80% of schools we partner with find over $35K in funding for TDI.</span>
+                  </p>
                   <p className="text-sm" style={{ color: '#1e2749' }}>
-                    Think you cannot afford to fix this?{' '}
-                    <span className="font-medium">73% of our partners use grant funding.</span>{' '}
+                    Tell us about your school. We&apos;ll handle the rest.{' '}
                     <Link
                       href="/funding?utm_source=diagnostic&utm_medium=results&utm_campaign=funding_cta"
                       className="font-semibold underline hover:no-underline"
                       style={{ color: '#80a4ed' }}
                     >
-                      Explore funding options
+                      Learn more
                     </Link>
                   </p>
                 </div>
