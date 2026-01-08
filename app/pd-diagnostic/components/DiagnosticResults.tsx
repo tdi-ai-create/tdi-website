@@ -27,14 +27,14 @@ export default function DiagnosticResults({ resultType, resultData }: Diagnostic
         {resultData.tagline}
       </p>
 
-      <div className="bg-slate-50 rounded-2xl p-8 text-left">
-        <h3 className="font-semibold text-slate-800 mb-3">What This Looks Like</h3>
-        <p className="text-slate-600 mb-6">
+      <div className="bg-[#1e2749] rounded-2xl p-8 text-left">
+        <h3 className="font-semibold text-white mb-3">What This Looks Like</h3>
+        <p className="text-white/80 mb-6">
           {resultData.description}
         </p>
 
-        <h3 className="font-semibold text-slate-800 mb-3">What This Commonly Predicts</h3>
-        <p className="text-slate-600">
+        <h3 className="font-semibold text-white mb-3">What This Commonly Predicts</h3>
+        <p className="text-white/80">
           {resultData.predicts}
         </p>
       </div>
