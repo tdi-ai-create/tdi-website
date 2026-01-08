@@ -200,26 +200,6 @@ export default function TDIPhases({ onCtaClick, onFundingClick }: TDIPhasesProps
               </Link>
             </div>
           </div>
-
-          {/* CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              href="/free-pd-plan?utm_source=framework&utm_medium=page&utm_campaign=pdplan"
-              onClick={() => onCtaClick?.('pdplan_cta', 'tdi_phases')}
-              className="inline-block px-8 py-4 rounded-full font-semibold transition-all hover:shadow-lg hover:-translate-y-0.5"
-              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-            >
-              Get Your Free PD Plan
-            </Link>
-            <Link
-              href="/for-schools/schedule-call?utm_source=framework&utm_medium=page&utm_campaign=schedule"
-              onClick={() => onCtaClick?.('schedule_cta', 'tdi_phases')}
-              className="inline-block px-8 py-4 rounded-full font-semibold transition-all hover:shadow-lg hover:-translate-y-0.5 border-2 border-white"
-              style={{ backgroundColor: 'transparent', color: '#ffffff' }}
-            >
-              Schedule a Call
-            </Link>
-          </div>
         </div>
       </div>
     </section>
