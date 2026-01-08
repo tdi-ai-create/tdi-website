@@ -27,7 +27,7 @@ const resources = [
     external: true,
   },
   {
-    title: 'Read Our Blog',
+    title: 'Read\nOur Blog',
     description: 'Weekly insights for educators who refuse to burn out.',
     href: 'https://raehughart.substack.com',
     icon: BookOpen,
