@@ -51,13 +51,6 @@ export function Footer() {
                     Contact
                   </Link>
                 </li>
-              </ul>
-            </div>
-
-            {/* Resources */}
-            <div>
-              <h4 className="font-semibold mb-4" style={{ color: 'white' }}>Resources</h4>
-              <ul className="space-y-2">
                 <li>
                   <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Blog
@@ -73,6 +66,13 @@ export function Footer() {
                     FAQ
                   </Link>
                 </li>
+              </ul>
+            </div>
+
+            {/* Resources */}
+            <div>
+              <h4 className="font-semibold mb-4" style={{ color: 'white' }}>Resources</h4>
+              <ul className="space-y-2">
                 <li>
                   <Link href="/pd-diagnostic" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     PD Diagnostic
