@@ -727,7 +727,7 @@ export default function FreePDPlanPage() {
               Get Your Free PD Evaluation Plan
             </h1>
             <p className="text-lg max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
-              Answer a few questions and we'll send you a custom PD evaluation plan within 24 hours.
+              Answer a few questions and we'll send you a custom<br />PD evaluation plan within 24 hours.
             </p>
           </div>
         </section>
@@ -804,7 +804,7 @@ export default function FreePDPlanPage() {
             Get Your Free PD Evaluation Plan
           </h1>
           <p className="text-lg max-w-2xl mx-auto mb-6" style={{ color: '#ffffff', opacity: 0.9 }}>
-            Answer a few questions and we'll send you a custom PD evaluation plan within 24 hours.
+            Answer a few questions and we'll send you a custom<br />PD evaluation plan within 24 hours.
           </p>
 
           {/* Stats */}
