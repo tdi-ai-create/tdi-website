@@ -32,16 +32,6 @@ export function Footer() {
                   </a>
                 </li>
                 <li>
-                  <Link href="/for-schools" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
-                    For Schools
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/funding" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
-                    Funding Options
-                  </Link>
-                </li>
-                <li>
                   <Link href="/about" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     About
                   </Link>
@@ -73,6 +63,16 @@ export function Footer() {
             <div>
               <h4 className="font-semibold mb-4" style={{ color: 'white' }}>Resources</h4>
               <ul className="space-y-2">
+                <li>
+                  <Link href="/for-schools" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
+                    For Schools
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/funding" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
+                    Funding Options
+                  </Link>
+                </li>
                 <li>
                   <Link href="/pd-diagnostic" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     PD Diagnostic
