@@ -98,6 +98,11 @@ export function Footer() {
                     Become a Creator
                   </a>
                 </li>
+                <li>
+                  <a href="https://us.shaklee.com/en_US/raehughart/storefront" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
+                    Health Check
+                  </a>
+                </li>
               </ul>
             </div>
 
