@@ -365,6 +365,20 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Our Community */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
+        <div className="container-default">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: '#ffba06' }}>
+              The educators in our community share something.
+            </h2>
+            <p className="text-lg md:text-xl" style={{ color: '#ffffff', opacity: 0.9 }}>
+              They're done pretending burnout is a badge of honor. They're practical optimists who believe there's a smarter way to do this work. They're still here because they still believe in teaching. They just refuse to destroy themselves doing it.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* The Team */}
       <section className="py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">

@@ -103,7 +103,10 @@ export function Footer() {
 
             {/* Stay Connected */}
             <div>
-              <h4 className="font-bold text-lg mb-4" style={{ color: '#ffffff' }}>Stay Connected</h4>
+              <h4 className="font-bold text-lg mb-2" style={{ color: '#ffffff' }}>Stay Connected</h4>
+              <p className="text-sm mb-4" style={{ color: '#ffba06' }}>
+                Join 87,000+ educators who decided they deserved better.
+              </p>
               <form
                 action="https://formsubmit.co/Olivia@teachersdeserveit.com"
                 method="POST"
@@ -128,7 +131,7 @@ export function Footer() {
                   className="w-full px-4 py-3 rounded-lg font-bold transition-all hover-glow"
                   style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
                 >
-                  Join 87K+ Educators
+                  Join the Movement
                 </button>
               </form>
               <p className="text-sm mt-4" style={{ color: '#ffffff', opacity: 0.6 }}>

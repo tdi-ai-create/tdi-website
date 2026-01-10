@@ -10,6 +10,20 @@ export default function Home() {
       {/* SECTION 1: Hero */}
       <ParallaxHero />
 
+      {/* SECTION 1.5: Who Joins TDI? - Identity Section */}
+      <section className="py-12 md:py-16" style={{ backgroundColor: '#1e2749' }}>
+        <div className="container-default">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: '#ffba06' }}>
+              Who Joins TDI?
+            </h2>
+            <p className="text-lg md:text-xl" style={{ color: '#ffffff', opacity: 0.9 }}>
+              Teachers who refuse to accept burnout as "just part of the job." Educators building 20-year careers, not just surviving semesters. The ones who believe sustainable teaching is possible. And they're proving it every day.
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* SECTION 2: Problem + Solution Section */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
@@ -428,8 +442,11 @@ export default function Home() {
       <section className="section" style={{ backgroundColor: 'var(--tdi-navy)' }}>
         <div className="container-default text-center">
           <h2 className="mb-4" style={{ color: 'white' }}>Practical Strategies, 3x a Week</h2>
-          <p className="text-lg mb-6 max-w-xl mx-auto" style={{ color: 'white', opacity: 0.8 }}>
+          <p className="text-lg mb-2 max-w-xl mx-auto" style={{ color: 'white', opacity: 0.8 }}>
             Join 87,000+ educators getting real strategies delivered to their inbox. Not theory, not fluff, just stuff that works.
+          </p>
+          <p className="text-base mb-6" style={{ color: '#ffba06' }}>
+            Join 87,000+ educators who decided they deserved better.
           </p>
           <a
             href="https://raehughart.substack.com"
@@ -437,7 +454,7 @@ export default function Home() {
             rel="noopener noreferrer"
             className="btn-primary inline-block"
           >
-            Join 87,000+ Educators
+            Join the Movement
           </a>
           <div className="mt-4">
             <a

@@ -746,8 +746,13 @@ export default function FreePDPlanPage() {
               <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#1e2749' }}>
                 You're all set!
               </h2>
-              <p className="text-lg mb-8" style={{ color: '#1e2749', opacity: 0.8 }}>
+              <p className="text-lg mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
                 Check your inbox within 24 hours for your custom PD Evaluation Plan.
+              </p>
+
+              {/* Identity Language */}
+              <p className="text-base italic mb-8 px-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                You're exactly the kind of educator we built this for. Someone ready to stop accepting the status quo and start building something that actually lasts.
               </p>
 
               <div className="pt-6 border-t" style={{ borderColor: '#e5e5e5' }}>
