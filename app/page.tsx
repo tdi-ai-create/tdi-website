@@ -18,7 +18,7 @@ export default function Home() {
               Who Joins TDI?
             </h2>
             <p className="text-lg md:text-xl" style={{ color: '#ffffff', opacity: 0.9 }}>
-              Teachers who refuse to accept burnout as "just part of the job." Educators building 20-year careers, not just surviving semesters. The ones who believe sustainable teaching is possible. And they're proving it every day.
+              Educators (Teachers, Administrators, Paraprofessionals, etc) who refuse to accept burnout as<br />"just part of the job." Educators building 20-year careers, not just surviving semesters. The ones who believe sustainable teaching is possible. And they're proving it every day.
             </p>
           </div>
         </div>
