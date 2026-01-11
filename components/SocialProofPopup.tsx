@@ -95,9 +95,9 @@ export function SocialProofPopup() {
         setCurrentMessage(null);
 
         if (pendingBurstRef.current) {
-          // Burst mode: show next bubble quickly (2-4 seconds)
+          // Burst mode: show next bubble quickly (1-3 seconds)
           pendingBurstRef.current = false;
-          const burstDelay = randomInRange(2000, 4000);
+          const burstDelay = randomInRange(1000, 3000);
           timeoutRef.current = setTimeout(() => {
             showNotification(true); // Mark as burst follow-up
           }, burstDelay);
@@ -115,8 +115,8 @@ export function SocialProofPopup() {
       clearTimeout(timeoutRef.current);
     }
 
-    // Random interval between 8-30 seconds
-    const delay = randomInRange(8000, 30000);
+    // Random interval between 6-20 seconds
+    const delay = randomInRange(6000, 20000);
 
     timeoutRef.current = setTimeout(() => {
       showNotification();
@@ -181,8 +181,8 @@ export function SocialProofPopup() {
         if (messages.length > 0) {
           messagesRef.current = shuffleArray(messages);
 
-          // Initial delay: random between 3-7 seconds
-          const initialDelay = randomInRange(3000, 7000);
+          // Initial delay: random between 2-5 seconds
+          const initialDelay = randomInRange(2000, 5000);
 
           timeoutRef.current = setTimeout(() => {
             showNotification();
