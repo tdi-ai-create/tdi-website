@@ -6,6 +6,7 @@ import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { EmailPopup } from "@/components/EmailPopup";
+import { CustomCursor } from "@/components/CustomCursor";
 
 export const metadata: Metadata = {
   title: {
@@ -61,6 +62,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
+        <CustomCursor />
         <GoogleAnalytics />
         <ScrollToTop />
         <AnnouncementBar />
