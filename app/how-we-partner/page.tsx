@@ -3,265 +3,312 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-interface PhaseData {
-  id: string;
+type PhaseId = 'ignite' | 'accelerate' | 'sustain';
+
+interface PhaseTab {
+  id: PhaseId;
   number: number;
+  name: string;
   badge: string;
-  title: string;
   tagline: string;
-  keyStat: string;
-  keyStatContext?: string;
-  shift: string;
-  whatYouGet: string[];
-  whatYouSee: string[];
-  timeline: string;
-  cta: { text: string; href: string };
-  isStart?: boolean;
+  stat: string;
 }
 
-const phases: PhaseData[] = [
+const phaseTabs: PhaseTab[] = [
   {
     id: 'ignite',
     number: 1,
-    badge: 'START HERE',
-    title: 'IGNITE',
-    tagline: 'Build buy-in with your leadership team and pilot group',
-    keyStat: '95%',
-    keyStatContext: 'of pilot teachers report saving planning time',
-    shift: 'Awareness → Buy-in',
-    whatYouGet: [
-      '2 On-Campus PD Days with Rae and the TDI team',
-      '4 Virtual Strategy Sessions',
-      '2 Leadership Executive Sessions',
-      '2 Leadership Impact Sessions',
-      'Learning Hub access for your pilot group (10-25 educators)',
-      'Teachers Deserve It book for each participant',
-    ],
-    whatYouSee: [
-      'Pilot teachers reduce planning time from 12 to 6-8 hours/week',
-      'Leadership alignment on wellness priorities',
-      'Foundation for school-wide rollout',
-    ],
-    timeline: '1 semester to 1 year (flexible based on your school\'s needs)',
-    cta: { text: 'See if IGNITE is right for your school →', href: '/for-schools/schedule-call' },
-    isStart: true,
+    name: 'IGNITE',
+    badge: 'Start Here',
+    tagline: 'Build buy-in with leadership and a pilot group',
+    stat: '95% of pilot teachers report saving planning time',
   },
   {
     id: 'accelerate',
     number: 2,
-    badge: 'SCALE',
-    title: 'ACCELERATE',
+    name: 'ACCELERATE',
+    badge: 'Scale',
     tagline: 'Expand support to your full staff',
-    keyStat: '65%',
-    keyStatContext: 'implementation rate (vs 10% industry average)',
-    shift: 'Buy-in → Action',
-    whatYouGet: [
-      'Everything in IGNITE, plus:',
-      'Learning Hub access for ALL staff',
-      '6 Executive Impact Sessions',
-      'Teachers Deserve It book for every educator',
-      'Retention tracking tools',
-      'Paraprofessional support options',
-    ],
-    whatYouSee: [
-      'Staff stress levels drop from 9 to 5-7 (on 10-point scale)',
-      'Teacher retention intent improves from 2-4 to 5-7',
-      'Strategies implemented school-wide, not just talked about',
-    ],
-    timeline: '1-3 years (many schools stay here for sustained growth)',
-    cta: { text: 'See what ACCELERATE could do for your staff →', href: '/for-schools#calculator' },
+    stat: '65% implementation rate vs 10% industry average',
   },
   {
     id: 'sustain',
     number: 3,
-    badge: 'LONG-TERM PARTNERSHIP',
-    title: 'SUSTAIN',
-    tagline: 'Embed lasting systems that outlive any single initiative',
-    keyStat: 'Transformation',
-    keyStatContext: 'that becomes part of your school\'s DNA',
-    shift: 'Action → Identity',
-    whatYouGet: [
-      'Everything in ACCELERATE, plus:',
-      'Desi AI Assistant (24/7 support for your educators)',
-      'Advanced analytics and progress tracking',
-      'Ongoing partnership support',
-      'Custom implementation coaching',
-    ],
-    whatYouSee: [
-      'Wellness becomes embedded in school culture',
-      'Systems sustain even through staff turnover',
-      'Your school becomes a model for others',
-    ],
-    timeline: 'Ongoing partnership (schools in SUSTAIN are long-term partners)',
-    cta: { text: 'Let\'s talk about long-term partnership →', href: '/for-schools/schedule-call' },
+    name: 'SUSTAIN',
+    badge: 'Embed',
+    tagline: 'Systems that last beyond any single initiative',
+    stat: 'Transformation that becomes part of your culture',
   },
 ];
 
-function PhaseCard({ phase, isExpanded, onToggle }: { phase: PhaseData; isExpanded: boolean; onToggle: () => void }) {
+function IgnitePanel() {
   return (
-    <div className="flex-1 relative">
-      {/* Timeline connector line - desktop */}
-      <div className="hidden md:block absolute top-8 left-0 right-0 h-1" style={{ backgroundColor: '#e5e7eb' }}>
-        <div
-          className="absolute top-0 h-full"
-          style={{
-            backgroundColor: '#ffba06',
-            left: phase.number === 1 ? '50%' : '0',
-            right: phase.number === 3 ? '50%' : '0',
-          }}
-        />
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#1e2749' }}>
+          IGNITE: Build Buy-In
+        </h2>
+        <p className="text-lg font-medium" style={{ color: '#ffba06' }}>
+          The Shift: Awareness to Buy-in
+        </p>
       </div>
 
-      {/* Timeline dot */}
-      <div className="relative z-10 flex justify-center mb-4">
-        <div
-          className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold transition-all ${
-            phase.isStart ? 'ring-4 ring-offset-2 ring-yellow-400' : ''
-          }`}
-          style={{
-            backgroundColor: '#ffba06',
-            color: '#1e2749',
-          }}
-        >
-          {phase.number}
+      <div>
+        <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>Who We Support</h3>
+        <p style={{ color: '#1e2749', opacity: 0.8 }}>
+          Every phase includes support for your full team: teachers, paraprofessionals, instructional coaches, and administrators. We meet each role where they are.
+        </p>
+      </div>
+
+      <div>
+        <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>What Your School Gets</h3>
+        <ul className="space-y-2">
+          {[
+            '2 On-Campus Observation Days with the TDI team',
+            '4 Virtual Strategy Sessions',
+            '2 Executive Impact Sessions',
+            'Leadership Dashboard (included)',
+            'Learning Hub access for your pilot group (typically 10-25 educators)',
+          ].map((item, idx) => (
+            <li key={idx} className="flex items-start gap-3">
+              <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+              </svg>
+              <span style={{ color: '#1e2749' }}>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>What You Will See</h3>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="p-4 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
+            <p className="text-2xl font-bold" style={{ color: '#ffba06' }}>12 → 6-8 hrs</p>
+            <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Weekly planning time reduction</p>
+          </div>
+          <div className="p-4 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
+            <p className="text-2xl font-bold" style={{ color: '#ffba06' }}>9 → 5-7</p>
+            <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Stress levels (10-point scale)</p>
+          </div>
+        </div>
+        <ul className="mt-4 space-y-2">
+          <li className="flex items-start gap-3">
+            <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24">
+              <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" />
+            </svg>
+            <span style={{ color: '#1e2749' }}>Leadership alignment on wellness priorities</span>
+          </li>
+          <li className="flex items-start gap-3">
+            <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24">
+              <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" />
+            </svg>
+            <span style={{ color: '#1e2749' }}>Foundation for school-wide rollout</span>
+          </li>
+        </ul>
+      </div>
+
+      <div className="p-4 rounded-lg" style={{ backgroundColor: '#fffbeb', border: '1px solid #ffba06' }}>
+        <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Typical Timeline</h3>
+        <p className="text-sm" style={{ color: '#1e2749' }}>
+          Most schools complete IGNITE in one semester to one year, but your pace depends on your school's needs and readiness.
+        </p>
+      </div>
+
+      <div>
+        <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>Tools to Explore</h3>
+        <div className="flex flex-wrap gap-3">
+          <Link href="/for-schools#calculator" className="text-sm px-4 py-2 rounded-full transition-all hover:scale-105" style={{ backgroundColor: '#e5e7eb', color: '#1e2749' }}>
+            ROI Calculator
+          </Link>
+          <Link href="/pd-diagnostic" className="text-sm px-4 py-2 rounded-full transition-all hover:scale-105" style={{ backgroundColor: '#e5e7eb', color: '#1e2749' }}>
+            PD Diagnostic
+          </Link>
+          <Link href="/free-pd-plan" className="text-sm px-4 py-2 rounded-full transition-all hover:scale-105" style={{ backgroundColor: '#e5e7eb', color: '#1e2749' }}>
+            Free PD Plan
+          </Link>
         </div>
       </div>
 
-      {/* Badge */}
-      <div className="flex justify-center mb-3">
-        <span
-          className="text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full"
-          style={{
-            backgroundColor: phase.isStart ? '#1e2749' : '#e5e7eb',
-            color: phase.isStart ? '#ffffff' : '#1e2749',
-          }}
-        >
-          {phase.badge}
-        </span>
-      </div>
-
-      {/* Card */}
-      <div
-        className={`rounded-xl transition-all cursor-pointer ${
-          isExpanded ? 'shadow-xl' : 'shadow-md hover:shadow-lg'
-        }`}
-        style={{
-          backgroundColor: '#ffffff',
-          border: isExpanded ? '2px solid #ffba06' : '1px solid #e5e7eb',
-        }}
-        onClick={onToggle}
+      <Link
+        href="/for-schools/schedule-call"
+        className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-[1.02] hover:shadow-lg"
+        style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
       >
-        {/* Collapsed View */}
-        <div className="p-5">
-          <h3 className="text-2xl font-bold text-center mb-2" style={{ color: '#1e2749' }}>
-            {phase.title}
-          </h3>
-          <p className="text-sm text-center mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
-            {phase.tagline}
-          </p>
+        See if IGNITE is right for your school
+      </Link>
+    </div>
+  );
+}
 
-          {/* Key Stat */}
-          <div className="text-center mb-4 p-3 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
-            <p className="text-2xl font-bold" style={{ color: '#ffba06' }}>
-              {phase.keyStat}
-            </p>
-            <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>
-              {phase.keyStatContext}
-            </p>
-          </div>
-
-          <p
-            className="text-sm text-center font-medium"
-            style={{ color: '#80a4ed' }}
-          >
-            {isExpanded ? 'Click to collapse −' : 'Click to learn more +'}
-          </p>
-        </div>
-
-        {/* Expanded View */}
-        <div
-          className={`overflow-hidden transition-all duration-300 ${
-            isExpanded ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
-          }`}
-        >
-          <div className="px-5 pb-5 border-t" style={{ borderColor: '#e5e7eb' }}>
-            {/* The Shift */}
-            <div className="py-4 text-center">
-              <p className="text-xs font-bold uppercase tracking-wide mb-1" style={{ color: '#1e2749', opacity: 0.5 }}>
-                The Shift
-              </p>
-              <p className="text-lg font-bold" style={{ color: '#1e2749' }}>
-                {phase.shift}
-              </p>
-            </div>
-
-            {/* What You Get */}
-            <div className="mb-4">
-              <h4 className="font-bold mb-2" style={{ color: '#1e2749' }}>
-                What Your School Gets:
-              </h4>
-              <ul className="space-y-2">
-                {phase.whatYouGet.map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#1e2749' }}>
-                    <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                    </svg>
-                    <span style={{ opacity: item.includes('Everything in') ? 0.7 : 1, fontStyle: item.includes('Everything in') ? 'italic' : 'normal' }}>
-                      {item}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* What You'll See */}
-            <div className="mb-4">
-              <h4 className="font-bold mb-2" style={{ color: '#1e2749' }}>
-                What You'll See:
-              </h4>
-              <ul className="space-y-2">
-                {phase.whatYouSee.map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-2 text-sm" style={{ color: '#1e2749' }}>
-                    <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24">
-                      <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" />
-                    </svg>
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Timeline */}
-            <div className="p-3 rounded-lg mb-4" style={{ backgroundColor: '#f5f5f5' }}>
-              <p className="text-xs font-bold uppercase tracking-wide mb-1" style={{ color: '#1e2749', opacity: 0.5 }}>
-                Typical Timeline
-              </p>
-              <p className="text-sm" style={{ color: '#1e2749' }}>
-                {phase.timeline}
-              </p>
-            </div>
-
-            {/* CTA */}
-            <Link
-              href={phase.cta.href}
-              className="block w-full py-3 rounded-lg font-bold text-center transition-all hover:scale-[1.02]"
-              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {phase.cta.text}
-            </Link>
-          </div>
-        </div>
+function AcceleratePanel() {
+  return (
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#1e2749' }}>
+          ACCELERATE: Scale to Full Staff
+        </h2>
+        <p className="text-lg font-medium" style={{ color: '#ffba06' }}>
+          The Shift: Buy-in to Action
+        </p>
       </div>
+
+      <div>
+        <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>Who We Support</h3>
+        <p style={{ color: '#1e2749', opacity: 0.8 }}>
+          Every phase includes support for your full team: teachers, paraprofessionals, instructional coaches, and administrators. We meet each role where they are.
+        </p>
+      </div>
+
+      <div>
+        <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>What Your School Gets</h3>
+        <p className="text-sm italic mb-3" style={{ color: '#1e2749', opacity: 0.6 }}>Everything in IGNITE, plus:</p>
+        <ul className="space-y-2">
+          {[
+            '4 Executive Impact Sessions (increased from 2)',
+            'Learning Hub access for ALL staff',
+            'Teachers Deserve It book for every educator',
+            'Retention tracking tools',
+          ].map((item, idx) => (
+            <li key={idx} className="flex items-start gap-3">
+              <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+              </svg>
+              <span style={{ color: '#1e2749' }}>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>What You Will See</h3>
+        <div className="grid sm:grid-cols-2 gap-4">
+          <div className="p-4 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
+            <p className="text-2xl font-bold" style={{ color: '#ffba06' }}>65%</p>
+            <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Implementation rate vs 10% industry average</p>
+          </div>
+          <div className="p-4 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
+            <p className="text-2xl font-bold" style={{ color: '#ffba06' }}>2-4 → 5-7</p>
+            <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Teacher retention intent</p>
+          </div>
+        </div>
+        <ul className="mt-4 space-y-2">
+          <li className="flex items-start gap-3">
+            <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24">
+              <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" />
+            </svg>
+            <span style={{ color: '#1e2749' }}>Staff stress levels continue to drop</span>
+          </li>
+          <li className="flex items-start gap-3">
+            <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24">
+              <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" />
+            </svg>
+            <span style={{ color: '#1e2749' }}>Strategies implemented school-wide, not just talked about</span>
+          </li>
+        </ul>
+      </div>
+
+      <div className="p-4 rounded-lg" style={{ backgroundColor: '#fffbeb', border: '1px solid #ffba06' }}>
+        <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Typical Timeline</h3>
+        <p className="text-sm" style={{ color: '#1e2749' }}>
+          Many schools stay in ACCELERATE for 1-3 years. There is no rush to move to the next phase. Growth at the right pace is more important than speed.
+        </p>
+      </div>
+
+      <Link
+        href="/for-schools#calculator"
+        className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-[1.02] hover:shadow-lg"
+        style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+      >
+        See what ACCELERATE could do for your staff
+      </Link>
+    </div>
+  );
+}
+
+function SustainPanel() {
+  return (
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#1e2749' }}>
+          SUSTAIN: Embed Lasting Change
+        </h2>
+        <p className="text-lg font-medium" style={{ color: '#ffba06' }}>
+          The Shift: Action to Identity
+        </p>
+      </div>
+
+      <div>
+        <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>Who We Support</h3>
+        <p style={{ color: '#1e2749', opacity: 0.8 }}>
+          Every phase includes support for your full team: teachers, paraprofessionals, instructional coaches, and administrators. We meet each role where they are.
+        </p>
+      </div>
+
+      <div>
+        <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>What Your School Gets</h3>
+        <p className="text-sm italic mb-3" style={{ color: '#1e2749', opacity: 0.6 }}>Everything in ACCELERATE, plus:</p>
+        <ul className="space-y-2">
+          {[
+            'Desi AI Assistant providing 24/7 support for your educators',
+            'Advanced analytics and progress tracking',
+            'Ongoing partnership support',
+            'Custom implementation coaching',
+          ].map((item, idx) => (
+            <li key={idx} className="flex items-start gap-3">
+              <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+              </svg>
+              <span style={{ color: '#1e2749' }}>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>What You Will See</h3>
+        <ul className="space-y-2">
+          {[
+            'Wellness becomes embedded in school culture',
+            'Systems sustain even through staff turnover',
+            'Your school becomes a model for others',
+            'Teachers identify as professionals who prioritize their own growth',
+          ].map((item, idx) => (
+            <li key={idx} className="flex items-start gap-3">
+              <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24">
+                <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" />
+              </svg>
+              <span style={{ color: '#1e2749' }}>{item}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div className="p-4 rounded-lg" style={{ backgroundColor: '#fffbeb', border: '1px solid #ffba06' }}>
+        <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Typical Timeline</h3>
+        <p className="text-sm" style={{ color: '#1e2749' }}>
+          Schools in SUSTAIN are long-term partners. This phase is designed for schools ready to make educator wellness part of their identity.
+        </p>
+      </div>
+
+      <Link
+        href="/for-schools/schedule-call"
+        className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-[1.02] hover:shadow-lg"
+        style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+      >
+        Start a conversation about long-term partnership
+      </Link>
     </div>
   );
 }
 
 export default function HowWePartnerPage() {
-  const [expandedPhase, setExpandedPhase] = useState<string | null>('ignite');
+  const [activePhase, setActivePhase] = useState<PhaseId>('ignite');
+  const [mobileExpanded, setMobileExpanded] = useState<PhaseId | null>('ignite');
 
-  const togglePhase = (phaseId: string) => {
-    setExpandedPhase(expandedPhase === phaseId ? null : phaseId);
+  const toggleMobilePhase = (phaseId: PhaseId) => {
+    setMobileExpanded(mobileExpanded === phaseId ? null : phaseId);
+    setActivePhase(phaseId);
   };
 
   return (
@@ -273,165 +320,185 @@ export default function HowWePartnerPage() {
             We Don't Do Workshops.<br />We Do Partnerships.
           </h1>
           <p className="text-lg md:text-xl max-w-3xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
-            Your school isn't one-size-fits-all. Neither is our approach. Our phased model meets you where you are and grows at your pace — whether that's a semester pilot or a multi-year transformation.
+            Your school is not one-size-fits-all. Neither is our approach. Our phased model meets you where you are and grows at your pace, whether that is a semester pilot or a multi-year transformation.
           </p>
         </div>
       </section>
 
-      {/* Timeline Section */}
+      {/* Side Tabs + Detail Panel Section */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
             Our Partnership Phases
           </h2>
           <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
-            Click each phase to see what's included. Phases are flexible — move at the pace that's right for your school.
+            Click a phase to see what is included. Phases are flexible, move at the pace that is right for your school.
           </p>
 
-          {/* Desktop Timeline */}
-          <div className="hidden md:flex gap-6 items-start">
-            {phases.map((phase) => (
-              <PhaseCard
-                key={phase.id}
-                phase={phase}
-                isExpanded={expandedPhase === phase.id}
-                onToggle={() => togglePhase(phase.id)}
-              />
-            ))}
+          {/* Desktop Layout: Side Tabs + Panel */}
+          <div className="hidden lg:flex gap-8 max-w-6xl mx-auto">
+            {/* Left Side: Vertical Tabs with Timeline */}
+            <div className="w-80 flex-shrink-0">
+              <div className="relative">
+                {/* Vertical timeline line */}
+                <div
+                  className="absolute left-6 top-12 bottom-12 w-1 rounded-full"
+                  style={{ backgroundColor: '#e5e7eb' }}
+                />
+                <div
+                  className="absolute left-6 top-12 w-1 rounded-full transition-all duration-300"
+                  style={{
+                    backgroundColor: '#ffba06',
+                    height: activePhase === 'ignite' ? '0%' : activePhase === 'accelerate' ? '50%' : '100%',
+                    maxHeight: 'calc(100% - 96px)',
+                  }}
+                />
+
+                {/* Tabs */}
+                <div className="space-y-4">
+                  {phaseTabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActivePhase(tab.id)}
+                      className={`w-full text-left transition-all duration-200 ${
+                        activePhase === tab.id ? 'scale-[1.02]' : 'hover:scale-[1.01]'
+                      }`}
+                    >
+                      <div className="flex items-start gap-4">
+                        {/* Timeline circle */}
+                        <div
+                          className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 relative z-10 transition-all ${
+                            activePhase === tab.id ? 'ring-4 ring-offset-2 ring-yellow-400' : ''
+                          }`}
+                          style={{
+                            backgroundColor: activePhase === tab.id ? '#ffba06' : '#e5e7eb',
+                            color: activePhase === tab.id ? '#1e2749' : '#6b7280',
+                          }}
+                        >
+                          {tab.number}
+                        </div>
+
+                        {/* Tab content */}
+                        <div
+                          className={`flex-1 p-4 rounded-xl transition-all ${
+                            activePhase === tab.id ? 'shadow-lg' : 'shadow-sm hover:shadow-md'
+                          }`}
+                          style={{
+                            backgroundColor: activePhase === tab.id ? '#ffffff' : '#f5f5f5',
+                            border: activePhase === tab.id ? '2px solid #ffba06' : '1px solid #e5e7eb',
+                          }}
+                        >
+                          <span
+                            className="text-xs font-bold uppercase tracking-wide"
+                            style={{ color: activePhase === tab.id ? '#ffba06' : '#6b7280' }}
+                          >
+                            {tab.badge}
+                          </span>
+                          <h3
+                            className="text-lg font-bold"
+                            style={{ color: '#1e2749' }}
+                          >
+                            {tab.name}
+                          </h3>
+                          <p className="text-sm mt-1" style={{ color: '#1e2749', opacity: 0.7 }}>
+                            {tab.tagline}
+                          </p>
+                          <p className="text-xs mt-2 font-medium" style={{ color: '#ffba06' }}>
+                            {tab.stat}
+                          </p>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Side: Detail Panel */}
+            <div className="flex-1 bg-white rounded-2xl p-8 shadow-lg" style={{ border: '1px solid #e5e7eb' }}>
+              {activePhase === 'ignite' && <IgnitePanel />}
+              {activePhase === 'accelerate' && <AcceleratePanel />}
+              {activePhase === 'sustain' && <SustainPanel />}
+            </div>
           </div>
 
-          {/* Mobile Timeline - Vertical */}
-          <div className="md:hidden space-y-6">
-            {phases.map((phase, index) => (
-              <div key={phase.id} className="relative">
-                {/* Vertical connector line */}
-                {index < phases.length - 1 && (
+          {/* Mobile Layout: Accordion Style */}
+          <div className="lg:hidden space-y-4">
+            {phaseTabs.map((tab, index) => (
+              <div key={tab.id} className="relative">
+                {/* Vertical line connector */}
+                {index < phaseTabs.length - 1 && (
                   <div
-                    className="absolute left-8 top-16 w-1 h-full -mb-6"
-                    style={{ backgroundColor: '#ffba06' }}
+                    className="absolute left-6 top-16 w-1 h-8"
+                    style={{ backgroundColor: mobileExpanded === tab.id || mobileExpanded === phaseTabs[index + 1]?.id ? '#ffba06' : '#e5e7eb' }}
                   />
                 )}
 
-                <div className="flex gap-4">
-                  {/* Timeline dot */}
-                  <div className="flex-shrink-0">
+                <button
+                  onClick={() => toggleMobilePhase(tab.id)}
+                  className="w-full text-left"
+                >
+                  <div className="flex items-start gap-4">
+                    {/* Timeline circle */}
                     <div
-                      className={`w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold ${
-                        phase.isStart ? 'ring-4 ring-offset-2 ring-yellow-400' : ''
+                      className={`w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 ${
+                        mobileExpanded === tab.id ? 'ring-4 ring-offset-2 ring-yellow-400' : ''
                       }`}
                       style={{
-                        backgroundColor: '#ffba06',
-                        color: '#1e2749',
+                        backgroundColor: mobileExpanded === tab.id ? '#ffba06' : '#e5e7eb',
+                        color: mobileExpanded === tab.id ? '#1e2749' : '#6b7280',
                       }}
                     >
-                      {phase.number}
+                      {tab.number}
+                    </div>
+
+                    {/* Tab header */}
+                    <div
+                      className="flex-1 p-4 rounded-xl transition-all"
+                      style={{
+                        backgroundColor: mobileExpanded === tab.id ? '#ffffff' : '#f5f5f5',
+                        border: mobileExpanded === tab.id ? '2px solid #ffba06' : '1px solid #e5e7eb',
+                      }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span
+                            className="text-xs font-bold uppercase tracking-wide"
+                            style={{ color: mobileExpanded === tab.id ? '#ffba06' : '#6b7280' }}
+                          >
+                            {tab.badge}
+                          </span>
+                          <h3 className="text-lg font-bold" style={{ color: '#1e2749' }}>
+                            {tab.name}
+                          </h3>
+                        </div>
+                        <svg
+                          className={`w-5 h-5 transition-transform ${mobileExpanded === tab.id ? 'rotate-180' : ''}`}
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="#1e2749"
+                          strokeWidth={2}
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
+                      <p className="text-sm mt-1" style={{ color: '#1e2749', opacity: 0.7 }}>
+                        {tab.tagline}
+                      </p>
                     </div>
                   </div>
+                </button>
 
-                  {/* Card */}
-                  <div className="flex-1">
-                    {/* Badge */}
-                    <span
-                      className="inline-block text-xs font-bold uppercase tracking-wide px-3 py-1 rounded-full mb-2"
-                      style={{
-                        backgroundColor: phase.isStart ? '#1e2749' : '#e5e7eb',
-                        color: phase.isStart ? '#ffffff' : '#1e2749',
-                      }}
-                    >
-                      {phase.badge}
-                    </span>
-
-                    <div
-                      className={`rounded-xl transition-all cursor-pointer ${
-                        expandedPhase === phase.id ? 'shadow-xl' : 'shadow-md'
-                      }`}
-                      style={{
-                        backgroundColor: '#ffffff',
-                        border: expandedPhase === phase.id ? '2px solid #ffba06' : '1px solid #e5e7eb',
-                      }}
-                      onClick={() => togglePhase(phase.id)}
-                    >
-                      <div className="p-4">
-                        <h3 className="text-xl font-bold mb-1" style={{ color: '#1e2749' }}>
-                          {phase.title}
-                        </h3>
-                        <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
-                          {phase.tagline}
-                        </p>
-
-                        <div className="flex items-center gap-2 mb-3">
-                          <span className="text-xl font-bold" style={{ color: '#ffba06' }}>
-                            {phase.keyStat}
-                          </span>
-                          <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>
-                            {phase.keyStatContext}
-                          </span>
-                        </div>
-
-                        <p className="text-sm font-medium" style={{ color: '#80a4ed' }}>
-                          {expandedPhase === phase.id ? 'Tap to collapse −' : 'Tap to learn more +'}
-                        </p>
-                      </div>
-
-                      {/* Expanded content */}
-                      <div
-                        className={`overflow-hidden transition-all duration-300 ${
-                          expandedPhase === phase.id ? 'max-h-[800px] opacity-100' : 'max-h-0 opacity-0'
-                        }`}
-                      >
-                        <div className="px-4 pb-4 border-t" style={{ borderColor: '#e5e7eb' }}>
-                          <div className="py-3">
-                            <p className="text-xs font-bold uppercase tracking-wide mb-1" style={{ color: '#1e2749', opacity: 0.5 }}>
-                              The Shift
-                            </p>
-                            <p className="font-bold" style={{ color: '#1e2749' }}>{phase.shift}</p>
-                          </div>
-
-                          <div className="mb-3">
-                            <h4 className="font-bold text-sm mb-2" style={{ color: '#1e2749' }}>What Your School Gets:</h4>
-                            <ul className="space-y-1">
-                              {phase.whatYouGet.map((item, idx) => (
-                                <li key={idx} className="flex items-start gap-2 text-xs" style={{ color: '#1e2749' }}>
-                                  <svg className="w-3 h-3 mt-0.5 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
-                                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                                  </svg>
-                                  <span>{item}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div className="mb-3">
-                            <h4 className="font-bold text-sm mb-2" style={{ color: '#1e2749' }}>What You'll See:</h4>
-                            <ul className="space-y-1">
-                              {phase.whatYouSee.map((item, idx) => (
-                                <li key={idx} className="flex items-start gap-2 text-xs" style={{ color: '#1e2749' }}>
-                                  <svg className="w-3 h-3 mt-0.5 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24">
-                                    <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" />
-                                  </svg>
-                                  <span>{item}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-
-                          <div className="p-2 rounded-lg mb-3" style={{ backgroundColor: '#f5f5f5' }}>
-                            <p className="text-xs" style={{ color: '#1e2749' }}>
-                              <strong>Timeline:</strong> {phase.timeline}
-                            </p>
-                          </div>
-
-                          <Link
-                            href={phase.cta.href}
-                            className="block w-full py-2 rounded-lg font-bold text-sm text-center"
-                            style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {phase.cta.text}
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
+                {/* Expanded content */}
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    mobileExpanded === tab.id ? 'max-h-[2000px] opacity-100 mt-4 ml-16' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="bg-white rounded-xl p-6 shadow-md" style={{ border: '1px solid #e5e7eb' }}>
+                    {tab.id === 'ignite' && <IgnitePanel />}
+                    {tab.id === 'accelerate' && <AcceleratePanel />}
+                    {tab.id === 'sustain' && <SustainPanel />}
                   </div>
                 </div>
               </div>
@@ -440,15 +507,29 @@ export default function HowWePartnerPage() {
         </div>
       </section>
 
-      {/* Your School's Journey Section */}
+      {/* Built for Your Whole Team */}
       <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-default">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#1e2749' }}>
+              Built for Your Whole Team
+            </h2>
+            <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
+              TDI supports teachers, paraprofessionals, instructional coaches, and administrators at every phase. Whether you are starting with a small pilot or rolling out school-wide, we have resources designed for each role on your team.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Every School's Path is Different */}
+      <section className="py-16" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: '#1e2749' }}>
               Every School's Path is Different
             </h2>
             <p className="text-lg mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
-              Some schools complete IGNITE in a semester and move quickly to ACCELERATE. Others stay in ACCELERATE for three years before they're ready for SUSTAIN. A few start with a summer pilot. There's no single timeline — just the right pace for your staff.
+              Some schools complete IGNITE in a semester and move quickly to ACCELERATE. Others stay in ACCELERATE for three years before they are ready for SUSTAIN. A few start with a summer pilot. There is no single timeline, just the right pace for your staff.
             </p>
             <p className="text-lg font-medium" style={{ color: '#1e2749' }}>
               What matters is the outcome: teachers who stay, students who thrive, and a school culture that supports both.
@@ -457,36 +538,36 @@ export default function HowWePartnerPage() {
         </div>
       </section>
 
-      {/* Data/Proof Section */}
+      {/* The Data Behind the Approach */}
       <section className="py-16" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-10" style={{ color: '#ffffff' }}>
             The Data Behind the Approach
           </h2>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6 max-w-4xl mx-auto">
             <div className="text-center p-6 rounded-xl" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
               <p className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#ffba06' }}>65%</p>
-              <p className="text-sm font-medium" style={{ color: '#ffffff' }}>Implementation Rate</p>
-              <p className="text-xs mt-1" style={{ color: '#ffffff', opacity: 0.6 }}>vs 10% industry average</p>
+              <p className="text-sm" style={{ color: '#ffffff', opacity: 0.8 }}>Implementation rate</p>
+              <p className="text-xs mt-1" style={{ color: '#ffffff', opacity: 0.5 }}>vs 10% industry average</p>
             </div>
 
             <div className="text-center p-6 rounded-xl" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
               <p className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#ffba06' }}>12 → 6-8</p>
-              <p className="text-sm font-medium" style={{ color: '#ffffff' }}>Hours/Week</p>
-              <p className="text-xs mt-1" style={{ color: '#ffffff', opacity: 0.6 }}>Planning time reduction</p>
+              <p className="text-sm" style={{ color: '#ffffff', opacity: 0.8 }}>Hours per week</p>
+              <p className="text-xs mt-1" style={{ color: '#ffffff', opacity: 0.5 }}>Planning time reduction</p>
             </div>
 
             <div className="text-center p-6 rounded-xl" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
               <p className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#ffba06' }}>9 → 5-7</p>
-              <p className="text-sm font-medium" style={{ color: '#ffffff' }}>Stress Levels</p>
-              <p className="text-xs mt-1" style={{ color: '#ffffff', opacity: 0.6 }}>On 10-point scale</p>
+              <p className="text-sm" style={{ color: '#ffffff', opacity: 0.8 }}>Stress levels</p>
+              <p className="text-xs mt-1" style={{ color: '#ffffff', opacity: 0.5 }}>On 10-point scale</p>
             </div>
 
             <div className="text-center p-6 rounded-xl" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}>
               <p className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#ffba06' }}>2-4 → 5-7</p>
-              <p className="text-sm font-medium" style={{ color: '#ffffff' }}>Retention Intent</p>
-              <p className="text-xs mt-1" style={{ color: '#ffffff', opacity: 0.6 }}>Teacher retention score</p>
+              <p className="text-sm" style={{ color: '#ffffff', opacity: 0.8 }}>Retention intent</p>
+              <p className="text-xs mt-1" style={{ color: '#ffffff', opacity: 0.5 }}>Teacher retention score</p>
             </div>
           </div>
 
@@ -496,11 +577,11 @@ export default function HowWePartnerPage() {
         </div>
       </section>
 
-      {/* Tools Section */}
+      {/* See What is Possible */}
       <section className="py-16" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
-            See What's Possible for Your School
+            See What is Possible for Your School
           </h2>
           <p className="text-center mb-10" style={{ color: '#1e2749', opacity: 0.7 }}>
             Explore your options
@@ -567,21 +648,21 @@ export default function HowWePartnerPage() {
               </div>
               <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Explore Funding Options</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                80% of our partner schools secure external funding. See how.
+                80% of our partner schools secure external funding.
               </p>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Final CTA Section */}
+      {/* Final CTA */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
           <h2 className="text-2xl md:text-4xl font-bold mb-4" style={{ color: '#ffffff' }}>
             Ready to Start the Conversation?
           </h2>
           <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
-            No pressure. No pitch. Just a conversation about what's possible for your school.
+            No pressure. No pitch. Just a conversation about what is possible for your school.
           </p>
           <Link
             href="/for-schools/schedule-call"
