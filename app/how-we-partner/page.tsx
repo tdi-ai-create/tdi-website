@@ -760,13 +760,13 @@ export default function HowWePartnerPage() {
 
   return (
     <main className="min-h-screen">
-      {/* Hero Section */}
-      <section className="py-16 md:py-24" style={{ backgroundColor: '#1e2749' }}>
+      {/* Hero Section - Compact */}
+      <section className="py-8 md:py-12" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default text-center">
-          <h1 className="text-3xl md:text-5xl font-bold mb-6" style={{ color: '#ffffff' }}>
-            We Don't Do Workshops.<br />We Do Partnerships.
+          <h1 className="text-2xl md:text-4xl font-bold mb-3" style={{ color: '#ffffff' }}>
+            We Don't Do Workshops. We Do Partnerships.
           </h1>
-          <p className="text-lg md:text-xl max-w-3xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
+          <p className="text-base md:text-lg max-w-3xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
             This is not about checking boxes or completing modules. It is about seeing and experiencing measurable change in your school.
           </p>
         </div>
