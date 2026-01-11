@@ -130,11 +130,11 @@ export function BudgetImpactCalculator() {
             Get Free PD Plan
           </a>
           <a
-            href="/contact"
+            href="/how-we-partner"
             className="flex items-center justify-center text-center px-4 py-3 rounded-lg font-bold transition-all hover-lift border-2"
             style={{ borderColor: '#1e2749', color: '#1e2749' }}
           >
-            Schedule a Call
+            See Partnership Model
           </a>
         </div>
 

@@ -136,11 +136,11 @@ export function AdminCalculator() {
             Get Your Free PD Plan
           </a>
           <a
-            href="/contact"
+            href="/how-we-partner"
             className="flex-1 text-center px-6 py-3 rounded-lg font-bold transition-all hover-lift border-2"
             style={{ borderColor: '#1e2749', color: '#1e2749' }}
           >
-            Schedule a Call
+            See What a Partnership Looks Like
           </a>
         </div>
 
