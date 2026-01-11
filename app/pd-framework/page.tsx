@@ -5,6 +5,7 @@ import FrameworkHero from './components/FrameworkHero';
 import MovementPath from './components/MovementPath';
 import TDIPhases from './components/TDIPhases';
 import ToolsGrid from './components/ToolsGrid';
+import { ImplementationStat } from '@/components/ImplementationStat';
 
 // GA4 event helper
 const sendGAEvent = (eventName: string, params: Record<string, string | number>) => {
@@ -75,6 +76,14 @@ export default function PDFrameworkPage() {
     <main className="min-h-screen">
       {/* Section 1: Minimal Header */}
       <FrameworkHero onCtaClick={handleCtaClick} />
+
+      {/* Implementation Rate Stat */}
+      <ImplementationStat
+        value={65}
+        suffix="%"
+        label="Implementation Rate"
+        subtext="vs 10% industry average — because our PD is built for Monday morning, not 'someday'"
+      />
 
       {/* Section 2: Movement Path (LEAD WITH THIS) */}
       <MovementPath />

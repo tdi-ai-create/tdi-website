@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { CoursesSection } from '@/components/CoursesSection';
 import { TabbedCalculator } from '@/components/calculators';
+import { BeforeAfterStats } from '@/components/BeforeAfterStats';
 
 export const metadata = {
   title: 'For Schools | Teachers Deserve It',
@@ -695,8 +696,27 @@ export default function ForSchoolsPage() {
 
       <CoursesSection />
 
+      {/* Verified Outcomes Stats */}
+      <BeforeAfterStats
+        title="Verified Outcomes from TDI Partner Schools"
+        stats={[
+          {
+            label: 'Likelihood to stay in teaching (10-point scale)',
+            beforeValue: '2-4',
+            afterValue: '5-7',
+            beforeNum: 3,
+          },
+          {
+            label: 'Reported stress reduction (10-point scale)',
+            beforeValue: '9',
+            afterValue: '5-7',
+            beforeNum: 9,
+          },
+        ]}
+      />
+
       {/* Calculator Section */}
-      <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
+      <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}
         <div className="container-default">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
             See the Potential Impact

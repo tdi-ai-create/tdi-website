@@ -3,6 +3,7 @@ import { TabbedCalculator } from '@/components/calculators/TabbedCalculator';
 import { FAQ } from '@/components/FAQ';
 import { ParallaxHero } from '@/components/ParallaxHero';
 import { CoursesSection } from '@/components/CoursesSection';
+import { AnimatedStatsBar } from '@/components/AnimatedStatsBar';
 
 export default function Home() {
   return (
@@ -97,28 +98,14 @@ export default function Home() {
       </section>
 
       {/* SECTION 4: Stats Bar */}
-      <section className="py-8" style={{ backgroundColor: '#1e2749' }}>
-        <div className="container-default">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#ffffff' }}>87,000+</p>
-              <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.9 }}>Educators in Our Community</p>
-            </div>
-            <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#ffffff' }}>65%</p>
-              <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.9 }}>Implementation Rate</p>
-            </div>
-            <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#ffffff' }}>94%</p>
-              <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.9 }}>Would Recommend</p>
-            </div>
-            <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#ffffff' }}>21</p>
-              <p className="text-sm md:text-base font-medium" style={{ color: '#ffffff', opacity: 0.9 }}>States with Partner Schools</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <AnimatedStatsBar
+        stats={[
+          { value: 87000, suffix: '+', label: 'Educators in Our Community' },
+          { value: 65, suffix: '%', label: 'Implementation Rate', subtext: 'vs 10% industry average' },
+          { value: 94, suffix: '%', label: 'Would Recommend' },
+          { value: 21, label: 'States with Partner Schools' },
+        ]}
+      />
 
       {/* SECTION 5: Testimonials */}
       <section className="section" style={{ backgroundColor: '#f5f5f5' }}>
