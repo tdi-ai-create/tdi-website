@@ -100,7 +100,7 @@ function OurApproachPanel() {
                 <span className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-2" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
                   Start Here
                 </span>
-                <h3 className="text-xl font-bold mb-1" style={{ color: '#1e2749' }}>IGNITE</h3>
+                <h3 className="text-lg font-bold mb-1" style={{ color: '#1e2749' }}>IGNITE</h3>
                 <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Leadership + Pilot Group</p>
                 <p className="text-xs font-semibold mb-2" style={{ color: '#ffba06' }}>The Shift: Awareness to Buy-in</p>
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
@@ -119,7 +119,7 @@ function OurApproachPanel() {
                 <span className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-2" style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}>
                   Scale
                 </span>
-                <h3 className="text-xl font-bold mb-1" style={{ color: '#1e2749' }}>ACCELERATE</h3>
+                <h3 className="text-lg font-bold mb-1" style={{ color: '#1e2749' }}>ACCELERATE</h3>
                 <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Full Staff</p>
                 <p className="text-xs font-semibold mb-2" style={{ color: '#ffba06' }}>The Shift: Buy-in to Action</p>
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
@@ -138,7 +138,7 @@ function OurApproachPanel() {
                 <span className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-2" style={{ backgroundColor: '#abc4ab', color: '#1e2749' }}>
                   Embed
                 </span>
-                <h3 className="text-xl font-bold mb-1" style={{ color: '#1e2749' }}>SUSTAIN</h3>
+                <h3 className="text-lg font-bold mb-1" style={{ color: '#1e2749' }}>SUSTAIN</h3>
                 <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Embedded Systems</p>
                 <p className="text-xs font-semibold mb-2" style={{ color: '#ffba06' }}>The Shift: Action to Identity</p>
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
@@ -162,7 +162,7 @@ function OurApproachPanel() {
             </div>
             <div className="flex-1 pb-6">
               <span className="inline-block px-2 py-0.5 text-xs font-bold rounded-full mb-1" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>Start Here</span>
-              <h3 className="text-lg font-bold" style={{ color: '#1e2749' }}>IGNITE</h3>
+              <h3 className="text-base font-bold" style={{ color: '#1e2749' }}>IGNITE</h3>
               <p className="text-sm mb-2" style={{ color: '#80a4ed' }}>Leadership + Pilot Group</p>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Build buy-in with your leadership team and a pilot group. See early wins.
@@ -180,7 +180,7 @@ function OurApproachPanel() {
             </div>
             <div className="flex-1 pb-6">
               <span className="inline-block px-2 py-0.5 text-xs font-bold rounded-full mb-1" style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}>Scale</span>
-              <h3 className="text-lg font-bold" style={{ color: '#1e2749' }}>ACCELERATE</h3>
+              <h3 className="text-base font-bold" style={{ color: '#1e2749' }}>ACCELERATE</h3>
               <p className="text-sm mb-2" style={{ color: '#80a4ed' }}>Full Staff</p>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Expand support to your full staff. Strategies get implemented school-wide.
@@ -197,7 +197,7 @@ function OurApproachPanel() {
             </div>
             <div className="flex-1">
               <span className="inline-block px-2 py-0.5 text-xs font-bold rounded-full mb-1" style={{ backgroundColor: '#abc4ab', color: '#1e2749' }}>Embed</span>
-              <h3 className="text-lg font-bold" style={{ color: '#1e2749' }}>SUSTAIN</h3>
+              <h3 className="text-base font-bold" style={{ color: '#1e2749' }}>SUSTAIN</h3>
               <p className="text-sm mb-2" style={{ color: '#80a4ed' }}>Embedded Systems</p>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Wellness becomes part of your school's identity. Systems sustain through staff turnover.
@@ -290,17 +290,17 @@ function InPersonPanel() {
         <div className="grid grid-cols-3 gap-4">
           <div className="p-4 rounded-lg text-center" style={{ backgroundColor: '#f5f5f5' }}>
             <p className="text-2xl font-bold" style={{ color: '#ffba06' }}>2</p>
-            <p className="text-sm font-medium" style={{ color: '#1e2749' }}>IGNITE</p>
+            <p className="text-xs font-medium" style={{ color: '#1e2749' }}>IGNITE</p>
             <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>on-campus days</p>
           </div>
           <div className="p-4 rounded-lg text-center" style={{ backgroundColor: '#f5f5f5' }}>
             <p className="text-2xl font-bold" style={{ color: '#80a4ed' }}>2</p>
-            <p className="text-sm font-medium" style={{ color: '#1e2749' }}>ACCELERATE</p>
+            <p className="text-xs font-medium" style={{ color: '#1e2749' }}>ACCELERATE</p>
             <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>on-campus days</p>
           </div>
           <div className="p-4 rounded-lg text-center" style={{ backgroundColor: '#f5f5f5' }}>
             <p className="text-2xl font-bold" style={{ color: '#abc4ab' }}>2</p>
-            <p className="text-sm font-medium" style={{ color: '#1e2749' }}>SUSTAIN</p>
+            <p className="text-xs font-medium" style={{ color: '#1e2749' }}>SUSTAIN</p>
             <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>on-campus days</p>
           </div>
         </div>
