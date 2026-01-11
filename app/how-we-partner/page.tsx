@@ -262,27 +262,6 @@ function InPersonPanel() {
         </p>
       </div>
 
-      <div>
-        <h3 className="text-xl font-bold mb-4" style={{ color: '#1e2749' }}>How Many Visits Per Phase</h3>
-        <div className="grid grid-cols-3 gap-4">
-          <div className="p-4 rounded-lg text-center" style={{ backgroundColor: '#f5f5f5' }}>
-            <p className="text-2xl font-bold" style={{ color: '#ffba06' }}>2</p>
-            <p className="text-xs font-medium" style={{ color: '#1e2749' }}>IGNITE</p>
-            <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>on-campus days</p>
-          </div>
-          <div className="p-4 rounded-lg text-center" style={{ backgroundColor: '#f5f5f5' }}>
-            <p className="text-2xl font-bold" style={{ color: '#80a4ed' }}>2</p>
-            <p className="text-xs font-medium" style={{ color: '#1e2749' }}>ACCELERATE</p>
-            <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>on-campus days</p>
-          </div>
-          <div className="p-4 rounded-lg text-center" style={{ backgroundColor: '#f5f5f5' }}>
-            <p className="text-2xl font-bold" style={{ color: '#abc4ab' }}>2</p>
-            <p className="text-xs font-medium" style={{ color: '#1e2749' }}>SUSTAIN</p>
-            <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>on-campus days</p>
-          </div>
-        </div>
-      </div>
-
       <Link
         href="/for-schools/schedule-call"
         className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:scale-[1.02] hover:shadow-lg"
