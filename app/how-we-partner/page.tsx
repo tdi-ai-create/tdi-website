@@ -74,7 +74,7 @@ function OurApproachPanel() {
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: '#1e2749' }}>
-          A Phased Journey, Not a One-Time Event
+          A Phased Journey,<br />Not a One-Time Event
         </h2>
         <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
           Real change takes time. Our three-phase model meets your school where you are and grows with you. Some schools move through quickly. Others stay in one phase for years. There is no single timeline, just the right pace for your team.
