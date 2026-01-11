@@ -47,7 +47,7 @@ export default function ContactPage() {
             Let's Connect
           </h1>
           <p className="text-xl max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
-            Whether you want to schedule a call, ask a question, or just say hello, we are here for you.
+            Whether you want to schedule a call, ask a question,<br />or just say hello, we are here for you.
           </p>
         </div>
       </section>
