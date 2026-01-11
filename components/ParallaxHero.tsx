@@ -93,7 +93,7 @@ export function ParallaxHero() {
               className="text-sm md:text-base mb-2 leading-relaxed"
               style={{ color: '#ffffff', opacity: 0.9 }}
             >
-              Now let's do something about it. TDI helps you support your teachers in ways that actually stick, so they stay, grow, and your students feel the difference.
+              <span className="font-bold">Now let's do something about it.</span> TDI helps you support your teachers in ways that actually stick, so they stay, grow, and your students feel the difference.
             </p>
 
             <p
