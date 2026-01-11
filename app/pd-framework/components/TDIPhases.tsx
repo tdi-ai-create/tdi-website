@@ -200,6 +200,21 @@ export default function TDIPhases({ onCtaClick, onFundingClick }: TDIPhasesProps
               </Link>
             </div>
           </div>
+
+          {/* Partnership Model Link */}
+          <div className="text-center">
+            <p className="text-white/60 text-sm mb-3">Ready for more than a framework?</p>
+            <Link
+              href="/how-we-partner"
+              className="inline-flex items-center gap-2 text-lg font-semibold transition-all hover:gap-3"
+              style={{ color: '#ffba06' }}
+            >
+              See our partnership model in detail
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </div>
     </section>

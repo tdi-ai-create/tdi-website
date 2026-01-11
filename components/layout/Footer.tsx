@@ -69,6 +69,11 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/how-we-partner" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
+                    How We Partner
+                  </Link>
+                </li>
+                <li>
                   <Link href="/funding" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Funding Options
                   </Link>
