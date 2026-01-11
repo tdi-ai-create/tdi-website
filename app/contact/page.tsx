@@ -340,7 +340,7 @@ export default function ContactPage() {
               </p>
             </a>
 
-            {/* Card 3: Get a Custom Recommendation */}
+            {/* Card 3: Get a Free PD Eval */}
             <a
               href="/free-pd-plan"
               className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-md transition-shadow border border-gray-100"
@@ -351,7 +351,7 @@ export default function ContactPage() {
                   <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14H6v-2h6v2zm4-4H6v-2h10v2zm0-4H6V7h10v2z"/>
                 </svg>
               </div>
-              <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Get a Custom Recommendation</h3>
+              <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Get a Free PD Eval</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 Answer 5 questions and receive a tailored plan within 24 hours.
               </p>
