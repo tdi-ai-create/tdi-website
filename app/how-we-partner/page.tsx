@@ -112,6 +112,32 @@ function OurApproachPanel() {
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
                   Build buy-in with your leadership team and a pilot group of 10-25 educators. See early wins. Lay the foundation for school-wide change.
                 </p>
+                {/* What's Included */}
+                <div className="mb-3 pt-3 border-t" style={{ borderColor: '#e5e7eb' }}>
+                  <p className="text-xs font-bold mb-2" style={{ color: '#1e2749' }}>What's Included:</p>
+                  <ul className="space-y-1">
+                    <li className="flex items-center gap-1.5 text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+                      <svg className="w-3 h-3 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      2 On-Campus Observation Days
+                    </li>
+                    <li className="flex items-center gap-1.5 text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+                      <svg className="w-3 h-3 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      4 Virtual Strategy Sessions
+                    </li>
+                    <li className="flex items-center gap-1.5 text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+                      <svg className="w-3 h-3 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      2 Executive Impact Sessions
+                    </li>
+                    <li className="flex items-center gap-1.5 text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+                      <svg className="w-3 h-3 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      Learning Hub access for pilot group
+                    </li>
+                    <li className="flex items-center gap-1.5 text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+                      <svg className="w-3 h-3 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      Leadership Dashboard
+                    </li>
+                  </ul>
+                </div>
                 <p className="text-xs" style={{ color: '#1e2749', opacity: 0.5 }}>Typical timeline: One semester to one year</p>
               </div>
             </div>
@@ -145,6 +171,29 @@ function OurApproachPanel() {
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
                   Expand support to your full staff. Every teacher, para, and coach gets access. Strategies get implemented school-wide, not just talked about.
                 </p>
+                {/* What's Included */}
+                <div className="mb-3 pt-3 border-t" style={{ borderColor: '#e5e7eb' }}>
+                  <p className="text-xs font-bold mb-2" style={{ color: '#1e2749' }}>What's Included:</p>
+                  <p className="text-xs italic mb-1.5" style={{ color: '#80a4ed' }}>Everything in IGNITE, plus:</p>
+                  <ul className="space-y-1">
+                    <li className="flex items-center gap-1.5 text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+                      <svg className="w-3 h-3 flex-shrink-0" fill="#80a4ed" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      Learning Hub access for ALL staff
+                    </li>
+                    <li className="flex items-center gap-1.5 text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+                      <svg className="w-3 h-3 flex-shrink-0" fill="#80a4ed" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      4 Executive Impact Sessions
+                    </li>
+                    <li className="flex items-center gap-1.5 text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+                      <svg className="w-3 h-3 flex-shrink-0" fill="#80a4ed" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      Teachers Deserve It book for every educator
+                    </li>
+                    <li className="flex items-center gap-1.5 text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+                      <svg className="w-3 h-3 flex-shrink-0" fill="#80a4ed" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      Retention tracking tools
+                    </li>
+                  </ul>
+                </div>
                 <p className="text-xs" style={{ color: '#1e2749', opacity: 0.5 }}>Typical timeline: 1-3 years (many schools stay here)</p>
               </div>
             </div>
@@ -177,6 +226,25 @@ function OurApproachPanel() {
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
                   Wellness becomes part of your school's identity. Systems sustain through staff turnover. Your school becomes a model for others.
                 </p>
+                {/* What's Included */}
+                <div className="mb-3 pt-3 border-t" style={{ borderColor: '#e5e7eb' }}>
+                  <p className="text-xs font-bold mb-2" style={{ color: '#1e2749' }}>What's Included:</p>
+                  <p className="text-xs italic mb-1.5" style={{ color: '#abc4ab' }}>Everything in ACCELERATE, plus:</p>
+                  <ul className="space-y-1">
+                    <li className="flex items-center gap-1.5 text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+                      <svg className="w-3 h-3 flex-shrink-0" fill="#abc4ab" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      Desi AI Assistant (24/7 support)
+                    </li>
+                    <li className="flex items-center gap-1.5 text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+                      <svg className="w-3 h-3 flex-shrink-0" fill="#abc4ab" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      Advanced analytics
+                    </li>
+                    <li className="flex items-center gap-1.5 text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+                      <svg className="w-3 h-3 flex-shrink-0" fill="#abc4ab" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                      Ongoing partnership support
+                    </li>
+                  </ul>
+                </div>
                 <p className="text-xs" style={{ color: '#1e2749', opacity: 0.5 }}>Typical timeline: Ongoing partnership</p>
               </div>
             </div>
