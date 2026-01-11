@@ -7,6 +7,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { EmailPopup } from "@/components/EmailPopup";
 import { CustomCursor } from "@/components/CustomCursor";
+import { SocialProofPopup } from "@/components/SocialProofPopup";
 
 export const metadata: Metadata = {
   title: {
@@ -72,6 +73,7 @@ export default function RootLayout({
         </main>
         <Footer />
         <EmailPopup />
+        <SocialProofPopup />
       </body>
     </html>
   );
