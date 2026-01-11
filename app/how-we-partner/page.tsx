@@ -81,30 +81,28 @@ function OurApproachPanel() {
         </p>
       </div>
 
-      {/* Horizontal Timeline */}
-      <div className="py-8">
-        {/* Desktop Timeline */}
-        <div className="hidden md:block">
-          {/* Timeline connector line */}
-          <div className="relative mb-8">
-            <div className="absolute top-6 left-[16%] right-[16%] h-1 bg-gray-200 rounded-full" />
-            <div className="absolute top-6 left-[16%] right-[16%] h-1 rounded-full" style={{ background: 'linear-gradient(to right, #ffba06, #80a4ed, #abc4ab)' }} />
-          </div>
-
-          <div className="grid grid-cols-3 gap-6">
-            {/* Phase 1: IGNITE */}
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center text-xl font-bold" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
+      {/* Vertical Timeline */}
+      <div className="py-4">
+        <div className="space-y-0">
+          {/* Phase 1: IGNITE */}
+          <div className="flex gap-4 md:gap-6">
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
                 1
               </div>
-              <div className="bg-white border-2 rounded-xl p-5 shadow-md" style={{ borderColor: '#ffba06' }}>
-                <span className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-2" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
-                  Start Here
-                </span>
-                <h3 className="text-lg font-bold mb-1" style={{ color: '#1e2749' }}>IGNITE</h3>
+              <div className="w-1 flex-1 mt-2" style={{ backgroundColor: '#ffba06' }} />
+            </div>
+            <div className="flex-1 pb-8">
+              <div className="bg-white border-2 rounded-xl p-5 md:p-6 shadow-md" style={{ borderColor: '#ffba06' }}>
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <span className="inline-block px-3 py-1 text-xs font-bold rounded-full" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
+                    Start Here
+                  </span>
+                  <h3 className="text-lg md:text-xl font-bold" style={{ color: '#1e2749' }}>IGNITE</h3>
+                </div>
                 <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Leadership + Pilot Group</p>
                 {/* The Shift Icon */}
-                <div className="flex items-center justify-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#fffbeb' }}>
+                <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#fffbeb' }}>
                   <span className="text-xs font-medium" style={{ color: '#1e2749' }}>Awareness</span>
                   <svg className="w-4 h-4 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
                     <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
@@ -117,20 +115,27 @@ function OurApproachPanel() {
                 <p className="text-xs" style={{ color: '#1e2749', opacity: 0.5 }}>Typical timeline: One semester to one year</p>
               </div>
             </div>
+          </div>
 
-            {/* Phase 2: ACCELERATE */}
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center text-xl font-bold" style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}>
+          {/* Phase 2: ACCELERATE */}
+          <div className="flex gap-4 md:gap-6">
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md" style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}>
                 2
               </div>
-              <div className="bg-white border rounded-xl p-5 shadow-sm" style={{ borderColor: '#e5e7eb' }}>
-                <span className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-2" style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}>
-                  Scale
-                </span>
-                <h3 className="text-lg font-bold mb-1" style={{ color: '#1e2749' }}>ACCELERATE</h3>
+              <div className="w-1 flex-1 mt-2" style={{ backgroundColor: '#80a4ed' }} />
+            </div>
+            <div className="flex-1 pb-8">
+              <div className="bg-white border-2 rounded-xl p-5 md:p-6 shadow-md" style={{ borderColor: '#80a4ed' }}>
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <span className="inline-block px-3 py-1 text-xs font-bold rounded-full" style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}>
+                    Scale
+                  </span>
+                  <h3 className="text-lg md:text-xl font-bold" style={{ color: '#1e2749' }}>ACCELERATE</h3>
+                </div>
                 <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Full Staff</p>
                 {/* The Shift Icon */}
-                <div className="flex items-center justify-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0f9ff' }}>
+                <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0f9ff' }}>
                   <span className="text-xs font-medium" style={{ color: '#1e2749' }}>Buy-in</span>
                   <svg className="w-4 h-4 flex-shrink-0" fill="#80a4ed" viewBox="0 0 24 24">
                     <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
@@ -143,20 +148,26 @@ function OurApproachPanel() {
                 <p className="text-xs" style={{ color: '#1e2749', opacity: 0.5 }}>Typical timeline: 1-3 years (many schools stay here)</p>
               </div>
             </div>
+          </div>
 
-            {/* Phase 3: SUSTAIN */}
-            <div className="text-center">
-              <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center text-xl font-bold" style={{ backgroundColor: '#abc4ab', color: '#1e2749' }}>
+          {/* Phase 3: SUSTAIN */}
+          <div className="flex gap-4 md:gap-6">
+            <div className="flex flex-col items-center">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md" style={{ backgroundColor: '#abc4ab', color: '#1e2749' }}>
                 3
               </div>
-              <div className="bg-white border rounded-xl p-5 shadow-sm" style={{ borderColor: '#e5e7eb' }}>
-                <span className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-2" style={{ backgroundColor: '#abc4ab', color: '#1e2749' }}>
-                  Embed
-                </span>
-                <h3 className="text-lg font-bold mb-1" style={{ color: '#1e2749' }}>SUSTAIN</h3>
+            </div>
+            <div className="flex-1">
+              <div className="bg-white border-2 rounded-xl p-5 md:p-6 shadow-md" style={{ borderColor: '#abc4ab' }}>
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <span className="inline-block px-3 py-1 text-xs font-bold rounded-full" style={{ backgroundColor: '#abc4ab', color: '#1e2749' }}>
+                    Embed
+                  </span>
+                  <h3 className="text-lg md:text-xl font-bold" style={{ color: '#1e2749' }}>SUSTAIN</h3>
+                </div>
                 <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Embedded Systems</p>
                 {/* The Shift Icon */}
-                <div className="flex items-center justify-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0fff4' }}>
+                <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0fff4' }}>
                   <span className="text-xs font-medium" style={{ color: '#1e2749' }}>Action</span>
                   <svg className="w-4 h-4 flex-shrink-0" fill="#abc4ab" viewBox="0 0 24 24">
                     <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
@@ -168,62 +179,6 @@ function OurApproachPanel() {
                 </p>
                 <p className="text-xs" style={{ color: '#1e2749', opacity: 0.5 }}>Typical timeline: Ongoing partnership</p>
               </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Mobile Timeline */}
-        <div className="md:hidden space-y-6">
-          {/* Phase 1 */}
-          <div className="flex gap-4">
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold flex-shrink-0" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
-                1
-              </div>
-              <div className="w-1 flex-1 mt-2" style={{ backgroundColor: '#ffba06' }} />
-            </div>
-            <div className="flex-1 pb-6">
-              <span className="inline-block px-2 py-0.5 text-xs font-bold rounded-full mb-1" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>Start Here</span>
-              <h3 className="text-base font-bold" style={{ color: '#1e2749' }}>IGNITE</h3>
-              <p className="text-sm mb-2" style={{ color: '#80a4ed' }}>Leadership + Pilot Group</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Build buy-in with your leadership team and a pilot group. See early wins.
-              </p>
-            </div>
-          </div>
-
-          {/* Phase 2 */}
-          <div className="flex gap-4">
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold flex-shrink-0" style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}>
-                2
-              </div>
-              <div className="w-1 flex-1 mt-2" style={{ backgroundColor: '#80a4ed' }} />
-            </div>
-            <div className="flex-1 pb-6">
-              <span className="inline-block px-2 py-0.5 text-xs font-bold rounded-full mb-1" style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}>Scale</span>
-              <h3 className="text-base font-bold" style={{ color: '#1e2749' }}>ACCELERATE</h3>
-              <p className="text-sm mb-2" style={{ color: '#80a4ed' }}>Full Staff</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Expand support to your full staff. Strategies get implemented school-wide.
-              </p>
-            </div>
-          </div>
-
-          {/* Phase 3 */}
-          <div className="flex gap-4">
-            <div className="flex flex-col items-center">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold flex-shrink-0" style={{ backgroundColor: '#abc4ab', color: '#1e2749' }}>
-                3
-              </div>
-            </div>
-            <div className="flex-1">
-              <span className="inline-block px-2 py-0.5 text-xs font-bold rounded-full mb-1" style={{ backgroundColor: '#abc4ab', color: '#1e2749' }}>Embed</span>
-              <h3 className="text-base font-bold" style={{ color: '#1e2749' }}>SUSTAIN</h3>
-              <p className="text-sm mb-2" style={{ color: '#80a4ed' }}>Embedded Systems</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Wellness becomes part of your school's identity. Systems sustain through staff turnover.
-              </p>
             </div>
           </div>
         </div>
