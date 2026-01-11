@@ -98,8 +98,8 @@ export function SocialProofPopup() {
       clearTimeout(timeoutRef.current);
     }
 
-    // Random interval between 30 seconds and 2 minutes
-    const delay = randomInRange(30000, 120000);
+    // Random interval between 15-45 seconds
+    const delay = randomInRange(15000, 45000);
 
     timeoutRef.current = setTimeout(() => {
       showNotification();
@@ -163,8 +163,8 @@ export function SocialProofPopup() {
         if (messages.length > 0) {
           messagesRef.current = shuffleArray(messages);
 
-          // Initial delay: random between 10-20 seconds
-          const initialDelay = randomInRange(10000, 20000);
+          // Initial delay: random between 5-10 seconds
+          const initialDelay = randomInRange(5000, 10000);
 
           timeoutRef.current = setTimeout(() => {
             showNotification();
