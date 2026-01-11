@@ -63,7 +63,7 @@ export default function ContactPage() {
                 Schedule a Call
               </h2>
               <p className="text-lg mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
-                A 30-minute conversation to explore what is possible for your school. No pressure, no pitch.
+                A 15-minute conversation to explore what is possible for your school. No pressure, no pitch.
               </p>
 
               {/* Calendly Embed */}
@@ -78,7 +78,7 @@ export default function ContactPage() {
               </div>
 
               <p className="text-center mt-4 text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                <span className="font-semibold">Time: 30 minutes</span> | With: Rae Hughart, Founder
+                <span className="font-semibold">Time: 15 minutes</span> | With: Rae Hughart, Founder
               </p>
             </div>
 
