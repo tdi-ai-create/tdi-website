@@ -573,7 +573,7 @@ function ResultsPanel() {
       </div>
 
       <div>
-        <h3 className="text-xl font-bold mb-4" style={{ color: '#1e2749' }}>Verified Outcomes from TDI Partner Schools</h3>
+        <h3 className="text-xl font-bold mb-4" style={{ color: '#1e2749' }}>Verified Outcomes from<br />TDI Partner Schools</h3>
 
         {/* Results Table */}
         <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #e5e7eb' }}>
