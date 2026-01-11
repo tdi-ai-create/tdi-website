@@ -217,12 +217,12 @@ export default function ContactPage() {
       </section>
 
       {/* Not Ready Yet Section */}
-      <section className="py-12 md:py-16" style={{ backgroundColor: '#ffffff' }}>
+      <section className="py-12 md:py-16" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: '#ffffff' }}>
             Not Ready to Talk Yet?
           </h2>
-          <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+          <p className="text-center mb-10 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
             Explore these resources first.
           </p>
 
