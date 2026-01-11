@@ -479,7 +479,7 @@ function BookPanel() {
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: '#1e2749' }}>
-          Teachers Deserve It: The Book That Started a Movement
+          Teachers Deserve It:<br />The Book That Started a Movement
         </h2>
       </div>
 
