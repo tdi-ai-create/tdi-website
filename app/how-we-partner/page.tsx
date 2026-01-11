@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 type TabId = 'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results';
 
@@ -520,20 +521,18 @@ function BookPanel() {
 
       {/* Book Display */}
       <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
-        {/* Book Cover Placeholder */}
-        <div
-          className="w-48 h-64 rounded-lg shadow-xl flex-shrink-0 flex items-center justify-center"
-          style={{
-            background: 'linear-gradient(135deg, #1e2749 0%, #80a4ed 100%)',
-            border: '4px solid #ffba06'
-          }}
-        >
-          <div className="text-center p-4">
-            <p className="text-xs font-bold mb-2" style={{ color: '#ffba06' }}>TEACHERS</p>
-            <p className="text-lg font-bold text-white mb-2">DESERVE IT</p>
-            <p className="text-xs text-white opacity-80">Rae Hughart &</p>
-            <p className="text-xs text-white opacity-80">Adam Welcome</p>
-          </div>
+        {/* Book Cover Image */}
+        <div className="flex-shrink-0">
+          <Image
+            src="/images/teachers-deserve-it-book.png"
+            alt="Teachers Deserve It book cover by Rae Hughart and Adam Welcome"
+            width={200}
+            height={300}
+            className="rounded-lg shadow-xl"
+            style={{
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.15), 0 10px 20px rgba(0, 0, 0, 0.1)'
+            }}
+          />
         </div>
 
         <div className="flex-1 space-y-4">
