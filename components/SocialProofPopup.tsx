@@ -47,6 +47,7 @@ const CACHE_TIMESTAMP_KEY = 'tdi-social-proof-cache-time';
 const DISMISS_COUNT_KEY = 'tdi-social-proof-dismissals';
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 const ANIMATION_DURATION = 6000; // 6 seconds for float animation
+const BURST_CHANCE = 0.3; // 30% chance of burst mode
 
 export function SocialProofPopup() {
   const [currentMessage, setCurrentMessage] = useState<NotificationMessage | null>(null);
@@ -58,6 +59,7 @@ export function SocialProofPopup() {
   const messageIndexRef = useRef(0);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const pendingBurstRef = useRef(false); // Track if next notification should be a burst
 
   // Get next message from shuffled list
   const getNextMessage = (): NotificationMessage | null => {
@@ -75,7 +77,7 @@ export function SocialProofPopup() {
   };
 
   // Show a notification with floating animation
-  const showNotification = () => {
+  const showNotification = (isBurstFollow: boolean = false) => {
     if (dismissCount >= 3 || messagesRef.current.length === 0) return;
 
     const message = getNextMessage();
@@ -83,11 +85,26 @@ export function SocialProofPopup() {
       setCurrentMessage(message);
       setIsAnimating(true);
 
+      // Decide if this notification triggers a burst (only if not already a burst follow-up)
+      const willBurst = !isBurstFollow && Math.random() < BURST_CHANCE;
+      pendingBurstRef.current = willBurst;
+
       // Animation completes after ANIMATION_DURATION
       animationTimeoutRef.current = setTimeout(() => {
         setIsAnimating(false);
         setCurrentMessage(null);
-        scheduleNextNotification();
+
+        if (pendingBurstRef.current) {
+          // Burst mode: show next bubble quickly (2-4 seconds)
+          pendingBurstRef.current = false;
+          const burstDelay = randomInRange(2000, 4000);
+          timeoutRef.current = setTimeout(() => {
+            showNotification(true); // Mark as burst follow-up
+          }, burstDelay);
+        } else {
+          // Normal mode: schedule with regular interval
+          scheduleNextNotification();
+        }
       }, ANIMATION_DURATION);
     }
   };
@@ -98,8 +115,8 @@ export function SocialProofPopup() {
       clearTimeout(timeoutRef.current);
     }
 
-    // Random interval between 15-45 seconds
-    const delay = randomInRange(15000, 45000);
+    // Random interval between 8-30 seconds
+    const delay = randomInRange(8000, 30000);
 
     timeoutRef.current = setTimeout(() => {
       showNotification();
@@ -111,6 +128,7 @@ export function SocialProofPopup() {
     e.stopPropagation();
     setIsAnimating(false);
     setCurrentMessage(null);
+    pendingBurstRef.current = false; // Cancel any pending burst
 
     if (animationTimeoutRef.current) {
       clearTimeout(animationTimeoutRef.current);
@@ -163,8 +181,8 @@ export function SocialProofPopup() {
         if (messages.length > 0) {
           messagesRef.current = shuffleArray(messages);
 
-          // Initial delay: random between 5-10 seconds
-          const initialDelay = randomInRange(5000, 10000);
+          // Initial delay: random between 3-7 seconds
+          const initialDelay = randomInRange(3000, 7000);
 
           timeoutRef.current = setTimeout(() => {
             showNotification();
