@@ -80,7 +80,7 @@ export function CustomCursor() {
           <path
             d="M2 2L26 14L14 14L10 26L2 2Z"
             stroke="#000000"
-            strokeWidth="3"
+            strokeWidth="4"
             strokeLinejoin="round"
             fill="none"
           />
@@ -88,14 +88,14 @@ export function CustomCursor() {
           <path
             d="M2 2L26 14L14 14L10 26L2 2Z"
             stroke="#ffffff"
-            strokeWidth="1.5"
+            strokeWidth="2.5"
             strokeLinejoin="round"
             fill="none"
           />
-          {/* Sage green fill */}
+          {/* Periwinkle blue fill */}
           <path
             d="M2 2L26 14L14 14L10 26L2 2Z"
-            fill="#abc4ab"
+            fill="#80a4ed"
           />
         </svg>
       </div>
