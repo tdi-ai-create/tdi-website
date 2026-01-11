@@ -234,7 +234,7 @@ export function TDICalculator() {
             </div>
 
             <Link 
-              href="/for-schools/schedule-call" 
+              href="/contact" 
               className="block w-full text-center py-3 rounded-lg font-bold transition-all"
               style={{ backgroundColor: 'var(--tdi-yellow)', color: 'var(--tdi-charcoal)' }}
             >

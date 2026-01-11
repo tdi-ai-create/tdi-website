@@ -21,7 +21,7 @@ export default function FinalCTA({ onCtaClick }: FinalCTAProps) {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             {/* Primary CTA */}
             <Link
-              href="/for-schools/schedule-call?utm_source=framework&utm_medium=page&utm_campaign=schedule"
+              href="/contact?utm_source=framework&utm_medium=page&utm_campaign=schedule"
               onClick={() => onCtaClick?.('schedule_cta', 'final_cta')}
               className="inline-block px-8 py-4 rounded-full font-semibold text-lg transition-all hover:shadow-lg hover:-translate-y-0.5"
               style={{ backgroundColor: '#ffba06', color: '#1e2749' }}

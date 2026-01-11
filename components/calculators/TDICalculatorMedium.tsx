@@ -253,7 +253,7 @@ export function TDICalculatorMedium() {
       <div className="px-6 pb-6">
         <div className="flex gap-3 justify-center">
           <Link 
-            href="/for-schools/schedule-call" 
+            href="/contact" 
             className="btn-primary px-6 py-3"
           >
             Schedule a Conversation

@@ -102,7 +102,7 @@ export function PricingCard({
   features,
   featured = false,
   ctaText = 'Schedule a Call',
-  ctaHref = '/for-schools/schedule-call',
+  ctaHref = '/contact',
 }: PricingCardProps) {
   return (
     <Card variant="pricing" featured={featured}>

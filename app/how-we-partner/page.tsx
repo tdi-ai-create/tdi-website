@@ -259,7 +259,7 @@ function OurApproachPanel() {
       </div>
 
       <Link
-        href="/for-schools/schedule-call"
+        href="/contact"
         className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:scale-[1.02] hover:shadow-lg"
         style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
       >
@@ -331,7 +331,7 @@ function InPersonPanel() {
       </div>
 
       <Link
-        href="/for-schools/schedule-call"
+        href="/contact"
         className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:scale-[1.02] hover:shadow-lg"
         style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
       >
@@ -532,7 +532,7 @@ function DashboardPanel() {
       </div>
 
       <Link
-        href="/for-schools/schedule-call"
+        href="/contact"
         className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:scale-[1.02] hover:shadow-lg"
         style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
       >
@@ -953,7 +953,7 @@ export default function HowWePartnerPage() {
             No pressure. No pitch. Just a conversation about what is possible for your school.
           </p>
           <Link
-            href="/for-schools/schedule-call"
+            href="/contact"
             className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-[1.02] hover:shadow-lg"
             style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
           >

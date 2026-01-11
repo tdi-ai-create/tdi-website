@@ -316,7 +316,7 @@ export function TDICalculatorLarge() {
         <div className="px-8 pb-6">
           <div className="flex gap-4 justify-center">
             <Link 
-              href="/for-schools/schedule-call" 
+              href="/contact" 
               className="btn-primary px-8 py-4 text-lg"
             >
               Schedule a Conversation
