@@ -565,7 +565,7 @@ function ResultsPanel() {
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: '#1e2749' }}>
-          This is What Change Looks Like
+          This is What Change<br />Looks Like
         </h2>
         <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
           We do not measure success by course completions. We measure it by what changes in your school. Here is what our partner schools report.
