@@ -305,7 +305,7 @@ function LearningHubPanel() {
       </div>
 
       <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
-        <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Built for Implementation, Not Consumption</h3>
+        <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Built for Implementation,<br />Not Consumption</h3>
         <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
           Most PD has a 10% implementation rate. Ours is 65%. The difference is in the design. Every course includes action steps, not just information. We measure what teachers do, not what they watch.
         </p>
