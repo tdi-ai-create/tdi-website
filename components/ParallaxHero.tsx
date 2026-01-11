@@ -79,7 +79,7 @@ export function ParallaxHero() {
               className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight"
               style={{ color: '#ffffff' }}
             >
-              Teachers<br className="md:hidden" /> Deserve<br className="md:hidden" /> More Than<br className="md:hidden" /> Survival
+              You're the<br className="md:hidden" /> Leader Who<br className="md:hidden" /> Notices.
             </h1>
 
             <p
@@ -93,13 +93,7 @@ export function ParallaxHero() {
               className="text-sm md:text-base mb-2 leading-relaxed"
               style={{ color: '#ffffff', opacity: 0.9 }}
             >
-              You became a teacher to make a difference. Not to drown in lesson plans, sit through pointless PD, and count down to summer.
-            </p>
-            <p
-              className="text-sm md:text-base mb-2 leading-relaxed font-semibold"
-              style={{ color: '#ffffff', opacity: 0.9 }}
-            >
-              We get it. We've been there.
+              Now let's do something about it. TDI helps you support your teachers in ways that actually stick, so they stay, grow, and your students feel the difference.
             </p>
 
             <p
