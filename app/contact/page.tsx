@@ -52,6 +52,39 @@ export default function ContactPage() {
         </div>
       </section>
 
+      {/* Rae's Photo + Quote */}
+      <section className="py-6" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-default">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex flex-col md:flex-row items-center gap-6 p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
+              {/* Rae's Photo */}
+              <div className="flex-shrink-0">
+                <Image
+                  src="/images/rae-headshot.webp"
+                  alt="Rae Hughart, Founder of Teachers Deserve It"
+                  width={128}
+                  height={128}
+                  className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover"
+                  style={{ border: '4px solid #ffba06' }}
+                />
+              </div>
+              {/* Message */}
+              <div className="text-center md:text-left">
+                <p className="text-lg italic mb-3" style={{ color: '#1e2749' }}>
+                  "I read every message that comes through. Whether you have a question, an idea, or just want to say hi, I'd love to hear from you."
+                </p>
+                <p className="font-bold" style={{ color: '#1e2749' }}>
+                  Rae Hughart
+                </p>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>
+                  Founder, Teachers Deserve It
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Two-Column Layout: Calendar + Form */}
       <section className="py-12 md:py-16" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
@@ -178,39 +211,6 @@ export default function ContactPage() {
                   </p>
                 </form>
               )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Rae's Photo + Quote */}
-      <section className="py-8" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="container-default">
-          <div className="max-w-3xl mx-auto">
-            <div className="flex flex-col md:flex-row items-center gap-6 p-6 rounded-xl" style={{ backgroundColor: '#ffffff' }}>
-              {/* Rae's Photo */}
-              <div className="flex-shrink-0">
-                <Image
-                  src="/images/rae-headshot.webp"
-                  alt="Rae Hughart, Founder of Teachers Deserve It"
-                  width={128}
-                  height={128}
-                  className="w-24 h-24 md:w-32 md:h-32 rounded-full object-cover"
-                  style={{ border: '4px solid #ffba06' }}
-                />
-              </div>
-              {/* Message */}
-              <div className="text-center md:text-left">
-                <p className="text-lg italic mb-3" style={{ color: '#1e2749' }}>
-                  "I read every message that comes through. Whether you have a question, an idea, or just want to say hi, I'd love to hear from you."
-                </p>
-                <p className="font-bold" style={{ color: '#1e2749' }}>
-                  Rae Hughart
-                </p>
-                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>
-                  Founder, Teachers Deserve It
-                </p>
-              </div>
             </div>
           </div>
         </div>
