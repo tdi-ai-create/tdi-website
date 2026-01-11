@@ -206,7 +206,7 @@ function InPersonPanel() {
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: '#1e2749' }}>
-          What Happens When We Visit Your School
+          What Happens When<br />We Visit Your School
         </h2>
         <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
           Our on-campus days happen while students are in session. We are in real classrooms, watching real teaching, and giving real feedback. This is not a sit-and-get workshop in the library.
