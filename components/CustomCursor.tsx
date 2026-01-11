@@ -60,25 +60,25 @@ export function CustomCursor() {
           position: 'fixed',
           top: 0,
           left: 0,
-          width: '28px',
-          height: '28px',
+          width: '32px',
+          height: '32px',
           pointerEvents: 'none',
           zIndex: 99999,
           transition: 'opacity 0.15s ease',
         }}
       >
-        {/* SVG Arrow with double outline for visibility on all backgrounds */}
+        {/* SVG Arrow with double outline and drop shadow for depth */}
         <svg
-          width="28"
-          height="28"
-          viewBox="0 0 28 28"
+          width="32"
+          height="32"
+          viewBox="0 0 32 32"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          style={{ display: 'block' }}
+          style={{ display: 'block', filter: 'drop-shadow(2px 2px 3px rgba(0, 0, 0, 0.3))' }}
         >
           {/* Outer black stroke for visibility on light backgrounds */}
           <path
-            d="M2 2L26 14L14 14L10 26L2 2Z"
+            d="M3 3L27 15L15 15L11 27L3 3Z"
             stroke="#000000"
             strokeWidth="4"
             strokeLinejoin="round"
@@ -86,16 +86,22 @@ export function CustomCursor() {
           />
           {/* Inner white stroke for visibility on dark backgrounds */}
           <path
-            d="M2 2L26 14L14 14L10 26L2 2Z"
+            d="M3 3L27 15L15 15L11 27L3 3Z"
             stroke="#ffffff"
-            strokeWidth="2.5"
+            strokeWidth="3"
             strokeLinejoin="round"
             fill="none"
           />
-          {/* Periwinkle blue fill */}
+          {/* Periwinkle blue fill with gradient for subtle 3D effect */}
+          <defs>
+            <linearGradient id="arrowGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#9ab8f2" />
+              <stop offset="100%" stopColor="#6b91d9" />
+            </linearGradient>
+          </defs>
           <path
-            d="M2 2L26 14L14 14L10 26L2 2Z"
-            fill="#80a4ed"
+            d="M3 3L27 15L15 15L11 27L3 3Z"
+            fill="url(#arrowGradient)"
           />
         </svg>
       </div>
