@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -642,10 +642,26 @@ function ResultsPanel() {
 export default function HowWePartnerPage() {
   const [activeTab, setActiveTab] = useState<TabId>('approach');
   const [mobileExpanded, setMobileExpanded] = useState<TabId | null>('approach');
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  const scrollToContent = () => {
+    if (contentRef.current) {
+      const yOffset = -100; // Account for sticky header
+      const y = contentRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }
+  };
+
+  const handleTabClick = (tabId: TabId) => {
+    setActiveTab(tabId);
+    scrollToContent();
+  };
 
   const toggleMobileTab = (tabId: TabId) => {
     setMobileExpanded(mobileExpanded === tabId ? null : tabId);
     setActiveTab(tabId);
+    // Small delay to allow content to render before scrolling
+    setTimeout(scrollToContent, 100);
   };
 
   const renderPanel = (tabId: TabId) => {
@@ -690,7 +706,7 @@ export default function HowWePartnerPage() {
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
-                    onClick={() => setActiveTab(tab.id)}
+                    onClick={() => handleTabClick(tab.id)}
                     className={`w-full text-left p-4 rounded-xl transition-all duration-200 flex items-center gap-3 ${
                       activeTab === tab.id
                         ? 'shadow-lg scale-[1.02]'
@@ -725,7 +741,7 @@ export default function HowWePartnerPage() {
             </div>
 
             {/* Right Side: Detail Panel */}
-            <div className="flex-1 bg-white rounded-2xl p-8 shadow-lg" style={{ border: '1px solid #e5e7eb' }}>
+            <div ref={contentRef} className="flex-1 bg-white rounded-2xl p-8 shadow-lg" style={{ border: '1px solid #e5e7eb' }}>
               {renderPanel(activeTab)}
             </div>
           </div>
