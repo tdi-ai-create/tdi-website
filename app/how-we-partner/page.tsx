@@ -102,7 +102,14 @@ function OurApproachPanel() {
                 </span>
                 <h3 className="text-lg font-bold mb-1" style={{ color: '#1e2749' }}>IGNITE</h3>
                 <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Leadership + Pilot Group</p>
-                <p className="text-xs font-semibold mb-2" style={{ color: '#ffba06' }}>The Shift: Awareness to Buy-in</p>
+                {/* The Shift Icon */}
+                <div className="flex items-center justify-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#fffbeb' }}>
+                  <span className="text-xs font-medium" style={{ color: '#1e2749' }}>Awareness</span>
+                  <svg className="w-4 h-4 flex-shrink-0" fill="#ffba06" viewBox="0 0 24 24">
+                    <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                  </svg>
+                  <span className="text-xs font-bold" style={{ color: '#ffba06' }}>Buy-in</span>
+                </div>
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
                   Build buy-in with your leadership team and a pilot group of 10-25 educators. See early wins. Lay the foundation for school-wide change.
                 </p>
@@ -121,7 +128,14 @@ function OurApproachPanel() {
                 </span>
                 <h3 className="text-lg font-bold mb-1" style={{ color: '#1e2749' }}>ACCELERATE</h3>
                 <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Full Staff</p>
-                <p className="text-xs font-semibold mb-2" style={{ color: '#ffba06' }}>The Shift: Buy-in to Action</p>
+                {/* The Shift Icon */}
+                <div className="flex items-center justify-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0f9ff' }}>
+                  <span className="text-xs font-medium" style={{ color: '#1e2749' }}>Buy-in</span>
+                  <svg className="w-4 h-4 flex-shrink-0" fill="#80a4ed" viewBox="0 0 24 24">
+                    <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                  </svg>
+                  <span className="text-xs font-bold" style={{ color: '#80a4ed' }}>Action</span>
+                </div>
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
                   Expand support to your full staff. Every teacher, para, and coach gets access. Strategies get implemented school-wide, not just talked about.
                 </p>
@@ -140,7 +154,14 @@ function OurApproachPanel() {
                 </span>
                 <h3 className="text-lg font-bold mb-1" style={{ color: '#1e2749' }}>SUSTAIN</h3>
                 <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Embedded Systems</p>
-                <p className="text-xs font-semibold mb-2" style={{ color: '#ffba06' }}>The Shift: Action to Identity</p>
+                {/* The Shift Icon */}
+                <div className="flex items-center justify-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0fff4' }}>
+                  <span className="text-xs font-medium" style={{ color: '#1e2749' }}>Action</span>
+                  <svg className="w-4 h-4 flex-shrink-0" fill="#abc4ab" viewBox="0 0 24 24">
+                    <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                  </svg>
+                  <span className="text-xs font-bold" style={{ color: '#22c55e' }}>Identity</span>
+                </div>
                 <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
                   Wellness becomes part of your school's identity. Systems sustain through staff turnover. Your school becomes a model for others.
                 </p>
