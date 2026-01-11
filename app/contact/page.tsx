@@ -88,7 +88,7 @@ export default function ContactPage() {
                 Send a Message
               </h2>
               <p className="text-lg mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
-                Have a question or not ready to talk yet? Send us a message.
+                Have a question or not ready to talk yet?<br />Send us a message.
               </p>
 
               {submitted ? (
