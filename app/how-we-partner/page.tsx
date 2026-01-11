@@ -616,7 +616,7 @@ function ResultsPanel() {
               "Our staff actually looked forward to PD. The flipped model made a huge difference. Teachers could watch on their own time and come ready for real conversations. We will absolutely be partnering with TDI again."
             </p>
             <p className="text-sm font-medium" style={{ color: '#1e2749', opacity: 0.7 }}>
-              Principal, K-8 School, CA
+              Principal, K-8 School
             </p>
           </div>
           <div className="p-4 rounded-lg" style={{ backgroundColor: '#f5f5f5' }}>
@@ -624,7 +624,7 @@ function ResultsPanel() {
               "Professional development that finally meets the moment. Between burnout and new initiatives, our team needed clarity and care. TDI delivered both."
             </p>
             <p className="text-sm font-medium" style={{ color: '#1e2749', opacity: 0.7 }}>
-              Assistant Superintendent, IN
+              Assistant Superintendent
             </p>
           </div>
         </div>
