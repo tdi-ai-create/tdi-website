@@ -27,6 +27,16 @@ export function Footer() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/for-schools" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
+                    For Schools
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/how-we-partner" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
+                    How We Partner
+                  </Link>
+                </li>
+                <li>
                   <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Learning Hub
                   </a>
@@ -63,16 +73,6 @@ export function Footer() {
             <div>
               <h4 className="font-semibold mb-4" style={{ color: 'white' }}>Resources</h4>
               <ul className="space-y-2">
-                <li>
-                  <Link href="/for-schools" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
-                    For Schools
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/how-we-partner" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
-                    How We Partner
-                  </Link>
-                </li>
                 <li>
                   <Link href="/funding" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Funding Options
