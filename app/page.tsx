@@ -486,7 +486,7 @@ export default function Home() {
               className="inline-block px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover-lift"
               style={{ borderColor: '#1e2749', color: '#1e2749', backgroundColor: 'transparent' }}
             >
-              Schedule a Call
+              Start the Conversation
             </Link>
           </div>
         </div>

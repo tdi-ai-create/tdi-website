@@ -123,7 +123,7 @@ export function ParallaxHero() {
                   backgroundColor: 'transparent',
                 }}
               >
-                Schedule a Call
+                Start the Conversation
               </a>
             </div>
           </div>

@@ -26,7 +26,7 @@ export default function FinalCTA({ onCtaClick }: FinalCTAProps) {
               className="inline-block px-8 py-4 rounded-full font-semibold text-lg transition-all hover:shadow-lg hover:-translate-y-0.5"
               style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
             >
-              Schedule a Conversation
+              Start the Conversation
             </Link>
 
             {/* Secondary CTA */}

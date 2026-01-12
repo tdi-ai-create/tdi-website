@@ -176,7 +176,7 @@ export default function FundingPage() {
                   </svg>
                 </div>
               </div>
-              <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Schedule a Call</h3>
+              <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Start the Conversation</h3>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
                 15 minutes. Tell us about your school and goals.
               </p>
@@ -273,7 +273,7 @@ export default function FundingPage() {
               className="inline-block px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover-lift"
               style={{ borderColor: '#ffffff', color: '#ffffff' }}
             >
-              Schedule a Call
+              Start the Conversation
             </a>
           </div>
         </div>

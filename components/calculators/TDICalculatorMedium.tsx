@@ -256,7 +256,7 @@ export function TDICalculatorMedium() {
             href="/contact" 
             className="btn-primary px-6 py-3"
           >
-            Schedule a Conversation
+            Start the Conversation
           </Link>
           <Link 
             href="/calculator" 

@@ -959,7 +959,7 @@ export default function HowWePartnerPage() {
             className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-[1.02] hover:shadow-lg"
             style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
           >
-            Schedule a Call
+            Start the Conversation
           </Link>
           <p className="mt-6 text-sm" style={{ color: '#ffffff', opacity: 0.8 }}>
             Or email us at{' '}

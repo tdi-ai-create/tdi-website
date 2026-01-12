@@ -101,7 +101,7 @@ export function PricingCard({
   description,
   features,
   featured = false,
-  ctaText = 'Schedule a Call',
+  ctaText = 'Start the Conversation',
   ctaHref = '/contact',
 }: PricingCardProps) {
   return (

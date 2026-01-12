@@ -758,7 +758,7 @@ export default function ForSchoolsPage() {
               className="px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-white/10"
               style={{ borderColor: '#ffffff', color: '#ffffff' }}
             >
-              Schedule a Call
+              Start the Conversation
             </a>
           </div>
         </div>

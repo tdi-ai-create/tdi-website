@@ -744,27 +744,31 @@ export default function FreePDPlanPage() {
               </div>
 
               <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#1e2749' }}>
-                You're all set!
+                Your Custom PD Plan is On Its Way
               </h2>
-              <p className="text-lg mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
-                Check your inbox within 24 hours for your custom PD Evaluation Plan.
+              <p className="text-lg mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
+                Check your inbox within 24 hours.
               </p>
 
-              {/* Identity Language */}
-              <p className="text-base italic mb-8 px-4" style={{ color: '#1e2749', opacity: 0.7 }}>
-                You're exactly the kind of educator we built this for. Someone ready to stop accepting the status quo and start building something that actually lasts.
+              {/* Bridge Text */}
+              <p className="text-base mb-8 px-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+                While you wait, see what impact TDI could have on your school.
               </p>
 
-              <div className="pt-6 border-t" style={{ borderColor: '#e5e5e5' }}>
-                <p className="text-sm mb-4" style={{ color: '#666' }}>
-                  Want to talk sooner?
-                </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
-                  href="/contact"
+                  href="/calculator"
                   className="inline-block px-8 py-4 rounded-lg font-semibold transition-all hover:scale-105"
                   style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
                 >
-                  Schedule a Call
+                  See Your School's Impact
+                </Link>
+                <Link
+                  href="/contact"
+                  className="inline-block px-8 py-4 rounded-lg font-semibold transition-all hover:scale-105 border-2"
+                  style={{ borderColor: '#1e2749', color: '#1e2749' }}
+                >
+                  Start the Conversation Now
                 </Link>
               </div>
             </div>

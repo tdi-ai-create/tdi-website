@@ -319,7 +319,7 @@ export function TDICalculatorLarge() {
               href="/contact" 
               className="btn-primary px-8 py-4 text-lg"
             >
-              Schedule a Conversation
+              Start the Conversation
             </Link>
             <button 
               onClick={() => window.print()}
