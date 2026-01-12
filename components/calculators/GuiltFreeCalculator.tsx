@@ -3,6 +3,15 @@
 import { useState } from 'react';
 
 export function GuiltFreeCalculator() {
+  // Step tracking
+  const [step, setStep] = useState<'intro' | 'calculator'>('intro');
+
+  // Intro question answers
+  const [gradeLevel, setGradeLevel] = useState<string | null>(null);
+  const [weekendLook, setWeekendLook] = useState<string | null>(null);
+  const [lunchBreak, setLunchBreak] = useState<string | null>(null);
+
+  // Main calculator state
   const [workHours, setWorkHours] = useState(10);
   const [guiltLevel, setGuiltLevel] = useState(3);
 
@@ -21,6 +30,127 @@ export function GuiltFreeCalculator() {
     if (score >= 30) return '#eab308';
     return '#22c55e';
   };
+
+  const handleProceed = () => {
+    setStep('calculator');
+    window.dispatchEvent(new CustomEvent('calculator-engaged'));
+  };
+
+  const allQuestionsAnswered = gradeLevel && weekendLook && lunchBreak;
+
+  // Intro questions options
+  const gradeLevelOptions = [
+    'Pre-K babies',
+    'Elementary chaos (K-2)',
+    'Upper elementary (3-5)',
+    'Middle school moods (6-8)',
+    'High school drama (9-12)',
+    'A little bit of everything'
+  ];
+
+  const weekendOptions = [
+    'Fully off (living the dream)',
+    'A few hours of planning',
+    'Half a day of catch-up',
+    'Honestly, what weekend?'
+  ];
+
+  const lunchOptions = [
+    'Eating in peace (rare but real)',
+    'Working through it',
+    'Supervising kids',
+    'What lunch break?'
+  ];
+
+  if (step === 'intro') {
+    return (
+      <div className="space-y-6">
+        <p className="text-sm text-center mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+          Let's get to know you first
+        </p>
+
+        {/* Question 1: Grade Level */}
+        <div>
+          <label className="block text-sm font-semibold mb-3" style={{ color: '#1e2749' }}>
+            Who do you teach?
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            {gradeLevelOptions.map((option) => (
+              <button
+                key={option}
+                onClick={() => setGradeLevel(option)}
+                className="py-3 px-3 rounded-lg text-sm font-medium transition-all text-left"
+                style={{
+                  backgroundColor: gradeLevel === option ? '#8b5cf6' : '#f3f4f6',
+                  color: gradeLevel === option ? '#ffffff' : '#1e2749'
+                }}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Question 2: Weekend */}
+        <div>
+          <label className="block text-sm font-semibold mb-3" style={{ color: '#1e2749' }}>
+            What does your weekend actually look like?
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {weekendOptions.map((option) => (
+              <button
+                key={option}
+                onClick={() => setWeekendLook(option)}
+                className="py-3 px-3 rounded-lg text-sm font-medium transition-all text-left"
+                style={{
+                  backgroundColor: weekendLook === option ? '#8b5cf6' : '#f3f4f6',
+                  color: weekendLook === option ? '#ffffff' : '#1e2749'
+                }}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Question 3: Lunch Break */}
+        <div>
+          <label className="block text-sm font-semibold mb-3" style={{ color: '#1e2749' }}>
+            Your lunch break usually looks like...
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {lunchOptions.map((option) => (
+              <button
+                key={option}
+                onClick={() => setLunchBreak(option)}
+                className="py-3 px-3 rounded-lg text-sm font-medium transition-all text-left"
+                style={{
+                  backgroundColor: lunchBreak === option ? '#8b5cf6' : '#f3f4f6',
+                  color: lunchBreak === option ? '#ffffff' : '#1e2749'
+                }}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Next Button */}
+        <button
+          onClick={handleProceed}
+          disabled={!allQuestionsAnswered}
+          className="w-full py-4 rounded-lg font-bold text-lg transition-all"
+          style={{
+            backgroundColor: allQuestionsAnswered ? '#8b5cf6' : '#e5e7eb',
+            color: allQuestionsAnswered ? '#ffffff' : '#9ca3af',
+            cursor: allQuestionsAnswered ? 'pointer' : 'not-allowed'
+          }}
+        >
+          See My Guilt-Free Score
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

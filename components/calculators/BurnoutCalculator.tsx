@@ -3,6 +3,15 @@
 import { useState } from 'react';
 
 export function BurnoutCalculator() {
+  // Step tracking
+  const [step, setStep] = useState<'intro' | 'calculator'>('intro');
+
+  // Intro question answers
+  const [gradeLevel, setGradeLevel] = useState<string | null>(null);
+  const [experience, setExperience] = useState<string | null>(null);
+  const [hardestTime, setHardestTime] = useState<string | null>(null);
+
+  // Main calculator state
   const [stress, setStress] = useState(5);
 
   // Calculate projected stress reduction over time
@@ -24,6 +33,129 @@ export function BurnoutCalculator() {
     if (value >= 4) return '#eab308';
     return '#22c55e';
   };
+
+  const handleProceed = () => {
+    setStep('calculator');
+    window.dispatchEvent(new CustomEvent('calculator-engaged'));
+  };
+
+  const allQuestionsAnswered = gradeLevel && experience && hardestTime;
+
+  // Intro questions options
+  const gradeLevelOptions = [
+    'Pre-K babies',
+    'Elementary chaos (K-2)',
+    'Upper elementary (3-5)',
+    'Middle school moods (6-8)',
+    'High school drama (9-12)',
+    'A little bit of everything'
+  ];
+
+  const experienceOptions = [
+    'Just getting started (0-2 years)',
+    'Finding my groove (3-5 years)',
+    'Solidly in it (6-10 years)',
+    'Veteran status (11-20 years)',
+    'Lost count (20+ years)'
+  ];
+
+  const hardestTimeOptions = [
+    'Before the kids even arrive',
+    'Mid-morning chaos',
+    'The post-lunch slump',
+    'That final hour',
+    'After dismissal when it all catches up'
+  ];
+
+  if (step === 'intro') {
+    return (
+      <div className="space-y-6">
+        <p className="text-sm text-center mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
+          Let's get to know you first
+        </p>
+
+        {/* Question 1: Grade Level */}
+        <div>
+          <label className="block text-sm font-semibold mb-3" style={{ color: '#1e2749' }}>
+            Who do you teach?
+          </label>
+          <div className="grid grid-cols-2 gap-2">
+            {gradeLevelOptions.map((option) => (
+              <button
+                key={option}
+                onClick={() => setGradeLevel(option)}
+                className="py-3 px-3 rounded-lg text-sm font-medium transition-all text-left"
+                style={{
+                  backgroundColor: gradeLevel === option ? '#ef4444' : '#f3f4f6',
+                  color: gradeLevel === option ? '#ffffff' : '#1e2749'
+                }}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Question 2: Experience */}
+        <div>
+          <label className="block text-sm font-semibold mb-3" style={{ color: '#1e2749' }}>
+            How long have you been in the game?
+          </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+            {experienceOptions.map((option) => (
+              <button
+                key={option}
+                onClick={() => setExperience(option)}
+                className="py-3 px-3 rounded-lg text-sm font-medium transition-all text-left"
+                style={{
+                  backgroundColor: experience === option ? '#ef4444' : '#f3f4f6',
+                  color: experience === option ? '#ffffff' : '#1e2749'
+                }}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Question 3: Hardest Time */}
+        <div>
+          <label className="block text-sm font-semibold mb-3" style={{ color: '#1e2749' }}>
+            When does the day hit hardest?
+          </label>
+          <div className="grid grid-cols-1 gap-2">
+            {hardestTimeOptions.map((option) => (
+              <button
+                key={option}
+                onClick={() => setHardestTime(option)}
+                className="py-3 px-3 rounded-lg text-sm font-medium transition-all text-left"
+                style={{
+                  backgroundColor: hardestTime === option ? '#ef4444' : '#f3f4f6',
+                  color: hardestTime === option ? '#ffffff' : '#1e2749'
+                }}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Next Button */}
+        <button
+          onClick={handleProceed}
+          disabled={!allQuestionsAnswered}
+          className="w-full py-4 rounded-lg font-bold text-lg transition-all"
+          style={{
+            backgroundColor: allQuestionsAnswered ? '#ef4444' : '#e5e7eb',
+            color: allQuestionsAnswered ? '#ffffff' : '#9ca3af',
+            cursor: allQuestionsAnswered ? 'pointer' : 'not-allowed'
+          }}
+        >
+          See My Burnout Score
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
