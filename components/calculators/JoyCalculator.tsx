@@ -270,12 +270,12 @@ export function JoyCalculator() {
           onChange={(e) => setJoy(parseInt(e.target.value))}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #f59e0b 0%, #f59e0b ${(joy - 1) / 9 * 100}%, #e5e7eb ${(joy - 1) / 9 * 100}%, #e5e7eb 100%)`
+            background: `linear-gradient(to right, #1e2749 0%, #1e2749 ${(joy - 1) / 9 * 100}%, #e5e7eb ${(joy - 1) / 9 * 100}%, #e5e7eb 100%)`
           }}
         />
         <div className="flex justify-between items-start mt-2">
           <div className="text-left">
-            <span className="block text-sm font-bold" style={{ color: '#ef4444' }}>1</span>
+            <span className="block text-sm font-bold" style={{ color: '#1e2749' }}>1</span>
             <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>None at all</span>
           </div>
           <div className="text-center">
@@ -283,7 +283,7 @@ export function JoyCalculator() {
             <span className="block text-lg font-bold" style={{ color: '#1e2749' }}>{joy}/10</span>
           </div>
           <div className="text-right">
-            <span className="block text-sm font-bold" style={{ color: '#22c55e' }}>10</span>
+            <span className="block text-sm font-bold" style={{ color: '#1e2749' }}>10</span>
             <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>I love it</span>
           </div>
         </div>
@@ -295,7 +295,7 @@ export function JoyCalculator() {
         disabled={!allFieldsFilled}
         className="w-full py-4 rounded-lg font-bold text-lg transition-all mt-2"
         style={{
-          backgroundColor: allFieldsFilled ? '#f59e0b' : '#e5e7eb',
+          backgroundColor: allFieldsFilled ? '#1e2749' : '#e5e7eb',
           color: allFieldsFilled ? '#ffffff' : '#9ca3af',
           cursor: allFieldsFilled ? 'pointer' : 'not-allowed'
         }}

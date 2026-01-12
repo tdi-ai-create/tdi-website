@@ -269,7 +269,7 @@ export function OverallImpactCalculator() {
           <label className="text-sm font-semibold" style={{ color: '#1e2749' }}>
             Staff morale rating
           </label>
-          <span className="text-lg font-bold" style={{ color: '#d97706' }}>{morale}/10</span>
+          <span className="text-lg font-bold" style={{ color: '#1e2749' }}>{morale}/10</span>
         </div>
         <input
           type="range"
@@ -279,7 +279,7 @@ export function OverallImpactCalculator() {
           onChange={(e) => { setMorale(parseInt(e.target.value)); handleChange(); }}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #d97706 0%, #d97706 ${(morale - 1) / 9 * 100}%, #e5e7eb ${(morale - 1) / 9 * 100}%, #e5e7eb 100%)`
+            background: `linear-gradient(to right, #1e2749 0%, #1e2749 ${(morale - 1) / 9 * 100}%, #e5e7eb ${(morale - 1) / 9 * 100}%, #e5e7eb 100%)`
           }}
         />
         <div className="flex justify-between text-xs mt-1" style={{ color: '#1e2749', opacity: 0.5 }}>
@@ -294,7 +294,7 @@ export function OverallImpactCalculator() {
           <label className="text-sm font-semibold" style={{ color: '#1e2749' }}>
             Students at grade-level benchmark
           </label>
-          <span className="text-lg font-bold" style={{ color: '#0284c7' }}>{benchmark}%</span>
+          <span className="text-lg font-bold" style={{ color: '#1e2749' }}>{benchmark}%</span>
         </div>
         <input
           type="range"
@@ -304,7 +304,7 @@ export function OverallImpactCalculator() {
           onChange={(e) => { setBenchmark(parseInt(e.target.value)); handleChange(); }}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #0284c7 0%, #0284c7 ${(benchmark - 20) / 70 * 100}%, #e5e7eb ${(benchmark - 20) / 70 * 100}%, #e5e7eb 100%)`
+            background: `linear-gradient(to right, #1e2749 0%, #1e2749 ${(benchmark - 20) / 70 * 100}%, #e5e7eb ${(benchmark - 20) / 70 * 100}%, #e5e7eb 100%)`
           }}
         />
         <div className="flex justify-between text-xs mt-1" style={{ color: '#1e2749', opacity: 0.5 }}>
@@ -319,7 +319,7 @@ export function OverallImpactCalculator() {
           <label className="text-sm font-semibold" style={{ color: '#1e2749' }}>
             Current state rating
           </label>
-          <span className="text-lg font-bold" style={{ color: '#a21caf' }}>{stateRating}</span>
+          <span className="text-lg font-bold" style={{ color: '#1e2749' }}>{stateRating}</span>
         </div>
         <div className="flex gap-2">
           {ratings.map((rating) => (
@@ -328,8 +328,8 @@ export function OverallImpactCalculator() {
               onClick={() => { setStateRating(rating); handleChange(); }}
               className="flex-1 py-2 rounded-lg font-bold text-sm transition-all"
               style={{
-                backgroundColor: stateRating === rating ? '#a21caf' : '#f3e8ff',
-                color: stateRating === rating ? 'white' : '#a21caf'
+                backgroundColor: stateRating === rating ? '#ffba06' : '#f3f4f6',
+                color: '#1e2749'
               }}
             >
               {rating}

@@ -143,7 +143,7 @@ export function TDICalculator() {
               <label className="text-sm font-bold text-gray-700">
                 Staff morale rating
               </label>
-              <span className="text-lg font-black" style={{ color: '#d97706' }}>{teacherHappiness}/10</span>
+              <span className="text-lg font-black" style={{ color: '#1e2749' }}>{teacherHappiness}/10</span>
             </div>
             <input
               type="range"
@@ -152,7 +152,7 @@ export function TDICalculator() {
               value={teacherHappiness}
               onChange={(e) => { setTeacherHappiness(parseInt(e.target.value)); handleSliderChange(); }}
               className="w-full h-2 rounded-full appearance-none cursor-pointer"
-              style={{ background: `linear-gradient(to right, #d97706 0%, #d97706 ${(teacherHappiness - 1) / 9 * 100}%, #e5e7eb ${(teacherHappiness - 1) / 9 * 100}%, #e5e7eb 100%)` }}
+              style={{ background: `linear-gradient(to right, #1e2749 0%, #1e2749 ${(teacherHappiness - 1) / 9 * 100}%, #e5e7eb ${(teacherHappiness - 1) / 9 * 100}%, #e5e7eb 100%)` }}
             />
             <p className="text-xs text-gray-500 italic">{getHappinessFact()}</p>
           </div>
@@ -163,7 +163,7 @@ export function TDICalculator() {
               <label className="text-sm font-bold text-gray-700">
                 Students at grade-level benchmark
               </label>
-              <span className="text-lg font-black" style={{ color: '#0284c7' }}>{studentPerformance}%</span>
+              <span className="text-lg font-black" style={{ color: '#1e2749' }}>{studentPerformance}%</span>
             </div>
             <input
               type="range"
@@ -172,7 +172,7 @@ export function TDICalculator() {
               value={studentPerformance}
               onChange={(e) => { setStudentPerformance(parseInt(e.target.value)); handleSliderChange(); }}
               className="w-full h-2 rounded-full appearance-none cursor-pointer"
-              style={{ background: `linear-gradient(to right, #0284c7 0%, #0284c7 ${(studentPerformance - 20) / 70 * 100}%, #e5e7eb ${(studentPerformance - 20) / 70 * 100}%, #e5e7eb 100%)` }}
+              style={{ background: `linear-gradient(to right, #1e2749 0%, #1e2749 ${(studentPerformance - 20) / 70 * 100}%, #e5e7eb ${(studentPerformance - 20) / 70 * 100}%, #e5e7eb 100%)` }}
             />
             <p className="text-xs text-gray-500 italic">{getPerformanceFact()}</p>
           </div>
@@ -183,7 +183,7 @@ export function TDICalculator() {
               <label className="text-sm font-bold text-gray-700">
                 Current state rating
               </label>
-              <span className="text-lg font-black" style={{ color: '#a21caf' }}>{stateRating}</span>
+              <span className="text-lg font-black" style={{ color: '#1e2749' }}>{stateRating}</span>
             </div>
             <div className="flex gap-2">
               {ratings.map((rating) => (
@@ -192,8 +192,8 @@ export function TDICalculator() {
                   onClick={() => { setStateRating(rating); handleSliderChange(); }}
                   className="flex-1 py-2 rounded-lg font-bold text-sm transition-all"
                   style={{
-                    backgroundColor: stateRating === rating ? '#a21caf' : '#f3e8ff',
-                    color: stateRating === rating ? 'white' : '#a21caf'
+                    backgroundColor: stateRating === rating ? '#ffba06' : '#f3f4f6',
+                    color: '#1e2749'
                   }}
                 >
                   {rating}

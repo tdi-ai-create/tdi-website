@@ -277,12 +277,12 @@ export function BurnoutCalculator() {
           onChange={(e) => setStress(parseInt(e.target.value))}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
-            background: `linear-gradient(to right, ${getStressColor(stress)} 0%, ${getStressColor(stress)} ${(stress - 1) / 9 * 100}%, #e5e7eb ${(stress - 1) / 9 * 100}%, #e5e7eb 100%)`
+            background: `linear-gradient(to right, #1e2749 0%, #1e2749 ${(stress - 1) / 9 * 100}%, #e5e7eb ${(stress - 1) / 9 * 100}%, #e5e7eb 100%)`
           }}
         />
         <div className="flex justify-between items-start mt-2">
           <div className="text-left">
-            <span className="block text-sm font-bold" style={{ color: '#22c55e' }}>1</span>
+            <span className="block text-sm font-bold" style={{ color: '#1e2749' }}>1</span>
             <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Doing great</span>
           </div>
           <div className="text-center">
@@ -290,7 +290,7 @@ export function BurnoutCalculator() {
             <span className="block text-lg font-bold" style={{ color: '#1e2749' }}>{stress}/10</span>
           </div>
           <div className="text-right">
-            <span className="block text-sm font-bold" style={{ color: '#ef4444' }}>10</span>
+            <span className="block text-sm font-bold" style={{ color: '#1e2749' }}>10</span>
             <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>In crisis</span>
           </div>
         </div>
@@ -302,7 +302,7 @@ export function BurnoutCalculator() {
         disabled={!allFieldsFilled}
         className="w-full py-4 rounded-lg font-bold text-lg transition-all mt-2"
         style={{
-          backgroundColor: allFieldsFilled ? '#ef4444' : '#e5e7eb',
+          backgroundColor: allFieldsFilled ? '#1e2749' : '#e5e7eb',
           color: allFieldsFilled ? '#ffffff' : '#9ca3af',
           cursor: allFieldsFilled ? 'pointer' : 'not-allowed'
         }}

@@ -306,19 +306,19 @@ export function GuiltFreeCalculator() {
           onChange={(e) => setWorkHours(parseInt(e.target.value))}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #8b5cf6 0%, #8b5cf6 ${workHours / 20 * 100}%, #e5e7eb ${workHours / 20 * 100}%, #e5e7eb 100%)`
+            background: `linear-gradient(to right, #1e2749 0%, #1e2749 ${workHours / 20 * 100}%, #e5e7eb ${workHours / 20 * 100}%, #e5e7eb 100%)`
           }}
         />
         <div className="flex justify-between items-start mt-2">
           <div className="text-left">
-            <span className="block text-sm font-bold" style={{ color: '#22c55e' }}>0</span>
+            <span className="block text-sm font-bold" style={{ color: '#1e2749' }}>0</span>
             <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>None</span>
           </div>
           <div className="text-center">
             <span className="block text-lg font-bold" style={{ color: '#1e2749' }}>{workHours} hrs/week</span>
           </div>
           <div className="text-right">
-            <span className="block text-sm font-bold" style={{ color: '#ef4444' }}>20+</span>
+            <span className="block text-sm font-bold" style={{ color: '#1e2749' }}>20+</span>
             <span className="block text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Way too many</span>
           </div>
         </div>
@@ -346,7 +346,7 @@ export function GuiltFreeCalculator() {
         disabled={!allFieldsFilled}
         className="w-full py-4 rounded-lg font-bold text-lg transition-all mt-2"
         style={{
-          backgroundColor: allFieldsFilled ? '#8b5cf6' : '#e5e7eb',
+          backgroundColor: allFieldsFilled ? '#1e2749' : '#e5e7eb',
           color: allFieldsFilled ? '#ffffff' : '#9ca3af',
           cursor: allFieldsFilled ? 'pointer' : 'not-allowed'
         }}
