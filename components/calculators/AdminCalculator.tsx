@@ -17,8 +17,12 @@ export function AdminCalculator() {
     return 'Thriving';
   };
 
+  const handleChange = () => {
+    window.dispatchEvent(new CustomEvent('calculator-engaged'));
+  };
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Input: Student Benchmark */}
       <div>
         <label className="block text-sm font-semibold mb-3" style={{ color: '#1e2749' }}>
@@ -29,10 +33,7 @@ export function AdminCalculator() {
           min="20"
           max="90"
           value={benchmark}
-          onChange={(e) => {
-            setBenchmark(parseInt(e.target.value));
-            window.dispatchEvent(new CustomEvent('calculator-engaged'));
-          }}
+          onChange={(e) => { setBenchmark(parseInt(e.target.value)); handleChange(); }}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
             background: `linear-gradient(to right, #ffba06 0%, #ffba06 ${(benchmark - 20) / 70 * 100}%, #e5e7eb ${(benchmark - 20) / 70 * 100}%, #e5e7eb 100%)`
@@ -55,10 +56,7 @@ export function AdminCalculator() {
           min="1"
           max="10"
           value={morale}
-          onChange={(e) => {
-            setMorale(parseInt(e.target.value));
-            window.dispatchEvent(new CustomEvent('calculator-engaged'));
-          }}
+          onChange={(e) => { setMorale(parseInt(e.target.value)); handleChange(); }}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
             background: `linear-gradient(to right, #ffba06 0%, #ffba06 ${(morale - 1) / 9 * 100}%, #e5e7eb ${(morale - 1) / 9 * 100}%, #e5e7eb 100%)`
@@ -140,7 +138,7 @@ export function AdminCalculator() {
             className="flex-1 text-center px-6 py-3 rounded-lg font-bold transition-all hover-lift border-2"
             style={{ borderColor: '#1e2749', color: '#1e2749' }}
           >
-            See What a Partnership Looks Like
+            See Partnership Model
           </a>
         </div>
 

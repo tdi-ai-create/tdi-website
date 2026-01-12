@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { CoursesSection } from '@/components/CoursesSection';
-import { SchoolsROICalculator } from '@/components/calculators/SchoolsROICalculator';
+import { TabbedCalculator } from '@/components/calculators';
 import { BeforeAfterStats } from '@/components/BeforeAfterStats';
 
 export const metadata = {
@@ -730,9 +730,9 @@ export default function ForSchoolsPage() {
       />
 
       {/* ROI Calculator Section */}
-      <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
+      <section id="calculator" className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
-          <SchoolsROICalculator />
+          <TabbedCalculator defaultTab="schools" />
         </div>
       </section>
 

@@ -258,13 +258,25 @@ function OurApproachPanel() {
         </p>
       </div>
 
-      <Link
-        href="/contact"
-        className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:scale-[1.02] hover:shadow-lg"
-        style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-      >
-        See if this approach is right for your school
-      </Link>
+      {/* Dual CTA */}
+      <div className="text-center space-y-3">
+        <Link
+          href="/free-pd-plan"
+          className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
+          style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+        >
+          Get Your Free PD Plan
+        </Link>
+        <div>
+          <Link
+            href="/contact"
+            className="text-sm font-medium hover:underline"
+            style={{ color: '#1e2749' }}
+          >
+            Or start the conversation now →
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
@@ -330,13 +342,25 @@ function InPersonPanel() {
         </p>
       </div>
 
-      <Link
-        href="/contact"
-        className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:scale-[1.02] hover:shadow-lg"
-        style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-      >
-        See how in-person support fits into a partnership
-      </Link>
+      {/* Dual CTA */}
+      <div className="text-center space-y-3">
+        <Link
+          href="/free-pd-plan"
+          className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
+          style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+        >
+          Get Your Free PD Plan
+        </Link>
+        <div>
+          <Link
+            href="/contact"
+            className="text-sm font-medium hover:underline"
+            style={{ color: '#1e2749' }}
+          >
+            Or start the conversation now →
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
@@ -421,15 +445,25 @@ function LearningHubPanel() {
         </div>
       </div>
 
-      <a
-        href="https://tdi.thinkific.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:scale-[1.02] hover:shadow-lg"
-        style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-      >
-        Explore Learning Hub resources
-      </a>
+      {/* Dual CTA */}
+      <div className="text-center space-y-3">
+        <Link
+          href="/free-pd-plan"
+          className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
+          style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+        >
+          Get Your Free PD Plan
+        </Link>
+        <div>
+          <Link
+            href="/contact"
+            className="text-sm font-medium hover:underline"
+            style={{ color: '#1e2749' }}
+          >
+            Or start the conversation now →
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
@@ -533,13 +567,25 @@ function DashboardPanel() {
         </p>
       </div>
 
-      <Link
-        href="/contact"
-        className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:scale-[1.02] hover:shadow-lg"
-        style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-      >
-        Schedule a demo of the Dashboard
-      </Link>
+      {/* Dual CTA */}
+      <div className="text-center space-y-3">
+        <Link
+          href="/free-pd-plan"
+          className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
+          style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+        >
+          Get Your Free PD Plan
+        </Link>
+        <div>
+          <Link
+            href="/contact"
+            className="text-sm font-medium hover:underline"
+            style={{ color: '#1e2749' }}
+          >
+            Or start the conversation now →
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
@@ -617,15 +663,38 @@ function BookPanel() {
         </div>
       </div>
 
-      <a
-        href="https://www.amazon.com/stores/Rae-Hughart/author/B07B52NR1F"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:scale-[1.02] hover:shadow-lg"
-        style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-      >
-        Order the Book on Amazon →
-      </a>
+      {/* Amazon Link */}
+      <div className="text-center mb-6">
+        <a
+          href="https://www.amazon.com/stores/Rae-Hughart/author/B07B52NR1F"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg border-2"
+          style={{ backgroundColor: 'transparent', color: '#1e2749', borderColor: '#1e2749' }}
+        >
+          Order the Book on Amazon
+        </a>
+      </div>
+
+      {/* Dual CTA */}
+      <div className="text-center space-y-3">
+        <Link
+          href="/free-pd-plan"
+          className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
+          style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+        >
+          Get Your Free PD Plan
+        </Link>
+        <div>
+          <Link
+            href="/contact"
+            className="text-sm font-medium hover:underline"
+            style={{ color: '#1e2749' }}
+          >
+            Or start the conversation now →
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
@@ -707,13 +776,25 @@ function ResultsPanel() {
         </p>
       </div>
 
-      <Link
-        href="/for-schools#calculator"
-        className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:scale-[1.02] hover:shadow-lg"
-        style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-      >
-        See what results are possible for your school
-      </Link>
+      {/* Dual CTA */}
+      <div className="text-center space-y-3">
+        <Link
+          href="/free-pd-plan"
+          className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
+          style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+        >
+          Get Your Free PD Plan
+        </Link>
+        <div>
+          <Link
+            href="/contact"
+            className="text-sm font-medium hover:underline"
+            style={{ color: '#1e2749' }}
+          >
+            Or start the conversation now →
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { AdminCalculator } from './AdminCalculator';
 import { BudgetImpactCalculator } from './BudgetImpactCalculator';
+import { OverallImpactCalculator } from './OverallImpactCalculator';
 import { BurnoutCalculator } from './BurnoutCalculator';
 import { GuiltFreeCalculator } from './GuiltFreeCalculator';
 import { JoyCalculator } from './JoyCalculator';
@@ -13,7 +14,7 @@ interface TabbedCalculatorProps {
 
 export function TabbedCalculator({ defaultTab = 'schools' }: TabbedCalculatorProps) {
   const [mainTab, setMainTab] = useState<'schools' | 'teachers'>(defaultTab);
-  const [adminTab, setAdminTab] = useState<'success' | 'budget'>('budget');
+  const [schoolTab, setSchoolTab] = useState<'success' | 'budget' | 'overall'>('overall');
   const [teacherTab, setTeacherTab] = useState<'burnout' | 'guilt' | 'joy'>('burnout');
   const [hasEngaged, setHasEngaged] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
@@ -94,7 +95,7 @@ export function TabbedCalculator({ defaultTab = 'schools' }: TabbedCalculatorPro
               Choose what matters most to your leadership team.
             </p>
 
-            {/* Admin Assessment Toggle */}
+            {/* School Assessment Toggle */}
             <div className="mb-6">
               <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#1e2749' }}>
                 Select Your Focus
@@ -102,36 +103,49 @@ export function TabbedCalculator({ defaultTab = 'schools' }: TabbedCalculatorPro
               <div className="p-1 rounded-xl" style={{ backgroundColor: '#e5e7eb' }}>
                 <div className="flex gap-1">
                   <button
-                    onClick={() => setAdminTab('success')}
+                    onClick={() => setSchoolTab('success')}
                     className="flex-1 py-3 px-2 rounded-lg text-sm font-semibold transition-all"
                     style={{
-                      backgroundColor: adminTab === 'success' ? '#ffffff' : 'transparent',
+                      backgroundColor: schoolTab === 'success' ? '#ffffff' : 'transparent',
                       color: '#1e2749',
-                      boxShadow: adminTab === 'success' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
+                      boxShadow: schoolTab === 'success' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
                     }}
                   >
                     <span className="block font-bold">Student Success</span>
                     <span className="block text-xs font-normal" style={{ opacity: 0.6 }}>Academic outcomes</span>
                   </button>
                   <button
-                    onClick={() => setAdminTab('budget')}
+                    onClick={() => setSchoolTab('budget')}
                     className="flex-1 py-3 px-2 rounded-lg text-sm font-semibold transition-all"
                     style={{
-                      backgroundColor: adminTab === 'budget' ? '#ffffff' : 'transparent',
+                      backgroundColor: schoolTab === 'budget' ? '#ffffff' : 'transparent',
                       color: '#1e2749',
-                      boxShadow: adminTab === 'budget' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
+                      boxShadow: schoolTab === 'budget' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
                     }}
                   >
                     <span className="block font-bold">Budget Impact</span>
                     <span className="block text-xs font-normal" style={{ opacity: 0.6 }}>PD efficiency</span>
                   </button>
+                  <button
+                    onClick={() => setSchoolTab('overall')}
+                    className="flex-1 py-3 px-2 rounded-lg text-sm font-semibold transition-all"
+                    style={{
+                      backgroundColor: schoolTab === 'overall' ? '#ffffff' : 'transparent',
+                      color: '#1e2749',
+                      boxShadow: schoolTab === 'overall' ? '0 2px 8px rgba(0,0,0,0.1)' : 'none'
+                    }}
+                  >
+                    <span className="block font-bold">Overall Impact</span>
+                    <span className="block text-xs font-normal" style={{ opacity: 0.6 }}>School-wide results</span>
+                  </button>
                 </div>
               </div>
             </div>
 
-            {/* Admin Calculator Content */}
-            {adminTab === 'success' && <AdminCalculator />}
-            {adminTab === 'budget' && <BudgetImpactCalculator />}
+            {/* School Calculator Content */}
+            {schoolTab === 'success' && <AdminCalculator />}
+            {schoolTab === 'budget' && <BudgetImpactCalculator />}
+            {schoolTab === 'overall' && <OverallImpactCalculator />}
           </>
         )}
 
