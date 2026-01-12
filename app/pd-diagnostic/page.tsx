@@ -224,10 +224,10 @@ export default function PDDiagnosticPage() {
     setFocusedOption(0);
   }, [currentQuestion]);
 
-  // Load saved state on mount
+  // Load saved state on mount - clear diagnostic state for fresh start
   useEffect(() => {
     try {
-      // Load user data
+      // Load user data (keep email for convenience)
       const storedUser = localStorage.getItem(STORAGE_KEY);
       if (storedUser) {
         const userData = JSON.parse(storedUser);
@@ -239,29 +239,8 @@ export default function PDDiagnosticPage() {
         }
       }
 
-      // Load diagnostic state (answers, results)
-      const storedState = localStorage.getItem(DIAGNOSTIC_STATE_KEY);
-      if (storedState) {
-        const state = JSON.parse(storedState);
-        if (state.answers && Object.keys(state.answers).length > 0) {
-          setAnswers(state.answers);
-          setCurrentQuestion(Math.min(Object.keys(state.answers).length + 1, 8));
-        }
-        if (state.resultType) {
-          setResultType(state.resultType);
-        }
-        if (state.showResults) {
-          setShowResults(true);
-          setEmailSubmitted(true);
-          // Scroll to results on refresh (delay to override ScrollToTop)
-          setTimeout(() => {
-            const resultsSection = document.getElementById('results');
-            if (resultsSection) {
-              resultsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-          }, 500);
-        }
-      }
+      // Clear diagnostic state on page load for fresh start
+      localStorage.removeItem(DIAGNOSTIC_STATE_KEY);
     } catch {
       // localStorage not available or invalid data
     }
@@ -452,6 +431,32 @@ export default function PDDiagnosticPage() {
         pd_type: resultData[resultType].name,
       });
     }
+  };
+
+  const handleRetakeQuiz = () => {
+    // Track retake event
+    sendGAEvent('diagnostic_retake', {
+      event_category: 'PD Diagnostic',
+      event_label: 'Retake Quiz',
+    });
+
+    // Clear all quiz state
+    setAnswers({});
+    setCurrentQuestion(1);
+    setShowResults(false);
+    setResultType(null);
+    setEmailSubmitted(false);
+    setFocusedOption(0);
+
+    // Clear localStorage
+    try {
+      localStorage.removeItem(DIAGNOSTIC_STATE_KEY);
+    } catch {
+      // localStorage not available
+    }
+
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const currentQ = questions[currentQuestion - 1];
@@ -852,6 +857,17 @@ export default function PDDiagnosticPage() {
                       Or schedule a call with our team
                     </Link>
                   </div>
+
+                  {/* Retake Quiz Button */}
+                  <div className="mt-8 pt-6 border-t border-gray-200">
+                    <button
+                      onClick={handleRetakeQuiz}
+                      className="px-6 py-3 rounded-full font-medium text-sm transition-all hover:bg-gray-100 border-2"
+                      style={{ borderColor: '#1e2749', color: '#1e2749' }}
+                    >
+                      Take It Again
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -959,6 +975,17 @@ export default function PDDiagnosticPage() {
                   >
                     Or schedule a call with our team
                   </Link>
+                </div>
+
+                {/* Retake Quiz Button */}
+                <div className="mt-8 pt-6 border-t border-gray-300">
+                  <button
+                    onClick={handleRetakeQuiz}
+                    className="px-6 py-3 rounded-full font-medium text-sm transition-all hover:bg-gray-200 border-2"
+                    style={{ borderColor: '#1e2749', color: '#1e2749' }}
+                  >
+                    Take It Again
+                  </button>
                 </div>
               </div>
             </div>
