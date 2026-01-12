@@ -153,44 +153,44 @@ export function OverallImpactCalculator() {
         </div>
 
         {/* Section 2: What TDI Actually Does */}
-        <div>
-          <h4 className="font-bold text-lg text-center mb-4" style={{ color: '#1e2749' }}>
+        <div className="rounded-xl p-6" style={{ backgroundColor: '#1e2749' }}>
+          <h4 className="text-white font-bold text-lg text-center mb-6">
             What TDI Actually Does
           </h4>
 
-          <div className="space-y-3 mb-4">
-            {/* IGNITE Card */}
-            <div className="rounded-xl p-4 flex items-start gap-4" style={{ backgroundColor: '#f9fafb', border: '1px solid #e5e7eb' }}>
-              <span className="flex-shrink-0 text-sm font-bold px-3 py-1.5 rounded" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
+          <div className="space-y-6 mb-6">
+            {/* IGNITE */}
+            <div className="flex items-center gap-4">
+              <span className="flex-shrink-0 text-sm font-bold px-3 py-1.5 rounded" style={{ backgroundColor: '#ffba06', color: '#1e2749', minWidth: '100px', textAlign: 'center' }}>
                 IGNITE
               </span>
-              <p className="text-sm leading-relaxed" style={{ color: '#1e2749' }}>
+              <p className="text-white" style={{ fontSize: '16px', lineHeight: '1.5' }}>
                 Build buy-in with leadership and a pilot group. See early wins.
               </p>
             </div>
 
-            {/* ACCELERATE Card */}
-            <div className="rounded-xl p-4 flex items-start gap-4" style={{ backgroundColor: '#f9fafb', border: '1px solid #e5e7eb' }}>
-              <span className="flex-shrink-0 text-sm font-bold px-3 py-1.5 rounded" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
+            {/* ACCELERATE */}
+            <div className="flex items-center gap-4">
+              <span className="flex-shrink-0 text-sm font-bold px-3 py-1.5 rounded" style={{ backgroundColor: '#ffba06', color: '#1e2749', minWidth: '100px', textAlign: 'center' }}>
                 ACCELERATE
               </span>
-              <p className="text-sm leading-relaxed" style={{ color: '#1e2749' }}>
+              <p className="text-white" style={{ fontSize: '16px', lineHeight: '1.5' }}>
                 Scale support to full staff. Strategies get implemented school-wide.
               </p>
             </div>
 
-            {/* SUSTAIN Card */}
-            <div className="rounded-xl p-4 flex items-start gap-4" style={{ backgroundColor: '#f9fafb', border: '1px solid #e5e7eb' }}>
-              <span className="flex-shrink-0 text-sm font-bold px-3 py-1.5 rounded" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
+            {/* SUSTAIN */}
+            <div className="flex items-center gap-4">
+              <span className="flex-shrink-0 text-sm font-bold px-3 py-1.5 rounded" style={{ backgroundColor: '#ffba06', color: '#1e2749', minWidth: '100px', textAlign: 'center' }}>
                 SUSTAIN
               </span>
-              <p className="text-sm leading-relaxed" style={{ color: '#1e2749' }}>
+              <p className="text-white" style={{ fontSize: '16px', lineHeight: '1.5' }}>
                 Embed systems that last beyond any single initiative.
               </p>
             </div>
           </div>
 
-          <p className="text-sm text-center italic" style={{ color: '#1e2749', opacity: 0.7 }}>
+          <p className="text-sm text-center italic text-white/70">
             Based on your inputs, your school would likely start at IGNITE phase.
           </p>
         </div>
