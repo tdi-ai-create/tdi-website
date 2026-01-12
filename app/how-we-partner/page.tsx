@@ -3,8 +3,9 @@
 import { useState, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { TabbedCalculator } from '@/components/calculators/TabbedCalculator';
 
-type TabId = 'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results';
+type TabId = 'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results' | 'calculator';
 
 interface Tab {
   id: TabId;
@@ -64,6 +65,15 @@ const tabs: Tab[] = [
     icon: (
       <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
         <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z" />
+      </svg>
+    ),
+  },
+  {
+    id: 'calculator',
+    name: 'See Your Impact',
+    icon: (
+      <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z" />
       </svg>
     ),
   },
@@ -799,6 +809,44 @@ function ResultsPanel() {
   );
 }
 
+function CalculatorPanel() {
+  return (
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: '#1e2749' }}>
+          See What's Possible<br />for Your School
+        </h2>
+        <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
+          Answer a few questions and get a personalized snapshot based on data from our partner schools.
+        </p>
+      </div>
+
+      {/* Calculator */}
+      <TabbedCalculator defaultTab="schools" />
+
+      {/* Dual CTA */}
+      <div className="text-center space-y-3">
+        <Link
+          href="/free-pd-plan"
+          className="inline-block px-8 py-4 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
+          style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+        >
+          Get Your Free PD Plan
+        </Link>
+        <div>
+          <Link
+            href="/contact"
+            className="text-sm font-medium hover:underline"
+            style={{ color: '#1e2749' }}
+          >
+            Or start the conversation now →
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function HowWePartnerPage() {
   const [activeTab, setActiveTab] = useState<TabId>('approach');
   const [mobileExpanded, setMobileExpanded] = useState<TabId | null>('approach');
@@ -838,6 +886,8 @@ export default function HowWePartnerPage() {
         return <BookPanel />;
       case 'results':
         return <ResultsPanel />;
+      case 'calculator':
+        return <CalculatorPanel />;
     }
   };
 
