@@ -46,7 +46,7 @@ const CACHE_KEY = 'tdi-social-proof-cache';
 const CACHE_TIMESTAMP_KEY = 'tdi-social-proof-cache-time';
 const DISMISS_COUNT_KEY = 'tdi-social-proof-dismissals';
 const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
-const ANIMATION_DURATION = 7000; // 7 seconds for smooth float animation
+const ANIMATION_DURATION = 10000; // 10 seconds for comfortable reading time
 const BURST_CHANCE = 0.3; // 30% chance of burst mode
 
 export function SocialProofPopup() {
@@ -248,7 +248,7 @@ export function SocialProofPopup() {
         .social-proof-bubble {
           position: fixed;
           bottom: 24px;
-          left: 24px;
+          right: 24px;
           z-index: 9998;
           display: inline-flex;
           align-items: center;
@@ -258,7 +258,7 @@ export function SocialProofPopup() {
           border-radius: 50px;
           box-shadow: 0 4px 20px rgba(30, 39, 73, 0.15);
           max-width: 320px;
-          animation: floatUp 7s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+          animation: floatUp 10s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
           cursor: default;
         }
 
@@ -313,17 +313,17 @@ export function SocialProofPopup() {
             opacity: 0;
             transform: translateY(20px) translateX(0);
           }
-          10% {
+          5% {
             opacity: 1;
             transform: translateY(0) translateX(0);
           }
-          70% {
+          75% {
             opacity: 1;
-            transform: translateY(-200px) translateX(3px);
+            transform: translateY(-120px) translateX(-3px);
           }
           100% {
             opacity: 0;
-            transform: translateY(-300px) translateX(5px);
+            transform: translateY(-200px) translateX(-5px);
             pointer-events: none;
           }
         }
@@ -345,17 +345,17 @@ export function SocialProofPopup() {
               opacity: 0;
               transform: translateY(20px) translateX(0);
             }
-            10% {
+            5% {
               opacity: 1;
               transform: translateY(0) translateX(0);
             }
-            70% {
+            75% {
               opacity: 1;
-              transform: translateY(-150px) translateX(2px);
+              transform: translateY(-100px) translateX(0);
             }
             100% {
               opacity: 0;
-              transform: translateY(-220px) translateX(4px);
+              transform: translateY(-160px) translateX(0);
               pointer-events: none;
             }
           }

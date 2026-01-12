@@ -3,6 +3,7 @@
 import { useState } from 'react';
 
 export function OverallImpactCalculator() {
+  const [showResults, setShowResults] = useState(false);
   const [pdBudget, setPdBudget] = useState(2000);
   const [morale, setMorale] = useState(5);
   const [benchmark, setBenchmark] = useState(50);
@@ -13,62 +14,228 @@ export function OverallImpactCalculator() {
   // Calculate projected improvements
   const tdiCostPerTeacher = 672;
   const budgetSavings = pdBudget > tdiCostPerTeacher ? pdBudget - tdiCostPerTeacher : 0;
-  const projectedMorale = Math.min(10, morale + 2);
-  const projectedBenchmark = Math.min(95, benchmark + 8);
+
+  // Morale improvement: +1 to +3 based on starting point (lower starting = more room to grow)
+  const moraleImprovement = morale <= 4 ? 3 : morale <= 6 ? 2 : 1;
+  const projectedMorale = Math.min(10, morale + moraleImprovement);
+
+  // Benchmark improvement: +5 to +10% based on starting point
+  const benchmarkImprovement = benchmark <= 40 ? 10 : benchmark <= 60 ? 8 : benchmark <= 75 ? 6 : 5;
+  const projectedBenchmark = Math.min(95, benchmark + benchmarkImprovement);
+
+  // Rating projection: one grade higher
+  const getProjectedRating = () => {
+    const ratingIndex = ratings.indexOf(stateRating);
+    if (ratingIndex < ratings.length - 1) {
+      return ratings[ratingIndex + 1];
+    }
+    return 'A'; // Already at A, maintain
+  };
 
   const handleChange = () => {
     window.dispatchEvent(new CustomEvent('calculator-engaged'));
   };
 
-  // Dynamic facts based on inputs
-  const getBudgetFact = () => {
-    if (pdBudget >= 3000) {
-      return "Districts spending $3,000+ per teacher often see less than 10% implementation. TDI achieves 4x higher rates.";
-    } else if (pdBudget >= 2000) {
-      return "The average district spends $2,000-3,000 per teacher annually on PD that doesn't stick.";
-    } else {
-      return "Schools investing under $1,500 per teacher typically rely on one-day workshops.";
-    }
+  const handleShowResults = () => {
+    setShowResults(true);
+    window.dispatchEvent(new CustomEvent('calculator-engaged'));
   };
 
-  const getMoraleFact = () => {
-    if (morale <= 3) {
-      return "Schools with morale below 4 see 23% higher turnover. (Learning Policy Institute)";
-    } else if (morale <= 5) {
-      return "53% of teachers report burnout. TDI partners see stress drop from 9/10 to 5-6/10. (RAND 2025)";
-    } else if (morale <= 7) {
-      return "Teachers with moderate satisfaction are 2x more likely to stay with sustained support. (RAND)";
-    } else {
-      return "High-morale schools still lose teachers to burnout. Proactive support prevents backslide.";
-    }
-  };
+  if (showResults) {
+    return (
+      <div className="space-y-6">
+        {/* Section 1: Your School's Potential */}
+        <div>
+          <h4 className="font-bold text-lg mb-4 text-center" style={{ color: '#1e2749' }}>
+            Your School's Potential with TDI
+          </h4>
 
-  const getBenchmarkFact = () => {
-    if (benchmark <= 40) {
-      return "When teachers reclaim 4+ hours/week, they provide 2x more small-group instruction. (Chetty et al.)";
-    } else if (benchmark <= 60) {
-      return "Teacher effectiveness is the #1 in-school factor for student achievement. (Hanushek)";
-    } else if (benchmark <= 75) {
-      return "Schools above 60% see accelerated gains when teachers have time for differentiation.";
-    } else {
-      return "High-performing schools maintain results by preventing teacher burnout.";
-    }
-  };
+          {/* Metric Cards */}
+          <div className="space-y-4">
+            {/* Metric 1: PD Investment */}
+            <div className="rounded-xl p-4" style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}>
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-sm font-semibold" style={{ color: '#1e2749' }}>PD Investment</span>
+                <span className="text-sm font-bold" style={{ color: '#16a34a' }}>
+                  You save: ${budgetSavings.toLocaleString()}/teacher
+                </span>
+              </div>
+              <div className="flex gap-4 mb-2">
+                <div>
+                  <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Current</span>
+                  <p className="font-bold" style={{ color: '#1e2749' }}>${pdBudget.toLocaleString()}/teacher</p>
+                </div>
+                <div className="text-xl" style={{ color: '#1e2749' }}>→</div>
+                <div>
+                  <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>With TDI</span>
+                  <p className="font-bold" style={{ color: '#16a34a' }}>${tdiCostPerTeacher}/teacher</p>
+                </div>
+              </div>
+              <p className="text-xs italic" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Why it changes: TDI's phased model means you stop paying for PD that gets ignored. Our partners see 65% implementation vs. the 10% industry average.
+              </p>
+            </div>
 
-  const getRatingFact = () => {
-    if (stateRating === 'F' || stateRating === 'D') {
-      return "Schools investing in sustained teacher development are 2x more likely to improve ratings. (TDI Data)";
-    } else if (stateRating === 'C') {
-      return "C-rated schools often have talent but lack systems. TDI provides the structure to unlock it.";
-    } else if (stateRating === 'B') {
-      return "The jump from B to A requires consistency. TDI's ongoing support prevents backslide.";
-    } else {
-      return "A-rated schools partner with TDI to retain top teachers and maintain excellence.";
-    }
-  };
+            {/* Metric 2: Staff Morale */}
+            <div className="rounded-xl p-4" style={{ backgroundColor: '#fef9c3', border: '1px solid #fde047' }}>
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-sm font-semibold" style={{ color: '#1e2749' }}>Staff Morale</span>
+                <span className="text-sm font-bold" style={{ color: '#16a34a' }}>
+                  +{moraleImprovement} points
+                </span>
+              </div>
+              <div className="flex gap-4 mb-2">
+                <div>
+                  <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Current</span>
+                  <p className="font-bold" style={{ color: '#1e2749' }}>{morale}/10</p>
+                </div>
+                <div className="text-xl" style={{ color: '#1e2749' }}>→</div>
+                <div>
+                  <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Year 1 with TDI</span>
+                  <p className="font-bold" style={{ color: '#16a34a' }}>{projectedMorale}/10</p>
+                </div>
+              </div>
+              <p className="text-xs italic" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Why it changes: When teachers get support that actually helps, stress drops. Our partners report stress dropping from 9 to 5-6 within 3-4 months.
+              </p>
+            </div>
+
+            {/* Metric 3: Student Achievement */}
+            <div className="rounded-xl p-4" style={{ backgroundColor: '#e0f2fe', border: '1px solid #7dd3fc' }}>
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-sm font-semibold" style={{ color: '#1e2749' }}>Student Achievement</span>
+                <span className="text-sm font-bold" style={{ color: '#16a34a' }}>
+                  +{benchmarkImprovement}%
+                </span>
+              </div>
+              <div className="flex gap-4 mb-2">
+                <div>
+                  <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Current</span>
+                  <p className="font-bold" style={{ color: '#1e2749' }}>{benchmark}% at benchmark</p>
+                </div>
+                <div className="text-xl" style={{ color: '#1e2749' }}>→</div>
+                <div>
+                  <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Projected with TDI</span>
+                  <p className="font-bold" style={{ color: '#16a34a' }}>{projectedBenchmark}% at benchmark</p>
+                </div>
+              </div>
+              <p className="text-xs italic" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Why it changes: Teacher effectiveness is the #1 in-school factor for student achievement. When teachers thrive, students follow.
+              </p>
+            </div>
+
+            {/* Metric 4: School Rating */}
+            <div className="rounded-xl p-4" style={{ backgroundColor: '#f5f3ff', border: '1px solid #c4b5fd' }}>
+              <div className="flex justify-between items-start mb-2">
+                <span className="text-sm font-semibold" style={{ color: '#1e2749' }}>School Rating</span>
+                {stateRating !== 'A' && (
+                  <span className="text-sm font-bold" style={{ color: '#16a34a' }}>
+                    On track for {getProjectedRating()}
+                  </span>
+                )}
+              </div>
+              <div className="flex gap-4 mb-2">
+                <div>
+                  <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Current</span>
+                  <p className="font-bold text-xl" style={{ color: '#1e2749' }}>{stateRating}</p>
+                </div>
+                <div className="text-xl" style={{ color: '#1e2749' }}>→</div>
+                <div>
+                  <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Projected trajectory</span>
+                  <p className="font-bold text-xl" style={{ color: '#16a34a' }}>{getProjectedRating()}</p>
+                </div>
+              </div>
+              <p className="text-xs italic" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Why it changes: Improved teacher retention + student outcomes = rating growth over 2-3 years.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Section 2: What TDI Actually Does */}
+        <div className="rounded-xl p-5" style={{ backgroundColor: '#1e2749' }}>
+          <h4 className="text-white font-bold text-center mb-4">What TDI Actually Does</h4>
+
+          <div className="space-y-3 mb-4">
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-20">
+                <span className="text-xs font-bold px-2 py-1 rounded" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
+                  IGNITE
+                </span>
+              </div>
+              <p className="text-sm text-white/80">
+                Build buy-in with leadership and a pilot group. See early wins.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-20">
+                <span className="text-xs font-bold px-2 py-1 rounded" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
+                  ACCELERATE
+                </span>
+              </div>
+              <p className="text-sm text-white/80">
+                Scale support to full staff. Strategies get implemented school-wide.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <div className="flex-shrink-0 w-20">
+                <span className="text-xs font-bold px-2 py-1 rounded" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
+                  SUSTAIN
+                </span>
+              </div>
+              <p className="text-sm text-white/80">
+                Embed systems that last beyond any single initiative.
+              </p>
+            </div>
+          </div>
+
+          <p className="text-sm text-white/70 text-center italic mb-4">
+            Based on your inputs, your school would likely start at IGNITE phase.
+          </p>
+        </div>
+
+        {/* Section 3: Dual CTA */}
+        <div className="grid grid-cols-2 gap-3">
+          <a
+            href="/free-pd-plan"
+            className="flex items-center justify-center text-center px-4 py-3 rounded-lg font-bold transition-all hover:opacity-90"
+            style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+          >
+            Get Your Free PD Plan
+          </a>
+          <a
+            href="/how-we-partner"
+            className="flex items-center justify-center text-center px-4 py-3 rounded-lg font-bold transition-all hover:opacity-90 border-2"
+            style={{ borderColor: '#1e2749', color: '#1e2749' }}
+          >
+            See Partnership Model
+          </a>
+        </div>
+
+        {/* Sources */}
+        <p className="text-xs text-center" style={{ color: '#1e2749', opacity: 0.5 }}>
+          Sources: RAND 2025, Learning Policy Institute, Chetty et al., TDI Partner Data
+        </p>
+
+        {/* Back button */}
+        <button
+          onClick={() => setShowResults(false)}
+          className="w-full py-3 rounded-lg font-medium transition-all text-sm"
+          style={{ color: '#1e2749', opacity: 0.7 }}
+        >
+          ← Adjust my inputs
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
+      {/* Explainer */}
+      <p className="text-sm text-center" style={{ color: '#1e2749', opacity: 0.7 }}>
+        Answer 4 quick questions about your school. We'll show you what's possible with TDI based on data from our partner schools.
+      </p>
+
       {/* Input 1: PD Budget */}
       <div>
         <div className="flex justify-between items-center mb-2">
@@ -89,7 +256,10 @@ export function OverallImpactCalculator() {
             background: `linear-gradient(to right, #1e2749 0%, #1e2749 ${(pdBudget - 500) / 4500 * 100}%, #e5e7eb ${(pdBudget - 500) / 4500 * 100}%, #e5e7eb 100%)`
           }}
         />
-        <p className="text-xs mt-1 italic" style={{ color: '#1e2749', opacity: 0.6 }}>{getBudgetFact()}</p>
+        <div className="flex justify-between text-xs mt-1" style={{ color: '#1e2749', opacity: 0.5 }}>
+          <span>$500</span>
+          <span>$5,000</span>
+        </div>
       </div>
 
       {/* Input 2: Staff Morale */}
@@ -111,7 +281,10 @@ export function OverallImpactCalculator() {
             background: `linear-gradient(to right, #d97706 0%, #d97706 ${(morale - 1) / 9 * 100}%, #e5e7eb ${(morale - 1) / 9 * 100}%, #e5e7eb 100%)`
           }}
         />
-        <p className="text-xs mt-1 italic" style={{ color: '#1e2749', opacity: 0.6 }}>{getMoraleFact()}</p>
+        <div className="flex justify-between text-xs mt-1" style={{ color: '#1e2749', opacity: 0.5 }}>
+          <span>1 (Low)</span>
+          <span>10 (High)</span>
+        </div>
       </div>
 
       {/* Input 3: Student Benchmark */}
@@ -133,7 +306,10 @@ export function OverallImpactCalculator() {
             background: `linear-gradient(to right, #0284c7 0%, #0284c7 ${(benchmark - 20) / 70 * 100}%, #e5e7eb ${(benchmark - 20) / 70 * 100}%, #e5e7eb 100%)`
           }}
         />
-        <p className="text-xs mt-1 italic" style={{ color: '#1e2749', opacity: 0.6 }}>{getBenchmarkFact()}</p>
+        <div className="flex justify-between text-xs mt-1" style={{ color: '#1e2749', opacity: 0.5 }}>
+          <span>20%</span>
+          <span>90%</span>
+        </div>
       </div>
 
       {/* Input 4: State Rating */}
@@ -159,53 +335,16 @@ export function OverallImpactCalculator() {
             </button>
           ))}
         </div>
-        <p className="text-xs mt-1 italic" style={{ color: '#1e2749', opacity: 0.6 }}>{getRatingFact()}</p>
       </div>
 
-      {/* Results Panel */}
-      <div className="rounded-xl p-5" style={{ backgroundColor: '#1e2749' }}>
-        <h4 className="text-white font-bold text-center mb-4">With TDI, Your School Could See:</h4>
-
-        <div className="grid grid-cols-2 gap-3 mb-4">
-          <div className="bg-white/10 rounded-lg p-3 text-center">
-            <div className="text-xl font-black text-white">
-              {budgetSavings > 0 ? `-$${budgetSavings.toLocaleString()}` : 'Same'}
-            </div>
-            <div className="text-xs text-white/70">PD cost per teacher</div>
-          </div>
-          <div className="bg-white/10 rounded-lg p-3 text-center">
-            <div className="text-xl font-black text-white">
-              {morale} → {projectedMorale}
-            </div>
-            <div className="text-xs text-white/70">Staff morale</div>
-          </div>
-          <div className="bg-white/10 rounded-lg p-3 text-center">
-            <div className="text-xl font-black text-white">
-              {benchmark}% → {projectedBenchmark}%
-            </div>
-            <div className="text-xs text-white/70">Students at benchmark</div>
-          </div>
-          <div className="bg-white/10 rounded-lg p-3 text-center">
-            <div className="text-xl font-black text-white">
-              Improved
-            </div>
-            <div className="text-xs text-white/70">On track for rating growth</div>
-          </div>
-        </div>
-
-        <a
-          href="/contact"
-          className="block w-full text-center py-3 rounded-lg font-bold transition-all"
-          style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-        >
-          Start the Conversation
-        </a>
-      </div>
-
-      {/* Sources */}
-      <p className="text-xs text-center" style={{ color: '#1e2749', opacity: 0.5 }}>
-        Sources: RAND 2025, Learning Policy Institute, Chetty et al., TDI Partner Data
-      </p>
+      {/* See Results Button */}
+      <button
+        onClick={handleShowResults}
+        className="w-full py-4 rounded-lg font-bold text-lg transition-all hover:opacity-90"
+        style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
+      >
+        See My School's Potential
+      </button>
     </div>
   );
 }

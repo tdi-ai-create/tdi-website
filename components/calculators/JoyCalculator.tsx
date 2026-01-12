@@ -204,6 +204,11 @@ export function JoyCalculator() {
 
   return (
     <div className="space-y-5">
+      {/* Explainer */}
+      <p className="text-sm text-center" style={{ color: '#1e2749', opacity: 0.7 }}>
+        Answer a few quick questions. See your path back to loving teaching.
+      </p>
+
       {/* Dropdown 1: Grade Level */}
       <div>
         <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>

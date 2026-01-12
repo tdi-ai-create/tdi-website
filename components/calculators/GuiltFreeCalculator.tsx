@@ -240,6 +240,11 @@ export function GuiltFreeCalculator() {
 
   return (
     <div className="space-y-5">
+      {/* Explainer */}
+      <p className="text-sm text-center" style={{ color: '#1e2749', opacity: 0.7 }}>
+        Answer a few questions about your work habits. See how much time you could reclaim.
+      </p>
+
       {/* Dropdown 1: Grade Level */}
       <div>
         <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>

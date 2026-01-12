@@ -211,6 +211,11 @@ export function BurnoutCalculator() {
 
   return (
     <div className="space-y-5">
+      {/* Explainer */}
+      <p className="text-sm text-center" style={{ color: '#1e2749', opacity: 0.7 }}>
+        Answer a few quick questions. See your stress reduction journey over the next 12 months.
+      </p>
+
       {/* Dropdown 1: Grade Level */}
       <div>
         <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
@@ -272,7 +277,7 @@ export function BurnoutCalculator() {
           onChange={(e) => setStress(parseInt(e.target.value))}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #ef4444 0%, #ef4444 ${(stress - 1) / 9 * 100}%, #e5e7eb ${(stress - 1) / 9 * 100}%, #e5e7eb 100%)`
+            background: `linear-gradient(to right, ${getStressColor(stress)} 0%, ${getStressColor(stress)} ${(stress - 1) / 9 * 100}%, #e5e7eb ${(stress - 1) / 9 * 100}%, #e5e7eb 100%)`
           }}
         />
         <div className="flex justify-between items-start mt-2">

@@ -111,6 +111,10 @@ export function TDICalculator() {
 
         {/* Input Sliders */}
         <div className="px-6 py-6 space-y-6">
+          {/* Explainer */}
+          <p className="text-sm text-center" style={{ color: '#1e2749', opacity: 0.7 }}>
+            Enter your current PD spending. See how TDI compares to traditional professional development.
+          </p>
 
           {/* Budget Slider */}
           <div className="space-y-2">
@@ -233,13 +237,22 @@ export function TDICalculator() {
               </div>
             </div>
 
-            <Link 
-              href="/contact" 
-              className="block w-full text-center py-3 rounded-lg font-bold transition-all"
-              style={{ backgroundColor: 'var(--tdi-yellow)', color: 'var(--tdi-charcoal)' }}
-            >
-              Start the Conversation
-            </Link>
+            <div className="grid grid-cols-2 gap-3">
+              <Link
+                href="/free-pd-plan"
+                className="flex items-center justify-center text-center py-3 rounded-lg font-bold transition-all"
+                style={{ backgroundColor: 'var(--tdi-yellow)', color: 'var(--tdi-charcoal)' }}
+              >
+                Get Your Free PD Plan
+              </Link>
+              <Link
+                href="/how-we-partner"
+                className="flex items-center justify-center text-center py-3 rounded-lg font-bold transition-all border-2 border-white/30"
+                style={{ color: 'white' }}
+              >
+                See Partnership Model
+              </Link>
+            </div>
           </div>
         </div>
 

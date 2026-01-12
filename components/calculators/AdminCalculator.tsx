@@ -23,6 +23,11 @@ export function AdminCalculator() {
 
   return (
     <div className="space-y-6">
+      {/* Explainer */}
+      <p className="text-sm text-center" style={{ color: '#1e2749', opacity: 0.7 }}>
+        Tell us about your students. See the academic impact TDI could have on your school.
+      </p>
+
       {/* Input: Student Benchmark */}
       <div>
         <label className="block text-sm font-semibold mb-3" style={{ color: '#1e2749' }}>
