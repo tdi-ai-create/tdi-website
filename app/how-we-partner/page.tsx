@@ -421,13 +421,15 @@ function LearningHubPanel() {
         </div>
       </div>
 
-      <Link
-        href="/for-teachers"
+      <a
+        href="https://tdi.thinkific.com"
+        target="_blank"
+        rel="noopener noreferrer"
         className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:scale-[1.02] hover:shadow-lg"
         style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
       >
         Explore Learning Hub resources
-      </Link>
+      </a>
     </div>
   );
 }
