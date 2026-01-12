@@ -26,10 +26,9 @@ export function GuiltFreeCalculator() {
 
   // Calculate outputs
   const guiltScore = Math.round((workHours / 20 * 50) + (guiltLevel / 4 * 50));
-  const projectedScore = Math.max(15, Math.round(guiltScore * 0.4));
-  const hoursReclaimed = Math.round(workHours * 0.5);
-  const eveningsFreed = Math.round(hoursReclaimed / 2);
-  const weekendHoursFreed = Math.round(workHours * 0.6 * 4);
+  const month3Score = Math.max(20, Math.round(guiltScore * 0.7));
+  const month6Score = Math.max(15, Math.round(guiltScore * 0.4));
+  const month12Score = Math.max(10, Math.round(guiltScore * 0.25));
 
   const getScoreColor = (score: number) => {
     if (score >= 70) return '#ef4444';
@@ -100,87 +99,132 @@ export function GuiltFreeCalculator() {
 
   if (showResults) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Results Header */}
-        <div className="text-center">
-          <p className="text-lg font-bold" style={{ color: '#1e2749' }}>
-            Your current guilt score: {guiltScore}/100
-          </p>
-        </div>
-
-        {/* Output */}
-        <div className="rounded-xl p-6" style={{ backgroundColor: '#f5f3ff' }}>
-          <h4 className="font-bold text-lg mb-4" style={{ color: '#1e2749' }}>
+        <div className="text-center mb-2">
+          <h4 className="font-bold text-lg" style={{ color: '#1e2749' }}>
             Your Guilt-Free Journey:
           </h4>
+        </div>
 
-          {/* Score Display */}
-          <div className="flex justify-center gap-8 mb-6">
-            <div className="text-center">
-              <p className="text-xs mb-1" style={{ color: '#1e2749', opacity: 0.6 }}>Now</p>
+        {/* Phase Cards */}
+        <div className="space-y-3">
+          {/* NOW */}
+          <div className="rounded-xl p-4" style={{ backgroundColor: '#f5f3ff' }}>
+            <div className="flex items-center gap-3 mb-2">
               <div
-                className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold text-white"
+                className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold text-white flex-shrink-0"
                 style={{ backgroundColor: getScoreColor(guiltScore) }}
               >
                 {guiltScore}
               </div>
-            </div>
-            <div className="flex items-center text-2xl" style={{ color: '#1e2749' }}>→</div>
-            <div className="text-center">
-              <p className="text-xs mb-1" style={{ color: '#1e2749', opacity: 0.6 }}>6 Months</p>
-              <div
-                className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold text-white"
-                style={{ backgroundColor: getScoreColor(projectedScore) }}
-              >
-                {projectedScore}
+              <div>
+                <p className="font-bold" style={{ color: '#1e2749' }}>Now: {guiltScore}/100</p>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Your starting point.</p>
               </div>
             </div>
           </div>
 
-          {/* What You'll Reclaim */}
-          <div className="grid grid-cols-3 gap-3 text-center">
-            <div className="p-3 rounded-lg" style={{ backgroundColor: '#ffffff' }}>
-              <p className="text-2xl font-bold" style={{ color: '#8b5cf6' }}>{hoursReclaimed}</p>
-              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>hrs/week back</p>
+          {/* 3 MONTHS */}
+          <div className="rounded-xl p-4" style={{ backgroundColor: '#f5f3ff' }}>
+            <div className="flex items-center gap-3 mb-3">
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold text-white flex-shrink-0"
+                style={{ backgroundColor: getScoreColor(month3Score) }}
+              >
+                {month3Score}
+              </div>
+              <div>
+                <p className="font-bold" style={{ color: '#1e2749' }}>3 Months: {month3Score}/100</p>
+              </div>
             </div>
-            <div className="p-3 rounded-lg" style={{ backgroundColor: '#ffffff' }}>
-              <p className="text-2xl font-bold" style={{ color: '#8b5cf6' }}>{eveningsFreed}</p>
-              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>evenings freed</p>
-            </div>
-            <div className="p-3 rounded-lg" style={{ backgroundColor: '#ffffff' }}>
-              <p className="text-2xl font-bold" style={{ color: '#8b5cf6' }}>{weekendHoursFreed}</p>
-              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>weekend hrs/mo</p>
-            </div>
+            <p className="text-sm italic mb-2" style={{ color: '#1e2749', opacity: 0.7 }}>
+              What's happening: You're learning that rest is not a reward. It's a requirement.
+            </p>
+            <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>
+              Your action: Set a hard stop time today. When it hits, you're done. Period.
+            </p>
           </div>
 
-          {/* Testimonial */}
-          <p className="text-sm italic mt-4 p-3 rounded-lg" style={{ backgroundColor: '#ffffff', color: '#1e2749', opacity: 0.8 }}>
-            "I finally leave school at school. My evenings are mine again."
-            <span className="block text-xs mt-1 not-italic" style={{ opacity: 0.6 }}>— Marcus T., High School Teacher</span>
-          </p>
-
-          {/* CTAs */}
-          <div className="grid grid-cols-2 gap-3 mt-4">
+          {/* 6 MONTHS */}
+          <div className="rounded-xl p-4" style={{ backgroundColor: '#f5f3ff' }}>
+            <div className="flex items-center gap-3 mb-3">
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold text-white flex-shrink-0"
+                style={{ backgroundColor: getScoreColor(month6Score) }}
+              >
+                {month6Score}
+              </div>
+              <div>
+                <p className="font-bold" style={{ color: '#1e2749' }}>6 Months: {month6Score}/100</p>
+              </div>
+            </div>
+            <p className="text-sm italic mb-2" style={{ color: '#1e2749', opacity: 0.7 }}>
+              What's happening: Boundaries are becoming habits. Weekends feel different.
+            </p>
+            <p className="text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+              Your action: Listen to one episode of our podcast this week. Real talk from teachers who get it.
+            </p>
             <a
-              href="https://tdi.thinkific.com"
+              href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center text-center px-4 py-3 rounded-lg font-bold transition-all hover:opacity-90"
-              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+              className="text-sm font-semibold underline hover:opacity-80 transition-opacity"
+              style={{ color: '#8b5cf6' }}
             >
-              Explore Learning Hub
+              Listen Now →
             </a>
+          </div>
+
+          {/* 12 MONTHS */}
+          <div className="rounded-xl p-4" style={{ backgroundColor: '#f5f3ff' }}>
+            <div className="flex items-center gap-3 mb-3">
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold text-white flex-shrink-0"
+                style={{ backgroundColor: getScoreColor(month12Score) }}
+              >
+                {month12Score}
+              </div>
+              <div>
+                <p className="font-bold" style={{ color: '#1e2749' }}>12 Months: {month12Score}/100</p>
+              </div>
+            </div>
+            <p className="text-sm italic mb-2" style={{ color: '#1e2749', opacity: 0.7 }}>
+              What's happening: Guilt is quieter. You've built systems that protect your time.
+            </p>
+            <p className="text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+              Your action: The Learning Hub course Teachers Deserve Their Time Back locks this in for good.
+            </p>
             <a
-              href="https://raehughart.substack.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center text-center px-4 py-3 rounded-lg font-bold transition-all hover:opacity-90 border-2"
-              style={{ borderColor: '#1e2749', color: '#1e2749' }}
+              href="/join"
+              className="text-sm font-semibold underline hover:opacity-80 transition-opacity"
+              style={{ color: '#8b5cf6' }}
             >
-              Free Weekly Tips
+              Explore Learning Hub →
             </a>
           </div>
         </div>
+
+        {/* What You're Not Ready For Yet */}
+        <div className="rounded-xl p-4 mt-4" style={{ backgroundColor: '#f3f4f6', border: '1px dashed #d1d5db' }}>
+          <p className="text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+            What You're Not Ready For Yet:
+          </p>
+          <ul className="text-sm space-y-1" style={{ color: '#1e2749', opacity: 0.8 }}>
+            <li>• Perfect balance (aim for "better" not "perfect")</li>
+            <li>• Overhauling everything (one change at a time)</li>
+            <li>• Zero guilt (that takes practice)</li>
+          </ul>
+        </div>
+
+        {/* Bottom CTA */}
+        <a
+          href="/free-pd-plan"
+          className="block w-full py-4 rounded-lg font-bold text-lg text-center transition-all hover:opacity-90 mt-4"
+          style={{ backgroundColor: '#8b5cf6', color: '#ffffff' }}
+        >
+          Get Your Free PD Plan
+        </a>
 
         {/* Back button */}
         <button

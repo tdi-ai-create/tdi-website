@@ -90,99 +90,112 @@ export function BurnoutCalculator() {
 
   if (showResults) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-4">
         {/* Results Header */}
-        <div className="text-center">
-          <span className="text-4xl mb-2 block">{getStressEmoji(stress)}</span>
-          <p className="text-lg font-bold" style={{ color: '#1e2749' }}>
-            Your current stress: {stress}/10
-          </p>
-        </div>
-
-        {/* Output: Stress Journey */}
-        <div className="rounded-xl p-6" style={{ backgroundColor: '#fef2f2' }}>
-          <h4 className="font-bold text-lg mb-4" style={{ color: '#1e2749' }}>
-            Your Stress Recovery Journey:
+        <div className="text-center mb-2">
+          <h4 className="font-bold text-lg" style={{ color: '#1e2749' }}>
+            Your Stress Reduction Journey:
           </h4>
+        </div>
 
-          <div className="space-y-3">
-            {/* Now */}
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium w-20" style={{ color: '#1e2749' }}>Now</span>
-              <div className="flex-1 h-6 rounded-full overflow-hidden" style={{ backgroundColor: '#e5e7eb' }}>
-                <div
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${stress * 10}%`, backgroundColor: getStressColor(stress) }}
-                />
+        {/* Phase Cards */}
+        <div className="space-y-3">
+          {/* NOW */}
+          <div className="rounded-xl p-4" style={{ backgroundColor: '#fef2f2' }}>
+            <div className="flex items-center gap-3 mb-2">
+              <span className="text-2xl">{getStressEmoji(stress)}</span>
+              <div>
+                <p className="font-bold" style={{ color: '#1e2749' }}>Now: {stress}/10</p>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Your starting point.</p>
               </div>
-              <span className="text-xl w-10">{getStressEmoji(stress)}</span>
-            </div>
-
-            {/* 3 Months */}
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium w-20" style={{ color: '#1e2749' }}>3 months</span>
-              <div className="flex-1 h-6 rounded-full overflow-hidden" style={{ backgroundColor: '#e5e7eb' }}>
-                <div
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${month3 * 10}%`, backgroundColor: getStressColor(month3) }}
-                />
-              </div>
-              <span className="text-xl w-10">{getStressEmoji(month3)}</span>
-            </div>
-
-            {/* 6 Months */}
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium w-20" style={{ color: '#1e2749' }}>6 months</span>
-              <div className="flex-1 h-6 rounded-full overflow-hidden" style={{ backgroundColor: '#e5e7eb' }}>
-                <div
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${month6 * 10}%`, backgroundColor: getStressColor(month6) }}
-                />
-              </div>
-              <span className="text-xl w-10">{getStressEmoji(month6)}</span>
-            </div>
-
-            {/* 12 Months */}
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium w-20" style={{ color: '#1e2749' }}>12 months</span>
-              <div className="flex-1 h-6 rounded-full overflow-hidden" style={{ backgroundColor: '#e5e7eb' }}>
-                <div
-                  className="h-full rounded-full transition-all duration-300"
-                  style={{ width: `${month12 * 10}%`, backgroundColor: getStressColor(month12) }}
-                />
-              </div>
-              <span className="text-xl w-10">{getStressEmoji(month12)}</span>
             </div>
           </div>
 
-          {/* Testimonial */}
-          <p className="text-sm italic mt-4 p-3 rounded-lg" style={{ backgroundColor: '#ffffff', color: '#1e2749', opacity: 0.8 }}>
-            "I went from crying in my car to actually looking forward to Mondays."
-            <span className="block text-xs mt-1 not-italic" style={{ opacity: 0.6 }}>— Amanda R., Middle School Teacher</span>
-          </p>
+          {/* 3 MONTHS */}
+          <div className="rounded-xl p-4" style={{ backgroundColor: '#fef2f2' }}>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-2xl">{getStressEmoji(month3)}</span>
+              <div>
+                <p className="font-bold" style={{ color: '#1e2749' }}>3 Months: {month3}/10</p>
+              </div>
+            </div>
+            <p className="text-sm italic mb-2" style={{ color: '#1e2749', opacity: 0.7 }}>
+              What's happening: We take things OFF your plate first. Less is more.
+            </p>
+            <p className="text-sm font-semibold" style={{ color: '#1e2749' }}>
+              Your action: Identify your biggest time thief this week. Say no to ONE thing.
+            </p>
+          </div>
 
-          {/* CTAs */}
-          <div className="grid grid-cols-2 gap-3 mt-4">
+          {/* 6 MONTHS */}
+          <div className="rounded-xl p-4" style={{ backgroundColor: '#fef2f2' }}>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-2xl">{getStressEmoji(month6)}</span>
+              <div>
+                <p className="font-bold" style={{ color: '#1e2749' }}>6 Months: {month6}/10</p>
+              </div>
+            </div>
+            <p className="text-sm italic mb-2" style={{ color: '#1e2749', opacity: 0.7 }}>
+              What's happening: With breathing room, you start building systems that work FOR you.
+            </p>
+            <p className="text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+              Your action: Join our free Facebook community. You're not alone in this.
+            </p>
             <a
-              href="https://tdi.thinkific.com"
+              href="https://facebook.com/groups/tdimovement"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center text-center px-4 py-3 rounded-lg font-bold transition-all hover:opacity-90"
-              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+              className="text-sm font-semibold underline hover:opacity-80 transition-opacity"
+              style={{ color: '#ef4444' }}
             >
-              Explore Learning Hub
+              Join the Community →
             </a>
+          </div>
+
+          {/* 12 MONTHS */}
+          <div className="rounded-xl p-4" style={{ backgroundColor: '#fef2f2' }}>
+            <div className="flex items-center gap-3 mb-3">
+              <span className="text-2xl">{getStressEmoji(month12)}</span>
+              <div>
+                <p className="font-bold" style={{ color: '#1e2749' }}>12 Months: {month12}/10</p>
+              </div>
+            </div>
+            <p className="text-sm italic mb-2" style={{ color: '#1e2749', opacity: 0.7 }}>
+              What's happening: Stress is manageable. Not gone, but not in control.
+            </p>
+            <p className="text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+              Your action: The Learning Hub has courses like Calm Classrooms, Not Chaos built for exactly where you are.
+            </p>
             <a
-              href="https://raehughart.substack.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center text-center px-4 py-3 rounded-lg font-bold transition-all hover:opacity-90 border-2"
-              style={{ borderColor: '#1e2749', color: '#1e2749' }}
+              href="/join"
+              className="text-sm font-semibold underline hover:opacity-80 transition-opacity"
+              style={{ color: '#ef4444' }}
             >
-              Free Weekly Tips
+              Explore Learning Hub →
             </a>
           </div>
         </div>
+
+        {/* What You're Not Ready For Yet */}
+        <div className="rounded-xl p-4 mt-4" style={{ backgroundColor: '#f3f4f6', border: '1px dashed #d1d5db' }}>
+          <p className="text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+            What You're Not Ready For Yet:
+          </p>
+          <ul className="text-sm space-y-1" style={{ color: '#1e2749', opacity: 0.8 }}>
+            <li>• New curriculum or strategies (rest first)</li>
+            <li>• Extra duties or committees (protect your capacity)</li>
+            <li>• Pushing through alone (that's how teachers leave)</li>
+          </ul>
+        </div>
+
+        {/* Bottom CTA */}
+        <a
+          href="/free-pd-plan"
+          className="block w-full py-4 rounded-lg font-bold text-lg text-center transition-all hover:opacity-90 mt-4"
+          style={{ backgroundColor: '#ef4444', color: '#ffffff' }}
+        >
+          Get Your Free PD Plan
+        </a>
 
         {/* Back button */}
         <button
