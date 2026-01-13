@@ -167,6 +167,8 @@ export default function StPeterChanelDashboard() {
               <span className="bg-white/20 px-3 py-1 rounded">Strong Teaching</span>
               <span className="text-2xl">→</span>
               <span className="bg-white/20 px-3 py-1 rounded">Student Success</span>
+              <span className="text-2xl">→</span>
+              <span className="bg-white/20 px-3 py-1 rounded">Statewide Results</span>
             </div>
           </div>
           <p className="text-center text-white/80 mt-3 text-sm">
