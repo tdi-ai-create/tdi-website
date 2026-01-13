@@ -216,7 +216,10 @@ export default function StPeterChanelDashboard() {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
+                  onClick={() => {
+                    setActiveTab(tab.id);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
                   className={`flex items-center gap-2 px-5 py-3 rounded-lg font-semibold transition-all ${
                     isActive
                       ? 'bg-[#38618C] text-white shadow-md'
