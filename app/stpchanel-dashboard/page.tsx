@@ -383,12 +383,14 @@ export default function StPeterChanelDashboard() {
             <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
 
               {/* Goal Header */}
-              <div className="flex items-center gap-2 mb-1">
-                <Target className="w-5 h-5 text-[#38618C]" />
-                <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Our Shared Goal</span>
+              <div className="mb-6">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Target className="w-5 h-5 text-[#38618C]" />
+                  <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Our Shared Goal:</span>
+                  <span className="font-semibold text-[#1e2749]">Student performance aligned with state benchmarks</span>
+                </div>
+                <p className="text-sm text-gray-500 mt-1 ml-7">Established Spring 2025 · Tracked via observations, Hub data, and staff surveys</p>
               </div>
-              <h3 className="text-2xl font-bold text-[#1e2749] mb-1">Student performance aligned with state benchmarks</h3>
-              <p className="text-sm text-gray-500 mb-6">Established Spring 2025 · Tracked via observations, Hub data, and staff surveys</p>
 
               {/* Divider */}
               <div className="border-t border-gray-200 mb-6"></div>
