@@ -944,6 +944,14 @@ export default function StPeterChanelDashboard() {
                       </div>
                     </div>
                   </div>
+                  <div className="mt-4 pt-3 border-t border-gray-100">
+                    <div className="flex items-start gap-2">
+                      <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-gray-600">
+                        <span className="font-semibold text-[#1e2749]">Recommendation:</span> Schedule both virtual sessions to give each group targeted strategies
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Chart 2: Hub Engagement Status */}
@@ -988,6 +996,14 @@ export default function StPeterChanelDashboard() {
                     </div>
                   </div>
                   <p className="text-xs text-gray-400 mt-3">⭐ Sandi Waguespack: Top engager</p>
+                  <div className="mt-4 pt-3 border-t border-gray-100">
+                    <div className="flex items-start gap-2">
+                      <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-gray-600">
+                        <span className="font-semibold text-[#1e2749]">Recommendation:</span> Add 15 min Hub time to next PLC + share a "Resource of the Week"
+                      </p>
+                    </div>
+                  </div>
                 </div>
 
                 {/* Chart 3: Strengths Observed */}
@@ -1029,6 +1045,14 @@ export default function StPeterChanelDashboard() {
                       <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                         <div className="h-full bg-[#38618C] rounded-full" style={{ width: '40%' }}></div>
                       </div>
+                    </div>
+                  </div>
+                  <div className="mt-4 pt-3 border-t border-gray-100">
+                    <div className="flex items-start gap-2">
+                      <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
+                      <p className="text-xs text-gray-600">
+                        <span className="font-semibold text-[#1e2749]">Recommendation:</span> Celebrate these wins at your next staff meeting — teachers need to hear what's working
+                      </p>
                     </div>
                   </div>
                 </div>
