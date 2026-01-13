@@ -15,9 +15,9 @@ export function OverallImpactCalculator() {
   // Calculate per-teacher spend from budget and teacher count
   const pdBudgetPerTeacher = Math.round(annualBudget / teacherCount);
 
-  // Calculate projected improvements
-  const tdiCostPerTeacher = 672;
-  const budgetSavings = pdBudgetPerTeacher > tdiCostPerTeacher ? pdBudgetPerTeacher - tdiCostPerTeacher : 0;
+  // Calculate effective value based on implementation rates
+  const traditionalEffective = Math.round(pdBudgetPerTeacher * 0.10);
+  const tdiEffective = Math.round(pdBudgetPerTeacher * 0.65);
 
   // Morale improvement: +1 to +3 based on starting point (lower starting = more room to grow)
   const moraleImprovement = morale <= 4 ? 3 : morale <= 6 ? 2 : 1;
@@ -58,28 +58,51 @@ export function OverallImpactCalculator() {
           <div className="space-y-4">
             {/* Metric 1: PD Investment */}
             <div className="rounded-xl p-4" style={{ backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0' }}>
-              <div className="flex justify-between items-start mb-2">
-                <span className="text-sm font-semibold" style={{ color: '#1e2749' }}>PD Investment</span>
-                <span className="text-sm font-bold" style={{ color: '#16a34a' }}>
-                  You save: ${budgetSavings.toLocaleString()}/teacher
-                </span>
-              </div>
-              <p className="text-sm mb-3 p-2 rounded-lg" style={{ backgroundColor: '#e0f2fe', color: '#1e2749' }}>
+              <h5 className="text-center font-bold mb-3" style={{ color: '#1e2749' }}>
+                Same Investment. 6x the Impact.
+              </h5>
+
+              <p className="text-sm mb-4 p-2 rounded-lg text-center" style={{ backgroundColor: '#e0f2fe', color: '#1e2749' }}>
                 That's approximately <strong>${pdBudgetPerTeacher.toLocaleString()}</strong> per teacher based on your ${annualBudget.toLocaleString()} budget and {teacherCount} teachers.
               </p>
-              <div className="flex gap-4 mb-2">
-                <div>
-                  <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Current</span>
-                  <p className="font-bold" style={{ color: '#1e2749' }}>${pdBudgetPerTeacher.toLocaleString()}/teacher</p>
+
+              {/* Comparison boxes - side by side on desktop, stacked on mobile */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                {/* Traditional PD Box */}
+                <div className="rounded-lg p-3" style={{ backgroundColor: '#f3f4f6', border: '1px solid #e5e7eb' }}>
+                  <p className="text-xs font-bold mb-2 text-center" style={{ color: '#6b7280' }}>Traditional PD</p>
+                  <p className="text-sm text-center mb-1" style={{ color: '#1e2749' }}>
+                    Your ${pdBudgetPerTeacher.toLocaleString()}/teacher budget
+                  </p>
+                  <p className="text-sm text-center mb-2" style={{ color: '#6b7280' }}>
+                    Only 10% gets implemented
+                  </p>
+                  <p className="text-center font-bold" style={{ color: '#1e2749' }}>
+                    ${traditionalEffective.toLocaleString()} actually reaches classrooms
+                  </p>
                 </div>
-                <div className="text-xl" style={{ color: '#1e2749' }}>→</div>
-                <div>
-                  <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>With TDI</span>
-                  <p className="font-bold" style={{ color: '#16a34a' }}>${tdiCostPerTeacher}/teacher</p>
+
+                {/* TDI Box */}
+                <div className="rounded-lg p-3" style={{ backgroundColor: '#dcfce7', border: '2px solid #22c55e' }}>
+                  <p className="text-xs font-bold mb-2 text-center" style={{ color: '#16a34a' }}>With TDI</p>
+                  <p className="text-sm text-center mb-1" style={{ color: '#1e2749' }}>
+                    Same ${pdBudgetPerTeacher.toLocaleString()}/teacher budget
+                  </p>
+                  <p className="text-sm text-center mb-2" style={{ color: '#16a34a' }}>
+                    65% gets implemented
+                  </p>
+                  <p className="text-center font-bold" style={{ color: '#16a34a', fontSize: '16px' }}>
+                    ${tdiEffective.toLocaleString()} actually reaches classrooms
+                  </p>
                 </div>
               </div>
+
+              <p className="text-sm font-semibold text-center mb-3" style={{ color: '#1e2749' }}>
+                That's 6.5x more value from the same budget.
+              </p>
+
               <p className="text-xs italic" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Why it changes: TDI's phased model means you stop paying for PD that gets ignored. Our partners see 65% implementation vs. the 10% industry average.
+                Why it changes: TDI's phased model ensures strategies actually get implemented. Our partners see 65% implementation vs. the 10% industry average.
               </p>
             </div>
 
