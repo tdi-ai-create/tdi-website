@@ -903,8 +903,7 @@ export default function StPeterChanelDashboard() {
 
             {/* SECTION B: Implementation Insights */}
             <div className="mb-8">
-              <h3 className="text-xl font-bold text-[#1e2749] mb-4">Implementation Insights</h3>
-              <p className="text-gray-600 text-sm mb-6">Data from September 30 observation visit</p>
+              <h3 className="text-xl font-bold text-[#1e2749] mb-6">Insights</h3>
 
               <div className="grid md:grid-cols-3 gap-6">
 
