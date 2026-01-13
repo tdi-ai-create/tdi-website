@@ -626,7 +626,7 @@ export default function StPeterChanelDashboard() {
             </div>
 
             {/* Phase Tabs - Button Style */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
               {phases.map((phase) => {
                 const isActive = activePhase === phase.id;
                 const styles = getPhaseStyles(phase);
@@ -634,7 +634,7 @@ export default function StPeterChanelDashboard() {
                   <button
                     key={phase.id}
                     onClick={() => setActivePhase(phase.id)}
-                    className={`px-4 py-3 rounded-lg font-semibold transition-all flex items-center gap-2 ${
+                    className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-1 whitespace-nowrap ${
                       isActive
                         ? 'bg-[#1e2749] text-white shadow-md'
                         : phase.isLocked
