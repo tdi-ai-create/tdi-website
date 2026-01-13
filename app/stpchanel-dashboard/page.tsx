@@ -263,8 +263,8 @@ export default function StPeterChanelDashboard() {
                   <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
                   <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
                 </div>
-                <div className="text-2xl font-bold text-[#E07A5F]">2</div>
-                <div className="text-xs text-[#E07A5F] font-medium">Sessions pending</div>
+                <div className="text-2xl font-bold text-[#E07A5F]">3</div>
+                <div className="text-xs text-[#E07A5F] font-medium">Items pending</div>
               </div>
 
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
@@ -310,11 +310,30 @@ export default function StPeterChanelDashboard() {
                       <div className="text-sm text-gray-500">Included in contract</div>
                     </div>
                   </div>
-                  <a 
+                  <a
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Schedule
+                  </a>
+                </div>
+                {/* Spring Leadership Recap */}
+                <div className="bg-white rounded-lg p-4 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Users className="w-5 h-5 text-[#E07A5F]" />
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Spring Leadership Recap</div>
+                      <div className="text-sm text-gray-500">Review progress + set goals for next year · Complimentary</div>
+                    </div>
+                  </div>
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
                   >
                     <Calendar className="w-4 h-4" />
                     Schedule
