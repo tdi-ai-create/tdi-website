@@ -4,16 +4,20 @@ import { useState } from 'react';
 
 export function OverallImpactCalculator() {
   const [showResults, setShowResults] = useState(false);
-  const [pdBudget, setPdBudget] = useState(2000);
+  const [annualBudget, setAnnualBudget] = useState(50000);
+  const [teacherCount, setTeacherCount] = useState(50);
   const [morale, setMorale] = useState(5);
   const [benchmark, setBenchmark] = useState(50);
   const [stateRating, setStateRating] = useState('C');
 
   const ratings = ['F', 'D', 'C', 'B', 'A'];
 
+  // Calculate per-teacher spend from budget and teacher count
+  const pdBudgetPerTeacher = Math.round(annualBudget / teacherCount);
+
   // Calculate projected improvements
   const tdiCostPerTeacher = 672;
-  const budgetSavings = pdBudget > tdiCostPerTeacher ? pdBudget - tdiCostPerTeacher : 0;
+  const budgetSavings = pdBudgetPerTeacher > tdiCostPerTeacher ? pdBudgetPerTeacher - tdiCostPerTeacher : 0;
 
   // Morale improvement: +1 to +3 based on starting point (lower starting = more room to grow)
   const moraleImprovement = morale <= 4 ? 3 : morale <= 6 ? 2 : 1;
@@ -60,10 +64,13 @@ export function OverallImpactCalculator() {
                   You save: ${budgetSavings.toLocaleString()}/teacher
                 </span>
               </div>
+              <p className="text-sm mb-3 p-2 rounded-lg" style={{ backgroundColor: '#e0f2fe', color: '#1e2749' }}>
+                That's approximately <strong>${pdBudgetPerTeacher.toLocaleString()}</strong> per teacher based on your ${annualBudget.toLocaleString()} budget and {teacherCount} teachers.
+              </p>
               <div className="flex gap-4 mb-2">
                 <div>
                   <span className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Current</span>
-                  <p className="font-bold" style={{ color: '#1e2749' }}>${pdBudget.toLocaleString()}/teacher</p>
+                  <p className="font-bold" style={{ color: '#1e2749' }}>${pdBudgetPerTeacher.toLocaleString()}/teacher</p>
                 </div>
                 <div className="text-xl" style={{ color: '#1e2749' }}>→</div>
                 <div>
@@ -234,36 +241,62 @@ export function OverallImpactCalculator() {
     <div className="space-y-6">
       {/* Explainer */}
       <p className="text-sm text-center" style={{ color: '#1e2749', opacity: 0.7 }}>
-        Answer 4 quick questions about your school. We'll show you what's possible with TDI based on data from our partner schools.
+        Answer 5 quick questions about your school. We'll show you what's possible with TDI based on data from our partner schools.
       </p>
 
-      {/* Input 1: PD Budget */}
+      {/* Input 1: Annual PD Budget */}
       <div>
         <div className="flex justify-between items-center mb-2">
           <label className="text-sm font-semibold" style={{ color: '#1e2749' }}>
-            Current PD spend per teacher
+            What's your approximate annual PD budget?
           </label>
-          <span className="text-lg font-bold" style={{ color: '#1e2749' }}>${pdBudget.toLocaleString()}</span>
+          <span className="text-lg font-bold" style={{ color: '#1e2749' }}>${annualBudget.toLocaleString()}</span>
         </div>
         <input
           type="range"
-          min="500"
-          max="5000"
-          step="100"
-          value={pdBudget}
-          onChange={(e) => { setPdBudget(parseInt(e.target.value)); handleChange(); }}
+          min="10000"
+          max="200000"
+          step="5000"
+          value={annualBudget}
+          onChange={(e) => { setAnnualBudget(parseInt(e.target.value)); handleChange(); }}
           className="w-full h-2 rounded-full appearance-none cursor-pointer"
           style={{
-            background: `linear-gradient(to right, #1e2749 0%, #1e2749 ${(pdBudget - 500) / 4500 * 100}%, #e5e7eb ${(pdBudget - 500) / 4500 * 100}%, #e5e7eb 100%)`
+            background: `linear-gradient(to right, #1e2749 0%, #1e2749 ${(annualBudget - 10000) / 190000 * 100}%, #e5e7eb ${(annualBudget - 10000) / 190000 * 100}%, #e5e7eb 100%)`
           }}
         />
         <div className="flex justify-between text-xs mt-1" style={{ color: '#1e2749', opacity: 0.5 }}>
-          <span>$500</span>
-          <span>$5,000</span>
+          <span>$10,000</span>
+          <span>$200,000</span>
         </div>
       </div>
 
-      {/* Input 2: Staff Morale */}
+      {/* Input 2: Teacher Count */}
+      <div>
+        <div className="flex justify-between items-center mb-2">
+          <label className="text-sm font-semibold" style={{ color: '#1e2749' }}>
+            How many teachers in your building?
+          </label>
+          <span className="text-lg font-bold" style={{ color: '#1e2749' }}>{teacherCount}</span>
+        </div>
+        <input
+          type="range"
+          min="10"
+          max="200"
+          step="5"
+          value={teacherCount}
+          onChange={(e) => { setTeacherCount(parseInt(e.target.value)); handleChange(); }}
+          className="w-full h-2 rounded-full appearance-none cursor-pointer"
+          style={{
+            background: `linear-gradient(to right, #1e2749 0%, #1e2749 ${(teacherCount - 10) / 190 * 100}%, #e5e7eb ${(teacherCount - 10) / 190 * 100}%, #e5e7eb 100%)`
+          }}
+        />
+        <div className="flex justify-between text-xs mt-1" style={{ color: '#1e2749', opacity: 0.5 }}>
+          <span>10</span>
+          <span>200</span>
+        </div>
+      </div>
+
+      {/* Input 3: Staff Morale */}
       <div>
         <div className="flex justify-between items-center mb-2">
           <label className="text-sm font-semibold" style={{ color: '#1e2749' }}>
