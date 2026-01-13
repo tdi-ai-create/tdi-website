@@ -745,7 +745,7 @@ export default function StPeterChanelDashboard() {
                 {/* Rae's Photo */}
                 <div className="w-32 h-32 rounded-xl overflow-hidden bg-[#F5F5F5] flex-shrink-0">
                   <Image
-                    src="/images/rae-headshot.webp"
+                    src="/images/rae-headshot.png"
                     alt="Rae Hughart"
                     width={128}
                     height={128}
