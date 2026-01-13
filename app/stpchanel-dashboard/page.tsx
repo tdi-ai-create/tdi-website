@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { 
   Calendar, 
   CheckCircle, 
@@ -18,11 +19,25 @@ import {
   Unlock,
   Eye,
   MessageCircle,
-  Award
+  Award,
+  Phone,
+  Mail,
+  MapPin,
+  Building,
+  User
 } from 'lucide-react';
 
 export default function StPeterChanelDashboard() {
+  const [activeTab, setActiveTab] = useState('overview');
   const [activePhase, setActivePhase] = useState(2);
+
+  const tabs = [
+    { id: 'overview', label: 'Overview', icon: Eye },
+    { id: 'journey', label: 'Our Journey', icon: TrendingUp },
+    { id: 'groups', label: 'Growth Groups', icon: Users },
+    { id: 'year2', label: 'Year 2 Opportunity', icon: Star },
+    { id: 'team', label: 'Your TDI Team', icon: User },
+  ];
 
   const phases = [
     {
@@ -51,7 +66,7 @@ export default function StPeterChanelDashboard() {
     {
       id: 2,
       name: 'Activation',
-      status: 'In Progress',
+      status: 'Current Phase',
       statusColor: '#80a4ed',
       description: 'Getting teachers actively engaged with resources and support',
       includes: [
@@ -61,7 +76,7 @@ export default function StPeterChanelDashboard() {
         'Virtual follow-up sessions'
       ],
       completed: [
-        'Classroom observations completed (January 13)',
+        'Classroom observations completed',
         'Personalized emails sent to all observed teachers',
         'Growth groups identified based on observation data'
       ],
@@ -79,7 +94,7 @@ export default function StPeterChanelDashboard() {
     {
       id: 3,
       name: 'Deepening',
-      status: 'Next',
+      status: 'Next Phase',
       statusColor: '#ffba06',
       description: 'Moving from awareness to consistent implementation',
       includes: [
@@ -88,7 +103,7 @@ export default function StPeterChanelDashboard() {
         'Implementation tracking',
         'Mid-partnership check-in'
       ],
-      unlocks: 'Phase 2 complete + Virtual sessions delivered + Hub engagement growing',
+      unlocks: 'Current phase complete + Virtual sessions delivered + Hub engagement growing',
       goals: [
         '50%+ of teachers actively using Hub resources',
         'Measurable shifts in classroom practice',
@@ -96,29 +111,29 @@ export default function StPeterChanelDashboard() {
       ],
       outcomes: [
         { label: 'Target', value: '50%+', sublabel: 'Active implementation' },
-        { label: 'Unlocks When', value: 'Phase 2', sublabel: 'Sessions complete' }
+        { label: 'Unlocks When', value: 'Evidence shows readiness', sublabel: 'Data-driven progression' }
       ],
       year2Preview: 'Peer coaching circles, advanced module access, and leadership pathway for teacher-leaders'
     },
     {
       id: 4,
       name: 'Sustainability',
-      status: 'Year 2',
+      status: 'TDI Blueprint',
       statusColor: '#1e2749',
       description: 'Embedding practices into school culture for lasting change',
       includes: [
         'Year-end impact assessment',
         'Retention and renewal conversation',
         'Success story documentation',
-        'Year 2 planning session'
+        'Next year planning session'
       ],
       tdiStats: [
-        { label: 'Partner Retention', value: '85%', sublabel: 'Schools continue to Year 2' },
+        { label: 'Partner Retention', value: '85%', sublabel: 'Schools continue partnership' },
         { label: 'Implementation Rate', value: '65%', sublabel: 'vs 10% industry average' }
       ],
       outcomes: [
-        { label: 'Partner Retention', value: '85%', sublabel: 'Continue to Year 2' },
-        { label: 'Unlocks When', value: 'Phase 3', sublabel: 'Implementation momentum' }
+        { label: 'Partner Retention', value: '85%', sublabel: 'Continue partnership' },
+        { label: 'Unlocks When', value: 'Implementation momentum established', sublabel: 'Evidence-based' }
       ],
       year2Preview: 'Full Blueprint experience: summer kickoff, multiple observation cycles, advanced coaching, teacher leadership development'
     }
@@ -128,549 +143,685 @@ export default function StPeterChanelDashboard() {
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
-      {/* Navigation */}
+      {/* Compact Navigation */}
       <nav className="bg-[#1e2749] sticky top-0 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-14">
             <div className="flex items-center gap-3">
               <span className="bg-white text-[#1e2749] px-2 py-1 rounded text-xs font-extrabold tracking-wide">TDI</span>
-              <span className="text-white font-semibold">Teachers Deserve It</span>
-              <span className="text-white/60 hidden sm:inline">| Partner Dashboard</span>
+              <span className="text-white font-semibold hidden sm:inline">Teachers Deserve It</span>
+              <span className="text-white/60 hidden md:inline">| Partner Dashboard</span>
             </div>
             <a 
               href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:-translate-y-0.5 flex items-center gap-2"
+              className="bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-3 py-1.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
             >
               <Calendar className="w-4 h-4" />
-              Schedule Session
+              <span className="hidden sm:inline">Schedule Session</span>
             </a>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section */}
-      <section className="relative text-white py-16 md:py-24 px-4 overflow-hidden">
-        {/* Background Image */}
+      {/* Compact Hero */}
+      <section className="relative text-white py-6 px-4 overflow-hidden">
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: "url('/images/st-peter-chanel-church.jpg')" }}
         />
-        {/* Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1e2749]/90 via-[#1e2749]/80 to-[#1e2749]/70" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1e2749]/95 via-[#1e2749]/90 to-[#1e2749]/85" />
         
-        {/* Content */}
-        <div className="relative max-w-5xl mx-auto text-center">
-          <div className="inline-block bg-white/10 backdrop-blur px-4 py-1 rounded-full text-sm font-medium mb-4">
-            Partnership Dashboard | January 2026
+        <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold">St. Peter Chanel School</h1>
+            <p className="text-white/80 text-sm">Paulina, Louisiana | Partner Dashboard</p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-3 drop-shadow-lg">St. Peter Chanel School</h1>
-          <p className="text-xl text-white/90 mb-6 drop-shadow">Paulina, Louisiana | PreK3 through 8th Grade | 25 Staff Members</p>
-          
-          <div className="bg-white/10 backdrop-blur-md rounded-xl p-6 max-w-2xl mx-auto border border-white/10">
-            <div className="text-sm uppercase tracking-wide text-white/70 mb-2">The Question We Are Solving Together</div>
-            <div className="text-xl md:text-2xl font-medium italic">
-              "How do we support our teachers so they can focus on what matters most, their students?"
+          <div className="flex items-center gap-3 text-sm">
+            <div className="bg-white/10 px-3 py-1.5 rounded-lg">
+              <span className="text-white/60">Status:</span>
+              <span className="ml-2 font-semibold text-[#80a4ed]">Phase 2 - Activation</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Implementation Focus Banner */}
-      <section className="bg-[#80a4ed] text-white py-6 px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-center">
-            <div className="flex flex-wrap items-center justify-center gap-3 text-lg md:text-xl font-semibold">
-              <span className="bg-white/20 px-3 py-1 rounded">Strong Teachers</span>
-              <ArrowRight className="w-5 h-5" />
-              <span className="bg-white/20 px-3 py-1 rounded">Strong Teaching</span>
-              <ArrowRight className="w-5 h-5" />
-              <span className="bg-white/20 px-3 py-1 rounded">Student Success</span>
-              <ArrowRight className="w-5 h-5" />
-              <span className="bg-white/20 px-3 py-1 rounded">Statewide Results</span>
-            </div>
-          </div>
-          <p className="text-center text-white/80 mt-3 text-sm">
-            We measure teacher implementation, not just platform logins. Real change happens in classrooms.
-          </p>
-        </div>
-      </section>
-
-      {/* Dedicated Hub Time Recommendation */}
-      <section className="py-8 px-4">
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white border-l-4 border-[#ffba06] rounded-r-xl p-6 shadow-sm">
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
-                <h3 className="text-[#1e2749] font-bold text-lg mb-2 flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-[#ffba06]" />
-                  Our Recommendation: Dedicated Hub Time
-                </h3>
-                <p className="text-gray-600 mb-4">
-                  Schools that build in 15-30 minutes of protected time during PLCs or staff meetings for teachers to explore the Hub see dramatically higher implementation rates.
-                </p>
-                <div className="flex flex-wrap gap-4 text-sm">
-                  <div className="bg-[#f5f5f5] rounded-lg px-4 py-2">
-                    <span className="font-bold text-[#1e2749]">3x</span>
-                    <span className="text-gray-600 ml-1">higher engagement</span>
-                  </div>
-                  <div className="bg-[#f5f5f5] rounded-lg px-4 py-2">
-                    <span className="font-bold text-[#1e2749]">Weekly</span>
-                    <span className="text-gray-600 ml-1">15-30 min blocks</span>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-[#f5f5f5] rounded-xl p-4 md:w-64">
-                <div className="text-sm font-semibold text-gray-500 mb-2">Try This</div>
-                <ul className="text-sm text-gray-700 space-y-2">
-                  <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-[#80a4ed]" /> Add Hub time to PLC agenda</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-[#80a4ed]" /> Share "Resource of the Week"</li>
-                  <li className="flex items-center gap-2"><CheckCircle className="w-4 h-4 text-[#80a4ed]" /> Let teachers explore together</li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Phase Journey Section */}
-      <section className="py-8 px-4" id="phases">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-[#1e2749] mb-6 text-center">Our Partnership Journey</h2>
-          
-          {/* Phase Tabs */}
-          <div className="flex gap-2 mb-6 justify-center overflow-x-auto">
-            {phases.map((phase) => (
-              <button
-                key={phase.id}
-                onClick={() => setActivePhase(phase.id)}
-                className={`px-5 py-3 rounded-xl font-semibold transition-all whitespace-nowrap ${
-                  activePhase === phase.id 
-                    ? 'bg-[#1e2749] text-white shadow-lg' 
-                    : 'bg-white text-gray-600 hover:bg-gray-100 shadow'
-                }`}
-              >
-                <span className="mr-2">Phase {phase.id}</span>
-                <span className={activePhase === phase.id ? 'text-white/80' : 'text-gray-400'}>
-                  {phase.name}
-                </span>
-                <span 
-                  className="ml-2 text-xs px-2 py-0.5 rounded-full"
-                  style={{ 
-                    backgroundColor: activePhase === phase.id ? 'rgba(255,255,255,0.2)' : phase.statusColor + '20',
-                    color: activePhase === phase.id ? 'white' : phase.statusColor
-                  }}
+      {/* Tab Navigation */}
+      <div className="bg-white border-b border-gray-200 sticky top-14 z-40">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="flex gap-1 overflow-x-auto">
+            {tabs.map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-all whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? 'border-[#1e2749] text-[#1e2749]'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
                 >
-                  {phase.status}
-                </span>
-              </button>
-            ))}
+                  <Icon className="w-4 h-4" />
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
+        </div>
+      </div>
 
-          {/* Phase Content */}
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-            {/* Phase Header */}
-            <div 
-              className="p-6 text-white"
-              style={{ backgroundColor: currentPhase.id === 4 ? '#1e2749' : currentPhase.statusColor }}
-            >
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div>
-                  <h3 className="text-2xl font-bold">Phase {currentPhase.id}: {currentPhase.name}</h3>
-                  <p className="text-white/80 mt-1">{currentPhase.description}</p>
+      {/* Tab Content */}
+      <div className="max-w-5xl mx-auto px-4 py-6">
+        
+        {/* OVERVIEW TAB */}
+        {activeTab === 'overview' && (
+          <div className="space-y-6">
+            {/* Quick Stats */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#80a4ed]">
+                <div className="flex items-center gap-2 mb-1">
+                  <Users className="w-4 h-4 text-[#80a4ed]" />
+                  <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
                 </div>
-                <div className="bg-white/20 px-4 py-2 rounded-lg font-semibold">
-                  {currentPhase.status}
+                <div className="text-2xl font-bold text-[#1e2749]">25/25</div>
+                <div className="text-xs text-gray-500">Full enrollment</div>
+              </div>
+
+              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#1e2749]">
+                <div className="flex items-center gap-2 mb-1">
+                  <Eye className="w-4 h-4 text-[#1e2749]" />
+                  <span className="text-xs text-gray-500 uppercase">Observations</span>
+                </div>
+                <div className="text-2xl font-bold text-[#1e2749]">100%</div>
+                <div className="text-xs text-gray-500">Complete</div>
+              </div>
+
+              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#F96767]">
+                <div className="flex items-center gap-2 mb-1">
+                  <AlertCircle className="w-4 h-4 text-[#F96767]" />
+                  <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
+                </div>
+                <div className="text-2xl font-bold text-[#F96767]">2</div>
+                <div className="text-xs text-gray-500">Sessions pending</div>
+              </div>
+
+              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#ffba06]">
+                <div className="flex items-center gap-2 mb-1">
+                  <TrendingUp className="w-4 h-4 text-[#ffba06]" />
+                  <span className="text-xs text-gray-500 uppercase">Current Phase</span>
+                </div>
+                <div className="text-2xl font-bold text-[#1e2749]">Phase 2</div>
+                <div className="text-xs text-gray-500">Activation</div>
+              </div>
+            </div>
+
+            {/* Needs Attention Section */}
+            <div className="bg-[#F96767]/5 border border-[#F96767]/20 rounded-xl p-5">
+              <h3 className="font-bold text-[#F96767] mb-3 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5" />
+                Needs Attention
+              </h3>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between bg-white rounded-lg p-3">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="w-5 h-5 text-[#F96767]" />
+                    <div>
+                      <div className="font-medium text-gray-800">Virtual session: Management/Routines group</div>
+                      <div className="text-sm text-gray-500">Included in contract</div>
+                    </div>
+                  </div>
+                  <a 
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Schedule
+                  </a>
+                </div>
+                <div className="flex items-center justify-between bg-white rounded-lg p-3">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="w-5 h-5 text-[#F96767]" />
+                    <div>
+                      <div className="font-medium text-gray-800">Virtual session: Relationship/Trust group</div>
+                      <div className="text-sm text-gray-500">Included in contract</div>
+                    </div>
+                  </div>
+                  <a 
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Schedule
+                  </a>
                 </div>
               </div>
             </div>
 
-            {/* Phase Body */}
-            <div className="p-6">
-              <div className="grid md:grid-cols-3 gap-6">
-                {/* What's Included */}
-                <div className="md:col-span-2 space-y-6">
+            {/* Hub Time Recommendation */}
+            <div className="bg-white border-l-4 border-[#ffba06] rounded-r-xl p-5 shadow-sm">
+              <div className="flex flex-col md:flex-row gap-4">
+                <div className="flex-1">
+                  <h3 className="text-[#1e2749] font-bold mb-2 flex items-center gap-2">
+                    <Lightbulb className="w-5 h-5 text-[#ffba06]" />
+                    Recommendation: Dedicated Hub Time
+                  </h3>
+                  <p className="text-gray-600 text-sm mb-3">
+                    Schools that build in 15-30 minutes of protected time during PLCs or staff meetings see 3x higher implementation rates.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="bg-[#f5f5f5] text-[#1e2749] px-3 py-1 rounded-full text-xs font-medium">Add Hub time to PLC agenda</span>
+                    <span className="bg-[#f5f5f5] text-[#1e2749] px-3 py-1 rounded-full text-xs font-medium">Share "Resource of the Week"</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* School Info Card */}
+            <div className="bg-white rounded-xl p-5 shadow-sm">
+              <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
+                <Building className="w-5 h-5" />
+                School Information
+              </h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <div className="font-semibold text-gray-800">St. Peter Chanel Interparochial Elementary School</div>
+                  <div className="text-sm text-gray-600 mt-2 flex items-start gap-2">
+                    <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <div>
+                      2590 Louisiana Hwy. 44<br />
+                      Paulina, LA 70763-2705
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Phone className="w-4 h-4" />
+                    225-869-5778
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Mail className="w-4 h-4" />
+                    chanel.school@stpchanel.org
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-500 text-xs">
+                    Fax: 225-869-8131
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* OUR JOURNEY TAB */}
+        {activeTab === 'journey' && (
+          <div className="space-y-6">
+            {/* Implementation Equation */}
+            <div className="bg-[#80a4ed] text-white rounded-xl p-4">
+              <div className="flex flex-wrap items-center justify-center gap-3 text-sm md:text-base font-semibold">
+                <span className="bg-white/20 px-3 py-1 rounded">Strong Teachers</span>
+                <ArrowRight className="w-4 h-4" />
+                <span className="bg-white/20 px-3 py-1 rounded">Strong Teaching</span>
+                <ArrowRight className="w-4 h-4" />
+                <span className="bg-white/20 px-3 py-1 rounded">Student Success</span>
+                <ArrowRight className="w-4 h-4" />
+                <span className="bg-white/20 px-3 py-1 rounded">Statewide Results</span>
+              </div>
+              <p className="text-center text-white/80 mt-2 text-xs">
+                Phase progression is evidence-based, not time-based. We move forward when data shows readiness.
+              </p>
+            </div>
+
+            {/* Phase Tabs */}
+            <div className="flex gap-2 overflow-x-auto pb-2">
+              {phases.map((phase) => (
+                <button
+                  key={phase.id}
+                  onClick={() => setActivePhase(phase.id)}
+                  className={`px-4 py-2 rounded-lg font-medium transition-all whitespace-nowrap text-sm ${
+                    activePhase === phase.id 
+                      ? 'bg-[#1e2749] text-white shadow' 
+                      : 'bg-white text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  Phase {phase.id}: {phase.name}
+                  <span 
+                    className="ml-2 text-xs px-2 py-0.5 rounded-full"
+                    style={{ 
+                      backgroundColor: activePhase === phase.id ? 'rgba(255,255,255,0.2)' : phase.statusColor + '20',
+                      color: activePhase === phase.id ? 'white' : phase.statusColor
+                    }}
+                  >
+                    {phase.status}
+                  </span>
+                </button>
+              ))}
+            </div>
+
+            {/* Phase Content */}
+            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div 
+                className="p-4 text-white"
+                style={{ backgroundColor: currentPhase.id === 4 ? '#1e2749' : currentPhase.statusColor }}
+              >
+                <div className="flex items-center justify-between flex-wrap gap-2">
                   <div>
-                    <h4 className="font-semibold text-[#1e2749] mb-3 flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: currentPhase.statusColor }}></span>
-                      What's Included
-                    </h4>
-                    <ul className="space-y-2">
-                      {currentPhase.includes.map((item, i) => (
-                        <li key={i} className="flex items-start gap-2 text-gray-600">
-                          <CheckCircle className="w-4 h-4 text-[#80a4ed] mt-1 flex-shrink-0" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
+                    <h3 className="text-xl font-bold">Phase {currentPhase.id}: {currentPhase.name}</h3>
+                    <p className="text-white/80 text-sm">{currentPhase.description}</p>
+                  </div>
+                  <div className="bg-white/20 px-3 py-1 rounded-lg text-sm font-semibold">
+                    {currentPhase.status}
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-5">
+                <div className="grid md:grid-cols-3 gap-6">
+                  <div className="md:col-span-2 space-y-5">
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] mb-2 text-sm uppercase tracking-wide">What's Included</h4>
+                      <ul className="space-y-1.5">
+                        {currentPhase.includes.map((item, i) => (
+                          <li key={i} className="flex items-start gap-2 text-gray-600 text-sm">
+                            <CheckCircle className="w-4 h-4 text-[#80a4ed] mt-0.5 flex-shrink-0" />
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {currentPhase.adaptations && (
+                      <div>
+                        <h4 className="font-semibold text-[#1e2749] mb-2 text-sm uppercase tracking-wide">Adaptations for St. Peter Chanel</h4>
+                        <ul className="space-y-1.5">
+                          {currentPhase.adaptations.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2 text-gray-600 text-sm">
+                              <ArrowRight className="w-4 h-4 text-[#80a4ed] mt-0.5 flex-shrink-0" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {currentPhase.completed && (
+                      <div>
+                        <h4 className="font-semibold text-[#1e2749] mb-2 text-sm uppercase tracking-wide">Completed</h4>
+                        <ul className="space-y-1.5">
+                          {currentPhase.completed.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2 text-gray-600 text-sm">
+                              <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {currentPhase.pending && (
+                      <div>
+                        <h4 className="font-semibold text-[#F96767] mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
+                          <AlertCircle className="w-4 h-4" />
+                          Needs Attention
+                        </h4>
+                        <ul className="space-y-1.5">
+                          {currentPhase.pending.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2 text-gray-600 text-sm">
+                              <Calendar className="w-4 h-4 text-[#F96767] mt-0.5 flex-shrink-0" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {currentPhase.goals && (
+                      <div>
+                        <h4 className="font-semibold text-[#1e2749] mb-2 text-sm uppercase tracking-wide">Goals</h4>
+                        <ul className="space-y-1.5">
+                          {currentPhase.goals.map((item, i) => (
+                            <li key={i} className="flex items-start gap-2 text-gray-600 text-sm">
+                              <Target className="w-4 h-4 text-[#ffba06] mt-0.5 flex-shrink-0" />
+                              {item}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {currentPhase.tdiStats && (
+                      <div className="bg-[#f5f5f5] rounded-lg p-4">
+                        <h4 className="font-semibold text-[#1e2749] mb-2 text-sm">TDI Partner Success Rates</h4>
+                        <div className="flex flex-wrap gap-3">
+                          {currentPhase.tdiStats.map((stat, i) => (
+                            <div key={i} className="bg-white rounded-lg px-3 py-2">
+                              <div className="text-xl font-bold text-[#1e2749]">{stat.value}</div>
+                              <div className="text-xs text-gray-500">{stat.label}</div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {currentPhase.unlocks && (
+                      <div className="bg-[#ffba06]/10 rounded-lg p-4 border border-[#ffba06]/30">
+                        <h4 className="font-semibold text-[#1e2749] mb-1 text-sm flex items-center gap-2">
+                          <Unlock className="w-4 h-4 text-[#ffba06]" />
+                          Unlocks When
+                        </h4>
+                        <p className="text-gray-600 text-sm">{currentPhase.unlocks}</p>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Phase-specific content */}
-                  {currentPhase.adaptations && (
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] mb-3">Adaptations for St. Peter Chanel</h4>
-                      <ul className="space-y-2">
-                        {currentPhase.adaptations.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2 text-gray-600">
-                            <ArrowRight className="w-4 h-4 text-[#80a4ed] mt-1 flex-shrink-0" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {currentPhase.completed && (
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] mb-3">Completed</h4>
-                      <ul className="space-y-2">
-                        {currentPhase.completed.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2 text-gray-600">
-                            <CheckCircle className="w-4 h-4 text-green-500 mt-1 flex-shrink-0" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {currentPhase.pending && (
-                    <div>
-                      <h4 className="font-semibold text-[#F96767] mb-3 flex items-center gap-2">
-                        <AlertCircle className="w-4 h-4" />
-                        Needs Attention
-                      </h4>
-                      <ul className="space-y-2">
-                        {currentPhase.pending.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2 text-gray-600">
-                            <Calendar className="w-4 h-4 text-[#F96767] mt-1 flex-shrink-0" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {currentPhase.goals && (
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] mb-3">Goals for This Phase</h4>
-                      <ul className="space-y-2">
-                        {currentPhase.goals.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2 text-gray-600">
-                            <Target className="w-4 h-4 text-[#ffba06] mt-1 flex-shrink-0" />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-
-                  {currentPhase.tdiStats && (
-                    <div className="bg-[#f5f5f5] rounded-xl p-4">
-                      <h4 className="font-semibold text-[#1e2749] mb-3">TDI Partner Success</h4>
-                      <div className="flex flex-wrap gap-4">
-                        {currentPhase.tdiStats.map((stat, i) => (
-                          <div key={i} className="bg-white rounded-lg px-4 py-2 shadow-sm">
-                            <div className="text-2xl font-bold text-[#1e2749]">{stat.value}</div>
-                            <div className="text-sm text-gray-500">{stat.label}</div>
+                  <div className="space-y-4">
+                    <div className="bg-[#f5f5f5] rounded-lg p-4">
+                      <h4 className="font-semibold text-gray-700 mb-2 text-sm">Key Metrics</h4>
+                      <div className="space-y-2">
+                        {currentPhase.outcomes.map((outcome, i) => (
+                          <div key={i} className="bg-white rounded-lg p-3">
+                            <div className="text-xs text-gray-500 uppercase">{outcome.label}</div>
+                            <div className="text-lg font-bold" style={{ color: currentPhase.statusColor }}>
+                              {outcome.value}
+                            </div>
+                            <div className="text-xs text-gray-500">{outcome.sublabel}</div>
                           </div>
                         ))}
                       </div>
                     </div>
-                  )}
 
-                  {currentPhase.unlocks && (
-                    <div className="bg-[#ffba06]/10 rounded-xl p-4 border border-[#ffba06]/30">
-                      <h4 className="font-semibold text-[#1e2749] mb-2 flex items-center gap-2">
-                        <Unlock className="w-4 h-4 text-[#ffba06]" />
-                        Unlocks When
+                    <div className="bg-[#1e2749]/5 rounded-lg p-4 border border-[#1e2749]/10">
+                      <h4 className="font-semibold text-[#1e2749] mb-1 text-sm flex items-center gap-2">
+                        <Star className="w-4 h-4 text-[#ffba06]" />
+                        Year 2 Preview
                       </h4>
-                      <p className="text-gray-600">{currentPhase.unlocks}</p>
+                      <p className="text-xs text-gray-600">{currentPhase.year2Preview}</p>
                     </div>
-                  )}
-                </div>
-
-                {/* Sidebar */}
-                <div className="space-y-4">
-                  {/* Outcomes */}
-                  <div className="bg-[#f5f5f5] rounded-xl p-4">
-                    <h4 className="font-semibold text-gray-700 mb-3">Key Metrics</h4>
-                    <div className="space-y-3">
-                      {currentPhase.outcomes.map((outcome, i) => (
-                        <div key={i} className="bg-white rounded-lg p-3 shadow-sm">
-                          <div className="text-xs text-gray-500 uppercase tracking-wide">{outcome.label}</div>
-                          <div className="text-xl font-bold" style={{ color: currentPhase.statusColor }}>
-                            {outcome.value}
-                          </div>
-                          <div className="text-xs text-gray-500">{outcome.sublabel}</div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Year 2 Preview */}
-                  <div className="bg-[#1e2749]/5 rounded-xl p-4 border border-[#1e2749]/10">
-                    <h4 className="font-semibold text-[#1e2749] mb-2 flex items-center gap-2">
-                      <Star className="w-4 h-4 text-[#ffba06]" />
-                      Year 2 Preview
-                    </h4>
-                    <p className="text-sm text-gray-600">{currentPhase.year2Preview}</p>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        )}
 
-      {/* Growth Groups Section */}
-      <section className="py-8 px-4 bg-white" id="groups">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-[#1e2749] mb-2 text-center">Growth Groups</h2>
-          <p className="text-gray-600 text-center mb-8">
-            Based on classroom observations, we have identified focus areas for targeted support
-          </p>
+        {/* GROWTH GROUPS TAB */}
+        {activeTab === 'groups' && (
+          <div className="space-y-6">
+            <p className="text-gray-600 text-center">
+              Based on classroom observations, we have identified focus areas for targeted support
+            </p>
 
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Management & Routines Group */}
-            <div className="bg-[#f5f5f5] rounded-2xl p-6 border border-gray-200">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-[#80a4ed] rounded-xl flex items-center justify-center text-white">
-                  <ClipboardList className="w-6 h-6" />
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Management & Routines Group */}
+              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-[#80a4ed] rounded-xl flex items-center justify-center text-white">
+                    <ClipboardList className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-[#1e2749] text-lg">Management and Routines</h3>
+                    <p className="text-sm text-gray-500">Building consistent classroom systems</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-bold text-[#1e2749] text-lg">Management and Routines</h3>
-                  <p className="text-sm text-gray-500">Building consistent classroom systems</p>
+                
+                <div className="mb-4">
+                  <div className="text-sm font-semibold text-gray-600 mb-2">Focus Areas</div>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="bg-[#80a4ed]/20 text-[#1e2749] px-3 py-1 rounded-full text-sm">Transitions</span>
+                    <span className="bg-[#80a4ed]/20 text-[#1e2749] px-3 py-1 rounded-full text-sm">Procedures</span>
+                    <span className="bg-[#80a4ed]/20 text-[#1e2749] px-3 py-1 rounded-full text-sm">Expectations</span>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="mb-4">
-                <div className="text-sm font-semibold text-gray-600 mb-2">Focus Areas</div>
-                <div className="flex flex-wrap gap-2">
-                  <span className="bg-[#80a4ed]/20 text-[#1e2749] px-3 py-1 rounded-full text-sm">Transitions</span>
-                  <span className="bg-[#80a4ed]/20 text-[#1e2749] px-3 py-1 rounded-full text-sm">Procedures</span>
-                  <span className="bg-[#80a4ed]/20 text-[#1e2749] px-3 py-1 rounded-full text-sm">Expectations</span>
+
+                <div className="mb-4">
+                  <div className="text-sm font-semibold text-gray-600 mb-2">Hub Resources</div>
+                  <p className="text-sm text-gray-600">Classroom Management Toolkit (Modules 3, 5, 6), No-Hands-Up Help Systems</p>
                 </div>
+
+                <div className="bg-[#F96767]/10 border border-[#F96767]/30 rounded-lg p-3 mb-4">
+                  <p className="text-sm text-[#F96767] flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    Virtual session pending, included in contract
+                  </p>
+                </div>
+
+                <a 
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Schedule This Session
+                </a>
               </div>
 
-              <div className="mb-4">
-                <div className="text-sm font-semibold text-gray-600 mb-2">Hub Resources</div>
-                <p className="text-sm text-gray-600">Classroom Management Toolkit (Modules 3, 5, 6), No-Hands-Up Help Systems</p>
+              {/* Relationship & Trust Group */}
+              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 bg-[#F96767] rounded-xl flex items-center justify-center text-white">
+                    <Heart className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-[#1e2749] text-lg">Relationship and Trust</h3>
+                    <p className="text-sm text-gray-500">Deepening student connections</p>
+                  </div>
+                </div>
+                
+                <div className="mb-4">
+                  <div className="text-sm font-semibold text-gray-600 mb-2">Focus Areas</div>
+                  <div className="flex flex-wrap gap-2">
+                    <span className="bg-[#F96767]/20 text-[#1e2749] px-3 py-1 rounded-full text-sm">Student Voice</span>
+                    <span className="bg-[#F96767]/20 text-[#1e2749] px-3 py-1 rounded-full text-sm">Connection</span>
+                    <span className="bg-[#F96767]/20 text-[#1e2749] px-3 py-1 rounded-full text-sm">Belonging</span>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <div className="text-sm font-semibold text-gray-600 mb-2">Hub Resources</div>
+                  <p className="text-sm text-gray-600">Building Relationships Module, Student Check-in Strategies, SEL Integration</p>
+                </div>
+
+                <div className="bg-[#F96767]/10 border border-[#F96767]/30 rounded-lg p-3 mb-4">
+                  <p className="text-sm text-[#F96767] flex items-center gap-2">
+                    <Clock className="w-4 h-4" />
+                    Virtual session pending, included in contract
+                  </p>
+                </div>
+
+                <a 
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Schedule This Session
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* YEAR 2 OPPORTUNITY TAB */}
+        {activeTab === 'year2' && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">The Full TDI Blueprint</h2>
+              <p className="text-gray-600">What becomes available when we continue our partnership</p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 gap-4">
+              <div className="bg-white rounded-xl p-5 shadow-sm">
+                <div className="w-10 h-10 bg-[#1e2749] rounded-lg flex items-center justify-center text-white mb-3">
+                  <BookOpen className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-[#1e2749] mb-2">Book Delivery</h3>
+                <p className="text-sm text-gray-600 mb-3">Physical copy of Teachers Deserve It to every teacher before school starts, creating shared language from Day 1</p>
+                <span className="text-xs bg-[#ffba06]/20 text-[#1e2749] px-2 py-1 rounded-full">TDI Blueprint</span>
               </div>
 
-              <div className="bg-[#F96767]/10 border border-[#F96767]/30 rounded-lg p-3 mb-4">
-                <p className="text-sm text-[#F96767] flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  Virtual session pending, included in contract
-                </p>
+              <div className="bg-white rounded-xl p-5 shadow-sm">
+                <div className="w-10 h-10 bg-[#1e2749] rounded-lg flex items-center justify-center text-white mb-3">
+                  <Target className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-[#1e2749] mb-2">Full Observation Cycles</h3>
+                <p className="text-sm text-gray-600 mb-3">Multiple observation rounds throughout the year with deeper coaching and extended follow-up</p>
+                <span className="text-xs bg-[#ffba06]/20 text-[#1e2749] px-2 py-1 rounded-full">TDI Blueprint</span>
               </div>
 
+              <div className="bg-white rounded-xl p-5 shadow-sm">
+                <div className="w-10 h-10 bg-[#1e2749] rounded-lg flex items-center justify-center text-white mb-3">
+                  <Users className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-[#1e2749] mb-2">Peer Coaching Circles</h3>
+                <p className="text-sm text-gray-600 mb-3">Teacher-to-teacher support structures and collaborative learning communities</p>
+                <span className="text-xs bg-[#ffba06]/20 text-[#1e2749] px-2 py-1 rounded-full">TDI Blueprint</span>
+              </div>
+
+              <div className="bg-white rounded-xl p-5 shadow-sm">
+                <div className="w-10 h-10 bg-[#1e2749] rounded-lg flex items-center justify-center text-white mb-3">
+                  <Award className="w-5 h-5" />
+                </div>
+                <h3 className="font-bold text-[#1e2749] mb-2">Leadership Pathways</h3>
+                <p className="text-sm text-gray-600 mb-3">Development track for emerging teacher-leaders to champion implementation</p>
+                <span className="text-xs bg-[#ffba06]/20 text-[#1e2749] px-2 py-1 rounded-full">TDI Blueprint</span>
+              </div>
+            </div>
+
+            <div className="bg-[#1e2749] text-white rounded-xl p-6 text-center">
+              <div className="text-3xl font-bold mb-1">85%</div>
+              <div className="text-white/80 mb-4">of TDI partner schools continue their partnership</div>
               <a 
                 href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block w-full bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                className="inline-flex items-center gap-2 bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-6 py-3 rounded-xl font-semibold transition-all"
               >
-                <Calendar className="w-4 h-4" />
-                Schedule This Session
+                <Calendar className="w-5 h-5" />
+                Discuss Year 2 Options
               </a>
             </div>
+          </div>
+        )}
 
-            {/* Relationship & Trust Group */}
-            <div className="bg-[#f5f5f5] rounded-2xl p-6 border border-gray-200">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-[#F96767] rounded-xl flex items-center justify-center text-white">
-                  <Heart className="w-6 h-6" />
+        {/* YOUR TDI TEAM TAB */}
+        {activeTab === 'team' && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your TDI Team</h2>
+              <p className="text-gray-600">Your dedicated partner for this journey</p>
+            </div>
+
+            <div className="bg-white rounded-xl p-6 shadow-sm max-w-2xl mx-auto">
+              <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+                {/* Rae's Photo */}
+                <div className="w-32 h-32 rounded-xl overflow-hidden bg-[#f5f5f5] flex-shrink-0">
+                  <Image
+                    src="/images/rae-hughart.jpg"
+                    alt="Rae Hughart"
+                    width={128}
+                    height={128}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
+
+                {/* Rae's Info */}
+                <div className="flex-1 text-center md:text-left">
+                  <h3 className="text-xl font-bold text-[#1e2749]">Rae Hughart</h3>
+                  <p className="text-[#80a4ed] font-medium mb-3">Lead Partner, St. Peter Chanel Account</p>
+                  
+                  <p className="text-gray-600 text-sm mb-4">
+                    Rae is the co-founder of Teachers Deserve It and your dedicated partner throughout this journey. She is here to support your school's success every step of the way.
+                  </p>
+
+                  <div className="space-y-2 mb-4">
+                    <a 
+                      href="mailto:rae@teachersdeserveit.com"
+                      className="flex items-center gap-2 text-gray-600 hover:text-[#1e2749] transition-colors justify-center md:justify-start"
+                    >
+                      <Mail className="w-4 h-4" />
+                      rae@teachersdeserveit.com
+                    </a>
+                    <a 
+                      href="tel:8477215503"
+                      className="flex items-center gap-2 text-gray-600 hover:text-[#1e2749] transition-colors justify-center md:justify-start"
+                    >
+                      <Phone className="w-4 h-4" />
+                      847-721-5503
+                      <span className="text-xs bg-[#f5f5f5] px-2 py-0.5 rounded-full">Text is great!</span>
+                    </a>
+                  </div>
+
+                  <a 
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-6 py-3 rounded-xl font-semibold transition-all"
+                  >
+                    <Calendar className="w-5 h-5" />
+                    Schedule Time with Rae
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* School Info */}
+            <div className="bg-white rounded-xl p-5 shadow-sm max-w-2xl mx-auto">
+              <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
+                <Building className="w-5 h-5" />
+                School Information
+              </h3>
+              <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <h3 className="font-bold text-[#1e2749] text-lg">Relationship and Trust</h3>
-                  <p className="text-sm text-gray-500">Deepening student connections</p>
+                  <div className="font-semibold text-gray-800">St. Peter Chanel Interparochial Elementary School</div>
+                  <div className="text-sm text-gray-600 mt-2 flex items-start gap-2">
+                    <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                    <div>
+                      2590 Louisiana Hwy. 44<br />
+                      Paulina, LA 70763-2705
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Phone className="w-4 h-4" />
+                    225-869-5778
+                  </div>
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Mail className="w-4 h-4" />
+                    chanel.school@stpchanel.org
+                  </div>
+                  <div className="text-gray-500 text-xs">
+                    Fax: 225-869-8131
+                  </div>
                 </div>
               </div>
-              
-              <div className="mb-4">
-                <div className="text-sm font-semibold text-gray-600 mb-2">Focus Areas</div>
-                <div className="flex flex-wrap gap-2">
-                  <span className="bg-[#F96767]/20 text-[#1e2749] px-3 py-1 rounded-full text-sm">Student Voice</span>
-                  <span className="bg-[#F96767]/20 text-[#1e2749] px-3 py-1 rounded-full text-sm">Connection</span>
-                  <span className="bg-[#F96767]/20 text-[#1e2749] px-3 py-1 rounded-full text-sm">Belonging</span>
-                </div>
-              </div>
-
-              <div className="mb-4">
-                <div className="text-sm font-semibold text-gray-600 mb-2">Hub Resources</div>
-                <p className="text-sm text-gray-600">Building Relationships Module, Student Check-in Strategies, SEL Integration</p>
-              </div>
-
-              <div className="bg-[#F96767]/10 border border-[#F96767]/30 rounded-lg p-3 mb-4">
-                <p className="text-sm text-[#F96767] flex items-center gap-2">
-                  <Clock className="w-4 h-4" />
-                  Virtual session pending, included in contract
-                </p>
-              </div>
-
-              <a 
-                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block w-full bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
-              >
-                <Calendar className="w-4 h-4" />
-                Schedule This Session
-              </a>
             </div>
           </div>
-        </div>
-      </section>
+        )}
+      </div>
 
-      {/* Implementation Indicators */}
-      <section className="py-8 px-4" id="metrics">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl font-bold text-[#1e2749] mb-2 text-center">Implementation Indicators</h2>
-          <p className="text-gray-600 text-center mb-8">
-            What we are tracking to measure real impact, not just clicks
-          </p>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white rounded-xl p-5 shadow-lg border-t-4 border-[#80a4ed]">
-              <div className="flex items-center gap-2 mb-2">
-                <Users className="w-5 h-5 text-[#80a4ed]" />
-              </div>
-              <div className="text-3xl font-bold text-[#1e2749]">25/25</div>
-              <div className="font-semibold text-gray-800">Staff Enrolled</div>
-              <div className="text-sm text-gray-500 mt-2">
-                <span className="text-[#80a4ed]">What this tells us:</span> Full buy-in from leadership
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-5 shadow-lg border-t-4 border-[#1e2749]">
-              <div className="flex items-center gap-2 mb-2">
-                <Eye className="w-5 h-5 text-[#1e2749]" />
-              </div>
-              <div className="text-3xl font-bold text-[#1e2749]">100%</div>
-              <div className="font-semibold text-gray-800">Observations Complete</div>
-              <div className="text-sm text-gray-500 mt-2">
-                <span className="text-[#1e2749]">What this tells us:</span> Foundation for personalized support
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-5 shadow-lg border-t-4 border-[#F96767]">
-              <div className="flex items-center gap-2 mb-2">
-                <AlertCircle className="w-5 h-5 text-[#F96767]" />
-              </div>
-              <div className="text-3xl font-bold text-[#F96767]">2</div>
-              <div className="font-semibold text-gray-800">Sessions Pending</div>
-              <div className="text-sm text-gray-500 mt-2">
-                <span className="text-[#F96767]">Needs attention:</span> Schedule to keep momentum
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl p-5 shadow-lg border-t-4 border-[#ffba06]">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-5 h-5 text-[#ffba06]" />
-              </div>
-              <div className="text-3xl font-bold text-[#1e2749]">Phase 2</div>
-              <div className="font-semibold text-gray-800">Current Stage</div>
-              <div className="text-sm text-gray-500 mt-2">
-                <span className="text-[#ffba06]">What this tells us:</span> Activation in progress
-              </div>
-            </div>
+      {/* Compact Footer */}
+      <footer className="bg-[#1e2749] text-white py-6 px-4">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+          <div>
+            <div className="font-bold">Teachers Deserve It</div>
+            <p className="text-white/60 text-sm">Partner Dashboard for St. Peter Chanel School</p>
           </div>
-        </div>
-      </section>
-
-      {/* Year 2 Opportunity */}
-      <section className="py-8 px-4 bg-white" id="year2">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-[#1e2749] mb-2">The Year 2 Opportunity</h2>
-            <p className="text-gray-600">What the full TDI Blueprint delivers, and what we will experience together</p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-[#f5f5f5] rounded-xl p-5">
-              <div className="w-10 h-10 bg-[#1e2749] rounded-lg flex items-center justify-center text-white mb-3">
-                <BookOpen className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-[#1e2749] mb-2">Book Delivery</h3>
-              <p className="text-sm text-gray-600 mb-3">Physical copy of Teachers Deserve It to every teacher before school starts</p>
-              <span className="text-xs bg-[#ffba06]/20 text-[#1e2749] px-2 py-1 rounded-full">Year 2 Feature</span>
-            </div>
-
-            <div className="bg-[#f5f5f5] rounded-xl p-5">
-              <div className="w-10 h-10 bg-[#1e2749] rounded-lg flex items-center justify-center text-white mb-3">
-                <Target className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-[#1e2749] mb-2">Full Observation Cycles</h3>
-              <p className="text-sm text-gray-600 mb-3">Multiple observation rounds with deeper coaching and follow-up</p>
-              <span className="text-xs bg-[#ffba06]/20 text-[#1e2749] px-2 py-1 rounded-full">Year 2 Feature</span>
-            </div>
-
-            <div className="bg-[#f5f5f5] rounded-xl p-5">
-              <div className="w-10 h-10 bg-[#1e2749] rounded-lg flex items-center justify-center text-white mb-3">
-                <Users className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-[#1e2749] mb-2">Peer Coaching</h3>
-              <p className="text-sm text-gray-600 mb-3">Teacher-to-teacher support circles and collaborative learning</p>
-              <span className="text-xs bg-[#ffba06]/20 text-[#1e2749] px-2 py-1 rounded-full">Year 2 Feature</span>
-            </div>
-
-            <div className="bg-[#f5f5f5] rounded-xl p-5">
-              <div className="w-10 h-10 bg-[#1e2749] rounded-lg flex items-center justify-center text-white mb-3">
-                <Award className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-[#1e2749] mb-2">Leadership Pathways</h3>
-              <p className="text-sm text-gray-600 mb-3">Development track for emerging teacher-leaders</p>
-              <span className="text-xs bg-[#ffba06]/20 text-[#1e2749] px-2 py-1 rounded-full">Year 2 Feature</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Schedule Banner */}
-      <section className="py-8 px-4 bg-[#ffba06]">
-        <div className="max-w-4xl mx-auto">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
-            <div>
-              <h3 className="text-xl font-bold text-[#1e2749] mb-1">Ready to Keep the Momentum Going?</h3>
-              <p className="text-[#1e2749]/80">Let's schedule your virtual sessions and plan the next steps together.</p>
-            </div>
-            <a 
-              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#1e2749] text-white px-8 py-3 rounded-xl font-bold hover:bg-[#2a3759] transition-all hover:-translate-y-0.5 whitespace-nowrap flex items-center gap-2"
-            >
-              <Calendar className="w-5 h-5" />
-              Schedule a Call with Rae
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-[#1e2749] text-white py-12 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="text-2xl font-bold mb-2">Teachers Deserve It</div>
-          <p className="text-white/80 italic mb-4">
-            "We are honored to partner with St. Peter Chanel School. Together, we are building something that lasts."
-          </p>
-          <p className="text-white/60 text-sm">The TDI Team</p>
-          
           <a 
             href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 mt-6 bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-6 py-3 rounded-xl font-semibold transition-all"
+            className="inline-flex items-center gap-2 bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-4 py-2 rounded-lg font-semibold transition-all text-sm"
           >
-            <MessageCircle className="w-5 h-5" />
-            Let's Talk About What's Next
+            <Calendar className="w-4 h-4" />
+            Schedule a Call
           </a>
-          
-          <p className="text-white/40 text-xs mt-6">
-            Dashboard created for St. Peter Chanel School | Paulina, Louisiana
-          </p>
         </div>
       </footer>
     </div>
