@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { 
+import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
+import {
   Calendar, 
   CheckCircle, 
   Clock, 
@@ -678,55 +679,18 @@ export default function StPeterChanelDashboard() {
               <p className="text-gray-600">What becomes available when we continue our partnership</p>
             </div>
 
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="bg-white rounded-xl p-5 shadow-sm">
-                <div className="w-10 h-10 bg-[#38618C] rounded-lg flex items-center justify-center text-white mb-3">
-                  <BookOpen className="w-5 h-5" />
-                </div>
-                <h3 className="font-bold text-[#1e2749] mb-2">Book Delivery</h3>
-                <p className="text-sm text-gray-600 mb-3">Physical copy of Teachers Deserve It to every teacher before school starts, creating shared language from Day 1</p>
-                <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-1 rounded-full font-medium">Full Blueprint</span>
-              </div>
+            {/* Embedded How We Partner Content - excludes Leadership Dashboard tab */}
+            <HowWePartnerTabs excludeTabs={['dashboard']} showCTAs={false} />
 
-              <div className="bg-white rounded-xl p-5 shadow-sm">
-                <div className="w-10 h-10 bg-[#38618C] rounded-lg flex items-center justify-center text-white mb-3">
-                  <Target className="w-5 h-5" />
-                </div>
-                <h3 className="font-bold text-[#1e2749] mb-2">Full Observation Cycles</h3>
-                <p className="text-sm text-gray-600 mb-3">Multiple observation rounds with deeper coaching and extended follow-up</p>
-                <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-1 rounded-full font-medium">Full Blueprint</span>
-              </div>
-
-              <div className="bg-white rounded-xl p-5 shadow-sm">
-                <div className="w-10 h-10 bg-[#38618C] rounded-lg flex items-center justify-center text-white mb-3">
-                  <Users className="w-5 h-5" />
-                </div>
-                <h3 className="font-bold text-[#1e2749] mb-2">Peer Coaching Circles</h3>
-                <p className="text-sm text-gray-600 mb-3">Teacher-to-teacher support structures and collaborative learning communities</p>
-                <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-1 rounded-full font-medium">Full Blueprint</span>
-              </div>
-
-              <div className="bg-white rounded-xl p-5 shadow-sm">
-                <div className="w-10 h-10 bg-[#38618C] rounded-lg flex items-center justify-center text-white mb-3">
-                  <Award className="w-5 h-5" />
-                </div>
-                <h3 className="font-bold text-[#1e2749] mb-2">Leadership Pathways</h3>
-                <p className="text-sm text-gray-600 mb-3">Development track for emerging teacher-leaders to champion implementation</p>
-                <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-1 rounded-full font-medium">Full Blueprint</span>
-              </div>
-            </div>
-
-            <div className="bg-[#1e2749] text-white rounded-xl p-6 text-center">
-              <div className="text-3xl font-bold mb-1">85%</div>
-              <div className="text-white/80 mb-4">of TDI partner schools continue their partnership</div>
-              <a 
-                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+            {/* Learn more link */}
+            <div className="text-center mt-6">
+              <a
+                href="https://teachersdeserveit.com/how-we-partner"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-6 py-3 rounded-xl font-semibold transition-all"
+                className="text-[#38618C] hover:text-[#2d4e73] font-medium underline underline-offset-4 transition-colors"
               >
-                <Calendar className="w-5 h-5" />
-                Discuss Full Blueprint Options
+                View full details on our website →
               </a>
             </div>
           </div>
