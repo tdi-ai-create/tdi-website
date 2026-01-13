@@ -28,8 +28,21 @@ import {
   User,
   BarChart3,
   Sparkles,
-  Headphones
+  Headphones,
+  Info
 } from 'lucide-react';
+
+// Tooltip component
+const Tooltip = ({ children, content }: { children: React.ReactNode; content: string }) => (
+  <span className="relative group inline-flex items-center">
+    {children}
+    <Info className="w-3.5 h-3.5 text-gray-400 ml-1 cursor-help" />
+    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-[#1e2749] text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap max-w-xs text-center z-50">
+      {content}
+      <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1e2749]"></span>
+    </span>
+  </span>
+);
 
 export default function StPeterChanelDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -439,14 +452,14 @@ export default function StPeterChanelDashboard() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28">Industry Avg</span>
+                      <Tooltip content="National averages from RAND 2025 and Learning Policy Institute"><span className="text-xs text-gray-500">Industry Avg</span></Tooltip>
                       <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
                         <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '85%' }}></div>
                       </div>
                       <span className="text-xs font-semibold text-[#E07A5F] w-12 text-right">8-9/10</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28">TDI Partners</span>
+                      <Tooltip content="Averages from TDI partner school surveys"><span className="text-xs text-gray-500">TDI Partners</span></Tooltip>
                       <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
                         <div className="h-full rounded-full bg-[#38618C]" style={{ width: '55%' }}></div>
                       </div>
@@ -470,14 +483,14 @@ export default function StPeterChanelDashboard() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28">Industry Avg</span>
+                      <Tooltip content="National averages from RAND 2025 and Learning Policy Institute"><span className="text-xs text-gray-500">Industry Avg</span></Tooltip>
                       <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
                         <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '10%' }}></div>
                       </div>
                       <span className="text-xs font-semibold text-[#E07A5F] w-12 text-right">10%</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28">TDI Partners</span>
+                      <Tooltip content="Averages from TDI partner school surveys"><span className="text-xs text-gray-500">TDI Partners</span></Tooltip>
                       <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
                         <div className="h-full rounded-full bg-[#38618C]" style={{ width: '65%' }}></div>
                       </div>
@@ -525,14 +538,14 @@ export default function StPeterChanelDashboard() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28">Industry Avg</span>
+                      <Tooltip content="National averages from RAND 2025 and Learning Policy Institute"><span className="text-xs text-gray-500">Industry Avg</span></Tooltip>
                       <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
                         <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '30%' }}></div>
                       </div>
                       <span className="text-xs font-semibold text-[#E07A5F] w-12 text-right">2-4/10</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28">TDI Partners</span>
+                      <Tooltip content="Averages from TDI partner school surveys"><span className="text-xs text-gray-500">TDI Partners</span></Tooltip>
                       <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
                         <div className="h-full rounded-full bg-[#38618C]" style={{ width: '60%' }}></div>
                       </div>
@@ -699,7 +712,7 @@ export default function StPeterChanelDashboard() {
                       <div className="bg-gray-100 rounded-lg p-4 border border-gray-200">
                         <h4 className="font-semibold text-gray-600 mb-1 text-sm flex items-center gap-2">
                           <Lock className="w-4 h-4" />
-                          Unlocks When
+                          <Tooltip content="Phase progression is evidence-based, not time-based"><span>Unlocks When</span></Tooltip>
                         </h4>
                         <p className="text-gray-500 text-sm">{currentPhase.unlocks}</p>
                       </div>
@@ -764,7 +777,7 @@ export default function StPeterChanelDashboard() {
                         </div>
                         <div>
                           <div className="text-2xl font-bold text-[#38618C]">25</div>
-                          <div className="text-xs text-gray-500">Love Notes Sent</div>
+                          <Tooltip content="Personalized feedback emails sent to each observed teacher"><span className="text-xs text-gray-500">Love Notes Sent</span></Tooltip>
                         </div>
                         <div>
                           <div className="text-2xl font-bold text-[#38618C]">2</div>
@@ -943,7 +956,7 @@ export default function StPeterChanelDashboard() {
 
                 {/* Chart 2: Hub Engagement Status */}
                 <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
-                  <div className="text-sm font-semibold text-[#1e2749] mb-4">Hub Engagement</div>
+                  <div className="text-sm font-semibold text-[#1e2749] mb-4"><Tooltip content="Login activity on TDI Learning Hub since account creation"><span>Hub Engagement</span></Tooltip></div>
                   <div className="space-y-3">
                     <div>
                       <div className="flex justify-between text-xs mb-1">
