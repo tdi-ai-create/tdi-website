@@ -896,15 +896,6 @@ export default function StPeterChanelDashboard() {
                       <div className="text-gray-600 text-sm">On-site classroom observations</div>
                       <div className="text-gray-500 text-xs mt-1">Follow-up visit scheduled</div>
                     </div>
-                    <a
-                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      Confirm Details
-                    </a>
                   </div>
                 </div>
               </div>
