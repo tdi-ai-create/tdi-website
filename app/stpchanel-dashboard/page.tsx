@@ -556,22 +556,6 @@ export default function StPeterChanelDashboard() {
               </p>
             </div>
 
-            {/* Implementation Equation */}
-            <div className="bg-[#38618C] text-white rounded-xl p-4">
-              <div className="flex flex-wrap items-center justify-center gap-3 text-sm md:text-base font-semibold">
-                <span className="bg-white/20 px-3 py-1 rounded">Strong Teachers</span>
-                <ArrowRight className="w-4 h-4" />
-                <span className="bg-white/20 px-3 py-1 rounded">Strong Teaching</span>
-                <ArrowRight className="w-4 h-4" />
-                <span className="bg-white/20 px-3 py-1 rounded">Student Success</span>
-                <ArrowRight className="w-4 h-4" />
-                <span className="bg-white/20 px-3 py-1 rounded">Statewide Results</span>
-              </div>
-              <p className="text-center text-white/80 mt-2 text-xs">
-                Phase progression is evidence-based, not time-based. We move forward when data shows readiness.
-              </p>
-            </div>
-
             {/* Phase Tabs - Button Style */}
             <div className="flex flex-wrap gap-2">
               {phases.map((phase) => {
