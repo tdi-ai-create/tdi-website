@@ -217,7 +217,7 @@ export default function StPeterChanelDashboard() {
           <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">Our Partnership Journey</h2>
           
           {/* Phase Tabs */}
-          <div className="flex flex-wrap gap-2 mb-6 justify-center">
+          <div className="flex gap-2 mb-6 justify-center overflow-x-auto">
             {phases.map((phase) => (
               <button
                 key={phase.id}
