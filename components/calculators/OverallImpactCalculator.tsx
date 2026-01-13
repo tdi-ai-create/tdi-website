@@ -15,9 +15,9 @@ export function OverallImpactCalculator() {
   // Calculate per-teacher spend from budget and teacher count
   const pdBudgetPerTeacher = Math.round(annualBudget / teacherCount);
 
-  // Calculate effective value based on implementation rates
-  const traditionalEffective = Math.round(pdBudgetPerTeacher * 0.10);
-  const tdiEffective = Math.round(pdBudgetPerTeacher * 0.65);
+  // Calculate teachers who will change practice based on implementation rates
+  const traditionalTeachers = Math.round(teacherCount * 0.10);
+  const tdiTeachers = Math.round(teacherCount * 0.65);
 
   // Morale improvement: +1 to +3 based on starting point (lower starting = more room to grow)
   const moraleImprovement = morale <= 4 ? 3 : morale <= 6 ? 2 : 1;
@@ -69,30 +69,44 @@ export function OverallImpactCalculator() {
               {/* Comparison boxes - side by side on desktop, stacked on mobile */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
                 {/* Traditional PD Box */}
-                <div className="rounded-lg p-3" style={{ backgroundColor: '#f3f4f6', border: '1px solid #e5e7eb' }}>
+                <div className="rounded-lg p-4" style={{ backgroundColor: '#f3f4f6', border: '1px solid #e5e7eb' }}>
                   <p className="text-xs font-bold mb-2 text-center" style={{ color: '#6b7280' }}>Traditional PD</p>
-                  <p className="text-sm text-center mb-1" style={{ color: '#1e2749' }}>
-                    Your ${pdBudgetPerTeacher.toLocaleString()}/teacher budget
+                  <p className="text-sm text-center mb-3" style={{ color: '#6b7280' }}>
+                    Only 10% implementation
                   </p>
-                  <p className="text-sm text-center mb-2" style={{ color: '#6b7280' }}>
-                    Only 10% gets implemented
+                  {/* Progress bar */}
+                  <div className="w-full h-3 rounded-full mb-3" style={{ backgroundColor: '#e5e7eb' }}>
+                    <div
+                      className="h-3 rounded-full"
+                      style={{ width: '10%', backgroundColor: '#9ca3af' }}
+                    />
+                  </div>
+                  <p className="text-center text-sm" style={{ color: '#1e2749' }}>
+                    <strong className="text-lg">{traditionalTeachers}</strong> of your {teacherCount} teachers
                   </p>
-                  <p className="text-center font-bold" style={{ color: '#1e2749' }}>
-                    ${traditionalEffective.toLocaleString()} actually reaches classrooms
+                  <p className="text-center text-xs" style={{ color: '#6b7280' }}>
+                    will change their practice
                   </p>
                 </div>
 
                 {/* TDI Box */}
-                <div className="rounded-lg p-3" style={{ backgroundColor: '#dcfce7', border: '2px solid #22c55e' }}>
+                <div className="rounded-lg p-4" style={{ backgroundColor: '#dcfce7', border: '2px solid #22c55e' }}>
                   <p className="text-xs font-bold mb-2 text-center" style={{ color: '#16a34a' }}>With TDI</p>
-                  <p className="text-sm text-center mb-1" style={{ color: '#1e2749' }}>
-                    Same ${pdBudgetPerTeacher.toLocaleString()}/teacher budget
+                  <p className="text-sm text-center mb-3" style={{ color: '#16a34a' }}>
+                    65% implementation
                   </p>
-                  <p className="text-sm text-center mb-2" style={{ color: '#16a34a' }}>
-                    65% gets implemented
+                  {/* Progress bar */}
+                  <div className="w-full h-3 rounded-full mb-3" style={{ backgroundColor: '#bbf7d0' }}>
+                    <div
+                      className="h-3 rounded-full"
+                      style={{ width: '65%', backgroundColor: '#22c55e' }}
+                    />
+                  </div>
+                  <p className="text-center text-sm" style={{ color: '#1e2749' }}>
+                    <strong className="text-lg" style={{ color: '#16a34a' }}>{tdiTeachers}</strong> of your {teacherCount} teachers
                   </p>
-                  <p className="text-center font-bold" style={{ color: '#16a34a', fontSize: '16px' }}>
-                    ${tdiEffective.toLocaleString()} actually reaches classrooms
+                  <p className="text-center text-xs" style={{ color: '#16a34a' }}>
+                    will change their practice
                   </p>
                 </div>
               </div>
