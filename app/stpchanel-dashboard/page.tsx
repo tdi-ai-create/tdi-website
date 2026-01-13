@@ -27,7 +27,8 @@ import {
   Building,
   User,
   BarChart3,
-  Sparkles
+  Sparkles,
+  Headphones
 } from 'lucide-react';
 
 export default function StPeterChanelDashboard() {
@@ -917,6 +918,53 @@ export default function StPeterChanelDashboard() {
                   </span>
                 </a>
 
+              </div>
+
+              {/* Additional Resources */}
+              <div className="mt-6 pt-6 border-t border-gray-200">
+                <p className="text-sm font-medium text-gray-600 mb-4">More ways to grow</p>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+
+                  {/* Weekly Blog Strategies */}
+                  <a
+                    href="https://raehughart.substack.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-white rounded-xl p-5 border border-gray-200 hover:border-[#35A7FF] hover:shadow-md transition-all group flex gap-4"
+                  >
+                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-[#35A7FF]/10 transition-colors">
+                      <Mail className="w-6 h-6 text-[#38618C] group-hover:text-[#35A7FF]" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-[#1e2749] mb-1">Weekly Strategies</div>
+                      <p className="text-xs text-gray-500 mb-2">Fresh, practical ideas delivered 3x per week to your inbox</p>
+                      <span className="text-xs text-[#35A7FF] font-medium flex items-center gap-1">
+                        Subscribe on Substack <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </a>
+
+                  {/* Podcast */}
+                  <a
+                    href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-white rounded-xl p-5 border border-gray-200 hover:border-[#35A7FF] hover:shadow-md transition-all group flex gap-4"
+                  >
+                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-[#35A7FF]/10 transition-colors">
+                      <Headphones className="w-6 h-6 text-[#38618C] group-hover:text-[#35A7FF]" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-[#1e2749] mb-1">Sustainable Teaching Podcast</div>
+                      <p className="text-xs text-gray-500 mb-2">Real conversations about what actually works in the classroom</p>
+                      <span className="text-xs text-[#35A7FF] font-medium flex items-center gap-1">
+                        Listen now <ArrowRight className="w-3 h-3" />
+                      </span>
+                    </div>
+                  </a>
+
+                </div>
               </div>
 
               <div className="text-center mt-6">
