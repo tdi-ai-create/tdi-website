@@ -377,6 +377,42 @@ export default function StPeterChanelDashboard() {
         {/* OUR JOURNEY TAB */}
         {activeTab === 'journey' && (
           <div className="space-y-6">
+            {/* Partnership Goal & Indicators */}
+            <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+              <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-1">Our Shared Goal</div>
+              <h3 className="text-xl font-bold text-[#1e2749] mb-4">Student performance aligned with state benchmarks</h3>
+
+              <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Leading Indicators</div>
+              <p className="text-gray-500 text-xs mb-4">Baseline data collection: January 14, 2025</p>
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="bg-[#F5F5F5] rounded-lg p-4 text-center">
+                  <div className="text-sm font-semibold text-[#1e2749] mb-1">Teacher Stress</div>
+                  <div className="text-2xl font-bold text-gray-300">TBD</div>
+                  <div className="text-xs text-gray-400 mt-1">Baseline pending</div>
+                </div>
+                <div className="bg-[#F5F5F5] rounded-lg p-4 text-center">
+                  <div className="text-sm font-semibold text-[#1e2749] mb-1">Strategy Implementation</div>
+                  <div className="text-2xl font-bold text-gray-300">TBD</div>
+                  <div className="text-xs text-gray-400 mt-1">Baseline pending</div>
+                </div>
+                <div className="bg-[#F5F5F5] rounded-lg p-4 text-center">
+                  <div className="text-sm font-semibold text-[#1e2749] mb-1">Grading Alignment</div>
+                  <div className="text-2xl font-bold text-gray-300">TBD</div>
+                  <div className="text-xs text-gray-400 mt-1">Baseline pending</div>
+                </div>
+                <div className="bg-[#F5F5F5] rounded-lg p-4 text-center">
+                  <div className="text-sm font-semibold text-[#1e2749] mb-1">Retention Intent</div>
+                  <div className="text-2xl font-bold text-gray-300">TBD</div>
+                  <div className="text-xs text-gray-400 mt-1">Baseline pending</div>
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-400 text-center mt-4">
+                These indicators help us track progress toward our shared goal
+              </p>
+            </div>
+
             {/* Implementation Equation */}
             <div className="bg-[#38618C] text-white rounded-xl p-4">
               <div className="flex flex-wrap items-center justify-center gap-3 text-sm md:text-base font-semibold">
