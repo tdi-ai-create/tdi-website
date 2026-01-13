@@ -170,7 +170,7 @@ export default function StPeterChanelDashboard() {
               href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#38618C] hover:bg-[#2d4e73] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+              className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
             >
               <Calendar className="w-4 h-4" />
               <span className="hidden sm:inline">Schedule Session</span>
@@ -291,7 +291,7 @@ export default function StPeterChanelDashboard() {
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-[#38618C] hover:bg-[#2d4e73] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all"
+                    className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all"
                   >
                     <Calendar className="w-4 h-4" />
                     Schedule
@@ -309,7 +309,7 @@ export default function StPeterChanelDashboard() {
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-[#38618C] hover:bg-[#2d4e73] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all"
+                    className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all"
                   >
                     <Calendar className="w-4 h-4" />
                     Schedule
@@ -616,7 +616,7 @@ export default function StPeterChanelDashboard() {
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full bg-[#38618C] hover:bg-[#2d4e73] text-white text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                  className="block w-full bg-[#35A7FF] hover:bg-[#2589db] text-white text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
                 >
                   <Calendar className="w-4 h-4" />
                   Schedule This Session
@@ -660,7 +660,7 @@ export default function StPeterChanelDashboard() {
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block w-full bg-[#38618C] hover:bg-[#2d4e73] text-white text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                  className="block w-full bg-[#35A7FF] hover:bg-[#2589db] text-white text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
                 >
                   <Calendar className="w-4 h-4" />
                   Schedule This Session
@@ -723,7 +723,7 @@ export default function StPeterChanelDashboard() {
                 href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-[#38618C] hover:bg-[#2d4e73] text-white px-6 py-3 rounded-xl font-semibold transition-all"
+                className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-6 py-3 rounded-xl font-semibold transition-all"
               >
                 <Calendar className="w-5 h-5" />
                 Discuss Full Blueprint Options
@@ -784,7 +784,7 @@ export default function StPeterChanelDashboard() {
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-[#38618C] hover:bg-[#2d4e73] text-white px-6 py-3 rounded-xl font-semibold transition-all"
+                    className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-6 py-3 rounded-xl font-semibold transition-all"
                   >
                     <Calendar className="w-5 h-5" />
                     Schedule Time with Rae
@@ -840,7 +840,7 @@ export default function StPeterChanelDashboard() {
             href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-[#38618C] hover:bg-[#2d4e73] text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm"
+            className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm"
           >
             <Calendar className="w-4 h-4" />
             Schedule a Call
