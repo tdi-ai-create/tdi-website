@@ -139,6 +139,7 @@ export default function StPeterChanelDashboard() {
         'Success story documentation',
         'Future planning session'
       ],
+      unlocks: 'Deepening phase complete + 50%+ Hub engagement + Measurable classroom practice shifts',
       tdiStats: [
         { label: 'Partner Retention', value: '85%', sublabel: 'Schools continue partnership' },
         { label: 'Implementation Rate', value: '65%', sublabel: 'vs 10% industry average' }
