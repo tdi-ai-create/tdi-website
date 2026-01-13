@@ -745,7 +745,7 @@ export default function StPeterChanelDashboard() {
                 {/* Rae's Photo */}
                 <div className="w-32 h-32 rounded-xl overflow-hidden bg-[#F5F5F5] flex-shrink-0">
                   <Image
-                    src="/images/rae-hughart.jpg"
+                    src="/images/rae-headshot.webp"
                     alt="Rae Hughart"
                     width={128}
                     height={128}
@@ -792,6 +792,16 @@ export default function StPeterChanelDashboard() {
                 </div>
               </div>
             </div>
+
+            {/* Meet the Full Team Button */}
+            <a
+              href="https://teachersdeserveit.com/about"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full max-w-2xl mx-auto bg-[#F5F5F5] hover:bg-gray-200 text-[#1e2749] text-center py-4 rounded-xl font-semibold transition-all border border-gray-200"
+            >
+              Meet the Full TDI Team →
+            </a>
 
             {/* School Info */}
             <div className="bg-white rounded-xl p-5 shadow-sm max-w-2xl mx-auto">
