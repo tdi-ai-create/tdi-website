@@ -294,42 +294,43 @@ export default function StPeterChanelDashboard() {
               </div>
             </div>
 
-            {/* Student Performance Tracker */}
+            {/* Student Performance - Paula's Core Question */}
             <div className="bg-white rounded-xl p-5 shadow-sm mb-6">
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <GraduationCap className="w-5 h-5 text-[#38618C]" />
                   <span className="font-semibold text-[#1e2749]">Student Performance</span>
                 </div>
-                <span className="text-xs text-gray-400">LEAP 2025 Mastery+ Rate</span>
+              </div>
+
+              <div className="bg-[#E07A5F]/10 border border-[#E07A5F]/20 rounded-lg p-4 mb-4">
+                <p className="text-sm text-[#1e2749] font-medium mb-1">Paula&apos;s Question:</p>
+                <p className="text-sm text-gray-700 italic">&quot;Why do our scores not match our data?&quot;</p>
+                <p className="text-xs text-gray-500 mt-2">Students appear successful in classroom grades, but standardized assessments tell a different story.</p>
               </div>
 
               <div className="space-y-3">
-                {/* Louisiana State Average */}
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-gray-500 w-32">Louisiana State Avg</span>
-                  <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                    <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '35%' }}></div>
+                {/* Louisiana State Benchmark */}
+                <div>
+                  <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                    <span>Louisiana Benchmark (Mastery+)</span>
+                    <span className="font-semibold text-[#38618C]">35%</span>
                   </div>
-                  <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">35%</span>
+                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full rounded-full bg-[#38618C]" style={{ width: '35%' }}></div>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-1">State target for grade-level proficiency</p>
                 </div>
 
-                {/* St. James Parish */}
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-gray-500 w-32">St. James Parish</span>
-                  <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                    <div className="h-full rounded-full bg-[#38618C]" style={{ width: '72%' }}></div>
+                {/* St. Peter Chanel - TBD */}
+                <div>
+                  <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+                    <span>St. Peter Chanel Assessment Data</span>
+                    <span className="font-medium text-gray-400">Collecting Jan 14</span>
                   </div>
-                  <span className="text-xs font-semibold text-[#38618C] w-14 text-right">~72%</span>
-                </div>
-
-                {/* St. Peter Chanel - Placeholder */}
-                <div className="flex items-center gap-3">
-                  <span className="text-xs text-gray-500 w-32">St. Peter Chanel</span>
-                  <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
                     <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
                   </div>
-                  <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
                 </div>
               </div>
 
@@ -337,12 +338,10 @@ export default function StPeterChanelDashboard() {
                 <div className="flex items-start gap-2">
                   <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
                   <p className="text-xs text-gray-600">
-                    <span className="font-semibold text-[#1e2749]">Next step:</span> Share your internal assessment data so we can track alignment to state benchmarks
+                    <span className="font-semibold text-[#1e2749]">What we&apos;re tracking:</span> Are classroom grades predicting assessment performance? We&apos;ll compare internal grades to benchmark assessments to find the gap.
                   </p>
                 </div>
               </div>
-
-              <p className="text-xs text-gray-400 mt-3">Source: Louisiana Dept. of Education LEAP 2025 Results</p>
             </div>
 
             {/* Needs Attention */}
