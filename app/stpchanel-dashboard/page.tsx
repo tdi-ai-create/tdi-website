@@ -958,48 +958,35 @@ export default function StPeterChanelDashboard() {
                   </div>
                 </div>
 
-                {/* Chart 2: Hub Engagement Status */}
+                {/* Hub Engagement - Simplified */}
                 <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
-                  <div className="text-sm font-semibold text-[#1e2749] mb-4"><Tooltip content="Login activity on TDI Learning Hub since account creation"><span>Hub Engagement</span></Tooltip></div>
-                  <div className="space-y-3">
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Power Users (5+ logins)</span>
-                        <span className="font-semibold text-[#38618C]">1</span>
-                      </div>
-                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '4%' }}></div>
-                      </div>
+                  <div className="text-sm font-semibold text-[#1e2749] mb-4">Hub Engagement</div>
+
+                  <div className="text-center mb-4">
+                    <div className="text-4xl font-bold text-[#1e2749]">2 <span className="text-lg font-normal text-gray-400">/ 25</span></div>
+                    <div className="text-sm text-gray-500 mt-1">teachers have logged in</div>
+                  </div>
+
+                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden mb-2">
+                    <div className="h-full bg-[#38618C] rounded-full" style={{ width: '8%' }}></div>
+                  </div>
+
+                  <div className="flex justify-between text-xs text-gray-500 mb-4">
+                    <span>Current: 8%</span>
+                    <span>Goal: 80%</span>
+                  </div>
+
+                  <div className="space-y-2 pt-3 border-t border-gray-100">
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-yellow-500">⭐</span>
+                      <span className="text-gray-600">Sandi Waguespack — power user</span>
                     </div>
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Exploring (1-4 logins)</span>
-                        <span className="font-semibold text-[#35A7FF]">1</span>
-                      </div>
-                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#35A7FF] rounded-full" style={{ width: '4%' }}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Account Ready (0 logins)</span>
-                        <span className="font-semibold text-gray-400">21</span>
-                      </div>
-                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-gray-300 rounded-full" style={{ width: '84%' }}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Need Account</span>
-                        <span className="font-semibold text-[#E07A5F]">2</span>
-                      </div>
-                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '8%' }}></div>
-                      </div>
+                    <div className="flex items-center gap-2 text-xs">
+                      <span className="text-[#35A7FF]">●</span>
+                      <span className="text-gray-600">Jordyn Middleton — exploring</span>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-400 mt-3">⭐ Sandi Waguespack: Top engager</p>
+
                   <div className="mt-4 pt-3 border-t border-gray-100">
                     <div className="flex items-start gap-2">
                       <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
