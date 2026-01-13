@@ -735,12 +735,19 @@ export default function StPeterChanelDashboard() {
                       </div>
                     </div>
 
-                    <div className={`rounded-lg p-4 border ${currentPhase.isLocked ? 'bg-gray-50 border-gray-200' : 'bg-[#38618C]/5 border-[#38618C]/20'}`}>
+                    <div
+                      onClick={() => {
+                        setActiveTab('blueprint');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                      className={`rounded-lg p-4 border cursor-pointer hover:shadow-md transition-all ${currentPhase.isLocked ? 'bg-gray-50 border-gray-200 hover:bg-gray-100' : 'bg-[#38618C]/5 border-[#38618C]/20 hover:bg-[#38618C]/10'}`}
+                    >
                       <h4 className={`font-semibold mb-1 text-sm flex items-center gap-2 ${currentPhase.isLocked ? 'text-gray-500' : 'text-[#1e2749]'}`}>
                         <Star className={`w-4 h-4 ${currentPhase.isLocked ? 'text-gray-400' : 'text-[#38618C]'}`} />
                         With Full Blueprint
                       </h4>
                       <p className={`text-xs ${currentPhase.isLocked ? 'text-gray-400' : 'text-gray-600'}`}>{currentPhase.blueprintPreview}</p>
+                      <span className="text-xs text-[#35A7FF] mt-2 inline-block">Learn more →</span>
                     </div>
                   </div>
                 </div>
