@@ -3,9 +3,16 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  const isActive = (href: string) => {
+    if (href === '/') return pathname === '/';
+    return pathname.startsWith(href);
+  };
 
   const navLinks = [
     { href: '/', label: 'Home' },
@@ -52,8 +59,11 @@ export function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-sm font-medium hover-color-shift"
-                  style={{ color: 'var(--tdi-charcoal)' }}
+                  className={`text-sm font-medium px-3 py-1.5 rounded-full transition-all ${
+                    isActive(link.href)
+                      ? 'bg-[#35A7FF]/15 text-[#35A7FF]'
+                      : 'text-[#1e2749] hover:text-[#35A7FF]'
+                  }`}
                 >
                   {link.label}
                 </Link>
@@ -104,8 +114,11 @@ export function Header() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="text-sm font-medium"
-                    style={{ color: 'var(--tdi-charcoal)' }}
+                    className={`text-sm font-medium px-3 py-1.5 rounded-full transition-all w-fit ${
+                      isActive(link.href)
+                        ? 'bg-[#35A7FF]/15 text-[#35A7FF]'
+                        : 'text-[#1e2749] hover:text-[#35A7FF]'
+                    }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {link.label}
