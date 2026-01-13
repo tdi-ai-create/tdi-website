@@ -680,7 +680,7 @@ export default function StPeterChanelDashboard() {
             </div>
 
             {/* Embedded How We Partner Content - excludes Leadership Dashboard tab */}
-            <HowWePartnerTabs excludeTabs={['dashboard']} showCTAs={false} />
+            <HowWePartnerTabs excludeTabs={['dashboard', 'calculator']} showCTAs={false} />
 
             {/* Learn more link */}
             <div className="text-center mt-6">
