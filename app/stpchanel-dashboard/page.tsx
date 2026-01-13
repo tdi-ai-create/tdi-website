@@ -386,30 +386,95 @@ export default function StPeterChanelDashboard() {
               <p className="text-gray-500 text-xs mb-4">Baseline data collection: January 14, 2025</p>
 
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-[#F5F5F5] rounded-lg p-4 text-center">
-                  <div className="text-sm font-semibold text-[#1e2749] mb-1">Teacher Stress</div>
-                  <div className="text-2xl font-bold text-gray-300">TBD</div>
-                  <div className="text-xs text-gray-400 mt-1">Baseline pending</div>
+
+                {/* Teacher Stress */}
+                <div className="bg-[#F5F5F5] rounded-lg p-4">
+                  <div className="text-sm font-semibold text-[#1e2749] mb-3">Teacher Stress</div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">Industry Avg</span>
+                      <span className="text-sm font-bold text-[#E07A5F]">8-9/10</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">TDI Partner Avg</span>
+                      <span className="text-sm font-bold text-[#38618C]">5-7/10</span>
+                    </div>
+                    <div className="border-t border-gray-200 pt-2 mt-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">St. Peter Chanel</span>
+                        <span className="text-sm font-bold text-gray-400">Collecting Jan 14</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-[#F5F5F5] rounded-lg p-4 text-center">
-                  <div className="text-sm font-semibold text-[#1e2749] mb-1">Strategy Implementation</div>
-                  <div className="text-2xl font-bold text-gray-300">TBD</div>
-                  <div className="text-xs text-gray-400 mt-1">Baseline pending</div>
+
+                {/* Strategy Implementation */}
+                <div className="bg-[#F5F5F5] rounded-lg p-4">
+                  <div className="text-sm font-semibold text-[#1e2749] mb-3">Strategy Implementation</div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">Industry Avg</span>
+                      <span className="text-sm font-bold text-[#E07A5F]">10%</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">TDI Partner Avg</span>
+                      <span className="text-sm font-bold text-[#38618C]">65%</span>
+                    </div>
+                    <div className="border-t border-gray-200 pt-2 mt-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">St. Peter Chanel</span>
+                        <span className="text-sm font-bold text-gray-400">Collecting Jan 14</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-[#F5F5F5] rounded-lg p-4 text-center">
-                  <div className="text-sm font-semibold text-[#1e2749] mb-1">Grading Alignment</div>
-                  <div className="text-2xl font-bold text-gray-300">TBD</div>
-                  <div className="text-xs text-gray-400 mt-1">Baseline pending</div>
+
+                {/* Grading Alignment */}
+                <div className="bg-[#F5F5F5] rounded-lg p-4">
+                  <div className="text-sm font-semibold text-[#1e2749] mb-3">Grading Alignment</div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">Target</span>
+                      <span className="text-sm font-bold text-[#38618C]">Aligned</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">Focus</span>
+                      <span className="text-xs text-gray-600">State test alignment</span>
+                    </div>
+                    <div className="border-t border-gray-200 pt-2 mt-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">St. Peter Chanel</span>
+                        <span className="text-sm font-bold text-gray-400">Assessing Jan 14</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <div className="bg-[#F5F5F5] rounded-lg p-4 text-center">
-                  <div className="text-sm font-semibold text-[#1e2749] mb-1">Retention Intent</div>
-                  <div className="text-2xl font-bold text-gray-300">TBD</div>
-                  <div className="text-xs text-gray-400 mt-1">Baseline pending</div>
+
+                {/* Retention Intent */}
+                <div className="bg-[#F5F5F5] rounded-lg p-4">
+                  <div className="text-sm font-semibold text-[#1e2749] mb-3">Retention Intent</div>
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">Industry Avg</span>
+                      <span className="text-sm font-bold text-[#E07A5F]">2-4/10</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-xs text-gray-500">TDI Partner Avg</span>
+                      <span className="text-sm font-bold text-[#38618C]">5-7/10</span>
+                    </div>
+                    <div className="border-t border-gray-200 pt-2 mt-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-xs text-gray-500">St. Peter Chanel</span>
+                        <span className="text-sm font-bold text-gray-400">Collecting Jan 14</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+
               </div>
 
               <p className="text-xs text-gray-400 text-center mt-4">
-                These indicators help us track progress toward our shared goal
+                Industry data from RAND 2025, Learning Policy Institute. TDI averages from partner school surveys.
               </p>
             </div>
 
