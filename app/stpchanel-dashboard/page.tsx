@@ -878,15 +878,145 @@ export default function StPeterChanelDashboard() {
               </div>
             </div>
 
-            {/* SECTION B: Implementation Insights (Placeholder) */}
+            {/* SECTION B: Implementation Insights */}
             <div className="mb-8">
               <h3 className="text-xl font-bold text-[#1e2749] mb-4">Implementation Insights</h3>
+              <p className="text-gray-600 text-sm mb-6">Data from September 30 observation visit</p>
 
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 text-center">
-                <BarChart3 className="w-12 h-12 mx-auto text-gray-300 mb-2" />
-                <p className="text-gray-500 font-medium">Charts coming soon</p>
-                <p className="text-gray-400 text-sm mt-1">Visual insights will populate as we collect more data</p>
+              <div className="grid md:grid-cols-3 gap-6">
+
+                {/* Chart 1: Growth Area Distribution */}
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+                  <div className="text-sm font-semibold text-[#1e2749] mb-4">Growth Area Distribution</div>
+                  <div className="flex items-center justify-center gap-4">
+                    <div className="relative w-32 h-32">
+                      {/* Simple donut chart using CSS */}
+                      <svg viewBox="0 0 36 36" className="w-full h-full">
+                        <path
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          fill="none"
+                          stroke="#38618C"
+                          strokeWidth="3"
+                          strokeDasharray="45, 100"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          fill="none"
+                          stroke="#35A7FF"
+                          strokeWidth="3"
+                          strokeDasharray="55, 100"
+                          strokeDashoffset="-45"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-lg font-bold text-[#1e2749]">20</span>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-[#38618C]"></div>
+                        <span className="text-xs text-gray-600">Instructional (9)</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-[#35A7FF]"></div>
+                        <span className="text-xs text-gray-600">Management (11)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Chart 2: Hub Engagement Status */}
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+                  <div className="text-sm font-semibold text-[#1e2749] mb-4">Hub Engagement</div>
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Power Users (5+ logins)</span>
+                        <span className="font-semibold text-[#38618C]">1</span>
+                      </div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '4%' }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Exploring (1-4 logins)</span>
+                        <span className="font-semibold text-[#35A7FF]">1</span>
+                      </div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#35A7FF] rounded-full" style={{ width: '4%' }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Account Ready (0 logins)</span>
+                        <span className="font-semibold text-gray-400">21</span>
+                      </div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gray-300 rounded-full" style={{ width: '84%' }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Need Account</span>
+                        <span className="font-semibold text-[#E07A5F]">2</span>
+                      </div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '8%' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-3">⭐ Sandi Waguespack: Top engager</p>
+                </div>
+
+                {/* Chart 3: Strengths Observed */}
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+                  <div className="text-sm font-semibold text-[#1e2749] mb-4">Top Strengths Observed</div>
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Strong teacher voice</span>
+                        <span className="font-semibold text-[#38618C]">8</span>
+                      </div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '80%' }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Welcoming classroom</span>
+                        <span className="font-semibold text-[#38618C]">6</span>
+                      </div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '60%' }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Creative engagement</span>
+                        <span className="font-semibold text-[#38618C]">5</span>
+                      </div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '50%' }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Clear modeling</span>
+                        <span className="font-semibold text-[#38618C]">4</span>
+                      </div>
+                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '40%' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
               </div>
+
+              <p className="text-xs text-gray-400 text-center mt-4">Data updates after each observation visit and Hub sync</p>
             </div>
 
             {/* SECTION C: Growth Groups */}
