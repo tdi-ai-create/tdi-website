@@ -52,7 +52,7 @@ export default function StPeterChanelDashboard() {
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Eye },
     { id: 'journey', label: 'Our Journey', icon: TrendingUp },
-    { id: 'groups', label: 'Growth Groups', icon: Users },
+    { id: 'implementation', label: 'Implementation', icon: Users },
     { id: 'blueprint', label: 'Full Blueprint', icon: Star },
     { id: 'team', label: 'Your TDI Team', icon: User },
   ];
@@ -880,8 +880,8 @@ export default function StPeterChanelDashboard() {
           </div>
         )}
 
-        {/* GROWTH GROUPS TAB */}
-        {activeTab === 'groups' && (
+        {/* IMPLEMENTATION TAB */}
+        {activeTab === 'implementation' && (
           <div className="space-y-6">
             {/* SECTION A: Observation Timeline */}
             <div className="mb-8">
