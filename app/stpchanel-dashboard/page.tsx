@@ -772,7 +772,10 @@ export default function StPeterChanelDashboard() {
                     <div className="flex items-center justify-between flex-wrap gap-4">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="bg-[#38618C]/10 text-[#38618C] text-xs font-semibold px-2 py-1 rounded-full">COMPLETE</span>
+                          <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" />
+                            COMPLETE
+                          </span>
                           <span className="font-bold text-[#1e2749]">September 30, 2025</span>
                         </div>
                         <div className="text-gray-600 text-sm">On-site classroom observations</div>
@@ -884,7 +887,10 @@ export default function StPeterChanelDashboard() {
                   <div className="flex items-center justify-between flex-wrap gap-4">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="bg-[#35A7FF]/10 text-[#35A7FF] text-xs font-semibold px-2 py-1 rounded-full">UPCOMING</span>
+                        <span className="bg-[#35A7FF]/10 text-[#35A7FF] text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+                          <Calendar className="w-3 h-3" />
+                          UPCOMING
+                        </span>
                         <span className="font-bold text-[#1e2749]">January 14, 2025</span>
                       </div>
                       <div className="text-gray-600 text-sm">On-site classroom observations</div>
