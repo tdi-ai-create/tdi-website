@@ -735,32 +735,119 @@ export default function StPeterChanelDashboard() {
               <h3 className="text-xl font-bold text-[#1e2749] mb-4">Observation Timeline</h3>
 
               <div className="space-y-4">
-                {/* Completed Visit */}
-                <div className="bg-white rounded-xl p-5 shadow-sm border-l-4 border-[#38618C]">
-                  <div className="flex items-center justify-between flex-wrap gap-4">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="bg-[#38618C]/10 text-[#38618C] text-xs font-semibold px-2 py-1 rounded-full">COMPLETE</span>
-                        <span className="font-bold text-[#1e2749]">September 30, 2025</span>
+                {/* Completed Visit - Expanded */}
+                <div className="bg-white rounded-xl shadow-sm border-l-4 border-[#38618C] overflow-hidden">
+
+                  {/* Header */}
+                  <div className="p-5 border-b border-gray-100">
+                    <div className="flex items-center justify-between flex-wrap gap-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="bg-[#38618C]/10 text-[#38618C] text-xs font-semibold px-2 py-1 rounded-full">COMPLETE</span>
+                          <span className="font-bold text-[#1e2749]">September 30, 2025</span>
+                        </div>
+                        <div className="text-gray-600 text-sm">On-site classroom observations</div>
                       </div>
-                      <div className="text-gray-600 text-sm">On-site classroom observations</div>
-                      <div className="mt-3 grid grid-cols-3 gap-4 text-center">
+                      <div className="flex gap-6 text-center">
                         <div>
                           <div className="text-2xl font-bold text-[#1e2749]">25</div>
-                          <div className="text-xs text-gray-500">Classrooms Observed</div>
+                          <div className="text-xs text-gray-500">Classrooms</div>
                         </div>
                         <div>
                           <div className="text-2xl font-bold text-[#38618C]">25</div>
-                          <div className="text-xs text-gray-500">Personalized Emails Sent</div>
+                          <div className="text-xs text-gray-500">Love Notes Sent</div>
                         </div>
                         <div>
                           <div className="text-2xl font-bold text-[#38618C]">2</div>
-                          <div className="text-xs text-gray-500">Growth Groups Formed</div>
+                          <div className="text-xs text-gray-500">Groups Formed</div>
                         </div>
                       </div>
-                      <div className="text-xs text-gray-400 mt-3">Principal CC'd on all teacher emails</div>
                     </div>
                   </div>
+
+                  {/* Insights Grid */}
+                  <div className="p-5 bg-gray-50">
+                    <div className="grid md:grid-cols-2 gap-6">
+
+                      {/* What We Celebrated */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-8 h-8 bg-[#38618C]/10 rounded-lg flex items-center justify-center">
+                            <Star className="w-4 h-4 text-[#38618C]" />
+                          </div>
+                          <span className="font-semibold text-[#1e2749]">What We Celebrated</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-3">Schoolwide strengths observed across classrooms</p>
+                        <div className="space-y-2">
+                          <div className="flex items-start gap-2">
+                            <CheckCircle className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-gray-700">Strong, confident teacher voices across all grade levels</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <CheckCircle className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-gray-700">Welcoming, thoughtfully decorated learning spaces</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <CheckCircle className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-gray-700">Creative engagement strategies (songs, games, movement)</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <CheckCircle className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-gray-700">Positive student-teacher rapport and classroom culture</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Where We're Growing */}
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <div className="w-8 h-8 bg-[#35A7FF]/10 rounded-lg flex items-center justify-center">
+                            <TrendingUp className="w-4 h-4 text-[#35A7FF]" />
+                          </div>
+                          <span className="font-semibold text-[#1e2749]">Where We're Growing</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-3">Focus areas identified for targeted support</p>
+                        <div className="space-y-2">
+                          <div className="flex items-start gap-2">
+                            <ArrowRight className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-gray-700">Time management and lesson pacing strategies</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <ArrowRight className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-gray-700">Differentiated choice boards for varied learners</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <ArrowRight className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-gray-700">Classroom management systems and routines</span>
+                          </div>
+                          <div className="flex items-start gap-2">
+                            <ArrowRight className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-gray-700">Reducing verbal redirections with proactive strategies</span>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  {/* Sample Love Note */}
+                  <div className="p-5 border-t border-gray-100">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center">
+                        <Heart className="w-4 h-4 text-[#E07A5F]" />
+                      </div>
+                      <span className="font-semibold text-[#1e2749]">Sample Love Note</span>
+                      <span className="text-xs text-gray-400">(Each teacher received personalized feedback like this)</span>
+                    </div>
+                    <div className="bg-[#F5F5F5] rounded-lg p-4 border-l-4 border-[#E07A5F]">
+                      <p className="text-sm text-gray-700 italic">
+                        "Your classroom had such a great vibe today — clean, welcoming, a place I'd want to stay all day! I loved your 'Odd Todd and Even Steven' songs and phrases. The way you used a review game as a formative check after packing up homework was genius. Your teacher voice is amazing — clear, warm, and full of energy. Keep leaning into those creative systems!"
+                      </p>
+                      <p className="text-xs text-gray-400 mt-2">— From observation of Cathy Dufresne's math class</p>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-3 text-center">Principal CC'd on all 25 personalized teacher emails</p>
+                  </div>
+
                 </div>
 
                 {/* Upcoming Visit */}
