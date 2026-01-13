@@ -131,8 +131,17 @@ export default function StPeterChanelDashboard() {
       </nav>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-[#1B3A5D] to-[#2d5a87] text-white py-12 px-4">
-        <div className="max-w-5xl mx-auto text-center">
+      <section className="relative text-white py-16 md:py-24 px-4 overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/images/st-peter-chanel-church.jpg')" }}
+        />
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1B3A5D]/90 via-[#1B3A5D]/80 to-[#2d5a87]/75" />
+
+        {/* Content */}
+        <div className="relative max-w-5xl mx-auto text-center">
           <div className="inline-block bg-white/10 backdrop-blur px-4 py-1 rounded-full text-sm font-medium mb-4">
             Partnership Dashboard • January 2026
           </div>
