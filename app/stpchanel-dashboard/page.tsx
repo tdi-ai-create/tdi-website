@@ -87,8 +87,8 @@ export default function StPeterChanelDashboard() {
         'Growth groups identified based on observation data'
       ],
       pending: [
-        'Virtual session for Management/Routines group',
-        'Virtual session for Relationship/Trust group',
+        'Virtual session for Instructional Design group',
+        'Virtual session for Class Management group',
         'Admin check-in with Paula'
       ],
       outcomes: [
@@ -285,7 +285,7 @@ export default function StPeterChanelDashboard() {
                   <div className="flex items-center gap-3">
                     <Calendar className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-gray-800">Virtual session: Management/Routines group</div>
+                      <div className="font-medium text-gray-800">Virtual session: Instructional Design group</div>
                       <div className="text-sm text-gray-500">Included in contract</div>
                     </div>
                   </div>
@@ -303,7 +303,7 @@ export default function StPeterChanelDashboard() {
                   <div className="flex items-center gap-3">
                     <Calendar className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-gray-800">Virtual session: Relationship/Trust group</div>
+                      <div className="font-medium text-gray-800">Virtual session: Class Management group</div>
                       <div className="text-sm text-gray-500">Included in contract</div>
                     </div>
                   </div>
@@ -612,11 +612,39 @@ export default function StPeterChanelDashboard() {
         {/* GROWTH GROUPS TAB */}
         {activeTab === 'groups' && (
           <div className="space-y-6">
-            {/* SECTION 1: Observation Timeline */}
+            {/* SECTION A: Observation Timeline */}
             <div className="mb-8">
               <h3 className="text-xl font-bold text-[#1e2749] mb-4">Observation Timeline</h3>
 
               <div className="space-y-4">
+                {/* Completed Visit */}
+                <div className="bg-white rounded-xl p-5 shadow-sm border-l-4 border-[#38618C]">
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="bg-[#38618C]/10 text-[#38618C] text-xs font-semibold px-2 py-1 rounded-full">COMPLETE</span>
+                        <span className="font-bold text-[#1e2749]">September 30, 2025</span>
+                      </div>
+                      <div className="text-gray-600 text-sm">On-site classroom observations</div>
+                      <div className="mt-3 grid grid-cols-3 gap-4 text-center">
+                        <div>
+                          <div className="text-2xl font-bold text-[#1e2749]">25</div>
+                          <div className="text-xs text-gray-500">Classrooms Observed</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-[#38618C]">25</div>
+                          <div className="text-xs text-gray-500">Personalized Emails Sent</div>
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-[#38618C]">2</div>
+                          <div className="text-xs text-gray-500">Growth Groups Formed</div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-gray-400 mt-3">Principal CC'd on all teacher emails</div>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Upcoming Visit */}
                 <div className="bg-white rounded-xl p-5 shadow-sm border-l-4 border-[#35A7FF]">
                   <div className="flex items-center justify-between flex-wrap gap-4">
@@ -626,118 +654,162 @@ export default function StPeterChanelDashboard() {
                         <span className="font-bold text-[#1e2749]">January 14, 2025</span>
                       </div>
                       <div className="text-gray-600 text-sm">On-site classroom observations</div>
-                      <div className="text-gray-500 text-xs mt-1">25 classrooms scheduled</div>
+                      <div className="text-gray-500 text-xs mt-1">Follow-up visit scheduled</div>
                     </div>
                     <a
                       href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all"
+                      className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
                     >
                       <Calendar className="w-4 h-4" />
                       Confirm Details
                     </a>
                   </div>
                 </div>
-
-                {/* Placeholder for future completed visits - commented out for now */}
-                {/* After 1/14 visit, this structure will be used:
-                <div className="bg-white rounded-xl p-5 shadow-sm border-l-4 border-[#38618C]">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="bg-[#38618C]/10 text-[#38618C] text-xs font-semibold px-2 py-1 rounded-full">COMPLETE</span>
-                    <span className="font-bold text-[#1e2749]">January 14, 2025</span>
-                  </div>
-                  <div className="text-gray-600 text-sm">On-site classroom observations</div>
-                  <div className="mt-3 grid grid-cols-3 gap-4 text-center">
-                    <div>
-                      <div className="text-2xl font-bold text-[#1e2749]">25</div>
-                      <div className="text-xs text-gray-500">Classrooms Observed</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-[#38618C]">25</div>
-                      <div className="text-xs text-gray-500">Personalized Emails Sent</div>
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-[#38618C]">2</div>
-                      <div className="text-xs text-gray-500">Growth Groups Formed</div>
-                    </div>
-                  </div>
-                  <div className="text-xs text-gray-400 mt-3">Principal CC'd on all teacher emails</div>
-                </div>
-                */}
               </div>
             </div>
 
-            {/* SECTION 2: Implementation Insights (Placeholder) */}
+            {/* SECTION B: Implementation Insights (Placeholder) */}
             <div className="mb-8">
               <h3 className="text-xl font-bold text-[#1e2749] mb-4">Implementation Insights</h3>
 
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 text-center">
-                <div className="text-gray-400 mb-2">
-                  <BarChart3 className="w-12 h-12 mx-auto" />
-                </div>
-                <p className="text-gray-500 font-medium">Insights available after first observation</p>
-                <p className="text-gray-400 text-sm mt-1">Data will populate after the January 14 visit</p>
+                <BarChart3 className="w-12 h-12 mx-auto text-gray-300 mb-2" />
+                <p className="text-gray-500 font-medium">Charts coming soon</p>
+                <p className="text-gray-400 text-sm mt-1">Visual insights will populate as we collect more data</p>
               </div>
-
-              {/*
-              AFTER OBSERVATION - Replace above placeholder with actual charts:
-
-              Chart 1: Growth Area Distribution (Pie or Donut)
-              - Shows % of teachers in each growth area
-              - Example: 40% Management/Routines, 35% Relationship/Trust, 25% Other
-
-              Chart 2: Classroom Strengths Observed (Horizontal Bar)
-              - Top strengths seen across classrooms
-              - Example: Student Engagement (18 teachers), Clear Instructions (15 teachers), Positive Rapport (20 teachers)
-
-              Chart 3: Areas for Growth (Horizontal Bar)
-              - Focus areas identified
-              - Example: Transitions (12 teachers), Procedures (8 teachers), Student Voice (10 teachers)
-
-              Use Recharts library (already available in Next.js setup) for visualizations.
-              Colors: #38618C (Baltic Blue) for strengths, #E07A5F (Coral) for growth areas, #35A7FF (Cool Sky) for neutral
-              */}
             </div>
 
-            {/* SECTION 3: Growth Groups (Placeholder) */}
+            {/* SECTION C: Growth Groups */}
             <div className="mb-8">
               <h3 className="text-xl font-bold text-[#1e2749] mb-2">Growth Groups</h3>
-              <p className="text-gray-600 mb-6">Targeted support groups based on observation data</p>
+              <p className="text-gray-600 mb-6">Based on September 30 classroom observations</p>
 
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 text-center">
-                <div className="text-gray-400 mb-2">
-                  <Users className="w-12 h-12 mx-auto" />
+              <div className="grid md:grid-cols-2 gap-6">
+
+                {/* Group 1: Instructional Design */}
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-[#38618C] rounded-xl flex items-center justify-center text-white">
+                      <ClipboardList className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-[#1e2749] text-lg">Instructional Design</h3>
+                      <p className="text-sm text-gray-500">~9 Teachers</p>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="text-sm font-semibold text-gray-600 mb-2">Focus Areas</div>
+                    <p className="text-sm text-gray-600">Diversifying lesson flow, time management, differentiating for varied learners</p>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="text-sm font-semibold text-gray-600 mb-2">Teachers in This Group</div>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Cathy Dufresne</span>
+                      <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Lacey Minor</span>
+                      <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Ashley Hymel</span>
+                      <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Natalie Foret</span>
+                      <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Caroline Dufresne</span>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="text-sm font-semibold text-gray-600 mb-2">Hub Resources</div>
+                    <p className="text-sm text-gray-600">Time Management courses, Differentiated Choice Boards, Instructional Audit</p>
+                  </div>
+
+                  <div className="bg-[#E07A5F]/10 border border-[#E07A5F]/30 rounded-lg p-3 mb-4">
+                    <p className="text-sm text-[#E07A5F] flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      Virtual session pending, included in contract
+                    </p>
+                  </div>
+
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full bg-[#35A7FF] hover:bg-[#2589db] text-white text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Schedule This Session
+                  </a>
                 </div>
-                <p className="text-gray-500 font-medium">Groups will be formed after observations</p>
-                <p className="text-gray-400 text-sm mt-1">Based on patterns we observe, we will create targeted support groups with virtual follow-up sessions</p>
-              </div>
 
-              {/*
-              AFTER OBSERVATION - Replace placeholder with actual Growth Group cards:
-              - Management and Routines group (with teacher names)
-              - Relationship and Trust group (with teacher names)
-              - Each card shows: Focus areas, Hub resources, teacher names, session scheduling CTA
-              */}
+                {/* Group 2: Class Management */}
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 bg-[#38618C] rounded-xl flex items-center justify-center text-white">
+                      <Users className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-[#1e2749] text-lg">Class Management</h3>
+                      <p className="text-sm text-gray-500">~11 Teachers</p>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="text-sm font-semibold text-gray-600 mb-2">Focus Areas</div>
+                    <p className="text-sm text-gray-600">Refining routines, reducing interruptions, checking for understanding, engagement strategies</p>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="text-sm font-semibold text-gray-600 mb-2">Teachers in This Group</div>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="bg-[#38618C]/10 text-[#38618C] px-3 py-1 rounded-full text-sm font-medium">Sandi Waguespack ⭐</span>
+                      <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Tori Warner</span>
+                      <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Tori Guidry</span>
+                      <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Maria Lambert</span>
+                      <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Bridget Roussel</span>
+                      <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Jordyn Middleton</span>
+                    </div>
+                  </div>
+
+                  <div className="mb-4">
+                    <div className="text-sm font-semibold text-gray-600 mb-2">Hub Resources</div>
+                    <p className="text-sm text-gray-600">Classroom Management Toolkit, Routine Builders, Engagement Strategies</p>
+                  </div>
+
+                  <div className="bg-[#E07A5F]/10 border border-[#E07A5F]/30 rounded-lg p-3 mb-4">
+                    <p className="text-sm text-[#E07A5F] flex items-center gap-2">
+                      <Clock className="w-4 h-4" />
+                      Virtual session pending, included in contract
+                    </p>
+                  </div>
+
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full bg-[#35A7FF] hover:bg-[#2589db] text-white text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Schedule This Session
+                  </a>
+                </div>
+              </div>
             </div>
 
-            {/* SECTION 4: Supporting Resources */}
+            {/* SECTION D: Supporting Resources */}
             <div>
               <h3 className="text-lg font-semibold text-gray-600 mb-2">Supporting Resources</h3>
               <p className="text-gray-500 text-sm mb-4">Tools available in the Learning Hub to support implementation</p>
 
               <div className="grid sm:grid-cols-3 gap-3">
                 <div className="bg-white rounded-lg p-4 border border-gray-200">
-                  <div className="text-sm font-medium text-[#1e2749]">Classroom Management Toolkit</div>
-                  <div className="text-xs text-gray-500 mt-1">Modules 3, 5, 6</div>
+                  <div className="text-sm font-medium text-[#1e2749]">Time Management</div>
+                  <div className="text-xs text-gray-500 mt-1">Planning & prioritization</div>
                 </div>
                 <div className="bg-white rounded-lg p-4 border border-gray-200">
-                  <div className="text-sm font-medium text-[#1e2749]">Building Relationships</div>
-                  <div className="text-xs text-gray-500 mt-1">Connection strategies</div>
+                  <div className="text-sm font-medium text-[#1e2749]">Classroom Routines</div>
+                  <div className="text-xs text-gray-500 mt-1">Systems that stick</div>
                 </div>
                 <div className="bg-white rounded-lg p-4 border border-gray-200">
-                  <div className="text-sm font-medium text-[#1e2749]">SEL Integration</div>
-                  <div className="text-xs text-gray-500 mt-1">Student check-in tools</div>
+                  <div className="text-sm font-medium text-[#1e2749]">Engagement Strategies</div>
+                  <div className="text-xs text-gray-500 mt-1">Active participation</div>
                 </div>
               </div>
 
