@@ -29,7 +29,8 @@ import {
   BarChart3,
   Sparkles,
   Headphones,
-  Info
+  Info,
+  GraduationCap
 } from 'lucide-react';
 
 // Tooltip component
@@ -293,68 +294,124 @@ export default function StPeterChanelDashboard() {
               </div>
             </div>
 
-            {/* Needs Attention Section */}
-            <div className="bg-[#E07A5F]/10 border border-[#E07A5F]/30 rounded-xl p-5">
-              <h3 className="font-bold text-[#E07A5F] mb-3 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5" />
-                Needs Attention
-              </h3>
+            {/* Student Performance Tracker */}
+            <div className="bg-white rounded-xl p-5 shadow-sm mb-6">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <GraduationCap className="w-5 h-5 text-[#38618C]" />
+                  <span className="font-semibold text-[#1e2749]">Student Performance</span>
+                </div>
+                <span className="text-xs text-gray-400">LEAP 2025 Mastery+ Rate</span>
+              </div>
+
               <div className="space-y-3">
-                <div className="flex items-center justify-between bg-white rounded-lg p-3">
+                {/* Louisiana State Average */}
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-gray-500 w-32">Louisiana State Avg</span>
+                  <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                    <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '35%' }}></div>
+                  </div>
+                  <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">35%</span>
+                </div>
+
+                {/* St. James Parish */}
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-gray-500 w-32">St. James Parish</span>
+                  <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                    <div className="h-full rounded-full bg-[#38618C]" style={{ width: '72%' }}></div>
+                  </div>
+                  <span className="text-xs font-semibold text-[#38618C] w-14 text-right">~72%</span>
+                </div>
+
+                {/* St. Peter Chanel - Placeholder */}
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-gray-500 w-32">St. Peter Chanel</span>
+                  <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                    <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                  </div>
+                  <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-gray-100">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
+                  <p className="text-xs text-gray-600">
+                    <span className="font-semibold text-[#1e2749]">Next step:</span> Share your internal assessment data so we can track alignment to state benchmarks
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-400 mt-3">Source: Louisiana Dept. of Education LEAP 2025 Results</p>
+            </div>
+
+            {/* Needs Attention */}
+            <div className="bg-[#E07A5F]/5 border border-[#E07A5F]/20 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <AlertCircle className="w-5 h-5 text-[#E07A5F]" />
+                <span className="font-semibold text-[#E07A5F] uppercase tracking-wide">Needs Attention</span>
+              </div>
+
+              <div className="space-y-3">
+                {/* Virtual session: Instructional Design */}
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md transition-all group"
+                >
                   <div className="flex items-center gap-3">
                     <Calendar className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-gray-800">Virtual session: Instructional Design group</div>
+                      <div className="font-medium text-[#1e2749] group-hover:text-[#35A7FF]">Virtual session for Instructional Design group</div>
                       <div className="text-sm text-gray-500">Included in contract</div>
                     </div>
                   </div>
-                  <a 
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all"
-                  >
+                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Schedule
-                  </a>
-                </div>
-                <div className="flex items-center justify-between bg-white rounded-lg p-3">
+                  </span>
+                </a>
+
+                {/* Virtual session: Class Management */}
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md transition-all group"
+                >
                   <div className="flex items-center gap-3">
                     <Calendar className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-gray-800">Virtual session: Class Management group</div>
+                      <div className="font-medium text-[#1e2749] group-hover:text-[#35A7FF]">Virtual session for Class Management group</div>
                       <div className="text-sm text-gray-500">Included in contract</div>
                     </div>
                   </div>
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-all"
-                  >
+                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Schedule
-                  </a>
-                </div>
-                {/* Spring Leadership Recap */}
-                <div className="bg-white rounded-lg p-4 flex items-center justify-between">
+                  </span>
+                </a>
+
+                {/* Admin check-in with Paula */}
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md transition-all group"
+                >
                   <div className="flex items-center gap-3">
-                    <Users className="w-5 h-5 text-[#E07A5F]" />
+                    <Calendar className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-[#1e2749]">Spring Leadership Recap</div>
+                      <div className="font-medium text-[#1e2749] group-hover:text-[#35A7FF]">Spring Leadership Recap</div>
                       <div className="text-sm text-gray-500">Review progress + set goals for next year · Complimentary</div>
                     </div>
                   </div>
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2"
-                  >
+                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Schedule
-                  </a>
-                </div>
+                  </span>
+                </a>
               </div>
             </div>
 
