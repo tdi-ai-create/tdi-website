@@ -636,9 +636,9 @@ export default function StPeterChanelDashboard() {
                     key={phase.id}
                     onClick={() => setActivePhase(phase.id)}
                     className={`px-4 py-3 rounded-lg font-semibold transition-all flex items-center gap-2 ${
-                      isActive 
-                        ? 'bg-[#1e2749] text-white shadow-md' 
-                        : phase.isLocked 
+                      isActive
+                        ? 'bg-[#1e2749] text-white shadow-md'
+                        : phase.isLocked
                           ? 'bg-gray-200 text-gray-500'
                           : 'bg-white text-gray-700 hover:bg-gray-100 shadow-sm'
                     }`}
@@ -646,6 +646,11 @@ export default function StPeterChanelDashboard() {
                     {phase.isLocked && <Lock className="w-4 h-4" />}
                     {phase.isComplete && <CheckCircle className="w-4 h-4 text-[#38618C]" />}
                     Phase {phase.id}: {phase.name}
+                    {phase.isCurrent && (
+                      <span className="bg-[#35A7FF] text-white text-xs px-2 py-0.5 rounded-full animate-pulse">
+                        YOU ARE HERE
+                      </span>
+                    )}
                   </button>
                 );
               })}
@@ -654,7 +659,7 @@ export default function StPeterChanelDashboard() {
             {/* Phase Content */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
               {/* Phase Header */}
-              <div 
+              <div
                 className="p-4 text-white"
                 style={{ backgroundColor: getPhaseStyles(currentPhase).bg }}
               >
@@ -663,7 +668,14 @@ export default function StPeterChanelDashboard() {
                     {currentPhase.isLocked && <Lock className="w-5 h-5" />}
                     {currentPhase.isComplete && <CheckCircle className="w-5 h-5" />}
                     <div>
-                      <h3 className="text-xl font-bold">Phase {currentPhase.id}: {currentPhase.name}</h3>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        <h3 className="text-xl font-bold">Phase {currentPhase.id}: {currentPhase.name}</h3>
+                        {currentPhase.isCurrent && (
+                          <span className="bg-[#35A7FF] text-white text-xs px-3 py-1 rounded-full animate-pulse">
+                            YOU ARE HERE
+                          </span>
+                        )}
+                      </div>
                       <p className="text-white/80 text-sm">{currentPhase.description}</p>
                     </div>
                   </div>
