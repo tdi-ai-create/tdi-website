@@ -352,61 +352,61 @@ export default function StPeterChanelDashboard() {
               </div>
 
               <div className="space-y-3">
-                {/* Virtual session: Instructional Design */}
+                {/* Item 1: Virtual session for Instructional Design */}
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md transition-all group"
+                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md hover:border-[#35A7FF] border border-transparent transition-all cursor-pointer block"
                 >
                   <div className="flex items-center gap-3">
                     <Calendar className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-[#1e2749] group-hover:text-[#35A7FF]">Virtual session for Instructional Design group</div>
+                      <div className="font-medium text-[#1e2749]">Virtual session for Instructional Design group</div>
                       <div className="text-sm text-gray-500">Included in contract</div>
                     </div>
                   </div>
-                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
+                  <span className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Schedule
                   </span>
                 </a>
 
-                {/* Virtual session: Class Management */}
+                {/* Item 2: Virtual session for Class Management */}
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md transition-all group"
+                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md hover:border-[#35A7FF] border border-transparent transition-all cursor-pointer block"
                 >
                   <div className="flex items-center gap-3">
                     <Calendar className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-[#1e2749] group-hover:text-[#35A7FF]">Virtual session for Class Management group</div>
+                      <div className="font-medium text-[#1e2749]">Virtual session for Class Management group</div>
                       <div className="text-sm text-gray-500">Included in contract</div>
                     </div>
                   </div>
-                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
+                  <span className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Schedule
                   </span>
                 </a>
 
-                {/* Admin check-in with Paula */}
+                {/* Item 3: Spring Leadership Recap */}
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md transition-all group"
+                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md hover:border-[#35A7FF] border border-transparent transition-all cursor-pointer block"
                 >
                   <div className="flex items-center gap-3">
                     <Calendar className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-[#1e2749] group-hover:text-[#35A7FF]">Spring Leadership Recap</div>
+                      <div className="font-medium text-[#1e2749]">Spring Leadership Recap</div>
                       <div className="text-sm text-gray-500">Review progress + set goals for next year · Complimentary</div>
                     </div>
                   </div>
-                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
+                  <span className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Schedule
                   </span>
