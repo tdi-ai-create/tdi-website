@@ -257,8 +257,8 @@ export default function StPeterChanelDashboard() {
                   <Eye className="w-4 h-4 text-[#38618C]" />
                   <span className="text-xs text-gray-500 uppercase">Observations</span>
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">100%</div>
-                <div className="text-xs text-[#38618C] font-medium">Complete</div>
+                <div className="text-2xl font-bold text-[#1e2749]">1<span className="text-lg font-normal text-gray-400">/2</span></div>
+                <div className="text-xs text-[#35A7FF] font-medium">Next: Jan 14</div>
               </div>
 
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#E07A5F]">
