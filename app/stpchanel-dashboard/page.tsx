@@ -26,7 +26,8 @@ import {
   MapPin,
   Building,
   User,
-  BarChart3
+  BarChart3,
+  Sparkles
 } from 'lucide-react';
 
 export default function StPeterChanelDashboard() {
@@ -860,25 +861,77 @@ export default function StPeterChanelDashboard() {
 
             {/* SECTION D: Supporting Resources */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-600 mb-2">Supporting Resources</h3>
+              <h3 className="text-lg font-semibold text-[#1e2749] mb-2">Supporting Resources</h3>
               <p className="text-gray-500 text-sm mb-4">Tools available in the Learning Hub to support implementation</p>
 
-              <div className="grid sm:grid-cols-3 gap-3">
-                <div className="bg-white rounded-lg p-4 border border-gray-200">
-                  <div className="text-sm font-medium text-[#1e2749]">Time Management</div>
-                  <div className="text-xs text-gray-500 mt-1">Planning & prioritization</div>
-                </div>
-                <div className="bg-white rounded-lg p-4 border border-gray-200">
-                  <div className="text-sm font-medium text-[#1e2749]">Classroom Routines</div>
-                  <div className="text-xs text-gray-500 mt-1">Systems that stick</div>
-                </div>
-                <div className="bg-white rounded-lg p-4 border border-gray-200">
-                  <div className="text-sm font-medium text-[#1e2749]">Engagement Strategies</div>
-                  <div className="text-xs text-gray-500 mt-1">Active participation</div>
-                </div>
+              <div className="grid sm:grid-cols-3 gap-4">
+
+                {/* Time Management */}
+                <a
+                  href="https://tdi.thinkific.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white rounded-xl p-5 border border-gray-200 hover:border-[#35A7FF] hover:shadow-md transition-all group"
+                >
+                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center mb-3 group-hover:bg-[#35A7FF]/10 transition-colors">
+                    <Clock className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF]" />
+                  </div>
+                  <div className="font-semibold text-[#1e2749] mb-1">Time Management</div>
+                  <p className="text-xs text-gray-500 mb-3">Planning and prioritization strategies that give you hours back</p>
+                  <span className="text-xs text-[#35A7FF] font-medium flex items-center gap-1">
+                    Explore in Hub <ArrowRight className="w-3 h-3" />
+                  </span>
+                </a>
+
+                {/* Classroom Routines */}
+                <a
+                  href="https://tdi.thinkific.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white rounded-xl p-5 border border-gray-200 hover:border-[#35A7FF] hover:shadow-md transition-all group"
+                >
+                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center mb-3 group-hover:bg-[#35A7FF]/10 transition-colors">
+                    <ClipboardList className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF]" />
+                  </div>
+                  <div className="font-semibold text-[#1e2749] mb-1">Classroom Routines</div>
+                  <p className="text-xs text-gray-500 mb-3">Systems that stick so you spend less time managing, more time teaching</p>
+                  <span className="text-xs text-[#35A7FF] font-medium flex items-center gap-1">
+                    Explore in Hub <ArrowRight className="w-3 h-3" />
+                  </span>
+                </a>
+
+                {/* Engagement Strategies */}
+                <a
+                  href="https://tdi.thinkific.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white rounded-xl p-5 border border-gray-200 hover:border-[#35A7FF] hover:shadow-md transition-all group"
+                >
+                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center mb-3 group-hover:bg-[#35A7FF]/10 transition-colors">
+                    <Sparkles className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF]" />
+                  </div>
+                  <div className="font-semibold text-[#1e2749] mb-1">Engagement Strategies</div>
+                  <p className="text-xs text-gray-500 mb-3">Active participation techniques that keep every student involved</p>
+                  <span className="text-xs text-[#35A7FF] font-medium flex items-center gap-1">
+                    Explore in Hub <ArrowRight className="w-3 h-3" />
+                  </span>
+                </a>
+
               </div>
 
-              <p className="text-xs text-gray-400 text-center mt-4">
+              <div className="text-center mt-6">
+                <a
+                  href="https://tdi.thinkific.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-[#38618C] hover:text-[#35A7FF] font-medium transition-colors"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  Browse all Learning Hub resources →
+                </a>
+              </div>
+
+              <p className="text-xs text-gray-400 text-center mt-3">
                 These resources support the implementation strategies discussed in Growth Group sessions
               </p>
             </div>
