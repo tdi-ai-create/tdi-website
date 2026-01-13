@@ -381,102 +381,153 @@ export default function StPeterChanelDashboard() {
           <div className="space-y-6">
             {/* Partnership Goal & Indicators */}
             <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
-              <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-1">Our Shared Goal</div>
-              <h3 className="text-xl font-bold text-[#1e2749] mb-4">Student performance aligned with state benchmarks</h3>
 
-              <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Leading Indicators</div>
-              <p className="text-gray-500 text-xs mb-4">Baseline data collection: January 14, 2025</p>
+              {/* Goal Header */}
+              <div className="flex items-center gap-2 mb-1">
+                <Target className="w-5 h-5 text-[#38618C]" />
+                <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Our Shared Goal</span>
+              </div>
+              <h3 className="text-2xl font-bold text-[#1e2749] mb-1">Student performance aligned with state benchmarks</h3>
+              <p className="text-sm text-gray-500 mb-6">Established Spring 2025 · Tracked via observations, Hub data, and staff surveys</p>
 
-              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Divider */}
+              <div className="border-t border-gray-200 mb-6"></div>
 
-                {/* Teacher Stress */}
-                <div className="bg-[#F5F5F5] rounded-lg p-4">
-                  <div className="text-sm font-semibold text-[#1e2749] mb-3">Teacher Stress</div>
+              {/* Leading Indicators Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div>
+                  <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Leading Indicators</span>
+                </div>
+                <span className="text-xs text-[#35A7FF] font-medium bg-[#35A7FF]/10 px-3 py-1 rounded-full">
+                  Baseline: Jan 14, 2025
+                </span>
+              </div>
+
+              {/* Indicator Bars */}
+              <div className="space-y-6">
+
+                {/* Teacher Stress (lower is better) */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Teacher Stress</span>
+                    <span className="text-xs text-gray-400">Lower is better</span>
+                  </div>
                   <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500">Industry Avg</span>
-                      <span className="text-sm font-bold text-[#E07A5F]">8-9/10</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500">TDI Partner Avg</span>
-                      <span className="text-sm font-bold text-[#38618C]">5-7/10</span>
-                    </div>
-                    <div className="border-t border-gray-200 pt-2 mt-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500">St. Peter Chanel</span>
-                        <span className="text-sm font-bold text-gray-400">Collecting Jan 14</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '85%' }}></div>
                       </div>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-12 text-right">8-9/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '55%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-12 text-right">5-7/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">St. Peter Chanel</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-400 w-12 text-right">TBD</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Strategy Implementation */}
-                <div className="bg-[#F5F5F5] rounded-lg p-4">
-                  <div className="text-sm font-semibold text-[#1e2749] mb-3">Strategy Implementation</div>
+                {/* Strategy Implementation (higher is better) */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Strategy Implementation</span>
+                    <span className="text-xs text-gray-400">Higher is better</span>
+                  </div>
                   <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500">Industry Avg</span>
-                      <span className="text-sm font-bold text-[#E07A5F]">10%</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500">TDI Partner Avg</span>
-                      <span className="text-sm font-bold text-[#38618C]">65%</span>
-                    </div>
-                    <div className="border-t border-gray-200 pt-2 mt-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500">St. Peter Chanel</span>
-                        <span className="text-sm font-bold text-gray-400">Collecting Jan 14</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '10%' }}></div>
                       </div>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-12 text-right">10%</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '65%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-12 text-right">65%</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">St. Peter Chanel</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-400 w-12 text-right">TBD</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Grading Alignment */}
-                <div className="bg-[#F5F5F5] rounded-lg p-4">
-                  <div className="text-sm font-semibold text-[#1e2749] mb-3">Grading Alignment</div>
+                {/* Grading Alignment (higher is better) */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Grading Alignment</span>
+                    <span className="text-xs text-gray-400">Higher is better</span>
+                  </div>
                   <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500">Target</span>
-                      <span className="text-sm font-bold text-[#38618C]">Aligned</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500">Focus</span>
-                      <span className="text-xs text-gray-600">State test alignment</span>
-                    </div>
-                    <div className="border-t border-gray-200 pt-2 mt-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500">St. Peter Chanel</span>
-                        <span className="text-sm font-bold text-gray-400">Assessing Jan 14</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">Target</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '100%' }}></div>
                       </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-12 text-right">100%</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">St. Peter Chanel</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-400 w-12 text-right">TBD</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Retention Intent */}
-                <div className="bg-[#F5F5F5] rounded-lg p-4">
-                  <div className="text-sm font-semibold text-[#1e2749] mb-3">Retention Intent</div>
+                {/* Retention Intent (higher is better) */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Retention Intent</span>
+                    <span className="text-xs text-gray-400">Higher is better</span>
+                  </div>
                   <div className="space-y-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500">Industry Avg</span>
-                      <span className="text-sm font-bold text-[#E07A5F]">2-4/10</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-xs text-gray-500">TDI Partner Avg</span>
-                      <span className="text-sm font-bold text-[#38618C]">5-7/10</span>
-                    </div>
-                    <div className="border-t border-gray-200 pt-2 mt-2">
-                      <div className="flex justify-between items-center">
-                        <span className="text-xs text-gray-500">St. Peter Chanel</span>
-                        <span className="text-sm font-bold text-gray-400">Collecting Jan 14</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '30%' }}></div>
                       </div>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-12 text-right">2-4/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '60%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-12 text-right">5-7/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">St. Peter Chanel</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-400 w-12 text-right">TBD</span>
                     </div>
                   </div>
                 </div>
 
               </div>
 
-              <p className="text-xs text-gray-400 text-center mt-4">
-                Industry data from RAND 2025, Learning Policy Institute. TDI averages from partner school surveys.
+              {/* Source Citation */}
+              <p className="text-xs text-gray-400 text-center mt-6 pt-4 border-t border-gray-100">
+                Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys
               </p>
             </div>
 
