@@ -237,10 +237,10 @@ export default function StPeterChanelDashboard() {
         </div>
       </section>
 
-      {/* Tab Navigation - Large, Button-like */}
+      {/* Tab Navigation - Always One Line */}
       <div className="bg-white border-b border-gray-200 sticky top-14 z-40 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-3">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex gap-2 overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
@@ -251,13 +251,13 @@ export default function StPeterChanelDashboard() {
                     setActiveTab(tab.id);
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   }}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-lg font-semibold transition-all ${
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all flex-shrink-0 ${
                     isActive
                       ? 'bg-[#38618C] text-white shadow-md'
                       : 'bg-[#F5F5F5] text-gray-600 hover:bg-gray-200 hover:text-gray-800'
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
+                  <Icon className="w-4 h-4" />
                   {tab.label}
                   {tab.badge && (
                     <span className={`ml-1 text-xs px-2 py-0.5 rounded-full ${
