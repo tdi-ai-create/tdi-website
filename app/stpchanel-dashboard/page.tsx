@@ -1324,16 +1324,10 @@ export default function StPeterChanelDashboard() {
                   </div>
 
                   <div className="mt-4 pt-3 border-t border-gray-100">
-                    <p className="text-xs text-gray-600">
-                      <span className="font-semibold text-[#E07A5F]">Not yet logged in:</span> Lauren Roussel, Cathy Dufresne, Lindsay Schexnayder, Tori Warner, Jessica Domangue
-                    </p>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-gray-100">
                     <div className="flex items-start gap-2">
                       <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
                       <p className="text-xs text-gray-600">
-                        <span className="font-semibold text-[#1e2749]">Recommendation:</span> Personal outreach to the 5 who haven&apos;t logged in yet
+                        <span className="font-semibold text-[#1e2749]">Recommendation:</span> Celebrate 100% login rate with staff!
                       </p>
                     </div>
                   </div>
