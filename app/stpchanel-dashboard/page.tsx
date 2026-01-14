@@ -330,9 +330,9 @@ export default function StPeterChanelDashboard() {
 
                 {/* Hub Logins */}
                 <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">80%</div>
+                  <div className="text-2xl font-bold text-green-600">100%</div>
                   <div className="text-xs text-gray-600 mt-1">Hub Logins</div>
-                  <div className="text-xs text-green-600 mt-1">✓ Goal Met</div>
+                  <div className="text-xs text-green-600 mt-1">✓ Goal Exceeded</div>
                 </div>
 
                 {/* Love Notes */}
@@ -365,15 +365,15 @@ export default function StPeterChanelDashboard() {
                   <Heart className="w-4 h-4 text-[#38618C]" />
                   <span className="text-sm font-medium text-[#1e2749]">Movement Involvement</span>
                 </div>
-                <span className="text-xs text-gray-400">Collecting Jan 14</span>
+                <span className="text-xs text-gray-400">Updated Jan 14, 2026</span>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 {/* Blog Readers */}
                 <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer"
                    className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
-                  <Mail className="w-5 h-5 text-gray-400 group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-gray-400">TBD</div>
+                  <Mail className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
+                  <div className="text-lg font-bold text-[#1e2749]">3</div>
                   <div className="text-xs text-gray-600 mt-1">Blog Readers</div>
                 </a>
 
@@ -381,15 +381,15 @@ export default function StPeterChanelDashboard() {
                 <a href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" target="_blank" rel="noopener noreferrer"
                    className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
                   <Headphones className="w-5 h-5 text-gray-400 group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-gray-400">TBD</div>
+                  <div className="text-lg font-bold text-gray-400">0</div>
                   <div className="text-xs text-gray-600 mt-1">Podcast Listeners</div>
                 </a>
 
                 {/* Community Members */}
                 <a href="https://www.facebook.com/groups/tdimovement" target="_blank" rel="noopener noreferrer"
                    className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
-                  <Users className="w-5 h-5 text-gray-400 group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-gray-400">TBD</div>
+                  <Users className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
+                  <div className="text-lg font-bold text-[#1e2749]">1</div>
                   <div className="text-xs text-gray-600 mt-1">Community Members</div>
                 </a>
               </div>
@@ -707,8 +707,18 @@ export default function StPeterChanelDashboard() {
 
                 </div>
 
+                {/* What Teachers Reported - Jan 14 Survey */}
+                <div className="bg-[#35A7FF]/10 border border-[#35A7FF]/20 rounded-lg p-4">
+                  <p className="text-sm font-medium text-[#1e2749] mb-2">What Teachers Reported (Jan 14):</p>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Most classrooms averaging <strong>B (80-89%)</strong></li>
+                    <li>• Top gap causes: test-taking skills, testing pressure, effort-based grading</li>
+                    <li>• Confidence grades match assessments: <strong>Mixed</strong> (only 2 very confident)</li>
+                  </ul>
+                </div>
+
                 {/* What We Need */}
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-4">
                   <p className="text-sm font-medium text-amber-800 mb-2">To complete this chart, we need:</p>
                   <ul className="text-xs text-amber-700 space-y-1">
                     <li>✓ Which assessments St. Peter Chanel uses (MAP, IOWA, LEAP, other)</li>
@@ -734,7 +744,7 @@ export default function StPeterChanelDashboard() {
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-semibold text-[#1e2749] uppercase tracking-wide">Leading Indicators</span>
                 <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-3 py-1 rounded-full">
-                  Baseline: Jan 14, 2025
+                  Baseline: Jan 14, 2026
                 </span>
               </div>
 
@@ -775,9 +785,9 @@ export default function StPeterChanelDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-28">St. Peter Chanel</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                        <div className="h-full rounded-full bg-green-500" style={{ width: '59%' }}></div>
                       </div>
-                      <span className="text-xs font-medium text-gray-400 w-12 text-right">TBD</span>
+                      <span className="text-xs font-semibold text-green-600 w-12 text-right">5.9/10</span>
                     </div>
                   </div>
                 </div>
@@ -806,9 +816,9 @@ export default function StPeterChanelDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-28">St. Peter Chanel</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                        <div className="h-full rounded-full bg-[#35A7FF]" style={{ width: '20%' }}></div>
                       </div>
-                      <span className="text-xs font-medium text-gray-400 w-12 text-right">TBD</span>
+                      <span className="text-xs font-semibold text-[#35A7FF] w-12 text-right">20%</span>
                     </div>
                   </div>
                 </div>
@@ -861,9 +871,9 @@ export default function StPeterChanelDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-28">St. Peter Chanel</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                        <div className="h-full rounded-full bg-green-500" style={{ width: '98%' }}></div>
                       </div>
-                      <span className="text-xs font-medium text-gray-400 w-12 text-right">TBD</span>
+                      <span className="text-xs font-semibold text-green-600 w-12 text-right">9.8/10</span>
                     </div>
                   </div>
                 </div>
@@ -1281,17 +1291,17 @@ export default function StPeterChanelDashboard() {
                   <div className="text-sm font-semibold text-[#1e2749] mb-4">Hub Engagement</div>
 
                   <div className="text-center mb-4">
-                    <div className="text-4xl font-bold text-[#38618C]">20 <span className="text-lg font-normal text-gray-400">/ 25</span></div>
-                    <div className="text-sm text-gray-500 mt-1">staff have logged in</div>
+                    <div className="text-4xl font-bold text-[#38618C]">25 <span className="text-lg font-normal text-gray-400">/ 25</span></div>
+                    <div className="text-sm text-gray-500 mt-1">all staff logged in</div>
                   </div>
 
                   <div className="h-3 bg-gray-100 rounded-full overflow-hidden mb-2">
-                    <div className="h-full bg-[#38618C] rounded-full" style={{ width: '80%' }}></div>
+                    <div className="h-full bg-[#38618C] rounded-full" style={{ width: '100%' }}></div>
                   </div>
 
                   <div className="flex justify-between text-xs mb-4">
-                    <span className="text-gray-500">Current: 80%</span>
-                    <span className="text-green-600 font-semibold">✓ Goal Met!</span>
+                    <span className="text-gray-500">Current: 100%</span>
+                    <span className="text-green-600 font-semibold">✓ Goal Exceeded!</span>
                   </div>
 
                   <div className="space-y-2 pt-3 border-t border-gray-100">
@@ -1336,7 +1346,7 @@ export default function StPeterChanelDashboard() {
                         <span className="font-semibold text-[#38618C]">8</span>
                       </div>
                       <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '80%' }}></div>
+                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '100%' }}></div>
                       </div>
                     </div>
                     <div>
