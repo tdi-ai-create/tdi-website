@@ -71,109 +71,83 @@ export default function StPeterChanelDashboard() {
   const phases = [
     {
       id: 1,
-      name: 'Foundation',
+      name: 'IGNITE',
       status: 'Complete',
       isComplete: true,
       isCurrent: false,
       isLocked: false,
-      description: 'Building the groundwork for sustainable teacher support',
+      description: 'Building baseline understanding and relationships',
       includes: [
-        'Learning Hub access for all staff members',
-        'Initial PD diagnostic assessment',
-        'Administrator orientation and dashboard setup',
-        'Customized pathway recommendations'
-      ],
-      adaptations: [
-        'Partnership began mid-year (typical: summer start)',
-        'Condensed foundation phase to match school calendar',
-        'Book delivery deferred to Full Blueprint for full impact'
+        'On-site observation days',
+        'Personalized observation notes (Love Notes)',
+        'Teacher baseline survey',
+        'Growth group formation'
       ],
       outcomes: [
-        { label: 'Staff Enrolled', value: '25/25', sublabel: '100% activation' },
-        { label: 'Paula Access', value: 'Active', sublabel: 'Full admin dashboard' }
+        { label: 'Observations', value: '25', sublabel: 'Completed' },
+        { label: 'Love Notes Sent', value: '25', sublabel: 'Personalized feedback' }
       ],
-      blueprintPreview: 'Book delivery to every teacher before school starts, creating shared language from Day 1'
+      blueprintPreview: 'This phase establishes trust and captures baseline data to inform targeted support.'
     },
     {
       id: 2,
-      name: 'Activation',
+      name: 'ACCELERATE',
       status: 'Current Phase',
       isComplete: false,
       isCurrent: true,
       isLocked: false,
-      description: 'Getting teachers actively engaged with resources and support',
+      description: 'Full implementation with comprehensive support',
       includes: [
-        'On-site classroom observations',
-        'Personalized teacher feedback emails',
-        'Growth group identification',
-        'Virtual follow-up sessions'
+        'Everything in IGNITE, plus:',
+        'Learning Hub access for ALL staff',
+        '4 Executive Impact Sessions',
+        'Teachers Deserve It book for every educator',
+        '4 Virtual Strategy Sessions',
+        '2 On-Campus Observation Days',
+        'Retention tracking tools'
       ],
       completed: [
-        'Classroom observations completed',
-        'Personalized emails sent to all observed teachers',
-        'Growth groups identified based on observation data'
+        'Hub access activated for all 25 staff',
+        'Executive Impact Session #1 (July planning)',
+        'On-Campus Day #1 with observations'
       ],
       pending: [
-        'Virtual session for Instructional Design group',
-        'Virtual session for Class Management group',
-        'Admin check-in with Paula'
+        'Executive Impact Sessions #2-4',
+        'Virtual Strategy Sessions #1-4',
+        'On-Campus Day #2'
       ],
       outcomes: [
-        { label: 'Observations', value: '25', sublabel: 'Completed' },
-        { label: 'Emails Sent', value: '25', sublabel: 'Personalized feedback' }
+        { label: 'Hub Engagement', value: '100%', sublabel: 'All staff active' },
+        { label: 'Sessions Remaining', value: '8', sublabel: 'This school year' }
       ],
-      blueprintPreview: 'Multiple observation cycles with deeper follow-up coaching'
+      blueprintPreview: 'This is the full implementation phase — building momentum through consistent touchpoints.'
     },
     {
       id: 3,
-      name: 'Deepening',
-      status: 'Not Yet Unlocked',
-      isComplete: false,
-      isCurrent: false,
-      isLocked: true,
-      description: 'Moving from awareness to consistent implementation',
-      includes: [
-        'Growth group virtual sessions',
-        'Hub resource deep-dives',
-        'Implementation tracking',
-        'Mid-partnership check-in'
-      ],
-      unlocks: 'Current phase complete + Virtual sessions delivered + Hub engagement growing',
-      goals: [
-        '50%+ of teachers actively using Hub resources',
-        'Measurable shifts in classroom practice',
-        'Teacher-reported confidence improvements'
-      ],
-      outcomes: [
-        { label: 'Target', value: '50%+', sublabel: 'Active implementation' },
-        { label: 'Unlocks When', value: 'Evidence shows readiness', sublabel: 'Data-driven progression' }
-      ],
-      blueprintPreview: 'Peer coaching circles, advanced module access, and leadership pathway for teacher-leaders'
-    },
-    {
-      id: 4,
-      name: 'Sustainability',
+      name: 'SUSTAIN',
       status: 'Not Yet Unlocked',
       isComplete: false,
       isCurrent: false,
       isLocked: true,
       description: 'Embedding practices into school culture for lasting change',
       includes: [
-        'Impact assessment',
-        'Retention and renewal conversation',
-        'Success story documentation',
-        'Future planning session'
+        'Everything in ACCELERATE, plus:',
+        'Peer coaching circles',
+        'Advanced module access',
+        'Leadership pathway for teacher-leaders',
+        'Multi-year sustainability planning'
       ],
-      unlocks: 'Deepening phase complete + 50%+ Hub engagement + Measurable classroom practice shifts',
-      tdiStats: [
-        { label: 'Partner Retention', value: '85%', sublabel: 'Schools continue partnership' },
-        { label: 'Implementation Rate', value: '65%', sublabel: 'vs 10% industry average' }
+      unlocks: 'ACCELERATE phase complete + Demonstrated implementation momentum',
+      goals: [
+        '65%+ strategy implementation rate',
+        'Teacher-led coaching conversations',
+        'Sustainable systems in place'
       ],
       outcomes: [
-        { label: 'Partner Retention', value: '85%', sublabel: 'Continue partnership' },
-        { label: 'Unlocks When', value: 'Implementation momentum established', sublabel: 'Evidence-based' }
+        { label: 'Target', value: '65%+', sublabel: 'Implementation rate' },
+        { label: 'Unlocks When', value: 'Year 2+', sublabel: 'After ACCELERATE' }
       ],
-      blueprintPreview: 'Full Blueprint experience: summer kickoff, multiple observation cycles, advanced coaching, teacher leadership development'
+      blueprintPreview: 'Long-term sustainability through teacher leadership and embedded systems.'
     }
   ];
 
