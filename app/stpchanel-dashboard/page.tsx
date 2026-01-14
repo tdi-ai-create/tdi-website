@@ -33,7 +33,8 @@ import {
   GraduationCap,
   Activity,
   Video,
-  School
+  School,
+  Laptop
 } from 'lucide-react';
 
 // Tooltip component
@@ -1952,12 +1953,13 @@ export default function StPeterChanelDashboard() {
               </div>
             </div>
 
-            {/* 2026-27 Timeline */}
+            {/* 2026-27 Timeline - Matches Phase 2 Package */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 mb-6">
+              <div className="flex items-center gap-2 mb-2">
                 <Calendar className="w-5 h-5 text-[#1e2749]" />
                 <h4 className="font-semibold text-[#1e2749]">Proposed 2026-27 Timeline</h4>
               </div>
+              <p className="text-sm text-gray-500 mb-6">Phase 2 (ACCELERATE) — Full package mapped to your school year</p>
 
               <div className="relative">
                 {/* Vertical line */}
@@ -1965,7 +1967,7 @@ export default function StPeterChanelDashboard() {
 
                 <div className="space-y-4">
 
-                  {/* July 2026 */}
+                  {/* July 2026 - Leadership #1 */}
                   <div className="flex items-start gap-4">
                     <div className="w-6 h-6 rounded-full bg-[#1e2749] flex items-center justify-center flex-shrink-0 z-10">
                       <span className="text-white text-xs">1</span>
@@ -1975,8 +1977,8 @@ export default function StPeterChanelDashboard() {
                         <div className="flex items-start gap-3">
                           <Users className="w-4 h-4 text-[#1e2749] mt-0.5" />
                           <div>
-                            <p className="font-medium text-[#1e2749]">Leadership Strategic Session</p>
-                            <p className="text-sm text-gray-500">Set goals, review data, align on focus areas</p>
+                            <p className="font-medium text-[#1e2749]">Executive Impact Session #1</p>
+                            <p className="text-sm text-gray-500">Set goals, review TerraNova data, align on differentiation focus</p>
                           </div>
                         </div>
                         <span className="text-xs bg-[#1e2749] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">July 2026</span>
@@ -1984,7 +1986,7 @@ export default function StPeterChanelDashboard() {
                     </div>
                   </div>
 
-                  {/* Sept/Oct 2026 */}
+                  {/* Sept/Oct 2026 - In-Person #1 */}
                   <div className="flex items-start gap-4">
                     <div className="w-6 h-6 rounded-full bg-[#38618C] flex items-center justify-center flex-shrink-0 z-10">
                       <span className="text-white text-xs">2</span>
@@ -1994,8 +1996,8 @@ export default function StPeterChanelDashboard() {
                         <div className="flex items-start gap-3">
                           <School className="w-4 h-4 text-[#38618C] mt-0.5" />
                           <div>
-                            <p className="font-medium text-[#1e2749]">Kickoff PD: In-Person</p>
-                            <p className="text-sm text-gray-500">Full staff book study launch + classroom observations</p>
+                            <p className="font-medium text-[#1e2749]">On-Campus Day #1</p>
+                            <p className="text-sm text-gray-500">Book distribution to all staff + classroom observations + Hub onboarding</p>
                           </div>
                         </div>
                         <span className="text-xs bg-[#38618C] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">Sept/Oct 2026</span>
@@ -2003,7 +2005,7 @@ export default function StPeterChanelDashboard() {
                     </div>
                   </div>
 
-                  {/* Oct/Nov 2026 */}
+                  {/* Oct/Nov 2026 - Virtual #1 */}
                   <div className="flex items-start gap-4">
                     <div className="w-6 h-6 rounded-full bg-[#35A7FF] flex items-center justify-center flex-shrink-0 z-10">
                       <span className="text-white text-xs">3</span>
@@ -2013,7 +2015,7 @@ export default function StPeterChanelDashboard() {
                         <div className="flex items-start gap-3">
                           <Video className="w-4 h-4 text-[#35A7FF] mt-0.5" />
                           <div>
-                            <p className="font-medium text-[#1e2749]">Virtual Session</p>
+                            <p className="font-medium text-[#1e2749]">Virtual Strategy Session #1</p>
                             <p className="text-sm text-gray-500">Differentiation strategies — follow-up from kickoff</p>
                           </div>
                         </div>
@@ -2022,7 +2024,7 @@ export default function StPeterChanelDashboard() {
                     </div>
                   </div>
 
-                  {/* Dec 2026 */}
+                  {/* Dec 2026 - Leadership #2 */}
                   <div className="flex items-start gap-4">
                     <div className="w-6 h-6 rounded-full bg-[#1e2749] flex items-center justify-center flex-shrink-0 z-10">
                       <span className="text-white text-xs">4</span>
@@ -2032,8 +2034,8 @@ export default function StPeterChanelDashboard() {
                         <div className="flex items-start gap-3">
                           <Users className="w-4 h-4 text-[#1e2749] mt-0.5" />
                           <div>
-                            <p className="font-medium text-[#1e2749]">Leadership Strategic Session</p>
-                            <p className="text-sm text-gray-500">Mid-year check-in, review progress, adjust as needed</p>
+                            <p className="font-medium text-[#1e2749]">Executive Impact Session #2</p>
+                            <p className="text-sm text-gray-500">Mid-year data review, retention check-in, adjust strategy</p>
                           </div>
                         </div>
                         <span className="text-xs bg-[#1e2749] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">Dec 2026</span>
@@ -2041,7 +2043,7 @@ export default function StPeterChanelDashboard() {
                     </div>
                   </div>
 
-                  {/* Jan 2027 */}
+                  {/* Jan 2027 - Virtual #2 */}
                   <div className="flex items-start gap-4">
                     <div className="w-6 h-6 rounded-full bg-[#35A7FF] flex items-center justify-center flex-shrink-0 z-10">
                       <span className="text-white text-xs">5</span>
@@ -2051,8 +2053,8 @@ export default function StPeterChanelDashboard() {
                         <div className="flex items-start gap-3">
                           <Video className="w-4 h-4 text-[#35A7FF] mt-0.5" />
                           <div>
-                            <p className="font-medium text-[#1e2749]">Virtual Session</p>
-                            <p className="text-sm text-gray-500">Differentiation deep-dive — grades 3-6 focus</p>
+                            <p className="font-medium text-[#1e2749]">Virtual Strategy Session #2</p>
+                            <p className="text-sm text-gray-500">Differentiation deep-dive — grades 3-6 Reading focus</p>
                           </div>
                         </div>
                         <span className="text-xs bg-[#35A7FF] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">Jan 2027</span>
@@ -2060,26 +2062,26 @@ export default function StPeterChanelDashboard() {
                     </div>
                   </div>
 
-                  {/* Feb/March 2027 */}
+                  {/* Feb 2027 - Leadership #3 */}
                   <div className="flex items-start gap-4">
-                    <div className="w-6 h-6 rounded-full bg-[#35A7FF] flex items-center justify-center flex-shrink-0 z-10">
+                    <div className="w-6 h-6 rounded-full bg-[#1e2749] flex items-center justify-center flex-shrink-0 z-10">
                       <span className="text-white text-xs">6</span>
                     </div>
-                    <div className="flex-1 bg-[#35A7FF]/10 rounded-lg p-3">
+                    <div className="flex-1 bg-[#1e2749]/5 rounded-lg p-3">
                       <div className="flex justify-between items-start">
                         <div className="flex items-start gap-3">
-                          <Video className="w-4 h-4 text-[#35A7FF] mt-0.5" />
+                          <Users className="w-4 h-4 text-[#1e2749] mt-0.5" />
                           <div>
-                            <p className="font-medium text-[#1e2749]">Virtual Session</p>
-                            <p className="text-sm text-gray-500">Assessment alignment — closing the grade/test gap</p>
+                            <p className="font-medium text-[#1e2749]">Executive Impact Session #3</p>
+                            <p className="text-sm text-gray-500">TerraNova prep planning, spring assessment strategy</p>
                           </div>
                         </div>
-                        <span className="text-xs bg-[#35A7FF] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">Feb/Mar 2027</span>
+                        <span className="text-xs bg-[#1e2749] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">Feb 2027</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* March 2027 */}
+                  {/* Mar 2027 - In-Person #2 */}
                   <div className="flex items-start gap-4">
                     <div className="w-6 h-6 rounded-full bg-[#38618C] flex items-center justify-center flex-shrink-0 z-10">
                       <span className="text-white text-xs">7</span>
@@ -2089,7 +2091,7 @@ export default function StPeterChanelDashboard() {
                         <div className="flex items-start gap-3">
                           <School className="w-4 h-4 text-[#38618C] mt-0.5" />
                           <div>
-                            <p className="font-medium text-[#1e2749]">In-Person PD Day</p>
+                            <p className="font-medium text-[#1e2749]">On-Campus Day #2</p>
                             <p className="text-sm text-gray-500">Classroom observations + coaching conversations</p>
                           </div>
                         </div>
@@ -2098,26 +2100,45 @@ export default function StPeterChanelDashboard() {
                     </div>
                   </div>
 
-                  {/* April 2027 */}
+                  {/* Mar/Apr 2027 - Virtual #3 */}
                   <div className="flex items-start gap-4">
-                    <div className="w-6 h-6 rounded-full bg-[#1e2749] flex items-center justify-center flex-shrink-0 z-10">
+                    <div className="w-6 h-6 rounded-full bg-[#35A7FF] flex items-center justify-center flex-shrink-0 z-10">
                       <span className="text-white text-xs">8</span>
                     </div>
-                    <div className="flex-1 bg-[#1e2749]/5 rounded-lg p-3">
+                    <div className="flex-1 bg-[#35A7FF]/10 rounded-lg p-3">
                       <div className="flex justify-between items-start">
                         <div className="flex items-start gap-3">
-                          <Users className="w-4 h-4 text-[#1e2749] mt-0.5" />
+                          <Video className="w-4 h-4 text-[#35A7FF] mt-0.5" />
                           <div>
-                            <p className="font-medium text-[#1e2749]">Leadership Strategic Session</p>
-                            <p className="text-sm text-gray-500">Review TerraNova prep, finalize spring push</p>
+                            <p className="font-medium text-[#1e2749]">Virtual Strategy Session #3</p>
+                            <p className="text-sm text-gray-500">Assessment alignment — closing the grade/test gap</p>
                           </div>
                         </div>
-                        <span className="text-xs bg-[#1e2749] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">April 2027</span>
+                        <span className="text-xs bg-[#35A7FF] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">Mar/Apr 2027</span>
                       </div>
                     </div>
                   </div>
 
-                  {/* May 2027 */}
+                  {/* Apr 2027 - Virtual #4 */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-6 h-6 rounded-full bg-[#35A7FF] flex items-center justify-center flex-shrink-0 z-10">
+                      <span className="text-white text-xs">9</span>
+                    </div>
+                    <div className="flex-1 bg-[#35A7FF]/10 rounded-lg p-3">
+                      <div className="flex justify-between items-start">
+                        <div className="flex items-start gap-3">
+                          <Video className="w-4 h-4 text-[#35A7FF] mt-0.5" />
+                          <div>
+                            <p className="font-medium text-[#1e2749]">Virtual Strategy Session #4</p>
+                            <p className="text-sm text-gray-500">Year-end reflection, strategy sustainability planning</p>
+                          </div>
+                        </div>
+                        <span className="text-xs bg-[#35A7FF] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">Apr 2027</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* May 2027 - Leadership #4 + Celebration */}
                   <div className="flex items-start gap-4">
                     <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 z-10">
                       <CheckCircle className="w-4 h-4 text-white" />
@@ -2127,8 +2148,8 @@ export default function StPeterChanelDashboard() {
                         <div className="flex items-start gap-3">
                           <Award className="w-4 h-4 text-green-600 mt-0.5" />
                           <div>
-                            <p className="font-medium text-green-800">Year-End Celebration + 2027-28 Planning</p>
-                            <p className="text-sm text-green-600">Celebrate wins, review data, plan continuation</p>
+                            <p className="font-medium text-green-800">Executive Impact Session #4 + Year-End Celebration</p>
+                            <p className="text-sm text-green-600">Celebrate wins, review retention data, plan 2027-28 continuation</p>
                           </div>
                         </div>
                         <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">May 2027</span>
@@ -2139,28 +2160,28 @@ export default function StPeterChanelDashboard() {
                 </div>
               </div>
 
-              {/* Summary Stats */}
-              <div className="grid grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-100">
+              {/* Summary Stats - Matches Package */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-100">
                 <div className="text-center">
                   <div className="flex justify-center mb-1">
                     <School className="w-4 h-4 text-[#38618C]" />
                   </div>
                   <p className="text-2xl font-bold text-[#1e2749]">2</p>
-                  <p className="text-xs text-gray-500">In-Person Days</p>
+                  <p className="text-xs text-gray-500">On-Campus Days</p>
                 </div>
                 <div className="text-center">
                   <div className="flex justify-center mb-1">
                     <Video className="w-4 h-4 text-[#35A7FF]" />
                   </div>
-                  <p className="text-2xl font-bold text-[#35A7FF]">3</p>
+                  <p className="text-2xl font-bold text-[#35A7FF]">4</p>
                   <p className="text-xs text-gray-500">Virtual Sessions</p>
                 </div>
                 <div className="text-center">
                   <div className="flex justify-center mb-1">
                     <Users className="w-4 h-4 text-[#1e2749]" />
                   </div>
-                  <p className="text-2xl font-bold text-[#1e2749]">3</p>
-                  <p className="text-xs text-gray-500">Leadership Sessions</p>
+                  <p className="text-2xl font-bold text-[#1e2749]">4</p>
+                  <p className="text-xs text-gray-500">Executive Impact Sessions</p>
                 </div>
                 <div className="text-center">
                   <div className="flex justify-center mb-1">
@@ -2168,6 +2189,29 @@ export default function StPeterChanelDashboard() {
                   </div>
                   <p className="text-2xl font-bold text-green-500">1</p>
                   <p className="text-xs text-gray-500">Celebration</p>
+                </div>
+              </div>
+
+              {/* Ongoing Support - Always Included */}
+              <div className="mt-6 pt-6 border-t border-gray-100">
+                <p className="text-sm font-medium text-[#1e2749] mb-3">Ongoing Throughout the Year:</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Laptop className="w-4 h-4 text-[#35A7FF]" />
+                    <span>Hub Access (All Staff)</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <BookOpen className="w-4 h-4 text-[#38618C]" />
+                    <span>TDI Book (Every Educator)</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <TrendingUp className="w-4 h-4 text-green-500" />
+                    <span>Retention Tracking</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Heart className="w-4 h-4 text-[#E07A5F]" />
+                    <span>Weekly Love Notes</span>
+                  </div>
                 </div>
               </div>
 
