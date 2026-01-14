@@ -632,69 +632,71 @@ export default function StPeterChanelDashboard() {
                   <p className="text-sm text-gray-700 italic">&quot;Why do our scores not match our data?&quot;</p>
                 </div>
 
-                {/* Sample Chart Preview */}
-                <div className="relative border border-dashed border-gray-300 rounded-lg p-4 mb-4">
+                {/* Sample Chart Preview - MORE VISIBLE AS SAMPLE */}
+                <div className="relative border-4 border-dashed border-amber-400 rounded-lg p-4 mb-4 bg-amber-50/50">
 
-                  {/* Preview Badge */}
-                  <div className="absolute -top-3 left-4 bg-white px-2">
-                    <span className="text-xs text-amber-600 font-medium">SAMPLE PREVIEW</span>
+                  {/* Preview Badge - LARGER AND MORE PROMINENT */}
+                  <div className="absolute -top-4 left-4 bg-amber-400 px-3 py-1 rounded-full">
+                    <span className="text-xs font-bold text-amber-900 uppercase tracking-wide">Sample Preview — Not Real Data</span>
                   </div>
 
-                  <p className="text-xs text-gray-500 mb-4">How this chart will look once we confirm your assessment data:</p>
+                  <p className="text-xs text-amber-700 mb-4 mt-2 font-medium">
+                    This is an example of how your chart will look once we confirm your assessment data:
+                  </p>
 
-                  {/* Sample Bars */}
-                  <div className="space-y-4">
+                  {/* Sample Bars - Add watermark effect */}
+                  <div className="space-y-4 opacity-70">
 
                     {/* Classroom Grades */}
                     <div>
                       <div className="flex justify-between text-xs mb-1">
                         <span className="text-gray-600">Classroom Grades (Avg)</span>
-                        <span className="font-medium text-gray-700">B+ (87%)</span>
+                        <span className="font-medium text-gray-500 italic">Example: B+ (87%)</span>
                       </div>
-                      <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-green-500 rounded-full" style={{ width: '87%' }}></div>
+                      <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-green-400 rounded-full" style={{ width: '87%' }}></div>
                       </div>
                     </div>
 
                     {/* Assessment Option 1: MAP */}
-                    <div className="opacity-60">
+                    <div>
                       <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">NWEA MAP Growth <span className="text-amber-600">(if used)</span></span>
-                        <span className="font-medium text-gray-500">52nd percentile</span>
+                        <span className="text-gray-600">NWEA MAP Growth <span className="text-amber-600 font-medium">(if used)</span></span>
+                        <span className="font-medium text-gray-500 italic">Example: 52nd percentile</span>
                       </div>
-                      <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '52%' }}></div>
+                      <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#38618C]/60 rounded-full" style={{ width: '52%' }}></div>
                       </div>
                     </div>
 
                     {/* Assessment Option 2: IOWA */}
-                    <div className="opacity-60">
+                    <div>
                       <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">IOWA Assessments <span className="text-amber-600">(if used)</span></span>
-                        <span className="font-medium text-gray-500">55th percentile</span>
+                        <span className="text-gray-600">IOWA Assessments <span className="text-amber-600 font-medium">(if used)</span></span>
+                        <span className="font-medium text-gray-500 italic">Example: 55th percentile</span>
                       </div>
-                      <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '55%' }}></div>
+                      <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#38618C]/60 rounded-full" style={{ width: '55%' }}></div>
                       </div>
                     </div>
 
                     {/* Assessment Option 3: LEAP */}
-                    <div className="opacity-60">
+                    <div>
                       <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Louisiana LEAP <span className="text-amber-600">(if used)</span></span>
-                        <span className="font-medium text-gray-500">42% Mastery+</span>
+                        <span className="text-gray-600">Louisiana LEAP <span className="text-amber-600 font-medium">(if used)</span></span>
+                        <span className="font-medium text-gray-500 italic">Example: 42% Mastery+</span>
                       </div>
-                      <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '42%' }}></div>
+                      <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#38618C]/60 rounded-full" style={{ width: '42%' }}></div>
                       </div>
                     </div>
 
                   </div>
 
-                  {/* Sample Insight */}
-                  <div className="mt-4 pt-3 border-t border-gray-200">
-                    <p className="text-xs text-gray-500 italic">
-                      <span className="font-medium">Sample insight:</span> &quot;Students earning B+ classroom grades but performing at 52nd percentile on MAP suggests grading may include non-mastery factors (effort, participation). Focus area: Align classroom assessments with standardized expectations.&quot;
+                  {/* Sample Insight - clearly marked as example */}
+                  <div className="mt-4 pt-3 border-t border-amber-300">
+                    <p className="text-xs text-amber-700 italic">
+                      <span className="font-bold">Example insight:</span> &quot;Students earning B+ classroom grades but performing at 52nd percentile on MAP suggests grading may include non-mastery factors. Focus area: Align classroom assessments with standardized expectations.&quot;
                     </p>
                   </div>
 
@@ -724,13 +726,21 @@ export default function StPeterChanelDashboard() {
               </div>
 
               {/* Leading Indicators Header */}
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Leading Indicators</span>
-                </div>
-                <span className="text-xs text-[#35A7FF] font-medium bg-[#35A7FF]/10 px-3 py-1 rounded-full">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-semibold text-[#1e2749] uppercase tracking-wide">Leading Indicators</span>
+                <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-3 py-1 rounded-full">
                   Baseline: Jan 14, 2025
                 </span>
+              </div>
+
+              {/* Leading Indicators Description */}
+              <div className="mb-6">
+                <p className="text-sm text-gray-600 mb-2">
+                  Research shows these four indicators are the strongest predictors of sustainable classroom change and student outcomes.<sup className="text-[#35A7FF]">1</sup> Each indicator is personalized to St. Peter Chanel&apos;s goals, established during our partnership kickoff.
+                </p>
+                <p className="text-xs text-gray-400">
+                  <sup>1</sup> RAND Corporation (2025), Learning Policy Institute · Indicators selected based on your school&apos;s specific priorities
+                </p>
               </div>
 
               {/* Indicator Bars */}
