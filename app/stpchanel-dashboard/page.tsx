@@ -300,7 +300,7 @@ export default function StPeterChanelDashboard() {
               </div>
             </div>
 
-            {/* Health Check */}
+            {/* Health Check - Goals Only */}
             <div className="bg-white rounded-xl p-5 shadow-sm">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
@@ -310,17 +310,10 @@ export default function StPeterChanelDashboard() {
                 <span className="text-xs text-gray-400">Updated Jan 13, 2026</span>
               </div>
 
-              {/* Row 1: Core Partnership Metrics */}
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-4">
+              {/* Row 1: Partnership Goals */}
+              <div className="grid grid-cols-3 gap-4 mb-4">
 
-                {/* Staff Enrolled */}
-                <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">100%</div>
-                  <div className="text-xs text-gray-600 mt-1">Staff Enrolled</div>
-                  <div className="text-xs text-green-600 mt-1">✓ Complete</div>
-                </div>
-
-                {/* Hub Engagement */}
+                {/* Hub Logins */}
                 <div className="text-center p-3 bg-green-50 rounded-lg">
                   <div className="text-2xl font-bold text-green-600">80%</div>
                   <div className="text-xs text-gray-600 mt-1">Hub Logins</div>
@@ -334,19 +327,13 @@ export default function StPeterChanelDashboard() {
                   <div className="text-xs text-green-600 mt-1">✓ Complete</div>
                 </div>
 
-                {/* Observations */}
-                <div className="text-center p-3 bg-[#35A7FF]/10 rounded-lg">
-                  <div className="text-2xl font-bold text-[#35A7FF]">1/2</div>
-                  <div className="text-xs text-gray-600 mt-1">Observations</div>
-                  <div className="text-xs text-[#35A7FF] mt-1">Next: Jan 14</div>
-                </div>
-
                 {/* Virtual Sessions */}
                 <div className="text-center p-3 bg-[#E07A5F]/10 rounded-lg">
                   <div className="text-2xl font-bold text-[#E07A5F]">0/2</div>
                   <div className="text-xs text-gray-600 mt-1">Virtual Sessions</div>
                   <div className="text-xs text-[#E07A5F] mt-1">Schedule Now</div>
                 </div>
+
               </div>
 
               {/* Divider */}
@@ -362,46 +349,29 @@ export default function StPeterChanelDashboard() {
               </div>
 
               <div className="grid grid-cols-3 gap-4">
-
-                {/* Blog Subscribers */}
-                <a
-                  href="https://raehughart.substack.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group"
-                >
+                {/* Blog Readers */}
+                <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer"
+                   className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
                   <Mail className="w-5 h-5 text-gray-400 group-hover:text-[#35A7FF] mx-auto mb-1" />
                   <div className="text-lg font-bold text-gray-400">TBD</div>
                   <div className="text-xs text-gray-600 mt-1">Blog Readers</div>
-                  <div className="text-xs text-[#35A7FF] mt-1 opacity-0 group-hover:opacity-100">Subscribe →</div>
                 </a>
 
                 {/* Podcast Listeners */}
-                <a
-                  href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group"
-                >
+                <a href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" target="_blank" rel="noopener noreferrer"
+                   className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
                   <Headphones className="w-5 h-5 text-gray-400 group-hover:text-[#35A7FF] mx-auto mb-1" />
                   <div className="text-lg font-bold text-gray-400">TBD</div>
                   <div className="text-xs text-gray-600 mt-1">Podcast Listeners</div>
-                  <div className="text-xs text-[#35A7FF] mt-1 opacity-0 group-hover:opacity-100">Listen →</div>
                 </a>
 
-                {/* FB Group Members */}
-                <a
-                  href="https://www.facebook.com/groups/tdimovement"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group"
-                >
+                {/* Community Members */}
+                <a href="https://www.facebook.com/groups/tdimovement" target="_blank" rel="noopener noreferrer"
+                   className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
                   <Users className="w-5 h-5 text-gray-400 group-hover:text-[#35A7FF] mx-auto mb-1" />
                   <div className="text-lg font-bold text-gray-400">TBD</div>
                   <div className="text-xs text-gray-600 mt-1">Community Members</div>
-                  <div className="text-xs text-[#35A7FF] mt-1 opacity-0 group-hover:opacity-100">Join →</div>
                 </a>
-
               </div>
             </div>
 
