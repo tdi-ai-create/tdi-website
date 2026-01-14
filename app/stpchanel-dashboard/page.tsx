@@ -1304,7 +1304,6 @@ export default function StPeterChanelDashboard() {
                     <ul className="text-sm text-red-700 space-y-1">
                       <li>• <strong>Strategy implementation at 21%</strong> — teachers need more support translating PD to practice</li>
                       <li>• <strong>Time constraints</strong> — &quot;too much to do&quot; cited as top barrier</li>
-                      <li>• <strong>15 teachers absent</strong> from session — need alternate touchpoint</li>
                     </ul>
                   </div>
 
