@@ -962,20 +962,6 @@ export default function StPeterChanelDashboard() {
                       </ul>
                     </div>
 
-                    {currentPhase.adaptations && (
-                      <div>
-                        <h4 className="font-semibold text-[#1e2749] mb-2 text-sm uppercase tracking-wide">Adaptations for St. Peter Chanel</h4>
-                        <ul className="space-y-1.5">
-                          {currentPhase.adaptations.map((item, i) => (
-                            <li key={i} className="flex items-start gap-2 text-gray-600 text-sm">
-                              <ArrowRight className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
                     {currentPhase.completed && (
                       <div>
                         <h4 className="font-semibold text-[#38618C] mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
@@ -1021,20 +1007,6 @@ export default function StPeterChanelDashboard() {
                             </li>
                           ))}
                         </ul>
-                      </div>
-                    )}
-
-                    {currentPhase.tdiStats && (
-                      <div className="bg-[#F5F5F5] rounded-lg p-4">
-                        <h4 className="font-semibold text-[#1e2749] mb-2 text-sm">TDI Partner Success Rates</h4>
-                        <div className="flex flex-wrap gap-3">
-                          {currentPhase.tdiStats.map((stat, i) => (
-                            <div key={i} className="bg-white rounded-lg px-3 py-2">
-                              <div className="text-xl font-bold text-[#1e2749]">{stat.value}</div>
-                              <div className="text-xs text-gray-500">{stat.label}</div>
-                            </div>
-                          ))}
-                        </div>
                       </div>
                     )}
 
