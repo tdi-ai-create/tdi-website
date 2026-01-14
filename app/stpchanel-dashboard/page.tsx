@@ -343,11 +343,16 @@ export default function StPeterChanelDashboard() {
                 </div>
 
                 {/* Virtual Sessions */}
-                <div className="text-center p-3 bg-[#E07A5F]/10 rounded-lg">
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-center p-3 bg-[#E07A5F]/10 rounded-lg hover:bg-[#E07A5F]/20 transition-all cursor-pointer block"
+                >
                   <div className="text-2xl font-bold text-[#E07A5F]">0/2</div>
                   <div className="text-xs text-gray-600 mt-1">Virtual Sessions</div>
-                  <div className="text-xs text-[#E07A5F] mt-1">Schedule Now</div>
-                </div>
+                  <div className="text-xs text-[#E07A5F] mt-1 font-medium hover:underline">Schedule Now →</div>
+                </a>
 
               </div>
 
