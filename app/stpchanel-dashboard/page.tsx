@@ -615,13 +615,16 @@ export default function StPeterChanelDashboard() {
               {/* Divider */}
               <div className="border-t border-gray-200 mb-6"></div>
 
-              {/* Student Performance - Paula's Core Question */}
-              <div className="bg-[#F5F5F5] rounded-xl p-5 mb-6">
+              {/* Student Performance - Preview Mode */}
+              <div className="bg-white rounded-xl p-5 shadow-sm mb-6">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <GraduationCap className="w-5 h-5 text-[#38618C]" />
                     <span className="font-semibold text-[#1e2749]">Student Performance</span>
                   </div>
+                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">
+                    Preview — Awaiting Your Data
+                  </span>
                 </div>
 
                 <div className="bg-[#E07A5F]/10 border border-[#E07A5F]/20 rounded-lg p-4 mb-4">
@@ -629,88 +632,95 @@ export default function StPeterChanelDashboard() {
                   <p className="text-sm text-gray-700 italic">&quot;Why do our scores not match our data?&quot;</p>
                 </div>
 
-                {/* Year-over-Year Chart */}
-                <div className="mb-4">
-                  <p className="text-xs text-gray-500 mb-3">LEAP Mastery+ Rate Over Time</p>
+                {/* Sample Chart Preview */}
+                <div className="relative border border-dashed border-gray-300 rounded-lg p-4 mb-4">
 
-                  {/* Chart Container */}
-                  <div className="relative h-48 border border-gray-200 rounded-lg p-4 bg-white">
-
-                    {/* Y-Axis Labels */}
-                    <div className="absolute left-0 top-4 bottom-8 w-8 flex flex-col justify-between text-xs text-gray-400">
-                      <span>100%</span>
-                      <span>75%</span>
-                      <span>50%</span>
-                      <span>25%</span>
-                      <span>0%</span>
-                    </div>
-
-                    {/* Chart Area */}
-                    <div className="ml-10 h-full relative">
-
-                      {/* Grid Lines */}
-                      <div className="absolute inset-0 flex flex-col justify-between">
-                        <div className="border-t border-gray-100"></div>
-                        <div className="border-t border-gray-100"></div>
-                        <div className="border-t border-gray-100"></div>
-                        <div className="border-t border-gray-100"></div>
-                        <div className="border-t border-gray-200"></div>
-                      </div>
-
-                      {/* Louisiana Benchmark Line (35% = 65% from top) */}
-                      <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-                        <line
-                          x1="0%" y1="65%"
-                          x2="100%" y2="65%"
-                          stroke="#38618C"
-                          strokeWidth="2"
-                          strokeDasharray="5,5"
-                        />
-                        <circle cx="10%" cy="65%" r="4" fill="#38618C" />
-                        <circle cx="35%" cy="65%" r="4" fill="#38618C" />
-                        <circle cx="60%" cy="65%" r="4" fill="#38618C" />
-                        <circle cx="85%" cy="65%" r="4" fill="#38618C" />
-                      </svg>
-
-                      {/* St. Peter Chanel Line - TBD (placeholder) */}
-                      <svg className="absolute inset-0 w-full h-full" preserveAspectRatio="none">
-                        <circle cx="85%" cy="50%" r="6" fill="none" stroke="#E07A5F" strokeWidth="2" strokeDasharray="3,3" />
-                        <text x="85%" y="53%" textAnchor="middle" fill="#E07A5F" fontSize="10" fontWeight="bold">?</text>
-                      </svg>
-
-                      {/* X-Axis Labels */}
-                      <div className="absolute bottom-0 left-0 right-0 flex justify-between text-xs text-gray-400 transform translate-y-5">
-                        <span>2022-23</span>
-                        <span>2023-24</span>
-                        <span>2024-25</span>
-                        <span>2025-26</span>
-                      </div>
-                    </div>
+                  {/* Preview Badge */}
+                  <div className="absolute -top-3 left-4 bg-white px-2">
+                    <span className="text-xs text-amber-600 font-medium">SAMPLE PREVIEW</span>
                   </div>
 
-                  {/* Legend */}
-                  <div className="flex items-center gap-6 mt-6 justify-center">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-0.5 bg-[#38618C]" style={{ borderStyle: 'dashed' }}></div>
-                      <span className="text-xs text-gray-600">Louisiana Benchmark (35%)</span>
+                  <p className="text-xs text-gray-500 mb-4">How this chart will look once we confirm your assessment data:</p>
+
+                  {/* Sample Bars */}
+                  <div className="space-y-4">
+
+                    {/* Classroom Grades */}
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Classroom Grades (Avg)</span>
+                        <span className="font-medium text-gray-700">B+ (87%)</span>
+                      </div>
+                      <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-green-500 rounded-full" style={{ width: '87%' }}></div>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full border-2 border-[#E07A5F] border-dashed"></div>
-                      <span className="text-xs text-gray-600">St. Peter Chanel (TBD)</span>
+
+                    {/* Assessment Option 1: MAP */}
+                    <div className="opacity-60">
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">NWEA MAP Growth <span className="text-amber-600">(if used)</span></span>
+                        <span className="font-medium text-gray-500">52nd percentile</span>
+                      </div>
+                      <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '52%' }}></div>
+                      </div>
                     </div>
+
+                    {/* Assessment Option 2: IOWA */}
+                    <div className="opacity-60">
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">IOWA Assessments <span className="text-amber-600">(if used)</span></span>
+                        <span className="font-medium text-gray-500">55th percentile</span>
+                      </div>
+                      <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '55%' }}></div>
+                      </div>
+                    </div>
+
+                    {/* Assessment Option 3: LEAP */}
+                    <div className="opacity-60">
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Louisiana LEAP <span className="text-amber-600">(if used)</span></span>
+                        <span className="font-medium text-gray-500">42% Mastery+</span>
+                      </div>
+                      <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '42%' }}></div>
+                      </div>
+                    </div>
+
                   </div>
+
+                  {/* Sample Insight */}
+                  <div className="mt-4 pt-3 border-t border-gray-200">
+                    <p className="text-xs text-gray-500 italic">
+                      <span className="font-medium">Sample insight:</span> &quot;Students earning B+ classroom grades but performing at 52nd percentile on MAP suggests grading may include non-mastery factors (effort, participation). Focus area: Align classroom assessments with standardized expectations.&quot;
+                    </p>
+                  </div>
+
                 </div>
 
-                <div className="pt-3 border-t border-gray-100">
+                {/* What We Need */}
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <p className="text-sm font-medium text-amber-800 mb-2">To complete this chart, we need:</p>
+                  <ul className="text-xs text-amber-700 space-y-1">
+                    <li>✓ Which assessments St. Peter Chanel uses (MAP, IOWA, LEAP, other)</li>
+                    <li>✓ Your most recent assessment results</li>
+                    <li>✓ Approximate classroom grade averages</li>
+                  </ul>
+                  <p className="text-xs text-amber-600 mt-2">
+                    → Complete the <a href="/stpchanel-dashboard/partner-data" target="_blank" rel="noopener noreferrer" className="underline font-medium">Partnership Data Form</a> to populate this with your real data
+                  </p>
+                </div>
+
+                <div className="pt-4 mt-4 border-t border-gray-100">
                   <div className="flex items-start gap-2">
                     <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
                     <p className="text-xs text-gray-600">
-                      <span className="font-semibold text-[#1e2749]">What we&apos;re tracking:</span> Once we have St. Peter Chanel assessment data, we&apos;ll see how classroom performance compares to state benchmarks year over year.
+                      <span className="font-semibold text-[#1e2749]">What we&apos;re tracking:</span> The gap between classroom performance and standardized assessments — this is the key to answering &quot;why don&apos;t our scores match our data?&quot;
                     </p>
                   </div>
                 </div>
-
-                <p className="text-xs text-gray-400 mt-3">Source: Louisiana Dept. of Education LEAP Results</p>
               </div>
 
               {/* Leading Indicators Header */}
