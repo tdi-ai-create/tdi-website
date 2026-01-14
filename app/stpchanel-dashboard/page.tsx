@@ -38,7 +38,10 @@ import {
   ChevronDown,
   ChevronRight,
   FileText,
-  Check
+  Check,
+  Layers,
+  Sun,
+  Sunset
 } from 'lucide-react';
 
 // Tooltip component
@@ -62,6 +65,17 @@ export default function StPeterChanelDashboard() {
     'observation-sept': false,
     'observation-jan': true,  // Most recent open by default
     'survey-data': true,
+    // 2026-27 Timeline
+    'timeline-july': false,
+    'timeline-sept': true,  // First on-campus day open
+    'timeline-oct': false,
+    'timeline-dec': false,
+    'timeline-jan': false,
+    'timeline-feb': false,
+    'timeline-mar-onsite': false,
+    'timeline-mar-virtual': false,
+    'timeline-apr': false,
+    'timeline-may': false,
   });
 
   // Toggle function for accordions
@@ -123,6 +137,78 @@ export default function StPeterChanelDashboard() {
         {/* Content - Collapsible */}
         {isOpen && (
           <div className="px-4 pb-4 border-t border-gray-100">
+            {children}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Timeline Accordion Component for 2026-27 tab
+  const TimelineAccordion = ({
+    id,
+    number,
+    date,
+    title,
+    type,
+    duration,
+    children
+  }: {
+    id: string;
+    number: number;
+    date: string;
+    title: string;
+    type: 'leadership' | 'onsite' | 'virtual' | 'celebration';
+    duration: string;
+    children: React.ReactNode;
+  }) => {
+    const isOpen = openSections[id];
+
+    const typeConfig = {
+      leadership: { bg: 'bg-[#1e2749]', label: 'Leadership' },
+      onsite: { bg: 'bg-[#38618C]', label: 'On-Site' },
+      virtual: { bg: 'bg-[#35A7FF]', label: 'Virtual' },
+      celebration: { bg: 'bg-green-500', label: 'Celebration' },
+    };
+
+    const config = typeConfig[type];
+
+    return (
+      <div className="border border-gray-200 rounded-xl overflow-hidden">
+        <button
+          onClick={() => toggleSection(id)}
+          className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors"
+        >
+          {/* Number Circle */}
+          <div className={`w-8 h-8 ${config.bg} rounded-full flex items-center justify-center flex-shrink-0`}>
+            <span className="text-white text-sm font-medium">{number}</span>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 text-left">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-medium text-[#1e2749]">{title}</span>
+              <span className={`text-xs ${config.bg} text-white px-2 py-0.5 rounded-full`}>
+                {config.label}
+              </span>
+            </div>
+            <div className="flex items-center gap-3 text-sm text-gray-500">
+              <span>{date}</span>
+              <span>•</span>
+              <span>{duration}</span>
+            </div>
+          </div>
+
+          {/* Chevron */}
+          {isOpen ? (
+            <ChevronDown className="w-5 h-5 text-gray-400" />
+          ) : (
+            <ChevronRight className="w-5 h-5 text-gray-400" />
+          )}
+        </button>
+
+        {isOpen && (
+          <div className="px-4 pb-4 pt-2 border-t border-gray-100 ml-12">
             {children}
           </div>
         )}
@@ -1916,211 +2002,391 @@ export default function StPeterChanelDashboard() {
               </div>
             </div>
 
-            {/* 2026-27 Timeline - Matches Phase 2 Package */}
+            {/* 2026-27 Focus Areas */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 mb-2">
-                <Calendar className="w-5 h-5 text-[#1e2749]" />
-                <h4 className="font-semibold text-[#1e2749]">Proposed 2026-27 Timeline</h4>
+              <div className="flex items-center gap-2 mb-4">
+                <Target className="w-5 h-5 text-[#1e2749]" />
+                <h4 className="font-semibold text-[#1e2749]">Year Focus: Closing the Gap</h4>
               </div>
-              <p className="text-sm text-gray-500 mb-6">Phase 2 (ACCELERATE) — Full package mapped to your school year</p>
+              <p className="text-sm text-gray-600 mb-6">
+                Based on your TerraNova data and teacher feedback, we&apos;ve identified three strategic focus areas for 2026-27. Each includes measurable goals we&apos;ll track together.
+              </p>
 
-              <div className="relative">
-                {/* Vertical line */}
-                <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-gray-200" />
+              <div className="grid md:grid-cols-3 gap-4">
 
-                <div className="space-y-4">
-
-                  {/* July 2026 - Leadership #1 */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-6 h-6 rounded-full bg-[#1e2749] flex items-center justify-center flex-shrink-0 z-10">
-                      <span className="text-white text-xs">1</span>
-                    </div>
-                    <div className="flex-1 bg-[#1e2749]/5 rounded-lg p-3">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start gap-3">
-                          <Users className="w-4 h-4 text-[#1e2749] mt-0.5" />
-                          <div>
-                            <p className="font-medium text-[#1e2749]">Executive Impact Session #1</p>
-                            <p className="text-sm text-gray-500">Set goals, review TerraNova data, align on differentiation focus</p>
-                          </div>
-                        </div>
-                        <span className="text-xs bg-[#1e2749] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">July 2026</span>
-                      </div>
-                    </div>
+                {/* Differentiation - Primary Focus */}
+                <div className="bg-[#1e2749] text-white rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Layers className="w-5 h-5" />
+                    <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">Primary Focus</span>
                   </div>
-
-                  {/* Sept/Oct 2026 - In-Person #1 */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-6 h-6 rounded-full bg-[#38618C] flex items-center justify-center flex-shrink-0 z-10">
-                      <span className="text-white text-xs">2</span>
-                    </div>
-                    <div className="flex-1 bg-[#38618C]/10 rounded-lg p-3">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start gap-3">
-                          <School className="w-4 h-4 text-[#38618C] mt-0.5" />
-                          <div>
-                            <p className="font-medium text-[#1e2749]">On-Campus Day #1</p>
-                            <p className="text-sm text-gray-500">Book distribution to all staff + classroom observations + Hub onboarding</p>
-                          </div>
-                        </div>
-                        <span className="text-xs bg-[#38618C] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">Sept/Oct 2026</span>
-                      </div>
-                    </div>
+                  <h5 className="font-semibold text-lg mb-2">Differentiation</h5>
+                  <p className="text-sm opacity-80 mb-4">Meeting students where they are — especially grades 3-6</p>
+                  <div className="border-t border-white/20 pt-3 mt-3">
+                    <p className="text-xs opacity-60 mb-2">Success Metrics:</p>
+                    <ul className="text-sm space-y-1">
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
+                        80% using tiered assignments
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
+                        Flexible grouping in 75% of classrooms
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
+                        TerraNova growth: +5 percentile points (Gr 3-6)
+                      </li>
+                    </ul>
                   </div>
-
-                  {/* Oct/Nov 2026 - Virtual #1 */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-6 h-6 rounded-full bg-[#35A7FF] flex items-center justify-center flex-shrink-0 z-10">
-                      <span className="text-white text-xs">3</span>
-                    </div>
-                    <div className="flex-1 bg-[#35A7FF]/10 rounded-lg p-3">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start gap-3">
-                          <Video className="w-4 h-4 text-[#35A7FF] mt-0.5" />
-                          <div>
-                            <p className="font-medium text-[#1e2749]">Virtual Strategy Session #1</p>
-                            <p className="text-sm text-gray-500">Differentiation strategies — follow-up from kickoff</p>
-                          </div>
-                        </div>
-                        <span className="text-xs bg-[#35A7FF] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">Oct/Nov 2026</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Dec 2026 - Leadership #2 */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-6 h-6 rounded-full bg-[#1e2749] flex items-center justify-center flex-shrink-0 z-10">
-                      <span className="text-white text-xs">4</span>
-                    </div>
-                    <div className="flex-1 bg-[#1e2749]/5 rounded-lg p-3">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start gap-3">
-                          <Users className="w-4 h-4 text-[#1e2749] mt-0.5" />
-                          <div>
-                            <p className="font-medium text-[#1e2749]">Executive Impact Session #2</p>
-                            <p className="text-sm text-gray-500">Mid-year data review, retention check-in, adjust strategy</p>
-                          </div>
-                        </div>
-                        <span className="text-xs bg-[#1e2749] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">Dec 2026</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Jan 2027 - Virtual #2 */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-6 h-6 rounded-full bg-[#35A7FF] flex items-center justify-center flex-shrink-0 z-10">
-                      <span className="text-white text-xs">5</span>
-                    </div>
-                    <div className="flex-1 bg-[#35A7FF]/10 rounded-lg p-3">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start gap-3">
-                          <Video className="w-4 h-4 text-[#35A7FF] mt-0.5" />
-                          <div>
-                            <p className="font-medium text-[#1e2749]">Virtual Strategy Session #2</p>
-                            <p className="text-sm text-gray-500">Differentiation deep-dive — grades 3-6 Reading focus</p>
-                          </div>
-                        </div>
-                        <span className="text-xs bg-[#35A7FF] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">Jan 2027</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Feb 2027 - Leadership #3 */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-6 h-6 rounded-full bg-[#1e2749] flex items-center justify-center flex-shrink-0 z-10">
-                      <span className="text-white text-xs">6</span>
-                    </div>
-                    <div className="flex-1 bg-[#1e2749]/5 rounded-lg p-3">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start gap-3">
-                          <Users className="w-4 h-4 text-[#1e2749] mt-0.5" />
-                          <div>
-                            <p className="font-medium text-[#1e2749]">Executive Impact Session #3</p>
-                            <p className="text-sm text-gray-500">TerraNova prep planning, spring assessment strategy</p>
-                          </div>
-                        </div>
-                        <span className="text-xs bg-[#1e2749] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">Feb 2027</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Mar 2027 - In-Person #2 */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-6 h-6 rounded-full bg-[#38618C] flex items-center justify-center flex-shrink-0 z-10">
-                      <span className="text-white text-xs">7</span>
-                    </div>
-                    <div className="flex-1 bg-[#38618C]/10 rounded-lg p-3">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start gap-3">
-                          <School className="w-4 h-4 text-[#38618C] mt-0.5" />
-                          <div>
-                            <p className="font-medium text-[#1e2749]">On-Campus Day #2</p>
-                            <p className="text-sm text-gray-500">Classroom observations + coaching conversations</p>
-                          </div>
-                        </div>
-                        <span className="text-xs bg-[#38618C] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">Mar 2027</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Mar/Apr 2027 - Virtual #3 */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-6 h-6 rounded-full bg-[#35A7FF] flex items-center justify-center flex-shrink-0 z-10">
-                      <span className="text-white text-xs">8</span>
-                    </div>
-                    <div className="flex-1 bg-[#35A7FF]/10 rounded-lg p-3">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start gap-3">
-                          <Video className="w-4 h-4 text-[#35A7FF] mt-0.5" />
-                          <div>
-                            <p className="font-medium text-[#1e2749]">Virtual Strategy Session #3</p>
-                            <p className="text-sm text-gray-500">Assessment alignment — closing the grade/test gap</p>
-                          </div>
-                        </div>
-                        <span className="text-xs bg-[#35A7FF] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">Mar/Apr 2027</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Apr 2027 - Virtual #4 */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-6 h-6 rounded-full bg-[#35A7FF] flex items-center justify-center flex-shrink-0 z-10">
-                      <span className="text-white text-xs">9</span>
-                    </div>
-                    <div className="flex-1 bg-[#35A7FF]/10 rounded-lg p-3">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start gap-3">
-                          <Video className="w-4 h-4 text-[#35A7FF] mt-0.5" />
-                          <div>
-                            <p className="font-medium text-[#1e2749]">Virtual Strategy Session #4</p>
-                            <p className="text-sm text-gray-500">Year-end reflection, strategy sustainability planning</p>
-                          </div>
-                        </div>
-                        <span className="text-xs bg-[#35A7FF] text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">Apr 2027</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* May 2027 - Leadership #4 + Celebration */}
-                  <div className="flex items-start gap-4">
-                    <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 z-10">
-                      <CheckCircle className="w-4 h-4 text-white" />
-                    </div>
-                    <div className="flex-1 bg-green-50 border border-green-200 rounded-lg p-3">
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start gap-3">
-                          <Award className="w-4 h-4 text-green-600 mt-0.5" />
-                          <div>
-                            <p className="font-medium text-green-800">Executive Impact Session #4 + Year-End Celebration</p>
-                            <p className="text-sm text-green-600">Celebrate wins, review retention data, plan 2027-28 continuation</p>
-                          </div>
-                        </div>
-                        <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full whitespace-nowrap ml-2">May 2027</span>
-                      </div>
-                    </div>
-                  </div>
-
                 </div>
+
+                {/* Classroom Management */}
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Users className="w-5 h-5 text-[#38618C]" />
+                    <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-0.5 rounded-full">Supporting Focus</span>
+                  </div>
+                  <h5 className="font-semibold text-lg text-[#1e2749] mb-2">Classroom Management</h5>
+                  <p className="text-sm text-gray-600 mb-4">Systems that support differentiated instruction</p>
+                  <div className="border-t border-gray-200 pt-3 mt-3">
+                    <p className="text-xs text-gray-500 mb-2">Success Metrics:</p>
+                    <ul className="text-sm text-gray-700 space-y-1">
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full" />
+                        Reduce &quot;repeat directions&quot; complaints by 50%
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full" />
+                        Transition routines in 90% of classrooms
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full" />
+                        Behavior as challenge: drop from 53% to 30%
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Instructional Design */}
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <BookOpen className="w-5 h-5 text-[#35A7FF]" />
+                    <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-0.5 rounded-full">Supporting Focus</span>
+                  </div>
+                  <h5 className="font-semibold text-lg text-[#1e2749] mb-2">Instructional Design</h5>
+                  <p className="text-sm text-gray-600 mb-4">Engaging lessons that reach all learners</p>
+                  <div className="border-t border-gray-200 pt-3 mt-3">
+                    <p className="text-xs text-gray-500 mb-2">Success Metrics:</p>
+                    <ul className="text-sm text-gray-700 space-y-1">
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
+                        Engagement as challenge: drop from 32% to 15%
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
+                        100% using formative checks (exit tickets, etc.)
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
+                        Planning time stress: drop from 84% to 50%
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Connection to Data */}
+              <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <TrendingUp className="w-5 h-5 text-amber-600 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-amber-800">Why These Metrics?</p>
+                    <p className="text-sm text-amber-700 mt-1">
+                      These goals come directly from your Jan 2026 survey (84% cited time management, 53% cited behavior) and Paula&apos;s stated goal of &quot;more engaging lessons and differentiated learning.&quot; We&apos;ll measure progress at each touchpoint.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2026-27 Timeline - Accordion Style */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-[#1e2749]" />
+                  <h4 className="font-semibold text-[#1e2749]">Proposed 2026-27 Timeline</h4>
+                </div>
+                <div className="flex gap-2 text-xs">
+                  <button
+                    onClick={() => setOpenSections(prev => ({
+                      ...prev,
+                      'timeline-july': true, 'timeline-sept': true, 'timeline-oct': true,
+                      'timeline-dec': true, 'timeline-jan': true, 'timeline-feb': true,
+                      'timeline-mar-onsite': true, 'timeline-mar-virtual': true,
+                      'timeline-apr': true, 'timeline-may': true
+                    }))}
+                    className="text-[#35A7FF] hover:underline"
+                  >
+                    Expand All
+                  </button>
+                  <span className="text-gray-300">|</span>
+                  <button
+                    onClick={() => setOpenSections(prev => ({
+                      ...prev,
+                      'timeline-july': false, 'timeline-sept': false, 'timeline-oct': false,
+                      'timeline-dec': false, 'timeline-jan': false, 'timeline-feb': false,
+                      'timeline-mar-onsite': false, 'timeline-mar-virtual': false,
+                      'timeline-apr': false, 'timeline-may': false
+                    }))}
+                    className="text-[#35A7FF] hover:underline"
+                  >
+                    Collapse All
+                  </button>
+                </div>
+              </div>
+              <p className="text-sm text-gray-500 mb-6">Phase 2 (ACCELERATE) — Click each session for details</p>
+
+              <div className="space-y-3">
+
+                {/* July 2026 - Executive Impact Session #1 */}
+                <TimelineAccordion id="timeline-july" number={1} date="July 2026" title="Executive Impact Session #1" type="leadership" duration="90 minutes">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Goals:</p>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Review 2025-26 outcomes and celebrate wins</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Set differentiation goals for each grade band</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Align on success metrics and tracking approach</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Plan book study rollout and kickoff logistics</li>
+                      </ul>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-xs text-gray-500 mb-1">Differentiation Connection:</p>
+                      <p className="text-sm text-gray-700">Establish baseline expectations — what does differentiation look like at SPC? Define observable indicators.</p>
+                    </div>
+                  </div>
+                </TimelineAccordion>
+
+                {/* Sept/Oct 2026 - On-Campus Day #1 */}
+                <TimelineAccordion id="timeline-sept" number={2} date="Sept/Oct 2026" title="On-Campus Day #1" type="onsite" duration="Full Day">
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Sun className="w-4 h-4 text-amber-600" />
+                          <p className="text-sm font-medium text-amber-800">Morning: All-Staff Session</p>
+                        </div>
+                        <ul className="text-sm text-amber-700 space-y-1">
+                          <li>• Book study kickoff + distribution</li>
+                          <li>• Differentiation framework introduction</li>
+                          <li>• &quot;What does this look like at SPC?&quot; discussion</li>
+                          <li>• Hub resource orientation</li>
+                        </ul>
+                      </div>
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Sunset className="w-4 h-4 text-blue-600" />
+                          <p className="text-sm font-medium text-blue-800">Afternoon: Classroom Observations</p>
+                        </div>
+                        <ul className="text-sm text-blue-700 space-y-1">
+                          <li>• Focus: Current differentiation practices</li>
+                          <li>• Baseline observation notes</li>
+                          <li>• 1:1 teacher check-ins</li>
+                          <li>• Identify bright spots to share</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-xs text-gray-500 mb-1">Differentiation Connection:</p>
+                      <p className="text-sm text-gray-700">Launch shared vocabulary and look-fors. Observations establish baseline for measuring growth.</p>
+                    </div>
+                  </div>
+                </TimelineAccordion>
+
+                {/* Oct/Nov 2026 - Virtual Session #1 */}
+                <TimelineAccordion id="timeline-oct" number={3} date="Oct/Nov 2026" title="Virtual Strategy Session #1" type="virtual" duration="60 minutes">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Focus: Tiered Instruction Basics</p>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Tiered assignments: What, why, and how</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Planning templates for tiered lessons</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Book study Chapter 1-2 discussion</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Peer sharing: What&apos;s working so far?</li>
+                      </ul>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-xs text-gray-500 mb-1">Classroom Management Connection:</p>
+                      <p className="text-sm text-gray-700">Introduce routines for managing multiple groups — &quot;What are the other students doing?&quot;</p>
+                    </div>
+                  </div>
+                </TimelineAccordion>
+
+                {/* Dec 2026 - Executive Impact Session #2 */}
+                <TimelineAccordion id="timeline-dec" number={4} date="Dec 2026" title="Executive Impact Session #2" type="leadership" duration="90 minutes">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Goals:</p>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Mid-year data review: What&apos;s moving?</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Teacher retention pulse check</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Adjust strategy based on observation data</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Plan spring differentiation push</li>
+                      </ul>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-xs text-gray-500 mb-1">Metrics Check:</p>
+                      <p className="text-sm text-gray-700">Compare teacher survey results to baseline. Are stress levels holding? Is differentiation showing up in classrooms?</p>
+                    </div>
+                  </div>
+                </TimelineAccordion>
+
+                {/* Jan 2027 - Virtual Session #2 */}
+                <TimelineAccordion id="timeline-jan" number={5} date="Jan 2027" title="Virtual Strategy Session #2" type="virtual" duration="60 minutes">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Focus: Flexible Grouping Strategies</p>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Data-driven grouping: Using formative assessments</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Grades 3-6 Reading focus: Targeted interventions</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Book study Chapter 3-4 discussion</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Troubleshooting: Management challenges with groups</li>
+                      </ul>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-xs text-gray-500 mb-1">Instructional Design Connection:</p>
+                      <p className="text-sm text-gray-700">Connect grouping to lesson design — how does this change planning?</p>
+                    </div>
+                  </div>
+                </TimelineAccordion>
+
+                {/* Feb 2027 - Executive Impact Session #3 */}
+                <TimelineAccordion id="timeline-feb" number={6} date="Feb 2027" title="Executive Impact Session #3" type="leadership" duration="90 minutes">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Goals:</p>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />TerraNova prep strategy alignment</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Test-taking skills + differentiation connection</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Spring observation focus areas</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Review implementation metrics</li>
+                      </ul>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-xs text-gray-500 mb-1">Differentiation Connection:</p>
+                      <p className="text-sm text-gray-700">How do we differentiate test prep? Avoid one-size-fits-all review.</p>
+                    </div>
+                  </div>
+                </TimelineAccordion>
+
+                {/* Mar 2027 - On-Campus Day #2 */}
+                <TimelineAccordion id="timeline-mar-onsite" number={7} date="Mar 2027" title="On-Campus Day #2" type="onsite" duration="Full Day">
+                  <div className="space-y-4">
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Sun className="w-4 h-4 text-blue-600" />
+                          <p className="text-sm font-medium text-blue-800">Morning: Classroom Observations</p>
+                        </div>
+                        <ul className="text-sm text-blue-700 space-y-1">
+                          <li>• Focus: Differentiation in action</li>
+                          <li>• Look-fors: Tiered tasks, flexible groups</li>
+                          <li>• Compare to Sept baseline</li>
+                          <li>• Document growth and bright spots</li>
+                        </ul>
+                      </div>
+                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Sunset className="w-4 h-4 text-amber-600" />
+                          <p className="text-sm font-medium text-amber-800">Afternoon: Coaching Conversations</p>
+                        </div>
+                        <ul className="text-sm text-amber-700 space-y-1">
+                          <li>• 1:1 feedback from morning observations</li>
+                          <li>• Growth group check-ins</li>
+                          <li>• Celebrate implementation wins</li>
+                          <li>• Problem-solve remaining challenges</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                      <p className="text-xs text-green-600 mb-1">Why Flipped?</p>
+                      <p className="text-sm text-green-700">Morning observations allow afternoon conversations to be immediately actionable — feedback is fresh.</p>
+                    </div>
+                  </div>
+                </TimelineAccordion>
+
+                {/* Mar/Apr 2027 - Virtual Session #3 */}
+                <TimelineAccordion id="timeline-mar-virtual" number={8} date="Mar/Apr 2027" title="Virtual Strategy Session #3" type="virtual" duration="60 minutes">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Focus: Assessment Alignment</p>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Closing the grades vs. test score gap</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Differentiated assessment strategies</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Book study final chapters</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Peer sharing: Biggest wins this year</li>
+                      </ul>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-xs text-gray-500 mb-1">Instructional Design Connection:</p>
+                      <p className="text-sm text-gray-700">How do we grade fairly when students are working at different levels?</p>
+                    </div>
+                  </div>
+                </TimelineAccordion>
+
+                {/* Apr 2027 - Virtual Session #4 */}
+                <TimelineAccordion id="timeline-apr" number={9} date="Apr 2027" title="Virtual Strategy Session #4" type="virtual" duration="60 minutes">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Focus: Sustainability Planning</p>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />What&apos;s working? What sticks?</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Building peer support structures</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Teacher-leader identification</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Summer planning for 2027-28</li>
+                      </ul>
+                    </div>
+                    <div className="bg-gray-50 rounded-lg p-3">
+                      <p className="text-xs text-gray-500 mb-1">Classroom Management Connection:</p>
+                      <p className="text-sm text-gray-700">Lock in routines and systems that support differentiation long-term.</p>
+                    </div>
+                  </div>
+                </TimelineAccordion>
+
+                {/* May 2027 - Celebration */}
+                <TimelineAccordion id="timeline-may" number={10} date="May 2027" title="Executive Impact Session #4 + Year-End Celebration" type="celebration" duration="2 hours">
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Goals:</p>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Celebrate growth: Compare to baseline</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Review TerraNova results vs. goals</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Teacher retention data</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Plan 2027-28 continuation (Phase 3?)</li>
+                      </ul>
+                    </div>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                      <p className="text-xs text-green-600 mb-1">Metrics Review:</p>
+                      <div className="grid grid-cols-3 gap-3 mt-2 text-center">
+                        <div>
+                          <p className="text-lg font-bold text-green-700">80%</p>
+                          <p className="text-xs text-green-600">Tiered assignments</p>
+                        </div>
+                        <div>
+                          <p className="text-lg font-bold text-green-700">+5</p>
+                          <p className="text-xs text-green-600">TerraNova growth</p>
+                        </div>
+                        <div>
+                          <p className="text-lg font-bold text-green-700">30%</p>
+                          <p className="text-xs text-green-600">Behavior challenge</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </TimelineAccordion>
+
               </div>
 
               {/* Summary Stats - Matches Package */}
