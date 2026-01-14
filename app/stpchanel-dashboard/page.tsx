@@ -1947,6 +1947,185 @@ export default function StPeterChanelDashboard() {
               </div>
             </div>
 
+            {/* 2026-27 Timeline */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h4 className="font-semibold text-[#1e2749] mb-6">📅 Proposed 2026-27 Timeline</h4>
+
+              <div className="relative">
+                {/* Vertical line */}
+                <div className="absolute left-[11px] top-2 bottom-2 w-0.5 bg-gray-200" />
+
+                <div className="space-y-4">
+
+                  {/* July 2026 */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-6 h-6 rounded-full bg-[#1e2749] flex items-center justify-center flex-shrink-0 z-10">
+                      <span className="text-white text-xs">1</span>
+                    </div>
+                    <div className="flex-1 bg-[#1e2749]/5 rounded-lg p-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-[#1e2749]">Leadership Strategic Session</p>
+                          <p className="text-sm text-gray-500">Set goals, review data, align on focus areas</p>
+                        </div>
+                        <span className="text-xs bg-[#1e2749] text-white px-2 py-1 rounded-full">July 2026</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Sept/Oct 2026 */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-6 h-6 rounded-full bg-[#38618C] flex items-center justify-center flex-shrink-0 z-10">
+                      <span className="text-white text-xs">2</span>
+                    </div>
+                    <div className="flex-1 bg-[#38618C]/10 rounded-lg p-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-[#1e2749]">Kickoff PD: In-Person</p>
+                          <p className="text-sm text-gray-500">Full staff book study launch + classroom observations</p>
+                        </div>
+                        <span className="text-xs bg-[#38618C] text-white px-2 py-1 rounded-full">Sept/Oct 2026</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Oct/Nov 2026 */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-6 h-6 rounded-full bg-[#35A7FF] flex items-center justify-center flex-shrink-0 z-10">
+                      <span className="text-white text-xs">3</span>
+                    </div>
+                    <div className="flex-1 bg-[#35A7FF]/10 rounded-lg p-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-[#1e2749]">Virtual Session</p>
+                          <p className="text-sm text-gray-500">Differentiation strategies — follow-up from kickoff</p>
+                        </div>
+                        <span className="text-xs bg-[#35A7FF] text-white px-2 py-1 rounded-full">Oct/Nov 2026</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Dec 2026 */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-6 h-6 rounded-full bg-[#1e2749] flex items-center justify-center flex-shrink-0 z-10">
+                      <span className="text-white text-xs">4</span>
+                    </div>
+                    <div className="flex-1 bg-[#1e2749]/5 rounded-lg p-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-[#1e2749]">Leadership Strategic Session</p>
+                          <p className="text-sm text-gray-500">Mid-year check-in, review progress, adjust as needed</p>
+                        </div>
+                        <span className="text-xs bg-[#1e2749] text-white px-2 py-1 rounded-full">Dec 2026</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Jan 2027 */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-6 h-6 rounded-full bg-[#35A7FF] flex items-center justify-center flex-shrink-0 z-10">
+                      <span className="text-white text-xs">5</span>
+                    </div>
+                    <div className="flex-1 bg-[#35A7FF]/10 rounded-lg p-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-[#1e2749]">Virtual Session</p>
+                          <p className="text-sm text-gray-500">Differentiation deep-dive — grades 3-6 focus</p>
+                        </div>
+                        <span className="text-xs bg-[#35A7FF] text-white px-2 py-1 rounded-full">Jan 2027</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Feb/March 2027 */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-6 h-6 rounded-full bg-[#35A7FF] flex items-center justify-center flex-shrink-0 z-10">
+                      <span className="text-white text-xs">6</span>
+                    </div>
+                    <div className="flex-1 bg-[#35A7FF]/10 rounded-lg p-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-[#1e2749]">Virtual Session</p>
+                          <p className="text-sm text-gray-500">Assessment alignment — closing the grade/test gap</p>
+                        </div>
+                        <span className="text-xs bg-[#35A7FF] text-white px-2 py-1 rounded-full">Feb/Mar 2027</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* March 2027 */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-6 h-6 rounded-full bg-[#38618C] flex items-center justify-center flex-shrink-0 z-10">
+                      <span className="text-white text-xs">7</span>
+                    </div>
+                    <div className="flex-1 bg-[#38618C]/10 rounded-lg p-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-[#1e2749]">In-Person PD Day</p>
+                          <p className="text-sm text-gray-500">Classroom observations + coaching conversations</p>
+                        </div>
+                        <span className="text-xs bg-[#38618C] text-white px-2 py-1 rounded-full">Mar 2027</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* April 2027 */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-6 h-6 rounded-full bg-[#1e2749] flex items-center justify-center flex-shrink-0 z-10">
+                      <span className="text-white text-xs">8</span>
+                    </div>
+                    <div className="flex-1 bg-[#1e2749]/5 rounded-lg p-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-[#1e2749]">Leadership Strategic Session</p>
+                          <p className="text-sm text-gray-500">Review TerraNova prep, finalize spring push</p>
+                        </div>
+                        <span className="text-xs bg-[#1e2749] text-white px-2 py-1 rounded-full">April 2027</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* May 2027 */}
+                  <div className="flex items-start gap-4">
+                    <div className="w-6 h-6 rounded-full bg-green-500 flex items-center justify-center flex-shrink-0 z-10">
+                      <span className="text-white text-xs">✓</span>
+                    </div>
+                    <div className="flex-1 bg-green-50 border border-green-200 rounded-lg p-3">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-green-800">Year-End Celebration + 2027-28 Planning</p>
+                          <p className="text-sm text-green-600">Celebrate wins, review data, plan continuation</p>
+                        </div>
+                        <span className="text-xs bg-green-500 text-white px-2 py-1 rounded-full">May 2027</span>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* Summary Stats */}
+              <div className="grid grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-100">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-[#1e2749]">2</p>
+                  <p className="text-xs text-gray-500">In-Person Days</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-[#35A7FF]">3</p>
+                  <p className="text-xs text-gray-500">Virtual Sessions</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-[#1e2749]">3</p>
+                  <p className="text-xs text-gray-500">Leadership Sessions</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-green-500">1</p>
+                  <p className="text-xs text-gray-500">Celebration</p>
+                </div>
+              </div>
+
+            </div>
+
             {/* Goals Alignment */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
               <p className="font-semibold text-[#1e2749] mb-4">🎯 Aligned to Your Goals</p>
