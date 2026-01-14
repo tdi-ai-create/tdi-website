@@ -286,7 +286,7 @@ export default function StPeterChanelDashboard() {
                   <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
                   <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
                 </div>
-                <div className="text-2xl font-bold text-[#E07A5F]">3</div>
+                <div className="text-2xl font-bold text-[#E07A5F]">4</div>
                 <div className="text-xs text-[#E07A5F] font-medium">Items pending</div>
               </div>
 
@@ -440,6 +440,23 @@ export default function StPeterChanelDashboard() {
                   <span className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Schedule
+                  </span>
+                </a>
+
+                {/* Item 4: Partnership Data Form */}
+                <a
+                  href="/stpchanel-dashboard/partner-data"
+                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md hover:border-[#35A7FF] border border-transparent transition-all cursor-pointer block"
+                >
+                  <div className="flex items-center gap-3">
+                    <ClipboardList className="w-5 h-5 text-[#E07A5F]" />
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Complete Partnership Data Form</div>
+                      <div className="text-sm text-gray-500">Help us personalize your dashboard</div>
+                    </div>
+                  </div>
+                  <span className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold">
+                    Complete
                   </span>
                 </a>
               </div>
