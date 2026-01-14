@@ -60,7 +60,7 @@ export default function PartnerDataPage() {
           </div>
           <h1 className="text-2xl font-bold text-[#1e2749] mb-2">Thank You, Paula!</h1>
           <p className="text-gray-600 mb-4">
-            Your data has been submitted. Rae will update your dashboard with this information.
+            Your data has been submitted. We&apos;ll update your dashboard with this information and follow up with you soon.
           </p>
           <p className="text-sm text-gray-500 mb-6">
             This window will close automatically in a few seconds...
@@ -339,7 +339,7 @@ export default function PartnerDataPage() {
           <div className="p-6 border-b border-gray-100">
             <div className="mb-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Anything else you want Rae to know?
+                Anything else you want us to know?
               </label>
               <textarea
                 name="anything_else"
@@ -360,7 +360,7 @@ export default function PartnerDataPage() {
               {submitting ? 'Submitting...' : 'Submit Partnership Data'}
             </button>
             <p className="text-xs text-gray-500 text-center mt-3">
-              Rae will receive your responses and update your dashboard accordingly.
+              Our team will receive your responses and update your dashboard accordingly.
             </p>
           </div>
 
