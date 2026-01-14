@@ -609,7 +609,7 @@ export default function StPeterChanelDashboard() {
 
             {/* 2026-27 Teaser */}
             <div
-              className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white cursor-pointer hover:shadow-lg transition-shadow"
+              className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-[1.01] mt-8"
               onClick={() => setActiveTab('next-year')}
             >
               <div className="flex justify-between items-center">
@@ -620,8 +620,8 @@ export default function StPeterChanelDashboard() {
                     Based on your TerraNova data, we&apos;ve built a differentiation-focused plan for next year.
                   </p>
                 </div>
-                <div className="text-right">
-                  <span className="text-3xl">→</span>
+                <div className="text-right flex flex-col items-center">
+                  <span className="text-4xl">→</span>
                   <p className="text-xs opacity-70">See the plan</p>
                 </div>
               </div>
@@ -1862,139 +1862,149 @@ export default function StPeterChanelDashboard() {
         {/* 2026-27 PREVIEW TAB */}
         {activeTab === 'next-year' && (
           <div className="space-y-6">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-5 h-5" />
-                <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Preview</span>
-              </div>
-              <h2 className="text-2xl font-bold">2026-27 Partnership Plan</h2>
-              <p className="text-white/80 mt-2">
-                Based on this year&apos;s data, here&apos;s what we recommend for your renewal.
-              </p>
-            </div>
 
-            {/* Why This Plan */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <h3 className="font-bold text-[#1e2749] mb-4">Why This Plan</h3>
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-                <p className="text-sm text-amber-800">
-                  <strong>The Data:</strong> Your TerraNova scores (30th-58th percentile) don&apos;t match classroom grades (A average).
-                  Paula&apos;s goal: &quot;More engaging lessons and differentiated learning in the regular classroom.&quot;
+            {/* Header */}
+            <div className="bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
+              <div className="flex justify-between items-start mb-6">
+                <div>
+                  <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Coming Soon</span>
+                  <h3 className="text-2xl font-bold mt-2">2026-27 Partnership Preview</h3>
+                  <p className="text-sm opacity-80 mt-1">Building on this year&apos;s foundation</p>
+                </div>
+                <div className="text-right">
+                  <span className="text-3xl font-bold">Phase 2</span>
+                  <p className="text-xs opacity-70">Continuation</p>
+                </div>
+              </div>
+
+              {/* The Why - Research Connection */}
+              <div className="bg-white/10 rounded-lg p-4">
+                <p className="text-sm font-medium mb-2">📊 Why This Plan?</p>
+                <p className="text-sm opacity-90">
+                  Your TerraNova data shows grades 3-6 averaging <strong>30th-48th percentile</strong> in Reading while earning <strong>A&apos;s in class</strong>. Research shows this gap closes when teachers implement <strong>differentiated instruction</strong> — meeting students where they are. That&apos;s our focus.
                 </p>
               </div>
-              <div className="grid md:grid-cols-3 gap-4">
+            </div>
+
+            {/* The Plan - 4 Components */}
+            <div className="grid md:grid-cols-2 gap-4">
+
+              {/* Full Staff Book Study */}
+              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-2xl">📚</span>
+                  <span className="font-semibold text-[#1e2749]">Full Staff Book Study</span>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">Kick off the year with shared language and strategies for differentiation.</p>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <p>✓ Research-backed text selection</p>
+                  <p>✓ Facilitated discussion guides</p>
+                  <p>✓ Immediate classroom application</p>
+                </div>
+              </div>
+
+              {/* In-Person Intensive */}
+              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-2xl">🏫</span>
+                  <span className="font-semibold text-[#1e2749]">In-Person Intensive Days</span>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">Two on-site visits with AM staff sessions + PM classroom observations.</p>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <p>✓ Morning: Collaborative PD</p>
+                  <p>✓ Afternoon: Real-time coaching</p>
+                  <p>✓ Personalized observation notes</p>
+                </div>
+              </div>
+
+              {/* Differentiation Focus */}
+              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-2xl">🎯</span>
+                  <span className="font-semibold text-[#1e2749]">Differentiation Deep-Dive</span>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">Virtual sessions specifically targeting grades 3-6 Reading & Math gaps.</p>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <p>✓ Grade-band specific strategies</p>
+                  <p>✓ Tiered instruction models</p>
+                  <p>✓ Formative assessment alignment</p>
+                </div>
+              </div>
+
+              {/* Continued Support */}
+              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                <div className="flex items-center gap-3 mb-3">
+                  <span className="text-2xl">💪</span>
+                  <span className="font-semibold text-[#1e2749]">Sustained Support</span>
+                </div>
+                <p className="text-sm text-gray-600 mb-4">Everything teachers loved this year — plus more.</p>
+                <div className="text-xs text-gray-500 space-y-1">
+                  <p>✓ Full Hub access continues</p>
+                  <p>✓ Weekly Love Notes</p>
+                  <p>✓ Dashboard tracking progress</p>
+                  <p>✓ Direct line to Rae</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Goals Alignment */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <p className="font-semibold text-[#1e2749] mb-4">🎯 Aligned to Your Goals</p>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-xs text-gray-500 mb-1">Paula&apos;s Goal:</p>
+                  <p className="text-sm text-[#1e2749] font-medium">&quot;More engaging lessons and differentiated learning in the regular classroom&quot;</p>
+                </div>
                 <div className="bg-[#35A7FF]/10 rounded-lg p-4">
-                  <p className="text-sm font-medium text-[#1e2749]">Focus Area 1</p>
-                  <p className="text-2xl font-bold text-[#35A7FF]">Differentiation</p>
-                  <p className="text-xs text-gray-500 mt-1">Meeting students where they are</p>
-                </div>
-                <div className="bg-[#38618C]/10 rounded-lg p-4">
-                  <p className="text-sm font-medium text-[#1e2749]">Focus Area 2</p>
-                  <p className="text-2xl font-bold text-[#38618C]">Assessment Alignment</p>
-                  <p className="text-xs text-gray-500 mt-1">Matching grades to mastery</p>
-                </div>
-                <div className="bg-green-50 rounded-lg p-4">
-                  <p className="text-sm font-medium text-[#1e2749]">Focus Area 3</p>
-                  <p className="text-2xl font-bold text-green-600">Reading (Gr 3-6)</p>
-                  <p className="text-xs text-gray-500 mt-1">Targeted intervention</p>
+                  <p className="text-xs text-[#35A7FF] mb-1">TDI Commitment:</p>
+                  <p className="text-sm text-[#1e2749] font-medium">Close the grades 3-6 performance gap through targeted differentiation support</p>
                 </div>
               </div>
             </div>
 
-            {/* Proposed Services */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <h3 className="font-bold text-[#1e2749] mb-4">Proposed Services for 2026-27</h3>
-              <div className="space-y-4">
-                <div className="border-l-4 border-[#35A7FF] pl-4 py-2">
-                  <p className="font-semibold text-[#1e2749]">Differentiation Deep-Dive PD Series</p>
-                  <p className="text-sm text-gray-600">3 on-site sessions focused on practical differentiation strategies for mixed-ability classrooms</p>
+            {/* Teacher Impact Stats */}
+            <div className="bg-green-50 border border-green-200 rounded-xl p-5">
+              <p className="font-semibold text-green-800 mb-4">💚 What Teachers Get</p>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-3xl font-bold text-green-700">30+</p>
+                  <p className="text-xs text-green-600">Hours of PD</p>
                 </div>
-                <div className="border-l-4 border-[#38618C] pl-4 py-2">
-                  <p className="font-semibold text-[#1e2749]">Assessment Alignment Workshop</p>
-                  <p className="text-sm text-gray-600">Work with grade-level teams to align classroom assessments with standardized test expectations</p>
+                <div>
+                  <p className="text-3xl font-bold text-green-700">1:1</p>
+                  <p className="text-xs text-green-600">Coaching Support</p>
                 </div>
-                <div className="border-l-4 border-green-500 pl-4 py-2">
-                  <p className="font-semibold text-[#1e2749]">Reading Intervention Support</p>
-                  <p className="text-sm text-gray-600">Targeted resources and coaching for grades 3-6 reading instruction</p>
-                </div>
-                <div className="border-l-4 border-[#E07A5F] pl-4 py-2">
-                  <p className="font-semibold text-[#1e2749]">Continued Teacher Wellness</p>
-                  <p className="text-sm text-gray-600">Monthly Love Notes, virtual check-ins, and Hub access to maintain your strong retention</p>
+                <div>
+                  <p className="text-3xl font-bold text-green-700">24/7</p>
+                  <p className="text-xs text-green-600">Hub Access</p>
                 </div>
               </div>
             </div>
 
-            {/* Investment Preview */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <h3 className="font-bold text-[#1e2749] mb-4">Investment Preview</h3>
-              <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-600">2025-26 Investment</span>
-                  <span className="font-semibold">$5,000</span>
-                </div>
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-gray-600">Proposed 2026-27 (Differentiation Focus)</span>
-                  <span className="font-semibold text-[#35A7FF]">$6,500</span>
-                </div>
-                <div className="border-t pt-2 mt-2">
-                  <p className="text-xs text-gray-500">
-                    Includes: 3 on-site PD days, assessment workshop, reading intervention resources, continued wellness support, full Hub access
-                  </p>
-                </div>
-              </div>
+            {/* Research Foundation */}
+            <div className="bg-gray-50 rounded-xl p-5">
+              <p className="text-xs text-gray-500 mb-2">Research Foundation:</p>
               <p className="text-sm text-gray-600">
-                <strong>Early renewal discount:</strong> Confirm by March 15, 2026 and receive $500 off.
+                Differentiated instruction improves student outcomes by 0.5 standard deviations (Hattie, 2023). Schools implementing TDI&apos;s model see <strong>65% strategy implementation</strong> vs. 10% industry average, with measurable improvements in teacher retention and student engagement.
               </p>
-            </div>
-
-            {/* Timeline */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <h3 className="font-bold text-[#1e2749] mb-4">Proposed 2026-27 Timeline</h3>
-              <div className="space-y-3">
-                <div className="flex items-center gap-4">
-                  <span className="text-xs bg-gray-100 px-3 py-1 rounded-full w-24 text-center">Aug 2026</span>
-                  <span className="text-sm">Kickoff PD: Differentiation Foundations</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-xs bg-gray-100 px-3 py-1 rounded-full w-24 text-center">Oct 2026</span>
-                  <span className="text-sm">Assessment Alignment Workshop + Observations</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-xs bg-gray-100 px-3 py-1 rounded-full w-24 text-center">Jan 2027</span>
-                  <span className="text-sm">Mid-Year Check: Reading Focus + Love Notes</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-xs bg-gray-100 px-3 py-1 rounded-full w-24 text-center">Mar 2027</span>
-                  <span className="text-sm">Differentiation Deep-Dive: Advanced Strategies</span>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-xs bg-gray-100 px-3 py-1 rounded-full w-24 text-center">May 2027</span>
-                  <span className="text-sm">Year-End Celebration + 2027-28 Planning</span>
-                </div>
-              </div>
             </div>
 
             {/* CTA */}
-            <div className="bg-[#1e2749] rounded-xl p-6 text-white text-center">
-              <h3 className="text-xl font-bold mb-2">Ready to discuss?</h3>
-              <p className="text-white/80 mb-4">
-                We&apos;ll review this plan together during your Spring Leadership Recap.
-              </p>
-              <div className="flex justify-center gap-4">
-                <a
-                  href="https://calendly.com/raehughart/tdi"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-[#35A7FF] hover:bg-[#2089e5] text-white px-6 py-3 rounded-lg font-semibold transition-colors"
-                >
-                  Schedule Renewal Call
-                </a>
+            <div className="bg-[#1e2749] rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="text-white">
+                <p className="font-semibold text-lg">Ready to continue the journey?</p>
+                <p className="text-sm opacity-80">Let&apos;s lock in your 2026-27 partnership.</p>
               </div>
-              <p className="text-xs text-white/60 mt-4">
-                This is a preview based on current data. Final plan will be customized during our conversation.
-              </p>
+              <a
+                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white text-[#1e2749] px-8 py-3 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors whitespace-nowrap"
+              >
+                Schedule Renewal Chat →
+              </a>
             </div>
+
           </div>
         )}
 
