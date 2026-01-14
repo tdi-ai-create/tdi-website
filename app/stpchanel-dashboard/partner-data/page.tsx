@@ -88,7 +88,7 @@ export default function PartnerDataPage() {
         <form onSubmit={handleSubmit} className="bg-white border-x border-b border-gray-200 rounded-b-2xl">
 
           {/* Hidden Web3Forms access key */}
-          <input type="hidden" name="access_key" value="YOUR_WEB3FORMS_KEY_HERE" />
+          <input type="hidden" name="access_key" value="91989992-61ab-470e-8c39-6156e23acaf4" />
           <input type="hidden" name="school" value="St. Peter Chanel" />
 
           {/* SECTION 1: Student Performance */}
