@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 
 interface NotificationMessage {
   message: string;
@@ -54,6 +55,10 @@ export function SocialProofPopup() {
   const [isAnimating, setIsAnimating] = useState(false);
   const [dismissCount, setDismissCount] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const pathname = usePathname();
+
+  // Don't show on dashboard pages (partners are already in the ecosystem)
+  const isDashboardPage = pathname?.includes('-dashboard');
 
   const messagesRef = useRef<NotificationMessage[]>([]);
   const messageIndexRef = useRef(0);
@@ -145,6 +150,9 @@ export function SocialProofPopup() {
 
   // Fetch messages from Google Sheet
   useEffect(() => {
+    // Skip on dashboard pages
+    if (isDashboardPage) return;
+
     const savedDismissCount = sessionStorage.getItem(DISMISS_COUNT_KEY);
     if (savedDismissCount) {
       const count = parseInt(savedDismissCount, 10);
@@ -199,10 +207,10 @@ export function SocialProofPopup() {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
     };
-  }, []);
+  }, [isDashboardPage]);
 
-  // Don't render if no message or not animating
-  if (!currentMessage || !isAnimating) {
+  // Don't render on dashboard pages or if no message
+  if (isDashboardPage || !currentMessage || !isAnimating) {
     return null;
   }
 

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 interface EmailPopupProps {
   delay?: number; // milliseconds for time trigger
@@ -11,8 +12,15 @@ export function EmailPopup({ delay = 30000 }: EmailPopupProps) {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const pathname = usePathname();
+
+  // Don't show on dashboard pages (partners are already in the ecosystem)
+  const isDashboardPage = pathname?.includes('-dashboard');
 
   useEffect(() => {
+    // Skip on dashboard pages
+    if (isDashboardPage) return;
+
     // Check if already dismissed this session
     const wasDismissed = sessionStorage.getItem('tdi-popup-dismissed');
     if (wasDismissed) {
@@ -47,7 +55,7 @@ export function EmailPopup({ delay = 30000 }: EmailPopupProps) {
       clearTimeout(timer);
       window.removeEventListener('scroll', handleScroll);
     };
-  }, [delay]);
+  }, [delay, isDashboardPage]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +74,7 @@ export function EmailPopup({ delay = 30000 }: EmailPopupProps) {
     sessionStorage.setItem('tdi-popup-dismissed', 'true');
   };
 
-  if (dismissed || !isOpen) return null;
+  if (isDashboardPage || dismissed || !isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
