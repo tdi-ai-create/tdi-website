@@ -70,6 +70,7 @@ export default function StPeterChanelDashboard() {
     { id: 'journey', label: 'Our Journey', icon: TrendingUp },
     { id: 'implementation', label: 'Implementation', icon: Users },
     { id: 'blueprint', label: 'Full Blueprint', icon: Star },
+    { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
     { id: 'team', label: 'Your TDI Team', icon: User },
   ];
 
@@ -258,6 +259,13 @@ export default function StPeterChanelDashboard() {
                 >
                   <Icon className="w-5 h-5" />
                   {tab.label}
+                  {tab.badge && (
+                    <span className={`ml-1 text-xs px-2 py-0.5 rounded-full ${
+                      isActive ? 'bg-white/20 text-white' : 'bg-[#35A7FF] text-white'
+                    }`}>
+                      {tab.badge}
+                    </span>
+                  )}
                 </button>
               );
             })}
@@ -595,6 +603,26 @@ export default function StPeterChanelDashboard() {
                     <span className="bg-[#F5F5F5] text-[#1e2749] px-3 py-1 rounded-full text-xs font-medium">Add Hub time to PLC agenda</span>
                     <span className="bg-[#F5F5F5] text-[#1e2749] px-3 py-1 rounded-full text-xs font-medium">Share "Resource of the Week"</span>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2026-27 Teaser */}
+            <div
+              className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => setActiveTab('next-year')}
+            >
+              <div className="flex justify-between items-center">
+                <div>
+                  <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Looking Ahead</span>
+                  <h3 className="text-lg font-bold mt-2">2026-27 Partnership Plan</h3>
+                  <p className="text-sm opacity-80 mt-1">
+                    Based on your TerraNova data, we&apos;ve built a differentiation-focused plan for next year.
+                  </p>
+                </div>
+                <div className="text-right">
+                  <span className="text-3xl">→</span>
+                  <p className="text-xs opacity-70">See the plan</p>
                 </div>
               </div>
             </div>
@@ -1827,6 +1855,145 @@ export default function StPeterChanelDashboard() {
               >
                 View full details on our website →
               </a>
+            </div>
+          </div>
+        )}
+
+        {/* 2026-27 PREVIEW TAB */}
+        {activeTab === 'next-year' && (
+          <div className="space-y-6">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="w-5 h-5" />
+                <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Preview</span>
+              </div>
+              <h2 className="text-2xl font-bold">2026-27 Partnership Plan</h2>
+              <p className="text-white/80 mt-2">
+                Based on this year&apos;s data, here&apos;s what we recommend for your renewal.
+              </p>
+            </div>
+
+            {/* Why This Plan */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <h3 className="font-bold text-[#1e2749] mb-4">Why This Plan</h3>
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-amber-800">
+                  <strong>The Data:</strong> Your TerraNova scores (30th-58th percentile) don&apos;t match classroom grades (A average).
+                  Paula&apos;s goal: &quot;More engaging lessons and differentiated learning in the regular classroom.&quot;
+                </p>
+              </div>
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="bg-[#35A7FF]/10 rounded-lg p-4">
+                  <p className="text-sm font-medium text-[#1e2749]">Focus Area 1</p>
+                  <p className="text-2xl font-bold text-[#35A7FF]">Differentiation</p>
+                  <p className="text-xs text-gray-500 mt-1">Meeting students where they are</p>
+                </div>
+                <div className="bg-[#38618C]/10 rounded-lg p-4">
+                  <p className="text-sm font-medium text-[#1e2749]">Focus Area 2</p>
+                  <p className="text-2xl font-bold text-[#38618C]">Assessment Alignment</p>
+                  <p className="text-xs text-gray-500 mt-1">Matching grades to mastery</p>
+                </div>
+                <div className="bg-green-50 rounded-lg p-4">
+                  <p className="text-sm font-medium text-[#1e2749]">Focus Area 3</p>
+                  <p className="text-2xl font-bold text-green-600">Reading (Gr 3-6)</p>
+                  <p className="text-xs text-gray-500 mt-1">Targeted intervention</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Proposed Services */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <h3 className="font-bold text-[#1e2749] mb-4">Proposed Services for 2026-27</h3>
+              <div className="space-y-4">
+                <div className="border-l-4 border-[#35A7FF] pl-4 py-2">
+                  <p className="font-semibold text-[#1e2749]">Differentiation Deep-Dive PD Series</p>
+                  <p className="text-sm text-gray-600">3 on-site sessions focused on practical differentiation strategies for mixed-ability classrooms</p>
+                </div>
+                <div className="border-l-4 border-[#38618C] pl-4 py-2">
+                  <p className="font-semibold text-[#1e2749]">Assessment Alignment Workshop</p>
+                  <p className="text-sm text-gray-600">Work with grade-level teams to align classroom assessments with standardized test expectations</p>
+                </div>
+                <div className="border-l-4 border-green-500 pl-4 py-2">
+                  <p className="font-semibold text-[#1e2749]">Reading Intervention Support</p>
+                  <p className="text-sm text-gray-600">Targeted resources and coaching for grades 3-6 reading instruction</p>
+                </div>
+                <div className="border-l-4 border-[#E07A5F] pl-4 py-2">
+                  <p className="font-semibold text-[#1e2749]">Continued Teacher Wellness</p>
+                  <p className="text-sm text-gray-600">Monthly Love Notes, virtual check-ins, and Hub access to maintain your strong retention</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Investment Preview */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <h3 className="font-bold text-[#1e2749] mb-4">Investment Preview</h3>
+              <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600">2025-26 Investment</span>
+                  <span className="font-semibold">$5,000</span>
+                </div>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-gray-600">Proposed 2026-27 (Differentiation Focus)</span>
+                  <span className="font-semibold text-[#35A7FF]">$6,500</span>
+                </div>
+                <div className="border-t pt-2 mt-2">
+                  <p className="text-xs text-gray-500">
+                    Includes: 3 on-site PD days, assessment workshop, reading intervention resources, continued wellness support, full Hub access
+                  </p>
+                </div>
+              </div>
+              <p className="text-sm text-gray-600">
+                <strong>Early renewal discount:</strong> Confirm by March 15, 2026 and receive $500 off.
+              </p>
+            </div>
+
+            {/* Timeline */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <h3 className="font-bold text-[#1e2749] mb-4">Proposed 2026-27 Timeline</h3>
+              <div className="space-y-3">
+                <div className="flex items-center gap-4">
+                  <span className="text-xs bg-gray-100 px-3 py-1 rounded-full w-24 text-center">Aug 2026</span>
+                  <span className="text-sm">Kickoff PD: Differentiation Foundations</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-xs bg-gray-100 px-3 py-1 rounded-full w-24 text-center">Oct 2026</span>
+                  <span className="text-sm">Assessment Alignment Workshop + Observations</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-xs bg-gray-100 px-3 py-1 rounded-full w-24 text-center">Jan 2027</span>
+                  <span className="text-sm">Mid-Year Check: Reading Focus + Love Notes</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-xs bg-gray-100 px-3 py-1 rounded-full w-24 text-center">Mar 2027</span>
+                  <span className="text-sm">Differentiation Deep-Dive: Advanced Strategies</span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-xs bg-gray-100 px-3 py-1 rounded-full w-24 text-center">May 2027</span>
+                  <span className="text-sm">Year-End Celebration + 2027-28 Planning</span>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="bg-[#1e2749] rounded-xl p-6 text-white text-center">
+              <h3 className="text-xl font-bold mb-2">Ready to discuss?</h3>
+              <p className="text-white/80 mb-4">
+                We&apos;ll review this plan together during your Spring Leadership Recap.
+              </p>
+              <div className="flex justify-center gap-4">
+                <a
+                  href="https://calendly.com/raehughart/tdi"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#35A7FF] hover:bg-[#2089e5] text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                >
+                  Schedule Renewal Call
+                </a>
+              </div>
+              <p className="text-xs text-white/60 mt-4">
+                This is a preview based on current data. Final plan will be customized during our conversation.
+              </p>
             </div>
           </div>
         )}
