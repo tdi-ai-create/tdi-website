@@ -405,23 +405,6 @@ export default function StPeterChanelDashboard() {
               </div>
             </div>
 
-            {/* Hub Engagement Quick Stat */}
-            <div className="bg-white rounded-xl p-4 shadow-sm flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <div className="text-sm font-semibold text-[#1e2749]">Hub Engagement</div>
-                  <div className="text-xs text-gray-500">20 of 25 staff have logged in</div>
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-green-600">80%</div>
-                <div className="text-xs text-green-600">✓ Goal Met</div>
-              </div>
-            </div>
-
             {/* Needs Attention */}
             <div id="needs-attention-section" className="bg-[#E07A5F]/5 border border-[#E07A5F]/20 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-4">
