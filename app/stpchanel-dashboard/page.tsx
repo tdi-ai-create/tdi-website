@@ -761,33 +761,36 @@ export default function StPeterChanelDashboard() {
               {/* Indicator Bars */}
               <div className="space-y-6">
 
-                {/* Teacher Stress (lower is better) */}
+                {/* Teacher Stress (lower is better — bars INVERTED) */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-[#1e2749]">Teacher Stress</span>
                     <span className="text-xs text-gray-400">Lower is better</span>
                   </div>
                   <div className="space-y-2">
+                    {/* Industry 8-9/10 = HIGH stress = BAD = SHORT bar */}
                     <div className="flex items-center gap-3">
-                      <Tooltip content="National averages from RAND 2025 and Learning Policy Institute"><span className="text-xs text-gray-500">Industry Avg</span></Tooltip>
-                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '85%' }}></div>
+                      <Tooltip content="National averages from RAND 2025 and Learning Policy Institute"><span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span></Tooltip>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '15%' }}></div>
                       </div>
-                      <span className="text-xs font-semibold text-[#E07A5F] w-12 text-right">8-9/10</span>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">8-9/10</span>
                     </div>
+                    {/* TDI 5-7/10 = MEDIUM stress = BETTER = LONGER bar */}
                     <div className="flex items-center gap-3">
-                      <Tooltip content="Averages from TDI partner school surveys"><span className="text-xs text-gray-500">TDI Partners</span></Tooltip>
-                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '55%' }}></div>
+                      <Tooltip content="Averages from TDI partner school surveys"><span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span></Tooltip>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '45%' }}></div>
                       </div>
-                      <span className="text-xs font-semibold text-[#38618C] w-12 text-right">5-7/10</span>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
                     </div>
+                    {/* St. Peter Chanel 5.9/10 = LOW stress = BEST = LONGEST bar */}
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28">St. Peter Chanel</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
-                        <div className="h-full rounded-full bg-green-500" style={{ width: '59%' }}></div>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">St. Peter Chanel</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-green-500" style={{ width: '41%' }}></div>
                       </div>
-                      <span className="text-xs font-semibold text-green-600 w-12 text-right">5.9/10</span>
+                      <span className="text-xs font-semibold text-green-600 w-14 text-right">5.9/10</span>
                     </div>
                   </div>
                 </div>
@@ -800,25 +803,25 @@ export default function StPeterChanelDashboard() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <Tooltip content="National averages from RAND 2025 and Learning Policy Institute"><span className="text-xs text-gray-500">Industry Avg</span></Tooltip>
-                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                      <Tooltip content="National averages from RAND 2025 and Learning Policy Institute"><span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span></Tooltip>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '10%' }}></div>
                       </div>
-                      <span className="text-xs font-semibold text-[#E07A5F] w-12 text-right">10%</span>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">10%</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Tooltip content="Averages from TDI partner school surveys"><span className="text-xs text-gray-500">TDI Partners</span></Tooltip>
-                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                      <Tooltip content="Averages from TDI partner school surveys"><span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span></Tooltip>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#38618C]" style={{ width: '65%' }}></div>
                       </div>
-                      <span className="text-xs font-semibold text-[#38618C] w-12 text-right">65%</span>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">65%</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28">St. Peter Chanel</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">St. Peter Chanel</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#35A7FF]" style={{ width: '20%' }}></div>
                       </div>
-                      <span className="text-xs font-semibold text-[#35A7FF] w-12 text-right">20%</span>
+                      <span className="text-xs font-semibold text-[#35A7FF] w-14 text-right">20%</span>
                     </div>
                   </div>
                 </div>
@@ -831,18 +834,18 @@ export default function StPeterChanelDashboard() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28">Target</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Target</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#38618C]" style={{ width: '100%' }}></div>
                       </div>
-                      <span className="text-xs font-semibold text-[#38618C] w-12 text-right">100%</span>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">100%</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28">St. Peter Chanel</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">St. Peter Chanel</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
                       </div>
-                      <span className="text-xs font-medium text-gray-400 w-12 text-right">TBD</span>
+                      <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
                     </div>
                   </div>
                 </div>
@@ -855,25 +858,25 @@ export default function StPeterChanelDashboard() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <Tooltip content="National averages from RAND 2025 and Learning Policy Institute"><span className="text-xs text-gray-500">Industry Avg</span></Tooltip>
-                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                      <Tooltip content="National averages from RAND 2025 and Learning Policy Institute"><span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span></Tooltip>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '30%' }}></div>
                       </div>
-                      <span className="text-xs font-semibold text-[#E07A5F] w-12 text-right">2-4/10</span>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">2-4/10</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Tooltip content="Averages from TDI partner school surveys"><span className="text-xs text-gray-500">TDI Partners</span></Tooltip>
-                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                      <Tooltip content="Averages from TDI partner school surveys"><span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span></Tooltip>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#38618C]" style={{ width: '60%' }}></div>
                       </div>
-                      <span className="text-xs font-semibold text-[#38618C] w-12 text-right">5-7/10</span>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28">St. Peter Chanel</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-4 overflow-hidden">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">St. Peter Chanel</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-green-500" style={{ width: '98%' }}></div>
                       </div>
-                      <span className="text-xs font-semibold text-green-600 w-12 text-right">9.8/10</span>
+                      <span className="text-xs font-semibold text-green-600 w-14 text-right">9.8/10</span>
                     </div>
                   </div>
                 </div>
