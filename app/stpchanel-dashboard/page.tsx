@@ -1249,7 +1249,7 @@ export default function StPeterChanelDashboard() {
                     </ul>
                   </div>
 
-                  {/* Wins */}
+                  {/* Session Wins */}
                   <div className="bg-green-50 rounded-lg p-4 mb-4">
                     <p className="text-sm font-medium text-green-800 mb-2">Session Wins:</p>
                     <ul className="text-sm text-green-700 space-y-1">
@@ -1261,41 +1261,7 @@ export default function StPeterChanelDashboard() {
                     </ul>
                   </div>
 
-                  {/* Teacher Voices */}
-                  <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                    <p className="text-sm font-medium text-[#1e2749] mb-3">In Their Words:</p>
-                    <div className="space-y-3 text-sm text-gray-600 italic">
-                      <p>&quot;As colleagues we help each other out when needed, which makes SPC feel like family.&quot;</p>
-                      <p>&quot;My co-worker and I make a great team!&quot;</p>
-                      <p>&quot;Centering our school around God [is what we don&apos;t want to change].&quot;</p>
-                    </div>
-                  </div>
-
-                  {/* Discussion Themes */}
-                  <div className="bg-[#35A7FF]/10 rounded-lg p-4 mb-4">
-                    <p className="text-sm font-medium text-[#1e2749] mb-2">Discussion Themes:</p>
-                    <ul className="text-sm text-gray-700 space-y-1">
-                      <li>• <strong>Time management</strong> — &quot;too much to do&quot; was the #1 challenge</li>
-                      <li>• <strong>Work-life balance</strong> — several new parents navigating demands</li>
-                      <li>• <strong>Student behavior</strong> — repeating directions, keeping focus</li>
-                      <li>• <strong>Schedule disruptions</strong> — interruptions making pacing difficult</li>
-                      <li>• <strong>Need for protected time</strong> — #1 request for using Hub more</li>
-                    </ul>
-                  </div>
-
-                  {/* Teachers Present */}
-                  <div className="border-t border-gray-100 pt-4 mb-4">
-                    <p className="text-sm font-medium text-[#1e2749] mb-2">Teachers Present (10):</p>
-                    <div className="flex flex-wrap gap-2">
-                      {['Natalie Foret', 'Tori Guidry', 'Tori Warner', 'Maci Schexnayder', 'Emily LeBlanc', 'Maria Lambert', 'Sandi Waguespack', 'Jessica Roper', 'Dana Bourgeois', 'Cathy Dufresne'].map((name) => (
-                        <span key={name} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                          {name}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Progress Comparison */}
+                  {/* Progress Since September */}
                   <div className="bg-[#38618C]/10 rounded-lg p-4 mb-4">
                     <p className="text-sm font-medium text-[#1e2749] mb-2">Progress Since September:</p>
                     <div className="grid grid-cols-2 gap-4 text-sm">
@@ -1318,17 +1284,29 @@ export default function StPeterChanelDashboard() {
                     </div>
                   </div>
 
-                  {/* Commitments Made */}
-                  <div className="border border-[#35A7FF]/30 rounded-lg p-4 mb-4">
-                    <p className="text-sm font-medium text-[#1e2749] mb-2">What Teachers Committed To:</p>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Schedule 30 min of protected Hub/planning time this week</li>
-                      <li>• Try one new strategy before virtual session</li>
-                      <li>• Share wins and fails with accountability partner</li>
+                  {/* Discussion Themes */}
+                  <div className="bg-[#35A7FF]/10 rounded-lg p-4 mb-4">
+                    <p className="text-sm font-medium text-[#1e2749] mb-2">Discussion Themes:</p>
+                    <ul className="text-sm text-gray-700 space-y-1">
+                      <li>• <strong>Time management</strong> — &quot;too much to do&quot; was the #1 challenge</li>
+                      <li>• <strong>Work-life balance</strong> — several new parents navigating demands</li>
+                      <li>• <strong>Student behavior</strong> — repeating directions, keeping focus</li>
+                      <li>• <strong>Schedule disruptions</strong> — interruptions making pacing difficult</li>
+                      <li>• <strong>Need for protected time</strong> — #1 request for using Hub more</li>
                     </ul>
                   </div>
 
-                  {/* Resources Shared */}
+                  {/* Teacher Voices */}
+                  <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                    <p className="text-sm font-medium text-[#1e2749] mb-3">In Their Words:</p>
+                    <div className="space-y-3 text-sm text-gray-600 italic">
+                      <p>&quot;As colleagues we help each other out when needed, which makes SPC feel like family.&quot;</p>
+                      <p>&quot;My co-worker and I make a great team!&quot;</p>
+                      <p>&quot;Centering our school around God [is what we don&apos;t want to change].&quot;</p>
+                    </div>
+                  </div>
+
+                  {/* Resources Recommended */}
                   <div className="mb-4">
                     <p className="text-sm font-medium text-[#1e2749] mb-2">Resources Recommended:</p>
                     <div className="flex flex-wrap gap-2">
@@ -1340,8 +1318,28 @@ export default function StPeterChanelDashboard() {
                     </div>
                   </div>
 
+                  {/* What Teachers Committed To */}
+                  <div className="border border-[#35A7FF]/30 rounded-lg p-4 mb-4">
+                    <p className="text-sm font-medium text-[#1e2749] mb-2">What Teachers Committed To:</p>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>• Schedule 30 min of protected Hub/planning time this week</li>
+                      <li>• Try one new strategy before virtual session</li>
+                      <li>• Share wins and fails with accountability partner</li>
+                    </ul>
+                  </div>
+
+                  {/* Areas to Watch */}
+                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                    <p className="text-sm font-medium text-red-800 mb-2">Areas to Watch:</p>
+                    <ul className="text-sm text-red-700 space-y-1">
+                      <li>• <strong>Strategy implementation at 20%</strong> — teachers need more support translating PD to practice</li>
+                      <li>• <strong>Time constraints</strong> — &quot;too much to do&quot; cited as top barrier</li>
+                      <li>• <strong>15 teachers absent</strong> from session — need alternate touchpoint</li>
+                    </ul>
+                  </div>
+
                   {/* Next Steps */}
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
                     <p className="text-sm font-medium text-amber-800 mb-2">Next Steps:</p>
                     <ul className="text-sm text-amber-700 space-y-1">
                       <li>• Virtual session with Instructional Design group</li>
@@ -1349,6 +1347,18 @@ export default function StPeterChanelDashboard() {
                       <li>• Follow-up survey to measure strategy implementation</li>
                       <li>• Spring Leadership Recap with Paula</li>
                     </ul>
+                  </div>
+
+                  {/* Teachers Present */}
+                  <div className="border-t border-gray-100 pt-4">
+                    <p className="text-sm font-medium text-[#1e2749] mb-2">Teachers Present (10):</p>
+                    <div className="flex flex-wrap gap-2">
+                      {['Natalie Foret', 'Tori Guidry', 'Tori Warner', 'Maci Schexnayder', 'Emily LeBlanc', 'Maria Lambert', 'Sandi Waguespack', 'Jessica Roper', 'Dana Bourgeois', 'Cathy Dufresne'].map((name) => (
+                        <span key={name} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                          {name}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
