@@ -34,9 +34,7 @@ import {
   Activity,
   Video,
   School,
-  Laptop,
-  ChevronLeft,
-  ChevronRight
+  Laptop
 } from 'lucide-react';
 
 // Tooltip component
@@ -206,64 +204,36 @@ export default function StPeterChanelDashboard() {
         </div>
       </section>
 
-      {/* Tab Navigation with Scroll Arrows */}
+      {/* Tab Navigation - Shortened Labels */}
       <div className="bg-white border-b border-gray-200 sticky top-14 z-40 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-3">
-          <div className="relative flex items-center">
-
-            {/* Left Arrow */}
-            <button
-              onClick={() => {
-                document.getElementById('tab-container')?.scrollBy({ left: -200, behavior: 'smooth' });
-              }}
-              className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 mr-2"
-            >
-              <ChevronLeft className="w-5 h-5 text-gray-600" />
-            </button>
-
-            {/* Scrollable Tabs Container */}
-            <div
-              id="tab-container"
-              className="flex gap-2 overflow-x-auto scrollbar-hide scroll-smooth"
-            >
-              {[
-                { id: 'overview', label: 'Overview', icon: Eye },
-                { id: 'journey', label: 'Our Journey', icon: TrendingUp },
-                { id: 'implementation', label: 'Implementation', icon: Users },
-                { id: 'blueprint', label: 'Full Blueprint', icon: Star },
-                { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
-                { id: 'team', label: 'Your TDI Team', icon: User },
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-5 py-3 text-sm font-medium rounded-xl whitespace-nowrap transition-all flex-shrink-0 ${
-                    activeTab === tab.id
-                      ? 'bg-[#1e2749] text-white shadow-md'
-                      : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
-                  }`}
-                >
-                  <tab.icon className="w-4 h-4" />
-                  <span>{tab.label}</span>
-                  {tab.badge && (
-                    <span className="text-xs bg-[#35A7FF] text-white px-2 py-0.5 rounded-full">
-                      {tab.badge}
-                    </span>
-                  )}
-                </button>
-              ))}
-            </div>
-
-            {/* Right Arrow */}
-            <button
-              onClick={() => {
-                document.getElementById('tab-container')?.scrollBy({ left: 200, behavior: 'smooth' });
-              }}
-              className="flex-shrink-0 w-10 h-10 flex items-center justify-center bg-white border border-gray-200 rounded-full shadow-sm hover:bg-gray-50 ml-2"
-            >
-              <ChevronRight className="w-5 h-5 text-gray-600" />
-            </button>
-
+          <div className="flex justify-center gap-2">
+            {[
+              { id: 'overview', label: 'Overview', icon: Eye },
+              { id: 'journey', label: 'Journey', icon: TrendingUp },
+              { id: 'implementation', label: 'Progress', icon: Users },
+              { id: 'blueprint', label: 'Blueprint', icon: Star },
+              { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
+              { id: 'team', label: 'Team', icon: User },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-[#1e2749] text-white shadow-md'
+                    : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                <span>{tab.label}</span>
+                {tab.badge && (
+                  <span className="text-xs bg-[#35A7FF] text-white px-2 py-0.5 rounded-full">
+                    {tab.badge}
+                  </span>
+                )}
+              </button>
+            ))}
           </div>
         </div>
       </div>
