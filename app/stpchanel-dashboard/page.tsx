@@ -770,7 +770,7 @@ export default function StPeterChanelDashboard() {
                   <div className="space-y-2">
                     {/* Industry 8-9/10 = HIGH stress = BAD = SHORT bar */}
                     <div className="flex items-center gap-3">
-                      <Tooltip content="National averages from RAND 2025 and Learning Policy Institute"><span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span></Tooltip>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '15%' }}></div>
                       </div>
@@ -778,7 +778,7 @@ export default function StPeterChanelDashboard() {
                     </div>
                     {/* TDI 5-7/10 = MEDIUM stress = BETTER = LONGER bar */}
                     <div className="flex items-center gap-3">
-                      <Tooltip content="Averages from TDI partner school surveys"><span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span></Tooltip>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#38618C]" style={{ width: '45%' }}></div>
                       </div>
@@ -803,14 +803,14 @@ export default function StPeterChanelDashboard() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <Tooltip content="National averages from RAND 2025 and Learning Policy Institute"><span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span></Tooltip>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '10%' }}></div>
                       </div>
                       <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">10%</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Tooltip content="Averages from TDI partner school surveys"><span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span></Tooltip>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#38618C]" style={{ width: '65%' }}></div>
                       </div>
@@ -858,14 +858,14 @@ export default function StPeterChanelDashboard() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <Tooltip content="National averages from RAND 2025 and Learning Policy Institute"><span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span></Tooltip>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '30%' }}></div>
                       </div>
                       <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">2-4/10</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Tooltip content="Averages from TDI partner school surveys"><span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span></Tooltip>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#38618C]" style={{ width: '60%' }}></div>
                       </div>
