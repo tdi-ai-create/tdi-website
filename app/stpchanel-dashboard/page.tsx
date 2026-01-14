@@ -62,7 +62,6 @@ export default function StPeterChanelDashboard() {
 
   // Due dates for each item (month, year)
   const dueDates = {
-    partnerData: { month: 2, year: 2026 },      // Feb 2026
     leadershipRecap: { month: 4, year: 2026 },  // April 2026
     instructionalDesign: { month: 5, year: 2026 }, // May 2026
     classManagement: { month: 5, year: 2026 },  // May 2026
@@ -275,7 +274,7 @@ export default function StPeterChanelDashboard() {
                   <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
                   <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
                 </div>
-                <div className="text-2xl font-bold text-[#E07A5F]">4</div>
+                <div className="text-2xl font-bold text-[#E07A5F]">3</div>
                 <div className="text-xs text-[#E07A5F] font-medium">Items pending</div>
               </div>
 
@@ -285,7 +284,7 @@ export default function StPeterChanelDashboard() {
                   <span className="text-xs text-gray-500 uppercase">Current Phase</span>
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">Phase 2</div>
-                <div className="text-xs text-[#38618C] font-medium">Activation</div>
+                <div className="text-xs text-[#38618C] font-medium">ACCELERATE</div>
               </div>
             </div>
 
@@ -377,50 +376,7 @@ export default function StPeterChanelDashboard() {
               </div>
 
               <div className="space-y-3">
-                {/* Item 1: Partnership Data Form */}
-                <a
-                  href="/stpchanel-dashboard/partner-data"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`rounded-lg p-4 flex items-center justify-between hover:shadow-md border transition-all cursor-pointer block ${
-                    isOverdue(dueDates.partnerData.month, dueDates.partnerData.year)
-                      ? 'border-red-500 bg-red-50'
-                      : 'bg-white border-transparent hover:border-[#35A7FF]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <ClipboardList className={`w-5 h-5 ${
-                      isOverdue(dueDates.partnerData.month, dueDates.partnerData.year)
-                        ? 'text-red-700'
-                        : 'text-[#E07A5F]'
-                    }`} />
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Complete Partnership Data Form</div>
-                      <div className="text-sm text-gray-500">
-                        Help us personalize your dashboard ·{' '}
-                        {isOverdue(dueDates.partnerData.month, dueDates.partnerData.year) ? (
-                          <span className="text-red-700 font-bold">OVERDUE</span>
-                        ) : (
-                          <span className="text-[#E07A5F] font-medium">DUE BY FEB 2026</span>
-                        )}
-                      </div>
-                      {isOverdue(dueDates.partnerData.month, dueDates.partnerData.year) && (
-                        <div className="text-xs text-red-600 mt-1">
-                          Warning: Without this completed, TDI cannot ensure partnership goals are met.
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <span className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap ${
-                    isOverdue(dueDates.partnerData.month, dueDates.partnerData.year)
-                      ? 'bg-red-700 text-white'
-                      : 'bg-[#35A7FF] text-white'
-                  }`}>
-                    Click to Complete
-                  </span>
-                </a>
-
-                {/* Item 2: Spring Leadership Recap */}
+                {/* Item 1: Spring Leadership Recap */}
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
