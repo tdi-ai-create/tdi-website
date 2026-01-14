@@ -1284,7 +1284,7 @@ export default function StPeterChanelDashboard() {
                   </div>
 
                   {/* Teachers Present */}
-                  <div className="border-t border-gray-100 pt-4">
+                  <div className="border-t border-gray-100 pt-4 mb-4">
                     <p className="text-sm font-medium text-[#1e2749] mb-2">Teachers Present (10):</p>
                     <div className="flex flex-wrap gap-2">
                       {['Natalie Foret', 'Tori Guidry', 'Tori Warner', 'Maci Schexnayder', 'Emily LeBlanc', 'Maria Lambert', 'Sandi Waguespack', 'Jessica Roper', 'Dana Bourgeois', 'Cathy Dufresne'].map((name) => (
@@ -1293,6 +1293,62 @@ export default function StPeterChanelDashboard() {
                         </span>
                       ))}
                     </div>
+                  </div>
+
+                  {/* Progress Comparison */}
+                  <div className="bg-[#38618C]/10 rounded-lg p-4 mb-4">
+                    <p className="text-sm font-medium text-[#1e2749] mb-2">Progress Since September:</p>
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-500">Hub Engagement:</span>
+                        <span className="font-semibold text-green-600 ml-2">8% → 100%</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Love Notes Sent:</span>
+                        <span className="font-semibold text-green-600 ml-2">0 → 25</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Growth Groups:</span>
+                        <span className="font-semibold text-green-600 ml-2">Formed & Active</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Teacher Baseline:</span>
+                        <span className="font-semibold text-green-600 ml-2">Established</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Commitments Made */}
+                  <div className="border border-[#35A7FF]/30 rounded-lg p-4 mb-4">
+                    <p className="text-sm font-medium text-[#1e2749] mb-2">What Teachers Committed To:</p>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li>• Schedule 30 min of protected Hub/planning time this week</li>
+                      <li>• Try one new strategy before virtual session</li>
+                      <li>• Share wins and fails with accountability partner</li>
+                    </ul>
+                  </div>
+
+                  {/* Resources Shared */}
+                  <div className="mb-4">
+                    <p className="text-sm font-medium text-[#1e2749] mb-2">Resources Recommended:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {['Teacher-Tested Hacks', 'Calm Classrooms Not Chaos', 'Classroom Management Toolkit', 'Differentiated Choice Boards'].map((resource) => (
+                        <span key={resource} className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-3 py-1 rounded-full">
+                          {resource}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Next Steps */}
+                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                    <p className="text-sm font-medium text-amber-800 mb-2">Next Steps:</p>
+                    <ul className="text-sm text-amber-700 space-y-1">
+                      <li>• Virtual session with Instructional Design group</li>
+                      <li>• Virtual session with Class Management group</li>
+                      <li>• Follow-up survey to measure strategy implementation</li>
+                      <li>• Spring Leadership Recap with Paula</li>
+                    </ul>
                   </div>
                 </div>
               </div>
