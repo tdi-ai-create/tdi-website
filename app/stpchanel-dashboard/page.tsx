@@ -50,6 +50,21 @@ export default function StPeterChanelDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [activePhase, setActivePhase] = useState(2);
 
+  // Check if a due date has passed (compares against 1st of the month)
+  const isOverdue = (dueMonth: number, dueYear: number) => {
+    const now = new Date();
+    const dueDate = new Date(dueYear, dueMonth - 1, 1); // 1st of due month
+    return now >= dueDate;
+  };
+
+  // Due dates for each item (month, year)
+  const dueDates = {
+    partnerData: { month: 2, year: 2026 },      // Feb 2026
+    leadershipRecap: { month: 4, year: 2026 },  // April 2026
+    instructionalDesign: { month: 5, year: 2026 }, // May 2026
+    classManagement: { month: 5, year: 2026 },  // May 2026
+  };
+
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Eye },
     { id: 'journey', label: 'Our Journey', icon: TrendingUp },
@@ -383,80 +398,176 @@ export default function StPeterChanelDashboard() {
               </div>
 
               <div className="space-y-3">
-                {/* Item 1: Virtual session for Instructional Design */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md hover:border-[#35A7FF] border border-transparent transition-all cursor-pointer block"
-                >
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-5 h-5 text-[#E07A5F]" />
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Virtual session for Instructional Design group</div>
-                      <div className="text-sm text-gray-500">Included in contract</div>
-                    </div>
-                  </div>
-                  <span className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Schedule
-                  </span>
-                </a>
-
-                {/* Item 2: Virtual session for Class Management */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md hover:border-[#35A7FF] border border-transparent transition-all cursor-pointer block"
-                >
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-5 h-5 text-[#E07A5F]" />
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Virtual session for Class Management group</div>
-                      <div className="text-sm text-gray-500">Included in contract</div>
-                    </div>
-                  </div>
-                  <span className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Schedule
-                  </span>
-                </a>
-
-                {/* Item 3: Spring Leadership Recap */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md hover:border-[#35A7FF] border border-transparent transition-all cursor-pointer block"
-                >
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-5 h-5 text-[#E07A5F]" />
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Spring Leadership Recap</div>
-                      <div className="text-sm text-gray-500">Review progress + set goals for next year · Complimentary</div>
-                    </div>
-                  </div>
-                  <span className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Schedule
-                  </span>
-                </a>
-
-                {/* Item 4: Partnership Data Form */}
+                {/* Item 1: Partnership Data Form */}
                 <a
                   href="/stpchanel-dashboard/partner-data"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md hover:border-[#35A7FF] border border-transparent transition-all cursor-pointer block"
+                  className={`rounded-lg p-4 flex items-center justify-between hover:shadow-md border transition-all cursor-pointer block ${
+                    isOverdue(dueDates.partnerData.month, dueDates.partnerData.year)
+                      ? 'border-red-500 bg-red-50'
+                      : 'bg-white border-transparent hover:border-[#35A7FF]'
+                  }`}
                 >
                   <div className="flex items-center gap-3">
-                    <ClipboardList className="w-5 h-5 text-[#E07A5F]" />
+                    <ClipboardList className={`w-5 h-5 ${
+                      isOverdue(dueDates.partnerData.month, dueDates.partnerData.year)
+                        ? 'text-red-700'
+                        : 'text-[#E07A5F]'
+                    }`} />
                     <div>
                       <div className="font-medium text-[#1e2749]">Complete Partnership Data Form</div>
-                      <div className="text-sm text-gray-500">Help us personalize your dashboard</div>
+                      <div className="text-sm text-gray-500">
+                        Help us personalize your dashboard ·{' '}
+                        {isOverdue(dueDates.partnerData.month, dueDates.partnerData.year) ? (
+                          <span className="text-red-700 font-bold">OVERDUE</span>
+                        ) : (
+                          <span className="text-[#E07A5F] font-medium">DUE BY FEB 2026</span>
+                        )}
+                      </div>
+                      {isOverdue(dueDates.partnerData.month, dueDates.partnerData.year) && (
+                        <div className="text-xs text-red-600 mt-1">
+                          Warning: Without this completed, TDI cannot ensure partnership goals are met.
+                        </div>
+                      )}
                     </div>
                   </div>
-                  <span className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold">
-                    Complete
+                  <span className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap ${
+                    isOverdue(dueDates.partnerData.month, dueDates.partnerData.year)
+                      ? 'bg-red-700 text-white'
+                      : 'bg-[#35A7FF] text-white'
+                  }`}>
+                    Click to Complete
+                  </span>
+                </a>
+
+                {/* Item 2: Spring Leadership Recap */}
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`rounded-lg p-4 flex items-center justify-between hover:shadow-md border transition-all cursor-pointer block ${
+                    isOverdue(dueDates.leadershipRecap.month, dueDates.leadershipRecap.year)
+                      ? 'border-red-500 bg-red-50'
+                      : 'bg-white border-transparent hover:border-[#35A7FF]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Calendar className={`w-5 h-5 ${
+                      isOverdue(dueDates.leadershipRecap.month, dueDates.leadershipRecap.year)
+                        ? 'text-red-700'
+                        : 'text-[#E07A5F]'
+                    }`} />
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Spring Leadership Recap</div>
+                      <div className="text-sm text-gray-500">
+                        Review progress + set goals for next year ·{' '}
+                        {isOverdue(dueDates.leadershipRecap.month, dueDates.leadershipRecap.year) ? (
+                          <span className="text-red-700 font-bold">OVERDUE</span>
+                        ) : (
+                          <span className="text-[#E07A5F] font-medium">DUE BY APRIL 2026</span>
+                        )}
+                      </div>
+                      {isOverdue(dueDates.leadershipRecap.month, dueDates.leadershipRecap.year) && (
+                        <div className="text-xs text-red-600 mt-1">
+                          Warning: Without this completed, TDI cannot ensure partnership goals are met.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <span className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 ${
+                    isOverdue(dueDates.leadershipRecap.month, dueDates.leadershipRecap.year)
+                      ? 'bg-red-700 text-white'
+                      : 'bg-[#35A7FF] text-white'
+                  }`}>
+                    <Calendar className="w-4 h-4" />
+                    Schedule
+                  </span>
+                </a>
+
+                {/* Item 3: Virtual session for Instructional Design */}
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`rounded-lg p-4 flex items-center justify-between hover:shadow-md border transition-all cursor-pointer block ${
+                    isOverdue(dueDates.instructionalDesign.month, dueDates.instructionalDesign.year)
+                      ? 'border-red-500 bg-red-50'
+                      : 'bg-white border-transparent hover:border-[#35A7FF]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Calendar className={`w-5 h-5 ${
+                      isOverdue(dueDates.instructionalDesign.month, dueDates.instructionalDesign.year)
+                        ? 'text-red-700'
+                        : 'text-[#E07A5F]'
+                    }`} />
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Virtual session for Instructional Design group</div>
+                      <div className="text-sm text-gray-500">
+                        Included in contract ·{' '}
+                        {isOverdue(dueDates.instructionalDesign.month, dueDates.instructionalDesign.year) ? (
+                          <span className="text-red-700 font-bold">OVERDUE</span>
+                        ) : (
+                          <span className="text-[#E07A5F] font-medium">DUE BY MAY 2026</span>
+                        )}
+                      </div>
+                      {isOverdue(dueDates.instructionalDesign.month, dueDates.instructionalDesign.year) && (
+                        <div className="text-xs text-red-600 mt-1">
+                          Warning: Without this completed, TDI cannot ensure partnership goals are met.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <span className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 ${
+                    isOverdue(dueDates.instructionalDesign.month, dueDates.instructionalDesign.year)
+                      ? 'bg-red-700 text-white'
+                      : 'bg-[#35A7FF] text-white'
+                  }`}>
+                    <Calendar className="w-4 h-4" />
+                    Schedule
+                  </span>
+                </a>
+
+                {/* Item 4: Virtual session for Class Management */}
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`rounded-lg p-4 flex items-center justify-between hover:shadow-md border transition-all cursor-pointer block ${
+                    isOverdue(dueDates.classManagement.month, dueDates.classManagement.year)
+                      ? 'border-red-500 bg-red-50'
+                      : 'bg-white border-transparent hover:border-[#35A7FF]'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <Calendar className={`w-5 h-5 ${
+                      isOverdue(dueDates.classManagement.month, dueDates.classManagement.year)
+                        ? 'text-red-700'
+                        : 'text-[#E07A5F]'
+                    }`} />
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Virtual session for Class Management group</div>
+                      <div className="text-sm text-gray-500">
+                        Included in contract ·{' '}
+                        {isOverdue(dueDates.classManagement.month, dueDates.classManagement.year) ? (
+                          <span className="text-red-700 font-bold">OVERDUE</span>
+                        ) : (
+                          <span className="text-[#E07A5F] font-medium">DUE BY MAY 2026</span>
+                        )}
+                      </div>
+                      {isOverdue(dueDates.classManagement.month, dueDates.classManagement.year) && (
+                        <div className="text-xs text-red-600 mt-1">
+                          Warning: Without this completed, TDI cannot ensure partnership goals are met.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <span className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 ${
+                    isOverdue(dueDates.classManagement.month, dueDates.classManagement.year)
+                      ? 'bg-red-700 text-white'
+                      : 'bg-[#35A7FF] text-white'
+                  }`}>
+                    <Calendar className="w-4 h-4" />
+                    Schedule
                   </span>
                 </a>
               </div>
