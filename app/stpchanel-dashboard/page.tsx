@@ -68,15 +68,6 @@ export default function StPeterChanelDashboard() {
     classManagement: { month: 5, year: 2026 },  // May 2026
   };
 
-  const tabs = [
-    { id: 'overview', label: 'Overview', icon: Eye },
-    { id: 'journey', label: 'Our Journey', icon: TrendingUp },
-    { id: 'implementation', label: 'Implementation', icon: Users },
-    { id: 'blueprint', label: 'Full Blueprint', icon: Star },
-    { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
-    { id: 'team', label: 'Your TDI Team', icon: User },
-  ];
-
   const phases = [
     {
       id: 1,
@@ -240,38 +231,36 @@ export default function StPeterChanelDashboard() {
         </div>
       </section>
 
-      {/* Tab Navigation - Always One Line */}
+      {/* Compact Tab Navigation */}
       <div className="bg-white border-b border-gray-200 sticky top-14 z-40 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-3">
-          <div className="flex gap-2 overflow-x-auto whitespace-nowrap pb-2 scrollbar-hide">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => {
-                    setActiveTab(tab.id);
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                  }}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all flex-shrink-0 ${
-                    isActive
-                      ? 'bg-[#38618C] text-white shadow-md'
-                      : 'bg-[#F5F5F5] text-gray-600 hover:bg-gray-200 hover:text-gray-800'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  {tab.label}
-                  {tab.badge && (
-                    <span className={`ml-1 text-xs px-2 py-0.5 rounded-full ${
-                      isActive ? 'bg-white/20 text-white' : 'bg-[#35A7FF] text-white'
-                    }`}>
-                      {tab.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
+          <div className="flex flex-wrap justify-center gap-1.5">
+            {[
+              { id: 'overview', label: 'Overview', icon: Eye },
+              { id: 'journey', label: 'Our Journey', icon: TrendingUp },
+              { id: 'implementation', label: 'Implementation', icon: Users },
+              { id: 'blueprint', label: 'Full Blueprint', icon: Star },
+              { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
+              { id: 'team', label: 'Your TDI Team', icon: User },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-colors ${
+                  activeTab === tab.id
+                    ? 'bg-[#1e2749] text-white'
+                    : 'text-gray-600 hover:bg-gray-100 bg-gray-50'
+                }`}
+              >
+                <tab.icon className="w-3.5 h-3.5" />
+                <span>{tab.label}</span>
+                {tab.badge && (
+                  <span className="text-[10px] bg-[#35A7FF] text-white px-1.5 py-0.5 rounded-full leading-none">
+                    {tab.badge}
+                  </span>
+                )}
+              </button>
+            ))}
           </div>
         </div>
       </div>
