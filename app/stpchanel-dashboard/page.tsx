@@ -38,8 +38,8 @@ import {
 const Tooltip = ({ children, content }: { children: React.ReactNode; content: string }) => (
   <span className="relative group inline-flex items-center">
     {children}
-    <Info className="w-3.5 h-3.5 text-gray-400 ml-1 cursor-help" />
-    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-[#1e2749] text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap max-w-xs text-center z-50">
+    <Info className="w-4 h-4 text-gray-500 ml-1 cursor-help" />
+    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-2.5 bg-[#1e2749] text-white text-sm leading-snug rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap max-w-sm text-center z-50 shadow-lg">
       {content}
       <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1e2749]"></span>
     </span>
