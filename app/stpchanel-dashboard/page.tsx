@@ -20,6 +20,7 @@ import {
   Lock,
   Eye,
   MessageCircle,
+  MessageSquare,
   Award,
   Phone,
   Mail,
@@ -62,12 +63,40 @@ export default function StPeterChanelDashboard() {
 
   // Accordion state for collapsible sections
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    // Overview
+    'leading-indicators': true,
+    'movement-involvement': false,
+
+    // Journey
+    'obs-jan-2026': true,
+    'obs-sept-2025': false,
+    'survey-results': true,
+    'survey-challenges': false,
+    'survey-help': false,
+    'terranova-data': false,
+    'discussion-themes': false,
+    'teacher-quotes': false,
+    'progress-comparison': false,
+
+    // Progress (implementation tab)
     'observation-sept': false,
-    'observation-jan': true,  // Most recent open by default
+    'observation-jan': true,
     'survey-data': true,
+    'phase-1-details': false,
+    'phase-2-details': true,
+    'phase-3-details': false,
+    'strategy-implementation': true,
+    'growth-groups': false,
+
+    // Blueprint
+    'deliverables': true,
+    'partnership-goals': true,
+    'whats-included': false,
+    'schedule': false,
+
     // 2026-27 Timeline
     'timeline-july': false,
-    'timeline-sept': true,  // First on-campus day open
+    'timeline-sept': true,
     'timeline-oct': false,
     'timeline-dec': false,
     'timeline-jan': false,
@@ -76,45 +105,77 @@ export default function StPeterChanelDashboard() {
     'timeline-mar-virtual': false,
     'timeline-apr': false,
     'timeline-may': false,
+
+    // 2026-27 Other
+    'research-foundation': false,
+
+    // Team
+    'contact-options': true,
+    'about-tdi': false,
   });
 
   // Toggle function for accordions
-  const toggleSection = (sectionId: string) => {
-    setOpenSections(prev => ({
-      ...prev,
-      [sectionId]: !prev[sectionId]
-    }));
+  const toggleSection = (id: string) => {
+    setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
   };
 
-  // Accordion Component
-  const Accordion = ({
-    id,
-    title,
-    subtitle,
-    badge,
-    badgeColor = 'bg-gray-100 text-gray-600',
-    icon,
-    children
-  }: {
+  // Expand all sections (optionally filtered by prefix)
+  const expandAll = (prefix?: string) => {
+    setOpenSections(prev => {
+      const updated = { ...prev };
+      Object.keys(updated).forEach(key => {
+        if (!prefix || key.startsWith(prefix)) {
+          updated[key] = true;
+        }
+      });
+      return updated;
+    });
+  };
+
+  // Collapse all sections (optionally filtered by prefix)
+  const collapseAll = (prefix?: string) => {
+    setOpenSections(prev => {
+      const updated = { ...prev };
+      Object.keys(updated).forEach(key => {
+        if (!prefix || key.startsWith(prefix)) {
+          updated[key] = false;
+        }
+      });
+      return updated;
+    });
+  };
+
+  // Accordion Component - accepts icon as component type or ReactNode
+  interface AccordionProps {
     id: string;
     title: string;
     subtitle?: string;
     badge?: string;
     badgeColor?: string;
-    icon?: React.ReactNode;
+    icon?: React.ComponentType<{ className?: string }> | React.ReactNode;
     children: React.ReactNode;
-  }) => {
+  }
+
+  const Accordion = ({ id, title, subtitle, badge, badgeColor = 'bg-gray-100 text-gray-600', icon: Icon, children }: AccordionProps) => {
     const isOpen = openSections[id];
+
+    // Render icon - handle both component type and ReactNode
+    const renderIcon = () => {
+      if (!Icon) return null;
+      if (typeof Icon === 'function') {
+        return <Icon className="w-5 h-5 text-[#38618C]" />;
+      }
+      return <div className="text-[#38618C]">{Icon}</div>;
+    };
 
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        {/* Header - Always visible, clickable */}
         <button
           onClick={() => toggleSection(id)}
           className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
         >
           <div className="flex items-center gap-3">
-            {icon && <div className="text-[#38618C]">{icon}</div>}
+            {renderIcon()}
             <div className="text-left">
               <h3 className="font-semibold text-[#1e2749]">{title}</h3>
               {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
@@ -134,15 +195,38 @@ export default function StPeterChanelDashboard() {
           </div>
         </button>
 
-        {/* Content - Collapsible */}
-        {isOpen && (
+        <div className={`overflow-hidden transition-all duration-200 ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
           <div className="px-4 pb-4 border-t border-gray-100">
             {children}
           </div>
-        )}
+        </div>
       </div>
     );
   };
+
+  // Section Controls Component
+  interface SectionControlsProps {
+    prefix?: string;
+    className?: string;
+  }
+
+  const SectionControls = ({ prefix, className = '' }: SectionControlsProps) => (
+    <div className={`flex justify-end gap-2 mb-4 ${className}`}>
+      <button
+        onClick={() => expandAll(prefix)}
+        className="text-xs text-[#35A7FF] hover:underline"
+      >
+        Expand All
+      </button>
+      <span className="text-gray-300">|</span>
+      <button
+        onClick={() => collapseAll(prefix)}
+        className="text-xs text-[#35A7FF] hover:underline"
+      >
+        Collapse All
+      </button>
+    </div>
+  );
 
   // Timeline Accordion Component for 2026-27 tab
   const TimelineAccordion = ({
@@ -1228,21 +1312,7 @@ export default function StPeterChanelDashboard() {
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-[#1e2749]">Observation Timeline</h3>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => setOpenSections(prev => ({ ...prev, 'observation-jan': true, 'observation-sept': true }))}
-                    className="text-xs text-[#35A7FF] hover:underline"
-                  >
-                    Expand All
-                  </button>
-                  <span className="text-gray-300">|</span>
-                  <button
-                    onClick={() => setOpenSections(prev => ({ ...prev, 'observation-jan': false, 'observation-sept': false }))}
-                    className="text-xs text-[#35A7FF] hover:underline"
-                  >
-                    Collapse All
-                  </button>
-                </div>
+                <SectionControls prefix="observation" />
               </div>
 
               <div className="space-y-3">
@@ -1253,7 +1323,7 @@ export default function StPeterChanelDashboard() {
                   subtitle="On-Site Visit + Group Sessions"
                   badge="Complete"
                   badgeColor="bg-green-100 text-green-700"
-                  icon={<FileText className="w-5 h-5" />}
+                  icon={FileText}
                 >
                   <div className="pt-4 space-y-4">
                     {/* What We Did */}
@@ -1355,7 +1425,7 @@ export default function StPeterChanelDashboard() {
                   subtitle="Initial Observations + Kickoff"
                   badge="Complete"
                   badgeColor="bg-green-100 text-green-700"
-                  icon={<FileText className="w-5 h-5" />}
+                  icon={FileText}
                 >
                   <div className="pt-4 space-y-4">
                     {/* Stats Summary */}
@@ -1426,7 +1496,7 @@ export default function StPeterChanelDashboard() {
                 subtitle="19 of 19 teachers responded (100%)"
                 badge="Jan 14, 2026"
                 badgeColor="bg-blue-100 text-blue-700"
-                icon={<ClipboardList className="w-5 h-5" />}
+                icon={ClipboardList}
               >
                 <div className="pt-4 space-y-4">
                   {/* Key Stats */}
