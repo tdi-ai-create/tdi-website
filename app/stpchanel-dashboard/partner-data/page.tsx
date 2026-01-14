@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   GraduationCap,
   MessageSquare,
@@ -13,6 +13,16 @@ import {
 export default function PartnerDataPage() {
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+
+  // Auto-close tab after submission
+  useEffect(() => {
+    if (submitted) {
+      const timer = setTimeout(() => {
+        window.close();
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [submitted]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -49,14 +59,17 @@ export default function PartnerDataPage() {
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
           <h1 className="text-2xl font-bold text-[#1e2749] mb-2">Thank You, Paula!</h1>
-          <p className="text-gray-600 mb-6">
-            Your data has been submitted. Rae will update your dashboard with this information and follow up with you soon.
+          <p className="text-gray-600 mb-4">
+            Your data has been submitted. Rae will update your dashboard with this information.
+          </p>
+          <p className="text-sm text-gray-500 mb-6">
+            This window will close automatically in a few seconds...
           </p>
           <a
             href="/stpchanel-dashboard"
             className="inline-flex items-center gap-2 bg-[#35A7FF] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2089e5] transition-colors"
           >
-            Back to Dashboard
+            Return to Dashboard
             <ArrowRight className="w-4 h-4" />
           </a>
         </div>

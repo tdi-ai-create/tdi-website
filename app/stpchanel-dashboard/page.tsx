@@ -401,6 +401,8 @@ export default function StPeterChanelDashboard() {
                 {/* Item 1: Partnership Data Form */}
                 <a
                   href="/stpchanel-dashboard/partner-data"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={`rounded-lg p-4 flex items-center justify-between hover:shadow-md border transition-all cursor-pointer block ${
                     isOverdue(dueDates.partnerData.month, dueDates.partnerData.year)
                       ? 'border-red-500 bg-red-50'
