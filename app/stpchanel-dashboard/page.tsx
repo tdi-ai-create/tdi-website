@@ -34,7 +34,11 @@ import {
   Activity,
   Video,
   School,
-  Laptop
+  Laptop,
+  ChevronDown,
+  ChevronRight,
+  FileText,
+  Check
 } from 'lucide-react';
 
 // Tooltip component
@@ -52,6 +56,79 @@ const Tooltip = ({ children, content }: { children: React.ReactNode; content: st
 export default function StPeterChanelDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [activePhase, setActivePhase] = useState(2);
+
+  // Accordion state for collapsible sections
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    'observation-sept': false,
+    'observation-jan': true,  // Most recent open by default
+    'survey-data': true,
+  });
+
+  // Toggle function for accordions
+  const toggleSection = (sectionId: string) => {
+    setOpenSections(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }));
+  };
+
+  // Accordion Component
+  const Accordion = ({
+    id,
+    title,
+    subtitle,
+    badge,
+    badgeColor = 'bg-gray-100 text-gray-600',
+    icon,
+    children
+  }: {
+    id: string;
+    title: string;
+    subtitle?: string;
+    badge?: string;
+    badgeColor?: string;
+    icon?: React.ReactNode;
+    children: React.ReactNode;
+  }) => {
+    const isOpen = openSections[id];
+
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        {/* Header - Always visible, clickable */}
+        <button
+          onClick={() => toggleSection(id)}
+          className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            {icon && <div className="text-[#38618C]">{icon}</div>}
+            <div className="text-left">
+              <h3 className="font-semibold text-[#1e2749]">{title}</h3>
+              {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            {badge && (
+              <span className={`text-xs px-3 py-1 rounded-full ${badgeColor}`}>
+                {badge}
+              </span>
+            )}
+            {isOpen ? (
+              <ChevronDown className="w-5 h-5 text-gray-400" />
+            ) : (
+              <ChevronRight className="w-5 h-5 text-gray-400" />
+            )}
+          </div>
+        </button>
+
+        {/* Content - Collapsible */}
+        {isOpen && (
+          <div className="px-4 pb-4 border-t border-gray-100">
+            {children}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Check if a due date has passed (compares against 1st of the month)
   const isOverdue = (dueMonth: number, dueYear: number) => {
@@ -1063,347 +1140,270 @@ export default function StPeterChanelDashboard() {
           <div className="space-y-6">
             {/* SECTION A: Observation Timeline */}
             <div className="mb-8">
-              <h3 className="text-xl font-bold text-[#1e2749] mb-4">Observation Timeline</h3>
-
-              <div className="space-y-4">
-                {/* Completed Visit - Expanded */}
-                <div className="bg-white rounded-xl shadow-sm border-l-4 border-[#38618C] overflow-hidden">
-
-                  {/* Header */}
-                  <div className="p-5 border-b border-gray-100">
-                    <div className="flex items-center justify-between flex-wrap gap-4">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
-                            <CheckCircle className="w-3 h-3" />
-                            COMPLETE
-                          </span>
-                          <span className="font-bold text-[#1e2749]">September 30, 2025</span>
-                        </div>
-                        <div className="text-gray-600 text-sm">On-site classroom observations</div>
-                      </div>
-                      <div className="flex gap-6 text-center">
-                        <div>
-                          <div className="text-2xl font-bold text-[#1e2749]">25</div>
-                          <div className="text-xs text-gray-500">Classrooms</div>
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-[#38618C]">25</div>
-                          <Tooltip content="Personalized feedback emails sent to each observed teacher"><span className="text-xs text-gray-500">Love Notes Sent</span></Tooltip>
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-[#38618C]">2</div>
-                          <div className="text-xs text-gray-500">Groups Formed</div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Insights Grid */}
-                  <div className="p-5 bg-gray-50">
-                    <div className="grid md:grid-cols-2 gap-6">
-
-                      {/* What We Celebrated */}
-                      <div>
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-8 h-8 bg-[#38618C]/10 rounded-lg flex items-center justify-center">
-                            <Star className="w-4 h-4 text-[#38618C]" />
-                          </div>
-                          <span className="font-semibold text-[#1e2749]">What We Celebrated</span>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-3">Schoolwide strengths observed across classrooms</p>
-                        <div className="space-y-2">
-                          <div className="flex items-start gap-2">
-                            <CheckCircle className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-gray-700">Strong, confident teacher voices across all grade levels</span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <CheckCircle className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-gray-700">Welcoming, thoughtfully decorated learning spaces</span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <CheckCircle className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-gray-700">Creative engagement strategies (songs, games, movement)</span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <CheckCircle className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-gray-700">Positive student-teacher rapport and classroom culture</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Where We're Growing */}
-                      <div>
-                        <div className="flex items-center gap-2 mb-3">
-                          <div className="w-8 h-8 bg-[#35A7FF]/10 rounded-lg flex items-center justify-center">
-                            <TrendingUp className="w-4 h-4 text-[#35A7FF]" />
-                          </div>
-                          <span className="font-semibold text-[#1e2749]">Where We're Growing</span>
-                        </div>
-                        <p className="text-sm text-gray-600 mb-3">Focus areas identified for targeted support</p>
-                        <div className="space-y-2">
-                          <div className="flex items-start gap-2">
-                            <ArrowRight className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-gray-700">Time management and lesson pacing strategies</span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <ArrowRight className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-gray-700">Differentiated choice boards for varied learners</span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <ArrowRight className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-gray-700">Classroom management systems and routines</span>
-                          </div>
-                          <div className="flex items-start gap-2">
-                            <ArrowRight className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-gray-700">Reducing verbal redirections with proactive strategies</span>
-                          </div>
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-
-                  {/* Sample Love Note */}
-                  <div className="p-5 border-t border-gray-100">
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="w-8 h-8 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center">
-                        <Heart className="w-4 h-4 text-[#E07A5F]" />
-                      </div>
-                      <span className="font-semibold text-[#1e2749]">Sample Love Note</span>
-                      <span className="text-xs text-gray-400">(Each teacher received personalized feedback like this)</span>
-                    </div>
-                    <div className="bg-[#F5F5F5] rounded-lg p-4 border-l-4 border-[#E07A5F]">
-                      <p className="text-sm text-gray-700 italic">
-                        "Your classroom had such a great vibe today — clean, welcoming, a place I'd want to stay all day! I loved your 'Odd Todd and Even Steven' songs and phrases. The way you used a review game as a formative check after packing up homework was genius. Your teacher voice is amazing — clear, warm, and full of energy. Keep leaning into those creative systems!"
-                      </p>
-                      <p className="text-xs text-gray-400 mt-2">— From observation of Cathy Dufresne's math class</p>
-                    </div>
-                    <p className="text-xs text-gray-400 mt-3 text-center">Principal CC'd on all 25 personalized teacher emails</p>
-                  </div>
-
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xl font-bold text-[#1e2749]">Observation Timeline</h3>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setOpenSections(prev => ({ ...prev, 'observation-jan': true, 'observation-sept': true }))}
+                    className="text-xs text-[#35A7FF] hover:underline"
+                  >
+                    Expand All
+                  </button>
+                  <span className="text-gray-300">|</span>
+                  <button
+                    onClick={() => setOpenSections(prev => ({ ...prev, 'observation-jan': false, 'observation-sept': false }))}
+                    className="text-xs text-[#35A7FF] hover:underline"
+                  >
+                    Collapse All
+                  </button>
                 </div>
+              </div>
 
-                {/* January 14, 2026 - Visit 2 */}
-                <div className="bg-white rounded-xl p-5 shadow-sm border-l-4 border-[#35A7FF]">
-                  <div className="flex justify-between items-start mb-4">
+              <div className="space-y-3">
+                {/* January 14, 2026 - Most Recent (open by default) */}
+                <Accordion
+                  id="observation-jan"
+                  title="January 14, 2026"
+                  subtitle="On-Site Visit + Group Sessions"
+                  badge="Complete"
+                  badgeColor="bg-green-100 text-green-700"
+                  icon={<FileText className="w-5 h-5" />}
+                >
+                  <div className="pt-4 space-y-4">
+                    {/* What We Did */}
                     <div>
-                      <span className="text-sm text-gray-500">January 14, 2026</span>
-                      <h3 className="font-semibold text-[#1e2749]">On-Site Visit + Group Sessions</h3>
+                      <p className="text-sm font-medium text-[#1e2749] mb-2">What We Did:</p>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-[#35A7FF]" />
+                          Teacher Check-In Survey (19 responses — 100%)
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-[#35A7FF]" />
+                          Group Discussion: Challenges & Peer Solutions
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-[#35A7FF]" />
+                          Protected Work Session: Hub Deep-Dives
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <Check className="w-4 h-4 text-[#35A7FF]" />
+                          100% Hub Engagement Achieved
+                        </li>
+                      </ul>
                     </div>
-                    <span className="bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-full">
-                      Complete
-                    </span>
-                  </div>
 
-                  {/* What We Did */}
-                  <div className="mb-4">
-                    <p className="text-sm font-medium text-[#1e2749] mb-2">What We Did:</p>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li className="flex items-start gap-2">
-                        <span className="text-[#35A7FF]">✓</span>
-                        Teacher Check-In Survey (19 responses — 100%)
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-[#35A7FF]">✓</span>
-                        Group Discussion: Challenges & Peer Solutions
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-[#35A7FF]">✓</span>
-                        Protected Work Session: Hub Deep-Dives, Planning, System Building
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <span className="text-[#35A7FF]">✓</span>
-                        100% Hub Engagement — All attendees logged in and explored resources
-                      </li>
-                    </ul>
-                  </div>
+                    {/* Session Wins */}
+                    <div className="bg-green-50 rounded-lg p-4">
+                      <p className="text-sm font-medium text-green-800 mb-2">Session Wins:</p>
+                      <ul className="text-sm text-green-700 space-y-1">
+                        <li>• <strong>Stress level 6.0/10</strong> — below industry average (8-9/10)</li>
+                        <li>• <strong>Retention intent 9.8/10</strong> — nearly everyone returning</li>
+                        <li>• <strong>47% feel better</strong> than start of year</li>
+                        <li>• <strong>100% Hub login</strong> achieved</li>
+                        <li>• Strong &quot;family&quot; culture cited by teachers</li>
+                      </ul>
+                    </div>
 
-                  {/* Session Wins */}
-                  <div className="bg-green-50 rounded-lg p-4 mb-4">
-                    <p className="text-sm font-medium text-green-800 mb-2">Session Wins:</p>
-                    <ul className="text-sm text-green-700 space-y-1">
-                      <li>• <strong>Stress level 6.0/10</strong> — significantly below industry average (8-9/10)</li>
-                      <li>• <strong>Retention intent 9.8/10</strong> — nearly everyone returning next year</li>
-                      <li>• <strong>100% Hub login</strong> — every teacher engaged with resources</li>
-                      <li>• Strong school culture — teachers cited &quot;family atmosphere&quot; and collaboration</li>
-                      <li>• Sandi W. emerging as peer leader — sharing Hub strategies with colleagues</li>
-                    </ul>
-                  </div>
-
-                  {/* Progress Since September */}
-                  <div className="bg-[#38618C]/10 rounded-lg p-4 mb-4">
-                    <p className="text-sm font-medium text-[#1e2749] mb-2">Progress Since September:</p>
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <span className="text-gray-500">Hub Engagement:</span>
-                        <span className="font-semibold text-green-600 ml-2">8% → 100%</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Love Notes Sent:</span>
-                        <span className="font-semibold text-green-600 ml-2">0 → 25</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Growth Groups:</span>
-                        <span className="font-semibold text-green-600 ml-2">Formed & Active</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-500">Teacher Baseline:</span>
-                        <span className="font-semibold text-green-600 ml-2">Established</span>
+                    {/* Progress Since September */}
+                    <div className="bg-[#38618C]/10 rounded-lg p-4">
+                      <p className="text-sm font-medium text-[#1e2749] mb-2">Progress Since September:</p>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <span className="text-gray-500">Hub Engagement:</span>
+                          <span className="font-semibold text-green-600 ml-2">8% → 100%</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Love Notes Sent:</span>
+                          <span className="font-semibold text-green-600 ml-2">0 → 25</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Growth Groups:</span>
+                          <span className="font-semibold text-green-600 ml-2">Formed & Active</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-500">Teacher Baseline:</span>
+                          <span className="font-semibold text-green-600 ml-2">Established</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Discussion Themes */}
-                  <div className="bg-[#35A7FF]/10 rounded-lg p-4 mb-4">
-                    <p className="text-sm font-medium text-[#1e2749] mb-2">Discussion Themes:</p>
-                    <ul className="text-sm text-gray-700 space-y-1">
-                      <li>• <strong>Time management</strong> — &quot;too much to do&quot; was the #1 challenge</li>
-                      <li>• <strong>Work-life balance</strong> — several new parents navigating demands</li>
-                      <li>• <strong>Student behavior</strong> — repeating directions, keeping focus</li>
-                      <li>• <strong>Schedule disruptions</strong> — interruptions making pacing difficult</li>
-                      <li>• <strong>Need for protected time</strong> — #1 request for using Hub more</li>
-                    </ul>
-                  </div>
+                    {/* Discussion Themes */}
+                    <div className="bg-[#35A7FF]/10 rounded-lg p-4">
+                      <p className="text-sm font-medium text-[#1e2749] mb-2">Top Challenges Discussed:</p>
+                      <ul className="text-sm text-gray-700 space-y-1">
+                        <li>• <strong>Time management</strong> — #1 challenge</li>
+                        <li>• <strong>Work-life balance</strong></li>
+                        <li>• <strong>Student behavior</strong></li>
+                        <li>• <strong>Schedule disruptions</strong></li>
+                      </ul>
+                    </div>
 
-                  {/* Teacher Voices */}
-                  <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                    <p className="text-sm font-medium text-[#1e2749] mb-3">In Their Words:</p>
-                    <div className="space-y-3 text-sm text-gray-600 italic">
-                      <p>&quot;As colleagues we help each other out when needed, which makes SPC feel like family.&quot;</p>
-                      <p>&quot;My co-worker and I make a great team!&quot;</p>
-                      <p>&quot;Centering our school around God [is what we don&apos;t want to change].&quot;</p>
+                    {/* Areas to Watch */}
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <p className="text-sm font-medium text-red-800 mb-2">Areas to Watch:</p>
+                      <ul className="text-sm text-red-700 space-y-1">
+                        <li>• <strong>Strategy implementation at 21%</strong> — needs support</li>
+                        <li>• <strong>Time constraints</strong> — top barrier</li>
+                      </ul>
+                    </div>
+
+                    {/* Teachers Present */}
+                    <div className="pt-2">
+                      <p className="text-sm font-medium text-[#1e2749] mb-2">Teachers Present (10):</p>
+                      <div className="flex flex-wrap gap-1">
+                        {['Natalie F.', 'Tori G.', 'Tori W.', 'Maci S.', 'Emily L.', 'Maria L.', 'Sandi W.', 'Jessica R.', 'Dana B.', 'Cathy D.'].map((name) => (
+                          <span key={name} className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                            {name}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   </div>
+                </Accordion>
 
-                  {/* Resources Recommended */}
-                  <div className="mb-4">
-                    <p className="text-sm font-medium text-[#1e2749] mb-2">Resources Recommended:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {['Teacher-Tested Hacks', 'Calm Classrooms Not Chaos', 'Classroom Management Toolkit', 'Differentiated Choice Boards'].map((resource) => (
-                        <span key={resource} className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-3 py-1 rounded-full">
-                          {resource}
-                        </span>
-                      ))}
+                {/* September 30, 2025 - Collapsed by default */}
+                <Accordion
+                  id="observation-sept"
+                  title="September 30, 2025"
+                  subtitle="Initial Observations + Kickoff"
+                  badge="Complete"
+                  badgeColor="bg-green-100 text-green-700"
+                  icon={<FileText className="w-5 h-5" />}
+                >
+                  <div className="pt-4 space-y-4">
+                    {/* Stats Summary */}
+                    <div className="flex gap-6 text-center py-2">
+                      <div>
+                        <div className="text-2xl font-bold text-[#1e2749]">25</div>
+                        <div className="text-xs text-gray-500">Classrooms</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-[#38618C]">25</div>
+                        <div className="text-xs text-gray-500">Love Notes</div>
+                      </div>
+                      <div>
+                        <div className="text-2xl font-bold text-[#38618C]">2</div>
+                        <div className="text-xs text-gray-500">Groups</div>
+                      </div>
+                    </div>
+
+                    {/* What We Celebrated */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Star className="w-4 h-4 text-[#38618C]" />
+                        <span className="font-semibold text-[#1e2749] text-sm">What We Celebrated</span>
+                      </div>
+                      <ul className="text-sm text-gray-600 space-y-1 ml-6">
+                        <li>• Strong, confident teacher voices</li>
+                        <li>• Welcoming, decorated learning spaces</li>
+                        <li>• Creative engagement strategies</li>
+                        <li>• Positive student-teacher rapport</li>
+                      </ul>
+                    </div>
+
+                    {/* Where We're Growing */}
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <TrendingUp className="w-4 h-4 text-[#35A7FF]" />
+                        <span className="font-semibold text-[#1e2749] text-sm">Where We&apos;re Growing</span>
+                      </div>
+                      <ul className="text-sm text-gray-600 space-y-1 ml-6">
+                        <li>• Time management and pacing</li>
+                        <li>• Differentiated choice boards</li>
+                        <li>• Classroom management systems</li>
+                        <li>• Reducing verbal redirections</li>
+                      </ul>
+                    </div>
+
+                    {/* Sample Love Note */}
+                    <div className="bg-[#F5F5F5] rounded-lg p-4 border-l-4 border-[#E07A5F]">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Heart className="w-4 h-4 text-[#E07A5F]" />
+                        <span className="font-semibold text-[#1e2749] text-sm">Sample Love Note</span>
+                      </div>
+                      <p className="text-sm text-gray-700 italic">
+                        &quot;Your classroom had such a great vibe today — clean, welcoming, a place I&apos;d want to stay all day! I loved your &apos;Odd Todd and Even Steven&apos; songs and phrases...&quot;
+                      </p>
+                      <p className="text-xs text-gray-400 mt-2">— From Cathy Dufresne&apos;s observation</p>
                     </div>
                   </div>
-
-                  {/* What Teachers Committed To */}
-                  <div className="border border-[#35A7FF]/30 rounded-lg p-4 mb-4">
-                    <p className="text-sm font-medium text-[#1e2749] mb-2">What Teachers Committed To:</p>
-                    <ul className="text-sm text-gray-600 space-y-1">
-                      <li>• Schedule 30 min of protected Hub/planning time this week</li>
-                      <li>• Try one new strategy before virtual session</li>
-                      <li>• Share wins and fails with accountability partner</li>
-                    </ul>
-                  </div>
-
-                  {/* Areas to Watch */}
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-                    <p className="text-sm font-medium text-red-800 mb-2">Areas to Watch:</p>
-                    <ul className="text-sm text-red-700 space-y-1">
-                      <li>• <strong>Strategy implementation at 21%</strong> — teachers need more support translating PD to practice</li>
-                      <li>• <strong>Time constraints</strong> — &quot;too much to do&quot; cited as top barrier</li>
-                    </ul>
-                  </div>
-
-                  {/* Next Steps */}
-                  <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-                    <p className="text-sm font-medium text-amber-800 mb-2">Next Steps:</p>
-                    <ul className="text-sm text-amber-700 space-y-1">
-                      <li>• Virtual session with Instructional Design group</li>
-                      <li>• Virtual session with Class Management group</li>
-                      <li>• Follow-up survey to measure strategy implementation</li>
-                      <li>• Spring Leadership Recap with Paula</li>
-                    </ul>
-                  </div>
-
-                  {/* Teachers Present */}
-                  <div className="border-t border-gray-100 pt-4">
-                    <p className="text-sm font-medium text-[#1e2749] mb-2">Teachers Present (10):</p>
-                    <div className="flex flex-wrap gap-2">
-                      {['Natalie Foret', 'Tori Guidry', 'Tori Warner', 'Maci Schexnayder', 'Emily LeBlanc', 'Maria Lambert', 'Sandi Waguespack', 'Jessica Roper', 'Dana Bourgeois', 'Cathy Dufresne'].map((name) => (
-                        <span key={name} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                          {name}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
+                </Accordion>
               </div>
             </div>
 
             {/* Survey Insights - Jan 14, 2026 */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h3 className="font-semibold text-[#1e2749]">Teacher Survey Insights</h3>
-                  <p className="text-sm text-gray-500">19 of 19 teachers responded (100%)</p>
-                </div>
-                <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full">
-                  Jan 14, 2026
-                </span>
-              </div>
-
-              {/* Key Stats */}
-              <div className="grid grid-cols-4 gap-4 mb-6">
-                <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <p className="text-2xl font-bold text-green-600">6.0</p>
-                  <p className="text-xs text-gray-500">Avg Stress</p>
-                  <p className="text-[10px] text-green-600">Industry: 8-9</p>
-                </div>
-                <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <p className="text-2xl font-bold text-green-600">9.8</p>
-                  <p className="text-xs text-gray-500">Retention Intent</p>
-                  <p className="text-[10px] text-green-600">Industry: 2-4</p>
-                </div>
-                <div className="text-center p-3 bg-blue-50 rounded-lg">
-                  <p className="text-2xl font-bold text-[#35A7FF]">47%</p>
-                  <p className="text-xs text-gray-500">Feel Better</p>
-                  <p className="text-[10px] text-gray-400">vs start of year</p>
-                </div>
-                <div className="text-center p-3 bg-blue-50 rounded-lg">
-                  <p className="text-2xl font-bold text-[#35A7FF]">21%</p>
-                  <p className="text-xs text-gray-500">Tried Strategies</p>
-                  <p className="text-[10px] text-gray-400">Industry: 10%</p>
-                </div>
-              </div>
-
-              {/* Top Challenges */}
-              <div className="mb-4">
-                <p className="text-sm font-medium text-[#1e2749] mb-2">Top Challenges Reported:</p>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                      <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '84%' }} />
+            <div className="mb-8">
+              <Accordion
+                id="survey-data"
+                title="Teacher Survey Results"
+                subtitle="19 of 19 teachers responded (100%)"
+                badge="Jan 14, 2026"
+                badgeColor="bg-blue-100 text-blue-700"
+                icon={<ClipboardList className="w-5 h-5" />}
+              >
+                <div className="pt-4 space-y-4">
+                  {/* Key Stats */}
+                  <div className="grid grid-cols-4 gap-4">
+                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                      <p className="text-2xl font-bold text-green-600">6.0</p>
+                      <p className="text-xs text-gray-500">Avg Stress</p>
+                      <p className="text-[10px] text-green-600">Industry: 8-9</p>
                     </div>
-                    <span className="text-xs text-gray-600 w-32">Time management (84%)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                      <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '68%' }} />
+                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                      <p className="text-2xl font-bold text-green-600">9.8</p>
+                      <p className="text-xs text-gray-500">Retention Intent</p>
+                      <p className="text-[10px] text-green-600">Industry: 2-4</p>
                     </div>
-                    <span className="text-xs text-gray-600 w-32">Work-life balance (68%)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                      <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '53%' }} />
+                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                      <p className="text-2xl font-bold text-[#35A7FF]">47%</p>
+                      <p className="text-xs text-gray-500">Feel Better</p>
+                      <p className="text-[10px] text-gray-400">vs start of year</p>
                     </div>
-                    <span className="text-xs text-gray-600 w-32">Student behavior (53%)</span>
+                    <div className="text-center p-3 bg-blue-50 rounded-lg">
+                      <p className="text-2xl font-bold text-[#35A7FF]">21%</p>
+                      <p className="text-xs text-gray-500">Tried Strategies</p>
+                      <p className="text-[10px] text-gray-400">Industry: 10%</p>
+                    </div>
                   </div>
-                </div>
-              </div>
 
-              {/* What Would Help */}
-              <div>
-                <p className="text-sm font-medium text-[#1e2749] mb-2">What Teachers Said Would Help:</p>
-                <div className="flex flex-wrap gap-2">
-                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">More planning time (10)</span>
-                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Support with challenging students (4)</span>
-                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Collaboration time (3)</span>
-                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Less paperwork (2)</span>
+                  {/* Top Challenges */}
+                  <div>
+                    <p className="text-sm font-medium text-[#1e2749] mb-2">Top Challenges Reported:</p>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                          <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '84%' }} />
+                        </div>
+                        <span className="text-xs text-gray-600 w-32">Time management (84%)</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                          <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '68%' }} />
+                        </div>
+                        <span className="text-xs text-gray-600 w-32">Work-life balance (68%)</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                          <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '53%' }} />
+                        </div>
+                        <span className="text-xs text-gray-600 w-32">Student behavior (53%)</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* What Would Help */}
+                  <div>
+                    <p className="text-sm font-medium text-[#1e2749] mb-2">What Teachers Said Would Help:</p>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">More planning time (10)</span>
+                      <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Support with challenging students (4)</span>
+                      <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Collaboration time (3)</span>
+                      <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Less paperwork (2)</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              </Accordion>
             </div>
 
             {/* SECTION B: Implementation Insights */}
