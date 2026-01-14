@@ -620,123 +620,171 @@ export default function StPeterChanelDashboard() {
               {/* Divider */}
               <div className="border-t border-gray-200 mb-6"></div>
 
-              {/* Student Performance - Preview Mode */}
-              <div className="bg-white rounded-xl p-5 shadow-sm mb-6">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <GraduationCap className="w-5 h-5 text-[#38618C]" />
-                    <span className="font-semibold text-[#1e2749]">Student Performance</span>
+              {/* Student Performance - Real Data */}
+              <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div>
+                    <h3 className="font-semibold text-[#1e2749]">Student Performance</h3>
+                    <p className="text-sm text-gray-500">TerraNova National Percentiles vs Classroom Grades</p>
                   </div>
-                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">
-                    Preview — Awaiting Your Data
+                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
+                    2024-25 Data
                   </span>
                 </div>
 
-                <div className="bg-[#E07A5F]/10 border border-[#E07A5F]/20 rounded-lg p-4 mb-4">
-                  <p className="text-sm text-[#1e2749] font-medium mb-1">Paula&apos;s Question:</p>
-                  <p className="text-sm text-gray-700 italic">&quot;Why do our scores not match our data?&quot;</p>
-                </div>
-
-                {/* Sample Chart Preview - MORE VISIBLE AS SAMPLE */}
-                <div className="relative border-4 border-dashed border-amber-400 rounded-lg p-4 mb-4 bg-amber-50/50">
-
-                  {/* Preview Badge - LARGER AND MORE PROMINENT */}
-                  <div className="absolute -top-4 left-4 bg-amber-400 px-3 py-1 rounded-full">
-                    <span className="text-xs font-bold text-amber-900 uppercase tracking-wide">Sample Preview — Not Real Data</span>
-                  </div>
-
-                  <p className="text-xs text-amber-700 mb-4 mt-2 font-medium">
-                    This is an example of how your chart will look once we confirm your assessment data:
-                  </p>
-
-                  {/* Sample Bars - Add watermark effect */}
-                  <div className="space-y-4 opacity-70">
-
-                    {/* Classroom Grades */}
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Classroom Grades (Avg)</span>
-                        <span className="font-medium text-gray-500 italic">Example: B+ (87%)</span>
-                      </div>
-                      <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-green-400 rounded-full" style={{ width: '87%' }}></div>
-                      </div>
-                    </div>
-
-                    {/* Assessment Option 1: MAP */}
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">NWEA MAP Growth <span className="text-amber-600 font-medium">(if used)</span></span>
-                        <span className="font-medium text-gray-500 italic">Example: 52nd percentile</span>
-                      </div>
-                      <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#38618C]/60 rounded-full" style={{ width: '52%' }}></div>
-                      </div>
-                    </div>
-
-                    {/* Assessment Option 2: IOWA */}
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">IOWA Assessments <span className="text-amber-600 font-medium">(if used)</span></span>
-                        <span className="font-medium text-gray-500 italic">Example: 55th percentile</span>
-                      </div>
-                      <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#38618C]/60 rounded-full" style={{ width: '55%' }}></div>
-                      </div>
-                    </div>
-
-                    {/* Assessment Option 3: LEAP */}
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Louisiana LEAP <span className="text-amber-600 font-medium">(if used)</span></span>
-                        <span className="font-medium text-gray-500 italic">Example: 42% Mastery+</span>
-                      </div>
-                      <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#38618C]/60 rounded-full" style={{ width: '42%' }}></div>
-                      </div>
-                    </div>
-
-                  </div>
-
-                  {/* Sample Insight - clearly marked as example */}
-                  <div className="mt-4 pt-3 border-t border-amber-300">
-                    <p className="text-xs text-amber-700 italic">
-                      <span className="font-bold">Example insight:</span> &quot;Students earning B+ classroom grades but performing at 52nd percentile on MAP suggests grading may include non-mastery factors. Focus area: Align classroom assessments with standardized expectations.&quot;
-                    </p>
-                  </div>
-
-                </div>
-
-                {/* What Teachers Reported - Jan 14 Survey */}
-                <div className="bg-[#35A7FF]/10 border border-[#35A7FF]/20 rounded-lg p-4">
-                  <p className="text-sm font-medium text-[#1e2749] mb-2">What Teachers Reported (Jan 14):</p>
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    <li>• Most classrooms averaging <strong>B (80-89%)</strong></li>
-                    <li>• Top gap causes: test-taking skills, testing pressure, effort-based grading</li>
-                    <li>• Confidence grades match assessments: <strong>Mixed</strong> (only 2 very confident)</li>
-                  </ul>
-                </div>
-
-                {/* What We Need */}
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mt-4">
-                  <p className="text-sm font-medium text-amber-800 mb-2">To complete this chart, we need:</p>
-                  <ul className="text-xs text-amber-700 space-y-1">
-                    <li>✓ Which assessments St. Peter Chanel uses (MAP, IOWA, LEAP, other)</li>
-                    <li>✓ Your most recent assessment results</li>
-                    <li>✓ Approximate classroom grade averages</li>
-                  </ul>
-                  <p className="text-xs text-amber-600 mt-2">
-                    → Complete the <a href="/stpchanel-dashboard/partner-data" target="_blank" rel="noopener noreferrer" className="underline font-medium">Partnership Data Form</a> to populate this with your real data
+                {/* The Gap Callout */}
+                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
+                  <p className="text-sm font-medium text-amber-800">
+                    📊 The Gap: Classroom grades average <strong>A (90-100%)</strong>, but TerraNova scores for grades 3-6 range from <strong>30th-58th percentile</strong>.
                   </p>
                 </div>
 
-                <div className="pt-4 mt-4 border-t border-gray-100">
-                  <div className="flex items-start gap-2">
-                    <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                    <p className="text-xs text-gray-600">
-                      <span className="font-semibold text-[#1e2749]">What we&apos;re tracking:</span> The gap between classroom performance and standardized assessments — this is the key to answering &quot;why don&apos;t our scores match our data?&quot;
-                    </p>
+                {/* Chart by Grade */}
+                <div className="space-y-4">
+                  {/* Header */}
+                  <div className="grid grid-cols-4 gap-4 text-xs text-gray-500 font-medium border-b pb-2">
+                    <span>Grade</span>
+                    <span>Reading</span>
+                    <span>Language</span>
+                    <span>Math</span>
                   </div>
+
+                  {/* 3rd Grade - Below Average */}
+                  <div className="grid grid-cols-4 gap-4 items-center">
+                    <span className="text-sm font-medium">3rd</span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '39%' }} />
+                      </div>
+                      <span className="text-xs text-[#E07A5F] font-medium">39th</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '43%' }} />
+                      </div>
+                      <span className="text-xs text-[#E07A5F] font-medium">43rd</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                        <div className="h-full bg-red-500 rounded-full" style={{ width: '38%' }} />
+                      </div>
+                      <span className="text-xs text-red-500 font-medium">38th</span>
+                    </div>
+                  </div>
+
+                  {/* 4th Grade */}
+                  <div className="grid grid-cols-4 gap-4 items-center">
+                    <span className="text-sm font-medium">4th</span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '43%' }} />
+                      </div>
+                      <span className="text-xs text-[#E07A5F] font-medium">43rd</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                        <div className="h-full bg-red-500 rounded-full" style={{ width: '39%' }} />
+                      </div>
+                      <span className="text-xs text-red-500 font-medium">39th</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                        <div className="h-full bg-[#35A7FF] rounded-full" style={{ width: '58%' }} />
+                      </div>
+                      <span className="text-xs text-[#35A7FF] font-medium">58th</span>
+                    </div>
+                  </div>
+
+                  {/* 5th Grade - Lowest Reading */}
+                  <div className="grid grid-cols-4 gap-4 items-center">
+                    <span className="text-sm font-medium">5th</span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                        <div className="h-full bg-red-500 rounded-full" style={{ width: '30%' }} />
+                      </div>
+                      <span className="text-xs text-red-500 font-medium">30th ⚠️</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '43%' }} />
+                      </div>
+                      <span className="text-xs text-[#E07A5F] font-medium">43rd</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                        <div className="h-full bg-[#35A7FF] rounded-full" style={{ width: '55%' }} />
+                      </div>
+                      <span className="text-xs text-[#35A7FF] font-medium">55th</span>
+                    </div>
+                  </div>
+
+                  {/* 6th Grade */}
+                  <div className="grid grid-cols-4 gap-4 items-center">
+                    <span className="text-sm font-medium">6th</span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                        <div className="h-full bg-red-500 rounded-full" style={{ width: '37%' }} />
+                      </div>
+                      <span className="text-xs text-red-500 font-medium">37th</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '48%' }} />
+                      </div>
+                      <span className="text-xs text-[#E07A5F] font-medium">48th</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                        <div className="h-full bg-[#35A7FF] rounded-full" style={{ width: '58%' }} />
+                      </div>
+                      <span className="text-xs text-[#35A7FF] font-medium">58th</span>
+                    </div>
+                  </div>
+
+                  {/* 7th Grade - Strong */}
+                  <div className="grid grid-cols-4 gap-4 items-center bg-green-50 -mx-2 px-2 py-2 rounded-lg">
+                    <span className="text-sm font-medium text-green-700">7th ✓</span>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                        <div className="h-full bg-green-500 rounded-full" style={{ width: '66%' }} />
+                      </div>
+                      <span className="text-xs text-green-600 font-medium">66th</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                        <div className="h-full bg-green-500 rounded-full" style={{ width: '65%' }} />
+                      </div>
+                      <span className="text-xs text-green-600 font-medium">65th</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                        <div className="h-full bg-green-500 rounded-full" style={{ width: '75%' }} />
+                      </div>
+                      <span className="text-xs text-green-600 font-medium">75th</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Legend */}
+                <div className="flex gap-4 mt-6 pt-4 border-t text-xs">
+                  <span className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-red-500" /> Below 40th
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-[#E07A5F]" /> 40th-49th
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-[#35A7FF]" /> 50th-64th
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <div className="w-3 h-3 rounded-full bg-green-500" /> 65th+
+                  </span>
+                </div>
+
+                {/* Paula's Focus */}
+                <div className="bg-[#1e2749] text-white rounded-lg p-4 mt-4">
+                  <p className="text-sm font-medium mb-1">Paula&apos;s Goal for Next Year:</p>
+                  <p className="text-sm opacity-90">&quot;More engaging lessons and differentiated learning in the regular classroom&quot;</p>
                 </div>
               </div>
 
