@@ -346,15 +346,15 @@ export default function StPeterChanelDashboard() {
                 <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer"
                    className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
                   <Mail className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-[#1e2749]">3</div>
+                  <div className="text-lg font-bold text-[#1e2749]">9</div>
                   <div className="text-xs text-gray-600 mt-1">Blog Readers</div>
                 </a>
 
                 {/* Podcast Listeners */}
                 <a href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" target="_blank" rel="noopener noreferrer"
                    className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
-                  <Headphones className="w-5 h-5 text-gray-400 group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-gray-400">0</div>
+                  <Headphones className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
+                  <div className="text-lg font-bold text-[#1e2749]">1</div>
                   <div className="text-xs text-gray-600 mt-1">Podcast Listeners</div>
                 </a>
 
@@ -362,7 +362,7 @@ export default function StPeterChanelDashboard() {
                 <a href="https://www.facebook.com/groups/tdimovement" target="_blank" rel="noopener noreferrer"
                    className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
                   <Users className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-[#1e2749]">1</div>
+                  <div className="text-lg font-bold text-[#1e2749]">2</div>
                   <div className="text-xs text-gray-600 mt-1">Community Members</div>
                 </a>
               </div>
@@ -782,13 +782,13 @@ export default function StPeterChanelDashboard() {
                       </div>
                       <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
                     </div>
-                    {/* St. Peter Chanel 5.9/10 = LOW stress = BEST = LONGEST bar */}
+                    {/* St. Peter Chanel 6.0/10 = LOW stress = BEST = LONGEST bar */}
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-28 flex-shrink-0">St. Peter Chanel</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-green-500" style={{ width: '41%' }}></div>
+                        <div className="h-full rounded-full bg-green-500" style={{ width: '40%' }}></div>
                       </div>
-                      <span className="text-xs font-semibold text-green-600 w-14 text-right">5.9/10</span>
+                      <span className="text-xs font-semibold text-green-600 w-14 text-right">6.0/10</span>
                     </div>
                   </div>
                 </div>
@@ -817,9 +817,9 @@ export default function StPeterChanelDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-28 flex-shrink-0">St. Peter Chanel</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#35A7FF]" style={{ width: '20%' }}></div>
+                        <div className="h-full rounded-full bg-[#35A7FF]" style={{ width: '21%' }}></div>
                       </div>
-                      <span className="text-xs font-semibold text-[#35A7FF] w-14 text-right">20%</span>
+                      <span className="text-xs font-semibold text-[#35A7FF] w-14 text-right">21%</span>
                     </div>
                   </div>
                 </div>
@@ -1202,7 +1202,7 @@ export default function StPeterChanelDashboard() {
                     <ul className="text-sm text-gray-600 space-y-1">
                       <li className="flex items-start gap-2">
                         <span className="text-[#35A7FF]">✓</span>
-                        Teacher Check-In Survey (10 responses)
+                        Teacher Check-In Survey (19 responses — 100%)
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="text-[#35A7FF]">✓</span>
@@ -1223,7 +1223,7 @@ export default function StPeterChanelDashboard() {
                   <div className="bg-green-50 rounded-lg p-4 mb-4">
                     <p className="text-sm font-medium text-green-800 mb-2">Session Wins:</p>
                     <ul className="text-sm text-green-700 space-y-1">
-                      <li>• <strong>Stress level 5.9/10</strong> — significantly below industry average (8-9/10)</li>
+                      <li>• <strong>Stress level 6.0/10</strong> — significantly below industry average (8-9/10)</li>
                       <li>• <strong>Retention intent 9.8/10</strong> — nearly everyone returning next year</li>
                       <li>• <strong>100% Hub login</strong> — every teacher engaged with resources</li>
                       <li>• Strong school culture — teachers cited &quot;family atmosphere&quot; and collaboration</li>
@@ -1302,7 +1302,7 @@ export default function StPeterChanelDashboard() {
                   <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
                     <p className="text-sm font-medium text-red-800 mb-2">Areas to Watch:</p>
                     <ul className="text-sm text-red-700 space-y-1">
-                      <li>• <strong>Strategy implementation at 20%</strong> — teachers need more support translating PD to practice</li>
+                      <li>• <strong>Strategy implementation at 21%</strong> — teachers need more support translating PD to practice</li>
                       <li>• <strong>Time constraints</strong> — &quot;too much to do&quot; cited as top barrier</li>
                       <li>• <strong>15 teachers absent</strong> from session — need alternate touchpoint</li>
                     </ul>
@@ -1330,6 +1330,79 @@ export default function StPeterChanelDashboard() {
                       ))}
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Survey Insights - Jan 14, 2026 */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-8">
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <h3 className="font-semibold text-[#1e2749]">Teacher Survey Insights</h3>
+                  <p className="text-sm text-gray-500">19 of 19 teachers responded (100%)</p>
+                </div>
+                <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full">
+                  Jan 14, 2026
+                </span>
+              </div>
+
+              {/* Key Stats */}
+              <div className="grid grid-cols-4 gap-4 mb-6">
+                <div className="text-center p-3 bg-green-50 rounded-lg">
+                  <p className="text-2xl font-bold text-green-600">6.0</p>
+                  <p className="text-xs text-gray-500">Avg Stress</p>
+                  <p className="text-[10px] text-green-600">Industry: 8-9</p>
+                </div>
+                <div className="text-center p-3 bg-green-50 rounded-lg">
+                  <p className="text-2xl font-bold text-green-600">9.8</p>
+                  <p className="text-xs text-gray-500">Retention Intent</p>
+                  <p className="text-[10px] text-green-600">Industry: 2-4</p>
+                </div>
+                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                  <p className="text-2xl font-bold text-[#35A7FF]">47%</p>
+                  <p className="text-xs text-gray-500">Feel Better</p>
+                  <p className="text-[10px] text-gray-400">vs start of year</p>
+                </div>
+                <div className="text-center p-3 bg-blue-50 rounded-lg">
+                  <p className="text-2xl font-bold text-[#35A7FF]">21%</p>
+                  <p className="text-xs text-gray-500">Tried Strategies</p>
+                  <p className="text-[10px] text-gray-400">Industry: 10%</p>
+                </div>
+              </div>
+
+              {/* Top Challenges */}
+              <div className="mb-4">
+                <p className="text-sm font-medium text-[#1e2749] mb-2">Top Challenges Reported:</p>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                      <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '84%' }} />
+                    </div>
+                    <span className="text-xs text-gray-600 w-32">Time management (84%)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                      <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '68%' }} />
+                    </div>
+                    <span className="text-xs text-gray-600 w-32">Work-life balance (68%)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-2 bg-gray-100 rounded-full">
+                      <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '53%' }} />
+                    </div>
+                    <span className="text-xs text-gray-600 w-32">Student behavior (53%)</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* What Would Help */}
+              <div>
+                <p className="text-sm font-medium text-[#1e2749] mb-2">What Teachers Said Would Help:</p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">More planning time (10)</span>
+                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Support with challenging students (4)</span>
+                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Collaboration time (3)</span>
+                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">Less paperwork (2)</span>
                 </div>
               </div>
             </div>
