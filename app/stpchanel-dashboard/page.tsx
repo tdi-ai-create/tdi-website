@@ -287,8 +287,8 @@ export default function StPeterChanelDashboard() {
                   <Eye className="w-4 h-4 text-[#38618C]" />
                   <span className="text-xs text-gray-500 uppercase">Observations</span>
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">1<span className="text-lg font-normal text-gray-400">/2</span></div>
-                <div className="text-xs text-[#35A7FF] font-medium">Next: Jan 14</div>
+                <div className="text-2xl font-bold text-[#1e2749]">2<span className="text-lg font-normal text-gray-400">/2</span></div>
+                <div className="text-xs text-green-600 font-medium">Complete</div>
               </div>
 
               <div
@@ -1214,19 +1214,84 @@ export default function StPeterChanelDashboard() {
 
                 </div>
 
-                {/* Upcoming Visit */}
+                {/* January 14, 2026 - Visit 2 */}
                 <div className="bg-white rounded-xl p-5 shadow-sm border-l-4 border-[#35A7FF]">
-                  <div className="flex items-center justify-between flex-wrap gap-4">
+                  <div className="flex justify-between items-start mb-4">
                     <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="bg-[#35A7FF]/10 text-[#35A7FF] text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1">
-                          <Calendar className="w-3 h-3" />
-                          UPCOMING
+                      <span className="text-sm text-gray-500">January 14, 2026</span>
+                      <h3 className="font-semibold text-[#1e2749]">On-Site Visit + Group Sessions</h3>
+                    </div>
+                    <span className="bg-green-100 text-green-700 text-xs font-medium px-3 py-1 rounded-full">
+                      Complete
+                    </span>
+                  </div>
+
+                  {/* What We Did */}
+                  <div className="mb-4">
+                    <p className="text-sm font-medium text-[#1e2749] mb-2">What We Did:</p>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li className="flex items-start gap-2">
+                        <span className="text-[#35A7FF]">✓</span>
+                        Teacher Check-In Survey (10 responses)
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-[#35A7FF]">✓</span>
+                        Group Discussion: Challenges & Peer Solutions
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-[#35A7FF]">✓</span>
+                        Protected Work Session: Hub Deep-Dives, Planning, System Building
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="text-[#35A7FF]">✓</span>
+                        100% Hub Engagement — All attendees logged in and explored resources
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Wins */}
+                  <div className="bg-green-50 rounded-lg p-4 mb-4">
+                    <p className="text-sm font-medium text-green-800 mb-2">Session Wins:</p>
+                    <ul className="text-sm text-green-700 space-y-1">
+                      <li>• <strong>Stress level 5.9/10</strong> — significantly below industry average (8-9/10)</li>
+                      <li>• <strong>Retention intent 9.8/10</strong> — nearly everyone returning next year</li>
+                      <li>• <strong>100% Hub login</strong> — every teacher engaged with resources</li>
+                      <li>• Strong school culture — teachers cited &quot;family atmosphere&quot; and collaboration</li>
+                      <li>• Sandi W. emerging as peer leader — sharing Hub strategies with colleagues</li>
+                    </ul>
+                  </div>
+
+                  {/* Teacher Voices */}
+                  <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                    <p className="text-sm font-medium text-[#1e2749] mb-3">In Their Words:</p>
+                    <div className="space-y-3 text-sm text-gray-600 italic">
+                      <p>&quot;As colleagues we help each other out when needed, which makes SPC feel like family.&quot;</p>
+                      <p>&quot;My co-worker and I make a great team!&quot;</p>
+                      <p>&quot;Centering our school around God [is what we don&apos;t want to change].&quot;</p>
+                    </div>
+                  </div>
+
+                  {/* Discussion Themes */}
+                  <div className="bg-[#35A7FF]/10 rounded-lg p-4 mb-4">
+                    <p className="text-sm font-medium text-[#1e2749] mb-2">Discussion Themes:</p>
+                    <ul className="text-sm text-gray-700 space-y-1">
+                      <li>• <strong>Time management</strong> — &quot;too much to do&quot; was the #1 challenge</li>
+                      <li>• <strong>Work-life balance</strong> — several new parents navigating demands</li>
+                      <li>• <strong>Student behavior</strong> — repeating directions, keeping focus</li>
+                      <li>• <strong>Schedule disruptions</strong> — interruptions making pacing difficult</li>
+                      <li>• <strong>Need for protected time</strong> — #1 request for using Hub more</li>
+                    </ul>
+                  </div>
+
+                  {/* Teachers Present */}
+                  <div className="border-t border-gray-100 pt-4">
+                    <p className="text-sm font-medium text-[#1e2749] mb-2">Teachers Present (10):</p>
+                    <div className="flex flex-wrap gap-2">
+                      {['Natalie Foret', 'Tori Guidry', 'Tori Warner', 'Maci Schexnayder', 'Emily LeBlanc', 'Maria Lambert', 'Sandi Waguespack', 'Jessica Roper', 'Dana Bourgeois', 'Cathy Dufresne'].map((name) => (
+                        <span key={name} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                          {name}
                         </span>
-                        <span className="font-bold text-[#1e2749]">January 14, 2025</span>
-                      </div>
-                      <div className="text-gray-600 text-sm">On-site classroom observations</div>
-                      <div className="text-gray-500 text-xs mt-1">Follow-up visit scheduled</div>
+                      ))}
                     </div>
                   </div>
                 </div>
