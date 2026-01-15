@@ -631,22 +631,13 @@ export default function AboutPage() {
               <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
                 We are always looking for passionate educators to join our team. Share your classroom-tested strategies with our community.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <Link
+              <Link
                   href="/create-with-us"
                   className="inline-block px-5 py-2 rounded-lg font-medium text-sm border-2 transition-all hover:bg-gray-50"
                   style={{ borderColor: '#1e2749', color: '#1e2749' }}
                 >
                   Apply to Be a Creator
                 </Link>
-                <a
-                  href="mailto:Rachel@Teachersdeserveit.com"
-                  className="inline-block px-5 py-2 rounded-lg font-medium text-sm border-2 transition-all hover:bg-gray-50"
-                  style={{ borderColor: '#1e2749', color: '#1e2749' }}
-                >
-                  Email Rachel
-                </a>
-              </div>
             </div>
           </div>
 
