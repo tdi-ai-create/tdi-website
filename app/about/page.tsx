@@ -629,18 +629,16 @@ export default function AboutPage() {
                 Interested in Becoming a Content Creator?
               </h4>
               <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.7 }}>
-                We are always looking for passionate educators to join our team. Review our content creator guide and reach out to get started.
+                We are always looking for passionate educators to join our team. Share your classroom-tested strategies with our community.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                <a
-                  href="https://drive.google.com/file/d/1q499mCTZxd8RJDidRZ7iKr9Ei3xssP9b/view?usp=sharing"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href="/create-with-us"
                   className="inline-block px-5 py-2 rounded-lg font-medium text-sm border-2 transition-all hover:bg-gray-50"
                   style={{ borderColor: '#1e2749', color: '#1e2749' }}
                 >
-                  View Content Creator Guide
-                </a>
+                  Apply to Be a Creator
+                </Link>
                 <a
                   href="mailto:Rachel@Teachersdeserveit.com"
                   className="inline-block px-5 py-2 rounded-lg font-medium text-sm border-2 transition-all hover:bg-gray-50"
