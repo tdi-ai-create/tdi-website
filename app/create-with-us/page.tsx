@@ -292,41 +292,6 @@ export default function CreateWithUsPage() {
         </div>
       </section>
 
-      {/* Current Creators */}
-      <section className="py-16 md:py-20 bg-gray-50">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2
-              className="text-3xl md:text-4xl font-bold text-[#1e2749] mb-4 opacity-0 translate-y-8 transition-all duration-700"
-              data-animate="true"
-            >
-              Meet Our Creators
-            </h2>
-            <p
-              className="text-lg text-gray-600 max-w-2xl mx-auto opacity-0 translate-y-8 transition-all duration-700 delay-100"
-              data-animate="true"
-            >
-              Join these incredible educators who are already making an impact through TDI.
-            </p>
-          </div>
-
-          <div
-            className="flex flex-wrap justify-center gap-3 opacity-0 translate-y-8 transition-all duration-700 delay-200"
-            data-animate="true"
-          >
-            {creators.map((creator, index) => (
-              <span
-                key={creator.name}
-                className="bg-white px-4 py-2 rounded-full text-[#1e2749] font-medium shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
-                style={{ transitionDelay: `${index * 50}ms` }}
-              >
-                {creator.name}
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Your Guide Through the Process */}
       <section className="py-16 md:py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
@@ -684,6 +649,41 @@ export default function CreateWithUsPage() {
                 </p>
               </form>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* Meet Our Creators */}
+      <section className="py-16 md:py-20 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2
+              className="text-3xl md:text-4xl font-bold text-[#1e2749] mb-4 opacity-0 translate-y-8 transition-all duration-700"
+              data-animate="true"
+            >
+              Meet Our Creators
+            </h2>
+            <p
+              className="text-lg text-gray-600 max-w-2xl mx-auto opacity-0 translate-y-8 transition-all duration-700 delay-100"
+              data-animate="true"
+            >
+              Join these incredible educators who are already making an impact through TDI.
+            </p>
+          </div>
+
+          <div
+            className="flex flex-wrap justify-center gap-3 opacity-0 translate-y-8 transition-all duration-700 delay-200"
+            data-animate="true"
+          >
+            {creators.map((creator, index) => (
+              <span
+                key={creator.name}
+                className="bg-white px-4 py-2 rounded-full text-[#1e2749] font-medium shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
+                style={{ transitionDelay: `${index * 50}ms` }}
+              >
+                {creator.name}
+              </span>
+            ))}
           </div>
         </div>
       </section>
