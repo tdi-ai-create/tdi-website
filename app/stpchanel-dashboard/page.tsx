@@ -145,28 +145,19 @@ export default function StPeterChanelDashboard() {
     });
   };
 
-  // Accordion Component - accepts icon as component type or ReactNode
+  // Accordion Component
   interface AccordionProps {
     id: string;
     title: string;
     subtitle?: string;
     badge?: string;
     badgeColor?: string;
-    icon?: React.ComponentType<{ className?: string }> | React.ReactNode;
+    icon?: React.ReactNode;
     children: React.ReactNode;
   }
 
-  const Accordion = ({ id, title, subtitle, badge, badgeColor = 'bg-gray-100 text-gray-600', icon: Icon, children }: AccordionProps) => {
+  const Accordion = ({ id, title, subtitle, badge, badgeColor = 'bg-gray-100 text-gray-600', icon, children }: AccordionProps) => {
     const isOpen = openSections[id];
-
-    // Render icon - handle both component type and ReactNode
-    const renderIcon = () => {
-      if (!Icon) return null;
-      if (typeof Icon === 'function') {
-        return <Icon className="w-5 h-5 text-[#38618C]" />;
-      }
-      return <div className="text-[#38618C]">{Icon}</div>;
-    };
 
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -175,7 +166,7 @@ export default function StPeterChanelDashboard() {
           className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
         >
           <div className="flex items-center gap-3">
-            {renderIcon()}
+            {icon && <div className="text-[#38618C]">{icon}</div>}
             <div className="text-left">
               <h3 className="font-semibold text-[#1e2749]">{title}</h3>
               {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
@@ -1323,7 +1314,7 @@ export default function StPeterChanelDashboard() {
                   subtitle="On-Site Visit + Group Sessions"
                   badge="Complete"
                   badgeColor="bg-green-100 text-green-700"
-                  icon={FileText}
+                  icon={<FileText className="w-5 h-5" />}
                 >
                   <div className="pt-4 space-y-4">
                     {/* What We Did */}
@@ -1425,7 +1416,7 @@ export default function StPeterChanelDashboard() {
                   subtitle="Initial Observations + Kickoff"
                   badge="Complete"
                   badgeColor="bg-green-100 text-green-700"
-                  icon={FileText}
+                  icon={<FileText className="w-5 h-5" />}
                 >
                   <div className="pt-4 space-y-4">
                     {/* Stats Summary */}
@@ -1496,7 +1487,7 @@ export default function StPeterChanelDashboard() {
                 subtitle="19 of 19 teachers responded (100%)"
                 badge="Jan 14, 2026"
                 badgeColor="bg-blue-100 text-blue-700"
-                icon={ClipboardList}
+                icon={<ClipboardList className="w-5 h-5" />}
               >
                 <div className="pt-4 space-y-4">
                   {/* Key Stats */}
