@@ -329,96 +329,64 @@ export default function CreateWithUsPage() {
         </div>
       </section>
 
-      {/* How It Works Timeline - Alternating Layout */}
+      {/* How It Works Timeline - Horizontal Layout */}
       <section className="py-16 md:py-20 bg-gray-50 overflow-hidden">
-        <div className="max-w-4xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-6">
           <h2
-            className="text-3xl md:text-4xl font-bold text-[#1e2749] mb-16 text-center opacity-0 translate-y-8 transition-all duration-700"
+            className="text-3xl md:text-4xl font-bold text-[#1e2749] mb-12 md:mb-16 text-center opacity-0 translate-y-8 transition-all duration-700"
             data-animate="true"
           >
             How It Works
           </h2>
 
-          {/* Desktop Alternating Timeline */}
-          <div className="hidden md:block relative">
-            {/* SVG Curved Path */}
-            <svg
-              className="absolute left-1/2 top-0 -translate-x-1/2 h-full w-32 pointer-events-none"
-              viewBox="0 0 100 600"
-              preserveAspectRatio="none"
-            >
-              <path
-                d="M50 0 Q50 60 50 60 Q50 120 50 120 Q50 180 50 180 Q50 240 50 240 Q50 300 50 300 Q50 360 50 360 Q50 420 50 420 Q50 480 50 480 Q50 540 50 540 Q50 600 50 600"
-                fill="none"
-                stroke="#1e2749"
-                strokeWidth="2"
-                strokeDasharray="8 8"
-                strokeOpacity="0.3"
-              />
-            </svg>
-
-            <div className="flex flex-col gap-8">
-              {phases.map((phase, index) => (
+          {/* Desktop Horizontal Timeline */}
+          <div className="hidden md:flex items-start justify-between">
+            {phases.map((phase, index) => (
+              <div key={phase.title} className="contents">
+                {/* Phase */}
                 <div
-                  key={phase.title}
-                  className={`flex items-center gap-8 ${index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'} opacity-0 translate-y-8 transition-all duration-700`}
+                  className="group flex flex-col items-center opacity-0 translate-y-8 transition-all duration-700 hover:-translate-y-1"
                   data-animate="true"
                   style={{ transitionDelay: `${index * 150}ms` }}
                 >
-                  {/* Card */}
-                  <div className={`flex-1 ${index % 2 === 0 ? 'text-right pr-4' : 'text-left pl-4'}`}>
-                    <div
-                      className={`inline-block bg-white rounded-xl p-6 shadow-md hover:shadow-lg hover:scale-105 hover:-translate-y-1 transition-all duration-300 group max-w-sm ${index % 2 === 0 ? 'ml-auto' : 'mr-auto'}`}
-                    >
-                      <div className={`flex items-center gap-4 ${index % 2 === 0 ? 'flex-row-reverse' : 'flex-row'}`}>
-                        <div className={`w-14 h-14 ${phase.isLaunch ? 'bg-[#ffba06]' : 'bg-[#1e2749] group-hover:bg-[#ffba06]'} rounded-full flex items-center justify-center flex-shrink-0 transition-colors duration-300`}>
-                          <span className={`${phase.isLaunch ? 'text-[#1e2749]' : 'text-white group-hover:text-[#1e2749]'} transition-colors duration-300`}>
-                            {phase.icon}
-                          </span>
-                        </div>
-                        <div className={index % 2 === 0 ? 'text-right' : 'text-left'}>
-                          <h3 className="font-bold text-[#1e2749] text-lg">{phase.title}</h3>
-                          <p className="text-sm text-gray-600">{phase.description}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Center Dot */}
-                  <div className="relative z-10">
-                    <div className={`w-4 h-4 rounded-full ${phase.isLaunch ? 'bg-[#ffba06]' : 'bg-[#1e2749]'} border-4 border-gray-50`} />
-                  </div>
-
-                  {/* Spacer */}
-                  <div className="flex-1" />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Mobile Timeline */}
-          <div className="md:hidden space-y-6">
-            {phases.map((phase, index) => (
-              <div
-                key={phase.title}
-                className="flex gap-4 opacity-0 translate-y-8 transition-all duration-700"
-                data-animate="true"
-                style={{ transitionDelay: `${index * 150}ms` }}
-              >
-                <div className="flex flex-col items-center">
-                  <div className={`w-12 h-12 ${phase.isLaunch ? 'bg-[#ffba06]' : 'bg-[#1e2749]'} rounded-full flex items-center justify-center flex-shrink-0`}>
-                    <span className={phase.isLaunch ? 'text-[#1e2749]' : 'text-white'}>
+                  <div className={`w-14 h-14 ${phase.isLaunch ? 'bg-[#ffba06]' : 'bg-[#1e2749] group-hover:bg-[#ffba06]'} rounded-full flex items-center justify-center transition-colors duration-300`}>
+                    <span className={`${phase.isLaunch ? 'text-[#1e2749]' : 'text-white group-hover:text-[#1e2749]'} transition-colors duration-300`}>
                       {phase.icon}
                     </span>
                   </div>
-                  {index < phases.length - 1 && (
-                    <div className="w-0.5 flex-1 bg-[#1e2749]/20 mt-2" />
-                  )}
+                  <h3 className="font-semibold text-[#1e2749] mt-4 text-center">{phase.title}</h3>
+                  <p className="text-sm text-gray-600 text-center max-w-[150px] mt-1">{phase.description}</p>
                 </div>
-                <div className={index < phases.length - 1 ? 'pb-6' : ''}>
-                  <h3 className="font-bold text-[#1e2749]">{phase.title}</h3>
-                  <p className="text-sm text-gray-600">{phase.description}</p>
+
+                {/* Connecting Line */}
+                {index < phases.length - 1 && (
+                  <div className="hidden md:flex items-center flex-1 pt-7">
+                    <div className="w-full border-t-2 border-dashed border-[#80a4ed]" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Mobile Vertical Timeline */}
+          <div className="md:hidden space-y-8">
+            {phases.map((phase, index) => (
+              <div
+                key={phase.title}
+                className="flex flex-col items-center text-center opacity-0 translate-y-8 transition-all duration-700"
+                data-animate="true"
+                style={{ transitionDelay: `${index * 150}ms` }}
+              >
+                <div className={`w-14 h-14 ${phase.isLaunch ? 'bg-[#ffba06]' : 'bg-[#1e2749]'} rounded-full flex items-center justify-center`}>
+                  <span className={phase.isLaunch ? 'text-[#1e2749]' : 'text-white'}>
+                    {phase.icon}
+                  </span>
                 </div>
+                <h3 className="font-semibold text-[#1e2749] mt-4">{phase.title}</h3>
+                <p className="text-sm text-gray-600 max-w-[200px] mt-1">{phase.description}</p>
+                {index < phases.length - 1 && (
+                  <div className="w-0.5 h-8 bg-[#80a4ed]/30 mt-4" />
+                )}
               </div>
             ))}
           </div>
