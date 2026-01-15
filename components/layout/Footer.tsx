@@ -99,9 +99,9 @@ export function Footer() {
                   </a>
                 </li>
                 <li>
-                  <a href="https://drive.google.com/file/d/1q499mCTZxd8RJDidRZ7iKr9Ei3xssP9b/view?usp=sharing" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
+                  <Link href="/create-with-us" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
                     Become a Creator
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <a href="https://us.shaklee.com/en_US/raehughart/storefront" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline hover-color-shift" style={{ color: 'white', opacity: 0.7 }}>
