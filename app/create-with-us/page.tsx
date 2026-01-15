@@ -335,7 +335,7 @@ export default function CreateWithUsPage() {
                 <p className="text-sm text-gray-500 mb-3">
                   Select all that interest you.
                 </p>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {contentTypes.map((type) => (
                     <label key={type.id} className="flex items-center gap-3 cursor-pointer group">
                       <input
