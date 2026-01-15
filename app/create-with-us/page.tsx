@@ -322,7 +322,7 @@ export default function CreateWithUsPage() {
             <div className="md:w-2/3 relative">
               <span className="absolute -top-4 -left-2 text-6xl text-[#ffba06] opacity-30 font-serif leading-none">"</span>
               <p className="text-lg md:text-xl text-gray-600 italic pl-6 md:pl-8">
-                Feeling unsure where to start? That's exactly why I'm here. I walk every creator through the entire process—from your first idea to your published course. You bring the strategy, and I'll handle the rest.
+                Feeling unsure where to start? That's exactly why I'm here. I walk every creator through the entire process, from your first idea to your published course. You bring the strategy, and I'll handle the rest.
               </p>
             </div>
           </div>
