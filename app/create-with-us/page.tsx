@@ -500,7 +500,7 @@ export default function CreateWithUsPage() {
                   value={formState.strategy}
                   onChange={(e) => setFormState(prev => ({ ...prev, strategy: e.target.value }))}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent transition-colors resize-none"
-                  placeholder="I've developed a 5-minute morning routine that helps my students settle in and start focused..."
+                  placeholder="Tell us about yourself and the strategies you'd love to share."
                 />
               </div>
 
