@@ -151,7 +151,7 @@ export default function CreateWithUsPage() {
               Why Create for TDI?
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Your expertise deserves a platform. Here's what you get when you join our creator team.
+              You don't need to be an 'expert.' If you do something in your classroom that works for you and your students, that's worth sharing.
             </p>
           </div>
 
@@ -162,9 +162,9 @@ export default function CreateWithUsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-[#1e2749] mb-3">Reach 87,000+ Educators</h3>
+              <h3 className="text-xl font-semibold text-[#1e2749] mb-3">You Already Have Something to Share</h3>
               <p className="text-gray-600">
-                Your content reaches our engaged community of teachers across 21 states who are actively seeking practical strategies.
+                That morning routine that settles your class. The grading hack that saves you hours. The parent communication strategy that actually works. If you do it regularly and it helps, other teachers need to hear about it.
               </p>
             </div>
 
@@ -174,9 +174,9 @@ export default function CreateWithUsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-[#1e2749] mb-3">Share What Works</h3>
+              <h3 className="text-xl font-semibold text-[#1e2749] mb-3">A True Partnership</h3>
               <p className="text-gray-600">
-                You've developed strategies that save time and reduce stress. Now help other teachers implement them in their classrooms.
+                This isn't just about creating content for us. Promote your social media, website, podcast, or other offerings directly within your content. We highlight you, and you grow your own platform too.
               </p>
             </div>
 
@@ -186,9 +186,9 @@ export default function CreateWithUsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-[#1e2749] mb-3">Build Your Brand</h3>
+              <h3 className="text-xl font-semibold text-[#1e2749] mb-3">Reach 87,000+ Educators</h3>
               <p className="text-gray-600">
-                Establish yourself as a thought leader in education while contributing to a movement that's transforming how teachers experience their profession.
+                Your strategies reach our engaged community of teachers across 21 states who are actively looking for practical, real-world solutions from educators like you.
               </p>
             </div>
           </div>
