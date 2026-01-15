@@ -207,17 +207,11 @@ export default function CreateWithUsPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="flex flex-wrap justify-center gap-3">
             {creators.map((creator) => (
-              <div key={creator.name} className="bg-white rounded-xl p-6 text-center shadow-sm">
-                <div className="w-16 h-16 bg-[#80a4ed] rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <h3 className="font-semibold text-[#1e2749]">{creator.name}</h3>
-                <p className="text-sm text-gray-500">{creator.role}</p>
-              </div>
+              <span key={creator.name} className="bg-white px-4 py-2 rounded-full text-[#1e2749] font-medium shadow-sm">
+                {creator.name}
+              </span>
             ))}
           </div>
         </div>
