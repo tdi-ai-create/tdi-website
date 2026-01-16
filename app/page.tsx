@@ -16,7 +16,7 @@ export default function Home() {
         <div className="container-default">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: '#ffba06' }}>
-              TDI helps you support your entire team
+              TDI helps you support
             </h2>
             <p className="text-lg md:text-xl mb-6" style={{ color: '#ffffff', opacity: 0.9 }}>
               Teachers. Administrators. Paraprofessionals. Instructional coaches. All kinds of educators who refuse to accept that professional development is only for core teachers and one-day trainings that don't clearly affect school and student outcomes.
