@@ -221,84 +221,6 @@ export default function CreateWithUsPage() {
         </div>
       </section>
 
-      {/* Why Create for TDI - Numbered Editorial Layout */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2
-              className="text-3xl md:text-4xl font-bold text-[#1e2749] mb-4 opacity-0 translate-y-8 transition-all duration-700"
-              data-animate="true"
-            >
-              Why Create for TDI?
-            </h2>
-            <p
-              className="text-lg text-gray-600 max-w-2xl mx-auto opacity-0 translate-y-8 transition-all duration-700 delay-100"
-              data-animate="true"
-            >
-              You don't need to be an 'expert.' If you do something in your classroom that works, that's worth sharing.
-            </p>
-          </div>
-
-          <div className="divide-y divide-gray-200">
-            {/* Item 01 */}
-            <div
-              className="group flex flex-col md:flex-row md:gap-8 items-start py-8 md:py-10 opacity-0 translate-y-8 transition-all duration-700"
-              data-animate="true"
-            >
-              <span className="text-5xl md:text-7xl font-bold text-[#ffba06] leading-none md:w-24 shrink-0 mb-4 md:mb-0 group-hover:translate-x-1 transition-transform duration-300">
-                01
-              </span>
-              <div className="flex-1">
-                <h3 className="text-xl md:text-2xl font-bold text-[#1e2749] mb-3 group-hover:text-[#80a4ed] transition-colors duration-300">
-                  You Already Have Something to Share
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  That morning routine that settles your class. The grading hack that saves you hours. The parent communication strategy that actually works. If you do it regularly and it helps, other teachers need to hear about it.
-                </p>
-              </div>
-            </div>
-
-            {/* Item 02 */}
-            <div
-              className="group flex flex-col md:flex-row md:gap-8 items-start py-8 md:py-10 opacity-0 translate-y-8 transition-all duration-700"
-              data-animate="true"
-              style={{ transitionDelay: '150ms' }}
-            >
-              <span className="text-5xl md:text-7xl font-bold text-[#ffba06] leading-none md:w-24 shrink-0 mb-4 md:mb-0 group-hover:translate-x-1 transition-transform duration-300">
-                02
-              </span>
-              <div className="flex-1">
-                <h3 className="text-xl md:text-2xl font-bold text-[#1e2749] mb-3 group-hover:text-[#80a4ed] transition-colors duration-300">
-                  A True Partnership
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  This isn't just about creating content for us. Promote your social media, website, podcast, or other offerings directly within your content. We highlight you, and you grow your own platform too.
-                </p>
-              </div>
-            </div>
-
-            {/* Item 03 */}
-            <div
-              className="group flex flex-col md:flex-row md:gap-8 items-start py-8 md:py-10 opacity-0 translate-y-8 transition-all duration-700"
-              data-animate="true"
-              style={{ transitionDelay: '300ms' }}
-            >
-              <span className="text-5xl md:text-7xl font-bold text-[#ffba06] leading-none md:w-24 shrink-0 mb-4 md:mb-0 group-hover:translate-x-1 transition-transform duration-300">
-                03
-              </span>
-              <div className="flex-1">
-                <h3 className="text-xl md:text-2xl font-bold text-[#1e2749] mb-3 group-hover:text-[#80a4ed] transition-colors duration-300">
-                  Reach 87,000+ Educators
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Your strategies reach our engaged community of teachers across 21 states who are actively looking for practical, real-world solutions from educators like you.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Your Guide Through the Process */}
       <section className="py-16 md:py-20 bg-white">
         <div className="max-w-4xl mx-auto px-6">
@@ -668,6 +590,84 @@ export default function CreateWithUsPage() {
                 {creator.name}
               </span>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Create for TDI - Numbered Editorial Layout */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2
+              className="text-3xl md:text-4xl font-bold text-[#1e2749] mb-4 opacity-0 translate-y-8 transition-all duration-700"
+              data-animate="true"
+            >
+              Why Create for TDI?
+            </h2>
+            <p
+              className="text-lg text-gray-600 max-w-2xl mx-auto opacity-0 translate-y-8 transition-all duration-700 delay-100"
+              data-animate="true"
+            >
+              You don't need to be an 'expert.' If you do something in your classroom that works, that's worth sharing.
+            </p>
+          </div>
+
+          <div className="divide-y divide-gray-200">
+            {/* Item 01 */}
+            <div
+              className="group flex flex-col md:flex-row md:gap-8 items-start py-8 md:py-10 opacity-0 translate-y-8 transition-all duration-700"
+              data-animate="true"
+            >
+              <span className="text-5xl md:text-7xl font-bold text-[#ffba06] leading-none md:w-24 shrink-0 mb-4 md:mb-0 group-hover:translate-x-1 transition-transform duration-300">
+                01
+              </span>
+              <div className="flex-1">
+                <h3 className="text-xl md:text-2xl font-bold text-[#1e2749] mb-3 group-hover:text-[#80a4ed] transition-colors duration-300">
+                  You Already Have Something to Share
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  That morning routine that settles your class. The grading hack that saves you hours. The parent communication strategy that actually works. If you do it regularly and it helps, other teachers need to hear about it.
+                </p>
+              </div>
+            </div>
+
+            {/* Item 02 */}
+            <div
+              className="group flex flex-col md:flex-row md:gap-8 items-start py-8 md:py-10 opacity-0 translate-y-8 transition-all duration-700"
+              data-animate="true"
+              style={{ transitionDelay: '150ms' }}
+            >
+              <span className="text-5xl md:text-7xl font-bold text-[#ffba06] leading-none md:w-24 shrink-0 mb-4 md:mb-0 group-hover:translate-x-1 transition-transform duration-300">
+                02
+              </span>
+              <div className="flex-1">
+                <h3 className="text-xl md:text-2xl font-bold text-[#1e2749] mb-3 group-hover:text-[#80a4ed] transition-colors duration-300">
+                  A True Partnership
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  This isn't just about creating content for us. Promote your social media, website, podcast, or other offerings directly within your content. We highlight you, and you grow your own platform too.
+                </p>
+              </div>
+            </div>
+
+            {/* Item 03 */}
+            <div
+              className="group flex flex-col md:flex-row md:gap-8 items-start py-8 md:py-10 opacity-0 translate-y-8 transition-all duration-700"
+              data-animate="true"
+              style={{ transitionDelay: '300ms' }}
+            >
+              <span className="text-5xl md:text-7xl font-bold text-[#ffba06] leading-none md:w-24 shrink-0 mb-4 md:mb-0 group-hover:translate-x-1 transition-transform duration-300">
+                03
+              </span>
+              <div className="flex-1">
+                <h3 className="text-xl md:text-2xl font-bold text-[#1e2749] mb-3 group-hover:text-[#80a4ed] transition-colors duration-300">
+                  Reach 87,000+ Educators
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Your strategies reach our engaged community of teachers across 21 states who are actively looking for practical, real-world solutions from educators like you.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
