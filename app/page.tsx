@@ -11,15 +11,18 @@ export default function Home() {
       {/* SECTION 1: Hero */}
       <ParallaxHero />
 
-      {/* SECTION 1.5: Who Joins TDI? - Identity Section */}
+      {/* SECTION 1.5: TDI helps you support your entire team */}
       <section className="py-12 md:py-16" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: '#ffba06' }}>
-              Who Joins TDI?
+              TDI helps you support your entire team
             </h2>
-            <p className="text-lg md:text-xl" style={{ color: '#ffffff', opacity: 0.9 }}>
-              Teachers. Administrators. Paraprofessionals. Instructional coaches. All kinds of educators who refuse to accept burnout as "just part of the job." People building 20-year careers in education, not just surviving semesters. The ones who believe sustainable work is possible. And they're proving it every day.
+            <p className="text-lg md:text-xl mb-6" style={{ color: '#ffffff', opacity: 0.9 }}>
+              Teachers. Administrators. Paraprofessionals. Instructional coaches. All kinds of educators who refuse to accept that professional development is only for core teachers and one-day trainings that don't clearly affect school and student outcomes.
+            </p>
+            <p className="text-base md:text-lg" style={{ color: '#ffffff', opacity: 0.75 }}>
+              We help admins support their staff in building 20-year careers in education—not just surviving semesters—through measurable outcomes that matter.
             </p>
           </div>
         </div>
@@ -58,39 +61,39 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Solution Features */}
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="text-center flex flex-col items-center">
+          {/* Three Differentiators */}
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="bg-gray-50 rounded-xl p-6 text-center flex flex-col items-center hover:shadow-lg transition-shadow">
               <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#ffba06' }}>
                 <svg className="w-6 h-6" fill="#1e2749" viewBox="0 0 24 24">
                   <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
               </div>
-              <h4 className="font-bold mb-2 h-14 flex items-center justify-center" style={{ color: '#1e2749' }}>Action-Focused Strategies</h4>
+              <h4 className="font-bold mb-3" style={{ color: '#1e2749' }}>Action-Focused Strategies</h4>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Tools you can use Monday morning. No fluff, no theory for theory's sake.
+                Real tools you can use Monday morning. We present theory and help teachers see exactly how to apply it to their classroom in real time.
               </p>
             </div>
-            <div className="text-center flex flex-col items-center">
+            <div className="bg-gray-50 rounded-xl p-6 text-center flex flex-col items-center hover:shadow-lg transition-shadow">
               <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#ffba06' }}>
                 <svg className="w-6 h-6" fill="#1e2749" viewBox="0 0 24 24">
-                  <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                  <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
                 </svg>
               </div>
-              <h4 className="font-bold mb-2 h-14 flex items-center justify-center" style={{ color: '#1e2749' }}>Respects<br />Your Time</h4>
+              <h4 className="font-bold mb-3" style={{ color: '#1e2749' }}>Bottom-Up Approach</h4>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Flipped PD model. Learn on your schedule. No more losing Saturdays.
+                A PD model that isn't just created by admins but actually asks teachers what they need. Customized support for individual departments or groups of staff. Daily, easy-to-digest learning happens all year round.
               </p>
             </div>
-            <div className="text-center flex flex-col items-center">
+            <div className="bg-gray-50 rounded-xl p-6 text-center flex flex-col items-center hover:shadow-lg transition-shadow">
               <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#ffba06' }}>
                 <svg className="w-6 h-6" fill="#1e2749" viewBox="0 0 24 24">
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                 </svg>
               </div>
-              <h4 className="font-bold mb-2 h-14 flex items-center justify-center" style={{ color: '#1e2749' }}>Wellness<br />Built In</h4>
+              <h4 className="font-bold mb-3" style={{ color: '#1e2749' }}>Wellness Built In</h4>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                You can't pour from an empty cup. Self-care isn't selfish, it's survival.
+                Where most PD fails, TDI leans in. We focus on the whole teacher—which supports better student outcomes in addition to curriculum and teaching theory.
               </p>
             </div>
           </div>
@@ -107,12 +110,49 @@ export default function Home() {
         ]}
       />
 
-      {/* SECTION 5: Testimonials */}
-      <section className="section" style={{ backgroundColor: '#f5f5f5' }}>
+      {/* SECTION 5a: What Admins Are Saying */}
+      <section className="py-12 md:py-16" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-wide">
-          <h2 className="text-center mb-12" style={{ color: '#1e2749' }}>What Educators Are Saying</h2>
+          <h2 className="text-center mb-8" style={{ color: '#1e2749' }}>What Admins Are Saying</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="rounded-xl p-6 hover-card" style={{ backgroundColor: '#1e2749' }}>
+              <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
+                "TDI transformed how our teachers engage with professional development."
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>— Principal, Louisiana</p>
+            </div>
+
+            <div className="rounded-xl p-6 hover-card" style={{ backgroundColor: '#1e2749' }}>
+              <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
+                "Finally, PD that my staff actually looks forward to."
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>— Assistant Superintendent, Illinois</p>
+            </div>
+
+            <div className="rounded-xl p-6 hover-card" style={{ backgroundColor: '#1e2749' }}>
+              <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
+                "The implementation support made all the difference."
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>— Curriculum Director, Texas</p>
+            </div>
+
+            <div className="rounded-xl p-6 hover-card" style={{ backgroundColor: '#1e2749' }}>
+              <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
+                "Our retention improved within the first year."
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>— School Administrator, California</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 5b: What Educators Are Saying */}
+      <section className="py-12 md:py-16" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-wide">
+          <h2 className="text-center mb-8" style={{ color: '#1e2749' }}>What Educators Are Saying</h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="rounded-xl p-8 hover-card" style={{ backgroundColor: '#80a4ed' }}>
               <p className="text-lg italic mb-4" style={{ color: '#ffffff' }}>
                 "I finally feel like I have strategies that work AND time to breathe. TDI changed how I approach my classroom and myself."
@@ -148,10 +188,10 @@ export default function Home() {
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
-            How TDI Develops Solutions
+            How TDI Helps Admins Create Real Solutions
           </h2>
           <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
-            Built by educators. Implemented by schools.
+            Built by educators. Measured for impact.
           </p>
 
           {/* Floating Bubbles Container */}
@@ -185,7 +225,7 @@ export default function Home() {
                   className="text-sm max-w-32 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
                   style={{ color: '#1e2749', opacity: 0.7 }}
                 >
-                  Teachers identify what they need
+                  TDI helps teachers identify what they need
                 </p>
               </div>
 
@@ -202,11 +242,11 @@ export default function Home() {
                   className="text-sm max-w-32 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
                   style={{ color: '#1e2749', opacity: 0.7 }}
                 >
-                  Experts<br />team up
+                  TDI curates education experts and industry leaders
                 </p>
               </div>
 
-              {/* Step 3 - Design */}
+              {/* Step 3 - Implement */}
               <div className="flex flex-col items-center text-center group relative z-10">
                 <div
                   className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold mb-3 transition-all group-hover:scale-110"
@@ -214,16 +254,16 @@ export default function Home() {
                 >
                   3
                 </div>
-                <h4 className="font-bold mb-1" style={{ color: '#1e2749' }}>Design</h4>
+                <h4 className="font-bold mb-1" style={{ color: '#1e2749' }}>Implement</h4>
                 <p
                   className="text-sm max-w-32 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
                   style={{ color: '#1e2749', opacity: 0.7 }}
                 >
-                  Research-backed, actionable tools
+                  Year-round support ensures teachers use what they learn
                 </p>
               </div>
 
-              {/* Step 4 - Publish */}
+              {/* Step 4 - Measure */}
               <div className="flex flex-col items-center text-center group relative z-10">
                 <div
                   className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold mb-3 transition-all group-hover:scale-110"
@@ -231,29 +271,12 @@ export default function Home() {
                 >
                   4
                 </div>
-                <h4 className="font-bold mb-1" style={{ color: '#1e2749' }}>Publish</h4>
+                <h4 className="font-bold mb-1" style={{ color: '#1e2749' }}>Measure</h4>
                 <p
                   className="text-sm max-w-32 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
                   style={{ color: '#1e2749', opacity: 0.7 }}
                 >
-                  Live in the<br />Learning Hub
-                </p>
-              </div>
-
-              {/* Step 5 - Deliver */}
-              <div className="flex flex-col items-center text-center group relative z-10">
-                <div
-                  className="w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center text-xl md:text-2xl font-bold mb-3 transition-all group-hover:scale-110"
-                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                >
-                  5
-                </div>
-                <h4 className="font-bold mb-1" style={{ color: '#1e2749' }}>Deliver</h4>
-                <p
-                  className="text-sm max-w-32 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-200"
-                  style={{ color: '#1e2749', opacity: 0.7 }}
-                >
-                  Ready to use Monday morning
+                  Ongoing feedback loops and KPI tracking show real progress
                 </p>
               </div>
 

@@ -16,8 +16,8 @@ export function Header() {
 
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/join', label: 'Join' },
     { href: '/for-schools', label: 'For Schools' },
+    { href: '/join', label: 'For Teachers' },
     { href: '/how-we-partner', label: 'How We Partner' },
     { href: 'https://raehughart.substack.com', label: 'Blog', external: true },
     { href: 'https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274', label: 'Podcast', external: true },

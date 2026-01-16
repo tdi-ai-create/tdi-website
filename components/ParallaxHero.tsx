@@ -74,34 +74,35 @@ export function ParallaxHero() {
         className="relative z-10 h-full flex items-center justify-start will-change-transform"
       >
         <div className="ml-8 md:ml-16 lg:ml-20 xl:ml-24">
-          <div className="max-w-md md:max-w-lg">
+          <div className="max-w-md md:max-w-xl">
             <h1
-              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 leading-tight"
+              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight"
               style={{ color: '#ffffff' }}
             >
-              You're the<br className="md:hidden" /> Leader Who<br className="md:hidden" /> Notices.
+              Research-Backed Professional Development for School Leaders
             </h1>
 
-            <p
-              className="text-base md:text-lg font-semibold mb-4"
-              style={{ color: '#ffba06' }}
-            >
-              Research-Backed. Expert-Designed. Educator-Focused. Admin-Approved.
-            </p>
-
-            <p
-              className="text-sm md:text-base mb-2 leading-relaxed"
-              style={{ color: '#ffffff', opacity: 0.9 }}
-            >
-              <span className="font-bold">Now let's do something about it.</span><br />TDI helps you support your teachers in ways that actually stick, so they stay, grow, and your students feel the difference.
-            </p>
-
-            <p
-              className="text-xs md:text-sm mb-6 font-bold"
-              style={{ color: '#ffffff', opacity: 0.8 }}
-            >
-              Join 87,000+ educators who are done accepting the status quo.
-            </p>
+            {/* Value Props - 3 phrases */}
+            <div className="flex flex-col gap-3 mb-6">
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#ffba06' }} />
+                <p className="text-sm md:text-base" style={{ color: '#ffffff', opacity: 0.95 }}>
+                  Creates a clear path to student and school outcomes admins care about
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#ffba06' }} />
+                <p className="text-sm md:text-base" style={{ color: '#ffffff', opacity: 0.95 }}>
+                  Proven methods designed by education experts across multiple disciplines
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#ffba06' }} />
+                <p className="text-sm md:text-base" style={{ color: '#ffffff', opacity: 0.95 }}>
+                  Instantly applicable learning for teachers, support staff, and specialists
+                </p>
+              </div>
+            </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
               <a

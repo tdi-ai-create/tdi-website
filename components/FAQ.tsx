@@ -8,22 +8,22 @@ interface FAQItem {
 }
 
 const faqs: FAQItem[] = [
-  // Priority questions (shown on homepage)
+  // Priority questions - Admin-focused (shown on homepage)
+  {
+    question: "My teachers already have so much on their plate. How does TDI avoid adding more?",
+    answer: "TDI replaces ineffective PD—it doesn't pile on top of it. Our micro-learning format fits into existing schedules with daily 5-10 minute sessions instead of day-long workshops that pull teachers from classrooms."
+  },
+  {
+    question: "I'm trying to avoid teacher burnout. How does TDI address this?",
+    answer: "Burnout happens when teachers feel unsupported and overwhelmed. TDI builds wellness into every course, teaches practical time-saving strategies, and creates a community where educators feel seen. Our partner schools report stress levels dropping from 9/10 to 5-7/10 within months."
+  },
+  {
+    question: "How do I get teacher buy-in for another PD program?",
+    answer: "Teachers resist PD that wastes their time. TDI's 65% implementation rate (vs. 10% industry average) exists because our content is immediately applicable. We also recommend starting with teacher input surveys so staff feel heard from day one."
+  },
   {
     question: "What makes TDI different from other PD?",
     answer: "TDI uses a flipped model. You learn strategies on your own time through bite-sized videos, then we focus live sessions on implementation and problem-solving. No more sitting through hours of PowerPoints. Our content is created by teachers who've been in the trenches, not consultants who haven't been in a classroom in years."
-  },
-  {
-    question: "Is this just another thing on my plate?",
-    answer: "We get it. Teachers are already stretched thin. TDI is designed to save you time, not add to your workload. Our resources are ready to use Monday morning with zero prep required. Most educators tell us they actually reclaim hours each week by implementing our strategies. This is about working smarter, not harder."
-  },
-  {
-    question: "I'm already burned out. Do I have the energy for this?",
-    answer: "If you're burned out, you're exactly who we built this for. TDI started because our founder hit that wall too. We don't ask you to do more. We help you do things differently so you can breathe again. Start small. One strategy. One course. Many teachers tell us that's all it took to feel a shift."
-  },
-  {
-    question: "What if my admin won't support it?",
-    answer: "Many teachers start with TDI on their own and see results that speak for themselves. When administrators see improved classroom management, reduced stress, and better student outcomes, they often become advocates. We also offer resources specifically for sharing TDI's value with school leadership, and our team is happy to connect with your admin directly."
   },
   {
     question: "How much does it cost?",
