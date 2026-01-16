@@ -221,43 +221,6 @@ export default function CreateWithUsPage() {
         </div>
       </section>
 
-      {/* Your Guide Through the Process */}
-      <section className="py-16 md:py-20 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
-          <h2
-            className="text-3xl md:text-4xl font-bold text-[#1e2749] mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
-            data-animate="true"
-          >
-            Your Guide Through the Process
-          </h2>
-
-          <div
-            className="flex flex-col md:flex-row md:items-center md:gap-12 lg:gap-16 opacity-0 translate-y-8 transition-all duration-700 delay-150"
-            data-animate="true"
-          >
-            {/* Left side - Photo + Name + Title */}
-            <div className="md:w-1/3 text-center md:text-left mb-8 md:mb-0">
-              <div className="w-24 h-24 bg-[#80a4ed] rounded-full flex items-center justify-center mx-auto md:mx-0 mb-4 hover:scale-105 transition-transform duration-300">
-                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                </svg>
-              </div>
-              <h3 className="text-2xl font-bold text-[#1e2749] mb-1">Rachel Patragas</h3>
-              <p className="text-[#80a4ed] font-medium mb-3">Director of Creative Solutions</p>
-              <div className="w-16 h-1 bg-[#ffba06] mx-auto md:mx-0" />
-            </div>
-
-            {/* Right side - Quote */}
-            <div className="md:w-2/3 relative">
-              <span className="absolute -top-4 -left-2 text-6xl text-[#ffba06] opacity-30 font-serif leading-none">"</span>
-              <p className="text-lg md:text-xl text-gray-600 italic pl-6 md:pl-8">
-                Feeling unsure where to start? That's exactly why I'm here. I walk every creator through the entire process, from your first idea to your published course. You bring the strategy, and I'll handle the rest.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* How It Works Timeline - Horizontal Layout */}
       <section className="py-16 md:py-20 bg-gray-50 overflow-hidden">
         <div className="max-w-6xl mx-auto px-6">
@@ -318,6 +281,43 @@ export default function CreateWithUsPage() {
                 )}
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Your Guide Through the Process */}
+      <section className="py-16 md:py-20 bg-white">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2
+            className="text-3xl md:text-4xl font-bold text-[#1e2749] mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
+            data-animate="true"
+          >
+            Your Guide Through the Process
+          </h2>
+
+          <div
+            className="flex flex-col md:flex-row md:items-center md:gap-12 lg:gap-16 opacity-0 translate-y-8 transition-all duration-700 delay-150"
+            data-animate="true"
+          >
+            {/* Left side - Photo + Name + Title */}
+            <div className="md:w-1/3 text-center md:text-left mb-8 md:mb-0">
+              <div className="w-24 h-24 bg-[#80a4ed] rounded-full flex items-center justify-center mx-auto md:mx-0 mb-4 hover:scale-105 transition-transform duration-300">
+                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-[#1e2749] mb-1">Rachel Patragas</h3>
+              <p className="text-[#80a4ed] font-medium mb-3">Director of Creative Solutions</p>
+              <div className="w-16 h-1 bg-[#ffba06] mx-auto md:mx-0" />
+            </div>
+
+            {/* Right side - Quote */}
+            <div className="md:w-2/3 relative">
+              <span className="absolute -top-4 -left-2 text-6xl text-[#ffba06] opacity-30 font-serif leading-none">"</span>
+              <p className="text-lg md:text-xl text-gray-600 italic pl-6 md:pl-8">
+                Feeling unsure where to start? That's exactly why I'm here. I walk every creator through the entire process, from your first idea to your published course. You bring the strategy, and I'll handle the rest.
+              </p>
+            </div>
           </div>
         </div>
       </section>
