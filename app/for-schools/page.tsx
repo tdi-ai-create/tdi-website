@@ -438,7 +438,7 @@ export default function ForSchoolsPage() {
                   Curriculum
                 </p>
                 <p className="text-xs mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, lineHeight: '1.4' }}>
-                  PD that works with what you're already doing—and actually gets used.
+                  PD that works with what you're already doing, and actually gets used.
                 </p>
                 <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
                   Take the PD Quiz →

@@ -11,7 +11,7 @@ const faqs: FAQItem[] = [
   // Priority questions - Admin-focused (shown on homepage)
   {
     question: "My teachers already have so much on their plate. How does TDI avoid adding more?",
-    answer: "TDI replaces ineffective PD—it doesn't pile on top of it. Our micro-learning format fits into existing schedules with daily 5-10 minute sessions instead of day-long workshops that pull teachers from classrooms."
+    answer: "TDI replaces ineffective PD, it doesn't pile on top of it. Our micro-learning format fits into existing schedules with daily 5-10 minute sessions instead of day-long workshops that pull teachers from classrooms."
   },
   {
     question: "I'm trying to avoid teacher burnout. How does TDI address this?",

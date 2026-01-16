@@ -76,14 +76,14 @@ export function ParallaxHero() {
         <div className="ml-8 md:ml-16 lg:ml-20 xl:ml-24">
           <div className="max-w-md md:max-w-xl">
             <h1
-              className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 leading-tight"
+              className="text-2xl md:text-3xl lg:text-4xl font-bold mb-4 leading-snug"
               style={{ color: '#ffffff' }}
             >
               Research-Backed Professional Development for School Leaders
             </h1>
 
             {/* Value Props - 3 phrases */}
-            <div className="flex flex-col gap-3 mb-6">
+            <div className="flex flex-col gap-2 mb-4">
               <div className="flex items-start gap-3">
                 <div className="w-2 h-2 rounded-full mt-2 flex-shrink-0" style={{ backgroundColor: '#ffba06' }} />
                 <p className="text-sm md:text-base" style={{ color: '#ffffff', opacity: 0.95 }}>

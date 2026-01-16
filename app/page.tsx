@@ -22,7 +22,7 @@ export default function Home() {
               Teachers. Administrators. Paraprofessionals. Instructional coaches. All kinds of educators who refuse to accept that professional development is only for core teachers and one-day trainings that don't clearly affect school and student outcomes.
             </p>
             <p className="text-base md:text-lg" style={{ color: '#ffffff', opacity: 0.75 }}>
-              We help admins support their staff in building 20-year careers in education—not just surviving semesters—through measurable outcomes that matter.
+              We help admins support their staff in building 20-year careers in education, not just surviving semesters, through measurable outcomes that matter.
             </p>
           </div>
         </div>
@@ -93,7 +93,7 @@ export default function Home() {
               </div>
               <h4 className="font-bold mb-3" style={{ color: '#1e2749' }}>Wellness Built In</h4>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Where most PD fails, TDI leans in. We focus on the whole teacher—which supports better student outcomes in addition to curriculum and teaching theory.
+                Where most PD fails, TDI leans in. We focus on the whole teacher, which supports better student outcomes in addition to curriculum and teaching theory.
               </p>
             </div>
           </div>
@@ -120,28 +120,28 @@ export default function Home() {
               <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
                 "TDI transformed how our teachers engage with professional development."
               </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>— Principal, Louisiana</p>
+              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>- Principal, Louisiana</p>
             </div>
 
             <div className="rounded-xl p-6 hover-card" style={{ backgroundColor: '#1e2749' }}>
               <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
                 "Finally, PD that my staff actually looks forward to."
               </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>— Assistant Superintendent, Illinois</p>
+              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>- Assistant Superintendent, Illinois</p>
             </div>
 
             <div className="rounded-xl p-6 hover-card" style={{ backgroundColor: '#1e2749' }}>
               <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
                 "The implementation support made all the difference."
               </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>— Curriculum Director, Texas</p>
+              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>- Curriculum Director, Texas</p>
             </div>
 
             <div className="rounded-xl p-6 hover-card" style={{ backgroundColor: '#1e2749' }}>
               <p className="text-base italic mb-4" style={{ color: '#ffffff' }}>
                 "Our retention improved within the first year."
               </p>
-              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>— School Administrator, California</p>
+              <p className="text-sm font-semibold" style={{ color: '#ffba06' }}>- School Administrator, California</p>
             </div>
           </div>
         </div>
