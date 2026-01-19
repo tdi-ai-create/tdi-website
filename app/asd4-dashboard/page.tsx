@@ -9,7 +9,6 @@ import {
   FileText,
   Users,
   CheckCircle,
-  Clock,
   AlertCircle,
   Calendar,
   TrendingUp,
@@ -23,12 +22,8 @@ import {
   ChevronRight,
   Star,
   Sparkles,
-  ClipboardList,
   Lightbulb,
-  Award,
-  ExternalLink,
-  Mail,
-  Phone
+  Mail
 } from 'lucide-react';
 
 // Partnership Phases
@@ -208,38 +203,8 @@ export default function ASD4Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
-      {/* Header */}
-      <nav className="bg-[#1e2749] sticky top-0 z-50 shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-4">
-              <span className="bg-white text-[#1e2749] px-3 py-1 rounded text-sm font-extrabold tracking-wide">TDI</span>
-              <div className="hidden sm:block">
-                <h1 className="text-white font-semibold">{partnershipData.partner}</h1>
-                <p className="text-white/60 text-xs">{partnershipData.partnershipType}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link
-                href="/asd4-dashboard/partner-data"
-                className="bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
-              >
-                <ClipboardList className="w-4 h-4" />
-                <span className="hidden sm:inline">Partner Data</span>
-              </Link>
-              <Link
-                href="/"
-                className="text-white/80 hover:text-white text-sm"
-              >
-                TDI Home
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
-
       {/* Tab Navigation */}
-      <div className="bg-white border-b border-gray-200 sticky top-16 z-40">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-1 overflow-x-auto py-2">
             {tabs.map((tab) => (
