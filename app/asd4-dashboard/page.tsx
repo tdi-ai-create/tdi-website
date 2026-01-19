@@ -248,8 +248,8 @@ export default function ASD4Dashboard() {
                       </div>
                     </div>
                   </div>
-                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
-                    Click to Complete
+                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
+                    Complete Form
                   </span>
                 </a>
 
@@ -267,8 +267,8 @@ export default function ASD4Dashboard() {
                       </div>
                     </div>
                   </div>
-                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
-                    Click to Select
+                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
+                    Identify Pilot Group
                   </span>
                 </a>
 
@@ -288,9 +288,9 @@ export default function ASD4Dashboard() {
                       </div>
                     </div>
                   </div>
-                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
+                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
-                    Click to Schedule
+                    Schedule
                   </span>
                 </a>
 
@@ -310,9 +310,9 @@ export default function ASD4Dashboard() {
                       </div>
                     </div>
                   </div>
-                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
+                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
-                    Click to Schedule
+                    Schedule
                   </span>
                 </a>
 
@@ -335,7 +335,7 @@ export default function ASD4Dashboard() {
                       </div>
                     </div>
                   </div>
-                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
+                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Schedule
                   </span>
@@ -357,7 +357,7 @@ export default function ASD4Dashboard() {
                       </div>
                     </div>
                   </div>
-                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
+                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Schedule
                   </span>
@@ -379,7 +379,7 @@ export default function ASD4Dashboard() {
                       </div>
                     </div>
                   </div>
-                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
+                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Schedule
                   </span>
@@ -401,7 +401,7 @@ export default function ASD4Dashboard() {
                       </div>
                     </div>
                   </div>
-                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
+                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Schedule
                   </span>
@@ -423,7 +423,7 @@ export default function ASD4Dashboard() {
                       </div>
                     </div>
                   </div>
-                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
+                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
                     Schedule
                   </span>
