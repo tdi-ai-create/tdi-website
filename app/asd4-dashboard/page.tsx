@@ -24,7 +24,12 @@ import {
   Star,
   Sparkles,
   Lightbulb,
-  Mail
+  Mail,
+  ClipboardList,
+  Clock,
+  Eye,
+  MessageCircle,
+  Info
 } from 'lucide-react';
 
 // Partnership Phases
@@ -71,7 +76,9 @@ const partnershipData = {
   healthScore: 85,
   currentPhase: 'Foundation',
   hubLogins: 91,
-  parasNotLoggedIn: 26
+  parasNotLoggedIn: 26,
+  pilotGroupTarget: 15,
+  pilotGroupSelected: 0
 };
 
 // Timeline Events
@@ -142,6 +149,14 @@ const needsAttention = [
     description: 'Help us personalize your experience',
     priority: 'high',
     link: '/asd4-dashboard/partner-data'
+  },
+  {
+    type: 'action',
+    title: 'Identify Pilot Group',
+    description: 'Select 10-20 paras for focused observation & coaching',
+    priority: 'high',
+    link: '/asd4-dashboard/pilot-selection',
+    due: 'FEB 2026'
   },
   {
     type: 'info',
@@ -286,19 +301,30 @@ export default function ASD4Dashboard() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white rounded-xl p-4 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Heart className="w-5 h-5 text-green-600" />
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Users className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-[#1e2749]">{partnershipData.healthScore}%</p>
-                    <p className="text-xs text-gray-500">Health Score</p>
+                    <p className="text-2xl font-bold text-[#1e2749]">{partnershipData.participantCount}</p>
+                    <p className="text-xs text-gray-500">Paras with Hub Access</p>
                   </div>
                 </div>
               </div>
               <div className="bg-white rounded-xl p-4 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Users className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <Target className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-[#1e2749]">{partnershipData.pilotGroupSelected}/{partnershipData.pilotGroupTarget}</p>
+                    <p className="text-xs text-gray-500">Pilot Group Selected</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-xl p-4 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-green-600" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-[#1e2749]">{partnershipData.hubLogins}/{partnershipData.participantCount}</p>
@@ -308,23 +334,12 @@ export default function ASD4Dashboard() {
               </div>
               <div className="bg-white rounded-xl p-4 shadow-sm">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <Calendar className="w-5 h-5 text-purple-600" />
+                  <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-yellow-600" />
                   </div>
                   <div>
                     <p className="text-2xl font-bold text-[#1e2749]">8</p>
                     <p className="text-xs text-gray-500">Sessions Planned</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-xl p-4 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                    <Target className="w-5 h-5 text-yellow-600" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold text-[#1e2749]">{partnershipData.currentPhase}</p>
-                    <p className="text-xs text-gray-500">Current Phase</p>
                   </div>
                 </div>
               </div>
@@ -446,7 +461,14 @@ export default function ASD4Dashboard() {
           <div className="space-y-6">
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your Partnership Journey</h2>
-              <p className="text-gray-600 mb-8">Track every step of your paraprofessional development partnership</p>
+              <p className="text-gray-600 mb-4">Track every step of your paraprofessional development partnership</p>
+
+              {/* Pilot Model Description */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+                <p className="text-sm text-blue-800">
+                  <strong>Your Unique Setup:</strong> All 117 paraprofessionals have Learning Hub access. Focused observation and coaching support will be provided to a pilot group of 10-20 paras this semester, with learnings and strategies shared across the full team.
+                </p>
+              </div>
 
               {/* Phase Progress Bar */}
               <div className="mb-8">
@@ -506,6 +528,175 @@ export default function ASD4Dashboard() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* Your Partnership Plan */}
+            <div className="bg-white rounded-xl p-5 shadow-sm">
+              <h3 className="font-semibold text-[#1e2749] mb-2 flex items-center gap-2">
+                <ClipboardList className="w-5 h-5 text-[#38618C]" />
+                Your Partnership Plan
+              </h3>
+              <p className="text-gray-500 text-sm mb-4">
+                January – May 2026 · Hub access continues through January 2027
+              </p>
+
+              {/* Timeline */}
+              <div className="relative">
+                {/* Vertical line */}
+                <div className="absolute left-4 top-8 bottom-8 w-0.5 bg-gray-200" />
+
+                {/* January */}
+                <div className="relative flex gap-4 mb-6">
+                  <div className="w-8 h-8 rounded-full bg-green-100 border-2 border-green-500 flex items-center justify-center z-10 flex-shrink-0">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div className="flex-1 pt-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-[#1e2749]">January 2026</span>
+                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">In Progress</span>
+                    </div>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2 text-green-600">
+                        <CheckCircle className="w-4 h-4" />
+                        <span>Kickoff Event (Jan 5)</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-green-600">
+                        <CheckCircle className="w-4 h-4" />
+                        <span>117 paras enrolled in Learning Hub</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Clock className="w-4 h-4 text-[#E07A5F]" />
+                        <span>Partner Data Form</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-gray-600">
+                        <Clock className="w-4 h-4 text-[#E07A5F]" />
+                        <span>Identify Pilot Group (10-20 paras)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* February */}
+                <div className="relative flex gap-4 mb-6">
+                  <div className="w-8 h-8 rounded-full bg-[#ffba06]/20 border-2 border-[#ffba06] flex items-center justify-center z-10 flex-shrink-0">
+                    <span className="text-xs font-bold text-[#1e2749]">2</span>
+                  </div>
+                  <div className="flex-1 pt-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-[#1e2749]">February 2026</span>
+                      <span className="text-xs bg-[#ffba06]/20 text-[#1e2749] px-2 py-0.5 rounded-full">Upcoming</span>
+                    </div>
+                    <div className="space-y-2 text-sm text-gray-600">
+                      <div className="flex items-center gap-2">
+                        <Target className="w-4 h-4 text-[#38618C]" />
+                        <span><strong>Executive Impact Session 1</strong> — Vision-setting with leadership</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Eye className="w-4 h-4 text-[#38618C]" />
+                        <span><strong>Observation Day 1</strong> — On-site with pilot group paras</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MessageCircle className="w-4 h-4 text-[#38618C]" />
+                        <span><strong>Virtual Session 1</strong> — Follow-up from observations</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* March */}
+                <div className="relative flex gap-4 mb-6">
+                  <div className="w-8 h-8 rounded-full bg-gray-100 border-2 border-gray-300 flex items-center justify-center z-10 flex-shrink-0">
+                    <span className="text-xs font-bold text-gray-500">3</span>
+                  </div>
+                  <div className="flex-1 pt-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-gray-400">March 2026</span>
+                    </div>
+                    <div className="space-y-2 text-sm text-gray-400">
+                      <div className="flex items-center gap-2">
+                        <MessageCircle className="w-4 h-4" />
+                        <span><strong>Virtual Session 2</strong> — Strategy implementation check-in</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* April */}
+                <div className="relative flex gap-4 mb-6">
+                  <div className="w-8 h-8 rounded-full bg-gray-100 border-2 border-gray-300 flex items-center justify-center z-10 flex-shrink-0">
+                    <span className="text-xs font-bold text-gray-500">4</span>
+                  </div>
+                  <div className="flex-1 pt-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-gray-400">April 2026</span>
+                    </div>
+                    <div className="space-y-2 text-sm text-gray-400">
+                      <div className="flex items-center gap-2">
+                        <Eye className="w-4 h-4" />
+                        <span><strong>Observation Day 2</strong> — Measure growth, celebrate wins</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MessageCircle className="w-4 h-4" />
+                        <span><strong>Virtual Session 3</strong> — Growth group deep-dive</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* May */}
+                <div className="relative flex gap-4">
+                  <div className="w-8 h-8 rounded-full bg-gray-100 border-2 border-gray-300 flex items-center justify-center z-10 flex-shrink-0">
+                    <span className="text-xs font-bold text-gray-500">5</span>
+                  </div>
+                  <div className="flex-1 pt-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-gray-400">May 2026</span>
+                    </div>
+                    <div className="space-y-2 text-sm text-gray-400">
+                      <div className="flex items-center gap-2">
+                        <MessageCircle className="w-4 h-4" />
+                        <span><strong>Virtual Session 4</strong> — Final strategy session</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Target className="w-4 h-4" />
+                        <span><strong>Executive Impact Session 2</strong> — Results review & Year 2 planning</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Contract Summary */}
+              <div className="mt-6 pt-4 border-t border-gray-100">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="text-lg font-bold text-[#1e2749]">117</div>
+                    <div className="text-xs text-gray-500">Hub Memberships</div>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="text-lg font-bold text-[#1e2749]">2</div>
+                    <div className="text-xs text-gray-500">Observation Days</div>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="text-lg font-bold text-[#1e2749]">4</div>
+                    <div className="text-xs text-gray-500">Virtual Sessions</div>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="text-lg font-bold text-[#1e2749]">2</div>
+                    <div className="text-xs text-gray-500">Exec Sessions</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pilot Group Note */}
+              <div className="mt-4 bg-[#35A7FF]/5 border border-[#35A7FF]/20 rounded-lg p-4">
+                <div className="flex items-start gap-2">
+                  <Info className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
+                  <p className="text-sm text-gray-700">
+                    <span className="font-semibold text-[#1e2749]">Your Unique Setup:</span> All 117 paras have Learning Hub access through January 2027. Focused observation and coaching support will be provided to your pilot group of 10-20 paras, with strategies shared across the full team.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
