@@ -213,7 +213,7 @@ export default function ASD4Dashboard() {
                   <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
                   <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
                 </div>
-                <div className="text-2xl font-bold text-[#E07A5F]">5</div>
+                <div className="text-2xl font-bold text-[#E07A5F]">8</div>
                 <div className="text-xs text-[#E07A5F] font-medium">Items pending</div>
               </div>
 
@@ -295,7 +295,7 @@ export default function ASD4Dashboard() {
                   </span>
                 </a>
 
-                {/* Item 4: Virtual Sessions */}
+                {/* Item 4: Virtual Session 1 */}
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
@@ -305,19 +305,85 @@ export default function ASD4Dashboard() {
                   <div className="flex items-center gap-3">
                     <MessageCircle className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-[#1e2749]">Schedule Virtual Sessions</div>
+                      <div className="font-medium text-[#1e2749]">Virtual Session 1 <span className="text-gray-400 font-normal">· 45 min</span></div>
                       <div className="text-sm text-gray-500">
-                        4 sessions included in contract · <span className="text-[#E07A5F] font-medium">DUE MAR-MAY 2026</span>
+                        Follow-up from observations · <span className="text-[#E07A5F] font-medium">DUE FEB 2026</span>
                       </div>
                     </div>
                   </div>
                   <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
-                    Click to Schedule
+                    Schedule
                   </span>
                 </a>
 
-                {/* Item 5: Executive Session 2 */}
+                {/* Item 5: Virtual Session 2 */}
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md border border-transparent hover:border-[#35A7FF] transition-all cursor-pointer block"
+                >
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="w-5 h-5 text-[#E07A5F]" />
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Virtual Session 2 <span className="text-gray-400 font-normal">· 45 min</span></div>
+                      <div className="text-sm text-gray-500">
+                        Strategy implementation check-in · <span className="text-[#E07A5F] font-medium">DUE MAR 2026</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Schedule
+                  </span>
+                </a>
+
+                {/* Item 6: Virtual Session 3 */}
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md border border-transparent hover:border-[#35A7FF] transition-all cursor-pointer block"
+                >
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="w-5 h-5 text-[#E07A5F]" />
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Virtual Session 3 <span className="text-gray-400 font-normal">· 45 min</span></div>
+                      <div className="text-sm text-gray-500">
+                        Growth group deep-dive · <span className="text-[#E07A5F] font-medium">DUE APR 2026</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Schedule
+                  </span>
+                </a>
+
+                {/* Item 7: Virtual Session 4 */}
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md border border-transparent hover:border-[#35A7FF] transition-all cursor-pointer block"
+                >
+                  <div className="flex items-center gap-3">
+                    <MessageCircle className="w-5 h-5 text-[#E07A5F]" />
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Virtual Session 4 <span className="text-gray-400 font-normal">· 45 min</span></div>
+                      <div className="text-sm text-gray-500">
+                        Final strategy session · <span className="text-[#E07A5F] font-medium">DUE MAY 2026</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Schedule
+                  </span>
+                </a>
+
+                {/* Item 8: Executive Session 2 */}
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
@@ -327,7 +393,7 @@ export default function ASD4Dashboard() {
                   <div className="flex items-center gap-3">
                     <Target className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-[#1e2749]">Schedule Executive Impact Session 2</div>
+                      <div className="font-medium text-[#1e2749]">Executive Impact Session 2</div>
                       <div className="text-sm text-gray-500">
                         Results review with leadership · <span className="text-[#E07A5F] font-medium">DUE APR 2026</span>
                       </div>
@@ -335,7 +401,7 @@ export default function ASD4Dashboard() {
                   </div>
                   <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
-                    Click to Schedule
+                    Schedule
                   </span>
                 </a>
               </div>
