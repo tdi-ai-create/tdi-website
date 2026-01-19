@@ -1,0 +1,759 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import {
+  LayoutDashboard,
+  Map,
+  Settings,
+  FileText,
+  Users,
+  CheckCircle,
+  Clock,
+  AlertCircle,
+  Calendar,
+  TrendingUp,
+  Target,
+  Heart,
+  ArrowRight,
+  BookOpen,
+  Video,
+  MessageSquare,
+  Download,
+  ChevronRight,
+  Star,
+  Sparkles,
+  ClipboardList,
+  Lightbulb,
+  Award,
+  ExternalLink,
+  Mail,
+  Phone
+} from 'lucide-react';
+
+// Partnership Phases
+const phases = [
+  {
+    id: 'foundation',
+    name: 'Foundation',
+    status: 'current',
+    description: 'Building the groundwork for partnership success',
+    color: '#38618C'
+  },
+  {
+    id: 'activation',
+    name: 'Activation',
+    status: 'upcoming',
+    description: 'Launching learning and building momentum',
+    color: '#22c55e'
+  },
+  {
+    id: 'deepening',
+    name: 'Deepening',
+    status: 'upcoming',
+    description: 'Strengthening skills through practice',
+    color: '#ffba06'
+  },
+  {
+    id: 'sustainability',
+    name: 'Sustainability',
+    status: 'upcoming',
+    description: 'Embedding lasting change',
+    color: '#8b5cf6'
+  }
+];
+
+// Dashboard Data
+const partnershipData = {
+  partner: 'Addison School District 4',
+  focus: 'Paraprofessional Development',
+  participantCount: 50,
+  buildingCount: 9,
+  startDate: 'February 2026',
+  partnershipType: 'Custom Para Partnership',
+  healthScore: 85,
+  currentPhase: 'Foundation'
+};
+
+// Timeline Events
+const timelineEvents = [
+  {
+    date: 'Late January 2026',
+    title: 'Executive Impact Session 1',
+    type: 'exec',
+    status: 'upcoming',
+    description: 'Align on goals, metrics, and success criteria'
+  },
+  {
+    date: 'February 2026',
+    title: 'Observation Day 1',
+    type: 'onsite',
+    status: 'upcoming',
+    description: 'On-site observation and needs assessment'
+  },
+  {
+    date: 'Late February 2026',
+    title: 'Virtual Session 1',
+    type: 'virtual',
+    status: 'upcoming',
+    description: 'Foundations of Para Excellence'
+  },
+  {
+    date: 'March 2026',
+    title: 'Virtual Session 2',
+    type: 'virtual',
+    status: 'upcoming',
+    description: 'Supporting IEP & 504 Students'
+  },
+  {
+    date: 'April 2026',
+    title: 'Observation Day 2',
+    type: 'onsite',
+    status: 'upcoming',
+    description: 'Mid-partnership check-in and observation'
+  },
+  {
+    date: 'April 2026',
+    title: 'Virtual Session 3',
+    type: 'virtual',
+    status: 'upcoming',
+    description: 'EL Support Strategies'
+  },
+  {
+    date: 'May 2026',
+    title: 'Virtual Session 4',
+    type: 'virtual',
+    status: 'upcoming',
+    description: 'Classroom Collaboration Mastery'
+  },
+  {
+    date: 'Mid-May 2026',
+    title: 'Executive Impact Session 2',
+    type: 'exec',
+    status: 'upcoming',
+    description: 'Review outcomes and plan next steps'
+  }
+];
+
+// Needs Attention Items
+const needsAttention = [
+  {
+    type: 'action',
+    title: 'Complete Partnership Data Form',
+    description: 'Help us personalize your experience',
+    priority: 'high',
+    link: '/asd4-dashboard/partner-data'
+  },
+  {
+    type: 'info',
+    title: 'Schedule Executive Session 1',
+    description: 'Coordinate with Rae on timing',
+    priority: 'medium'
+  }
+];
+
+// Learning Hub Resources
+const learningResources = [
+  {
+    title: 'Para Foundations Course',
+    type: 'course',
+    duration: '45 min',
+    status: 'available'
+  },
+  {
+    title: 'IEP Support Toolkit',
+    type: 'resource',
+    status: 'available'
+  },
+  {
+    title: 'Teacher-Para Collaboration Guide',
+    type: 'guide',
+    status: 'available'
+  },
+  {
+    title: 'EL Support Strategies',
+    type: 'course',
+    duration: '30 min',
+    status: 'coming_soon'
+  }
+];
+
+// Team Members
+const teamMembers = [
+  {
+    name: 'Rae Hughart',
+    role: 'Partnership Lead',
+    email: 'rae@teachersdeserveit.com',
+    avatar: '/images/rae-hughart.webp'
+  },
+  {
+    name: 'Your District Lead',
+    role: 'District Contact',
+    email: 'TBD',
+    avatar: null
+  }
+];
+
+// Tabs
+const tabs = [
+  { id: 'overview', name: 'Overview', icon: LayoutDashboard },
+  { id: 'journey', name: 'Journey', icon: Map },
+  { id: 'implementation', name: 'Implementation', icon: Settings },
+  { id: 'blueprint', name: 'Blueprint', icon: FileText },
+  { id: 'team', name: 'Team', icon: Users }
+];
+
+export default function ASD4Dashboard() {
+  const [activeTab, setActiveTab] = useState('overview');
+
+  return (
+    <div className="min-h-screen bg-[#f5f5f5]">
+      {/* Header */}
+      <nav className="bg-[#1e2749] sticky top-0 z-50 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-4">
+              <span className="bg-white text-[#1e2749] px-3 py-1 rounded text-sm font-extrabold tracking-wide">TDI</span>
+              <div className="hidden sm:block">
+                <h1 className="text-white font-semibold">{partnershipData.partner}</h1>
+                <p className="text-white/60 text-xs">{partnershipData.partnershipType}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <Link
+                href="/asd4-dashboard/partner-data"
+                className="bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+              >
+                <ClipboardList className="w-4 h-4" />
+                <span className="hidden sm:inline">Partner Data</span>
+              </Link>
+              <Link
+                href="/"
+                className="text-white/80 hover:text-white text-sm"
+              >
+                TDI Home
+              </Link>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Tab Navigation */}
+      <div className="bg-white border-b border-gray-200 sticky top-16 z-40">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex gap-1 overflow-x-auto py-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-[#38618C] text-white'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                {tab.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Overview Tab */}
+        {activeTab === 'overview' && (
+          <div className="space-y-6">
+            {/* Welcome Banner */}
+            <div className="bg-gradient-to-r from-[#38618C] to-[#1e2749] rounded-2xl p-6 text-white">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <h2 className="text-2xl font-bold mb-2">Welcome, Addison SD4!</h2>
+                  <p className="text-white/80">
+                    Your paraprofessional development journey starts here. Let's empower your paras to make a bigger impact.
+                  </p>
+                </div>
+                <div className="flex items-center gap-3 bg-white/10 rounded-xl p-4">
+                  <div className="text-center">
+                    <p className="text-3xl font-bold">{partnershipData.participantCount}</p>
+                    <p className="text-xs text-white/70">Paras</p>
+                  </div>
+                  <div className="w-px h-12 bg-white/20" />
+                  <div className="text-center">
+                    <p className="text-3xl font-bold">{partnershipData.buildingCount}</p>
+                    <p className="text-xs text-white/70">Schools</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Stats Row */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white rounded-xl p-4 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                    <Heart className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-[#1e2749]">{partnershipData.healthScore}%</p>
+                    <p className="text-xs text-gray-500">Health Score</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-xl p-4 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Target className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-[#1e2749]">{partnershipData.currentPhase}</p>
+                    <p className="text-xs text-gray-500">Current Phase</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-xl p-4 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-[#1e2749]">8</p>
+                    <p className="text-xs text-gray-500">Sessions Planned</p>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-xl p-4 shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-yellow-600" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-[#1e2749]">{partnershipData.startDate}</p>
+                    <p className="text-xs text-gray-500">Launch Date</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Main Grid */}
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Needs Attention */}
+              <div className="md:col-span-2 bg-white rounded-xl shadow-sm p-6">
+                <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-orange-500" />
+                  Needs Your Attention
+                </h3>
+                <div className="space-y-3">
+                  {needsAttention.map((item, index) => (
+                    <div
+                      key={index}
+                      className={`flex items-center justify-between p-4 rounded-lg border ${
+                        item.priority === 'high' ? 'border-orange-200 bg-orange-50' : 'border-gray-200 bg-gray-50'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-2 h-2 rounded-full ${item.priority === 'high' ? 'bg-orange-500' : 'bg-gray-400'}`} />
+                        <div>
+                          <p className="font-medium text-[#1e2749]">{item.title}</p>
+                          <p className="text-sm text-gray-500">{item.description}</p>
+                        </div>
+                      </div>
+                      {item.link && (
+                        <Link
+                          href={item.link}
+                          className="flex items-center gap-1 text-[#38618C] hover:text-[#2d4e73] font-medium text-sm"
+                        >
+                          Complete
+                          <ChevronRight className="w-4 h-4" />
+                        </Link>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Phase Progress */}
+              <div className="bg-white rounded-xl shadow-sm p-6">
+                <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-[#38618C]" />
+                  Partnership Phases
+                </h3>
+                <div className="space-y-3">
+                  {phases.map((phase, index) => (
+                    <div key={phase.id} className="flex items-center gap-3">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                          phase.status === 'current'
+                            ? 'bg-[#38618C] text-white'
+                            : phase.status === 'completed'
+                            ? 'bg-green-500 text-white'
+                            : 'bg-gray-200 text-gray-500'
+                        }`}
+                      >
+                        {phase.status === 'completed' ? (
+                          <CheckCircle className="w-4 h-4" />
+                        ) : (
+                          index + 1
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <p className={`font-medium ${phase.status === 'current' ? 'text-[#38618C]' : 'text-gray-600'}`}>
+                          {phase.name}
+                        </p>
+                        {phase.status === 'current' && (
+                          <p className="text-xs text-gray-500">{phase.description}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Upcoming Events */}
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-[#1e2749] flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-[#38618C]" />
+                  Upcoming Events
+                </h3>
+                <button
+                  onClick={() => setActiveTab('journey')}
+                  className="text-[#38618C] hover:text-[#2d4e73] text-sm font-medium flex items-center gap-1"
+                >
+                  View Full Journey
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="grid md:grid-cols-3 gap-4">
+                {timelineEvents.slice(0, 3).map((event, index) => (
+                  <div key={index} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className={`px-2 py-1 rounded text-xs font-medium ${
+                        event.type === 'exec' ? 'bg-purple-100 text-purple-700' :
+                        event.type === 'onsite' ? 'bg-green-100 text-green-700' :
+                        'bg-blue-100 text-blue-700'
+                      }`}>
+                        {event.type === 'exec' ? 'Executive' : event.type === 'onsite' ? 'On-Site' : 'Virtual'}
+                      </span>
+                    </div>
+                    <p className="font-medium text-[#1e2749]">{event.title}</p>
+                    <p className="text-sm text-gray-500 mt-1">{event.date}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Journey Tab */}
+        {activeTab === 'journey' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your Partnership Journey</h2>
+              <p className="text-gray-600 mb-8">Track every step of your paraprofessional development partnership</p>
+
+              {/* Phase Progress Bar */}
+              <div className="mb-8">
+                <div className="flex justify-between mb-2">
+                  {phases.map((phase) => (
+                    <div key={phase.id} className="text-center flex-1">
+                      <p className={`text-sm font-medium ${phase.status === 'current' ? 'text-[#38618C]' : 'text-gray-500'}`}>
+                        {phase.name}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-[#38618C] rounded-full" style={{ width: '12%' }} />
+                </div>
+              </div>
+
+              {/* Timeline */}
+              <div className="space-y-4">
+                {timelineEvents.map((event, index) => (
+                  <div key={index} className="flex gap-4">
+                    <div className="flex flex-col items-center">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                        event.status === 'completed' ? 'bg-green-500 text-white' :
+                        event.status === 'current' ? 'bg-[#38618C] text-white' :
+                        'bg-gray-200 text-gray-500'
+                      }`}>
+                        {event.status === 'completed' ? (
+                          <CheckCircle className="w-5 h-5" />
+                        ) : event.type === 'exec' ? (
+                          <Star className="w-5 h-5" />
+                        ) : event.type === 'onsite' ? (
+                          <Users className="w-5 h-5" />
+                        ) : (
+                          <Video className="w-5 h-5" />
+                        )}
+                      </div>
+                      {index < timelineEvents.length - 1 && (
+                        <div className="w-0.5 flex-1 bg-gray-200 my-2" />
+                      )}
+                    </div>
+                    <div className={`flex-1 pb-6 ${event.status === 'completed' ? 'opacity-60' : ''}`}>
+                      <div className="bg-gray-50 rounded-lg p-4">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className={`px-2 py-0.5 rounded text-xs font-medium ${
+                            event.type === 'exec' ? 'bg-purple-100 text-purple-700' :
+                            event.type === 'onsite' ? 'bg-green-100 text-green-700' :
+                            'bg-blue-100 text-blue-700'
+                          }`}>
+                            {event.type === 'exec' ? 'Executive Session' : event.type === 'onsite' ? 'On-Site Visit' : 'Virtual Session'}
+                          </span>
+                          <span className="text-xs text-gray-500">{event.date}</span>
+                        </div>
+                        <p className="font-semibold text-[#1e2749]">{event.title}</p>
+                        <p className="text-sm text-gray-600 mt-1">{event.description}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Implementation Tab */}
+        {activeTab === 'implementation' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Implementation Tracker</h2>
+              <p className="text-gray-600 mb-6">Monitor progress and track key implementation metrics</p>
+
+              {/* Leading Indicators */}
+              <div className="mb-8">
+                <h3 className="font-semibold text-[#1e2749] mb-4">Leading Indicators</h3>
+                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <p className="text-sm text-gray-500">Para Confidence</p>
+                    <p className="text-2xl font-bold text-[#1e2749]">Baseline</p>
+                    <p className="text-xs text-gray-400">Survey pending</p>
+                  </div>
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <p className="text-sm text-gray-500">Strategy Implementation</p>
+                    <p className="text-2xl font-bold text-[#1e2749]">0%</p>
+                    <p className="text-xs text-gray-400">Starting soon</p>
+                  </div>
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <p className="text-sm text-gray-500">Teacher Collaboration</p>
+                    <p className="text-2xl font-bold text-[#1e2749]">Baseline</p>
+                    <p className="text-xs text-gray-400">Survey pending</p>
+                  </div>
+                  <div className="border border-gray-200 rounded-lg p-4">
+                    <p className="text-sm text-gray-500">Session Attendance</p>
+                    <p className="text-2xl font-bold text-[#1e2749]">--</p>
+                    <p className="text-xs text-gray-400">Sessions not started</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Items */}
+              <div>
+                <h3 className="font-semibold text-[#1e2749] mb-4">Pre-Launch Checklist</h3>
+                <div className="space-y-3">
+                  {[
+                    { task: 'Complete Partner Data Form', status: 'pending' },
+                    { task: 'Schedule Executive Impact Session 1', status: 'pending' },
+                    { task: 'Confirm Observation Day 1 date', status: 'pending' },
+                    { task: 'Identify para cohort participants', status: 'pending' },
+                    { task: 'Share baseline survey with paras', status: 'upcoming' },
+                    { task: 'Distribute Learning Hub access', status: 'upcoming' }
+                  ].map((item, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                        item.status === 'completed' ? 'bg-green-500 border-green-500' : 'border-gray-300'
+                      }`}>
+                        {item.status === 'completed' && <CheckCircle className="w-4 h-4 text-white" />}
+                      </div>
+                      <span className={item.status === 'completed' ? 'text-gray-400 line-through' : 'text-gray-700'}>
+                        {item.task}
+                      </span>
+                      {item.status === 'pending' && (
+                        <span className="ml-auto text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">Action Needed</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Blueprint Tab */}
+        {activeTab === 'blueprint' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Partnership Blueprint</h2>
+              <p className="text-gray-600 mb-6">Your customized plan for paraprofessional excellence</p>
+
+              {/* Shared Goal */}
+              <div className="bg-gradient-to-r from-[#38618C] to-[#1e2749] rounded-xl p-6 text-white mb-8">
+                <div className="flex items-start gap-3">
+                  <Target className="w-6 h-6 flex-shrink-0 mt-1" />
+                  <div>
+                    <h3 className="font-semibold mb-2">Shared Goal</h3>
+                    <p className="text-white/90 italic">
+                      "Empower paraprofessionals to become confident, skilled partners in student success - equipped with real strategies, valued by their teams, and making measurable impact with IEP, EL, and 504 students."
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Focus Areas */}
+              <div className="mb-8">
+                <h3 className="font-semibold text-[#1e2749] mb-4">Focus Areas</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {[
+                    { icon: BookOpen, title: 'IEP & 504 Support', description: 'Strategies for effectively supporting students with accommodation plans' },
+                    { icon: MessageSquare, title: 'EL Student Support', description: 'Language acquisition strategies and cultural responsiveness' },
+                    { icon: Users, title: 'Teacher Collaboration', description: 'Building effective partnerships with classroom teachers' },
+                    { icon: Heart, title: 'Para Wellness', description: 'Self-care and sustainable support practices' }
+                  ].map((area, index) => (
+                    <div key={index} className="border border-gray-200 rounded-lg p-4 flex gap-4">
+                      <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <area.icon className="w-5 h-5 text-[#38618C]" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-[#1e2749]">{area.title}</p>
+                        <p className="text-sm text-gray-500">{area.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Resources */}
+              <div>
+                <h3 className="font-semibold text-[#1e2749] mb-4">Learning Hub Resources</h3>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {learningResources.map((resource, index) => (
+                    <div key={index} className="border border-gray-200 rounded-lg p-4 flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        {resource.type === 'course' ? (
+                          <Video className="w-5 h-5 text-[#38618C]" />
+                        ) : (
+                          <Download className="w-5 h-5 text-[#38618C]" />
+                        )}
+                        <div>
+                          <p className="font-medium text-[#1e2749]">{resource.title}</p>
+                          {resource.duration && <p className="text-xs text-gray-500">{resource.duration}</p>}
+                        </div>
+                      </div>
+                      {resource.status === 'available' ? (
+                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Available</span>
+                      ) : (
+                        <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">Coming Soon</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Team Tab */}
+        {activeTab === 'team' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-xl shadow-sm p-6">
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your Partnership Team</h2>
+              <p className="text-gray-600 mb-6">The people dedicated to your success</p>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* TDI Team */}
+                <div>
+                  <h3 className="font-semibold text-[#1e2749] mb-4">TDI Team</h3>
+                  <div className="border border-gray-200 rounded-xl p-4">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-16 h-16 bg-[#38618C] rounded-full flex items-center justify-center text-white text-xl font-bold">
+                        RH
+                      </div>
+                      <div>
+                        <p className="font-semibold text-[#1e2749]">Rae Hughart</p>
+                        <p className="text-sm text-gray-500">Partnership Lead</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      <a href="mailto:rae@teachersdeserveit.com" className="flex items-center gap-2 text-sm text-[#38618C] hover:underline">
+                        <Mail className="w-4 h-4" />
+                        rae@teachersdeserveit.com
+                      </a>
+                    </div>
+                    <p className="mt-4 text-sm text-gray-600">
+                      Rae leads all partner relationships and will be your primary point of contact throughout the partnership.
+                    </p>
+                  </div>
+                </div>
+
+                {/* District Team */}
+                <div>
+                  <h3 className="font-semibold text-[#1e2749] mb-4">District Team</h3>
+                  <div className="border border-gray-200 rounded-xl p-4 border-dashed">
+                    <div className="flex items-center gap-4 mb-4">
+                      <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-gray-400">
+                        <Users className="w-8 h-8" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-[#1e2749]">District Contact</p>
+                        <p className="text-sm text-gray-500">To be confirmed</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-500">
+                      Please share your district point of contact in the Partner Data Form so we can add them here.
+                    </p>
+                    <Link
+                      href="/asd4-dashboard/partner-data"
+                      className="inline-flex items-center gap-2 mt-4 text-[#38618C] hover:text-[#2d4e73] font-medium text-sm"
+                    >
+                      Complete Partner Data Form
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quick Contact */}
+              <div className="mt-8 bg-[#38618C]/5 rounded-xl p-6">
+                <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
+                  <Lightbulb className="w-5 h-5 text-[#ffba06]" />
+                  Need Help?
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Have questions about your partnership? Rae is always just an email away.
+                </p>
+                <a
+                  href="mailto:rae@teachersdeserveit.com?subject=ASD4 Partnership Question"
+                  className="inline-flex items-center gap-2 bg-[#38618C] hover:bg-[#2d4e73] text-white px-6 py-3 rounded-xl font-semibold transition-all"
+                >
+                  <Mail className="w-4 h-4" />
+                  Email Rae
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-[#1e2749] text-white py-8 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-3">
+              <span className="bg-white text-[#1e2749] px-2 py-1 rounded text-xs font-extrabold">TDI</span>
+              <span className="text-white/70 text-sm">Teachers Deserve It Partner Dashboard</span>
+            </div>
+            <div className="flex items-center gap-6 text-sm text-white/70">
+              <Link href="/" className="hover:text-white">TDI Home</Link>
+              <Link href="/contact" className="hover:text-white">Contact</Link>
+              <a href="mailto:rae@teachersdeserveit.com" className="hover:text-white">Support</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
