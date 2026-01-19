@@ -206,8 +206,37 @@ export default function ASD4Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
+      {/* Dashboard Header */}
+      <div className="bg-[#1e2749] sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-20">
+            <div className="flex items-center gap-4">
+              <span className="bg-white text-[#1e2749] px-3 py-1 rounded text-sm font-extrabold tracking-wide">TDI</span>
+              <div className="hidden sm:block">
+                <h1 className="text-white font-semibold text-lg">{partnershipData.partner}</h1>
+                <p className="text-white/60 text-sm">{partnershipData.partnershipType}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <Link
+                href="/asd4-dashboard/partner-data"
+                className="bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-semibold transition-all"
+              >
+                Partner Data Form
+              </Link>
+              <Link
+                href="/"
+                className="text-white/80 hover:text-white text-sm hidden sm:block"
+              >
+                TDI Home
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Tab Navigation */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
+      <div className="bg-white border-b border-gray-200 sticky top-20 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-1 overflow-x-auto py-2">
             {tabs.map((tab) => (
