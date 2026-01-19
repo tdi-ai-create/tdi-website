@@ -206,95 +206,81 @@ export default function ASD4Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
-      {/* Dashboard Header */}
-      <div className="bg-[#1e2749] sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-6">
-            <div className="flex items-center gap-4">
-              <span className="bg-white text-[#1e2749] px-3 py-1 rounded text-sm font-extrabold tracking-wide">TDI</span>
-              <div className="hidden sm:block">
-                <h1 className="text-white font-semibold text-lg">{partnershipData.partner}</h1>
-                <p className="text-white/60 text-sm">{partnershipData.partnershipType}</p>
+      {/* Unified Hero Section */}
+      <section className="relative text-white overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/images/asd4-hero.jpg')" }}
+        />
+        {/* Navy Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1e2749]/95 via-[#1e2749]/90 to-[#1e2749]/85" />
+
+        {/* Content */}
+        <div className="relative">
+          {/* Top Bar */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <span className="bg-white text-[#1e2749] px-2 py-1 rounded text-xs font-extrabold tracking-wide">TDI</span>
+                <span className="text-white font-semibold hidden sm:inline">Teachers Deserve It</span>
+                <span className="text-white/60 hidden md:inline">| Partner Dashboard</span>
+              </div>
+              <a
+                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+              >
+                <Calendar className="w-4 h-4" />
+                <span className="hidden sm:inline">Schedule Session</span>
+              </a>
+            </div>
+          </div>
+
+          {/* School Info */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold mb-2">Addison School District 4</h1>
+                <p className="text-white/80">Addison, Illinois | Paraprofessional Partnership</p>
+              </div>
+              <div className="flex items-center gap-4">
+                <div className="bg-white/10 px-4 py-2 rounded-lg">
+                  <span className="text-white/60 text-sm">Status:</span>
+                  <span className="ml-2 font-semibold text-[#1e2749] bg-white px-3 py-1 rounded text-sm">Phase 1 - Foundation</span>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-4">
-              <Link
-                href="/asd4-dashboard/partner-data"
-                className="bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-semibold transition-all"
-              >
-                Partner Data Form
-              </Link>
-              <Link
-                href="/"
-                className="text-white/80 hover:text-white text-sm hidden sm:block"
-              >
-                TDI Home
-              </Link>
+          </div>
+
+          {/* Tab Navigation - Inside Hero */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-4">
+            <div className="flex gap-2 overflow-x-auto">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
+                    activeTab === tab.id
+                      ? 'bg-[#1e2749] text-white shadow-lg'
+                      : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
+                  }`}
+                >
+                  <tab.icon className="w-4 h-4" />
+                  {tab.name}
+                </button>
+              ))}
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Tab Navigation */}
-      <div className="bg-white border-b border-gray-200 sticky top-[88px] z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex gap-1 overflow-x-auto py-2">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-all ${
-                  activeTab === tab.id
-                    ? 'bg-[#38618C] text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
-                }`}
-              >
-                <tab.icon className="w-4 h-4" />
-                {tab.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      </section>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Overview Tab */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            {/* Welcome Banner */}
-            <div className="relative rounded-2xl overflow-hidden text-white">
-              {/* Background Image */}
-              <div
-                className="absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: "url('/images/asd4-hero.jpg')" }}
-              />
-              {/* Navy Gradient Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[#1e2749]/95 via-[#1e2749]/85 to-[#1e2749]/75" />
-              {/* Content */}
-              <div className="relative px-6 py-12">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                  <div>
-                    <h2 className="text-2xl font-bold mb-2">Welcome, Addison SD4!</h2>
-                    <p className="text-white/80">
-                      Your paraprofessional development journey starts here. Let's empower your paras to make a bigger impact.
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3 bg-white/10 rounded-xl p-4">
-                    <div className="text-center">
-                      <p className="text-3xl font-bold">{partnershipData.participantCount}/{partnershipData.contractedCount}</p>
-                      <p className="text-xs text-white/70">Paras Enrolled</p>
-                    </div>
-                    <div className="w-px h-12 bg-white/20" />
-                    <div className="text-center">
-                      <p className="text-3xl font-bold">{partnershipData.buildingCount}</p>
-                      <p className="text-xs text-white/70">Schools</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Stats Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white rounded-xl p-4 shadow-sm">
