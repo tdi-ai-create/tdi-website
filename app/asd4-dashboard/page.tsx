@@ -62,12 +62,15 @@ const phases = [
 const partnershipData = {
   partner: 'Addison School District 4',
   focus: 'Paraprofessional Development',
-  participantCount: 50,
+  participantCount: 117,
+  contractedCount: 94,
   buildingCount: 9,
   startDate: 'February 2026',
   partnershipType: 'Custom Para Partnership',
   healthScore: 85,
-  currentPhase: 'Foundation'
+  currentPhase: 'Foundation',
+  hubLogins: 91,
+  parasNotLoggedIn: 26
 };
 
 // Timeline Events
@@ -241,8 +244,8 @@ export default function ASD4Dashboard() {
                 </div>
                 <div className="flex items-center gap-3 bg-white/10 rounded-xl p-4">
                   <div className="text-center">
-                    <p className="text-3xl font-bold">{partnershipData.participantCount}</p>
-                    <p className="text-xs text-white/70">Paras</p>
+                    <p className="text-3xl font-bold">{partnershipData.participantCount}/{partnershipData.contractedCount}</p>
+                    <p className="text-xs text-white/70">Paras Enrolled</p>
                   </div>
                   <div className="w-px h-12 bg-white/20" />
                   <div className="text-center">
@@ -269,11 +272,11 @@ export default function ASD4Dashboard() {
               <div className="bg-white rounded-xl p-4 shadow-sm">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Target className="w-5 h-5 text-blue-600" />
+                    <Users className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-[#1e2749]">{partnershipData.currentPhase}</p>
-                    <p className="text-xs text-gray-500">Current Phase</p>
+                    <p className="text-2xl font-bold text-[#1e2749]">{partnershipData.hubLogins}/{partnershipData.participantCount}</p>
+                    <p className="text-xs text-gray-500">Hub Logins</p>
                   </div>
                 </div>
               </div>
@@ -291,11 +294,11 @@ export default function ASD4Dashboard() {
               <div className="bg-white rounded-xl p-4 shadow-sm">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-yellow-600" />
+                    <Target className="w-5 h-5 text-yellow-600" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-[#1e2749]">{partnershipData.startDate}</p>
-                    <p className="text-xs text-gray-500">Launch Date</p>
+                    <p className="text-2xl font-bold text-[#1e2749]">{partnershipData.currentPhase}</p>
+                    <p className="text-xs text-gray-500">Current Phase</p>
                   </div>
                 </div>
               </div>
@@ -494,14 +497,14 @@ export default function ASD4Dashboard() {
                 <h3 className="font-semibold text-[#1e2749] mb-4">Leading Indicators</h3>
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="border border-gray-200 rounded-lg p-4">
+                    <p className="text-sm text-gray-500">Hub Engagement</p>
+                    <p className="text-2xl font-bold text-[#1e2749]">{partnershipData.hubLogins} / {partnershipData.participantCount}</p>
+                    <p className="text-xs text-gray-400">~78% logged in</p>
+                  </div>
+                  <div className="border border-gray-200 rounded-lg p-4">
                     <p className="text-sm text-gray-500">Para Confidence</p>
                     <p className="text-2xl font-bold text-[#1e2749]">Baseline</p>
                     <p className="text-xs text-gray-400">Survey pending</p>
-                  </div>
-                  <div className="border border-gray-200 rounded-lg p-4">
-                    <p className="text-sm text-gray-500">Strategy Implementation</p>
-                    <p className="text-2xl font-bold text-[#1e2749]">0%</p>
-                    <p className="text-xs text-gray-400">Starting soon</p>
                   </div>
                   <div className="border border-gray-200 rounded-lg p-4">
                     <p className="text-sm text-gray-500">Teacher Collaboration</p>
@@ -514,6 +517,17 @@ export default function ASD4Dashboard() {
                     <p className="text-xs text-gray-400">Sessions not started</p>
                   </div>
                 </div>
+              </div>
+
+              {/* Quick Win */}
+              <div className="mb-8 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <h4 className="font-medium text-yellow-800 mb-2 flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4" />
+                  Quick Win Recommendation
+                </h4>
+                <p className="text-sm text-yellow-700">
+                  {partnershipData.parasNotLoggedIn} paras haven't logged in yet. Consider sending a reminder email with login instructions or scheduling a brief tech support session.
+                </p>
               </div>
 
               {/* Action Items */}
@@ -624,6 +638,25 @@ export default function ASD4Dashboard() {
         {/* Team Tab */}
         {activeTab === 'team' && (
           <div className="space-y-6">
+            {/* Partnership Summary */}
+            <div className="bg-gradient-to-r from-[#38618C] to-[#1e2749] rounded-xl p-6 text-white mb-6">
+              <h3 className="font-semibold mb-4">Partnership Summary</h3>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-3xl font-bold">{partnershipData.participantCount}</p>
+                  <p className="text-xs text-white/70">Paras Enrolled</p>
+                </div>
+                <div>
+                  <p className="text-3xl font-bold">{partnershipData.buildingCount}</p>
+                  <p className="text-xs text-white/70">Schools</p>
+                </div>
+                <div>
+                  <p className="text-3xl font-bold">8</p>
+                  <p className="text-xs text-white/70">Sessions</p>
+                </div>
+              </div>
+            </div>
+
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your Partnership Team</h2>
               <p className="text-gray-600 mb-6">The people dedicated to your success</p>
