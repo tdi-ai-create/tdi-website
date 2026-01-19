@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import {
   LayoutDashboard,
   Map,
@@ -590,72 +591,24 @@ export default function ASD4Dashboard() {
         {/* Blueprint Tab */}
         {activeTab === 'blueprint' && (
           <div className="space-y-6">
-            <div className="bg-white rounded-xl shadow-sm p-6">
-              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Partnership Blueprint</h2>
-              <p className="text-gray-600 mb-6">Your customized plan for paraprofessional excellence</p>
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">The Full TDI Blueprint</h2>
+              <p className="text-gray-600">What becomes available when we continue our partnership</p>
+            </div>
 
-              {/* Shared Goal */}
-              <div className="bg-gradient-to-r from-[#38618C] to-[#1e2749] rounded-xl p-6 text-white mb-8">
-                <div className="flex items-start gap-3">
-                  <Target className="w-6 h-6 flex-shrink-0 mt-1" />
-                  <div>
-                    <h3 className="font-semibold mb-2">Shared Goal</h3>
-                    <p className="text-white/90 italic">
-                      "Empower paraprofessionals to become confident, skilled partners in student success - equipped with real strategies, valued by their teams, and making measurable impact with IEP, EL, and 504 students."
-                    </p>
-                  </div>
-                </div>
-              </div>
+            {/* Embedded How We Partner Content */}
+            <HowWePartnerTabs excludeTabs={['dashboard', 'calculator']} showCTAs={false} />
 
-              {/* Focus Areas */}
-              <div className="mb-8">
-                <h3 className="font-semibold text-[#1e2749] mb-4">Focus Areas</h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {[
-                    { icon: BookOpen, title: 'IEP & 504 Support', description: 'Strategies for effectively supporting students with accommodation plans' },
-                    { icon: MessageSquare, title: 'EL Student Support', description: 'Language acquisition strategies and cultural responsiveness' },
-                    { icon: Users, title: 'Teacher Collaboration', description: 'Building effective partnerships with classroom teachers' },
-                    { icon: Heart, title: 'Para Wellness', description: 'Self-care and sustainable support practices' }
-                  ].map((area, index) => (
-                    <div key={index} className="border border-gray-200 rounded-lg p-4 flex gap-4">
-                      <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <area.icon className="w-5 h-5 text-[#38618C]" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-[#1e2749]">{area.title}</p>
-                        <p className="text-sm text-gray-500">{area.description}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Resources */}
-              <div>
-                <h3 className="font-semibold text-[#1e2749] mb-4">Learning Hub Resources</h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  {learningResources.map((resource, index) => (
-                    <div key={index} className="border border-gray-200 rounded-lg p-4 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        {resource.type === 'course' ? (
-                          <Video className="w-5 h-5 text-[#38618C]" />
-                        ) : (
-                          <Download className="w-5 h-5 text-[#38618C]" />
-                        )}
-                        <div>
-                          <p className="font-medium text-[#1e2749]">{resource.title}</p>
-                          {resource.duration && <p className="text-xs text-gray-500">{resource.duration}</p>}
-                        </div>
-                      </div>
-                      {resource.status === 'available' ? (
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded">Available</span>
-                      ) : (
-                        <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">Coming Soon</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
+            {/* Learn more link */}
+            <div className="text-center mt-6">
+              <a
+                href="https://teachersdeserveit.com/how-we-partner"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#38618C] hover:text-[#2d4e73] font-medium underline underline-offset-4 transition-colors"
+              >
+                View full details on our website →
+              </a>
             </div>
           </div>
         )}
