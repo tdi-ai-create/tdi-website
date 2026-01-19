@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
+import { Tooltip } from '@/components/Tooltip';
 import {
   Calendar,
   CheckCircle,
@@ -188,6 +189,7 @@ export default function ASD4Dashboard() {
                 <div className="flex items-center gap-2 mb-1">
                   <Users className="w-4 h-4 text-[#38618C]" />
                   <span className="text-xs text-gray-500 uppercase">Paras Enrolled</span>
+                  <Tooltip text="Total paraprofessionals with Learning Hub access. This number may exceed contracted seats if additional paras were added." position="bottom" iconSize={12} />
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">117/117</div>
                 <div className="text-xs text-[#38618C] font-medium">Hub Access</div>
@@ -197,6 +199,7 @@ export default function ASD4Dashboard() {
                 <div className="flex items-center gap-2 mb-1">
                   <Eye className="w-4 h-4 text-[#38618C]" />
                   <span className="text-xs text-gray-500 uppercase">Hub Logins</span>
+                  <Tooltip text="Percentage of enrolled paras who have logged into the Learning Hub at least once. Industry average is ~40%." position="bottom" iconSize={12} />
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">78%</div>
                 <div className="text-xs text-[#38618C] font-medium">91/117 logged in</div>
@@ -211,6 +214,7 @@ export default function ASD4Dashboard() {
                 <div className="flex items-center gap-2 mb-1">
                   <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
                   <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
+                  <Tooltip text="Action items to complete for your partnership. Click any item below to take action." position="bottom" iconSize={12} />
                 </div>
                 <div className="text-2xl font-bold text-[#E07A5F]">9</div>
                 <div className="text-xs text-[#E07A5F] font-medium">Items pending</div>
@@ -220,6 +224,7 @@ export default function ASD4Dashboard() {
                 <div className="flex items-center gap-2 mb-1">
                   <TrendingUp className="w-4 h-4 text-[#38618C]" />
                   <span className="text-xs text-gray-500 uppercase">Current Phase</span>
+                  <Tooltip text="Your partnership phase. IGNITE focuses on building foundation and identifying your pilot group." position="bottom" iconSize={12} />
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">IGNITE</div>
                 <div className="text-xs text-[#38618C] font-medium">Phase 1</div>
@@ -242,7 +247,10 @@ export default function ASD4Dashboard() {
                   <div className="flex items-center gap-3">
                     <ClipboardList className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-[#1e2749]">Complete Partner Data Form</div>
+                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
+                        Complete Partner Data Form
+                        <Tooltip text="Takes ~10 minutes. Helps us customize your dashboard with your specific goals and challenges." position="right" iconSize={14} />
+                      </div>
                       <div className="text-sm text-gray-500">
                         Help us customize your dashboard · <span className="text-[#E07A5F] font-medium">DUE FEB 2026</span>
                       </div>
@@ -261,7 +269,10 @@ export default function ASD4Dashboard() {
                   <div className="flex items-center gap-3">
                     <Users className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-[#1e2749]">Identify Pilot Group</div>
+                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
+                        Identify Pilot Group
+                        <Tooltip text="Select 10-20 paras for focused coaching during observations. These are your 'early adopters' who will help build momentum." position="right" iconSize={14} />
+                      </div>
                       <div className="text-sm text-gray-500">
                         Select 10-20 paras for focused coaching · <span className="text-[#E07A5F] font-medium">DUE FEB 2026</span>
                       </div>
@@ -282,7 +293,10 @@ export default function ASD4Dashboard() {
                   <div className="flex items-center gap-3">
                     <Eye className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-[#1e2749]">Schedule Observation Day 1</div>
+                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
+                        Schedule Observation Day 1
+                        <Tooltip text="Rae visits on-site to observe pilot group paras in action and provide personalized feedback." position="right" iconSize={14} />
+                      </div>
                       <div className="text-sm text-gray-500">
                         On-site observation with pilot group · <span className="text-[#E07A5F] font-medium">DUE FEB 2026</span>
                       </div>
@@ -304,7 +318,10 @@ export default function ASD4Dashboard() {
                   <div className="flex items-center gap-3">
                     <Eye className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-[#1e2749]">Schedule Observation Day 2</div>
+                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
+                        Schedule Observation Day 2
+                        <Tooltip text="Follow-up on-site visit to observe progress and provide additional personalized feedback." position="right" iconSize={14} />
+                      </div>
                       <div className="text-sm text-gray-500">
                         Follow-up on-site observation · <span className="text-[#E07A5F] font-medium">DUE FEB 2026</span>
                       </div>
@@ -329,6 +346,7 @@ export default function ASD4Dashboard() {
                       <div className="font-medium text-[#1e2749] flex items-center gap-2">
                         Virtual Session 1 <span className="text-gray-400 font-normal">· 45 min</span>
                         <span className="bg-[#38618C]/10 text-[#38618C] px-2 py-0.5 rounded text-xs font-medium">Baseline Data</span>
+                        <Tooltip text="45-minute video call. Baseline survey administered to pilot group during this session." position="right" iconSize={14} />
                       </div>
                       <div className="text-sm text-gray-500">
                         Baseline survey administered to pilot group · <span className="text-[#E07A5F] font-medium">DUE FEB 2026</span>
@@ -351,7 +369,10 @@ export default function ASD4Dashboard() {
                   <div className="flex items-center gap-3">
                     <MessageCircle className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-[#1e2749]">Virtual Session 2 <span className="text-gray-400 font-normal">· 45 min</span></div>
+                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
+                        Virtual Session 2 <span className="text-gray-400 font-normal">· 45 min</span>
+                        <Tooltip text="45-minute video call with Rae. Sessions can be combined or spread out based on your schedule." position="right" iconSize={14} />
+                      </div>
                       <div className="text-sm text-gray-500">
                         Strategy implementation check-in · <span className="text-[#E07A5F] font-medium">DUE MAR 2026</span>
                       </div>
@@ -373,7 +394,10 @@ export default function ASD4Dashboard() {
                   <div className="flex items-center gap-3">
                     <MessageCircle className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-[#1e2749]">Virtual Session 3 <span className="text-gray-400 font-normal">· 45 min</span></div>
+                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
+                        Virtual Session 3 <span className="text-gray-400 font-normal">· 45 min</span>
+                        <Tooltip text="45-minute video call with Rae. Sessions can be combined or spread out based on your schedule." position="right" iconSize={14} />
+                      </div>
                       <div className="text-sm text-gray-500">
                         Growth group deep-dive · <span className="text-[#E07A5F] font-medium">DUE APR 2026</span>
                       </div>
@@ -395,7 +419,10 @@ export default function ASD4Dashboard() {
                   <div className="flex items-center gap-3">
                     <MessageCircle className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-[#1e2749]">Virtual Session 4 <span className="text-gray-400 font-normal">· 45 min</span></div>
+                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
+                        Virtual Session 4 <span className="text-gray-400 font-normal">· 45 min</span>
+                        <Tooltip text="45-minute video call with Rae. Sessions can be combined or spread out based on your schedule." position="right" iconSize={14} />
+                      </div>
                       <div className="text-sm text-gray-500">
                         Final strategy session · <span className="text-[#E07A5F] font-medium">DUE MAY 2026</span>
                       </div>
@@ -417,7 +444,10 @@ export default function ASD4Dashboard() {
                   <div className="flex items-center gap-3">
                     <Target className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-[#1e2749]">Executive Impact Session 2</div>
+                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
+                        Executive Impact Session 2
+                        <Tooltip text="Leadership-focused session reviewing data, progress, and strategic next steps. Includes admin team." position="right" iconSize={14} />
+                      </div>
                       <div className="text-sm text-gray-500">
                         Results review with leadership · <span className="text-[#E07A5F] font-medium">DUE APR 2026</span>
                       </div>
@@ -451,7 +481,7 @@ export default function ASD4Dashboard() {
                     Recommendation: Dedicated Hub Time
                   </h3>
                   <p className="text-gray-600 text-sm mb-3">
-                    Districts that build in 15-30 minutes of protected time during para meetings see 3x higher implementation rates.
+                    Districts that build in 15-30 minutes of protected time during para meetings see <span className="inline-flex items-center">3x higher implementation rates<Tooltip text="Based on TDI partner data comparing districts with dedicated Hub time vs. self-directed access only." position="top" iconSize={12} /></span>.
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <span className="bg-[#F5F5F5] text-[#1e2749] px-3 py-1 rounded-full text-xs font-medium">Add Hub time to para meetings</span>
@@ -706,7 +736,10 @@ export default function ASD4Dashboard() {
               <h3 className="font-semibold text-[#1e2749] mb-4">Implementation Insights</h3>
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="border border-gray-200 rounded-lg p-4">
-                  <p className="text-sm text-gray-500 mb-1">Hub Engagement</p>
+                  <p className="text-sm text-gray-500 mb-1 flex items-center">
+                    Hub Engagement
+                    <Tooltip text="Percentage of enrolled paras who have logged into the Learning Hub at least once." position="top" iconSize={12} />
+                  </p>
                   <p className="text-2xl font-bold text-[#1e2749]">91/117</p>
                   <div className="mt-2 h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div className="h-full bg-[#38618C] rounded-full" style={{ width: '78%' }}></div>
@@ -714,11 +747,17 @@ export default function ASD4Dashboard() {
                   <p className="text-xs text-gray-400 mt-1">78% logged in</p>
                 </div>
                 <div className="border border-gray-200 rounded-lg p-4">
-                  <p className="text-sm text-gray-500 mb-1">Growth Areas</p>
+                  <p className="text-sm text-gray-500 mb-1 flex items-center">
+                    Growth Areas
+                    <Tooltip text="Areas where paras show opportunity for growth. Baseline collected during Virtual Session 1." position="top" iconSize={12} />
+                  </p>
                   <p className="text-lg font-medium text-gray-400">Data available after Observation 1</p>
                 </div>
                 <div className="border border-gray-200 rounded-lg p-4">
-                  <p className="text-sm text-gray-500 mb-1">Top Strengths</p>
+                  <p className="text-sm text-gray-500 mb-1 flex items-center">
+                    Top Strengths
+                    <Tooltip text="Areas where paras are already excelling. Baseline collected during Virtual Session 1." position="top" iconSize={12} />
+                  </p>
                   <p className="text-lg font-medium text-gray-400">Data available after Observation 1</p>
                 </div>
               </div>
@@ -798,7 +837,10 @@ export default function ASD4Dashboard() {
           <div className="space-y-6">
             {/* Header */}
             <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
-              <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Year 2 Preview</span>
+              <div className="flex items-center gap-2">
+                <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Year 2 Preview</span>
+                <Tooltip text="Early renewal conversations typically happen in April. No commitment required to view options." position="right" iconSize={14} />
+              </div>
               <h2 className="text-2xl font-bold mt-3">Continue to ACCELERATE in 2026-27</h2>
               <p className="text-white/80 mt-2">
                 You're building momentum with your pilot group this spring. Year 2 expands that success to your full para team.
