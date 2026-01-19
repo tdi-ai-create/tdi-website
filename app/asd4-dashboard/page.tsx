@@ -212,7 +212,7 @@ export default function ASD4Dashboard() {
                   <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
                   <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
                 </div>
-                <div className="text-2xl font-bold text-[#E07A5F]">8</div>
+                <div className="text-2xl font-bold text-[#E07A5F]">9</div>
                 <div className="text-xs text-[#E07A5F] font-medium">Items pending</div>
               </div>
 
@@ -294,7 +294,29 @@ export default function ASD4Dashboard() {
                   </span>
                 </a>
 
-                {/* Item 4: Virtual Session 1 */}
+                {/* Item 4: Observation Day 2 */}
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md border border-transparent hover:border-[#35A7FF] transition-all cursor-pointer block"
+                >
+                  <div className="flex items-center gap-3">
+                    <Eye className="w-5 h-5 text-[#E07A5F]" />
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Schedule Observation Day 2</div>
+                      <div className="text-sm text-gray-500">
+                        Follow-up on-site observation · <span className="text-[#E07A5F] font-medium">DUE FEB 2026</span>
+                      </div>
+                    </div>
+                  </div>
+                  <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
+                    <Calendar className="w-4 h-4" />
+                    Click to Schedule
+                  </span>
+                </a>
+
+                {/* Item 5: Virtual Session 1 */}
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
@@ -316,7 +338,7 @@ export default function ASD4Dashboard() {
                   </span>
                 </a>
 
-                {/* Item 5: Virtual Session 2 */}
+                {/* Item 6: Virtual Session 2 */}
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
@@ -338,7 +360,7 @@ export default function ASD4Dashboard() {
                   </span>
                 </a>
 
-                {/* Item 6: Virtual Session 3 */}
+                {/* Item 7: Virtual Session 3 */}
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
@@ -360,7 +382,7 @@ export default function ASD4Dashboard() {
                   </span>
                 </a>
 
-                {/* Item 7: Virtual Session 4 */}
+                {/* Item 8: Virtual Session 4 */}
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
@@ -382,7 +404,7 @@ export default function ASD4Dashboard() {
                   </span>
                 </a>
 
-                {/* Item 8: Executive Session 2 */}
+                {/* Item 9: Executive Session 2 */}
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
