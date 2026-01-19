@@ -326,9 +326,12 @@ export default function ASD4Dashboard() {
                   <div className="flex items-center gap-3">
                     <MessageCircle className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <div className="font-medium text-[#1e2749]">Virtual Session 1 <span className="text-gray-400 font-normal">· 45 min</span></div>
+                      <div className="font-medium text-[#1e2749] flex items-center gap-2">
+                        Virtual Session 1 <span className="text-gray-400 font-normal">· 45 min</span>
+                        <span className="bg-[#38618C]/10 text-[#38618C] px-2 py-0.5 rounded text-xs font-medium">Baseline Data</span>
+                      </div>
                       <div className="text-sm text-gray-500">
-                        Follow-up from observations · <span className="text-[#E07A5F] font-medium">DUE FEB 2026</span>
+                        Baseline survey administered to pilot group · <span className="text-[#E07A5F] font-medium">DUE FEB 2026</span>
                       </div>
                     </div>
                   </div>
