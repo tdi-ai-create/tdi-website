@@ -185,9 +185,9 @@ const teamMembers = [
     avatar: '/images/rae-hughart.webp'
   },
   {
-    name: 'Your District Lead',
+    name: 'Janet Diaz',
     role: 'District Contact',
-    email: 'TBD',
+    email: 'jdiaz@asd4.org',
     avatar: null
   }
 ];
@@ -696,9 +696,11 @@ export default function ASD4Dashboard() {
                   <h3 className="font-semibold text-[#1e2749] mb-4">TDI Team</h3>
                   <div className="border border-gray-200 rounded-xl p-4">
                     <div className="flex items-center gap-4 mb-4">
-                      <div className="w-16 h-16 bg-[#38618C] rounded-full flex items-center justify-center text-white text-xl font-bold">
-                        RH
-                      </div>
+                      <img
+                        src="/images/rae-hughart.webp"
+                        alt="Rae Hughart"
+                        className="w-16 h-16 rounded-full object-cover"
+                      />
                       <div>
                         <p className="font-semibold text-[#1e2749]">Rae Hughart</p>
                         <p className="text-sm text-gray-500">Partnership Lead</p>
@@ -719,26 +721,25 @@ export default function ASD4Dashboard() {
                 {/* District Team */}
                 <div>
                   <h3 className="font-semibold text-[#1e2749] mb-4">District Team</h3>
-                  <div className="border border-gray-200 rounded-xl p-4 border-dashed">
+                  <div className="border border-gray-200 rounded-xl p-4">
                     <div className="flex items-center gap-4 mb-4">
-                      <div className="w-16 h-16 bg-gray-200 rounded-full flex items-center justify-center text-gray-400">
-                        <Users className="w-8 h-8" />
+                      <div className="w-16 h-16 bg-[#38618C] rounded-full flex items-center justify-center text-white text-xl font-bold">
+                        JD
                       </div>
                       <div>
-                        <p className="font-semibold text-[#1e2749]">District Contact</p>
-                        <p className="text-sm text-gray-500">To be confirmed</p>
+                        <p className="font-semibold text-[#1e2749]">Janet Diaz</p>
+                        <p className="text-sm text-gray-500">District Contact</p>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-500">
-                      Please share your district point of contact in the Partner Data Form so we can add them here.
+                    <div className="space-y-2">
+                      <a href="mailto:jdiaz@asd4.org" className="flex items-center gap-2 text-sm text-[#38618C] hover:underline">
+                        <Mail className="w-4 h-4" />
+                        jdiaz@asd4.org
+                      </a>
+                    </div>
+                    <p className="mt-4 text-sm text-gray-600">
+                      Janet is your district point of contact for the TDI partnership.
                     </p>
-                    <Link
-                      href="/asd4-dashboard/partner-data"
-                      className="inline-flex items-center gap-2 mt-4 text-[#38618C] hover:text-[#2d4e73] font-medium text-sm"
-                    >
-                      Complete Partner Data Form
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
                   </div>
                 </div>
               </div>
