@@ -458,35 +458,6 @@ export default function ASD4Dashboard() {
               </div>
             </div>
 
-            {/* District Information */}
-            <div className="bg-white rounded-xl p-5 shadow-sm">
-              <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
-                <Building className="w-5 h-5 text-[#38618C]" />
-                District Information
-              </h3>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <p className="font-medium text-[#1e2749]">Addison School District 4</p>
-                  <p className="text-sm text-gray-600 flex items-center gap-2 mt-1">
-                    <MapPin className="w-4 h-4" />
-                    222 N. Kennedy Dr., Addison, IL 60101
-                  </p>
-                  <p className="text-sm text-gray-600 flex items-center gap-2 mt-1">
-                    <Phone className="w-4 h-4" />
-                    (630) 458-2425
-                  </p>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 uppercase tracking-wide mb-1">Primary Contact</p>
-                  <p className="font-medium text-[#1e2749]">Janet Diaz</p>
-                  <a href="mailto:jdiaz@asd4.org" className="text-sm text-[#35A7FF] hover:underline flex items-center gap-2">
-                    <Mail className="w-4 h-4" />
-                    jdiaz@asd4.org
-                  </a>
-                </div>
-              </div>
-            </div>
-
             {/* 2026-27 Teaser */}
             <div
               className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-[1.01]"
