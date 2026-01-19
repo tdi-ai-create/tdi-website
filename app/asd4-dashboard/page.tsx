@@ -83,7 +83,6 @@ const Accordion = ({ id, isOpen, onToggle, title, subtitle, badge, badgeColor = 
 
 export default function ASD4Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
-  const [activeBlueprintTab, setActiveBlueprintTab] = useState('approach');
 
   // Accordion states
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -404,6 +403,14 @@ export default function ASD4Dashboard() {
                     Schedule
                   </span>
                 </a>
+              </div>
+
+              {/* Virtual Sessions Note */}
+              <div className="mt-3 flex items-start gap-2 text-xs text-gray-500">
+                <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <p>
+                  <strong>Virtual Sessions:</strong> Due dates indicate when sessions should be scheduled by. You have flexibility in how you use them — combine sessions back-to-back, spread them out, whatever works best for your team.
+                </p>
               </div>
             </div>
 
@@ -931,204 +938,24 @@ export default function ASD4Dashboard() {
         {/* ==================== BLUEPRINT TAB ==================== */}
         {activeTab === 'blueprint' && (
           <div className="space-y-6">
-            {/* Sidebar + Content Layout */}
-            <div className="flex flex-col md:flex-row gap-6">
-              {/* Sidebar */}
-              <div className="md:w-48 flex-shrink-0">
-                <div className="bg-white rounded-xl shadow-sm p-2 sticky top-32">
-                  {[
-                    { id: 'approach', label: 'Our Approach' },
-                    { id: 'inperson', label: 'In-Person Support' },
-                    { id: 'hub', label: 'Learning Hub' },
-                    { id: 'book', label: 'The Book' },
-                    { id: 'results', label: 'Proven Results' },
-                  ].map((tab) => (
-                    <button
-                      key={tab.id}
-                      onClick={() => setActiveBlueprintTab(tab.id)}
-                      className={`w-full text-left px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                        activeBlueprintTab === tab.id
-                          ? 'bg-[#1e2749] text-white'
-                          : 'text-gray-600 hover:bg-gray-50'
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">The Full TDI Blueprint</h2>
+              <p className="text-gray-600">What becomes available when we continue our partnership</p>
+            </div>
 
-              {/* Content */}
-              <div className="flex-1">
-                {activeBlueprintTab === 'approach' && (
-                  <div className="bg-white rounded-xl p-6 shadow-sm">
-                    <h2 className="text-xl font-bold text-[#1e2749] mb-2">A Phased Journey, Not a One-Time Event</h2>
-                    <p className="text-gray-600 mb-6">
-                      Real change takes time. Our three-phase model meets your school where you are and grows with you. Some schools move through quickly. Others stay in one phase for years. There is no single timeline, just the right pace for your team.
-                    </p>
+            {/* Embedded How We Partner Content - excludes Leadership Dashboard tab */}
+            <HowWePartnerTabs excludeTabs={['dashboard', 'calculator']} showCTAs={false} />
 
-                    {/* Phase Cards */}
-                    <div className="space-y-4">
-                      {/* Phase 1: IGNITE */}
-                      <div className="border-2 border-[#ffba06] rounded-xl overflow-hidden">
-                        <div className="bg-[#ffba06]/10 p-4">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-[#ffba06] rounded-full flex items-center justify-center">
-                                <span className="text-[#1e2749] font-bold">1</span>
-                              </div>
-                              <div>
-                                <div className="flex items-center gap-2">
-                                  <h3 className="font-bold text-[#1e2749]">IGNITE</h3>
-                                  <span className="text-xs bg-[#ffba06] text-[#1e2749] px-2 py-0.5 rounded-full">Start Here</span>
-                                </div>
-                                <p className="text-sm text-gray-600">Leadership + Pilot Group</p>
-                              </div>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-xs text-gray-500">Awareness → Buy-in</p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="p-4">
-                          <p className="text-sm text-gray-600 mb-3">
-                            Build buy-in with your leadership team and a pilot group of 10-25 educators. See early wins, lay the foundation for real, lasting change.
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            <strong>What's Included:</strong> Learning Hub, Observation Days, Virtual Sessions, Executive Sessions
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Phase 2: ACCELERATE */}
-                      <div className="border border-gray-200 rounded-xl overflow-hidden">
-                        <div className="bg-gray-50 p-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-[#38618C] rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold">2</span>
-                            </div>
-                            <div>
-                              <h3 className="font-bold text-[#1e2749]">ACCELERATE</h3>
-                              <p className="text-sm text-gray-600">Whole Staff Implementation</p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="p-4">
-                          <p className="text-sm text-gray-600 mb-1">Buy-in → Momentum</p>
-                          <p className="text-sm text-gray-500">Scale from pilot to full team implementation with deeper coaching cycles.</p>
-                        </div>
-                      </div>
-
-                      {/* Phase 3: SUSTAIN */}
-                      <div className="border border-gray-200 rounded-xl overflow-hidden">
-                        <div className="bg-gray-50 p-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gray-400 rounded-full flex items-center justify-center">
-                              <span className="text-white font-bold">3</span>
-                            </div>
-                            <div>
-                              <h3 className="font-bold text-[#1e2749]">SUSTAIN</h3>
-                              <p className="text-sm text-gray-600">Culture & Systems</p>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="p-4">
-                          <p className="text-sm text-gray-600 mb-1">Momentum → Lasting Change</p>
-                          <p className="text-sm text-gray-500">Embed practices into culture. Build internal leaders. Make it stick.</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {activeBlueprintTab === 'inperson' && (
-                  <div className="bg-white rounded-xl p-6 shadow-sm">
-                    <h2 className="text-xl font-bold text-[#1e2749] mb-2">In-Person Support</h2>
-                    <p className="text-gray-600 mb-6">
-                      Nothing replaces being there. Our on-site visits include classroom observations, personalized feedback, and collaborative planning sessions.
-                    </p>
-                    <div className="space-y-4">
-                      <div className="border border-gray-200 rounded-lg p-4">
-                        <h4 className="font-semibold text-[#1e2749] mb-1">Observation Days</h4>
-                        <p className="text-sm text-gray-600">We observe paras in action and provide personalized "Love Notes" with specific, actionable feedback.</p>
-                      </div>
-                      <div className="border border-gray-200 rounded-lg p-4">
-                        <h4 className="font-semibold text-[#1e2749] mb-1">Executive Impact Sessions</h4>
-                        <p className="text-sm text-gray-600">Strategic planning sessions with leadership to align goals and measure progress.</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {activeBlueprintTab === 'hub' && (
-                  <div className="bg-white rounded-xl p-6 shadow-sm">
-                    <h2 className="text-xl font-bold text-[#1e2749] mb-2">The Learning Hub</h2>
-                    <p className="text-gray-600 mb-6">
-                      24/7 access to practical, ready-to-use strategies. New content added monthly based on partner needs.
-                    </p>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="border border-gray-200 rounded-lg p-4">
-                        <h4 className="font-semibold text-[#1e2749] mb-1">Micro-Learning Courses</h4>
-                        <p className="text-sm text-gray-600">5-15 minute modules designed for busy paras</p>
-                      </div>
-                      <div className="border border-gray-200 rounded-lg p-4">
-                        <h4 className="font-semibold text-[#1e2749] mb-1">Resource Library</h4>
-                        <p className="text-sm text-gray-600">Downloadable tools, templates, and guides</p>
-                      </div>
-                      <div className="border border-gray-200 rounded-lg p-4">
-                        <h4 className="font-semibold text-[#1e2749] mb-1">Strategy Cards</h4>
-                        <p className="text-sm text-gray-600">Quick-reference cards for common situations</p>
-                      </div>
-                      <div className="border border-gray-200 rounded-lg p-4">
-                        <h4 className="font-semibold text-[#1e2749] mb-1">Community Forum</h4>
-                        <p className="text-sm text-gray-600">Connect with other paras across the country</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {activeBlueprintTab === 'book' && (
-                  <div className="bg-white rounded-xl p-6 shadow-sm">
-                    <h2 className="text-xl font-bold text-[#1e2749] mb-2">The Book</h2>
-                    <p className="text-gray-600 mb-6">
-                      "Teachers Deserve It" provides the foundational mindset and strategies that drive lasting change.
-                    </p>
-                    <div className="bg-[#1e2749] text-white rounded-xl p-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-20 h-28 bg-white/20 rounded flex items-center justify-center">
-                          <BookOpen className="w-8 h-8" />
-                        </div>
-                        <div>
-                          <h3 className="font-bold text-lg">Teachers Deserve It</h3>
-                          <p className="text-white/80 text-sm">By Rae Hughart & Adam Welcome</p>
-                          <p className="text-white/60 text-xs mt-2">Included for all partner schools</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {activeBlueprintTab === 'results' && (
-                  <div className="bg-white rounded-xl p-6 shadow-sm">
-                    <h2 className="text-xl font-bold text-[#1e2749] mb-2">Proven Results</h2>
-                    <p className="text-gray-600 mb-6">
-                      Data from TDI partner schools shows consistent, measurable improvement.
-                    </p>
-                    <div className="grid md:grid-cols-2 gap-6">
-                      <div className="text-center p-6 bg-[#38618C]/5 rounded-xl">
-                        <p className="text-4xl font-bold text-[#38618C]">65%</p>
-                        <p className="text-sm text-gray-600 mt-1">Strategy Implementation Rate</p>
-                        <p className="text-xs text-gray-400">(vs 10% industry average)</p>
-                      </div>
-                      <div className="text-center p-6 bg-[#38618C]/5 rounded-xl">
-                        <p className="text-4xl font-bold text-[#38618C]">85%</p>
-                        <p className="text-sm text-gray-600 mt-1">Partner Renewal Rate</p>
-                        <p className="text-xs text-gray-400">Continue to Year 2</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
+            {/* Learn more link */}
+            <div className="text-center mt-6">
+              <a
+                href="https://teachersdeserveit.com/how-we-partner"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#38618C] hover:text-[#2d4e73] font-medium underline underline-offset-4 transition-colors"
+              >
+                View full details on our website →
+              </a>
             </div>
           </div>
         )}
@@ -1202,7 +1029,7 @@ export default function ASD4Dashboard() {
               <div className="flex flex-col md:flex-row gap-6">
                 <div className="flex-shrink-0">
                   <img
-                    src="/images/rae-headshot.png"
+                    src="/images/rae-headshot.webp"
                     alt="Rae Hughart"
                     className="w-24 h-24 rounded-full object-cover"
                   />
