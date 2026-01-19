@@ -263,7 +263,7 @@ export default function ASD4Dashboard() {
         {activeTab === 'overview' && (
           <div className="space-y-6">
             {/* Welcome Banner */}
-            <div className="bg-gradient-to-r from-[#38618C] to-[#1e2749] rounded-2xl p-6 text-white">
+            <div className="bg-gradient-to-r from-[#38618C] to-[#1e2749] rounded-2xl px-6 py-12 text-white">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                   <h2 className="text-2xl font-bold mb-2">Welcome, Addison SD4!</h2>
