@@ -427,12 +427,15 @@ export default function ASD4Dashboard() {
                 </a>
               </div>
 
-              {/* Virtual Sessions Note */}
-              <div className="mt-3 flex items-start gap-2 text-xs text-gray-500">
-                <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <p>
-                  <strong>Virtual Sessions:</strong> Due dates indicate when sessions should be scheduled by. You have flexibility in how you use them — combine sessions back-to-back, spread them out, whatever works best for your team.
-                </p>
+              {/* Virtual Sessions Flexibility Note */}
+              <div className="mt-4 bg-[#35A7FF]/10 border border-[#35A7FF]/30 rounded-lg p-4 flex items-start gap-3">
+                <Info className="w-5 h-5 text-[#35A7FF] flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-[#1e2749] text-sm mb-1">Virtual Sessions are Flexible</p>
+                  <p className="text-sm text-gray-600">
+                    Due dates indicate when sessions should be scheduled by. You have flexibility in how you use them — combine sessions back-to-back, spread them out, whatever works best for your team.
+                  </p>
+                </div>
               </div>
             </div>
 
