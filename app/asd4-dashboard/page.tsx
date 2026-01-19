@@ -263,23 +263,33 @@ export default function ASD4Dashboard() {
         {activeTab === 'overview' && (
           <div className="space-y-6">
             {/* Welcome Banner */}
-            <div className="bg-gradient-to-r from-[#38618C] to-[#1e2749] rounded-2xl px-6 py-12 text-white">
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl font-bold mb-2">Welcome, Addison SD4!</h2>
-                  <p className="text-white/80">
-                    Your paraprofessional development journey starts here. Let's empower your paras to make a bigger impact.
-                  </p>
-                </div>
-                <div className="flex items-center gap-3 bg-white/10 rounded-xl p-4">
-                  <div className="text-center">
-                    <p className="text-3xl font-bold">{partnershipData.participantCount}/{partnershipData.contractedCount}</p>
-                    <p className="text-xs text-white/70">Paras Enrolled</p>
+            <div className="relative rounded-2xl overflow-hidden text-white">
+              {/* Background Image */}
+              <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{ backgroundImage: "url('/images/asd4-hero.jpg')" }}
+              />
+              {/* Navy Gradient Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-r from-[#1e2749]/95 via-[#1e2749]/85 to-[#1e2749]/75" />
+              {/* Content */}
+              <div className="relative px-6 py-12">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <h2 className="text-2xl font-bold mb-2">Welcome, Addison SD4!</h2>
+                    <p className="text-white/80">
+                      Your paraprofessional development journey starts here. Let's empower your paras to make a bigger impact.
+                    </p>
                   </div>
-                  <div className="w-px h-12 bg-white/20" />
-                  <div className="text-center">
-                    <p className="text-3xl font-bold">{partnershipData.buildingCount}</p>
-                    <p className="text-xs text-white/70">Schools</p>
+                  <div className="flex items-center gap-3 bg-white/10 rounded-xl p-4">
+                    <div className="text-center">
+                      <p className="text-3xl font-bold">{partnershipData.participantCount}/{partnershipData.contractedCount}</p>
+                      <p className="text-xs text-white/70">Paras Enrolled</p>
+                    </div>
+                    <div className="w-px h-12 bg-white/20" />
+                    <div className="text-center">
+                      <p className="text-3xl font-bold">{partnershipData.buildingCount}</p>
+                      <p className="text-xs text-white/70">Schools</p>
+                    </div>
                   </div>
                 </div>
               </div>
