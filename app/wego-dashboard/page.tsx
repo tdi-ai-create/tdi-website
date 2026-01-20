@@ -35,7 +35,8 @@ import {
   Quote,
   ChevronDown,
   ChevronUp,
-  PartyPopper
+  PartyPopper,
+  Award
 } from 'lucide-react';
 
 export default function WegoDashboard() {
@@ -1367,118 +1368,273 @@ export default function WegoDashboard() {
 
         {/* 2026-27 TAB */}
         {activeTab === 'next-year' && (
-          <div className="space-y-6">
+          <div className="space-y-8">
+            {/* Hero Statement */}
             <div className="text-center mb-6">
-              <span className="inline-block bg-[#35A7FF]/10 text-[#35A7FF] text-xs font-medium px-3 py-1 rounded-full mb-2">
-                Preview
+              <span className="inline-block bg-[#35A7FF]/10 text-[#35A7FF] text-xs font-medium px-3 py-1 rounded-full mb-3">
+                The Natural Next Step
               </span>
-              <h2 className="text-2xl font-bold text-[#1e2749] mb-2">Continuing Your Partnership</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Your para team is thriving. The natural next step is bringing their teachers into the fold — but we&apos;ll customize Year 2 to fit YOUR goals.
+              <h2 className="text-2xl font-bold text-[#1e2749] mb-3">Year 2: Teacher-Para Partnerships</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto text-lg">
+                Your para team is thriving. Year 2 brings their teachers into the conversation — building the co-teaching partnerships that benefit everyone.
               </p>
             </div>
 
-            {/* What Year 2 Could Include */}
+            {/* Why Teacher-Para Partnerships Matter */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#35A7FF]" />
-                What Year 2 Could Include
+                <Handshake className="w-5 h-5 text-[#38618C]" />
+                Why Teacher-Para Partnerships Matter
               </h3>
 
-              <div className="space-y-4">
-                {/* Co-Teaching Support */}
-                <div className="border border-gray-200 rounded-xl p-5">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Handshake className="w-6 h-6 text-[#38618C]" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] mb-1">Co-Teaching Support</h4>
-                      <p className="text-gray-600 text-sm">
-                        Train teachers and paras to work together more effectively — shared planning, clear roles, and collaborative instruction.
-                      </p>
-                    </div>
-                  </div>
-                </div>
+              {/* Bob's Quote - Featured */}
+              <div className="bg-[#ffba06]/10 border-l-4 border-[#ffba06] rounded-r-xl p-5 mb-6">
+                <p className="text-[#1e2749] font-medium italic mb-2">Bob said it best:</p>
+                <p className="text-xl text-[#1e2749] font-semibold">&quot;Trust and shared goals to best serve students.&quot;</p>
+                <p className="text-gray-600 text-sm mt-3">
+                  Your PAs are already practicing this. Year 2 brings their teachers into the same conversation — so everyone is aligned.
+                </p>
+              </div>
 
+              {/* Research Points */}
+              <p className="text-gray-700 mb-4 font-medium">Research shows effective co-teaching requires:</p>
+              <ul className="space-y-2 mb-4">
+                <li className="flex items-center gap-3 text-gray-700">
+                  <Check className="w-5 h-5 text-[#38618C] flex-shrink-0" />
+                  Clear role definition between teacher and para
+                </li>
+                <li className="flex items-center gap-3 text-gray-700">
+                  <Check className="w-5 h-5 text-[#38618C] flex-shrink-0" />
+                  Shared planning time
+                </li>
+                <li className="flex items-center gap-3 text-gray-700">
+                  <Check className="w-5 h-5 text-[#38618C] flex-shrink-0" />
+                  Mutual respect and communication
+                </li>
+                <li className="flex items-center gap-3 text-gray-700">
+                  <Check className="w-5 h-5 text-[#38618C] flex-shrink-0" />
+                  Common language and strategies
+                </li>
+              </ul>
+              <p className="text-[#38618C] font-medium">
+                Your PAs completed &quot;Building Strong Teacher-Para Partnerships&quot; and gave it rave reviews. Year 2 gives their teachers the same foundation.
+              </p>
+            </div>
+
+            {/* The Year 2 Plan */}
+            <div className="space-y-4">
+              <h3 className="font-bold text-[#1e2749] text-lg flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#35A7FF]" />
+                The Year 2 Plan
+              </h3>
+
+              <div className="grid gap-4">
                 {/* Teacher Onboarding */}
-                <div className="border border-gray-200 rounded-xl p-5">
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
                       <GraduationCap className="w-6 h-6 text-[#38618C]" />
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] mb-1">Teacher Onboarding</h4>
-                      <p className="text-gray-600 text-sm">
-                        Bring the teachers who work alongside your paras into the TDI community with Hub access and targeted PD.
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="font-semibold text-[#1e2749]">Teacher Onboarding</h4>
+                        <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full font-medium">Year 2 Feature</span>
+                      </div>
+                      <p className="text-gray-600 text-sm mb-3">
+                        Teachers who work alongside your paras get:
                       </p>
+                      <ul className="space-y-1 text-sm text-gray-600">
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                          Learning Hub access with co-teaching resources
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                          &quot;Building Strong Teacher-Para Partnerships&quot; course
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                          Common language and strategies shared with their PA partners
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Co-Teaching Observations */}
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Handshake className="w-6 h-6 text-[#38618C]" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="font-semibold text-[#1e2749]">Co-Teaching Observations</h4>
+                        <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full font-medium">Year 2 Feature</span>
+                      </div>
+                      <p className="text-gray-600 text-sm mb-3">
+                        Observe teacher-para teams working together:
+                      </p>
+                      <ul className="space-y-1 text-sm text-gray-600">
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                          Joint Love Notes celebrating partnership wins
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                          Targeted feedback on collaboration dynamics
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                          Strategies for shared planning and communication
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Partnership Coaching Sessions */}
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Users className="w-6 h-6 text-[#38618C]" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="font-semibold text-[#1e2749]">Partnership Coaching Sessions</h4>
+                        <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full font-medium">Year 2 Feature</span>
+                      </div>
+                      <p className="text-gray-600 text-sm mb-3">
+                        Virtual sessions designed for teacher-para teams:
+                      </p>
+                      <ul className="space-y-1 text-sm text-gray-600">
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                          Co-planning strategies that actually work
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                          Role clarity conversations
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                          Communication frameworks for busy days
+                        </li>
+                      </ul>
                     </div>
                   </div>
                 </div>
 
                 {/* Continued Para Support */}
-                <div className="border border-gray-200 rounded-xl p-5">
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
                       <RefreshCw className="w-6 h-6 text-[#38618C]" />
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] mb-1">Continued Para Support</h4>
-                      <p className="text-gray-600 text-sm">
-                        Your paras keep growing with additional observation cycles, Growth Groups, and leadership development.
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="font-semibold text-[#1e2749]">Continued Para Support</h4>
+                        <span className="text-xs bg-gray-200 text-gray-600 px-2 py-1 rounded-full font-medium">Continued from Year 1</span>
+                      </div>
+                      <p className="text-gray-600 text-sm mb-3">
+                        Your PA team keeps growing with:
                       </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Collaboration Metrics */}
-                <div className="border border-gray-200 rounded-xl p-5">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <LineChart className="w-6 h-6 text-[#38618C]" />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] mb-1">Collaboration Metrics</h4>
-                      <p className="text-gray-600 text-sm">
-                        Track how teacher-para partnerships improve — planning time, student outcomes, and team satisfaction.
-                      </p>
+                      <ul className="space-y-1 text-sm text-gray-600">
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                          Additional observation cycles
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                          Growth Groups and peer support
+                        </li>
+                        <li className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                          PA leadership development pathway
+                        </li>
+                      </ul>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Why It Matters */}
+            {/* What Success Looks Like */}
             <div className="bg-[#F5F5F5] rounded-xl p-6">
-              <h3 className="font-bold text-[#1e2749] mb-4">Why It Matters</h3>
-              <p className="text-gray-700 mb-4">
-                Research shows that effective co-teaching requires:
-              </p>
-              <ul className="space-y-2 mb-4">
-                <li className="flex items-center gap-3 text-gray-700">
-                  <Check className="w-5 h-5 text-[#38618C]" />
-                  Clear role definition between teacher and para
-                </li>
-                <li className="flex items-center gap-3 text-gray-700">
-                  <Check className="w-5 h-5 text-[#38618C]" />
-                  Shared planning time
-                </li>
-                <li className="flex items-center gap-3 text-gray-700">
-                  <Check className="w-5 h-5 text-[#38618C]" />
-                  Mutual respect and communication
-                </li>
-              </ul>
-              <p className="text-[#38618C] font-semibold">
-                Your PAs are already practicing this. Year 2 brings their teachers into the conversation.
-              </p>
+              <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
+                <Award className="w-5 h-5 text-[#ffba06]" />
+                What Success Looks Like
+              </h3>
+              <p className="text-gray-700 mb-4">Your team told us what good partnerships need:</p>
+
+              <div className="bg-white rounded-xl p-5 border border-gray-200">
+                <p className="text-sm font-medium text-[#38618C] mb-3">FROM BOB&apos;S FEEDBACK:</p>
+                <ul className="space-y-2 mb-4">
+                  <li className="flex items-center gap-3 text-gray-700">
+                    <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    &quot;Start the week with a 5-minute check-in&quot;
+                  </li>
+                  <li className="flex items-center gap-3 text-gray-700">
+                    <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    &quot;Clear role expectations for everyone&quot;
+                  </li>
+                  <li className="flex items-center gap-3 text-gray-700">
+                    <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    &quot;Clear and constant communication&quot;
+                  </li>
+                  <li className="flex items-center gap-3 text-gray-700">
+                    <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    &quot;Trust and shared goals to best serve students&quot;
+                  </li>
+                </ul>
+                <p className="text-[#38618C] font-medium text-sm">
+                  Year 2 gives teachers the tools to meet your PAs where they are.
+                </p>
+              </div>
+            </div>
+
+            {/* By The Numbers */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-[#35A7FF]" />
+                By The Numbers
+              </h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="text-center p-4 bg-[#F5F5F5] rounded-xl">
+                  <div className="text-3xl font-bold text-[#38618C]">85%</div>
+                  <div className="text-xs text-gray-600 mt-1">of partners continue to Year 2</div>
+                </div>
+                <div className="text-center p-4 bg-[#F5F5F5] rounded-xl">
+                  <div className="text-3xl font-bold text-[#38618C]">65%</div>
+                  <div className="text-xs text-gray-600 mt-1">implementation rate vs 10% industry</div>
+                </div>
+                <div className="text-center p-4 bg-[#F5F5F5] rounded-xl">
+                  <div className="text-3xl font-bold text-[#38618C]">95%</div>
+                  <div className="text-xs text-gray-600 mt-1">of WEGO PAs logged into Hub</div>
+                </div>
+              </div>
             </div>
 
             {/* CTA */}
             <div className="bg-[#1e2749] rounded-xl p-6 text-center">
-              <h3 className="text-xl font-bold text-white mb-2">Ready to talk about Year 2?</h3>
-              <p className="text-white/80 mb-4">
-                Every partnership is different. Let&apos;s design a continuation plan that fits YOUR goals — whether that&apos;s deepening para support, adding teachers, or something in between.
+              <h3 className="text-xl font-bold text-white mb-2">Ready to Talk About Year 2?</h3>
+              <p className="text-white/80 mb-4 max-w-xl mx-auto">
+                Your paras are building something special. Year 2 brings their teachers into the fold — so everyone speaks the same language.
               </p>
+              <p className="text-white/70 text-sm mb-5">
+                We&apos;ll customize the plan to fit YOUR goals. Options include:
+              </p>
+              <div className="flex flex-wrap justify-center gap-3 mb-5">
+                <span className="bg-white/10 text-white/90 px-3 py-1.5 rounded-full text-sm">
+                  Continue para-only support
+                </span>
+                <span className="bg-white/10 text-white/90 px-3 py-1.5 rounded-full text-sm">
+                  Add teachers (co-teaching focus)
+                </span>
+                <span className="bg-white/10 text-white/90 px-3 py-1.5 rounded-full text-sm">
+                  Something in between
+                </span>
+              </div>
               <a
                 href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                 target="_blank"
@@ -1487,6 +1643,7 @@ export default function WegoDashboard() {
               >
                 <Calendar className="w-5 h-5" />
                 Schedule Year 2 Conversation
+                <ArrowRight className="w-4 h-4" />
               </a>
             </div>
           </div>
