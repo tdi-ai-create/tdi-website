@@ -396,7 +396,7 @@ export default function CreateWithUsPage() {
                 </p>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6" encType="multipart/form-data">
                 {/* Web3Forms Access Key */}
                 <input type="hidden" name="access_key" value="2ac6e03c-f09d-436f-bb54-a96ec7f00c34" />
                 <input type="hidden" name="subject" value="New Content Creator Application - TDI" />
@@ -439,7 +439,7 @@ export default function CreateWithUsPage() {
                 {/* Headshot Upload */}
                 <div>
                   <label htmlFor="headshot" className="block text-sm font-medium text-gray-700 mb-2">
-                    Headshot *
+                    Headshot (optional)
                   </label>
                   <p className="text-sm text-gray-500 mb-2">
                     Upload a professional photo we can use on the website if you join our team.
@@ -448,7 +448,6 @@ export default function CreateWithUsPage() {
                     type="file"
                     id="headshot"
                     name="headshot"
-                    required
                     accept="image/*"
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffba06] focus:border-transparent transition-all duration-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#ffba06]/20 file:text-[#1e2749] file:font-medium hover:file:bg-[#ffba06]/30 file:cursor-pointer file:transition-colors"
                   />
