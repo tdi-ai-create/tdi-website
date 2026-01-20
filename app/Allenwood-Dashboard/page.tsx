@@ -1419,38 +1419,6 @@ export default function AllenwoodDashboard() {
         {/* BLUEPRINT TAB */}
         {activeTab === 'blueprint' && (
           <div className="space-y-6">
-            {/* Partnership Goal - CORRECTED */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <Target className="w-5 h-5 text-blue-500" />
-                Partnership Goal
-              </h3>
-
-              <p className="text-gray-600 mb-6">
-                Support 10 new teachers (new to Allenwood and/or new to the profession) with
-                practical strategies for managing diverse classrooms and building confidence
-                in their first years.
-              </p>
-
-              {/* Visual flow */}
-              <div className="flex items-center justify-between">
-                <div className="text-center p-4 bg-blue-50 rounded-lg flex-1">
-                  <Heart className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-gray-700">Supported Teachers</p>
-                </div>
-                <ArrowRight className="w-5 h-5 text-gray-300 mx-2" />
-                <div className="text-center p-4 bg-blue-100 rounded-lg flex-1">
-                  <Users className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-gray-700">Confident Classrooms</p>
-                </div>
-                <ArrowRight className="w-5 h-5 text-gray-300 mx-2" />
-                <div className="text-center p-4 bg-amber-50 rounded-lg flex-1">
-                  <Star className="w-6 h-6 text-amber-500 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-gray-700">Student Success</p>
-                </div>
-              </div>
-            </div>
-
             {/* What&apos;s Included */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
