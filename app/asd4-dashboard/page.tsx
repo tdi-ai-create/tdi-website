@@ -17,6 +17,7 @@ import {
   TrendingUp,
   ArrowRight,
   AlertCircle,
+  AlertTriangle,
   Lock,
   Eye,
   MessageCircle,
@@ -45,7 +46,12 @@ import {
   Flame,
   Construction,
   Thermometer,
-  RefreshCw
+  RefreshCw,
+  BarChart,
+  TrendingDown,
+  Shield,
+  Award,
+  Quote
 } from 'lucide-react';
 
 export default function ASD4Dashboard() {
@@ -947,63 +953,280 @@ export default function ASD4Dashboard() {
         {/* ==================== 2026-27 TAB ==================== */}
         {activeTab === 'year2' && (
           <div className="space-y-6">
-            {/* Header */}
+
+            {/* Section 1: Header */}
             <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mb-3">
                 <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Year 2 Preview</span>
               </div>
-              <h2 className="text-2xl font-bold mt-3">Continue to ACCELERATE in 2026-27</h2>
+              <h2 className="text-2xl font-bold">Continue Building Momentum in 2026-27</h2>
               <p className="text-white/80 mt-2">
-                You&apos;re building momentum with your pilot group this spring. Year 2 expands that success to your full para team.
+                This spring, you&apos;re laying the groundwork. Year 2 is where transformation becomes culture.
               </p>
             </div>
 
-            {/* What Year 2 Includes */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <h3 className="font-semibold text-[#1e2749] mb-4">What Year 2 Includes</h3>
-              <ul className="space-y-3">
-                {[
-                  'Full year of support (fall through spring)',
-                  'Move from pilot (10-20) → all 117 paras receiving focused coaching',
-                  'Multiple observation cycles across all buildings',
-                  'Growth Groups for entire para team',
-                  'Para leadership development pathway',
-                  'Summer kickoff to start strong'
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-[#38618C] mt-0.5 flex-shrink-0" />
-                    <span className="text-gray-700">{item}</span>
-                  </li>
-                ))}
-              </ul>
+            {/* Section 2: Risk of Stopping */}
+            <div className="bg-[#E07A5F]/10 border border-[#E07A5F]/30 rounded-xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <AlertTriangle className="w-5 h-5 text-[#E07A5F]" />
+                <h3 className="font-bold text-[#1e2749]">What Happens If We Stop After Phase 1?</h3>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="flex items-start gap-3">
+                  <TrendingDown className="w-5 h-5 text-[#E07A5F] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Momentum fades</p>
+                    <p className="text-sm text-gray-600">Research shows PD impact drops 80% within 6 months without follow-up</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Users className="w-5 h-5 text-[#E07A5F] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Only your pilot benefits</p>
+                    <p className="text-sm text-gray-600">97 other paras miss out on transformative support</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <BarChart className="w-5 h-5 text-[#E07A5F] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Hard to measure ROI</p>
+                    <p className="text-sm text-gray-600">One semester of data isn&apos;t enough to prove long-term impact</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Heart className="w-5 h-5 text-[#E07A5F] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Culture doesn&apos;t stick</p>
+                    <p className="text-sm text-gray-600">True culture change requires sustained investment</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Stats */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="bg-white rounded-xl p-6 shadow-sm text-center">
-                <p className="text-4xl font-bold text-[#38618C]">85%</p>
-                <p className="text-sm text-gray-600 mt-1">of partners continue to Year 2</p>
-              </div>
-              <div className="bg-white rounded-xl p-6 shadow-sm text-center">
-                <p className="text-4xl font-bold text-[#38618C]">65%</p>
-                <p className="text-sm text-gray-600 mt-1">implementation rate vs 10% industry average</p>
+            {/* Section 3: What Continuing Looks Like */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <h3 className="font-bold text-[#1e2749] mb-4">What Continuing Looks Like</h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* This Spring Column */}
+                <div className="bg-gray-50 rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Sprout className="w-5 h-5 text-[#38618C]" />
+                    <span className="font-semibold text-[#1e2749]">This Spring (Phase 1)</span>
+                  </div>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-[#38618C] flex-shrink-0 mt-0.5" />
+                      <span>Pilot group of 10-20 paras</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-[#38618C] flex-shrink-0 mt-0.5" />
+                      <span>2 observation days</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-[#38618C] flex-shrink-0 mt-0.5" />
+                      <span>4 virtual sessions</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-[#38618C] flex-shrink-0 mt-0.5" />
+                      <span>Baseline + mid-point data</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-[#38618C] flex-shrink-0 mt-0.5" />
+                      <span>Growth Groups begin</span>
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Next Phase Column */}
+                <div className="bg-[#ffba06]/10 rounded-xl p-5 border border-[#ffba06]/30">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Rocket className="w-5 h-5 text-[#ffba06]" />
+                    <span className="font-semibold text-[#1e2749]">2026-27 (Phase 2)</span>
+                  </div>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
+                      <span><strong>All 117 paras</strong> receive coaching</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
+                      <span>Full year of support</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
+                      <span>Multiple observation cycles</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
+                      <span>Year-over-year data comparison</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Star className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
+                      <span>Para leadership development</span>
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
 
-            {/* CTA */}
+            {/* Section 4: TDI Proven Results */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <h3 className="font-semibold text-[#1e2749] mb-2">Ready to continue the journey?</h3>
-              <p className="text-gray-600 text-sm mb-4">Let&apos;s lock in your 2026-27 partnership.</p>
-              <a
-                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-[#1e2749] hover:bg-[#2d3a5c] text-white px-6 py-3 rounded-xl font-semibold transition-all"
-              >
-                <Calendar className="w-4 h-4" />
-                Schedule Renewal Chat
-              </a>
+              <div className="flex items-center gap-2 mb-4">
+                <BarChart className="w-5 h-5 text-[#38618C]" />
+                <h3 className="font-bold text-[#1e2749]">TDI Proven Results</h3>
+              </div>
+              <p className="text-gray-600 text-sm mb-5">What our partner schools experience after a full year:</p>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-gray-50 rounded-xl">
+                  <p className="text-3xl font-bold text-[#38618C]">41%</p>
+                  <p className="text-sm text-gray-600 mt-1">increase in job satisfaction</p>
+                  <p className="text-xs text-gray-400 mt-1">5.1 → 7.2 avg</p>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-xl">
+                  <p className="text-3xl font-bold text-[#38618C]">71%</p>
+                  <p className="text-sm text-gray-600 mt-1">increase in feeling valued</p>
+                  <p className="text-xs text-gray-400 mt-1">3.8 → 6.5 avg</p>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-xl">
+                  <p className="text-3xl font-bold text-[#38618C]">30%</p>
+                  <p className="text-sm text-gray-600 mt-1">reduction in stress</p>
+                  <p className="text-xs text-gray-400 mt-1">7.9 → 5.5 avg</p>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-xl">
+                  <p className="text-3xl font-bold text-[#38618C]">90%</p>
+                  <p className="text-sm text-gray-600 mt-1">increase in retention intent</p>
+                  <p className="text-xs text-gray-400 mt-1">4.1 → 7.8 avg</p>
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-400 text-center mt-4">
+                Data from TDI partner surveys · Industry averages from RAND, NCTQ, Learning Policy Institute
+              </p>
             </div>
+
+            {/* Section 5: What Your Paras Get */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Users className="w-5 h-5 text-[#38618C]" />
+                <h3 className="font-bold text-[#1e2749]">What Your Paras Get in Year 2</h3>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                  <Heart className="w-5 h-5 text-[#E07A5F] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Personalized Love Notes</p>
+                    <p className="text-sm text-gray-600">Every para receives individual feedback after each observation</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                  <BookOpen className="w-5 h-5 text-[#38618C] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Continued Hub Access</p>
+                    <p className="text-sm text-gray-600">150+ on-demand micro-courses built specifically for paras</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                  <Users className="w-5 h-5 text-[#38618C] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Growth Groups</p>
+                    <p className="text-sm text-gray-600">Targeted support with peers who share similar growth areas</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                  <Award className="w-5 h-5 text-[#ffba06] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Leadership Pathway</p>
+                    <p className="text-sm text-gray-600">Opportunity to become a para leader or mentor</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 6: What You Get as a Leader */}
+            <div className="bg-[#1e2749] rounded-xl p-6 text-white">
+              <div className="flex items-center gap-2 mb-4">
+                <Shield className="w-5 h-5 text-[#ffba06]" />
+                <h3 className="font-bold">What You Get as a Leader</h3>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#ffba06] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Board-ready data</p>
+                    <p className="text-sm text-white/70">Year-over-year metrics that prove ROI</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#ffba06] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Retention strategy</p>
+                    <p className="text-sm text-white/70">Keep your best paras from leaving</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#ffba06] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Executive partnership</p>
+                    <p className="text-sm text-white/70">Regular check-ins with your TDI team</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#ffba06] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium">Culture transformation</p>
+                    <p className="text-sm text-white/70">Move from program to embedded practice</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 7: Testimonial */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <Quote className="w-8 h-8 text-[#ffba06] mb-3" />
+              <blockquote className="text-lg text-[#1e2749] italic mb-4">
+                &ldquo;Year 1 got our paras excited. Year 2 made it part of who we are. Our turnover dropped from 25% to 8%, and paras are now leading their own professional learning.&rdquo;
+              </blockquote>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#38618C] rounded-full flex items-center justify-center">
+                  <User className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-semibold text-[#1e2749]">Sarah M.</p>
+                  <p className="text-sm text-gray-500">Director of Special Education, TDI Partner</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 8: Renewal CTA */}
+            <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
+              <h3 className="text-xl font-bold mb-2">Let&apos;s Talk About 2026-27</h3>
+              <p className="text-white/80 mb-5">
+                No pressure. We&apos;ll walk through your options and answer any questions about continuing your partnership.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center gap-2 bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-6 py-3 rounded-xl font-semibold transition-all"
+                >
+                  <Calendar className="w-5 h-5" />
+                  Schedule Renewal Conversation
+                </a>
+                <a
+                  href="mailto:rae@teachersdeserveit.com?subject=2026-27 Partnership Question - ASD4"
+                  className="inline-flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 text-white px-6 py-3 rounded-xl font-semibold transition-all border border-white/30"
+                >
+                  <Mail className="w-5 h-5" />
+                  Email Rae Instead
+                </a>
+              </div>
+              <p className="text-xs text-white/60 mt-4">
+                85% of partners continue to Year 2 · Early renewal ensures continuity for your team
+              </p>
+            </div>
+
           </div>
         )}
 
@@ -1113,10 +1336,14 @@ export default function ASD4Dashboard() {
                   </a>
                   <div className="pt-2 border-t border-gray-100">
                     <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Primary Contact</p>
-                    <p className="font-medium text-gray-800">Katie Diaz</p>
-                    <a href="mailto:kdiaz@asd4.org" className="text-[#35A7FF] hover:underline">
-                      kdiaz@asd4.org
+                    <p className="font-medium text-gray-800">Janet Diaz</p>
+                    <a href="mailto:jdiaz@asd4.org" className="text-[#35A7FF] hover:underline">
+                      jdiaz@asd4.org
                     </a>
+                  </div>
+                  <div className="pt-2 border-t border-gray-100 mt-2">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Secondary Contact</p>
+                    <p className="font-medium text-gray-800">Katie Purse</p>
                   </div>
                 </div>
               </div>
