@@ -217,7 +217,7 @@ export default function AllenwoodDashboard() {
                 <div className="flex items-center justify-between p-4 bg-amber-50 border border-amber-200 rounded-lg">
                   <div>
                     <p className="font-medium text-gray-800">Virtual Session #2</p>
-                    <p className="text-sm text-gray-500">Included in contract · Due by June 2026</p>
+                    <p className="text-sm text-gray-500">Included in contract · Schedule before April 2026</p>
                   </div>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
@@ -233,7 +233,7 @@ export default function AllenwoodDashboard() {
                 <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
                   <div>
                     <p className="font-medium text-gray-800">Virtual Session #3</p>
-                    <p className="text-sm text-gray-500">Included in contract · Due by June 2026</p>
+                    <p className="text-sm text-gray-500">Included in contract · Schedule before April 2026</p>
                   </div>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
@@ -249,7 +249,7 @@ export default function AllenwoodDashboard() {
                 <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
                   <div>
                     <p className="font-medium text-gray-800">Virtual Session #4</p>
-                    <p className="text-sm text-gray-500">Included in contract · Due by June 2026</p>
+                    <p className="text-sm text-gray-500">Included in contract · Schedule before April 2026</p>
                   </div>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
@@ -265,7 +265,7 @@ export default function AllenwoodDashboard() {
                 <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
                   <div>
                     <p className="font-medium text-gray-800">Virtual Session #5</p>
-                    <p className="text-sm text-gray-500">Included in contract · Due by June 2026</p>
+                    <p className="text-sm text-gray-500">Included in contract · Schedule before April 2026</p>
                   </div>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
@@ -281,7 +281,7 @@ export default function AllenwoodDashboard() {
                 <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
                   <div>
                     <p className="font-medium text-gray-800">Virtual Session #6</p>
-                    <p className="text-sm text-gray-500">Included in contract · Due by June 2026</p>
+                    <p className="text-sm text-gray-500">Included in contract · Schedule before April 2026</p>
                   </div>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
