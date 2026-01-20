@@ -709,67 +709,86 @@ export default function ASD4Dashboard() {
 
             {/* ===== SECTION 2: Your Next Steps ===== */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h3 className="text-lg font-bold text-[#1e2749] mb-5">Your Next Steps</h3>
-
-              <div className="space-y-4">
-                {/* Step 1: Identify Pilot Group */}
-                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                  <div className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
-                    <Circle className="w-4 h-4 text-gray-300" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-medium text-[#1e2749]">Identify Pilot Group (10-20 paras)</div>
-                    <p className="text-sm text-gray-500 mt-1">Select the paras who will participate in focused coaching this spring.</p>
-                  </div>
-                  <a
-                    href="/asd4-dashboard/pilot-selection"
-                    className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2d3a5c] transition-colors flex items-center gap-2"
-                  >
-                    Select Pilot Group
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
-                </div>
-
-                {/* Step 2: Schedule Virtual Session 1 */}
-                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                  <div className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
-                    <Circle className="w-4 h-4 text-gray-300" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-medium text-[#1e2749]">Schedule Virtual Session 1</div>
-                    <p className="text-sm text-gray-500 mt-1">Your kickoff session includes baseline survey collection.</p>
-                  </div>
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2d3a5c] transition-colors flex items-center gap-2"
-                  >
-                    Schedule Session
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
-                </div>
-
-                {/* Step 3: Schedule Observation Day 1 */}
-                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                  <div className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
-                    <Circle className="w-4 h-4 text-gray-300" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-medium text-[#1e2749]">Schedule Observation Day 1</div>
-                    <p className="text-sm text-gray-500 mt-1">On-site classroom visits with personalized Love Notes.</p>
-                  </div>
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2d3a5c] transition-colors flex items-center gap-2"
-                  >
-                    Schedule Observation
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
+              <div className="flex items-center justify-between mb-5">
+                <div className="flex items-center gap-2">
+                  <AlertCircle className="w-5 h-5 text-[#E07A5F]" />
+                  <h3 className="text-lg font-bold text-[#1e2749]">Your Next Steps</h3>
+                  <span className="bg-[#E07A5F]/10 text-[#E07A5F] text-xs font-medium px-2 py-0.5 rounded-full">3 items</span>
                 </div>
               </div>
+
+              <div className="space-y-3">
+                {/* Item 1: Complete Partner Data Form */}
+                <a
+                  href="/asd4-dashboard/partner-data"
+                  className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <ClipboardList className="w-5 h-5 text-[#E07A5F]" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Complete Partner Data Form</div>
+                      <p className="text-sm text-gray-500">Help us customize your dashboard</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-[#E07A5F] font-medium">DUE FEB 2026</span>
+                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[#1e2749] transition-colors" />
+                  </div>
+                </a>
+
+                {/* Item 2: Identify Pilot Group */}
+                <a
+                  href="/asd4-dashboard/pilot-selection"
+                  className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 text-[#E07A5F]" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Identify Pilot Group</div>
+                      <p className="text-sm text-gray-500">Select 10-20 paras for focused coaching</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-[#E07A5F] font-medium">DUE FEB 2026</span>
+                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[#1e2749] transition-colors" />
+                  </div>
+                </a>
+
+                {/* Item 3: Schedule Observation Day 1 */}
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Eye className="w-5 h-5 text-[#E07A5F]" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Schedule Observation Day 1</div>
+                      <p className="text-sm text-gray-500">On-site visit with personalized Love Notes</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-[#E07A5F] font-medium">DUE FEB 2026</span>
+                    <Calendar className="w-4 h-4 text-gray-400 group-hover:text-[#1e2749] transition-colors" />
+                  </div>
+                </a>
+              </div>
+
+              {/* Link to full list */}
+              <button
+                onClick={() => setActiveTab('overview')}
+                className="w-full mt-4 pt-4 border-t border-gray-100 text-center text-sm text-[#38618C] hover:text-[#2d4a6d] font-medium transition-colors flex items-center justify-center gap-2"
+              >
+                View all 9 action items on Overview
+                <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
 
             {/* ===== SECTION 3: Hub Engagement (REAL DATA) ===== */}
