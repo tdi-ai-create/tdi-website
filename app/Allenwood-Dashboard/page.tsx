@@ -1986,23 +1986,6 @@ export default function AllenwoodDashboard() {
                   </div>
                 </div>
 
-                {/* Autism Support Bundle */}
-                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <BookOpen className="w-6 h-6 text-[#38618C]" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-semibold text-[#1e2749]">Autism Support Bundle</h4>
-                        <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full font-medium">Year 2 Feature</span>
-                      </div>
-                      <p className="text-gray-600 text-sm">
-                        New TDI content — visual routines, communication supports, sensory-safe transitions — designed for your team&apos;s needs.
-                      </p>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
 
