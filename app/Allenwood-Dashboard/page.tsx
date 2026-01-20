@@ -136,8 +136,9 @@ export default function AllenwoodDashboard() {
                 <div className="text-sm text-gray-600">Hub Logins (9/11)</div>
               </div>
               <div className="bg-white rounded-xl p-4 shadow-sm text-center">
-                <div className="text-3xl font-bold text-amber-600">6</div>
-                <div className="text-sm text-gray-600">Items to Schedule</div>
+                <div className="text-3xl font-bold text-green-600">10</div>
+                <div className="text-sm text-gray-600">Love Notes</div>
+                <div className="text-xs text-gray-400">Delivered</div>
               </div>
               <div className="bg-white rounded-xl p-4 shadow-sm text-center">
                 <div className="text-sm font-bold text-[#35A7FF]">IGNITE</div>
@@ -215,14 +216,83 @@ export default function AllenwoodDashboard() {
                     <p className="text-xs text-amber-600 mt-1">Alexander H., Alexander S., Andrea J., Jasmin T., Traci W., Yvette W., Jovy O., Rofiat A.</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-200">
-                  <div className="w-3 h-3 bg-red-500 rounded-full mt-1.5"></div>
+                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="w-3 h-3 bg-gray-400 rounded-full mt-1.5"></div>
                   <div>
-                    <span className="font-semibold text-red-800">Needs Support: 2 Teachers</span>
-                    <p className="text-sm text-red-700">Haven&apos;t logged in yet</p>
-                    <p className="text-xs text-red-600 mt-1">Carlita Law, Tia Bowles-Simon</p>
+                    <span className="font-semibold text-gray-700">Getting Started: 2 Teachers</span>
+                    <p className="text-sm text-gray-600">Haven&apos;t logged in yet — we&apos;ll reconnect at Feb observation</p>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Support Delivered So Far */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                Support Delivered So Far
+              </h3>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-gray-800">Summer Leadership Planning</p>
+                    <p className="text-sm text-gray-500">July 25, 2025 — Goal setting and partnership launch</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-gray-800">Virtual Coaching Session #1</p>
+                    <p className="text-sm text-gray-500">September 17, 2025 — Team kickoff and Hub orientation</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-gray-800">Full Observation Day + 10 Love Notes</p>
+                    <p className="text-sm text-gray-500">October 15, 2025 — All 10 teachers observed with personalized feedback</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium text-gray-800">Hub Access Activated</p>
+                    <p className="text-sm text-gray-500">11 educators enrolled with full course library access</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Observation Highlights */}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
+              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <Star className="w-5 h-5 text-green-600" />
+                Observation Day #1 Highlights
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">October 15, 2025 — All 10 teachers observed</p>
+
+              <div className="space-y-2">
+                <p className="text-sm text-gray-700">
+                  <span className="font-medium">Strong foundations observed:</span> Calm classroom management,
+                  joyful learning environments, effective call-and-response routines, and strong
+                  adult teamwork across multiple classrooms.
+                </p>
+                <p className="text-sm text-gray-700">
+                  <span className="font-medium">Growth areas identified:</span> Targeted support for
+                  classroom structure and para alignment — resources shared in personalized Love Notes.
+                </p>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-green-200">
+                <p className="text-sm text-gray-500 italic">
+                  &quot;Your team has the heart and dedication — we&apos;re here to make sure they have
+                  the structure and support to match.&quot; — Rae
+                </p>
               </div>
             </div>
 
@@ -325,90 +395,89 @@ export default function AllenwoodDashboard() {
         {/* PROGRESS TAB */}
         {activeTab === 'progress' && (
           <div className="space-y-6">
-            {/* Journey Timeline */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-[#35A7FF]" />
-                Your Journey So Far
-              </h3>
+            {/* Partnership Timeline */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-800 mb-6">Your Partnership Journey</h3>
 
-              {/* Visual Timeline */}
-              <div className="relative mb-8">
-                <div className="h-2 bg-gray-200 rounded-full">
-                  <div className="h-2 bg-gradient-to-r from-[#35A7FF] to-[#38618C] rounded-full" style={{ width: '50%' }}></div>
-                </div>
-                <div className="flex justify-between mt-2 text-xs text-gray-500">
-                  <span>Jul 2025</span>
-                  <span>Jan 2026</span>
-                  <span>Jun 2026</span>
-                </div>
-              </div>
+              <div className="relative">
+                {/* Timeline line */}
+                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200" />
 
-              {/* Milestones */}
-              <div className="space-y-4">
-                <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Milestones Achieved</h4>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <div className="space-y-6">
+                  {/* July - Contract */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center z-10">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
                     <div>
-                      <p className="font-medium text-[#1e2749]">July 2025</p>
-                      <p className="text-sm text-gray-600">Contract signed, partnership launched</p>
+                      <p className="font-medium text-gray-800">Partnership Launched</p>
+                      <p className="text-sm text-gray-500">July 2025 — Contract signed, goals aligned</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-[#1e2749]">July 25, 2025</p>
-                      <p className="text-sm text-gray-600">Summer Leadership Team Meeting</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-[#1e2749]">September 17, 2025</p>
-                      <p className="text-sm text-gray-600">Virtual Session #1 complete</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-[#1e2749]">October 6, 2025</p>
-                      <p className="text-sm text-gray-600">Hub access activated for 11 teachers</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-[#1e2749]">October 15, 2025</p>
-                      <p className="text-sm text-gray-600">Observation Day #1 complete</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
 
-              {/* Coming Up */}
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-4">Coming Up</h4>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <Calendar className="w-5 h-5 text-[#35A7FF] flex-shrink-0 mt-0.5" />
+                  {/* July - Leadership */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center z-10">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
                     <div>
-                      <p className="font-medium text-[#1e2749]">February 18, 2026</p>
-                      <p className="text-sm text-gray-600">Observation Day #2</p>
+                      <p className="font-medium text-gray-800">Summer Leadership Meeting</p>
+                      <p className="text-sm text-gray-500">July 25, 2025 — Planning and preparation</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <Clock className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+
+                  {/* September - Virtual */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center z-10">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
                     <div>
-                      <p className="font-medium text-[#1e2749]">TBD</p>
-                      <p className="text-sm text-gray-600">Virtual Sessions #2-6</p>
+                      <p className="font-medium text-gray-800">Virtual Session #1</p>
+                      <p className="text-sm text-gray-500">September 17, 2025 — Team kickoff</p>
                     </div>
                   </div>
-                  <div className="flex items-start gap-3">
-                    <PartyPopper className="w-5 h-5 text-[#ffba06] flex-shrink-0 mt-0.5" />
+
+                  {/* October - Observation */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center z-10">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
                     <div>
-                      <p className="font-medium text-[#1e2749]">Spring 2026</p>
-                      <p className="text-sm text-gray-600">Leadership Celebration + Year 2 Planning</p>
+                      <p className="font-medium text-gray-800">Observation Day #1</p>
+                      <p className="text-sm text-gray-500">October 15, 2025 — 10 teachers observed, 10 Love Notes delivered</p>
+                    </div>
+                  </div>
+
+                  {/* TODAY marker */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-[#35A7FF] flex items-center justify-center z-10 ring-4 ring-[#35A7FF]/20">
+                      <span className="text-white text-xs font-bold">NOW</span>
+                    </div>
+                    <div>
+                      <p className="font-medium text-[#35A7FF]">January 2026</p>
+                      <p className="text-sm text-gray-500">Planning next steps</p>
+                    </div>
+                  </div>
+
+                  {/* February - Observation 2 */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center z-10">
+                      <Calendar className="w-4 h-4 text-gray-500" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-800">Observation Day #2</p>
+                      <p className="text-sm text-gray-500">February 18, 2026 — Scheduled</p>
+                    </div>
+                  </div>
+
+                  {/* Spring - Celebration */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center z-10">
+                      <PartyPopper className="w-4 h-4 text-gray-500" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-800">Spring Leadership Celebration</p>
+                      <p className="text-sm text-gray-500">Spring 2026 — Celebrate wins + Year 2 planning</p>
                     </div>
                   </div>
                 </div>
@@ -931,6 +1000,26 @@ export default function AllenwoodDashboard() {
                       sharonh.porter@pgcps.org
                     </a>
                     <p className="text-sm text-gray-600">(301) 655-2785</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-gray-200">
+                <h5 className="font-medium text-gray-500 text-sm mb-3">LEADERSHIP TEAM</h5>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">Stephanie Gobbo</span>
+                    <a href="mailto:stephanie.gobbo@pgcps.org" className="text-sm text-[#38618C] hover:underline">
+                      stephanie.gobbo@pgcps.org
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Mail className="w-4 h-4 text-gray-400" />
+                    <span className="text-sm text-gray-600">Jovita Ortiz</span>
+                    <a href="mailto:jovita.ortiz@pgcps.org" className="text-sm text-[#38618C] hover:underline">
+                      jovita.ortiz@pgcps.org
+                    </a>
                   </div>
                 </div>
               </div>
