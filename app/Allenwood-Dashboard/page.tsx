@@ -395,118 +395,124 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Needs Attention */}
-            <div id="needs-attention-section" className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <AlertCircle className="w-5 h-5 text-[#E07A5F]" />
-                <span className="font-semibold text-[#1e2749]">Needs Attention</span>
-                <span className="text-xs bg-[#E07A5F]/10 text-[#E07A5F] px-2 py-0.5 rounded-full">6 items</span>
-              </div>
+            {/* Needs Attention - Matching Upcoming Sessions Style */}
+            <div id="needs-attention-section" className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-orange-500" />
+                Needs Attention
+                <span className="text-sm font-normal text-orange-500 ml-2">6 items</span>
+              </h3>
 
               <div className="space-y-3">
-                {/* Virtual Session #2 - highlighted as next to schedule */}
-                <div className="flex items-center justify-between p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                  <div>
-                    <p className="font-medium text-gray-800">Virtual Session #2</p>
-                    <p className="text-sm text-gray-500">Included in contract · Schedule before April 2026</p>
+                {/* Virtual Session #2 */}
+                <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
+                  <div className="flex items-center gap-6">
+                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
+                    <span className="text-gray-800 font-medium">Virtual Session #2</span>
                   </div>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3659] transition-colors"
+                    className="px-4 py-2 bg-orange-500 text-white rounded-full text-sm font-medium hover:bg-orange-600"
                   >
-                    Schedule
+                    Schedule Now
                   </a>
                 </div>
 
                 {/* Virtual Session #3 */}
-                <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
-                  <div>
-                    <p className="font-medium text-gray-800">Virtual Session #3</p>
-                    <p className="text-sm text-gray-500">Included in contract · Schedule before April 2026</p>
+                <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
+                  <div className="flex items-center gap-6">
+                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
+                    <span className="text-gray-800 font-medium">Virtual Session #3</span>
                   </div>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 bg-orange-500 text-white rounded-full text-sm font-medium hover:bg-orange-600"
                   >
-                    Schedule
+                    Schedule Now
                   </a>
                 </div>
 
                 {/* Virtual Session #4 */}
-                <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
-                  <div>
-                    <p className="font-medium text-gray-800">Virtual Session #4</p>
-                    <p className="text-sm text-gray-500">Included in contract · Schedule before April 2026</p>
+                <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
+                  <div className="flex items-center gap-6">
+                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
+                    <span className="text-gray-800 font-medium">Virtual Session #4</span>
                   </div>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 bg-orange-500 text-white rounded-full text-sm font-medium hover:bg-orange-600"
                   >
-                    Schedule
+                    Schedule Now
                   </a>
                 </div>
 
                 {/* Virtual Session #5 */}
-                <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
-                  <div>
-                    <p className="font-medium text-gray-800">Virtual Session #5</p>
-                    <p className="text-sm text-gray-500">Included in contract · Schedule before April 2026</p>
+                <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
+                  <div className="flex items-center gap-6">
+                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
+                    <span className="text-gray-800 font-medium">Virtual Session #5</span>
                   </div>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 bg-orange-500 text-white rounded-full text-sm font-medium hover:bg-orange-600"
                   >
-                    Schedule
+                    Schedule Now
                   </a>
                 </div>
 
                 {/* Virtual Session #6 */}
-                <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
-                  <div>
-                    <p className="font-medium text-gray-800">Virtual Session #6</p>
-                    <p className="text-sm text-gray-500">Included in contract · Schedule before April 2026</p>
+                <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
+                  <div className="flex items-center gap-6">
+                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
+                    <span className="text-gray-800 font-medium">Virtual Session #6</span>
                   </div>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 bg-orange-500 text-white rounded-full text-sm font-medium hover:bg-orange-600"
                   >
-                    Schedule
+                    Schedule Now
                   </a>
                 </div>
 
-                {/* Spring Leadership Celebration */}
-                <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
-                  <div>
-                    <p className="font-medium text-gray-800">Spring Leadership Celebration</p>
-                    <p className="text-sm text-gray-500">Schedule before April 2026 · Complimentary</p>
+                {/* Leadership Celebration */}
+                <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
+                  <div className="flex items-center gap-6">
+                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
+                    <span className="text-gray-800 font-medium">Leadership Celebration + Year 2 Planning</span>
                   </div>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                    className="px-4 py-2 bg-orange-500 text-white rounded-full text-sm font-medium hover:bg-orange-600"
                   >
-                    Schedule
+                    Schedule Now
                   </a>
                 </div>
               </div>
 
-              {/* Already Scheduled */}
+              {/* Already Scheduled - Same Style */}
               <div className="mt-6 pt-4 border-t border-gray-200">
-                <p className="text-sm font-medium text-gray-500 mb-3">ALREADY SCHEDULED</p>
-                <div className="flex items-center gap-3 text-gray-700">
-                  <Check className="w-5 h-5 text-green-500" />
-                  <span>Observation Day #2 — February 18, 2026</span>
+                <h4 className="font-medium text-gray-700 mb-3">Already Scheduled</h4>
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-6">
+                    <span className="text-sm font-medium text-blue-600 w-24">Feb 18</span>
+                    <span className="text-gray-800 font-medium">Observation Day #2</span>
+                  </div>
+                  <span className="text-sm text-green-600 flex items-center gap-1">
+                    <Check className="w-4 h-4" />
+                    Scheduled
+                  </span>
                 </div>
               </div>
             </div>
