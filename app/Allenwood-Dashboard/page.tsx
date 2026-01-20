@@ -194,115 +194,6 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Hours of Support Delivered - matches WEGO */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <Timer className="w-5 h-5 text-[#38618C]" />
-                <span className="font-semibold text-[#1e2749] uppercase tracking-wide">Support Delivered So Far</span>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-[#38618C]">6+</div>
-                  <div className="text-xs text-gray-600 mt-1">Hours On-Site<br/>Observation</div>
-                </div>
-                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-[#38618C]">1</div>
-                  <div className="text-xs text-gray-600 mt-1">Virtual<br/>Session</div>
-                </div>
-                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-[#38618C]">10</div>
-                  <div className="text-xs text-gray-600 mt-1">Love Notes<br/>Delivered</div>
-                </div>
-                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-[#38618C]">11</div>
-                  <div className="text-xs text-gray-600 mt-1">Hub<br/>Memberships</div>
-                </div>
-              </div>
-
-              <p className="text-sm text-gray-600 text-center">
-                Your team receives dedicated, personalized support — not one-size-fits-all PD.
-              </p>
-            </div>
-
-            {/* Hub Engagement Section */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <BarChart3 className="w-5 h-5 text-[#38618C]" />
-                <span className="font-semibold text-[#1e2749]">Hub Engagement</span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="text-center p-3 bg-[#F5F5F5] rounded-xl">
-                  <div className="text-2xl font-bold text-[#38618C]">82%</div>
-                  <div className="text-xs text-gray-600">Logged In (9/11)</div>
-                </div>
-                <div className="text-center p-3 bg-[#F5F5F5] rounded-xl">
-                  <div className="text-2xl font-bold text-[#38618C]">13</div>
-                  <div className="text-xs text-gray-600">Total Logins</div>
-                </div>
-                <div className="text-center p-3 bg-[#F5F5F5] rounded-xl">
-                  <div className="text-2xl font-bold text-amber-600">2</div>
-                  <div className="text-xs text-gray-600">Need Support</div>
-                </div>
-              </div>
-
-              {/* Engagement Tiers */}
-              <div className="space-y-3">
-                <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                  <div className="w-3 h-3 bg-green-500 rounded-full mt-1.5"></div>
-                  <div>
-                    <span className="font-semibold text-green-800">High Engagement: 1 Teacher</span>
-                    <p className="text-sm text-green-700">Logging in regularly (3+ logins)</p>
-                    <p className="text-xs text-green-600 mt-1">Georgette Cruickshank</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
-                  <div className="w-3 h-3 bg-amber-500 rounded-full mt-1.5"></div>
-                  <div>
-                    <span className="font-semibold text-amber-800">Building Habits: 8 Teachers</span>
-                    <p className="text-sm text-amber-700">Logged in 1-2 times</p>
-                    <p className="text-xs text-amber-600 mt-1">Alexander H., Alexander S., Andrea J., Jasmin T., Traci W., Yvette W., Jovy O., Rofiat A.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="w-3 h-3 bg-gray-400 rounded-full mt-1.5"></div>
-                  <div>
-                    <span className="font-semibold text-gray-700">Getting Started: 2 Teachers</span>
-                    <p className="text-sm text-gray-600">Haven&apos;t logged in yet — we&apos;ll reconnect at Feb observation</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Observation Highlights */}
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
-              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <Star className="w-5 h-5 text-green-600" />
-                Observation Day #1 Highlights
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">October 15, 2025 — All 10 teachers observed</p>
-
-              <div className="space-y-2">
-                <p className="text-sm text-gray-700">
-                  <span className="font-medium">Strong foundations observed:</span> Calm classroom management,
-                  joyful learning environments, effective call-and-response routines, and strong
-                  adult teamwork across multiple classrooms.
-                </p>
-                <p className="text-sm text-gray-700">
-                  <span className="font-medium">Growth areas identified:</span> Targeted support for
-                  classroom structure and para alignment — resources shared in personalized Love Notes.
-                </p>
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-green-200">
-                <p className="text-sm text-gray-500 italic">
-                  &quot;Your team has the heart and dedication — we&apos;re here to make sure they have
-                  the structure and support to match.&quot; — Rae
-                </p>
-              </div>
-            </div>
-
             {/* Recommendation Card */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
               <div className="flex items-start gap-3">
@@ -580,6 +471,115 @@ export default function AllenwoodDashboard() {
                   <p className="text-sm text-gray-500">Follow-up observations + continued coaching</p>
                 </div>
                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">SCHEDULED</span>
+              </div>
+            </div>
+
+            {/* Support Delivered So Far */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Timer className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749] uppercase tracking-wide">Support Delivered So Far</span>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#38618C]">6+</div>
+                  <div className="text-xs text-gray-600 mt-1">Hours On-Site<br/>Observation</div>
+                </div>
+                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#38618C]">1</div>
+                  <div className="text-xs text-gray-600 mt-1">Virtual<br/>Session</div>
+                </div>
+                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#38618C]">10</div>
+                  <div className="text-xs text-gray-600 mt-1">Love Notes<br/>Delivered</div>
+                </div>
+                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#38618C]">11</div>
+                  <div className="text-xs text-gray-600 mt-1">Hub<br/>Memberships</div>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-600 text-center">
+                Your team receives dedicated, personalized support — not one-size-fits-all PD.
+              </p>
+            </div>
+
+            {/* Observation Highlights */}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
+              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <Star className="w-5 h-5 text-green-600" />
+                Observation Day #1 Highlights
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">October 15, 2025 — All 10 teachers observed</p>
+
+              <div className="space-y-2">
+                <p className="text-sm text-gray-700">
+                  <span className="font-medium">Strong foundations observed:</span> Calm classroom management,
+                  joyful learning environments, effective call-and-response routines, and strong
+                  adult teamwork across multiple classrooms.
+                </p>
+                <p className="text-sm text-gray-700">
+                  <span className="font-medium">Growth areas identified:</span> Targeted support for
+                  classroom structure and para alignment — resources shared in personalized Love Notes.
+                </p>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-green-200">
+                <p className="text-sm text-gray-500 italic">
+                  &quot;Your team has the heart and dedication — we&apos;re here to make sure they have
+                  the structure and support to match.&quot; — Rae
+                </p>
+              </div>
+            </div>
+
+            {/* Hub Engagement Details */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <BarChart3 className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749]">Hub Engagement Details</span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="text-center p-3 bg-[#F5F5F5] rounded-xl">
+                  <div className="text-2xl font-bold text-[#38618C]">82%</div>
+                  <div className="text-xs text-gray-600">Logged In (9/11)</div>
+                </div>
+                <div className="text-center p-3 bg-[#F5F5F5] rounded-xl">
+                  <div className="text-2xl font-bold text-[#38618C]">13</div>
+                  <div className="text-xs text-gray-600">Total Logins</div>
+                </div>
+                <div className="text-center p-3 bg-[#F5F5F5] rounded-xl">
+                  <div className="text-2xl font-bold text-amber-600">2</div>
+                  <div className="text-xs text-gray-600">Need Support</div>
+                </div>
+              </div>
+
+              {/* Engagement Tiers */}
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div className="w-3 h-3 bg-green-500 rounded-full mt-1.5"></div>
+                  <div>
+                    <span className="font-semibold text-green-800">High Engagement: 1 Teacher</span>
+                    <p className="text-sm text-green-700">Logging in regularly (3+ logins)</p>
+                    <p className="text-xs text-green-600 mt-1">Georgette Cruickshank</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                  <div className="w-3 h-3 bg-amber-500 rounded-full mt-1.5"></div>
+                  <div>
+                    <span className="font-semibold text-amber-800">Building Habits: 8 Teachers</span>
+                    <p className="text-sm text-amber-700">Logged in 1-2 times</p>
+                    <p className="text-xs text-amber-600 mt-1">Alexander H., Alexander S., Andrea J., Jasmin T., Traci W., Yvette W., Jovy O., Rofiat A.</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
+                  <div className="w-3 h-3 bg-gray-400 rounded-full mt-1.5"></div>
+                  <div>
+                    <span className="font-semibold text-gray-700">Getting Started: 2 Teachers</span>
+                    <p className="text-sm text-gray-600">Haven&apos;t logged in yet — we&apos;ll reconnect at Feb observation</p>
+                  </div>
+                </div>
               </div>
             </div>
 
