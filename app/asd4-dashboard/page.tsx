@@ -687,21 +687,22 @@ export default function ASD4Dashboard() {
               <div className="text-xs uppercase tracking-wide text-white/60 mb-2">Why This Partnership Matters</div>
               <div className="text-lg font-semibold mb-3">The Paraprofessional Crisis</div>
 
-              <div className="grid grid-cols-3 gap-4 mb-4">
+              <div className="grid grid-cols-4 gap-4 mb-4">
                 <div className="text-center">
                   <div className="text-3xl font-bold">23%</div>
                   <div className="text-xs text-white/70">Para attrition rate</div>
-                  <div className="text-xs text-white/50">up from 8% in 2008</div>
                 </div>
-                <div className="text-center border-l border-r border-white/20">
+                <div className="text-center border-l border-white/20">
                   <div className="text-3xl font-bold">50%+</div>
                   <div className="text-xs text-white/70">of school turnover</div>
-                  <div className="text-xs text-white/50">is paras & staff</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-3xl font-bold">16%</div>
-                  <div className="text-xs text-white/70">feel included in PD</div>
-                  <div className="text-xs text-white/50">"often" or "always"</div>
+                <div className="text-center border-l border-white/20">
+                  <div className="text-3xl font-bold">84%</div>
+                  <div className="text-xs text-white/70">excluded from PD</div>
+                </div>
+                <div className="text-center border-l border-white/20">
+                  <div className="text-3xl font-bold">3.8</div>
+                  <div className="text-xs text-white/70">"feeling valued" avg</div>
                 </div>
               </div>
 
