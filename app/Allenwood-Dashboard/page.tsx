@@ -32,7 +32,8 @@ import {
   PartyPopper,
   Award,
   MessageCircle,
-  Timer
+  Timer,
+  Heart
 } from 'lucide-react';
 
 export default function AllenwoodDashboard() {
@@ -660,24 +661,68 @@ export default function AllenwoodDashboard() {
             </div>
 
             {/* Hub Engagement Details */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <BarChart3 className="w-5 h-5 text-[#38618C]" />
-                <span className="font-semibold text-[#1e2749]">Hub Engagement Details</span>
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-blue-500" />
+                Hub Engagement Details
+              </h3>
+
+              {/* Stats Row */}
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <p className="text-2xl font-bold text-green-600">82%</p>
+                  <p className="text-sm text-gray-500">Logged In (9/11)</p>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <p className="text-2xl font-bold text-[#1e2749]">13</p>
+                  <p className="text-sm text-gray-500">Total Logins</p>
+                </div>
+                <div className="text-center p-4 bg-gray-50 rounded-lg">
+                  <p className="text-2xl font-bold text-orange-500">2</p>
+                  <p className="text-sm text-gray-500">Need Support</p>
+                </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="text-center p-3 bg-[#F5F5F5] rounded-xl">
-                  <div className="text-2xl font-bold text-[#38618C]">82%</div>
-                  <div className="text-xs text-gray-600">Logged In (9/11)</div>
+              {/* Visual Progress Bars */}
+              <div className="space-y-4 mb-6">
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">Login Rate</span>
+                    <span className="font-medium text-green-600">82%</span>
+                  </div>
+                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-green-500 rounded-full" style={{ width: '82%' }} />
+                  </div>
                 </div>
-                <div className="text-center p-3 bg-[#F5F5F5] rounded-xl">
-                  <div className="text-2xl font-bold text-[#38618C]">13</div>
-                  <div className="text-xs text-gray-600">Total Logins</div>
+
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">High Engagement (3+ logins)</span>
+                    <span className="font-medium text-green-600">9%</span>
+                  </div>
+                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-green-500 rounded-full" style={{ width: '9%' }} />
+                  </div>
                 </div>
-                <div className="text-center p-3 bg-[#F5F5F5] rounded-xl">
-                  <div className="text-2xl font-bold text-amber-600">2</div>
-                  <div className="text-xs text-gray-600">Need Support</div>
+
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">Building Habits (1-2 logins)</span>
+                    <span className="font-medium text-amber-500">73%</span>
+                  </div>
+                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-amber-400 rounded-full" style={{ width: '73%' }} />
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">Getting Started (0 logins)</span>
+                    <span className="font-medium text-orange-500">18%</span>
+                  </div>
+                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-orange-400 rounded-full" style={{ width: '18%' }} />
+                  </div>
                 </div>
               </div>
 
@@ -807,32 +852,34 @@ export default function AllenwoodDashboard() {
         {/* BLUEPRINT TAB */}
         {activeTab === 'blueprint' && (
           <div className="space-y-6">
-            {/* Partnership Goal */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
-                <Target className="w-5 h-5 text-[#38618C]" />
+            {/* Partnership Goal - CORRECTED */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <Target className="w-5 h-5 text-blue-500" />
                 Partnership Goal
               </h3>
-              <p className="text-gray-700 mb-6">
-                Equip Autism/Special Ed teachers with practical strategies to reduce stress
-                and increase confidence in supporting diverse learners.
+
+              <p className="text-gray-600 mb-6">
+                Support 10 new teachers (new to Allenwood and/or new to the profession) with
+                practical strategies for managing diverse classrooms and building confidence
+                in their first years.
               </p>
 
-              {/* Goal Equation */}
-              <div className="flex items-center justify-center gap-4 text-center">
-                <div className="bg-[#35A7FF]/10 rounded-xl p-4 flex-1">
-                  <GraduationCap className="w-6 h-6 text-[#35A7FF] mx-auto mb-2" />
-                  <p className="font-semibold text-[#1e2749] text-sm">Confident Teachers</p>
+              {/* Visual flow */}
+              <div className="flex items-center justify-between">
+                <div className="text-center p-4 bg-blue-50 rounded-lg flex-1">
+                  <Heart className="w-6 h-6 text-blue-500 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-gray-700">Supported Teachers</p>
                 </div>
-                <ArrowRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                <div className="bg-[#38618C]/10 rounded-xl p-4 flex-1">
-                  <Users className="w-6 h-6 text-[#38618C] mx-auto mb-2" />
-                  <p className="font-semibold text-[#1e2749] text-sm">Better Support</p>
+                <ArrowRight className="w-5 h-5 text-gray-300 mx-2" />
+                <div className="text-center p-4 bg-blue-100 rounded-lg flex-1">
+                  <Users className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-gray-700">Confident Classrooms</p>
                 </div>
-                <ArrowRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                <div className="bg-[#ffba06]/10 rounded-xl p-4 flex-1">
-                  <Star className="w-6 h-6 text-[#ffba06] mx-auto mb-2" />
-                  <p className="font-semibold text-[#1e2749] text-sm">Student Success</p>
+                <ArrowRight className="w-5 h-5 text-gray-300 mx-2" />
+                <div className="text-center p-4 bg-amber-50 rounded-lg flex-1">
+                  <Star className="w-6 h-6 text-amber-500 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-gray-700">Student Success</p>
                 </div>
               </div>
             </div>
