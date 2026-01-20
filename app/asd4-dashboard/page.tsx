@@ -1041,45 +1041,7 @@ export default function ASD4Dashboard() {
               </p>
             </div>
 
-            {/* Section 2: Risk of Stopping */}
-            <div className="bg-[#E07A5F]/10 border border-[#E07A5F]/30 rounded-xl p-6">
-              <div className="flex items-center gap-2 mb-4">
-                <AlertTriangle className="w-5 h-5 text-[#E07A5F]" />
-                <h3 className="font-bold text-[#1e2749]">What Happens If We Stop After Phase 1?</h3>
-              </div>
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="flex items-start gap-3">
-                  <TrendingDown className="w-5 h-5 text-[#E07A5F] flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-[#1e2749]">Momentum fades</p>
-                    <p className="text-sm text-gray-600">Research shows PD impact drops 80% within 6 months without follow-up</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Users className="w-5 h-5 text-[#E07A5F] flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-[#1e2749]">Only your pilot benefits</p>
-                    <p className="text-sm text-gray-600">97 other paras miss out on transformative support</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <BarChart className="w-5 h-5 text-[#E07A5F] flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-[#1e2749]">Hard to measure ROI</p>
-                    <p className="text-sm text-gray-600">One semester of data isn&apos;t enough to prove long-term impact</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <Heart className="w-5 h-5 text-[#E07A5F] flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="font-medium text-[#1e2749]">Culture doesn&apos;t stick</p>
-                    <p className="text-sm text-gray-600">True culture change requires sustained investment</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Section 3: What Continuing Looks Like */}
+            {/* Section 2: What Continuing Looks Like */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="font-bold text-[#1e2749] mb-4">What Continuing Looks Like</h3>
               <div className="grid md:grid-cols-2 gap-6">
@@ -1257,7 +1219,45 @@ export default function ASD4Dashboard() {
               </div>
             </div>
 
-            {/* Section 7: Testimonial */}
+            {/* Section 7: Risk of Stopping */}
+            <div className="bg-[#E07A5F]/10 border border-[#E07A5F]/30 rounded-xl p-6">
+              <div className="flex items-center gap-2 mb-4">
+                <AlertTriangle className="w-5 h-5 text-[#E07A5F]" />
+                <h3 className="font-bold text-[#1e2749]">What Happens If We Stop After Phase 1?</h3>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="flex items-start gap-3">
+                  <TrendingDown className="w-5 h-5 text-[#E07A5F] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Momentum fades</p>
+                    <p className="text-sm text-gray-600">Research shows PD impact drops 80% within 6 months without follow-up</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Users className="w-5 h-5 text-[#E07A5F] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Only your pilot benefits</p>
+                    <p className="text-sm text-gray-600">97 other paras miss out on transformative support</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <BarChart className="w-5 h-5 text-[#E07A5F] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Hard to measure ROI</p>
+                    <p className="text-sm text-gray-600">One semester of data isn&apos;t enough to prove long-term impact</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <Heart className="w-5 h-5 text-[#E07A5F] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Culture doesn&apos;t stick</p>
+                    <p className="text-sm text-gray-600">True culture change requires sustained investment</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 8: Testimonial */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <Quote className="w-8 h-8 text-[#ffba06] mb-3" />
               <blockquote className="text-lg text-[#1e2749] italic mb-4">
