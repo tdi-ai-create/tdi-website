@@ -1794,7 +1794,7 @@ export default function AllenwoodDashboard() {
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <Repeat className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
-                    <span><strong>Full-year support</strong> — August to April</span>
+                    <span><strong>Full-year support</strong> — August to July</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <Award className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
