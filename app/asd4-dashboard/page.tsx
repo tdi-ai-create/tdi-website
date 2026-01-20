@@ -751,25 +751,80 @@ export default function ASD4Dashboard() {
               </div>
             </div>
 
-            {/* 3. TDI Proven Results - REAL DATA (TDI Track Record) */}
+            {/* 3. Strategy Implementation Rate - Simplified */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
+
+              {/* Header */}
+              <div className="p-5 pb-0">
+                <div className="text-sm font-semibold text-[#1e2749]">Strategy Implementation Rate</div>
+                <div className="text-xs text-gray-500 mt-1">Do strategies from PD actually get used?</div>
+              </div>
+
+              {/* Main comparison - This is REAL data, not example */}
+              <div className="p-5">
+                <div className="flex items-center justify-center gap-8">
+
+                  {/* Traditional PD */}
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-[#E07A5F]">10%</div>
+                    <div className="text-sm text-gray-600 mt-1">Traditional PD</div>
+                    <div className="text-xs text-gray-400">Industry average</div>
+                  </div>
+
+                  {/* Arrow with context */}
+                  <div className="flex flex-col items-center">
+                    <div className="text-[#38618C] font-bold text-lg">→</div>
+                    <div className="text-xs text-[#38618C] font-medium">with TDI</div>
+                  </div>
+
+                  {/* TDI Partners */}
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-[#38618C]">65%</div>
+                    <div className="text-sm text-gray-600 mt-1">TDI Partners</div>
+                    <div className="text-xs text-[#38618C] font-medium">6.5x higher</div>
+                  </div>
+
+                </div>
+
+                {/* What this means */}
+                <div className="bg-gray-50 rounded-lg p-4 mt-5 text-center">
+                  <div className="text-sm text-gray-700">
+                    <strong>Translation:</strong> With traditional PD, only 1 in 10 strategies make it to the classroom.
+                    With TDI, <span className="text-[#38618C] font-semibold">6-7 out of 10</span> strategies get implemented.
+                  </div>
+                </div>
+              </div>
+
+              {/* ASD4 callout - clearly separate */}
+              <div className="bg-amber-50 border-t border-amber-200 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-amber-600">📊</span>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-[#1e2749]">ASD4's implementation rate will be measured after Observation 1</div>
+                    <div className="text-xs text-gray-500">We'll track how many paras are using strategies from the Hub in their daily work.</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Source */}
+              <div className="px-5 py-3 border-t border-gray-100">
+                <div className="text-xs text-gray-400 text-center">
+                  Industry data: Learning Policy Institute · TDI data: Partner school surveys
+                </div>
+              </div>
+
+            </div>
+
+            {/* 4. TDI Proven Results - REAL DATA (TDI Track Record) */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <div className="text-sm font-semibold text-[#1e2749]">What TDI Partners Achieve</div>
                 <span className="px-2 py-1 bg-[#38618C]/10 text-[#38618C] text-xs font-medium rounded">PROVEN RESULTS</span>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
-                {/* Implementation */}
-                <div className="text-center p-4 bg-gray-50 rounded-xl">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <span className="text-2xl font-bold text-[#E07A5F]">10%</span>
-                    <span className="text-gray-400">→</span>
-                    <span className="text-2xl font-bold text-[#38618C]">65%</span>
-                  </div>
-                  <div className="text-xs text-gray-600 font-medium">Implementation Rate</div>
-                  <div className="text-xs text-gray-400">Industry → TDI Partners</div>
-                </div>
-
+              <div className="grid grid-cols-2 gap-4">
                 {/* Stress Reduction */}
                 <div className="text-center p-4 bg-gray-50 rounded-xl">
                   <div className="flex items-center justify-center gap-2 mb-2">
@@ -798,7 +853,7 @@ export default function ASD4Dashboard() {
               </div>
             </div>
 
-            {/* 4. Leading Indicators - Awaiting Baseline */}
+            {/* 5. Leading Indicators - Awaiting Baseline */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
 
               {/* Header with prominent status */}
@@ -921,7 +976,7 @@ export default function ASD4Dashboard() {
 
             </div>
 
-            {/* 5. Observation Preview - PROMINENT EXAMPLE (with floating banner) */}
+            {/* 6. Observation Preview - PROMINENT EXAMPLE (with floating banner) */}
             <div className="relative">
               {/* EXAMPLE BANNER */}
               <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
@@ -1038,7 +1093,7 @@ export default function ASD4Dashboard() {
               </div>
             </div>
 
-            {/* 6. Para Research Context - REAL DATA (Industry Data) */}
+            {/* 7. Para Research Context - REAL DATA (Industry Data) */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <div className="text-sm font-semibold text-[#1e2749]">Paraprofessional Research</div>
