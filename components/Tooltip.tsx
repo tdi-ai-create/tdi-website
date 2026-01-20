@@ -97,7 +97,7 @@ export function Tooltip({ text, children, position = 'top', iconSize = 14 }: Too
           className={`absolute z-50 ${positionClasses[position]}`}
           role="tooltip"
         >
-          <div className="bg-[#1e2749] text-white text-xs rounded-lg px-3 py-2 max-w-[250px] shadow-lg">
+          <div className="bg-[#1e2749] text-white text-sm rounded-lg px-4 py-3 max-w-[320px] shadow-lg leading-relaxed">
             {text}
           </div>
           <div
