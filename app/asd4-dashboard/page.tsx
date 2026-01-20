@@ -40,73 +40,16 @@ import {
   Monitor,
   Briefcase,
   Sprout,
-  Circle
+  Circle,
+  LogIn,
+  Flame,
+  Construction,
+  Thermometer,
+  RefreshCw
 } from 'lucide-react';
-
-// Accordion Component
-interface AccordionProps {
-  id: string;
-  isOpen: boolean;
-  onToggle: () => void;
-  title: string;
-  subtitle?: string;
-  badge?: string;
-  badgeColor?: string;
-  icon?: React.ReactNode;
-  children: React.ReactNode;
-}
-
-const Accordion = ({ id, isOpen, onToggle, title, subtitle, badge, badgeColor = 'bg-gray-100 text-gray-600', icon, children }: AccordionProps) => {
-  return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-      <button
-        onClick={onToggle}
-        className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
-      >
-        <div className="flex items-center gap-3">
-          {icon && <div className="text-[#38618C]">{icon}</div>}
-          <div className="text-left">
-            <h3 className="font-semibold text-[#1e2749]">{title}</h3>
-            {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          {badge && (
-            <span className={`text-xs px-3 py-1 rounded-full ${badgeColor}`}>
-              {badge}
-            </span>
-          )}
-          {isOpen ? (
-            <ChevronDown className="w-5 h-5 text-gray-400" />
-          ) : (
-            <ChevronRight className="w-5 h-5 text-gray-400" />
-          )}
-        </div>
-      </button>
-
-      <div className={`overflow-hidden transition-all duration-200 ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-        <div className="px-4 pb-4 border-t border-gray-100">
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export default function ASD4Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
-
-  // Accordion states
-  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
-    'timeline': true,
-    'indicators': true,
-    'observation1': false,
-    'observation2': false,
-  });
-
-  const toggleSection = (id: string) => {
-    setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
-  };
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Eye },
@@ -196,13 +139,14 @@ export default function ASD4Dashboard() {
         {/* ==================== OVERVIEW TAB ==================== */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            {/* Quick Stats */}
+
+            {/* Section 1: Stats Grid */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
                 <div className="flex items-center gap-2 mb-1">
                   <Users className="w-4 h-4 text-[#38618C]" />
                   <span className="text-xs text-gray-500 uppercase">Paras Enrolled</span>
-                  <Tooltip text="Total paraprofessionals with Learning Hub access. This number may exceed contracted seats if additional paras were added." position="bottom" iconSize={12} />
+                  <Tooltip text="Total paraprofessionals with Learning Hub access." position="bottom" iconSize={12} />
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">117/117</div>
                 <div className="text-xs text-[#38618C] font-medium">Hub Access</div>
@@ -210,7 +154,7 @@ export default function ASD4Dashboard() {
 
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
                 <div className="flex items-center gap-2 mb-1">
-                  <Eye className="w-4 h-4 text-[#38618C]" />
+                  <LogIn className="w-4 h-4 text-[#38618C]" />
                   <span className="text-xs text-gray-500 uppercase">Hub Logins</span>
                   <Tooltip text="Percentage of enrolled paras who have logged into the Learning Hub at least once. Industry average is ~40%." position="bottom" iconSize={12} />
                 </div>
@@ -227,73 +171,76 @@ export default function ASD4Dashboard() {
                 <div className="flex items-center gap-2 mb-1">
                   <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
                   <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
-                  <Tooltip text="Action items to complete for your partnership. Click any item below to take action." position="bottom" iconSize={12} />
+                  <Tooltip text="Action items to complete for your partnership. Click to view details." position="bottom" iconSize={12} />
                 </div>
-                <div className="text-2xl font-bold text-[#E07A5F]">9</div>
+                <div className="text-2xl font-bold text-[#E07A5F]">5</div>
                 <div className="text-xs text-[#E07A5F] font-medium">Items pending</div>
               </div>
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
+              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#ffba06]">
                 <div className="flex items-center gap-2 mb-1">
-                  <TrendingUp className="w-4 h-4 text-[#38618C]" />
+                  <Flame className="w-4 h-4 text-[#ffba06]" />
                   <span className="text-xs text-gray-500 uppercase">Current Phase</span>
-                  <Tooltip text="Your partnership phase. IGNITE focuses on building foundation and identifying your pilot group." position="bottom" iconSize={12} />
+                  <Tooltip text="IGNITE focuses on building foundation and identifying your pilot group." position="bottom" iconSize={12} />
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">IGNITE</div>
-                <div className="text-xs text-[#38618C] font-medium">Phase 1</div>
+                <div className="text-xs text-[#ffba06] font-medium">Phase 1</div>
               </div>
             </div>
 
-            {/* Needs Attention */}
-            <div id="needs-attention-section" className="bg-[#E07A5F]/5 border border-[#E07A5F]/20 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-4">
+            {/* Section 2: Needs Attention */}
+            <div id="needs-attention-section" className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center gap-2 mb-5">
                 <AlertCircle className="w-5 h-5 text-[#E07A5F]" />
-                <span className="font-semibold text-[#E07A5F] uppercase tracking-wide">Needs Attention</span>
+                <h3 className="text-lg font-bold text-[#1e2749]">Needs Attention</h3>
+                <span className="bg-[#E07A5F]/10 text-[#E07A5F] text-xs font-medium px-2 py-0.5 rounded-full">5 items</span>
               </div>
 
               <div className="space-y-3">
                 {/* Item 1: Partner Data Form */}
                 <a
                   href="/asd4-dashboard/partner-data"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md border border-transparent hover:border-[#35A7FF] transition-all cursor-pointer block"
+                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
                 >
                   <div className="flex items-center gap-3">
-                    <ClipboardList className="w-5 h-5 text-[#E07A5F]" />
+                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <ClipboardList className="w-5 h-5 text-[#ffba06]" />
+                    </div>
                     <div>
-                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
-                        Complete Partner Data Form
-                        <Tooltip text="Takes ~10 minutes. Helps us customize your dashboard with your specific goals and challenges." position="right" iconSize={14} />
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Help us customize your dashboard · <span className="text-[#E07A5F] font-medium">DUE FEB 2026</span>
-                      </div>
+                      <div className="font-medium text-[#1e2749]">Complete Partner Data Form</div>
+                      <p className="text-sm text-gray-500">Help us customize your dashboard</p>
                     </div>
                   </div>
-                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
-                    Complete Form
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-400">DUE FEB 2026</span>
+                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                      Click to Complete
+                      <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </div>
                 </a>
 
                 {/* Item 2: Pilot Group */}
                 <a
                   href="/asd4-dashboard/pilot-selection"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md border border-transparent hover:border-[#35A7FF] transition-all cursor-pointer block"
+                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
                 >
                   <div className="flex items-center gap-3">
-                    <Users className="w-5 h-5 text-[#E07A5F]" />
+                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Users className="w-5 h-5 text-[#ffba06]" />
+                    </div>
                     <div>
-                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
-                        Identify Pilot Group
-                        <Tooltip text="Select 10-20 paras for focused coaching during observations. These are your 'early adopters' who will help build momentum." position="right" iconSize={14} />
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Select 10-20 paras for focused coaching · <span className="text-[#E07A5F] font-medium">DUE FEB 2026</span>
-                      </div>
+                      <div className="font-medium text-[#1e2749]">Identify Pilot Group</div>
+                      <p className="text-sm text-gray-500">Select 10-20 paras for focused coaching</p>
                     </div>
                   </div>
-                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
-                    Identify Pilot Group
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-400">DUE FEB 2026</span>
+                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                      Click to Select
+                      <ArrowRight className="w-4 h-4" />
+                    </span>
+                  </div>
                 </a>
 
                 {/* Item 3: Observation Day 1 */}
@@ -301,205 +248,96 @@ export default function ASD4Dashboard() {
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md border border-transparent hover:border-[#35A7FF] transition-all cursor-pointer block"
+                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
                 >
                   <div className="flex items-center gap-3">
-                    <Eye className="w-5 h-5 text-[#E07A5F]" />
+                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Eye className="w-5 h-5 text-[#ffba06]" />
+                    </div>
                     <div>
-                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
-                        Schedule Observation Day 1
-                        <Tooltip text="Rae visits on-site to observe pilot group paras in action and provide personalized feedback." position="right" iconSize={14} />
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        On-site observation with pilot group · <span className="text-[#E07A5F] font-medium">DUE FEB 2026</span>
-                      </div>
+                      <div className="font-medium text-[#1e2749]">Schedule Observation Day 1</div>
+                      <p className="text-sm text-gray-500">On-site observation with pilot group</p>
                     </div>
                   </div>
-                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Schedule
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-400">DUE FEB 2026</span>
+                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                      <Calendar className="w-4 h-4" />
+                      Click to Schedule
+                    </span>
+                  </div>
                 </a>
 
-                {/* Item 4: Observation Day 2 */}
+                {/* Item 4: Virtual Session 1 */}
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md border border-transparent hover:border-[#35A7FF] transition-all cursor-pointer block"
+                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
                 >
                   <div className="flex items-center gap-3">
-                    <Eye className="w-5 h-5 text-[#E07A5F]" />
+                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Monitor className="w-5 h-5 text-[#ffba06]" />
+                    </div>
                     <div>
-                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
-                        Schedule Observation Day 2
-                        <Tooltip text="Follow-up on-site visit to observe progress and provide additional personalized feedback." position="right" iconSize={14} />
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Follow-up on-site observation · <span className="text-[#E07A5F] font-medium">DUE FEB 2026</span>
-                      </div>
+                      <div className="font-medium text-[#1e2749]">Schedule Virtual Session 1</div>
+                      <p className="text-sm text-gray-500">Kickoff session with baseline survey</p>
                     </div>
                   </div>
-                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Schedule
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-400">DUE FEB 2026</span>
+                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                      <Calendar className="w-4 h-4" />
+                      Click to Schedule
+                    </span>
+                  </div>
                 </a>
 
-                {/* Item 5: Virtual Session 1 */}
+                {/* Item 5: Executive Session 2 */}
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md border border-transparent hover:border-[#35A7FF] transition-all cursor-pointer block"
+                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
                 >
                   <div className="flex items-center gap-3">
-                    <MessageCircle className="w-5 h-5 text-[#E07A5F]" />
+                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Briefcase className="w-5 h-5 text-[#ffba06]" />
+                    </div>
                     <div>
-                      <div className="font-medium text-[#1e2749] flex items-center gap-2">
-                        Virtual Session 1 <span className="text-gray-400 font-normal">· 45 min</span>
-                        <span className="bg-[#38618C]/10 text-[#38618C] px-2 py-0.5 rounded text-xs font-medium">Baseline Data</span>
-                        <Tooltip text="45-minute video call. Baseline survey administered to pilot group during this session." position="right" iconSize={14} />
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Baseline survey administered to pilot group · <span className="text-[#E07A5F] font-medium">DUE FEB 2026</span>
-                      </div>
+                      <div className="font-medium text-[#1e2749]">Schedule Executive Session 2</div>
+                      <p className="text-sm text-gray-500">Leadership alignment meeting</p>
                     </div>
                   </div>
-                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Schedule
-                  </span>
-                </a>
-
-                {/* Item 6: Virtual Session 2 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md border border-transparent hover:border-[#35A7FF] transition-all cursor-pointer block"
-                >
                   <div className="flex items-center gap-3">
-                    <MessageCircle className="w-5 h-5 text-[#E07A5F]" />
-                    <div>
-                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
-                        Virtual Session 2 <span className="text-gray-400 font-normal">· 45 min</span>
-                        <Tooltip text="45-minute video call with Rae. Sessions can be combined or spread out based on your schedule." position="right" iconSize={14} />
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Strategy implementation check-in · <span className="text-[#E07A5F] font-medium">DUE MAR 2026</span>
-                      </div>
-                    </div>
+                    <span className="text-xs text-gray-400">DUE MAR 2026</span>
+                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                      <Calendar className="w-4 h-4" />
+                      Click to Schedule
+                    </span>
                   </div>
-                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Schedule
-                  </span>
                 </a>
-
-                {/* Item 7: Virtual Session 3 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md border border-transparent hover:border-[#35A7FF] transition-all cursor-pointer block"
-                >
-                  <div className="flex items-center gap-3">
-                    <MessageCircle className="w-5 h-5 text-[#E07A5F]" />
-                    <div>
-                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
-                        Virtual Session 3 <span className="text-gray-400 font-normal">· 45 min</span>
-                        <Tooltip text="45-minute video call with Rae. Sessions can be combined or spread out based on your schedule." position="right" iconSize={14} />
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Growth group deep-dive · <span className="text-[#E07A5F] font-medium">DUE APR 2026</span>
-                      </div>
-                    </div>
-                  </div>
-                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Schedule
-                  </span>
-                </a>
-
-                {/* Item 8: Virtual Session 4 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md border border-transparent hover:border-[#35A7FF] transition-all cursor-pointer block"
-                >
-                  <div className="flex items-center gap-3">
-                    <MessageCircle className="w-5 h-5 text-[#E07A5F]" />
-                    <div>
-                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
-                        Virtual Session 4 <span className="text-gray-400 font-normal">· 45 min</span>
-                        <Tooltip text="45-minute video call with Rae. Sessions can be combined or spread out based on your schedule." position="right" iconSize={14} />
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Final strategy session · <span className="text-[#E07A5F] font-medium">DUE MAY 2026</span>
-                      </div>
-                    </div>
-                  </div>
-                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Schedule
-                  </span>
-                </a>
-
-                {/* Item 9: Executive Session 2 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white rounded-lg p-4 flex items-center justify-between hover:shadow-md border border-transparent hover:border-[#35A7FF] transition-all cursor-pointer block"
-                >
-                  <div className="flex items-center gap-3">
-                    <Target className="w-5 h-5 text-[#E07A5F]" />
-                    <div>
-                      <div className="font-medium text-[#1e2749] flex items-center gap-1">
-                        Executive Impact Session 2
-                        <Tooltip text="Leadership-focused session reviewing data, progress, and strategic next steps. Includes admin team." position="right" iconSize={14} />
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        Results review with leadership · <span className="text-[#E07A5F] font-medium">DUE APR 2026</span>
-                      </div>
-                    </div>
-                  </div>
-                  <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
-                    <Calendar className="w-4 h-4" />
-                    Schedule
-                  </span>
-                </a>
-              </div>
-
-              {/* Virtual Sessions Flexibility Note */}
-              <div className="mt-4 bg-[#35A7FF]/10 border border-[#35A7FF]/30 rounded-lg p-4 flex items-start gap-3">
-                <Info className="w-5 h-5 text-[#35A7FF] flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-semibold text-[#1e2749] text-sm mb-1">Virtual Sessions are Flexible</p>
-                  <p className="text-sm text-gray-600">
-                    Due dates indicate when sessions should be scheduled by. You have flexibility in how you use them — combine sessions back-to-back, spread them out, whatever works best for your team.
-                  </p>
-                </div>
               </div>
             </div>
 
-            {/* Hub Time Recommendation */}
+            {/* Section 3: Recommendation Card */}
             <div className="bg-white border-l-4 border-[#38618C] rounded-r-xl p-5 shadow-sm">
               <div className="flex flex-col md:flex-row gap-4">
                 <div className="flex-1">
                   <h3 className="text-[#1e2749] font-bold mb-2 flex items-center gap-2">
-                    <Lightbulb className="w-5 h-5 text-[#38618C]" />
+                    <Lightbulb className="w-5 h-5 text-[#ffba06]" />
                     Recommendation: Dedicated Hub Time
                   </h3>
                   <p className="text-gray-600 text-sm mb-3">
-                    Districts that build in 15-30 minutes of protected time during para meetings see <span className="inline-flex items-center">3x higher implementation rates<Tooltip text="Based on TDI partner data comparing districts with dedicated Hub time vs. self-directed access only." position="top" iconSize={12} /></span>.
+                    Set aside 15 minutes during your next para meeting for a guided Hub walkthrough. Schools that do this see <strong>40% higher engagement</strong> in the first month.
                   </p>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="bg-[#F5F5F5] text-[#1e2749] px-3 py-1 rounded-full text-xs font-medium">Add Hub time to para meetings</span>
-                    <span className="bg-[#F5F5F5] text-[#1e2749] px-3 py-1 rounded-full text-xs font-medium">Share "Strategy of the Week"</span>
-                  </div>
+                  <a
+                    href="#"
+                    className="inline-flex items-center gap-2 text-[#38618C] hover:text-[#2d4a6d] font-medium text-sm transition-colors"
+                  >
+                    View Hub Walkthrough Guide
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
                 </div>
               </div>
             </div>
@@ -518,7 +356,7 @@ export default function ASD4Dashboard() {
                   </p>
                 </div>
                 <div className="text-right flex flex-col items-center">
-                  <span className="text-4xl">→</span>
+                  <ArrowRight className="w-8 h-8" />
                   <p className="text-xs opacity-70">See the plan</p>
                 </div>
               </div>
@@ -529,162 +367,155 @@ export default function ASD4Dashboard() {
         {/* ==================== JOURNEY TAB ==================== */}
         {activeTab === 'journey' && (
           <div className="space-y-6">
-            {/* Partnership Goal */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center gap-2 flex-wrap mb-2">
+
+            {/* Section 1: Partnership Goal */}
+            <div className="bg-white rounded-xl p-8 shadow-sm text-center">
+              <div className="flex items-center justify-center gap-2 mb-4">
                 <Target className="w-5 h-5 text-[#38618C]" />
-                <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Our Shared Goal:</span>
+                <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Your Partnership Goal</span>
               </div>
-              <p className="font-semibold text-[#1e2749] text-lg">
-                "Equip paraprofessionals with practical strategies and resources to confidently support students and teachers in the classroom"
+              <p className="text-xl md:text-2xl font-semibold text-[#1e2749] max-w-2xl mx-auto leading-relaxed">
+                &ldquo;Equip paraprofessionals with practical strategies and resources to confidently support students and teachers.&rdquo;
               </p>
-              <p className="text-sm text-gray-500 mt-2">Established January 2026 · Tracked via observations, Hub data, and para surveys</p>
             </div>
 
-            {/* Leading Indicators */}
+            {/* Section 2: Implementation Equation */}
+            <div className="bg-gradient-to-r from-[#ffba06]/10 to-white rounded-xl p-6 border border-[#ffba06]/30">
+              <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-[#38618C] rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Users className="w-8 h-8 text-white" />
+                  </div>
+                  <p className="font-semibold text-[#1e2749]">Strong Paras</p>
+                </div>
+                <ArrowRight className="w-6 h-6 text-[#ffba06] rotate-90 md:rotate-0" />
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-[#38618C] rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Heart className="w-8 h-8 text-white" />
+                  </div>
+                  <p className="font-semibold text-[#1e2749]">Strong Support</p>
+                </div>
+                <ArrowRight className="w-6 h-6 text-[#ffba06] rotate-90 md:rotate-0" />
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-[#ffba06] rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Star className="w-8 h-8 text-[#1e2749]" />
+                  </div>
+                  <p className="font-semibold text-[#1e2749]">Student Success</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: Phase Timeline */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <span className="text-sm font-semibold text-[#1e2749] uppercase tracking-wide">Leading Indicators</span>
-                <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
-                  Data collected after Observation 1
-                </span>
-              </div>
+              <h3 className="text-lg font-bold text-[#1e2749] mb-6 text-center">Your Partnership Journey</h3>
 
-              <p className="text-sm text-gray-600 mb-6">
-                These indicators are the strongest predictors of sustainable para development and student outcomes.
-              </p>
-
-              <div className="space-y-6">
-                {/* Para Stress Level */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-[#1e2749]">Para Stress Level</span>
-                    <span className="text-xs text-gray-400">Lower is better</span>
+              <div className="grid md:grid-cols-3 gap-4">
+                {/* Phase 1 - IGNITE (Current) */}
+                <div className="relative bg-gradient-to-br from-[#ffba06]/20 to-[#ffba06]/5 rounded-xl p-5 border-2 border-[#ffba06]">
+                  <div className="absolute -top-3 left-4">
+                    <span className="bg-[#ffba06] text-[#1e2749] text-xs font-bold px-3 py-1 rounded-full">YOU ARE HERE</span>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '75%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">7-8/10</span>
+                  <div className="mt-2">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Flame className="w-5 h-5 text-[#ffba06]" />
+                      <h4 className="font-bold text-[#1e2749]">IGNITE</h4>
                     </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '45%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">4-5/10</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">ASD4</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
-                      </div>
-                      <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
-                    </div>
+                    <p className="text-sm text-gray-500 mb-3">Phase 1 · Spring 2026</p>
+                    <ul className="text-sm text-gray-600 space-y-1">
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
+                        Pilot group identification
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
+                        Baseline data collection
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
+                        First observations
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <CheckCircle className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
+                        Growth Group formation
+                      </li>
+                    </ul>
                   </div>
                 </div>
 
-                {/* Confidence in Role */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-[#1e2749]">Confidence in Role</span>
-                    <span className="text-xs text-gray-400">Higher is better</span>
+                {/* Phase 2 - ACCELERATE */}
+                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200 opacity-75">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Rocket className="w-5 h-5 text-gray-400" />
+                    <h4 className="font-bold text-gray-500">ACCELERATE</h4>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '40%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">4/10</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '75%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">7-8/10</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">ASD4</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
-                      </div>
-                      <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
-                    </div>
-                  </div>
+                  <p className="text-sm text-gray-400 mb-3">Phase 2 · Fall 2026</p>
+                  <ul className="text-sm text-gray-400 space-y-1">
+                    <li className="flex items-start gap-2">
+                      <Circle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                      Expand to full para team
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Circle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                      Multiple observation cycles
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Circle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                      Deeper implementation
+                    </li>
+                  </ul>
                 </div>
 
-                {/* Feeling Valued by Teachers */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-[#1e2749]">Feeling Valued by Teachers</span>
-                    <span className="text-xs text-gray-400">Higher is better</span>
+                {/* Phase 3 - SUSTAIN */}
+                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200 opacity-75">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sprout className="w-5 h-5 text-gray-400" />
+                    <h4 className="font-bold text-gray-500">SUSTAIN</h4>
                   </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '40%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">4/10</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '75%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">7-8/10</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">ASD4</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
-                      </div>
-                      <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Weekly Planning/Prep Clarity */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-[#1e2749]">Weekly Planning/Prep Clarity</span>
-                    <span className="text-xs text-gray-400">Higher is better</span>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '30%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">3/10</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '70%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">7/10</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">ASD4</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
-                      </div>
-                      <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
-                    </div>
-                  </div>
+                  <p className="text-sm text-gray-400 mb-3">Phase 3 · 2027+</p>
+                  <ul className="text-sm text-gray-400 space-y-1">
+                    <li className="flex items-start gap-2">
+                      <Circle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                      Internal leadership development
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Circle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                      Self-sustaining systems
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Circle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                      Culture embedded
+                    </li>
+                  </ul>
                 </div>
               </div>
-
-              <p className="text-xs text-gray-400 text-center mt-6 pt-4 border-t border-gray-100">
-                Data will be collected via para survey during first observation visit
-              </p>
             </div>
 
+            {/* Section 4: What Success Looks Like */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Target className="w-5 h-5 text-[#38618C]" />
+                <h3 className="text-lg font-bold text-[#1e2749]">End-of-Partnership Targets</h3>
+              </div>
+              <p className="text-gray-600 mb-4">By May 2026, we aim to see:</p>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#38618C] flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Pilot group paras report increased confidence in classroom strategies</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#38618C] flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Measurable improvement in feeling valued by teachers and admin</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#38618C] flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Reduced stress levels compared to baseline</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-5 h-5 text-[#38618C] flex-shrink-0 mt-0.5" />
+                  <span className="text-gray-700">Clear implementation of Hub strategies observed in classrooms</span>
+                </li>
+              </ul>
+            </div>
           </div>
         )}
 
@@ -692,11 +523,11 @@ export default function ASD4Dashboard() {
         {activeTab === 'progress' && (
           <div className="space-y-6">
 
-            {/* ===== SECTION 1: Status Banner ===== */}
+            {/* Section 1: Status Banner */}
             <div className="bg-gradient-to-r from-[#ffba06]/20 to-white rounded-xl p-6 border border-[#ffba06]/30">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-[#ffba06] rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Rocket className="w-6 h-6 text-[#1e2749]" />
+                  <Construction className="w-6 h-6 text-[#1e2749]" />
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-[#1e2749] mb-2">Building Your Foundation</h2>
@@ -707,104 +538,82 @@ export default function ASD4Dashboard() {
               </div>
             </div>
 
-            {/* ===== SECTION 2: Your Next Steps ===== */}
+            {/* Section 2: Your Next Steps */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-[#E07A5F]" />
-                  <h3 className="text-lg font-bold text-[#1e2749]">Your Next Steps</h3>
-                  <span className="bg-[#E07A5F]/10 text-[#E07A5F] text-xs font-medium px-2 py-0.5 rounded-full">3 items</span>
+              <h3 className="text-lg font-bold text-[#1e2749] mb-5">Your Next Steps</h3>
+
+              <div className="space-y-4">
+                {/* Step 1 */}
+                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                  <div className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-bold text-gray-400">1</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-[#1e2749]">Identify Pilot Group (10-20 paras)</div>
+                    <p className="text-sm text-gray-500 mb-3">Select the paras who will participate in focused coaching this spring.</p>
+                    <a
+                      href="/asd4-dashboard/pilot-selection"
+                      className="inline-flex items-center gap-2 bg-[#1e2749] hover:bg-[#2d3a5c] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                    >
+                      Select Pilot Group
+                      <ArrowRight className="w-4 h-4" />
+                    </a>
+                  </div>
+                </div>
+
+                {/* Step 2 */}
+                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                  <div className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-bold text-gray-400">2</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-[#1e2749]">Schedule Virtual Session 1</div>
+                    <p className="text-sm text-gray-500 mb-3">Your kickoff session includes baseline survey collection.</p>
+                    <a
+                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-[#1e2749] hover:bg-[#2d3a5c] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Schedule Session
+                    </a>
+                  </div>
+                </div>
+
+                {/* Step 3 */}
+                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                  <div className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-bold text-gray-400">3</span>
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-[#1e2749]">Schedule Observation Day 1</div>
+                    <p className="text-sm text-gray-500 mb-3">On-site classroom visits with personalized Love Notes.</p>
+                    <a
+                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-[#1e2749] hover:bg-[#2d3a5c] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Schedule Observation
+                    </a>
+                  </div>
                 </div>
               </div>
-
-              <div className="space-y-3">
-                {/* Item 1: Complete Partner Data Form */}
-                <a
-                  href="/asd4-dashboard/partner-data"
-                  className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <ClipboardList className="w-5 h-5 text-[#E07A5F]" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Complete Partner Data Form</div>
-                      <p className="text-sm text-gray-500">Help us customize your dashboard</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-[#E07A5F] font-medium">DUE FEB 2026</span>
-                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[#1e2749] transition-colors" />
-                  </div>
-                </a>
-
-                {/* Item 2: Identify Pilot Group */}
-                <a
-                  href="/asd4-dashboard/pilot-selection"
-                  className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Users className="w-5 h-5 text-[#E07A5F]" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Identify Pilot Group</div>
-                      <p className="text-sm text-gray-500">Select 10-20 paras for focused coaching</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-[#E07A5F] font-medium">DUE FEB 2026</span>
-                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-[#1e2749] transition-colors" />
-                  </div>
-                </a>
-
-                {/* Item 3: Schedule Observation Day 1 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Eye className="w-5 h-5 text-[#E07A5F]" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Schedule Observation Day 1</div>
-                      <p className="text-sm text-gray-500">On-site visit with personalized Love Notes</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-[#E07A5F] font-medium">DUE FEB 2026</span>
-                    <Calendar className="w-4 h-4 text-gray-400 group-hover:text-[#1e2749] transition-colors" />
-                  </div>
-                </a>
-              </div>
-
-              {/* Link to full list */}
-              <button
-                onClick={() => setActiveTab('overview')}
-                className="w-full mt-4 pt-4 border-t border-gray-100 text-center text-sm text-[#38618C] hover:text-[#2d4a6d] font-medium transition-colors flex items-center justify-center gap-2"
-              >
-                View all 9 action items on Overview
-                <ArrowRight className="w-4 h-4" />
-              </button>
             </div>
 
-            {/* ===== SECTION 3: Hub Engagement (REAL DATA) ===== */}
+            {/* Section 3: Hub Engagement (REAL DATA) */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <h3 className="text-lg font-bold text-[#1e2749] mb-5">Hub Engagement</h3>
 
-              <div className="flex items-center gap-8">
+              <div className="flex flex-col md:flex-row items-center gap-8">
                 {/* Progress Ring */}
                 <div className="relative w-36 h-36 flex-shrink-0">
                   <svg className="w-36 h-36 transform -rotate-90">
                     <circle cx="72" cy="72" r="60" stroke="#E5E7EB" strokeWidth="12" fill="none"/>
                     <circle cx="72" cy="72" r="60" stroke="#ffba06" strokeWidth="12" fill="none"
                       strokeDasharray="377" strokeDashoffset="83" strokeLinecap="round"/>
-                    {/* Goal marker at 100% */}
-                    <circle cx="72" cy="72" r="60" stroke="#38618C" strokeWidth="2" fill="none"
-                      strokeDasharray="2 375" strokeLinecap="round" opacity="0.5"/>
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
                     <span className="text-4xl font-bold text-[#1e2749]">78%</span>
@@ -812,7 +621,7 @@ export default function ASD4Dashboard() {
                   </div>
                 </div>
 
-                <div className="flex-1">
+                <div className="flex-1 text-center md:text-left">
                   <div className="text-3xl font-bold text-[#1e2749]">91 <span className="text-xl font-normal text-gray-400">of 117</span></div>
                   <div className="text-gray-600 mb-4">paras have logged in</div>
 
@@ -836,7 +645,7 @@ export default function ASD4Dashboard() {
               </div>
             </div>
 
-            {/* ===== SECTION 4: What We'll Measure ===== */}
+            {/* Section 4: What We'll Measure */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-lg font-bold text-[#1e2749]">What We&apos;ll Measure</h3>
@@ -911,7 +720,7 @@ export default function ASD4Dashboard() {
                 <div className="p-4 border border-gray-200 rounded-xl">
                   <div className="flex items-center gap-3 mb-3">
                     <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center">
-                      <UserCheck className="w-5 h-5 text-[#38618C]" />
+                      <RefreshCw className="w-5 h-5 text-[#38618C]" />
                     </div>
                     <div className="font-medium text-[#1e2749]">Retention Intent</div>
                   </div>
@@ -930,11 +739,11 @@ export default function ASD4Dashboard() {
               </div>
 
               <p className="text-xs text-gray-400 text-center mt-6 pt-4 border-t border-gray-100">
-                Your ASD4 baseline will appear here after Virtual Session 1 · Sources: NCTQ, RAND, Learning Policy Institute
+                Your ASD4 baseline will appear here after Virtual Session 1 · Sources: RAND, NCTQ, Learning Policy Institute
               </p>
             </div>
 
-            {/* ===== SECTION 5: Observation Preview ===== */}
+            {/* Section 5: Observation Preview */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <div className="p-6">
                 <h3 className="text-lg font-bold text-[#1e2749] mb-2">What Your Observation Day Looks Like</h3>
@@ -992,56 +801,6 @@ export default function ASD4Dashboard() {
               </div>
             </div>
 
-            {/* ===== SECTION 6: Your Partnership Includes ===== */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h3 className="text-lg font-bold text-[#1e2749] mb-5">Your Partnership Includes</h3>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="text-center p-4 bg-gray-50 rounded-xl">
-                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <School className="w-5 h-5 text-[#38618C]" />
-                  </div>
-                  <div className="text-2xl font-bold text-[#1e2749]">2</div>
-                  <div className="text-xs text-gray-500">On-Site Observation Days</div>
-                </div>
-
-                <div className="text-center p-4 bg-gray-50 rounded-xl">
-                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <Monitor className="w-5 h-5 text-[#38618C]" />
-                  </div>
-                  <div className="text-2xl font-bold text-[#1e2749]">4</div>
-                  <div className="text-xs text-gray-500">Virtual Strategy Sessions</div>
-                </div>
-
-                <div className="text-center p-4 bg-gray-50 rounded-xl">
-                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <Briefcase className="w-5 h-5 text-[#38618C]" />
-                  </div>
-                  <div className="text-2xl font-bold text-[#1e2749]">2</div>
-                  <div className="text-xs text-gray-500">Executive Impact Sessions</div>
-                </div>
-
-                <div className="text-center p-4 bg-gray-50 rounded-xl">
-                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
-                    <BookOpen className="w-5 h-5 text-[#38618C]" />
-                  </div>
-                  <div className="text-2xl font-bold text-[#1e2749]">117</div>
-                  <div className="text-xs text-gray-500">Learning Hub Memberships</div>
-                </div>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4 p-4 bg-[#1e2749]/5 rounded-xl">
-                <div className="flex items-center gap-2 text-sm">
-                  <Calendar className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-gray-600"><strong className="text-[#1e2749]">Partnership:</strong> January 2026 – May 2026</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm">
-                  <Calendar className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-gray-600"><strong className="text-[#1e2749]">Hub Access:</strong> Through January 2027</span>
-                </div>
-              </div>
-            </div>
-
           </div>
         )}
 
@@ -1077,11 +836,10 @@ export default function ASD4Dashboard() {
             <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
               <div className="flex items-center gap-2">
                 <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Year 2 Preview</span>
-                <Tooltip text="Early renewal conversations typically happen in April. No commitment required to view options." position="right" iconSize={14} />
               </div>
               <h2 className="text-2xl font-bold mt-3">Continue to ACCELERATE in 2026-27</h2>
               <p className="text-white/80 mt-2">
-                You're building momentum with your pilot group this spring. Year 2 expands that success to your full para team.
+                You&apos;re building momentum with your pilot group this spring. Year 2 expands that success to your full para team.
               </p>
             </div>
 
@@ -1120,7 +878,7 @@ export default function ASD4Dashboard() {
             {/* CTA */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="font-semibold text-[#1e2749] mb-2">Ready to continue the journey?</h3>
-              <p className="text-gray-600 text-sm mb-4">Let's lock in your 2026-27 partnership.</p>
+              <p className="text-gray-600 text-sm mb-4">Let&apos;s lock in your 2026-27 partnership.</p>
               <a
                 href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                 target="_blank"
@@ -1137,7 +895,7 @@ export default function ASD4Dashboard() {
         {/* ==================== TEAM TAB ==================== */}
         {activeTab === 'team' && (
           <div className="space-y-6">
-            {/* Headline */}
+            {/* Header */}
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your TDI Team</h2>
               <p className="text-gray-600">Your dedicated partner for this journey</p>
@@ -1249,9 +1007,9 @@ export default function ASD4Dashboard() {
               </div>
             </div>
 
-            {/* Partnership Summary */}
+            {/* Partnership Summary (Moved from Progress) */}
             <div className="bg-white rounded-xl p-6 shadow-sm max-w-2xl mx-auto">
-              <h3 className="font-bold text-[#1e2749] mb-4">Partnership Summary</h3>
+              <h3 className="font-bold text-[#1e2749] mb-4">Your Partnership Includes</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
                   <p className="text-2xl font-bold text-[#1e2749]">117</p>
