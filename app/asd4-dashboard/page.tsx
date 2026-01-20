@@ -30,7 +30,10 @@ import {
   ChevronDown,
   ChevronRight,
   ExternalLink,
-  Heart
+  Heart,
+  Smile,
+  Activity,
+  UserCheck
 } from 'lucide-react';
 
 // Accordion Component
@@ -887,7 +890,7 @@ export default function ASD4Dashboard() {
                   {/* Job Satisfaction */}
                   <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
                     <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <span className="text-xl">😊</span>
+                      <Smile className="w-6 h-6 text-[#38618C]" />
                     </div>
                     <div className="flex-1">
                       <div className="font-medium text-[#1e2749] mb-1">Job Satisfaction</div>
@@ -908,7 +911,7 @@ export default function ASD4Dashboard() {
                   {/* Feeling Valued */}
                   <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
                     <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <span className="text-xl">⭐</span>
+                      <Star className="w-6 h-6 text-[#38618C]" />
                     </div>
                     <div className="flex-1">
                       <div className="font-medium text-[#1e2749] mb-1">Feeling Valued</div>
@@ -929,7 +932,7 @@ export default function ASD4Dashboard() {
                   {/* Stress Level */}
                   <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
                     <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <span className="text-xl">🌡️</span>
+                      <Activity className="w-6 h-6 text-[#38618C]" />
                     </div>
                     <div className="flex-1">
                       <div className="font-medium text-[#1e2749] mb-1">Stress Level</div>
@@ -951,7 +954,7 @@ export default function ASD4Dashboard() {
                   {/* Retention Intent */}
                   <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
                     <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <span className="text-xl">🔄</span>
+                      <UserCheck className="w-6 h-6 text-[#38618C]" />
                     </div>
                     <div className="flex-1">
                       <div className="font-medium text-[#1e2749] mb-1">Retention Intent</div>
