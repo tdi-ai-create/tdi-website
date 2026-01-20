@@ -57,8 +57,8 @@ export function SocialProofPopup() {
   const [isHovered, setIsHovered] = useState(false);
   const pathname = usePathname();
 
-  // Don't show on dashboard pages or internal team pages
-  const isDashboardPage = pathname?.includes('-dashboard') || pathname?.includes('dashboard-creation');
+  // Only hide on internal team pages (show on partner dashboards)
+  const isInternalPage = pathname?.includes('dashboard-creation');
 
   const messagesRef = useRef<NotificationMessage[]>([]);
   const messageIndexRef = useRef(0);
@@ -150,8 +150,8 @@ export function SocialProofPopup() {
 
   // Fetch messages from Google Sheet
   useEffect(() => {
-    // Skip on dashboard pages
-    if (isDashboardPage) return;
+    // Skip on internal pages
+    if (isInternalPage) return;
 
     const savedDismissCount = sessionStorage.getItem(DISMISS_COUNT_KEY);
     if (savedDismissCount) {
@@ -207,10 +207,10 @@ export function SocialProofPopup() {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (animationTimeoutRef.current) clearTimeout(animationTimeoutRef.current);
     };
-  }, [isDashboardPage]);
+  }, [isInternalPage]);
 
-  // Don't render on dashboard pages or if no message
-  if (isDashboardPage || !currentMessage || !isAnimating) {
+  // Don't render on internal pages or if no message
+  if (isInternalPage || !currentMessage || !isAnimating) {
     return null;
   }
 
