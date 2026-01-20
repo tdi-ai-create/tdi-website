@@ -1662,7 +1662,7 @@ export default function WegoDashboard() {
                 <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#35A7FF] via-[#38618C] to-[#1e2749]"></div>
 
                 <div className="space-y-4">
-                  {/* August 2026 */}
+                  {/* July/August 2026 */}
                   <div className="relative pl-10">
                     <div className="absolute left-2 w-5 h-5 bg-[#35A7FF] rounded-full flex items-center justify-center">
                       <span className="text-white text-xs font-bold">1</span>
@@ -1670,7 +1670,7 @@ export default function WegoDashboard() {
                     <div className="bg-[#F5F5F5] rounded-lg p-4">
                       <div className="flex items-center gap-2 mb-1">
                         <Users className="w-4 h-4 text-[#38618C]" />
-                        <span className="text-xs font-medium text-[#35A7FF]">AUGUST 2026</span>
+                        <span className="text-xs font-medium text-[#35A7FF]">JUL/AUG 2026</span>
                       </div>
                       <h4 className="font-semibold text-[#1e2749] text-sm">Leadership Planning Session</h4>
                       <p className="text-xs text-gray-600 mt-1">Set goals for Year 2, review Year 1 wins, identify teachers to onboard alongside para team</p>
@@ -1694,7 +1694,7 @@ export default function WegoDashboard() {
                         <Building className="w-4 h-4 text-[#38618C]" />
                         <span className="text-xs font-medium text-[#35A7FF]">SEPTEMBER 2026</span>
                       </div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm">On-Site Kickoff Day #1</h4>
+                      <h4 className="font-semibold text-[#1e2749] text-sm">On-Site Kickoff + Observation Day #1</h4>
                       <p className="text-xs text-gray-600 mt-1">Teacher Hub onboarding + &quot;Building Strong Teacher-Para Partnerships&quot; course launch + classroom observations</p>
                     </div>
                   </div>
