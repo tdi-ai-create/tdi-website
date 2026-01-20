@@ -170,17 +170,7 @@ export default function AllenwoodDashboard() {
             </div>
 
             {/* Feature Cards - matches WEGO */}
-            <div className="grid md:grid-cols-3 gap-4">
-              {/* Hub Logins - GREEN */}
-              <div className="bg-green-50 border border-green-200 rounded-xl p-5 text-center">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
-                </div>
-                <div className="text-2xl font-bold text-green-700">Hub Logins</div>
-                <div className="text-green-600 font-semibold">82% (9/11)</div>
-                <div className="text-sm text-green-600 mt-1">Building habits!</div>
-              </div>
-
+            <div className="grid md:grid-cols-2 gap-4">
               {/* Obs Day 2 - BLUE */}
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 text-center">
                 <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
