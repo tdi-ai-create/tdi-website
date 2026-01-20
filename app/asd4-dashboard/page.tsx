@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import { Tooltip } from '@/components/Tooltip';
 import {
@@ -1117,94 +1118,121 @@ export default function ASD4Dashboard() {
         {/* ==================== TEAM TAB ==================== */}
         {activeTab === 'team' && (
           <div className="space-y-6">
+            {/* Headline */}
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your TDI Team</h2>
+              <p className="text-gray-600">Your dedicated partner for this journey</p>
+            </div>
+
             {/* Rae's Contact Card */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex flex-col md:flex-row gap-6">
-                <div className="flex-shrink-0">
-                  <img
-                    src="/images/rae-headshot.webp"
+            <div className="bg-white rounded-xl p-6 shadow-sm max-w-2xl mx-auto">
+              <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+                {/* Rae's Photo */}
+                <div className="w-32 h-32 rounded-xl overflow-hidden bg-[#F5F5F5] flex-shrink-0">
+                  <Image
+                    src="/images/rae-headshot.png"
                     alt="Rae Hughart"
-                    className="w-24 h-24 rounded-full object-cover"
+                    width={128}
+                    height={128}
+                    className="w-full h-full object-cover"
                   />
                 </div>
-                <div className="flex-1">
+
+                {/* Rae's Info */}
+                <div className="flex-1 text-center md:text-left">
                   <h3 className="text-xl font-bold text-[#1e2749]">Rae Hughart</h3>
-                  <p className="text-gray-600">Founder, Teachers Deserve It</p>
-                  <div className="mt-4 space-y-2">
-                    <a href="mailto:rae@teachersdeserveit.com" className="flex items-center gap-2 text-[#35A7FF] hover:underline">
-                      <Mail className="w-4 h-4" />
+                  <p className="text-[#38618C] font-medium mb-3">Lead Partner, Addison School District 4 Account</p>
+
+                  <p className="text-gray-600 text-sm mb-4">
+                    Rae is the co-founder of Teachers Deserve It and your dedicated partner throughout this journey. She is here to support your school&apos;s success every step of the way.
+                  </p>
+
+                  <div className="space-y-2 mb-4">
+                    <a
+                      href="mailto:rae@teachersdeserveit.com"
+                      className="flex items-center gap-2 text-gray-600 hover:text-[#38618C] transition-colors justify-center md:justify-start"
+                    >
+                      <Mail className="w-4 h-4 text-[#38618C]" />
                       rae@teachersdeserveit.com
                     </a>
-                    <p className="flex items-center gap-2 text-gray-600">
-                      <Phone className="w-4 h-4" />
-                      Text is great!
-                    </p>
+                    <a
+                      href="tel:8477215503"
+                      className="flex items-center gap-2 text-gray-600 hover:text-[#38618C] transition-colors justify-center md:justify-start"
+                    >
+                      <Phone className="w-4 h-4 text-[#38618C]" />
+                      847-721-5503
+                      <span className="text-xs bg-[#F5F5F5] px-2 py-0.5 rounded-full text-gray-500">Text is great!</span>
+                    </a>
                   </div>
+
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-[#1e2749] hover:bg-[#2d3a5c] text-white px-6 py-3 rounded-xl font-semibold transition-all mt-4"
+                    className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-6 py-3 rounded-xl font-semibold transition-all"
                   >
-                    <Calendar className="w-4 h-4" />
-                    Schedule a Call
+                    <Calendar className="w-5 h-5" />
+                    Schedule Time with Rae
                   </a>
                 </div>
               </div>
             </div>
 
-            {/* Meet the Full Team */}
+            {/* Meet the Full Team Button */}
             <a
               href="https://teachersdeserveit.com/about"
               target="_blank"
               rel="noopener noreferrer"
-              className="block bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-all border border-gray-200 hover:border-[#35A7FF]"
+              className="block w-full max-w-2xl mx-auto bg-[#F5F5F5] hover:bg-gray-200 text-[#1e2749] text-center py-4 rounded-xl font-semibold transition-all border border-gray-200"
             >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-[#38618C]" />
-                  <span className="font-semibold text-[#1e2749]">Meet the Full TDI Team</span>
-                </div>
-                <ExternalLink className="w-4 h-4 text-gray-400" />
-              </div>
+              Meet the Full TDI Team →
             </a>
 
-            {/* District Information */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
+            {/* School Information */}
+            <div className="bg-white rounded-xl p-5 shadow-sm max-w-2xl mx-auto">
+              <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
                 <Building className="w-5 h-5 text-[#38618C]" />
-                District Information
+                School Information
               </h3>
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <p className="font-medium text-[#1e2749]">Addison School District 4</p>
-                  <p className="text-sm text-gray-600 flex items-center gap-2 mt-1">
-                    <MapPin className="w-4 h-4" />
-                    222 N. Kennedy Dr., Addison, IL 60101
-                  </p>
-                  <p className="text-sm text-gray-600 flex items-center gap-2 mt-1">
-                    <Phone className="w-4 h-4" />
+                  <div className="font-semibold text-gray-800">Addison School District 4</div>
+                  <div className="text-sm text-gray-600 mt-2 flex items-start gap-2">
+                    <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#38618C]" />
+                    <div>
+                      222 N. Kennedy Dr.<br />
+                      Addison, IL 60101
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <Phone className="w-4 h-4 text-[#38618C]" />
                     (630) 458-2425
-                  </p>
-                  <a href="https://asd4.org" target="_blank" rel="noopener noreferrer" className="text-sm text-[#35A7FF] hover:underline flex items-center gap-2 mt-1">
+                  </div>
+                  <a
+                    href="https://asd4.org"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 text-[#35A7FF] hover:underline"
+                  >
                     <ExternalLink className="w-4 h-4" />
                     asd4.org
                   </a>
-                </div>
-                <div>
-                  <p className="text-sm text-gray-500 uppercase tracking-wide mb-1">Primary Contact</p>
-                  <p className="font-medium text-[#1e2749]">Janet Diaz</p>
-                  <a href="mailto:jdiaz@asd4.org" className="text-sm text-[#35A7FF] hover:underline flex items-center gap-2">
-                    <Mail className="w-4 h-4" />
-                    jdiaz@asd4.org
-                  </a>
+                  <div className="pt-2 border-t border-gray-100">
+                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Primary Contact</p>
+                    <p className="font-medium text-gray-800">Katie Diaz</p>
+                    <a href="mailto:kdiaz@asd4.org" className="text-[#35A7FF] hover:underline">
+                      kdiaz@asd4.org
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Partnership Summary */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <h3 className="font-semibold text-[#1e2749] mb-4">Partnership Summary</h3>
+            <div className="bg-white rounded-xl p-6 shadow-sm max-w-2xl mx-auto">
+              <h3 className="font-bold text-[#1e2749] mb-4">Partnership Summary</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
                   <p className="text-2xl font-bold text-[#1e2749]">117</p>
@@ -1223,7 +1251,7 @@ export default function ASD4Dashboard() {
                   <p className="text-xs text-gray-500">Exec Sessions</p>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+              <div className="flex flex-col sm:flex-row gap-4 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-[#38618C]" />
                   <span><strong>Partnership Period:</strong> January 2026 – May 2026</span>
@@ -1238,24 +1266,22 @@ export default function ASD4Dashboard() {
         )}
       </div>
 
-      {/* Footer */}
-      <footer className="bg-[#1e2749] text-white py-8 mt-12">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div>
-              <p className="font-semibold">Teachers Deserve It</p>
-              <p className="text-white/60 text-sm">Partner Dashboard for Addison School District 4</p>
-            </div>
-            <a
-              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-6 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
-            >
-              <Calendar className="w-4 h-4" />
-              Schedule a Call
-            </a>
+      {/* Compact Footer */}
+      <footer className="bg-[#1e2749] text-white py-6 px-4">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+          <div>
+            <div className="font-bold">Teachers Deserve It</div>
+            <p className="text-white/60 text-sm">Partner Dashboard for Addison School District 4</p>
           </div>
+          <a
+            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm"
+          >
+            <Calendar className="w-4 h-4" />
+            Schedule a Call
+          </a>
         </div>
       </footer>
     </div>
