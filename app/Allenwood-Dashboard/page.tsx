@@ -284,6 +284,117 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
+            {/* TDI Impact Section */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+              <h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-blue-600" />
+                What Schools Like Yours Are Achieving
+              </h3>
+              <p className="text-sm text-gray-500 mb-6">
+                When schools lean into the TDI partnership, here&apos;s what we see:
+              </p>
+
+              {/* Impact Stats */}
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="bg-white rounded-lg p-4 text-center shadow-sm">
+                  <p className="text-3xl font-bold text-green-600">65%</p>
+                  <p className="text-sm text-gray-600">Implementation Rate</p>
+                  <p className="text-xs text-gray-400">vs 10% industry average</p>
+                </div>
+                <div className="bg-white rounded-lg p-4 text-center shadow-sm">
+                  <p className="text-3xl font-bold text-blue-600">9→5</p>
+                  <p className="text-sm text-gray-600">Stress Level Drop</p>
+                  <p className="text-xs text-gray-400">on 10-point scale</p>
+                </div>
+                <div className="bg-white rounded-lg p-4 text-center shadow-sm">
+                  <p className="text-3xl font-bold text-purple-600">40%</p>
+                  <p className="text-sm text-gray-600">Less Planning Time</p>
+                  <p className="text-xs text-gray-400">12hrs → 6-8hrs weekly</p>
+                </div>
+              </div>
+
+              {/* Additional Stats Row */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="bg-white rounded-lg p-4 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                      <Heart className="w-5 h-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-gray-800">98%</p>
+                      <p className="text-sm text-gray-500">Plan to return next year</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-white rounded-lg p-4 shadow-sm">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                      <Users className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-gray-800">87K+</p>
+                      <p className="text-sm text-gray-500">Educators in the movement</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Testimonials */}
+              <div className="space-y-4">
+                <h4 className="font-medium text-gray-700">From Teachers Like Yours:</h4>
+
+                <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 border-green-500">
+                  <p className="text-sm text-gray-600 italic mb-2">
+                    &quot;I went from crying in my car every day to actually enjoying my job again.
+                    The strategies are practical and the community gets it.&quot;
+                  </p>
+                  <p className="text-xs text-gray-400">— 3rd year teacher, Louisiana</p>
+                </div>
+
+                <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 border-blue-500">
+                  <p className="text-sm text-gray-600 italic mb-2">
+                    &quot;My stress went from a 9 to a 5. I finally have time to plan AND
+                    have a life outside of school.&quot;
+                  </p>
+                  <p className="text-xs text-gray-400">— Special Education teacher, Illinois</p>
+                </div>
+
+                <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 border-purple-500">
+                  <p className="text-sm text-gray-600 italic mb-2">
+                    &quot;As a new teacher, I felt lost. TDI gave me a roadmap and a community
+                    that actually understands what I&apos;m going through.&quot;
+                  </p>
+                  <p className="text-xs text-gray-400">— 1st year teacher, Maryland</p>
+                </div>
+              </div>
+
+              {/* Call to Action */}
+              <div className="mt-6 pt-4 border-t border-blue-200">
+                <p className="text-sm text-gray-600 mb-3">
+                  <strong>Your team has the same potential.</strong> The key is consistent
+                  engagement with the Hub and implementing strategies from your coaching sessions.
+                </p>
+                <div className="flex gap-3">
+                  <a
+                    href="https://tdi.thinkific.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                  >
+                    Explore the Hub →
+                  </a>
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm border border-blue-600 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50"
+                  >
+                    Schedule Your Next Session
+                  </a>
+                </div>
+              </div>
+            </div>
+
             {/* Needs Attention */}
             <div id="needs-attention-section" className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
