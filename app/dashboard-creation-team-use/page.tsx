@@ -124,46 +124,52 @@ export default function DashboardCreationForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          access_key: 'f7599c6e-7eb1-446f-a2fd-88be99d0eb66',
-          subject: `New Dashboard Request: ${formData.schoolName}`,
-          from_name: formData.submittedBy,
-          // Format the data nicely for email
-          'School Name': formData.schoolName,
-          'URL Slug': `${formData.schoolSlug}-dashboard`,
-          'Location': formData.location,
-          'Address': formData.address,
-          'Phone': formData.phone,
-          'Website': formData.website,
-          'Primary Contact': `${formData.primaryContactName} (${formData.primaryContactEmail}) - ${formData.primaryContactRole}`,
-          'Secondary Contact': formData.secondaryContactName ? `${formData.secondaryContactName} (${formData.secondaryContactEmail})` : 'N/A',
-          'Audience': formData.audience,
-          'Total Enrolled': formData.totalEnrolled,
-          'Partnership Period': `${formData.startDate} - ${formData.endDate}`,
-          'Hub Access Until': formData.hubAccessUntil,
-          'Current Phase': formData.currentPhase,
-          'Observation Days': formData.observationDays,
-          'Virtual Sessions': formData.virtualSessions,
-          'Exec Sessions': formData.execSessions,
-          'Book Included': formData.bookIncluded ? 'Yes' : 'No',
-          'Other Inclusions': formData.otherInclusions || 'N/A',
-          'Observation Calendly': formData.observationCalendly,
-          'Virtual Calendly': formData.virtualCalendly,
-          'Exec Calendly': formData.execCalendly,
-          'Kickoff Complete': formData.kickoffComplete ? 'Yes' : 'No',
-          'Hub Activated': formData.hubActivated ? 'Yes' : 'No',
-          'Current Logins': formData.currentLogins || 'N/A',
-          'Goal Statement': formData.goalStatement,
-          'Schedule By Dates': `Partner Data: ${formData.partnerDataBy}, Pilot Group: ${formData.pilotGroupBy}, Obs 1: ${formData.obs1By}, Obs 2: ${formData.obs2By}, Virtual 1: ${formData.virtual1By}, Virtual 2: ${formData.virtual2By}, Virtual 3: ${formData.virtual3By}, Virtual 4: ${formData.virtual4By}, Exec 2: ${formData.exec2By}`,
-          'Year 2 Notes': formData.renewalNotes || 'N/A',
-          'Submitted By': formData.submittedBy,
+          access_key: process.env.NEXT_PUBLIC_WEB3FORMS_KEY,
+          subject: `🆕 New Dashboard Request: ${formData.schoolName}`,
+          from_name: `TDI Dashboard Tool - ${formData.submittedBy}`,
+          to: 'rae@teachersdeserveit.com',
+          message: `
+NEW DASHBOARD REQUEST
+=====================
+
+SCHOOL: ${formData.schoolName}
+URL: teachersdeserveit.com/${formData.schoolSlug}-dashboard
+Location: ${formData.location}
+
+PRIMARY CONTACT: ${formData.primaryContactName} (${formData.primaryContactEmail})
+SECONDARY: ${formData.secondaryContactName || 'None'}
+
+AUDIENCE: ${formData.audience}
+ENROLLED: ${formData.totalEnrolled}
+PARTNERSHIP: ${formData.startDate} – ${formData.endDate}
+HUB ACCESS: Through ${formData.hubAccessUntil}
+PHASE: ${formData.currentPhase}
+
+DELIVERABLES:
+- ${formData.observationDays} Observation Days
+- ${formData.virtualSessions} Virtual Sessions
+- ${formData.execSessions} Exec Sessions
+- Book: ${formData.bookIncluded ? 'Yes' : 'No'}
+
+CURRENT STATUS:
+- Kickoff Complete: ${formData.kickoffComplete ? 'Yes' : 'No'}
+- Hub Logins: ${formData.currentLogins} of ${formData.totalEnrolled}
+
+GOAL: ${formData.goalStatement}
+
+SUBMITTED BY: ${formData.submittedBy}
+          `,
         }),
       });
 
       if (response.ok) {
         setSubmitted(true);
+      } else {
+        alert('Error submitting form. Please try again.');
       }
     } catch (error) {
       console.error('Form submission error:', error);
+      alert('Error submitting form. Please try again.');
     } finally {
       setSubmitting(false);
     }
