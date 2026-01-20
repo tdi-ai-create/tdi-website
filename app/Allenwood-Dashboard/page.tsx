@@ -31,7 +31,8 @@ import {
   BookOpen,
   PartyPopper,
   Award,
-  MessageCircle
+  MessageCircle,
+  Timer
 } from 'lucide-react';
 
 export default function AllenwoodDashboard() {
@@ -43,137 +44,195 @@ export default function AllenwoodDashboard() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Tab configuration
-  const tabs = [
-    { id: 'overview', label: 'Overview', icon: BarChart3 },
-    { id: 'progress', label: 'Progress', icon: TrendingUp },
-    { id: 'blueprint', label: 'Blueprint', icon: Target },
-    { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
-    { id: 'team', label: 'Team', icon: Users },
-  ];
-
-  // Timeline items for completed section
-  const completedItems = [
-    'Contract Signed — July 3, 2025',
-    'Summer Leadership Meeting — July 25, 2025',
-    'Virtual Session #1 — September 17, 2025',
-    'Hub Access Activated — October 6, 2025',
-    'Observation Day #1 — October 15, 2025',
-  ];
-
   return (
     <div className="min-h-screen bg-[#F5F5F5]">
-      {/* Header */}
-      <div className="bg-[#1e2749] text-white">
-        <div className="max-w-4xl mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="flex items-center gap-3 mb-2">
-                <span className="bg-[#35A7FF] text-white text-xs font-bold px-3 py-1 rounded-full">
-                  IGNITE
-                </span>
-                <span className="text-white/60 text-sm">Phase 1</span>
-              </div>
-              <h1 className="text-2xl md:text-3xl font-bold">Allenwood Elementary School</h1>
-              <p className="text-white/80 mt-1">Prince George&apos;s County Public Schools</p>
+      {/* Compact Navigation - matches WEGO */}
+      <nav className="bg-[#1e2749] sticky top-0 z-50 shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14">
+            <div className="flex items-center gap-3">
+              <span className="bg-white text-[#1e2749] px-2 py-1 rounded text-xs font-extrabold tracking-wide">TDI</span>
+              <span className="text-white font-semibold hidden sm:inline">Teachers Deserve It</span>
+              <span className="text-white/60 hidden md:inline">| Partner Dashboard</span>
             </div>
-            <div className="hidden md:block">
-              <Image
-                src="/images/tdi-logo-white.png"
-                alt="TDI Logo"
-                width={120}
-                height={40}
-                className="opacity-90"
-              />
+            <a
+              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+            >
+              <Calendar className="w-4 h-4" />
+              <span className="hidden sm:inline">Schedule Session</span>
+            </a>
+          </div>
+        </div>
+      </nav>
+
+      {/* Compact Hero - matches WEGO */}
+      <section className="relative text-white py-6 px-4 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1e2749] via-[#1e2749] to-[#38618C]" />
+
+        <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl font-bold">Allenwood Elementary School</h1>
+            <p className="text-white/80 text-sm">Camp Springs, Maryland | Partner Dashboard</p>
+          </div>
+          <div className="flex items-center gap-3 text-sm">
+            <div className="bg-white/10 px-3 py-2 rounded-lg text-center">
+              <div className="text-white/60">Status:</div>
+              <div className="font-semibold text-[#35A7FF] bg-white px-2 py-0.5 rounded mt-1">Phase 1 - IGNITE</div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Tab Navigation - matches WEGO */}
+      <div className="bg-white border-b border-gray-200 sticky top-14 z-40 shadow-sm">
+        <div className="max-w-5xl mx-auto px-4 py-3">
+          <div className="flex justify-center gap-2 flex-wrap">
+            {[
+              { id: 'overview', label: 'Overview', icon: Eye },
+              { id: 'journey', label: 'Journey', icon: TrendingUp },
+              { id: 'progress', label: 'Progress', icon: Users },
+              { id: 'blueprint', label: 'Blueprint', icon: Star },
+              { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
+              { id: 'team', label: 'Team', icon: User },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                  activeTab === tab.id
+                    ? 'bg-[#1e2749] text-white shadow-md'
+                    : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+                }`}
+              >
+                <tab.icon className="w-4 h-4" />
+                <span>{tab.label}</span>
+                {tab.badge && (
+                  <span className="text-xs bg-[#35A7FF] text-white px-2 py-0.5 rounded-full">
+                    {tab.badge}
+                  </span>
+                )}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex overflow-x-auto scrollbar-hide -mb-px">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => handleTabChange(tab.id)}
-                  className={`flex items-center gap-2 px-4 py-4 border-b-2 whitespace-nowrap transition-colors ${
-                    activeTab === tab.id
-                      ? 'border-[#38618C] text-[#38618C] font-medium'
-                      : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span>{tab.label}</span>
-                  {tab.badge && (
-                    <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-0.5 rounded-full">
-                      {tab.badge}
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-6">
+      {/* Tab Content */}
+      <div className="max-w-5xl mx-auto px-4 py-6">
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white rounded-xl p-4 shadow-sm text-center">
-                <div className="text-3xl font-bold text-[#38618C]">10</div>
-                <div className="text-sm text-gray-600">Teachers Enrolled</div>
+            {/* Quick Stats - matches WEGO */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
+                <div className="flex items-center gap-2 mb-1">
+                  <Users className="w-4 h-4 text-[#38618C]" />
+                  <span className="text-xs text-gray-500 uppercase">Teachers Enrolled</span>
+                </div>
+                <div className="text-2xl font-bold text-[#1e2749]">10/10</div>
+                <div className="text-xs text-[#38618C] font-medium">Hub Access</div>
               </div>
-              <div className="bg-white rounded-xl p-4 shadow-sm text-center">
-                <div className="text-3xl font-bold text-green-600">82%</div>
-                <div className="text-sm text-gray-600">Hub Logins (9/11)</div>
-              </div>
-              <div className="bg-white rounded-xl p-4 shadow-sm text-center">
-                <div className="text-3xl font-bold text-green-600">10</div>
-                <div className="text-sm text-gray-600">Love Notes</div>
-                <div className="text-xs text-gray-400">Delivered</div>
-              </div>
-              <div className="bg-white rounded-xl p-4 shadow-sm text-center">
-                <div className="text-sm font-bold text-[#35A7FF]">IGNITE</div>
-                <div className="text-sm text-gray-600">Current Phase</div>
-              </div>
-            </div>
 
-            {/* Feature Cards */}
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="bg-white rounded-xl p-5 shadow-sm border-l-4 border-green-500">
-                <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
-                  <span className="font-semibold text-[#1e2749]">Hub Logins</span>
+              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-green-500">
+                <div className="flex items-center gap-2 mb-1">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  <span className="text-xs text-gray-500 uppercase">Hub Logins</span>
                 </div>
                 <div className="text-2xl font-bold text-green-600">82%</div>
                 <div className="text-xs text-green-600 font-medium">9/11 Logged In</div>
               </div>
 
-              <div className="bg-white rounded-xl p-5 shadow-sm border-l-4 border-[#35A7FF]">
-                <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="w-5 h-5 text-[#35A7FF]" />
-                  <span className="font-semibold text-[#1e2749]">Obs Day #2</span>
+              <div
+                onClick={() => {
+                  document.getElementById('needs-attention-section')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#E07A5F] cursor-pointer hover:shadow-md transition-all"
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
+                  <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
                 </div>
-                <div className="text-lg font-bold text-[#1e2749]">Feb 18, 2026</div>
-                <div className="text-xs text-[#35A7FF] font-medium">Scheduled</div>
+                <div className="text-2xl font-bold text-[#E07A5F]">1</div>
+                <div className="text-xs text-[#E07A5F] font-medium">Spring Celebration</div>
               </div>
 
-              <div className="bg-white rounded-xl p-5 shadow-sm border-l-4 border-[#38618C]">
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="w-5 h-5 text-[#38618C]" />
-                  <span className="font-semibold text-[#1e2749]">Implementation</span>
+              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
+                <div className="flex items-center gap-2 mb-1">
+                  <TrendingUp className="w-4 h-4 text-[#38618C]" />
+                  <span className="text-xs text-gray-500 uppercase">Current Phase</span>
                 </div>
-                <div className="text-2xl font-bold text-[#38618C]">65%</div>
-                <div className="text-xs text-gray-500">vs 10% industry avg</div>
+                <div className="text-2xl font-bold text-[#1e2749]">IGNITE</div>
+                <div className="text-xs text-[#38618C] font-medium">Phase 1</div>
               </div>
+            </div>
+
+            {/* Feature Cards - matches WEGO */}
+            <div className="grid md:grid-cols-3 gap-4">
+              {/* Hub Logins - GREEN */}
+              <div className="bg-green-50 border border-green-200 rounded-xl p-5 text-center">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="text-2xl font-bold text-green-700">Hub Logins</div>
+                <div className="text-green-600 font-semibold">82% (9/11)</div>
+                <div className="text-sm text-green-600 mt-1">Building habits!</div>
+              </div>
+
+              {/* Obs Day 2 - BLUE */}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 text-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Calendar className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="text-lg font-bold text-blue-700">Obs Day 2</div>
+                <div className="text-blue-600 font-semibold">Feb 18, 2026</div>
+                <div className="text-sm text-blue-600 mt-1 flex items-center justify-center gap-1">
+                  <CheckCircle className="w-4 h-4" /> Scheduled
+                </div>
+              </div>
+
+              {/* 65% Implementation - BLUE */}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 text-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <BarChart3 className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="text-2xl font-bold text-blue-700">65%</div>
+                <div className="text-blue-600 font-semibold">Implementation Target</div>
+                <div className="text-sm text-blue-600 mt-1">vs 10% industry avg</div>
+              </div>
+            </div>
+
+            {/* Hours of Support Delivered - matches WEGO */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Timer className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749] uppercase tracking-wide">Support Delivered So Far</span>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#38618C]">6+</div>
+                  <div className="text-xs text-gray-600 mt-1">Hours On-Site<br/>Observation</div>
+                </div>
+                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#38618C]">1</div>
+                  <div className="text-xs text-gray-600 mt-1">Virtual<br/>Session</div>
+                </div>
+                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#38618C]">10</div>
+                  <div className="text-xs text-gray-600 mt-1">Love Notes<br/>Delivered</div>
+                </div>
+                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#38618C]">11</div>
+                  <div className="text-xs text-gray-600 mt-1">Hub<br/>Memberships</div>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-600 text-center">
+                Your team receives dedicated, personalized support — not one-size-fits-all PD.
+              </p>
             </div>
 
             {/* Hub Engagement Section */}
@@ -226,48 +285,6 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Support Delivered So Far */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                Support Delivered So Far
-              </h3>
-
-              <div className="space-y-3">
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-gray-800">Summer Leadership Planning</p>
-                    <p className="text-sm text-gray-500">July 25, 2025 — Goal setting and partnership launch</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-gray-800">Virtual Coaching Session #1</p>
-                    <p className="text-sm text-gray-500">September 17, 2025 — Team kickoff and Hub orientation</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-gray-800">Full Observation Day + 10 Love Notes</p>
-                    <p className="text-sm text-gray-500">October 15, 2025 — All 10 teachers observed with personalized feedback</p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3">
-                  <div className="w-2 h-2 rounded-full bg-green-500 mt-2 flex-shrink-0" />
-                  <div>
-                    <p className="font-medium text-gray-800">Hub Access Activated</p>
-                    <p className="text-sm text-gray-500">11 educators enrolled with full course library access</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Observation Highlights */}
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
               <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
@@ -312,9 +329,9 @@ export default function AllenwoodDashboard() {
             </div>
 
             {/* Needs Attention */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
+            <div id="needs-attention-section" className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
-                <AlertCircle className="w-5 h-5 text-amber-500" />
+                <AlertCircle className="w-5 h-5 text-[#E07A5F]" />
                 <span className="font-semibold text-[#1e2749]">Needs Attention</span>
               </div>
 
@@ -366,23 +383,6 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Completed Section */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                <span className="font-semibold text-[#1e2749]">Completed</span>
-              </div>
-
-              <div className="space-y-2">
-                {completedItems.map((item, index) => (
-                  <div key={index} className="flex items-center gap-3 text-gray-700">
-                    <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
-                    <span className="text-sm">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* Partnership Footer */}
             <div className="bg-[#1e2749] rounded-xl p-6 text-center">
               <p className="text-white/80 text-sm mb-2">Partnership Period</p>
@@ -392,8 +392,8 @@ export default function AllenwoodDashboard() {
           </div>
         )}
 
-        {/* PROGRESS TAB */}
-        {activeTab === 'progress' && (
+        {/* JOURNEY TAB */}
+        {activeTab === 'journey' && (
           <div className="space-y-6">
             {/* Partnership Timeline */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
@@ -484,6 +484,59 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
+            {/* Upcoming Sessions */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Calendar className="w-5 h-5 text-[#35A7FF]" />
+                <span className="font-semibold text-[#1e2749] uppercase tracking-wide">Upcoming Sessions</span>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-[#38618C]">Feb 18</span>
+                    <span className="text-sm text-gray-700">Observation Day 2</span>
+                  </div>
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                    <Check className="w-3 h-3" /> Scheduled
+                  </span>
+                </div>
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 bg-[#E07A5F]/5 rounded-lg border border-[#E07A5F]/20 hover:bg-[#E07A5F]/10 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-[#38618C]">TBD</span>
+                    <span className="text-sm text-gray-700">Virtual Sessions #2-6</span>
+                  </div>
+                  <span className="text-xs bg-[#E07A5F] text-white px-3 py-1 rounded-full font-medium group-hover:bg-[#d06a4f] transition-colors">
+                    Schedule Now
+                  </span>
+                </a>
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 bg-[#E07A5F]/5 rounded-lg border border-[#E07A5F]/20 hover:bg-[#E07A5F]/10 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-[#38618C]">Spring</span>
+                    <span className="text-sm text-gray-700">Leadership Celebration + Year 2 Planning</span>
+                  </div>
+                  <span className="text-xs bg-[#E07A5F] text-white px-3 py-1 rounded-full font-medium group-hover:bg-[#d06a4f] transition-colors">
+                    Schedule Now
+                  </span>
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PROGRESS TAB */}
+        {activeTab === 'progress' && (
+          <div className="space-y-6">
             {/* Observations */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between mb-4">
