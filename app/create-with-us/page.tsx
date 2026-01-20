@@ -398,7 +398,7 @@ export default function CreateWithUsPage() {
             ) : (
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Web3Forms Access Key */}
-                <input type="hidden" name="access_key" value="91989992-61ab-470e-8c39-6156e23acaf4" />
+                <input type="hidden" name="access_key" value="2ac6e03c-f09d-436f-bb54-a96ec7f00c34" />
                 <input type="hidden" name="subject" value="New Content Creator Application - TDI" />
                 <input type="hidden" name="from_name" value="TDI Content Creator Form" />
 
