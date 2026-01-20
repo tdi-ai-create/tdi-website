@@ -57,8 +57,8 @@ export function SocialProofPopup() {
   const [isHovered, setIsHovered] = useState(false);
   const pathname = usePathname();
 
-  // Don't show on dashboard pages (partners are already in the ecosystem)
-  const isDashboardPage = pathname?.includes('-dashboard');
+  // Don't show on dashboard pages or internal team pages
+  const isDashboardPage = pathname?.includes('-dashboard') || pathname?.includes('dashboard-creation');
 
   const messagesRef = useRef<NotificationMessage[]>([]);
   const messageIndexRef = useRef(0);

@@ -14,8 +14,8 @@ export function EmailPopup({ delay = 30000 }: EmailPopupProps) {
   const [dismissed, setDismissed] = useState(false);
   const pathname = usePathname();
 
-  // Don't show on dashboard pages (partners are already in the ecosystem)
-  const isDashboardPage = pathname?.includes('-dashboard');
+  // Don't show on dashboard pages or internal team pages
+  const isDashboardPage = pathname?.includes('-dashboard') || pathname?.includes('dashboard-creation');
 
   useEffect(() => {
     // Skip on dashboard pages
