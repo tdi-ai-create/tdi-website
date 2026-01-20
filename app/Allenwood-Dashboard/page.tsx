@@ -370,28 +370,10 @@ export default function AllenwoodDashboard() {
 
               {/* Call to Action */}
               <div className="mt-6 pt-4 border-t border-blue-200">
-                <p className="text-sm text-gray-600 mb-3">
+                <p className="text-sm text-gray-600">
                   <strong>Your team has the same potential.</strong> The key is consistent
                   engagement with the Hub and implementing strategies from your coaching sessions.
                 </p>
-                <div className="flex gap-3">
-                  <a
-                    href="https://tdi.thinkific.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                  >
-                    Explore the Hub →
-                  </a>
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm border border-blue-600 text-blue-600 px-4 py-2 rounded-lg hover:bg-blue-50"
-                  >
-                    Schedule Your Next Session
-                  </a>
-                </div>
               </div>
             </div>
 
@@ -407,7 +389,7 @@ export default function AllenwoodDashboard() {
                 {/* Virtual Session #2 */}
                 <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
                   <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
+                    <span className="text-sm font-medium text-orange-500 w-24">By March</span>
                     <span className="text-gray-800 font-medium">Virtual Session #2</span>
                   </div>
                   <a
@@ -423,7 +405,7 @@ export default function AllenwoodDashboard() {
                 {/* Virtual Session #3 */}
                 <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
                   <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
+                    <span className="text-sm font-medium text-orange-500 w-24">By March</span>
                     <span className="text-gray-800 font-medium">Virtual Session #3</span>
                   </div>
                   <a
@@ -439,7 +421,7 @@ export default function AllenwoodDashboard() {
                 {/* Virtual Session #4 */}
                 <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
                   <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
+                    <span className="text-sm font-medium text-orange-500 w-24">By March</span>
                     <span className="text-gray-800 font-medium">Virtual Session #4</span>
                   </div>
                   <a
@@ -455,7 +437,7 @@ export default function AllenwoodDashboard() {
                 {/* Virtual Session #5 */}
                 <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
                   <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
+                    <span className="text-sm font-medium text-orange-500 w-24">By March</span>
                     <span className="text-gray-800 font-medium">Virtual Session #5</span>
                   </div>
                   <a
@@ -471,7 +453,7 @@ export default function AllenwoodDashboard() {
                 {/* Virtual Session #6 */}
                 <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
                   <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
+                    <span className="text-sm font-medium text-orange-500 w-24">By March</span>
                     <span className="text-gray-800 font-medium">Virtual Session #6</span>
                   </div>
                   <a
@@ -487,7 +469,7 @@ export default function AllenwoodDashboard() {
                 {/* Leadership Celebration */}
                 <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
                   <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
+                    <span className="text-sm font-medium text-orange-500 w-24">By March</span>
                     <span className="text-gray-800 font-medium">Leadership Celebration + Year 2 Planning</span>
                   </div>
                   <a
@@ -646,7 +628,7 @@ export default function AllenwoodDashboard() {
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
+                    <span className="text-sm font-medium text-orange-600 w-24">By March</span>
                     <span className="text-gray-800">Virtual Session #2</span>
                   </div>
                   <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
@@ -662,7 +644,7 @@ export default function AllenwoodDashboard() {
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
+                    <span className="text-sm font-medium text-orange-600 w-24">By March</span>
                     <span className="text-gray-800">Virtual Session #3</span>
                   </div>
                   <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
@@ -678,7 +660,7 @@ export default function AllenwoodDashboard() {
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
+                    <span className="text-sm font-medium text-orange-600 w-24">By March</span>
                     <span className="text-gray-800">Virtual Session #4</span>
                   </div>
                   <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
@@ -694,7 +676,7 @@ export default function AllenwoodDashboard() {
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
+                    <span className="text-sm font-medium text-orange-600 w-24">By March</span>
                     <span className="text-gray-800">Virtual Session #5</span>
                   </div>
                   <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
@@ -710,7 +692,7 @@ export default function AllenwoodDashboard() {
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
+                    <span className="text-sm font-medium text-orange-600 w-24">By March</span>
                     <span className="text-gray-800">Virtual Session #6</span>
                   </div>
                   <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
@@ -726,7 +708,7 @@ export default function AllenwoodDashboard() {
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
+                    <span className="text-sm font-medium text-orange-600 w-24">By March</span>
                     <span className="text-gray-800">Leadership Celebration + Year 2 Planning</span>
                   </div>
                   <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
