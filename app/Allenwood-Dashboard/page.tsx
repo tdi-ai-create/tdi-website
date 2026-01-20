@@ -257,6 +257,15 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
+            {/* Pro Tip - Dashboard Overview */}
+            <div className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
+              <Lightbulb className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-amber-800">
+                <span className="font-semibold">Pro tip:</span> Green borders = on track.
+                The Hub login rate (82%) shows early engagement — our goal is to turn those logins into consistent strategy use.
+              </p>
+            </div>
+
             {/* Feature Cards - matches WEGO */}
             <div className="grid md:grid-cols-2 gap-4">
               {/* Obs Day 2 - BLUE */}
@@ -322,6 +331,14 @@ export default function AllenwoodDashboard() {
                     <p className="text-xs text-amber-600">5 Available</p>
                   </div>
                 </div>
+              </div>
+
+              {/* Health Check Tip */}
+              <div className="mt-4 pt-3 border-t border-gray-100">
+                <p className="text-xs text-gray-500 flex items-start gap-2">
+                  <Lightbulb className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <span><strong>Why these 3?</strong> Hub engagement predicts implementation. Love Notes build trust. Virtual sessions create accountability. Together, they drive sustainable change.</span>
+                </p>
               </div>
             </div>
 
@@ -599,6 +616,15 @@ export default function AllenwoodDashboard() {
         {/* JOURNEY TAB */}
         {activeTab === 'journey' && (
           <div className="space-y-6">
+            {/* Journey Tip */}
+            <div className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
+              <Lightbulb className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-amber-800">
+                <span className="font-semibold">Timeline tip:</span> Green checkmarks = completed milestones. The blue &quot;NOW&quot; marker shows where you are.
+                Gray items are upcoming — click the schedule buttons to book them!
+              </p>
+            </div>
+
             {/* Partnership Timeline */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h3 className="font-semibold text-gray-800 mb-6">Your Partnership Journey</h3>
@@ -891,10 +917,19 @@ export default function AllenwoodDashboard() {
                 </span>
               </div>
 
-              <p className="text-sm text-gray-600 mb-6">
+              <p className="text-sm text-gray-600 mb-4">
                 Research shows these indicators are the strongest predictors of sustainable classroom change.
                 We&apos;ll measure Allenwood&apos;s baseline at your next virtual session.
               </p>
+
+              {/* Success Metrics Tip */}
+              <div className="flex items-start gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100 mb-6">
+                <Lightbulb className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                <p className="text-xs text-blue-800">
+                  <span className="font-semibold">Reading the bars:</span> Red = industry average (what most schools see).
+                  Navy = TDI partner average (schools working with us). Your goal is to match or beat the navy bar.
+                </p>
+              </div>
 
               {/* Indicator Bars */}
               <div className="space-y-6">
@@ -1126,6 +1161,14 @@ export default function AllenwoodDashboard() {
               <p className="text-sm text-gray-600 text-center">
                 Your team receives dedicated, personalized support — not one-size-fits-all PD.
               </p>
+
+              {/* Support Tip */}
+              <div className="mt-4 pt-3 border-t border-gray-100">
+                <p className="text-xs text-gray-500 flex items-start gap-2">
+                  <Lightbulb className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <span><strong>What are Love Notes?</strong> Personalized feedback letters for each teacher based on classroom observations — celebrating strengths and offering targeted resources.</span>
+                </p>
+              </div>
             </div>
 
             {/* 4. Observation Day #1 - Accordion with Teacher Notes */}
@@ -1452,10 +1495,16 @@ export default function AllenwoodDashboard() {
 
             {/* 6. Hub Engagement Details */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-blue-500" />
                 Hub Engagement Details
               </h3>
+
+              {/* Hub Engagement Tip */}
+              <p className="text-xs text-gray-500 mb-4 flex items-start gap-2">
+                <Lightbulb className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
+                <span><strong>What we&apos;re watching:</strong> 3+ logins = building habits. The goal isn&apos;t just access — it&apos;s regular use. We&apos;ll re-engage the &quot;Getting Started&quot; group at the Feb observation.</span>
+              </p>
 
               {/* Stats Row */}
               <div className="grid grid-cols-3 gap-4 mb-6">
@@ -1546,10 +1595,16 @@ export default function AllenwoodDashboard() {
 
             {/* 7. Teacher Roster */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
+              <div className="flex items-center gap-2 mb-2">
                 <Users className="w-5 h-5 text-[#38618C]" />
                 <span className="font-semibold text-[#1e2749]">Teacher Roster</span>
               </div>
+
+              {/* Teacher Roster Tip */}
+              <p className="text-xs text-gray-500 mb-4 flex items-start gap-2">
+                <Lightbulb className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
+                <span><strong>Red rows</strong> = teachers who haven&apos;t logged into the Hub yet. These are great candidates for a quick 1:1 check-in or virtual office hours session.</span>
+              </p>
 
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -1684,6 +1739,18 @@ export default function AllenwoodDashboard() {
                 Your new teacher pilot team is building strong foundations.
                 Year 2 is the perfect opportunity to expand this support schoolwide.
               </p>
+            </div>
+
+            {/* Year 2 Planning Tip */}
+            <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-[#38618C]/5 to-[#35A7FF]/5 rounded-xl border border-[#38618C]/10">
+              <Lightbulb className="w-5 h-5 text-[#38618C] mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm text-[#1e2749] font-medium mb-1">How to use this preview</p>
+                <p className="text-xs text-gray-600">
+                  This isn&apos;t a commitment — it&apos;s a conversation starter. Use these options to think about what
+                  makes sense for YOUR school. We&apos;ll customize any Year 2 plan based on your goals, budget, and capacity.
+                </p>
+              </div>
             </div>
 
             {/* What Year 2 Includes */}
