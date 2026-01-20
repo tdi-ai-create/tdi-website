@@ -644,22 +644,7 @@ export default function ASD4Dashboard() {
         {activeTab === 'progress' && (
           <div className="space-y-6">
 
-            {/* Section 1: Status Banner */}
-            <div className="bg-gradient-to-r from-[#ffba06]/20 to-white rounded-xl p-6 border border-[#ffba06]/30">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-[#ffba06] rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Construction className="w-6 h-6 text-[#1e2749]" />
-                </div>
-                <div>
-                  <h2 className="text-xl font-bold text-[#1e2749] mb-2">Building Your Foundation</h2>
-                  <p className="text-gray-600">
-                    Your pilot para group will be identified, then we&apos;ll collect baseline data during Virtual Session 1 to measure growth throughout the partnership.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Section 2: Your Next Steps */}
+            {/* Section 1: Your Next Steps */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <h3 className="text-lg font-bold text-[#1e2749] mb-5">Your Next Steps</h3>
 
@@ -722,9 +707,18 @@ export default function ASD4Dashboard() {
                   </div>
                 </div>
               </div>
+
+              {/* Link to full list */}
+              <button
+                onClick={() => handleTabClick('overview')}
+                className="w-full mt-4 pt-4 border-t border-gray-100 text-center text-sm text-[#38618C] hover:text-[#2d4a6d] font-medium transition-colors flex items-center justify-center gap-2"
+              >
+                View all 9 action items on Overview
+                <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
 
-            {/* Section 3: Hub Engagement (REAL DATA) */}
+            {/* Section 2: Hub Engagement (REAL DATA) */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <h3 className="text-lg font-bold text-[#1e2749] mb-5">Hub Engagement</h3>
 
