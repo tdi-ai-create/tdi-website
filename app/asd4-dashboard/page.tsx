@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import { Tooltip } from '@/components/Tooltip';
@@ -50,6 +50,16 @@ import {
 
 export default function ASD4Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
+  const tabContentRef = useRef<HTMLDivElement>(null);
+
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    // Scroll to tab content area so user sees the tab they selected
+    tabContentRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    });
+  };
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Eye },
@@ -113,7 +123,7 @@ export default function ASD4Dashboard() {
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabClick(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'bg-[#1e2749] text-white shadow-md'
@@ -134,7 +144,7 @@ export default function ASD4Dashboard() {
       </div>
 
       {/* Tab Content */}
-      <div className="max-w-5xl mx-auto px-4 py-6">
+      <div ref={tabContentRef} className="max-w-5xl mx-auto px-4 py-6">
 
         {/* ==================== OVERVIEW TAB ==================== */}
         {activeTab === 'overview' && (
