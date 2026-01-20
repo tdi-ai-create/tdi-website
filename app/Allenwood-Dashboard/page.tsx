@@ -430,9 +430,34 @@ export default function AllenwoodDashboard() {
                 <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <p className="font-medium text-[#1e2749]">Observation Day #1 — October 15, 2025</p>
-                  <p className="text-sm text-gray-500">Love Note data to be added</p>
+                  <p className="text-sm text-gray-500">10 teachers observed · 10 personalized Love Notes delivered</p>
                 </div>
                 <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">COMPLETE</span>
+              </div>
+
+              {/* Observation Day 1 Key Findings */}
+              <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Key Findings</p>
+                <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="text-center p-3 bg-white rounded-lg">
+                    <div className="text-xl font-bold text-[#38618C]">10</div>
+                    <div className="text-xs text-gray-600">Teachers Observed</div>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded-lg">
+                    <div className="text-xl font-bold text-[#38618C]">~50%</div>
+                    <div className="text-xs text-gray-600">Strong Management</div>
+                  </div>
+                  <div className="text-center p-3 bg-white rounded-lg">
+                    <div className="text-xl font-bold text-[#38618C]">10</div>
+                    <div className="text-xs text-gray-600">Love Notes</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-gray-700">
+                    <span className="font-medium">Insight:</span> About half the staff observed would benefit from more targeted, hands-on classroom management strategies.
+                  </p>
+                </div>
               </div>
 
               {/* Observation Day 2 */}
@@ -662,6 +687,24 @@ export default function AllenwoodDashboard() {
                   </div>
                 </div>
 
+                {/* Add Paraprofessional Support */}
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                  <div className="flex items-start gap-4">
+                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <Users className="w-6 h-6 text-[#38618C]" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="font-semibold text-[#1e2749]">Add Paraprofessional Support</h4>
+                        <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full font-medium">Year 2 Feature</span>
+                      </div>
+                      <p className="text-gray-600 text-sm">
+                        Your classrooms have multiple adults — getting paras into the Hub alongside teachers creates shared language and consistency.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Full-Year Implementation */}
                 <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
                   <div className="flex items-start gap-4">
@@ -680,19 +723,19 @@ export default function AllenwoodDashboard() {
                   </div>
                 </div>
 
-                {/* Teacher Leadership Pathway */}
+                {/* Autism Support Bundle */}
                 <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Star className="w-6 h-6 text-[#38618C]" />
+                      <BookOpen className="w-6 h-6 text-[#38618C]" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-semibold text-[#1e2749]">Teacher Leadership Pathway</h4>
+                        <h4 className="font-semibold text-[#1e2749]">Autism Support Bundle</h4>
                         <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full font-medium">Year 2 Feature</span>
                       </div>
                       <p className="text-gray-600 text-sm">
-                        Develop your strongest teachers into mentors and PD leaders for their peers.
+                        New TDI content — visual routines, communication supports, sensory-safe transitions — designed for your team&apos;s needs.
                       </p>
                     </div>
                   </div>
@@ -728,16 +771,21 @@ export default function AllenwoodDashboard() {
                   <h4 className="font-semibold text-gray-800 mb-2">Recommendation</h4>
                   <p className="text-sm text-gray-700 mb-3">
                     Your Autism/Special Ed team is building strong foundations.
-                    One thing we often see: when part of a staff gets support and the rest
-                    doesn&apos;t, it can create unintended gaps.
+                    During observations, we noticed most classrooms have multiple adults — and some opportunities for stronger alignment.
                   </p>
-                  <p className="text-sm text-gray-700 font-medium mb-4">
-                    Question worth discussing:<br />
-                    Are there other teachers at Allenwood who could benefit from this support?
-                  </p>
+                  <p className="text-sm text-gray-700 font-medium mb-2">Questions worth discussing:</p>
+                  <ul className="text-sm text-gray-700 mb-4 space-y-2 ml-4">
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-600 mt-1">•</span>
+                      <span>Could paraprofessionals benefit from the same Hub access and training your teachers are receiving?</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-amber-600 mt-1">•</span>
+                      <span>Are there other teachers at Allenwood who could benefit from this support?</span>
+                    </li>
+                  </ul>
                   <p className="text-sm text-gray-600 mb-4">
-                    Year 2 could be an opportunity to bring everyone onto the same page —
-                    same language, same strategies, same community.
+                    Year 2 could bring everyone onto the same page — teachers AND paras with shared language, strategies, and community.
                   </p>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
