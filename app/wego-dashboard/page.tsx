@@ -8,11 +8,9 @@ import {
   CheckCircle,
   Clock,
   Users,
-  BookOpen,
   Target,
   Star,
   Lightbulb,
-  Heart,
   TrendingUp,
   ArrowRight,
   AlertCircle,
@@ -24,10 +22,6 @@ import {
   User,
   BarChart3,
   Sparkles,
-  Info,
-  Video,
-  ChevronDown,
-  ChevronRight,
   Check,
   ExternalLink,
   Briefcase,
@@ -39,7 +33,6 @@ import {
 
 export default function WegoDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
-  const [showAllVirtual, setShowAllVirtual] = useState(false);
 
   // Scroll to top when changing tabs
   const handleTabChange = (tabId: string) => {
@@ -248,73 +241,27 @@ export default function WegoDashboard() {
                 </a>
               </div>
 
-              {/* Scheduled Item */}
-              <div className="mb-4">
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Scheduled</div>
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-green-50 border border-green-200">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <div>
-                    <span className="font-medium text-[#1e2749]">Observation Day 3</span>
-                    <span className="text-gray-500 mx-2">—</span>
-                    <span className="text-green-600 font-medium">February 25, 2026</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Virtual Sessions Accordion */}
+              {/* Scheduled Items */}
               <div>
-                <button
-                  onClick={() => setShowAllVirtual(!showAllVirtual)}
-                  className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#1e2749] transition-colors"
-                >
-                  {showAllVirtual ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                  <span className="font-semibold uppercase tracking-wide">Virtual Sessions</span>
-                  <span className="text-gray-400">(3 remaining)</span>
-                </button>
-
-                {showAllVirtual && (
-                  <div className="mt-3 space-y-2">
-                    {[
-                      { num: 4, due: 'MAR 2026' },
-                      { num: 5, due: 'APR 2026' },
-                      { num: 6, due: 'MAY 2026' },
-                    ].map((session) => (
-                      <a
-                        key={session.num}
-                        href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between p-4 rounded-xl border border-gray-200 bg-white hover:border-[#35A7FF] hover:shadow-sm transition-all group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-[#35A7FF]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <Video className="w-5 h-5 text-[#35A7FF]" />
-                          </div>
-                          <div>
-                            <div className="font-medium text-[#1e2749]">Virtual Session {session.num}</div>
-                            <p className="text-sm text-gray-500">45 min · Flexible scheduling</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs text-gray-400">SCHEDULE BY {session.due}</span>
-                          <span className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2589db] transition-colors">
-                            <Calendar className="w-4 h-4" />
-                            Book Your Session
-                          </span>
-                        </div>
-                      </a>
-                    ))}
-                    <div className="mt-3 bg-[#35A7FF]/10 border border-[#35A7FF]/30 rounded-lg p-4 flex items-start gap-3">
-                      <Info className="w-5 h-5 text-[#35A7FF] flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="font-semibold text-[#1e2749] text-sm mb-1">Virtual Sessions are Flexible</p>
-                        <p className="text-sm text-gray-600">
-                          Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.
-                        </p>
-                      </div>
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Scheduled</div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 p-4 rounded-xl bg-green-50 border border-green-200">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <div>
+                      <span className="font-medium text-[#1e2749]">Observation Day 3</span>
+                      <span className="text-gray-500 mx-2">—</span>
+                      <span className="text-green-600 font-medium">February 25, 2026</span>
                     </div>
                   </div>
-                )}
+                  <div className="flex items-center gap-3 p-4 rounded-xl bg-green-50 border border-green-200">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <div>
+                      <span className="font-medium text-[#1e2749]">Virtual Sessions 4-6</span>
+                      <span className="text-gray-500 mx-2">—</span>
+                      <span className="text-green-600 font-medium">Scheduled</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
