@@ -468,7 +468,7 @@ export default function ASD4Dashboard() {
 
                   {/* Item 9: Executive Session 2 */}
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"

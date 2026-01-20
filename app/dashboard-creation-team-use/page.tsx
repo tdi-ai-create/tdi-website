@@ -41,7 +41,7 @@ export default function DashboardCreationForm() {
     // Section 5: Calendly Links
     observationCalendly: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone',
     virtualCalendly: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
-    execCalendly: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+    execCalendly: 'https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone',
 
     // Section 6: Current Status
     kickoffComplete: false,
@@ -97,7 +97,7 @@ export default function DashboardCreationForm() {
     otherInclusions: '',
     observationCalendly: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone',
     virtualCalendly: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
-    execCalendly: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+    execCalendly: 'https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone',
     kickoffComplete: false,
     hubActivated: true,
     currentLogins: '',
