@@ -1092,60 +1092,6 @@ export default function ASD4Dashboard() {
 
             </div>
 
-            {/* 8. Para Research Context - REAL DATA (Industry Data) */}
-            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <div className="text-sm font-semibold text-[#1e2749]">Paraprofessional Research</div>
-                <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded">INDUSTRY DATA</span>
-              </div>
-
-              <div className="space-y-4">
-
-                {/* Attrition trend */}
-                <div>
-                  <div className="text-xs text-gray-500 mb-2">Para Attrition Rate Over Time</div>
-                  <div className="flex items-end gap-1 h-20">
-                    <div className="flex-1 flex flex-col items-center">
-                      <div className="w-full bg-[#38618C]/30 rounded-t" style={{ height: '35%' }}></div>
-                      <div className="text-xs text-gray-500 mt-1">2008</div>
-                      <div className="text-xs font-medium">8%</div>
-                    </div>
-                    <div className="flex-1 flex flex-col items-center">
-                      <div className="w-full bg-[#38618C]/50 rounded-t" style={{ height: '52%' }}></div>
-                      <div className="text-xs text-gray-500 mt-1">2015</div>
-                      <div className="text-xs font-medium">12%</div>
-                    </div>
-                    <div className="flex-1 flex flex-col items-center">
-                      <div className="w-full bg-[#38618C]/70 rounded-t" style={{ height: '70%' }}></div>
-                      <div className="text-xs text-gray-500 mt-1">2019</div>
-                      <div className="text-xs font-medium">16%</div>
-                    </div>
-                    <div className="flex-1 flex flex-col items-center">
-                      <div className="w-full bg-[#E07A5F] rounded-t" style={{ height: '100%' }}></div>
-                      <div className="text-xs text-gray-500 mt-1">2022</div>
-                      <div className="text-xs font-bold text-[#E07A5F]">23%</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Key stat callout */}
-                <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
-                  <div className="flex items-start gap-3">
-                    <span className="text-2xl">⚠️</span>
-                    <div>
-                      <div className="text-sm font-medium text-[#1e2749]">Para attrition has nearly tripled since 2008</div>
-                      <div className="text-xs text-gray-600 mt-1">At least half of employees lost from a school building each year are paraprofessionals and staff — leaving at disproportionately high rates.</div>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-              <div className="text-xs text-gray-400 text-center mt-4 pt-3 border-t border-gray-100">
-                Source: NCTQ analysis of Washington state workforce data, 2023
-              </div>
-            </div>
-
             {/* Supporting Resources */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
