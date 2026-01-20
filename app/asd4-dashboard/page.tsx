@@ -183,7 +183,7 @@ export default function ASD4Dashboard() {
                   <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
                   <Tooltip text="Action items to complete for your partnership. Click to view details." position="bottom" iconSize={12} />
                 </div>
-                <div className="text-2xl font-bold text-[#E07A5F]">5</div>
+                <div className="text-2xl font-bold text-[#E07A5F]">9</div>
                 <div className="text-xs text-[#E07A5F] font-medium">Items pending</div>
               </div>
 
@@ -203,7 +203,7 @@ export default function ASD4Dashboard() {
               <div className="flex items-center gap-2 mb-5">
                 <AlertCircle className="w-5 h-5 text-[#E07A5F]" />
                 <h3 className="text-lg font-bold text-[#1e2749]">Needs Attention</h3>
-                <span className="bg-[#E07A5F]/10 text-[#E07A5F] text-xs font-medium px-2 py-0.5 rounded-full">5 items</span>
+                <span className="bg-[#E07A5F]/10 text-[#E07A5F] text-xs font-medium px-2 py-0.5 rounded-full">9 items</span>
               </div>
 
               <div className="space-y-3">
@@ -303,7 +303,107 @@ export default function ASD4Dashboard() {
                   </div>
                 </a>
 
-                {/* Item 5: Executive Session 2 */}
+                {/* Item 5: Observation Day 2 */}
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Eye className="w-5 h-5 text-[#ffba06]" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Schedule Observation Day 2</div>
+                      <p className="text-sm text-gray-500">Follow-up on-site observation</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-400">DUE FEB 2026</span>
+                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                      <Calendar className="w-4 h-4" />
+                      Click to Schedule
+                    </span>
+                  </div>
+                </a>
+
+                {/* Item 6: Virtual Session 2 */}
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Monitor className="w-5 h-5 text-[#ffba06]" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Schedule Virtual Session 2</div>
+                      <p className="text-sm text-gray-500">Strategy implementation check-in</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-400">DUE MAR 2026</span>
+                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                      <Calendar className="w-4 h-4" />
+                      Click to Schedule
+                    </span>
+                  </div>
+                </a>
+
+                {/* Item 7: Virtual Session 3 */}
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Monitor className="w-5 h-5 text-[#ffba06]" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Schedule Virtual Session 3</div>
+                      <p className="text-sm text-gray-500">Growth group deep-dive</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-400">DUE APR 2026</span>
+                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                      <Calendar className="w-4 h-4" />
+                      Click to Schedule
+                    </span>
+                  </div>
+                </a>
+
+                {/* Item 8: Virtual Session 4 */}
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Monitor className="w-5 h-5 text-[#ffba06]" />
+                    </div>
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Schedule Virtual Session 4</div>
+                      <p className="text-sm text-gray-500">Final strategy session</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-gray-400">DUE MAY 2026</span>
+                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                      <Calendar className="w-4 h-4" />
+                      Click to Schedule
+                    </span>
+                  </div>
+                </a>
+
+                {/* Item 9: Executive Session 2 */}
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
@@ -316,17 +416,28 @@ export default function ASD4Dashboard() {
                     </div>
                     <div>
                       <div className="font-medium text-[#1e2749]">Schedule Executive Session 2</div>
-                      <p className="text-sm text-gray-500">Leadership alignment meeting</p>
+                      <p className="text-sm text-gray-500">Results review with leadership</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-400">DUE MAR 2026</span>
+                    <span className="text-xs text-gray-400">DUE APR 2026</span>
                     <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
                       <Calendar className="w-4 h-4" />
                       Click to Schedule
                     </span>
                   </div>
                 </a>
+              </div>
+
+              {/* Virtual Sessions Flexibility Note */}
+              <div className="mt-4 bg-[#35A7FF]/10 border border-[#35A7FF]/30 rounded-lg p-4 flex items-start gap-3">
+                <Info className="w-5 h-5 text-[#35A7FF] flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-[#1e2749] text-sm mb-1">Virtual Sessions are Flexible</p>
+                  <p className="text-sm text-gray-600">
+                    Due dates indicate when sessions should be scheduled by. You have flexibility in how you use them — combine sessions back-to-back, spread them out, whatever works best for your team.
+                  </p>
+                </div>
               </div>
             </div>
 
