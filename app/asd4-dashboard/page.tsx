@@ -1046,7 +1046,7 @@ export default function ASD4Dashboard() {
                   <ul className="space-y-2 text-sm text-gray-600">
                     <li className="flex items-start gap-2">
                       <Star className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
-                      <span><strong>All 117 paras</strong> receive coaching</span>
+                      <span>Paras get continued personalized coaching</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Star className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
