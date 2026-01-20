@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import {
+  Activity,
   Calendar,
   CheckCircle,
   Clock,
@@ -281,6 +282,49 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
+            {/* Health Check Section */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-green-500" />
+                  Health Check
+                </h3>
+                <span className="text-sm text-gray-400">Updated Jan 20, 2026</span>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <Check className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-gray-800">82%</p>
+                    <p className="text-xs text-gray-500">Hub Logins</p>
+                    <p className="text-xs text-green-600">✓ On Track</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <Check className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-gray-800">10</p>
+                    <p className="text-xs text-gray-500">Love Notes Sent</p>
+                    <p className="text-xs text-green-600">✓ Complete</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                    <Calendar className="w-4 h-4 text-amber-600" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-gray-800">1/6</p>
+                    <p className="text-xs text-gray-500">Virtual Sessions</p>
+                    <p className="text-xs text-amber-600">5 Available</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Recommendation Card */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
               <div className="flex items-start gap-3">
@@ -389,11 +433,11 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Needs Attention - Matching Upcoming Sessions Style */}
-            <div id="needs-attention-section" className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            {/* Next Steps - Matching Upcoming Sessions Style */}
+            <div id="next-steps-section" className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <AlertCircle className="w-5 h-5 text-orange-500" />
-                Needs Attention
+                <Calendar className="w-5 h-5 text-orange-500" />
+                Next Steps
                 <span className="text-sm font-normal text-orange-500 ml-2">6 items</span>
               </h3>
 
@@ -401,7 +445,7 @@ export default function AllenwoodDashboard() {
                 {/* Virtual Session #2 */}
                 <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
                   <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-orange-500 w-24">By March</span>
+                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
                     <span className="text-gray-800 font-medium">Virtual Session #2</span>
                   </div>
                   <a
@@ -417,7 +461,7 @@ export default function AllenwoodDashboard() {
                 {/* Virtual Session #3 */}
                 <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
                   <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-orange-500 w-24">By March</span>
+                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
                     <span className="text-gray-800 font-medium">Virtual Session #3</span>
                   </div>
                   <a
@@ -433,7 +477,7 @@ export default function AllenwoodDashboard() {
                 {/* Virtual Session #4 */}
                 <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
                   <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-orange-500 w-24">By March</span>
+                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
                     <span className="text-gray-800 font-medium">Virtual Session #4</span>
                   </div>
                   <a
@@ -449,7 +493,7 @@ export default function AllenwoodDashboard() {
                 {/* Virtual Session #5 */}
                 <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
                   <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-orange-500 w-24">By March</span>
+                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
                     <span className="text-gray-800 font-medium">Virtual Session #5</span>
                   </div>
                   <a
@@ -465,7 +509,7 @@ export default function AllenwoodDashboard() {
                 {/* Virtual Session #6 */}
                 <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
                   <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-orange-500 w-24">By March</span>
+                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
                     <span className="text-gray-800 font-medium">Virtual Session #6</span>
                   </div>
                   <a
@@ -481,7 +525,7 @@ export default function AllenwoodDashboard() {
                 {/* Leadership Celebration */}
                 <div className="flex items-center justify-between p-4 bg-orange-50 rounded-lg">
                   <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-orange-500 w-24">By March</span>
+                    <span className="text-sm font-medium text-orange-500 w-24">Before Apr</span>
                     <span className="text-gray-800 font-medium">Leadership Celebration + Year 2 Planning</span>
                   </div>
                   <a
@@ -511,11 +555,43 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Partnership Footer */}
-            <div className="bg-[#1e2749] rounded-xl p-6 text-center">
-              <p className="text-white/80 text-sm mb-2">Partnership Period</p>
-              <p className="text-white font-semibold">July 2025 – June 2026</p>
-              <p className="text-white/60 text-sm mt-2">Hub Access Until July 2026</p>
+            {/* Looking Ahead Teaser */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="text-sm text-blue-600 font-medium mb-1">Looking Ahead</p>
+                  <h3 className="text-xl font-semibold text-gray-800 mb-2">2026-27 Partnership Plan</h3>
+                  <p className="text-sm text-gray-600">
+                    Your pilot team is building strong foundations. Year 2 could expand
+                    this support schoolwide — bringing shared strategies to every classroom.
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleTabChange('next-year')}
+                  className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium whitespace-nowrap ml-4"
+                >
+                  See the plan
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {/* Partnership Footer with CTA */}
+            <div className="bg-[#1e2749] text-white rounded-xl p-6">
+              <div className="flex justify-between items-center">
+                <div>
+                  <p className="font-semibold">Teachers Deserve It</p>
+                  <p className="text-sm text-gray-300">Partner Dashboard for Allenwood Elementary</p>
+                </div>
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white text-[#1e2749] px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100"
+                >
+                  Schedule a Call
+                </a>
+              </div>
             </div>
           </div>
         )}
@@ -640,7 +716,7 @@ export default function AllenwoodDashboard() {
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">By March</span>
+                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
                     <span className="text-gray-800">Virtual Session #2</span>
                   </div>
                   <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
@@ -656,7 +732,7 @@ export default function AllenwoodDashboard() {
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">By March</span>
+                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
                     <span className="text-gray-800">Virtual Session #3</span>
                   </div>
                   <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
@@ -672,7 +748,7 @@ export default function AllenwoodDashboard() {
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">By March</span>
+                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
                     <span className="text-gray-800">Virtual Session #4</span>
                   </div>
                   <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
@@ -688,7 +764,7 @@ export default function AllenwoodDashboard() {
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">By March</span>
+                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
                     <span className="text-gray-800">Virtual Session #5</span>
                   </div>
                   <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
@@ -704,7 +780,7 @@ export default function AllenwoodDashboard() {
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">By March</span>
+                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
                     <span className="text-gray-800">Virtual Session #6</span>
                   </div>
                   <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
@@ -720,7 +796,7 @@ export default function AllenwoodDashboard() {
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
                 >
                   <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">By March</span>
+                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
                     <span className="text-gray-800">Leadership Celebration + Year 2 Planning</span>
                   </div>
                   <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
@@ -1414,8 +1490,8 @@ export default function AllenwoodDashboard() {
             <div className="text-center mb-6">
               <h2 className="text-2xl font-bold text-[#1e2749] mb-3">Expand Your Impact in 2026-27</h2>
               <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-                Your pilot team of Autism/Special Ed teachers is building strong foundations.
-                Year 2 brings more teachers into the fold — same strategies, same community, schoolwide impact.
+                Your new teacher pilot team is building strong foundations.
+                Year 2 is the perfect opportunity to expand this support schoolwide.
               </p>
             </div>
 
@@ -1644,15 +1720,15 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Expansion Discovery Card */}
+            {/* Recommendation Card */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
               <div className="flex items-start gap-3">
                 <Lightbulb className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Recommendation: Expand Schoolwide</h4>
+                  <h4 className="font-semibold text-gray-800 mb-2">Recommendation</h4>
                   <p className="text-sm text-gray-700 mb-3">
-                    Your Autism/Special Ed pilot team is building strong foundations.
-                    With proven strategies and growing momentum, Year 2 is the perfect time to bring more teachers into the fold.
+                    Your new teacher pilot team is building strong foundations.
+                    Year 2 is the perfect opportunity to expand this support schoolwide.
                   </p>
                   <p className="text-sm text-gray-700 font-medium mb-2">Questions worth discussing:</p>
                   <ul className="text-sm text-gray-700 mb-4 space-y-2 ml-4">
@@ -1665,9 +1741,6 @@ export default function AllenwoodDashboard() {
                       <span>Are there teachers who&apos;ve expressed interest in the strategies your pilot team is using?</span>
                     </li>
                   </ul>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Year 2 expands your impact — more teachers with shared language, strategies, and a schoolwide culture of support.
-                  </p>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
                     target="_blank"
