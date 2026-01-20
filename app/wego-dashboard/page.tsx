@@ -246,20 +246,36 @@ export default function WegoDashboard() {
               <div>
                 <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Scheduled</div>
                 <div className="space-y-2">
-                  <div className="flex items-center gap-3 p-4 rounded-xl bg-green-50 border border-green-200">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200">
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <div>
                       <span className="font-medium text-[#1e2749]">Observation Day 3</span>
                       <span className="text-gray-500 mx-2">—</span>
                       <span className="text-green-600 font-medium">February 25, 2026</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-4 rounded-xl bg-green-50 border border-green-200">
-                    <CheckCircle className="w-5 h-5 text-green-600" />
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200">
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <div>
-                      <span className="font-medium text-[#1e2749]">Virtual Sessions 4-6</span>
+                      <span className="font-medium text-[#1e2749]">Virtual Session 4</span>
                       <span className="text-gray-500 mx-2">—</span>
-                      <span className="text-green-600 font-medium">Scheduled</span>
+                      <span className="text-green-600 font-medium">March 16, 2026</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200">
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <div>
+                      <span className="font-medium text-[#1e2749]">Virtual Session 5</span>
+                      <span className="text-gray-500 mx-2">—</span>
+                      <span className="text-green-600 font-medium">April 13, 2026</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200">
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <div>
+                      <span className="font-medium text-[#1e2749]">Virtual Session 6</span>
+                      <span className="text-gray-500 mx-2">—</span>
+                      <span className="text-green-600 font-medium">May 11, 2026</span>
                     </div>
                   </div>
                 </div>
@@ -535,7 +551,8 @@ export default function WegoDashboard() {
                 </div>
 
                 <div className="ml-11 bg-gray-50 rounded-xl p-5 border border-gray-200">
-                  <p className="text-gray-500 italic">Data to be added when available</p>
+                  <p className="text-gray-700">Remaining 11 PAs observed</p>
+                  <p className="text-gray-500 text-sm italic mt-1">Specific data to be added when available</p>
                 </div>
               </div>
 
@@ -554,7 +571,7 @@ export default function WegoDashboard() {
                 </div>
 
                 <div className="ml-11 bg-blue-50 rounded-xl p-5 border border-blue-200">
-                  <p className="text-blue-700">Remaining 11 PAs + follow-up observations</p>
+                  <p className="text-blue-700">Follow-up observations + continued coaching</p>
                 </div>
               </div>
             </div>
@@ -617,6 +634,37 @@ export default function WegoDashboard() {
 
               <div className="mt-6 bg-[#1e2749] rounded-xl p-4 text-center">
                 <p className="text-white font-semibold">This confirms: Implementation support works.</p>
+              </div>
+            </div>
+
+            {/* Resources Available */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Star className="w-5 h-5 text-[#ffba06]" />
+                <span className="font-semibold text-[#1e2749]">Specialized Resource Bundles</span>
+              </div>
+              <p className="text-gray-600 mb-4">Available to all WEGO PAs in the Learning Hub:</p>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-[#35A7FF]/10 rounded-xl p-5 border border-[#35A7FF]/30">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Users className="w-5 h-5 text-[#35A7FF]" />
+                    <span className="font-semibold text-[#1e2749]">EL Support</span>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Strategies for English Learner support in the classroom
+                  </p>
+                </div>
+
+                <div className="bg-purple-50 rounded-xl p-5 border border-purple-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Lightbulb className="w-5 h-5 text-purple-600" />
+                    <span className="font-semibold text-[#1e2749]">Autism & Neurodivergent Learners</span>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Practical strategies for inclusive support
+                  </p>
+                </div>
               </div>
             </div>
           </div>
