@@ -30,11 +30,17 @@ import {
   RefreshCw,
   LineChart,
   MessageSquare,
-  BookOpen
+  BookOpen,
+  Timer,
+  Quote,
+  ChevronDown,
+  ChevronUp,
+  PartyPopper
 } from 'lucide-react';
 
 export default function WegoDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [showAllLoveNotes, setShowAllLoveNotes] = useState(false);
 
   // Scroll to top when changing tabs
   const handleTabChange = (tabId: string) => {
@@ -140,8 +146,8 @@ export default function WegoDashboard() {
                   <CheckCircle className="w-4 h-4 text-green-500" />
                   <span className="text-xs text-gray-500 uppercase">Hub Logins</span>
                 </div>
-                <div className="text-2xl font-bold text-green-600">100%</div>
-                <div className="text-xs text-green-600 font-medium">Goal Complete</div>
+                <div className="text-2xl font-bold text-green-600">95%</div>
+                <div className="text-xs text-green-600 font-medium">18/19 Logged In</div>
               </div>
 
               <div
@@ -155,7 +161,7 @@ export default function WegoDashboard() {
                   <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
                 </div>
                 <div className="text-2xl font-bold text-[#E07A5F]">1</div>
-                <div className="text-xs text-[#E07A5F] font-medium">Spring Leadership Recap</div>
+                <div className="text-xs text-[#E07A5F] font-medium">Year 1 Celebration</div>
               </div>
 
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
@@ -176,8 +182,8 @@ export default function WegoDashboard() {
                   <CheckCircle className="w-6 h-6 text-green-600" />
                 </div>
                 <div className="text-2xl font-bold text-green-700">Hub Logins</div>
-                <div className="text-green-600 font-semibold">100% Complete</div>
-                <div className="text-sm text-green-600 mt-1">All 19 paras!</div>
+                <div className="text-green-600 font-semibold">95% (18/19)</div>
+                <div className="text-sm text-green-600 mt-1">Almost there!</div>
               </div>
 
               {/* Obs Day 3 - BLUE */}
@@ -201,6 +207,187 @@ export default function WegoDashboard() {
                 <div className="text-blue-600 font-semibold">Implementation Target</div>
                 <div className="text-sm text-blue-600 mt-1">vs 10% industry avg</div>
               </div>
+            </div>
+
+            {/* Hours of Support Delivered */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Timer className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749] uppercase tracking-wide">Hours of Support Delivered</span>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#38618C]">18+</div>
+                  <div className="text-xs text-gray-600 mt-1">Hours On-Site<br/>Obs Days</div>
+                </div>
+                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#38618C]">6</div>
+                  <div className="text-xs text-gray-600 mt-1">Hours Coaching<br/>Sessions</div>
+                </div>
+                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#38618C]">Weekly</div>
+                  <div className="text-xs text-gray-600 mt-1">Subgroup<br/>Support</div>
+                </div>
+                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#38618C]">19</div>
+                  <div className="text-xs text-gray-600 mt-1">Love Notes<br/>Sent</div>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-600 text-center">
+                Your team receives dedicated, personalized support — not one-size-fits-all PD.
+              </p>
+            </div>
+
+            {/* Upcoming Sessions */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Calendar className="w-5 h-5 text-[#35A7FF]" />
+                <span className="font-semibold text-[#1e2749] uppercase tracking-wide">Upcoming Sessions</span>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-[#38618C]">Feb 25</span>
+                    <span className="text-sm text-gray-700">Observation Day 3</span>
+                  </div>
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                    <Check className="w-3 h-3" /> Scheduled
+                  </span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-[#38618C]">Mar 16</span>
+                    <span className="text-sm text-gray-700">Virtual Session 4</span>
+                  </div>
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                    <Check className="w-3 h-3" /> Scheduled
+                  </span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-[#38618C]">Apr 13</span>
+                    <span className="text-sm text-gray-700">Virtual Session 5</span>
+                  </div>
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                    <Check className="w-3 h-3" /> Scheduled
+                  </span>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-[#38618C]">May 11</span>
+                    <span className="text-sm text-gray-700">Virtual Session 6</span>
+                  </div>
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                    <Check className="w-3 h-3" /> Scheduled
+                  </span>
+                </div>
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 bg-[#E07A5F]/5 rounded-lg border border-[#E07A5F]/20 hover:bg-[#E07A5F]/10 transition-colors group"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-[#38618C]">TBD</span>
+                    <span className="text-sm text-gray-700">Year 1 Celebration + Year 2 Planning</span>
+                  </div>
+                  <span className="text-xs bg-[#E07A5F] text-white px-3 py-1 rounded-full font-medium group-hover:bg-[#d06a4f] transition-colors">
+                    Schedule Now
+                  </span>
+                </a>
+              </div>
+
+              <div className="mt-4 flex items-center gap-2 text-sm text-green-600">
+                <CheckCircle className="w-4 h-4" />
+                <span>Only 1 item left to schedule — you&apos;re almost there!</span>
+              </div>
+            </div>
+
+            {/* What Your Team Is Saying */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Quote className="w-5 h-5 text-[#ffba06]" />
+                <span className="font-semibold text-[#1e2749] uppercase tracking-wide">What Your Team Is Saying</span>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#ffba06]">
+                  <p className="text-gray-700 italic mb-2">&quot;Trust and shared goals to best serve students.&quot;</p>
+                  <p className="text-sm text-[#38618C] font-medium">— Bob Talbot</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#ffba06]">
+                  <p className="text-gray-700 italic mb-2">&quot;The feedback step has been effective for me and enables me to provide better support to both teachers and students.&quot;</p>
+                  <p className="text-sm text-[#38618C] font-medium">— Claudia Castellanos</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#ffba06]">
+                  <p className="text-gray-700 italic mb-2">&quot;We all agreed this course was useful.&quot;</p>
+                  <p className="text-sm text-[#38618C] font-medium">— Curt Treu&apos;s Subgroup</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Engagement Snapshot */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <BarChart3 className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749] uppercase tracking-wide">Engagement Snapshot</span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4 mb-6">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-[#38618C]">95%</div>
+                  <div className="text-xs text-gray-600">Logged In<br/>18/19</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-[#38618C]">83</div>
+                  <div className="text-xs text-gray-600">Total Logins<br/>Since Oct</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-[#38618C]">7</div>
+                  <div className="text-xs text-gray-600">Active This<br/>Month</div>
+                </div>
+              </div>
+
+              <div className="space-y-3 mb-4">
+                <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
+                  <div className="w-3 h-3 bg-green-500 rounded-full mt-1 flex-shrink-0"></div>
+                  <div>
+                    <div className="font-medium text-green-800 text-sm">High Engagement (5+ logins)</div>
+                    <div className="text-xs text-green-700">9 PAs — logging in regularly</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
+                  <div className="w-3 h-3 bg-amber-500 rounded-full mt-1 flex-shrink-0"></div>
+                  <div>
+                    <div className="font-medium text-amber-800 text-sm">Building Habits (2-4 logins)</div>
+                    <div className="text-xs text-amber-700">9 PAs — exploring at their pace</div>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-200">
+                  <div className="w-3 h-3 bg-red-500 rounded-full mt-1 flex-shrink-0"></div>
+                  <div>
+                    <div className="font-medium text-red-800 text-sm">Needs Support (0 logins)</div>
+                    <div className="text-xs text-red-700">1 PA — hasn&apos;t logged in yet</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#35A7FF]/10 rounded-lg p-4 border border-[#35A7FF]/30">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="text-sm font-semibold text-[#38618C]">Recommendation</div>
+                    <p className="text-sm text-gray-700">Consider a quick Hub walkthrough for the 1 PA who hasn&apos;t logged in — a 5-minute demo at your next team meeting can make the difference.</p>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-600 text-center mt-4">
+                7 PAs logged in this month (January 2026) — momentum is building!
+              </p>
             </div>
 
             {/* Needs Attention */}
@@ -230,8 +417,8 @@ export default function WegoDashboard() {
                       <Briefcase className="w-5 h-5 text-[#E07A5F]" />
                     </div>
                     <div>
-                      <div className="font-medium text-[#1e2749]">Spring Leadership Recap</div>
-                      <p className="text-sm text-gray-500">Review progress + plan for 2026-27 expansion</p>
+                      <div className="font-medium text-[#1e2749]">Year 1 Celebration + Year 2 Planning</div>
+                      <p className="text-sm text-gray-500">Review wins, insights, and plan your next chapter</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3">
@@ -293,8 +480,8 @@ export default function WegoDashboard() {
               <div className="grid sm:grid-cols-2 gap-3">
                 {[
                   'Hub Access Activated — 19 paras enrolled',
-                  'Hub Logins — 100% (All 19 paras!)',
-                  'Observation Day 1 — Complete',
+                  'Hub Logins — 95% (18/19)',
+                  'Observation Day 1 — November 12, 2025',
                   'Observation Day 2 — Complete',
                   'Virtual Sessions 1-3 — Complete',
                 ].map((item, idx) => (
@@ -413,7 +600,7 @@ export default function WegoDashboard() {
                     <Clock className="w-5 h-5 text-gray-500" />
                   </div>
                   <div className="flex-1">
-                    <div className="font-medium text-[#1e2749]">Spring Leadership Recap</div>
+                    <div className="font-medium text-[#1e2749]">Year 1 Celebration + Year 2 Planning</div>
                     <p className="text-sm text-gray-500">Review progress and plan for 2026-27 expansion</p>
                   </div>
                   <span className="text-xs text-[#E07A5F] font-medium">Schedule by Apr 2026</span>
@@ -473,6 +660,124 @@ export default function WegoDashboard() {
             <div className="text-center mb-6">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Observation Data & Progress</h2>
               <p className="text-gray-600">Tracking implementation through observation cycles</p>
+            </div>
+
+            {/* Your Journey So Far - Visual Timeline */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-6">
+                <TrendingUp className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749]">Your Journey So Far</span>
+              </div>
+
+              {/* Visual Timeline */}
+              <div className="relative mb-8">
+                <div className="absolute top-4 left-0 right-0 h-1 bg-gradient-to-r from-green-400 via-[#35A7FF] to-gray-200 rounded-full"></div>
+                <div className="flex justify-between relative">
+                  <div className="text-center">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="text-xs font-semibold text-[#1e2749]">Sep 2025</div>
+                    <div className="text-xs text-gray-500">Launched</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="text-xs font-semibold text-[#1e2749]">Nov 2025</div>
+                    <div className="text-xs text-gray-500">Obs Day 1</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="text-xs font-semibold text-[#1e2749]">Dec 2025</div>
+                    <div className="text-xs text-gray-500">Subgroups</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-8 h-8 bg-[#35A7FF] rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow animate-pulse">
+                      <Star className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="text-xs font-semibold text-[#1e2749]">Jan 2026</div>
+                    <div className="text-xs text-[#35A7FF]">You Are Here</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow">
+                      <Calendar className="w-4 h-4 text-gray-400" />
+                    </div>
+                    <div className="text-xs font-semibold text-gray-400">Feb 2026</div>
+                    <div className="text-xs text-gray-400">Obs Day 3</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow">
+                      <PartyPopper className="w-4 h-4 text-gray-400" />
+                    </div>
+                    <div className="text-xs font-semibold text-gray-400">Jun 2026</div>
+                    <div className="text-xs text-gray-400">Complete!</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Milestones Achieved */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <div className="text-sm font-semibold text-green-700 mb-3 flex items-center gap-2">
+                    <Check className="w-4 h-4" />
+                    Milestones Achieved
+                  </div>
+                  <ul className="text-sm text-gray-700 space-y-2">
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <span><strong>Sep 2025</strong> — Partnership launched, 19 PAs enrolled</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <span><strong>Oct 2025</strong> — 95% Hub access, subgroups established</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <span><strong>Nov 2025</strong> — Obs Day 1: 62.5% high Hub engagement</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <span><strong>Dec 2025</strong> — Subgroups thriving, course feedback flowing</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <span><strong>Jan 2026</strong> — 7 PAs active this month</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <div className="text-sm font-semibold text-[#35A7FF] mb-3 flex items-center gap-2">
+                    <ArrowRight className="w-4 h-4" />
+                    Coming Up
+                  </div>
+                  <ul className="text-sm text-gray-700 space-y-2">
+                    <li className="flex items-start gap-2">
+                      <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
+                      <span><strong>Feb 25</strong> — Observation Day 3</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
+                      <span><strong>Mar 16</strong> — Virtual Session 4</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
+                      <span><strong>Apr 13</strong> — Virtual Session 5</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
+                      <span><strong>Apr (TBD)</strong> — Year 1 Celebration + Year 2 Planning</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
+                      <span><strong>May 11</strong> — Virtual Session 6 (Final)</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </div>
 
             {/* Observation Timeline */}
@@ -578,157 +883,226 @@ export default function WegoDashboard() {
               </div>
             </div>
 
-            {/* Sample Love Notes */}
+            {/* Love Notes from Observations */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-6">
+              <div className="flex items-center gap-2 mb-4">
                 <Star className="w-5 h-5 text-[#ffba06]" />
-                <span className="font-semibold text-[#1e2749]">Sample Love Notes</span>
+                <span className="font-semibold text-[#1e2749]">Love Notes from Observations</span>
               </div>
-              <p className="text-gray-600 mb-6">Personalized feedback delivered to PAs after observations — celebrating wins and connecting growth to Hub resources.</p>
+              <p className="text-gray-600 mb-6">Every observed PA receives personalized feedback celebrating their strengths and recommending targeted Hub resources.</p>
 
-              {/* Love Note 1 - Isaac Spear */}
-              <div className="mb-6 bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-5 border border-[#ffba06]/30">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#ffba06] rounded-full flex items-center justify-center">
-                      <Star className="w-5 h-5 text-[#1e2749]" />
+              {/* Featured Love Notes - Condensed */}
+              <div className="space-y-4 mb-4">
+                {/* Isaac Spear Featured */}
+                <div className="bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-4 border border-[#ffba06]/30">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-[#ffba06] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Star className="w-4 h-4 text-[#1e2749]" />
                     </div>
-                    <div>
-                      <div className="font-bold text-[#1e2749]">Isaac Spear</div>
-                      <div className="text-sm text-gray-600">Step Center Observation</div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-[#1e2749]">Isaac Spear</span>
+                        <span className="text-xs text-gray-500">Nov 12, 2025</span>
+                      </div>
+                      <p className="text-sm text-gray-700 italic">&quot;Textbook scaffolding! Goal review was outstanding — reviewed when work would be done, asked &apos;Do you have any questions?&apos;, gave reminders of next steps. Multi-modal support shows deep understanding.&quot;</p>
+                      <div className="mt-2 text-xs text-[#35A7FF] font-medium">Recommended: Sentence Starter Guide</div>
                     </div>
                   </div>
-                  <span className="text-xs bg-white px-3 py-1 rounded-full text-gray-600 font-medium">Nov 12, 2025</span>
                 </div>
 
-                <div className="space-y-3">
-                  <div className="bg-white rounded-lg p-4">
-                    <div className="text-sm font-semibold text-[#38618C] uppercase tracking-wide mb-2">What We Celebrated</div>
-                    <ul className="text-sm text-gray-700 space-y-2">
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Calm, structured environment</strong> — students clearly knew expectations and felt safe</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>AAC tools integration</strong> — using devices to support communication for non-verbal learners</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Goal review scaffolding</strong> — helping students track their own progress toward IEP goals</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Multi-modal support</strong> — using visuals, verbal cues, and physical prompts appropriately</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Leadership presence</strong> — confident, proactive, and clearly invested in student success</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="bg-[#35A7FF]/10 rounded-lg p-4 border border-[#35A7FF]/30">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Lightbulb className="w-4 h-4 text-[#35A7FF]" />
-                      <span className="text-sm font-semibold text-[#35A7FF]">Hub Resource Recommended</span>
+                {/* Quinn Ricci Featured */}
+                <div className="bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-4 border border-[#ffba06]/30">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-[#ffba06] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Star className="w-4 h-4 text-[#1e2749]" />
                     </div>
-                    <p className="text-sm text-gray-700">&quot;Sentence Starter Guide&quot; — to expand student responses during goal review conversations</p>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-[#1e2749]">Quinn Ricci</span>
+                        <span className="text-xs text-gray-500">Dec 3, 2025</span>
+                      </div>
+                      <p className="text-sm text-gray-700 italic">&quot;Leadership was seamless — even with a sub, you kept everything running smoothly. 15/10 for handling that student moment with warmth. &apos;Thank you for apologizing&apos; models exactly the kind of respect that builds trust.&quot;</p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Love Note 2 - Quinn Ricci */}
-              <div className="bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-5 border border-[#ffba06]/30">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#ffba06] rounded-full flex items-center justify-center">
-                      <Star className="w-5 h-5 text-[#1e2749]" />
+                {/* Lizz Nieto Featured */}
+                <div className="bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-4 border border-[#ffba06]/30">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-[#ffba06] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Star className="w-4 h-4 text-[#1e2749]" />
                     </div>
-                    <div>
-                      <div className="font-bold text-[#1e2749]">Quinn Ricci</div>
-                      <div className="text-sm text-gray-600">Classroom Observation</div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-[#1e2749]">Lizz Nieto</span>
+                        <span className="text-xs text-gray-500">Dec 3, 2025</span>
+                      </div>
+                      <p className="text-sm text-gray-700 italic">&quot;All Star Status! Natural relationship-building in action — you leaned into conversation and bonded over TJ Maxx. Uses downtime with intention, not just filler. Keep exploring the Hub!&quot;</p>
                     </div>
-                  </div>
-                  <span className="text-xs bg-white px-3 py-1 rounded-full text-gray-600 font-medium">Dec 3, 2025</span>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="bg-white rounded-lg p-4">
-                    <div className="text-sm font-semibold text-[#38618C] uppercase tracking-wide mb-2">What We Celebrated</div>
-                    <ul className="text-sm text-gray-700 space-y-2">
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Leadership with substitute</strong> — stepped up seamlessly when regular teacher was out</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Device communication</strong> — effectively supported students using AAC devices throughout class</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Warm student relationships</strong> — students clearly trust and respond positively to Quinn</span>
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Users className="w-4 h-4 text-purple-600" />
-                      <span className="text-sm font-semibold text-purple-700">Student Feedback</span>
-                    </div>
-                    <p className="text-sm text-gray-700 italic">&quot;Quinn helps me use my device to say what I&apos;m thinking. She never rushes me.&quot;</p>
                   </div>
                 </div>
               </div>
 
-              {/* Love Note 3 - Lizz Nieto */}
-              <div className="mt-6 bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-5 border border-[#ffba06]/30">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#ffba06] rounded-full flex items-center justify-center">
-                      <Star className="w-5 h-5 text-[#1e2749]" />
-                    </div>
-                    <div>
-                      <div className="font-bold text-[#1e2749]">Lizz Nieto</div>
-                      <div className="text-sm text-gray-600">Classroom Observation</div>
-                    </div>
-                  </div>
-                  <span className="text-xs bg-white px-3 py-1 rounded-full text-gray-600 font-medium">Dec 3, 2025</span>
-                </div>
+              {/* View All Love Notes - Expandable */}
+              <button
+                onClick={() => setShowAllLoveNotes(!showAllLoveNotes)}
+                className="w-full flex items-center justify-center gap-2 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium text-[#38618C]"
+              >
+                {showAllLoveNotes ? (
+                  <>
+                    <ChevronUp className="w-4 h-4" />
+                    Hide Full Love Notes
+                  </>
+                ) : (
+                  <>
+                    <ChevronDown className="w-4 h-4" />
+                    View Full Love Notes
+                  </>
+                )}
+              </button>
 
-                <div className="space-y-3">
-                  <div className="bg-white rounded-lg p-4">
-                    <div className="text-sm font-semibold text-[#38618C] uppercase tracking-wide mb-2">What We Celebrated</div>
-                    <ul className="text-sm text-gray-700 space-y-2">
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Natural relationship-building</strong> — with a talkative student, you didn&apos;t shut down the conversation, you leaned into it and bonded over TJ Maxx!</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Intentional use of downtime</strong> — the puzzle wasn&apos;t just filler, it was an opportunity to keep students engaged and have real conversation</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>Warm communication style</strong> — clearly makes students feel comfortable around you</span>
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span><strong>All Star Status!</strong> — knew how to engage students, use all forms of communication, and gave great reminders about charging tools at home</span>
-                      </li>
-                    </ul>
+              {/* Expanded Love Notes */}
+              {showAllLoveNotes && (
+                <div className="mt-4 space-y-6 pt-4 border-t border-gray-200">
+                  {/* Full Isaac Spear */}
+                  <div className="bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-5 border border-[#ffba06]/30">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#ffba06] rounded-full flex items-center justify-center">
+                          <Star className="w-5 h-5 text-[#1e2749]" />
+                        </div>
+                        <div>
+                          <div className="font-bold text-[#1e2749]">Isaac Spear</div>
+                          <div className="text-sm text-gray-600">Step Center Observation</div>
+                        </div>
+                      </div>
+                      <span className="text-xs bg-white px-3 py-1 rounded-full text-gray-600 font-medium">Nov 12, 2025</span>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="bg-white rounded-lg p-4">
+                        <div className="text-sm font-semibold text-[#38618C] uppercase tracking-wide mb-2">What We Celebrated</div>
+                        <ul className="text-sm text-gray-700 space-y-2">
+                          <li className="flex items-start gap-2">
+                            <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span><strong>Calm, structured environment</strong> — students clearly knew expectations and felt safe</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span><strong>AAC tools integration</strong> — using devices to support communication for non-verbal learners</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span><strong>Goal review scaffolding</strong> — helping students track their own progress toward IEP goals</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span><strong>Multi-modal support</strong> — using visuals, verbal cues, and physical prompts appropriately</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span><strong>Leadership presence</strong> — confident, proactive, and clearly invested in student success</span>
+                          </li>
+                        </ul>
+                      </div>
+                      <div className="bg-[#35A7FF]/10 rounded-lg p-4 border border-[#35A7FF]/30">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Lightbulb className="w-4 h-4 text-[#35A7FF]" />
+                          <span className="text-sm font-semibold text-[#35A7FF]">Hub Resource Recommended</span>
+                        </div>
+                        <p className="text-sm text-gray-700">&quot;Sentence Starter Guide&quot; — to expand student responses during goal review conversations</p>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Lightbulb className="w-4 h-4 text-amber-600" />
-                      <span className="text-sm font-semibold text-amber-700">Growth Opportunity</span>
+                  {/* Full Quinn Ricci */}
+                  <div className="bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-5 border border-[#ffba06]/30">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#ffba06] rounded-full flex items-center justify-center">
+                          <Star className="w-5 h-5 text-[#1e2749]" />
+                        </div>
+                        <div>
+                          <div className="font-bold text-[#1e2749]">Quinn Ricci</div>
+                          <div className="text-sm text-gray-600">Classroom Observation</div>
+                        </div>
+                      </div>
+                      <span className="text-xs bg-white px-3 py-1 rounded-full text-gray-600 font-medium">Dec 3, 2025</span>
                     </div>
-                    <p className="text-sm text-gray-700">Hasn&apos;t explored Learning Hub yet — invited to share feedback on what resources would actually be useful for her day-to-day.</p>
+                    <div className="space-y-3">
+                      <div className="bg-white rounded-lg p-4">
+                        <div className="text-sm font-semibold text-[#38618C] uppercase tracking-wide mb-2">What We Celebrated</div>
+                        <ul className="text-sm text-gray-700 space-y-2">
+                          <li className="flex items-start gap-2">
+                            <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span><strong>Leadership with substitute</strong> — stepped up seamlessly when regular teacher was out</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span><strong>Device communication</strong> — effectively supported students using AAC devices throughout class</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span><strong>Warm student relationships</strong> — students clearly trust and respond positively to Quinn</span>
+                          </li>
+                        </ul>
+                      </div>
+                      <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Users className="w-4 h-4 text-purple-600" />
+                          <span className="text-sm font-semibold text-purple-700">Student Feedback</span>
+                        </div>
+                        <p className="text-sm text-gray-700 italic">&quot;Quinn helps me use my device to say what I&apos;m thinking. She never rushes me.&quot;</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Full Lizz Nieto - FIXED: She has logged in */}
+                  <div className="bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-5 border border-[#ffba06]/30">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#ffba06] rounded-full flex items-center justify-center">
+                          <Star className="w-5 h-5 text-[#1e2749]" />
+                        </div>
+                        <div>
+                          <div className="font-bold text-[#1e2749]">Lizz Nieto</div>
+                          <div className="text-sm text-gray-600">Classroom Observation</div>
+                        </div>
+                      </div>
+                      <span className="text-xs bg-white px-3 py-1 rounded-full text-gray-600 font-medium">Dec 3, 2025</span>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="bg-white rounded-lg p-4">
+                        <div className="text-sm font-semibold text-[#38618C] uppercase tracking-wide mb-2">What We Celebrated</div>
+                        <ul className="text-sm text-gray-700 space-y-2">
+                          <li className="flex items-start gap-2">
+                            <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span><strong>Natural relationship-building</strong> — with a talkative student, you didn&apos;t shut down the conversation, you leaned into it and bonded over TJ Maxx!</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span><strong>Intentional use of downtime</strong> — the puzzle wasn&apos;t just filler, it was an opportunity to keep students engaged and have real conversation</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span><strong>Warm communication style</strong> — clearly makes students feel comfortable around you</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                            <span><strong>All Star Status!</strong> — knew how to engage students, use all forms of communication, and gave great reminders about charging tools at home</span>
+                          </li>
+                        </ul>
+                      </div>
+                      <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <CheckCircle className="w-4 h-4 text-green-600" />
+                          <span className="text-sm font-semibold text-green-700">Hub Status</span>
+                        </div>
+                        <p className="text-sm text-gray-700">Logged in twice (last: Dec 18) — keep exploring! We&apos;d love your feedback on what resources are most useful.</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
+              )}
 
               {/* Standouts Summary */}
               <div className="mt-6 bg-[#1e2749] rounded-xl p-5">
@@ -998,17 +1372,17 @@ export default function WegoDashboard() {
               <span className="inline-block bg-[#35A7FF]/10 text-[#35A7FF] text-xs font-medium px-3 py-1 rounded-full mb-2">
                 Preview
               </span>
-              <h2 className="text-2xl font-bold text-[#1e2749] mb-2">Expand Your Impact in 2026-27</h2>
+              <h2 className="text-2xl font-bold text-[#1e2749] mb-2">Continuing Your Partnership</h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                Your para team is thriving. Year 2 brings their teachers into the fold — building co-collaboration and co-teaching partnerships that benefit everyone.
+                Your para team is thriving. The natural next step is bringing their teachers into the fold — but we&apos;ll customize Year 2 to fit YOUR goals.
               </p>
             </div>
 
-            {/* What Year 2 Includes */}
+            {/* What Year 2 Could Include */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-[#35A7FF]" />
-                What Year 2 Includes
+                What Year 2 Could Include
               </h3>
 
               <div className="space-y-4">
@@ -1095,15 +1469,15 @@ export default function WegoDashboard() {
                 </li>
               </ul>
               <p className="text-[#38618C] font-semibold">
-                TDI&apos;s Year 2 builds ALL of this intentionally.
+                Your PAs are already practicing this. Year 2 brings their teachers into the conversation.
               </p>
             </div>
 
             {/* CTA */}
             <div className="bg-[#1e2749] rounded-xl p-6 text-center">
-              <h3 className="text-xl font-bold text-white mb-2">Ready to expand?</h3>
+              <h3 className="text-xl font-bold text-white mb-2">Ready to talk about Year 2?</h3>
               <p className="text-white/80 mb-4">
-                Let&apos;s talk about bringing your teachers into the partnership.
+                Every partnership is different. Let&apos;s design a continuation plan that fits YOUR goals — whether that&apos;s deepening para support, adding teachers, or something in between.
               </p>
               <a
                 href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
@@ -1112,7 +1486,7 @@ export default function WegoDashboard() {
                 className="inline-flex items-center gap-2 bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-6 py-3 rounded-xl font-semibold transition-all"
               >
                 <Calendar className="w-5 h-5" />
-                Schedule Renewal Conversation
+                Schedule Year 2 Conversation
               </a>
             </div>
           </div>
@@ -1247,7 +1621,7 @@ export default function WegoDashboard() {
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-[#38618C]">1</div>
-                  <div className="text-xs text-gray-500">Leadership Recap</div>
+                  <div className="text-xs text-gray-500">Year 1<br/>Celebration</div>
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-gray-100 text-center text-sm text-gray-600">
