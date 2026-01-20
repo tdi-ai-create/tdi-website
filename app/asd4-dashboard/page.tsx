@@ -1107,6 +1107,23 @@ export default function ASD4Dashboard() {
               </div>
             </div>
 
+            {/* Section 3: Testimonial */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <Quote className="w-8 h-8 text-[#ffba06] mb-3" />
+              <blockquote className="text-lg text-[#1e2749] italic mb-4">
+                &ldquo;Year 1 got our paras excited. Year 2 made it part of who we are. Our turnover dropped from 25% to 8%, and paras are now leading their own professional learning.&rdquo;
+              </blockquote>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-[#38618C] rounded-full flex items-center justify-center">
+                  <User className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <p className="font-semibold text-[#1e2749]">Sarah M.</p>
+                  <p className="text-sm text-gray-500">Director of Special Education, TDI Partner</p>
+                </div>
+              </div>
+            </div>
+
             {/* Section 4: TDI Proven Results */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
@@ -1253,23 +1270,6 @@ export default function ASD4Dashboard() {
                     <p className="font-medium text-[#1e2749]">Culture doesn&apos;t stick</p>
                     <p className="text-sm text-gray-600">True culture change requires sustained investment</p>
                   </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Section 8: Testimonial */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <Quote className="w-8 h-8 text-[#ffba06] mb-3" />
-              <blockquote className="text-lg text-[#1e2749] italic mb-4">
-                &ldquo;Year 1 got our paras excited. Year 2 made it part of who we are. Our turnover dropped from 25% to 8%, and paras are now leading their own professional learning.&rdquo;
-              </blockquote>
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#38618C] rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <p className="font-semibold text-[#1e2749]">Sarah M.</p>
-                  <p className="text-sm text-gray-500">Director of Special Education, TDI Partner</p>
                 </div>
               </div>
             </div>
