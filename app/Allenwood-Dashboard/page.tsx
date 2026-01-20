@@ -243,14 +243,17 @@ export default function AllenwoodDashboard() {
                 <div className="text-xs text-green-600 font-medium">9/11 Logged In</div>
               </div>
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-green-500">
+              <button
+                onClick={() => document.getElementById('next-steps-section')?.scrollIntoView({ behavior: 'smooth' })}
+                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-orange-500 text-left hover:shadow-md transition-shadow cursor-pointer w-full"
+              >
                 <div className="flex items-center gap-2 mb-1">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span className="text-xs text-gray-500 uppercase">Love Notes</span>
+                  <AlertCircle className="w-4 h-4 text-orange-500" />
+                  <span className="text-xs text-gray-500 uppercase">Actions Needed</span>
                 </div>
-                <div className="text-2xl font-bold text-green-600">10</div>
-                <div className="text-xs text-green-600 font-medium">Delivered</div>
-              </div>
+                <div className="text-2xl font-bold text-orange-600">6</div>
+                <div className="text-xs text-orange-600 font-medium">Click to view ↓</div>
+              </button>
 
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
                 <div className="flex items-center gap-2 mb-1">
