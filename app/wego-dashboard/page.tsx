@@ -70,7 +70,7 @@ export default function WegoDashboard() {
 
         <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">WEGO</h1>
+            <h1 className="text-2xl md:text-3xl font-bold">WEGO High School<br />District 94</h1>
             <p className="text-white/80 text-sm">West Chicago, Illinois | Partner Dashboard</p>
           </div>
           <div className="flex items-center gap-3 text-sm">
