@@ -798,85 +798,127 @@ export default function ASD4Dashboard() {
               </div>
             </div>
 
-            {/* 4. ASD4 Baseline Data - PROMINENT EXAMPLE (with floating banner) */}
-            <div className="relative">
-              {/* EXAMPLE BANNER - Very Prominent */}
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
-                <div className="bg-amber-400 text-amber-900 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-md">
-                  📊 Example Preview — Your Data Coming Soon
+            {/* 4. Leading Indicators - Awaiting Baseline */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+
+              {/* Header with prominent status */}
+              <div className="bg-amber-50 border-b border-amber-200 p-4">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
+                      <ClipboardList className="w-5 h-5 text-amber-600" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-[#1e2749]">Para Wellness Indicators</div>
+                      <div className="text-sm text-gray-500">Baseline survey will be administered during Virtual Session 1</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+                    <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
+                    Awaiting Data
+                  </div>
                 </div>
               </div>
 
-              {/* Card with muted styling */}
-              <div className="bg-gray-50 rounded-xl p-5 border-2 border-dashed border-amber-300 pt-8">
-                <div className="text-sm font-semibold text-gray-500 mb-4 text-center">
-                  ASD4 Para Wellness Indicators
-                </div>
+              {/* Metrics we'll track - Clear explanations */}
+              <div className="p-5">
+                <div className="text-xs uppercase tracking-wide text-gray-400 mb-4">What We'll Measure</div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 opacity-60">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                   {/* Job Satisfaction */}
-                  <div className="bg-white rounded-xl p-4 text-center border border-gray-200">
-                    <div className="text-xs text-gray-400 mb-2">Job Satisfaction</div>
-                    <div className="relative w-16 h-8 mx-auto mb-2">
-                      <svg viewBox="0 0 100 50" className="w-full h-full">
-                        <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#E5E7EB" strokeWidth="8" strokeLinecap="round"/>
-                        <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#9CA3AF" strokeWidth="8" strokeLinecap="round" strokeDasharray="126" strokeDashoffset="50"/>
-                      </svg>
+                  <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <span className="text-xl">😊</span>
                     </div>
-                    <div className="text-xl font-bold text-gray-400">—</div>
-                    <div className="text-xs text-gray-400 mt-1">Awaiting baseline</div>
+                    <div className="flex-1">
+                      <div className="font-medium text-[#1e2749] mb-1">Job Satisfaction</div>
+                      <div className="text-xs text-gray-500 mb-2">"How satisfied are you in your current role?"</div>
+                      <div className="flex items-center gap-4 text-xs">
+                        <div>
+                          <span className="text-gray-400">Industry:</span>
+                          <span className="font-medium text-[#E07A5F] ml-1">5.1/10</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">TDI Goal:</span>
+                          <span className="font-medium text-[#38618C] ml-1">7.2+</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Feeling Valued */}
-                  <div className="bg-white rounded-xl p-4 text-center border border-gray-200">
-                    <div className="text-xs text-gray-400 mb-2">Feeling Valued</div>
-                    <div className="relative w-16 h-8 mx-auto mb-2">
-                      <svg viewBox="0 0 100 50" className="w-full h-full">
-                        <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#E5E7EB" strokeWidth="8" strokeLinecap="round"/>
-                        <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#9CA3AF" strokeWidth="8" strokeLinecap="round" strokeDasharray="126" strokeDashoffset="70"/>
-                      </svg>
+                  <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <span className="text-xl">⭐</span>
                     </div>
-                    <div className="text-xl font-bold text-gray-400">—</div>
-                    <div className="text-xs text-gray-400 mt-1">Awaiting baseline</div>
+                    <div className="flex-1">
+                      <div className="font-medium text-[#1e2749] mb-1">Feeling Valued</div>
+                      <div className="text-xs text-gray-500 mb-2">"How valued do you feel by teachers and admin?"</div>
+                      <div className="flex items-center gap-4 text-xs">
+                        <div>
+                          <span className="text-gray-400">Industry:</span>
+                          <span className="font-medium text-[#E07A5F] ml-1">3.8/10</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">TDI Goal:</span>
+                          <span className="font-medium text-[#38618C] ml-1">6.9+</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Stress Level */}
-                  <div className="bg-white rounded-xl p-4 text-center border border-gray-200">
-                    <div className="text-xs text-gray-400 mb-2">Stress Level</div>
-                    <div className="flex justify-center mb-2">
-                      <div className="relative w-5 h-12">
-                        <div className="absolute inset-x-0 top-0 bottom-2 bg-gray-200 rounded-t-full"></div>
-                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-gray-300 rounded-full"></div>
-                      </div>
+                  <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <span className="text-xl">🌡️</span>
                     </div>
-                    <div className="text-xl font-bold text-gray-400">—</div>
-                    <div className="text-xs text-gray-400 mt-1">Awaiting baseline</div>
+                    <div className="flex-1">
+                      <div className="font-medium text-[#1e2749] mb-1">Stress Level</div>
+                      <div className="text-xs text-gray-500 mb-2">"Rate your current stress level at work"</div>
+                      <div className="flex items-center gap-4 text-xs">
+                        <div>
+                          <span className="text-gray-400">Industry:</span>
+                          <span className="font-medium text-[#E07A5F] ml-1">7.9/10</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">TDI Goal:</span>
+                          <span className="font-medium text-[#38618C] ml-1">5.5 ↓</span>
+                        </div>
+                      </div>
+                      <div className="text-xs text-green-600 mt-1">↓ Lower is better</div>
+                    </div>
                   </div>
 
                   {/* Retention Intent */}
-                  <div className="bg-white rounded-xl p-4 text-center border border-gray-200">
-                    <div className="text-xs text-gray-400 mb-2">Retention Intent</div>
-                    <div className="relative w-16 h-8 mx-auto mb-2">
-                      <svg viewBox="0 0 100 50" className="w-full h-full">
-                        <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#E5E7EB" strokeWidth="8" strokeLinecap="round"/>
-                        <path d="M 10 50 A 40 40 0 0 1 90 50" fill="none" stroke="#9CA3AF" strokeWidth="8" strokeLinecap="round" strokeDasharray="126" strokeDashoffset="80"/>
-                      </svg>
+                  <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <span className="text-xl">🔄</span>
                     </div>
-                    <div className="text-xl font-bold text-gray-400">—</div>
-                    <div className="text-xs text-gray-400 mt-1">Awaiting baseline</div>
+                    <div className="flex-1">
+                      <div className="font-medium text-[#1e2749] mb-1">Retention Intent</div>
+                      <div className="text-xs text-gray-500 mb-2">"How likely are you to stay in this role next year?"</div>
+                      <div className="flex items-center gap-4 text-xs">
+                        <div>
+                          <span className="text-gray-400">Industry:</span>
+                          <span className="font-medium text-[#E07A5F] ml-1">4.1/10</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400">TDI Goal:</span>
+                          <span className="font-medium text-[#38618C] ml-1">7.4+</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
+
                 </div>
 
-                {/* Call to action */}
-                <div className="bg-white rounded-lg p-4 mt-4 text-center border border-amber-200">
-                  <div className="text-sm font-medium text-[#1e2749] mb-1">Baseline Survey</div>
-                  <div className="text-xs text-gray-500 mb-3">Will be administered during Virtual Session 1</div>
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
-                    <div className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></div>
-                    Pending — 0/117 responses
-                  </div>
+                {/* Source */}
+                <div className="text-xs text-gray-400 text-center mt-4 pt-4 border-t border-gray-100">
+                  Industry benchmarks: NCTQ 2023 Paraprofessional Research, RAND State of American Teacher
                 </div>
               </div>
+
             </div>
 
             {/* 5. Observation Preview - PROMINENT EXAMPLE (with floating banner) */}
