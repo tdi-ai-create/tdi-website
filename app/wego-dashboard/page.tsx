@@ -74,9 +74,9 @@ export default function WegoDashboard() {
             <p className="text-white/80 text-sm">West Chicago, Illinois | Partner Dashboard</p>
           </div>
           <div className="flex items-center gap-3 text-sm">
-            <div className="bg-white/10 px-3 py-1.5 rounded-lg">
-              <span className="text-white/60">Status:</span>
-              <span className="ml-2 font-semibold text-[#38618C] bg-white px-2 py-0.5 rounded">Phase 2 - ACCELERATE</span>
+            <div className="bg-white/10 px-3 py-2 rounded-lg text-center">
+              <div className="text-white/60">Status:</div>
+              <div className="font-semibold text-[#38618C] bg-white px-2 py-0.5 rounded mt-1">Phase 2 - ACCELERATE</div>
             </div>
           </div>
         </div>
