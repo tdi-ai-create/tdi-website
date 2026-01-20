@@ -90,6 +90,8 @@ export default function ASD4Dashboard() {
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     'timeline': true,
     'indicators': true,
+    'observation1': false,
+    'observation2': false,
   });
 
   const toggleSection = (id: string) => {
@@ -976,124 +978,120 @@ export default function ASD4Dashboard() {
 
             </div>
 
-            {/* 6. Observation Preview - PROMINENT EXAMPLE (with floating banner) */}
-            <div className="relative">
-              {/* EXAMPLE BANNER */}
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
-                <div className="bg-purple-500 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wide shadow-md">
-                  👁️ Preview — What You'll Receive After Observation 1
-                </div>
-              </div>
+            {/* 6. Observation Day 1 - Accordion with Scheduling */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
 
-              <div className="bg-purple-50 rounded-xl border-2 border-dashed border-purple-300 overflow-hidden pt-6">
-
-                {/* Header */}
-                <div className="bg-gradient-to-r from-[#38618C]/80 to-[#35A7FF]/80 p-5 text-white">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
-                      <Eye className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="font-semibold">Observation Day 1 Report</div>
-                      <div className="text-sm text-white/80">Example format — your actual insights will appear here</div>
-                    </div>
+              {/* Clickable Header */}
+              <button
+                onClick={() => toggleSection('observation1')}
+                className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition-colors text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center">
+                    <Eye className="w-5 h-5 text-[#38618C]" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-[#1e2749]">Observation Day 1</div>
+                    <div className="text-sm text-gray-500">On-site classroom observations with pilot group</div>
                   </div>
                 </div>
 
-                {/* Content with watermark effect */}
-                <div className="p-5 relative">
-                  {/* Subtle watermark */}
-                  <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-5">
-                    <span className="text-6xl font-bold text-purple-900 rotate-[-15deg]">EXAMPLE</span>
+                <div className="flex items-center gap-3">
+                  {/* Status + Schedule */}
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400">Target: Feb 2026</span>
+                    <a
+                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="px-2 py-1 bg-[#38618C] text-white rounded text-xs font-medium hover:bg-[#2d4a6d] transition-colors"
+                    >
+                      Schedule
+                    </a>
                   </div>
 
-                  {/* Stats Row */}
-                  <div className="grid grid-cols-3 gap-4 mb-5 relative">
-                    <div className="text-center p-3 bg-white/70 rounded-lg">
-                      <div className="text-2xl font-bold text-gray-400">12</div>
-                      <div className="text-xs text-gray-500">Paras Observed</div>
-                    </div>
-                    <div className="text-center p-3 bg-white/70 rounded-lg">
-                      <div className="text-2xl font-bold text-gray-400">12</div>
-                      <div className="text-xs text-gray-500">Love Notes Sent</div>
-                    </div>
-                    <div className="text-center p-3 bg-white/70 rounded-lg">
-                      <div className="text-2xl font-bold text-gray-400">3</div>
-                      <div className="text-xs text-gray-500">Buildings Visited</div>
-                    </div>
-                  </div>
+                  {/* Chevron */}
+                  <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${openSections['observation1'] ? 'rotate-180' : ''}`} />
+                </div>
+              </button>
 
-                  {/* Two Column: Strengths + Growth */}
-                  <div className="grid md:grid-cols-2 gap-4 mb-5 relative">
+              {/* Expandable Content */}
+              <div className={`overflow-hidden transition-all duration-200 ${openSections['observation1'] ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                <div className="px-5 pb-5 border-t border-gray-100">
 
-                    {/* What We Celebrated */}
-                    <div className="bg-green-100/50 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Star className="w-4 h-4 text-green-600" />
-                        <span className="font-semibold text-green-800 text-sm">What We Celebrated</span>
-                      </div>
-                      <div className="space-y-2 text-sm text-gray-600">
-                        <div className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span>Calm redirection with challenging student</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span>Strong rapport with small group</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                          <span>Proactive support during transitions</span>
-                        </div>
-                      </div>
-                    </div>
+                  <p className="text-sm text-gray-600 mt-4 mb-4">
+                    After each observation, paras receive personalized "Love Notes" — specific, actionable feedback celebrating what they're doing well.
+                  </p>
 
-                    {/* Where We're Growing */}
-                    <div className="bg-blue-100/50 rounded-lg p-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <TrendingUp className="w-4 h-4 text-[#35A7FF]" />
-                        <span className="font-semibold text-[#38618C] text-sm">Where We're Growing</span>
-                      </div>
-                      <div className="space-y-2 text-sm text-gray-600">
-                        <div className="flex items-start gap-2">
-                          <ArrowRight className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                          <span>Wait time before jumping in to help</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <ArrowRight className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                          <span>Prompting independence vs. doing for student</span>
-                        </div>
-                        <div className="flex items-start gap-2">
-                          <ArrowRight className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                          <span>Positioning for classroom visibility</span>
-                        </div>
-                      </div>
-                    </div>
-
-                  </div>
-
-                  {/* Sample Love Note */}
-                  <div className="border-t border-purple-200 pt-5 relative">
+                  {/* Example Love Note */}
+                  <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
                     <div className="flex items-center gap-2 mb-3">
-                      <div className="w-8 h-8 bg-[#E07A5F]/20 rounded-lg flex items-center justify-center">
-                        <Heart className="w-4 h-4 text-[#E07A5F]" />
-                      </div>
-                      <span className="font-semibold text-[#1e2749]">Sample Love Note</span>
-                      <span className="text-xs text-gray-400">(Each para receives personalized feedback)</span>
+                      <Heart className="w-4 h-4 text-[#E07A5F]" />
+                      <span className="font-semibold text-[#1e2749] text-sm">Example Love Note</span>
+                      <span className="px-2 py-0.5 bg-amber-200 text-amber-800 text-xs rounded">EXAMPLE</span>
                     </div>
                     <div className="bg-white rounded-lg p-4 border-l-4 border-[#E07A5F]">
                       <p className="text-sm text-gray-700 italic">
-                        "I loved watching you work with Marcus today! The way you gave him wait time before stepping in showed real trust in his ability. When he started to get frustrated with the math problem, your calm 'Let's try one more way' kept him engaged instead of shutting down. Your small group had such a positive energy — keep being the steady presence these kids need!"
+                        "Maria, I noticed how you positioned yourself at eye level with Jayden during the reading activity — that small shift made him visibly more engaged. You have a natural gift for creating connection. Keep using that superpower!"
                       </p>
-                      <p className="text-xs text-gray-400 mt-2">— Example Love Note for a paraprofessional</p>
+                      <p className="text-xs text-gray-400 mt-2">— Rae Hughart, Observation Day 1</p>
+                    </div>
+                  </div>
+
+                  {/* Recommendation */}
+                  <div className="bg-blue-50 rounded-lg p-3 mt-4 border-l-4 border-[#38618C]">
+                    <div className="text-sm text-gray-700">
+                      <strong className="text-[#38618C]">Share the love:</strong> Consider reading Love Notes aloud at para meetings — it builds culture and shows paras their work is seen.
                     </div>
                   </div>
 
                 </div>
               </div>
+
             </div>
 
-            {/* 7. Para Research Context - REAL DATA (Industry Data) */}
+            {/* 7. Observation Day 2 - Accordion */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+
+              {/* Clickable Header */}
+              <button
+                onClick={() => toggleSection('observation2')}
+                className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition-colors text-left"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <Eye className="w-5 h-5 text-gray-400" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-[#1e2749]">Observation Day 2</div>
+                    <div className="text-sm text-gray-500">Follow-up on-site observation</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  {/* Status */}
+                  <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded text-xs font-medium">
+                    After Obs 1
+                  </span>
+
+                  {/* Chevron */}
+                  <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${openSections['observation2'] ? 'rotate-180' : ''}`} />
+                </div>
+              </button>
+
+              {/* Expandable Content */}
+              <div className={`overflow-hidden transition-all duration-200 ${openSections['observation2'] ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
+                <div className="px-5 pb-5 border-t border-gray-100">
+                  <p className="text-sm text-gray-500 py-4 text-center">
+                    Details will appear after Observation Day 1 is complete. This follow-up visit builds on insights from your first observation and tracks progress on growth areas.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+            {/* 8. Para Research Context - REAL DATA (Industry Data) */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
               <div className="flex items-center justify-between mb-4">
                 <div className="text-sm font-semibold text-[#1e2749]">Paraprofessional Research</div>
