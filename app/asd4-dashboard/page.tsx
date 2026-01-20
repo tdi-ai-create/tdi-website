@@ -33,7 +33,13 @@ import {
   Heart,
   Smile,
   Activity,
-  UserCheck
+  UserCheck,
+  Rocket,
+  School,
+  Monitor,
+  Briefcase,
+  Sprout,
+  Circle
 } from 'lucide-react';
 
 // Accordion Component
@@ -685,457 +691,337 @@ export default function ASD4Dashboard() {
         {activeTab === 'progress' && (
           <div className="space-y-6">
 
-            {/* 1. Research Context - REAL DATA (No Example Label) */}
-            <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-5 text-white">
-              <div className="text-xs uppercase tracking-wide text-white/60 mb-2">Why This Partnership Matters</div>
-              <div className="text-lg font-semibold mb-3">The Paraprofessional Crisis</div>
-
-              <div className="grid grid-cols-4 gap-4 mb-4">
-                <div className="text-center">
-                  <div className="text-3xl font-bold">23%</div>
-                  <div className="text-xs text-white/70">Para attrition rate</div>
+            {/* ===== SECTION 1: Status Banner ===== */}
+            <div className="bg-gradient-to-r from-[#ffba06]/20 to-white rounded-xl p-6 border border-[#ffba06]/30">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-[#ffba06] rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Rocket className="w-6 h-6 text-[#1e2749]" />
                 </div>
-                <div className="text-center border-l border-white/20">
-                  <div className="text-3xl font-bold">50%+</div>
-                  <div className="text-xs text-white/70">of school turnover</div>
+                <div>
+                  <h2 className="text-xl font-bold text-[#1e2749] mb-2">Building Your Foundation</h2>
+                  <p className="text-gray-600">
+                    Your pilot para group will be identified, then we&apos;ll collect baseline data during Virtual Session 1 to measure growth throughout the partnership.
+                  </p>
                 </div>
-                <div className="text-center border-l border-white/20">
-                  <div className="text-3xl font-bold">84%</div>
-                  <div className="text-xs text-white/70">excluded from PD</div>
-                </div>
-                <div className="text-center border-l border-white/20">
-                  <div className="text-3xl font-bold">3.8</div>
-                  <div className="text-xs text-white/70">"feeling valued" avg</div>
-                </div>
-              </div>
-
-              <div className="text-xs text-white/50 text-center">
-                Sources: NCTQ 2023 Paraprofessional Research, Learning Policy Institute
               </div>
             </div>
 
-            {/* 2. Hub Login Goal - REAL DATA (Current ASD4 Numbers) */}
-            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <div className="text-sm font-semibold text-[#1e2749]">Hub Login Progress</div>
-                <span className="px-2 py-1 bg-green-100 text-green-700 text-xs font-medium rounded">LIVE DATA</span>
-              </div>
+            {/* ===== SECTION 2: Your Next Steps ===== */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h3 className="text-lg font-bold text-[#1e2749] mb-5">Your Next Steps</h3>
 
-              <div className="flex items-center gap-6">
+              <div className="space-y-4">
+                {/* Step 1: Identify Pilot Group */}
+                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                  <div className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
+                    <Circle className="w-4 h-4 text-gray-300" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-[#1e2749]">Identify Pilot Group (10-20 paras)</div>
+                    <p className="text-sm text-gray-500 mt-1">Select the paras who will participate in focused coaching this spring.</p>
+                  </div>
+                  <a
+                    href="/asd4-dashboard/pilot-selection"
+                    className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2d3a5c] transition-colors flex items-center gap-2"
+                  >
+                    Select Pilot Group
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
+                </div>
+
+                {/* Step 2: Schedule Virtual Session 1 */}
+                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                  <div className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
+                    <Circle className="w-4 h-4 text-gray-300" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-[#1e2749]">Schedule Virtual Session 1</div>
+                    <p className="text-sm text-gray-500 mt-1">Your kickoff session includes baseline survey collection.</p>
+                  </div>
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2d3a5c] transition-colors flex items-center gap-2"
+                  >
+                    Schedule Session
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
+                </div>
+
+                {/* Step 3: Schedule Observation Day 1 */}
+                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
+                  <div className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
+                    <Circle className="w-4 h-4 text-gray-300" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-medium text-[#1e2749]">Schedule Observation Day 1</div>
+                    <p className="text-sm text-gray-500 mt-1">On-site classroom visits with personalized Love Notes.</p>
+                  </div>
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2d3a5c] transition-colors flex items-center gap-2"
+                  >
+                    Schedule Observation
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            {/* ===== SECTION 3: Hub Engagement (REAL DATA) ===== */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h3 className="text-lg font-bold text-[#1e2749] mb-5">Hub Engagement</h3>
+
+              <div className="flex items-center gap-8">
                 {/* Progress Ring */}
-                <div className="relative w-32 h-32">
-                  <svg className="w-32 h-32 transform -rotate-90">
-                    <circle cx="64" cy="64" r="56" stroke="#E5E7EB" strokeWidth="12" fill="none"/>
-                    <circle cx="64" cy="64" r="56" stroke="#38618C" strokeWidth="12" fill="none"
-                      strokeDasharray="352" strokeDashoffset="77" strokeLinecap="round"/>
+                <div className="relative w-36 h-36 flex-shrink-0">
+                  <svg className="w-36 h-36 transform -rotate-90">
+                    <circle cx="72" cy="72" r="60" stroke="#E5E7EB" strokeWidth="12" fill="none"/>
+                    <circle cx="72" cy="72" r="60" stroke="#ffba06" strokeWidth="12" fill="none"
+                      strokeDasharray="377" strokeDashoffset="83" strokeLinecap="round"/>
+                    {/* Goal marker at 100% */}
+                    <circle cx="72" cy="72" r="60" stroke="#38618C" strokeWidth="2" fill="none"
+                      strokeDasharray="2 375" strokeLinecap="round" opacity="0.5"/>
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-3xl font-bold text-[#1e2749]">78%</span>
-                    <span className="text-xs text-gray-500">logged in</span>
+                    <span className="text-4xl font-bold text-[#1e2749]">78%</span>
+                    <span className="text-sm text-gray-500">logged in</span>
                   </div>
                 </div>
 
                 <div className="flex-1">
-                  <div className="text-2xl font-bold text-[#1e2749]">91 <span className="text-base font-normal text-gray-400">/ 117</span></div>
-                  <div className="text-sm text-gray-500 mb-3">paras have accessed the Hub</div>
-                  <div className="flex gap-4 text-xs">
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-[#38618C]"></div>
-                      <span className="text-gray-600">Logged in (91)</span>
+                  <div className="text-3xl font-bold text-[#1e2749]">91 <span className="text-xl font-normal text-gray-400">of 117</span></div>
+                  <div className="text-gray-600 mb-4">paras have logged in</div>
+
+                  <div className="bg-gray-100 rounded-full h-3 overflow-hidden mb-2">
+                    <div className="bg-[#ffba06] h-full rounded-full" style={{ width: '78%' }}></div>
+                  </div>
+
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-500">Current: 78%</span>
+                    <span className="text-[#38618C] font-medium">Goal: 100% before Virtual Session 1</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tip */}
+              <div className="bg-[#ffba06]/10 rounded-xl p-4 mt-6 flex items-start gap-3">
+                <Lightbulb className="w-5 h-5 text-[#ffba06] flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-gray-700">
+                  <strong className="text-[#1e2749]">26 paras haven&apos;t logged in yet</strong> — try a walkthrough at your next staff meeting or share the &quot;Getting Started&quot; video in your para newsletter.
+                </div>
+              </div>
+            </div>
+
+            {/* ===== SECTION 4: What We'll Measure ===== */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-bold text-[#1e2749]">What We&apos;ll Measure</h3>
+              </div>
+              <p className="text-sm text-gray-500 mb-6">Baseline collected during Virtual Session 1</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Job Satisfaction */}
+                <div className="p-4 border border-gray-200 rounded-xl">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center">
+                      <Smile className="w-5 h-5 text-[#38618C]" />
                     </div>
-                    <div className="flex items-center gap-1">
-                      <div className="w-2 h-2 rounded-full bg-gray-200"></div>
-                      <span className="text-gray-600">Not yet (26)</span>
-                    </div>
+                    <div className="font-medium text-[#1e2749]">Job Satisfaction</div>
                   </div>
-                </div>
-              </div>
-
-              <div className="bg-amber-50 rounded-lg p-3 mt-4 flex items-start gap-2">
-                <span className="text-amber-500">💡</span>
-                <div className="text-xs text-gray-600">26 paras haven't logged in yet. Consider a quick walkthrough at your next para meeting.</div>
-              </div>
-            </div>
-
-            {/* 3. Strategy Implementation Rate - Simplified */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-6 overflow-hidden">
-
-              {/* Header */}
-              <div className="p-5 pb-0">
-                <div className="text-sm font-semibold text-[#1e2749]">Strategy Implementation Rate</div>
-                <div className="text-xs text-gray-500 mt-1">Do strategies from PD actually get used?</div>
-              </div>
-
-              {/* Main comparison - This is REAL data, not example */}
-              <div className="p-5">
-                <div className="flex items-center justify-center gap-8">
-
-                  {/* Traditional PD */}
-                  <div className="text-center">
-                    <div className="text-4xl font-bold text-[#E07A5F]">10%</div>
-                    <div className="text-sm text-gray-600 mt-1">Traditional PD</div>
-                    <div className="text-xs text-gray-400">Industry average</div>
-                  </div>
-
-                  {/* Arrow with context */}
-                  <div className="flex flex-col items-center">
-                    <div className="text-[#38618C] font-bold text-lg">→</div>
-                    <div className="text-xs text-[#38618C] font-medium">with TDI</div>
-                  </div>
-
-                  {/* TDI Partners */}
-                  <div className="text-center">
-                    <div className="text-4xl font-bold text-[#38618C]">65%</div>
-                    <div className="text-sm text-gray-600 mt-1">TDI Partners</div>
-                    <div className="text-xs text-[#38618C] font-medium">6.5x higher</div>
-                  </div>
-
-                </div>
-
-                {/* What this means */}
-                <div className="bg-gray-50 rounded-lg p-4 mt-5 text-center">
-                  <div className="text-sm text-gray-700">
-                    <strong>Translation:</strong> With traditional PD, only 1 in 10 strategies make it to the classroom.
-                    With TDI, <span className="text-[#38618C] font-semibold">6-7 out of 10</span> strategies get implemented.
-                  </div>
-                </div>
-              </div>
-
-              {/* ASD4 callout - clearly separate */}
-              <div className="bg-amber-50 border-t border-amber-200 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-amber-600">📊</span>
-                  </div>
-                  <div>
-                    <div className="text-sm font-medium text-[#1e2749]">ASD4's implementation rate will be measured after Observation 1</div>
-                    <div className="text-xs text-gray-500">We'll track how many paras are using strategies from the Hub in their daily work.</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Source */}
-              <div className="px-5 py-3 border-t border-gray-100">
-                <div className="text-xs text-gray-400 text-center">
-                  Industry data: Learning Policy Institute · TDI data: Partner school surveys
-                </div>
-              </div>
-
-            </div>
-
-            {/* 4. TDI Proven Results - REAL DATA (TDI Track Record) */}
-            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <div className="text-sm font-semibold text-[#1e2749]">What TDI Partners Achieve</div>
-                <span className="px-2 py-1 bg-[#38618C]/10 text-[#38618C] text-xs font-medium rounded">PROVEN RESULTS</span>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                {/* Stress Reduction */}
-                <div className="text-center p-4 bg-gray-50 rounded-xl">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <span className="text-2xl font-bold text-[#E07A5F]">8-9</span>
-                    <span className="text-gray-400">→</span>
-                    <span className="text-2xl font-bold text-[#38618C]">5-6</span>
-                  </div>
-                  <div className="text-xs text-gray-600 font-medium">Stress Level (1-10)</div>
-                  <div className="text-xs text-gray-400">Baseline → After TDI</div>
-                </div>
-
-                {/* Planning Hours */}
-                <div className="text-center p-4 bg-gray-50 rounded-xl">
-                  <div className="flex items-center justify-center gap-2 mb-2">
-                    <span className="text-2xl font-bold text-[#E07A5F]">12</span>
-                    <span className="text-gray-400">→</span>
-                    <span className="text-2xl font-bold text-[#38618C]">6-8</span>
-                  </div>
-                  <div className="text-xs text-gray-600 font-medium">Weekly Planning Hours</div>
-                  <div className="text-xs text-gray-400">Baseline → After TDI</div>
-                </div>
-              </div>
-
-              <div className="text-xs text-gray-400 text-center mt-4">
-                Based on TDI partner school survey data across 21 states
-              </div>
-            </div>
-
-            {/* 5. Leading Indicators - Awaiting Baseline */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-
-              {/* Header with prominent status */}
-              <div className="bg-amber-50 border-b border-amber-200 p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-                      <ClipboardList className="w-5 h-5 text-amber-600" />
+                  <p className="text-sm text-gray-500 mb-3">&quot;How satisfied are you in your current role?&quot;</p>
+                  <div className="flex items-center gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-400">Industry Avg:</span>
+                      <span className="font-medium text-gray-600 ml-1">5.1/10</span>
                     </div>
                     <div>
-                      <div className="font-semibold text-[#1e2749]">Para Wellness Indicators</div>
-                      <div className="text-sm text-gray-500">Baseline survey will be administered during Virtual Session 1</div>
+                      <span className="text-gray-400">TDI Partners:</span>
+                      <span className="font-medium text-green-600 ml-1">7.2/10 ↑</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
-                    <div className="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></div>
-                    Awaiting Data
+                </div>
+
+                {/* Feeling Valued */}
+                <div className="p-4 border border-gray-200 rounded-xl">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center">
+                      <Heart className="w-5 h-5 text-[#38618C]" />
+                    </div>
+                    <div className="font-medium text-[#1e2749]">Feeling Valued</div>
+                  </div>
+                  <p className="text-sm text-gray-500 mb-3">&quot;How valued do you feel by teachers and admin?&quot;</p>
+                  <div className="flex items-center gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-400">Industry Avg:</span>
+                      <span className="font-medium text-gray-600 ml-1">3.8/10</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">TDI Partners:</span>
+                      <span className="font-medium text-green-600 ml-1">6.5/10 ↑</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stress Level */}
+                <div className="p-4 border border-gray-200 rounded-xl">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center">
+                      <Activity className="w-5 h-5 text-[#38618C]" />
+                    </div>
+                    <div className="font-medium text-[#1e2749]">Stress Level</div>
+                  </div>
+                  <p className="text-sm text-gray-500 mb-3">&quot;Rate your current stress level at work&quot;</p>
+                  <div className="flex items-center gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-400">Industry Avg:</span>
+                      <span className="font-medium text-gray-600 ml-1">7.9/10</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">TDI Partners:</span>
+                      <span className="font-medium text-green-600 ml-1">5.5/10 ↓</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Retention Intent */}
+                <div className="p-4 border border-gray-200 rounded-xl">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center">
+                      <UserCheck className="w-5 h-5 text-[#38618C]" />
+                    </div>
+                    <div className="font-medium text-[#1e2749]">Retention Intent</div>
+                  </div>
+                  <p className="text-sm text-gray-500 mb-3">&quot;How likely are you to stay in this role next year?&quot;</p>
+                  <div className="flex items-center gap-4 text-sm">
+                    <div>
+                      <span className="text-gray-400">Industry Avg:</span>
+                      <span className="font-medium text-gray-600 ml-1">4.1/10</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-400">TDI Partners:</span>
+                      <span className="font-medium text-green-600 ml-1">7.8/10 ↑</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Metrics we'll track - Clear explanations */}
-              <div className="p-5">
-                <div className="text-xs uppercase tracking-wide text-gray-400 mb-4">What We'll Measure</div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                  {/* Job Satisfaction */}
-                  <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Smile className="w-6 h-6 text-[#38618C]" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-[#1e2749] mb-1">Job Satisfaction</div>
-                      <div className="text-xs text-gray-500 mb-2">"How satisfied are you in your current role?"</div>
-                      <div className="flex items-center gap-4 text-xs">
-                        <div>
-                          <span className="text-gray-400">Industry:</span>
-                          <span className="font-medium text-[#E07A5F] ml-1">5.1/10</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-400">TDI Goal:</span>
-                          <span className="font-medium text-[#38618C] ml-1">7.2+</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Feeling Valued */}
-                  <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Star className="w-6 h-6 text-[#38618C]" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-[#1e2749] mb-1">Feeling Valued</div>
-                      <div className="text-xs text-gray-500 mb-2">"How valued do you feel by teachers and admin?"</div>
-                      <div className="flex items-center gap-4 text-xs">
-                        <div>
-                          <span className="text-gray-400">Industry:</span>
-                          <span className="font-medium text-[#E07A5F] ml-1">3.8/10</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-400">TDI Goal:</span>
-                          <span className="font-medium text-[#38618C] ml-1">6.9+</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Stress Level */}
-                  <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Activity className="w-6 h-6 text-[#38618C]" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-[#1e2749] mb-1">Stress Level</div>
-                      <div className="text-xs text-gray-500 mb-2">"Rate your current stress level at work"</div>
-                      <div className="flex items-center gap-4 text-xs">
-                        <div>
-                          <span className="text-gray-400">Industry:</span>
-                          <span className="font-medium text-[#E07A5F] ml-1">7.9/10</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-400">TDI Goal:</span>
-                          <span className="font-medium text-[#38618C] ml-1">5.5 ↓</span>
-                        </div>
-                      </div>
-                      <div className="text-xs text-green-600 mt-1">↓ Lower is better</div>
-                    </div>
-                  </div>
-
-                  {/* Retention Intent */}
-                  <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <UserCheck className="w-6 h-6 text-[#38618C]" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-[#1e2749] mb-1">Retention Intent</div>
-                      <div className="text-xs text-gray-500 mb-2">"How likely are you to stay in this role next year?"</div>
-                      <div className="flex items-center gap-4 text-xs">
-                        <div>
-                          <span className="text-gray-400">Industry:</span>
-                          <span className="font-medium text-[#E07A5F] ml-1">4.1/10</span>
-                        </div>
-                        <div>
-                          <span className="text-gray-400">TDI Goal:</span>
-                          <span className="font-medium text-[#38618C] ml-1">7.4+</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Source */}
-                <div className="text-xs text-gray-400 text-center mt-4 pt-4 border-t border-gray-100">
-                  Industry benchmarks: NCTQ 2023 Paraprofessional Research, RAND State of American Teacher
-                </div>
-              </div>
-
+              <p className="text-xs text-gray-400 text-center mt-6 pt-4 border-t border-gray-100">
+                Your ASD4 baseline will appear here after Virtual Session 1 · Sources: NCTQ, RAND, Learning Policy Institute
+              </p>
             </div>
 
-            {/* 6. Observation Day 1 - Accordion with Scheduling */}
+            {/* ===== SECTION 5: Observation Preview ===== */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="p-6">
+                <h3 className="text-lg font-bold text-[#1e2749] mb-2">What Your Observation Day Looks Like</h3>
+                <p className="text-gray-600 mb-6">
+                  During each on-site visit, Rae observes classrooms and creates personalized feedback for every para in your pilot group.
+                </p>
 
-              {/* Clickable Header */}
-              <button
-                onClick={() => toggleSection('observation1')}
-                className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition-colors text-left"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center">
-                    <Eye className="w-5 h-5 text-[#38618C]" />
+                {/* Love Note Format Example */}
+                <div className="bg-gray-50 rounded-xl p-5 border-2 border-dashed border-gray-200">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Heart className="w-5 h-5 text-[#E07A5F]" />
+                    <span className="font-semibold text-[#1e2749]">Love Note Format</span>
+                    <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs rounded font-medium">FORMAT EXAMPLE</span>
                   </div>
-                  <div>
-                    <div className="font-semibold text-[#1e2749]">Observation Day 1</div>
-                    <div className="text-sm text-gray-500">On-site classroom observations with pilot group</div>
+
+                  <div className="bg-white rounded-lg p-5 border border-gray-200">
+                    <div className="text-sm text-gray-500 mb-4">
+                      <div><strong className="text-gray-700">To:</strong> [Para Name]</div>
+                      <div><strong className="text-gray-700">From:</strong> Rae Hughart, TDI</div>
+                      <div><strong className="text-gray-700">Observed:</strong> [Date]</div>
+                    </div>
+
+                    <div className="mb-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Sparkles className="w-4 h-4 text-green-600" />
+                        <span className="font-semibold text-green-700 text-sm">WHAT WE CELEBRATED</span>
+                      </div>
+                      <ul className="text-sm text-gray-600 space-y-1 ml-6">
+                        <li>• The way you redirected Marcus with a quiet word instead of calling him out — that&apos;s relationship-building in action</li>
+                        <li>• Your small group station was organized and inviting</li>
+                        <li>• Students clearly trust you — I saw 3 kids come to you for help before asking the lead teacher</li>
+                      </ul>
+                    </div>
+
+                    <div className="mb-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Sprout className="w-4 h-4 text-[#35A7FF]" />
+                        <span className="font-semibold text-[#38618C] text-sm">WHERE WE&apos;RE GROWING</span>
+                      </div>
+                      <ul className="text-sm text-gray-600 space-y-1 ml-6">
+                        <li>• Try the &quot;2x10&quot; strategy with Jaylen — 2 minutes of personal conversation for 10 days can transform challenging relationships</li>
+                      </ul>
+                    </div>
+
+                    <div className="bg-[#38618C]/5 rounded-lg p-3">
+                      <div className="text-xs font-semibold text-[#38618C] mb-1">HUB RESOURCE FOR YOU</div>
+                      <div className="text-sm text-gray-600">→ &quot;Building Relationships with Reluctant Students&quot; (Course 4.2)</div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3">
-                  {/* Status + Schedule */}
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-400">Target: Feb 2026</span>
-                    <a
-                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="px-2 py-1 bg-[#38618C] text-white rounded text-xs font-medium hover:bg-[#2d4a6d] transition-colors"
-                    >
-                      Schedule
-                    </a>
-                  </div>
-
-                  {/* Chevron */}
-                  <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${openSections['observation1'] ? 'rotate-180' : ''}`} />
-                </div>
-              </button>
-
-              {/* Expandable Content */}
-              <div className={`overflow-hidden transition-all duration-200 ${openSections['observation1'] ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                <div className="px-5 pb-5 border-t border-gray-100">
-
-                  <p className="text-sm text-gray-600 mt-4 mb-4">
-                    After each observation, paras receive personalized "Love Notes" — specific, actionable feedback celebrating what they're doing well.
-                  </p>
-
-                  {/* Example Love Note */}
-                  <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Heart className="w-4 h-4 text-[#E07A5F]" />
-                      <span className="font-semibold text-[#1e2749] text-sm">Example Love Note</span>
-                      <span className="px-2 py-0.5 bg-amber-200 text-amber-800 text-xs rounded">EXAMPLE</span>
-                    </div>
-                    <div className="bg-white rounded-lg p-4 border-l-4 border-[#E07A5F]">
-                      <p className="text-sm text-gray-700 italic">
-                        "Maria, I noticed how you positioned yourself at eye level with Jayden during the reading activity — that small shift made him visibly more engaged. You have a natural gift for creating connection. Keep using that superpower!"
-                      </p>
-                      <p className="text-xs text-gray-400 mt-2">— Rae Hughart, Observation Day 1</p>
-                    </div>
-                  </div>
-
-                  {/* Recommendation */}
-                  <div className="bg-blue-50 rounded-lg p-3 mt-4 border-l-4 border-[#38618C]">
-                    <div className="text-sm text-gray-700">
-                      <strong className="text-[#38618C]">Share the love:</strong> Consider reading Love Notes aloud at para meetings — it builds culture and shows paras their work is seen.
-                    </div>
-                  </div>
-
-                </div>
+                <p className="text-sm text-gray-500 mt-4 text-center">
+                  After observations, paras are grouped by growth area for targeted support through Growth Groups.
+                </p>
               </div>
-
             </div>
 
-            {/* 7. Observation Day 2 - Accordion */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-
-              {/* Clickable Header */}
-              <button
-                onClick={() => toggleSection('observation2')}
-                className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition-colors text-left"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                    <Eye className="w-5 h-5 text-gray-400" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-[#1e2749]">Observation Day 2</div>
-                    <div className="text-sm text-gray-500">Follow-up on-site observation</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  {/* Status */}
-                  <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded text-xs font-medium">
-                    After Obs 1
-                  </span>
-
-                  {/* Chevron */}
-                  <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${openSections['observation2'] ? 'rotate-180' : ''}`} />
-                </div>
-              </button>
-
-              {/* Expandable Content */}
-              <div className={`overflow-hidden transition-all duration-200 ${openSections['observation2'] ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}>
-                <div className="px-5 pb-5 border-t border-gray-100">
-                  <p className="text-sm text-gray-500 py-4 text-center">
-                    Details will appear after Observation Day 1 is complete. This follow-up visit builds on insights from your first observation and tracks progress on growth areas.
-                  </p>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Supporting Resources */}
+            {/* ===== SECTION 6: Your Partnership Includes ===== */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-[#38618C]" />
-                Supporting Resources
-              </h3>
-              <div className="grid md:grid-cols-3 gap-4 mb-4">
-                <div className="border border-gray-200 rounded-lg p-4 hover:border-[#35A7FF] transition-all">
-                  <h4 className="font-medium text-[#1e2749] mb-1">Paraprofessional Foundations</h4>
-                  <p className="text-sm text-gray-500">Core strategies for para success</p>
+              <h3 className="text-lg font-bold text-[#1e2749] mb-5">Your Partnership Includes</h3>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="text-center p-4 bg-gray-50 rounded-xl">
+                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <School className="w-5 h-5 text-[#38618C]" />
+                  </div>
+                  <div className="text-2xl font-bold text-[#1e2749]">2</div>
+                  <div className="text-xs text-gray-500">On-Site Observation Days</div>
                 </div>
-                <div className="border border-gray-200 rounded-lg p-4 hover:border-[#35A7FF] transition-all">
-                  <h4 className="font-medium text-[#1e2749] mb-1">Teacher-Para Partnerships</h4>
-                  <p className="text-sm text-gray-500">Building collaborative relationships</p>
+
+                <div className="text-center p-4 bg-gray-50 rounded-xl">
+                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <Monitor className="w-5 h-5 text-[#38618C]" />
+                  </div>
+                  <div className="text-2xl font-bold text-[#1e2749]">4</div>
+                  <div className="text-xs text-gray-500">Virtual Strategy Sessions</div>
                 </div>
-                <div className="border border-gray-200 rounded-lg p-4 hover:border-[#35A7FF] transition-all">
-                  <h4 className="font-medium text-[#1e2749] mb-1">De-Escalation Strategies</h4>
-                  <p className="text-sm text-gray-500">Supporting students in crisis</p>
+
+                <div className="text-center p-4 bg-gray-50 rounded-xl">
+                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <Briefcase className="w-5 h-5 text-[#38618C]" />
+                  </div>
+                  <div className="text-2xl font-bold text-[#1e2749]">2</div>
+                  <div className="text-xs text-gray-500">Executive Impact Sessions</div>
+                </div>
+
+                <div className="text-center p-4 bg-gray-50 rounded-xl">
+                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center mx-auto mb-2">
+                    <BookOpen className="w-5 h-5 text-[#38618C]" />
+                  </div>
+                  <div className="text-2xl font-bold text-[#1e2749]">117</div>
+                  <div className="text-xs text-gray-500">Learning Hub Memberships</div>
                 </div>
               </div>
-              <div className="flex flex-wrap gap-3">
-                <a
-                  href="https://raehughart.substack.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm text-[#35A7FF] hover:underline"
-                >
-                  <Mail className="w-4 h-4" />
-                  Weekly Strategies (Substack)
-                </a>
-                <a
-                  href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-sm text-[#35A7FF] hover:underline"
-                >
-                  <Headphones className="w-4 h-4" />
-                  Podcast
-                </a>
+
+              <div className="flex flex-col sm:flex-row gap-4 p-4 bg-[#1e2749]/5 rounded-xl">
+                <div className="flex items-center gap-2 text-sm">
+                  <Calendar className="w-4 h-4 text-[#38618C]" />
+                  <span className="text-gray-600"><strong className="text-[#1e2749]">Partnership:</strong> January 2026 – May 2026</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm">
+                  <Calendar className="w-4 h-4 text-[#38618C]" />
+                  <span className="text-gray-600"><strong className="text-[#1e2749]">Hub Access:</strong> Through January 2027</span>
+                </div>
               </div>
             </div>
+
           </div>
         )}
 
