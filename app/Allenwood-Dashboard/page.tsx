@@ -33,11 +33,90 @@ import {
   Award,
   MessageCircle,
   Timer,
-  Heart
+  Heart,
+  ChevronDown,
+  ChevronRight
 } from 'lucide-react';
 
 export default function AllenwoodDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
+
+  // Accordion state for 2026-27 timeline
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
+    'timeline-1': false,
+    'timeline-2': true,
+    'timeline-3': false,
+    'timeline-4': false,
+    'timeline-5': false,
+    'timeline-6': false,
+    'timeline-7': false,
+    'timeline-8': false,
+    'timeline-9': false,
+  });
+
+  const toggleSection = (id: string) => {
+    setOpenSections(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  // Timeline Accordion Component
+  const TimelineAccordion = ({
+    id,
+    number,
+    date,
+    title,
+    type,
+    children
+  }: {
+    id: string;
+    number: number;
+    date: string;
+    title: string;
+    type: 'leadership' | 'onsite' | 'virtual' | 'celebration';
+    children: React.ReactNode;
+  }) => {
+    const isOpen = openSections[id];
+
+    const typeConfig = {
+      leadership: { bg: 'bg-[#1e2749]', label: 'Leadership' },
+      onsite: { bg: 'bg-[#38618C]', label: 'On-Site' },
+      virtual: { bg: 'bg-[#35A7FF]', label: 'Virtual' },
+      celebration: { bg: 'bg-green-500', label: 'Celebration' },
+    };
+
+    const config = typeConfig[type];
+
+    return (
+      <div className="border border-gray-200 rounded-xl overflow-hidden">
+        <button
+          onClick={() => toggleSection(id)}
+          className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors"
+        >
+          <div className={`w-8 h-8 ${config.bg} rounded-full flex items-center justify-center flex-shrink-0`}>
+            <span className="text-white text-sm font-medium">{number}</span>
+          </div>
+          <div className="flex-1 text-left">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-medium text-[#1e2749]">{title}</span>
+              <span className={`text-xs ${config.bg} text-white px-2 py-0.5 rounded-full`}>
+                {config.label}
+              </span>
+            </div>
+            <div className="text-sm text-gray-500">{date}</div>
+          </div>
+          {isOpen ? (
+            <ChevronDown className="w-5 h-5 text-gray-400" />
+          ) : (
+            <ChevronRight className="w-5 h-5 text-gray-400" />
+          )}
+        </button>
+        {isOpen && (
+          <div className="px-4 pb-4 pt-2 border-t border-gray-100 ml-12">
+            {children}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   // Scroll to top when changing tabs
   const handleTabChange = (tabId: string) => {
@@ -1028,163 +1107,105 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Proposed 2026-27 Timeline */}
+            {/* 2026-27 Timeline - Accordion Style */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-800 mb-6">Proposed 2026-27 Timeline</h3>
-              <p className="text-sm text-gray-500 mb-6">Phase 2 (ACCELERATE) — Expanding Your Team</p>
+              <h3 className="font-semibold text-gray-800 mb-2">Proposed 2026-27 Timeline</h3>
+              <p className="text-sm text-gray-500 mb-6">Phase 2 (ACCELERATE) — Expanding Schoolwide</p>
 
-              <div className="relative">
-                {/* Timeline line */}
-                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200" />
+              <div className="space-y-2">
+                {/* 1. July/August - Leadership Planning */}
+                <TimelineAccordion id="timeline-1" number={1} date="July/August 2026" title="Leadership Planning Session" type="leadership">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Meet with leadership to set Year 2 goals and identify which grade levels
+                    or departments should join the expanded partnership.
+                  </p>
+                  <ul className="text-sm text-gray-500 space-y-1">
+                    <li>• Review Year 1 data and wins</li>
+                    <li>• Discuss schoolwide expansion strategy</li>
+                    <li>• Plan onboarding for new teachers</li>
+                  </ul>
+                </TimelineAccordion>
 
-                <div className="space-y-6">
-                  {/* 1. July/August - Leadership Planning */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
-                      <span className="text-white text-xs font-bold">1</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-gray-800">Leadership Planning Session</p>
-                          <p className="text-sm text-gray-500">Set Year 2 goals, identify grade levels/departments to expand to</p>
-                        </div>
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Jul/Aug 2026</span>
-                      </div>
-                      <p className="text-sm text-gray-400 italic mt-2">
-                        💭 We&apos;ll discuss: Which grade levels or departments would benefit most from joining Year 2?
-                      </p>
-                    </div>
-                  </div>
+                {/* 2. September - Kickoff + Observation */}
+                <TimelineAccordion id="timeline-2" number={2} date="September 2026" title="On-Site Kickoff + Observation Day #1" type="onsite">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Welcome new teachers to the TDI community, activate Hub access,
+                    and conduct classroom observations.
+                  </p>
+                  <ul className="text-sm text-gray-500 space-y-1">
+                    <li>• New teacher onboarding and Hub orientation</li>
+                    <li>• Classroom observations for all participating teachers</li>
+                    <li>• Personalized Love Notes with specific feedback</li>
+                  </ul>
+                </TimelineAccordion>
 
-                  {/* 2. September - Kickoff + Observation */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
-                      <span className="text-white text-xs font-bold">2</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-gray-800">On-Site Kickoff + Observation Day #1</p>
-                          <p className="text-sm text-gray-500">New team onboarding, Hub access, classroom observations</p>
-                        </div>
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Sep 2026</span>
-                      </div>
-                    </div>
-                  </div>
+                {/* 3. October - Virtual #1 */}
+                <TimelineAccordion id="timeline-3" number={3} date="October 2026" title="Virtual Session #1" type="virtual">
+                  <p className="text-sm text-gray-600">
+                    Build on observation insights. Focus on quick wins and immediate
+                    classroom strategies based on what we saw in September.
+                  </p>
+                </TimelineAccordion>
 
-                  {/* 3. October - Virtual #1 */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
-                      <span className="text-white text-xs font-bold">3</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-gray-800">Virtual Session #1</p>
-                          <p className="text-sm text-gray-500">Building on observation insights</p>
-                        </div>
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Oct 2026</span>
-                      </div>
-                    </div>
-                  </div>
+                {/* 4. November - Virtual #2 */}
+                <TimelineAccordion id="timeline-4" number={4} date="November 2026" title="Virtual Session #2" type="virtual">
+                  <p className="text-sm text-gray-600">
+                    Deep dive into classroom management strategies tailored to
+                    the needs we&apos;ve identified across your team.
+                  </p>
+                </TimelineAccordion>
 
-                  {/* 4. November - Virtual #2 */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
-                      <span className="text-white text-xs font-bold">4</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-gray-800">Virtual Session #2</p>
-                          <p className="text-sm text-gray-500">Classroom management strategies</p>
-                        </div>
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Nov 2026</span>
-                      </div>
-                    </div>
-                  </div>
+                {/* 5. December - Mid-Year Check-in */}
+                <TimelineAccordion id="timeline-5" number={5} date="December 2026" title="Mid-Year Leadership Check-in" type="leadership">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Pause to celebrate first-semester wins and adjust strategy for spring.
+                  </p>
+                  <ul className="text-sm text-gray-500 space-y-1">
+                    <li>• Review Hub engagement data</li>
+                    <li>• Celebrate teacher growth</li>
+                    <li>• Adjust focus areas for spring</li>
+                  </ul>
+                </TimelineAccordion>
 
-                  {/* 5. December - Mid-Year Check-in */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
-                      <span className="text-white text-xs font-bold">5</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-gray-800">Mid-Year Leadership Check-in</p>
-                          <p className="text-sm text-gray-500">Review progress, celebrate wins, adjust strategy</p>
-                        </div>
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Dec 2026</span>
-                      </div>
-                    </div>
-                  </div>
+                {/* 6. January - Virtual #3 */}
+                <TimelineAccordion id="timeline-6" number={6} date="January 2027" title="Virtual Session #3" type="virtual">
+                  <p className="text-sm text-gray-600">
+                    Fresh start energy! Focus on sustainability and preventing
+                    spring burnout with practical strategies.
+                  </p>
+                </TimelineAccordion>
 
-                  {/* 6. January - Virtual #3 */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
-                      <span className="text-white text-xs font-bold">6</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-gray-800">Virtual Session #3</p>
-                          <p className="text-sm text-gray-500">Classroom management strategies</p>
-                        </div>
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Jan 2027</span>
-                      </div>
-                    </div>
-                  </div>
+                {/* 7. February - Observation #2 */}
+                <TimelineAccordion id="timeline-7" number={7} date="February 2027" title="On-Site Observation Day #2" type="onsite">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Follow-up observations to see growth and provide fresh feedback.
+                  </p>
+                  <ul className="text-sm text-gray-500 space-y-1">
+                    <li>• Compare to September observations</li>
+                    <li>• New Love Notes with growth-focused feedback</li>
+                    <li>• Identify teachers ready for leadership roles</li>
+                  </ul>
+                </TimelineAccordion>
 
-                  {/* 7. February - Observation #2 */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
-                      <span className="text-white text-xs font-bold">7</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-gray-800">On-Site Observation Day #2</p>
-                          <p className="text-sm text-gray-500">Follow-up observations, personalized Love Notes</p>
-                        </div>
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Feb 2027</span>
-                      </div>
-                    </div>
-                  </div>
+                {/* 8. March - Virtual #4 */}
+                <TimelineAccordion id="timeline-8" number={8} date="March 2027" title="Virtual Session #4" type="virtual">
+                  <p className="text-sm text-gray-600">
+                    Leadership development and finishing the year strong.
+                    Focus on sustaining momentum through testing season.
+                  </p>
+                </TimelineAccordion>
 
-                  {/* 8. March - Virtual #4 */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
-                      <span className="text-white text-xs font-bold">8</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-gray-800">Virtual Session #4</p>
-                          <p className="text-sm text-gray-500">Leadership development, sustaining momentum</p>
-                        </div>
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Mar 2027</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 9. April - Celebration */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center z-10">
-                      <span className="text-white text-xs font-bold">9</span>
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-gray-800">Year 2 Celebration + Year 3 Planning</p>
-                          <p className="text-sm text-gray-500">Celebrate growth, review data, discuss Year 3 options</p>
-                        </div>
-                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Apr 2027</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                {/* 9. April - Celebration */}
+                <TimelineAccordion id="timeline-9" number={9} date="April 2027" title="Year 2 Celebration + Year 3 Planning" type="celebration">
+                  <p className="text-sm text-gray-600 mb-2">
+                    Celebrate your team&apos;s growth and discuss continuing the partnership.
+                  </p>
+                  <ul className="text-sm text-gray-500 space-y-1">
+                    <li>• Review year-over-year data</li>
+                    <li>• Celebrate individual and team wins</li>
+                    <li>• Discuss Year 3 options (SUSTAIN phase)</li>
+                  </ul>
+                </TimelineAccordion>
               </div>
 
               {/* Year 2 Package Summary */}
