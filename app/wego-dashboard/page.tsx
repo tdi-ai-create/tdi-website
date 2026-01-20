@@ -1387,9 +1387,9 @@ export default function WegoDashboard() {
                 Why Teacher-Para Partnerships Matter
               </h3>
 
-              {/* Bob's Quote - Featured */}
+              {/* Team Quote - Featured */}
               <div className="bg-[#ffba06]/10 border-l-4 border-[#ffba06] rounded-r-xl p-5 mb-6">
-                <p className="text-[#1e2749] font-medium italic mb-2">Bob said it best:</p>
+                <p className="text-[#1e2749] font-medium italic mb-2">Your team said it best:</p>
                 <p className="text-xl text-[#1e2749] font-semibold">&quot;Trust and shared goals to best serve students.&quot;</p>
                 <p className="text-gray-600 text-sm mt-3">
                   Your PAs are already practicing this. Year 2 brings their teachers into the same conversation — so everyone is aligned.
@@ -1568,7 +1568,7 @@ export default function WegoDashboard() {
               <p className="text-gray-700 mb-4">Your team told us what good partnerships need:</p>
 
               <div className="bg-white rounded-xl p-5 border border-gray-200">
-                <p className="text-sm font-medium text-[#38618C] mb-3">FROM BOB&apos;S FEEDBACK:</p>
+                <p className="text-sm font-medium text-[#38618C] mb-3">FROM YOUR TEAM&apos;S FEEDBACK:</p>
                 <ul className="space-y-2 mb-4">
                   <li className="flex items-center gap-3 text-gray-700">
                     <Check className="w-5 h-5 text-green-500 flex-shrink-0" />
