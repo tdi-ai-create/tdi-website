@@ -867,11 +867,11 @@ export default function ASD4Dashboard() {
                 </p>
 
                 {/* Love Note Format Example */}
-                <div className="bg-gray-50 rounded-xl p-5 border-2 border-dashed border-gray-200">
+                <div className="bg-[#ffba06]/10 rounded-xl p-5 border-2 border-dashed border-[#ffba06]/40">
                   <div className="flex items-center gap-2 mb-4">
                     <Heart className="w-5 h-5 text-[#E07A5F]" />
                     <span className="font-semibold text-[#1e2749]">Love Note Format</span>
-                    <span className="px-2 py-0.5 bg-gray-200 text-gray-600 text-xs rounded font-medium">FORMAT EXAMPLE</span>
+                    <span className="px-2 py-0.5 bg-[#ffba06]/30 text-[#1e2749] text-xs rounded font-medium">FORMAT EXAMPLE</span>
                   </div>
 
                   <div className="bg-white rounded-lg p-5 border border-gray-200">
