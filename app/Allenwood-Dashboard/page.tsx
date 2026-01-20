@@ -855,19 +855,19 @@ export default function AllenwoodDashboard() {
                   </div>
                 </div>
 
-                {/* Add Paraprofessional Support */}
+                {/* Teacher Leadership Pathway */}
                 <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Users className="w-6 h-6 text-[#38618C]" />
+                      <Award className="w-6 h-6 text-[#38618C]" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-semibold text-[#1e2749]">Add Paraprofessional Support</h4>
+                        <h4 className="font-semibold text-[#1e2749]">Teacher Leadership Pathway</h4>
                         <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full font-medium">Year 2 Feature</span>
                       </div>
                       <p className="text-gray-600 text-sm">
-                        Your classrooms have multiple adults — getting paras into the Hub alongside teachers creates shared language and consistency.
+                        Your pilot teachers become in-house mentors — modeling strategies and supporting new team members as they onboard.
                       </p>
                     </div>
                   </div>
@@ -930,12 +930,12 @@ export default function AllenwoodDashboard() {
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-medium text-gray-800">Leadership Planning Session</p>
-                          <p className="text-sm text-gray-500">Set Year 2 goals, identify teachers &amp; paras to expand to</p>
+                          <p className="text-sm text-gray-500">Set Year 2 goals, identify grade levels/departments to expand to</p>
                         </div>
                         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Jul/Aug 2026</span>
                       </div>
                       <p className="text-sm text-gray-400 italic mt-2">
-                        💭 We&apos;ll discuss: Which additional teachers and paras should join Year 2?
+                        💭 We&apos;ll discuss: Which grade levels or departments would benefit most from joining Year 2?
                       </p>
                     </div>
                   </div>
@@ -1013,7 +1013,7 @@ export default function AllenwoodDashboard() {
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-medium text-gray-800">Virtual Session #3</p>
-                          <p className="text-sm text-gray-500">Para-teacher collaboration strategies</p>
+                          <p className="text-sm text-gray-500">Classroom management strategies</p>
                         </div>
                         <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Jan 2027</span>
                       </div>
@@ -1099,24 +1099,24 @@ export default function AllenwoodDashboard() {
               <div className="flex items-start gap-3">
                 <Lightbulb className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Recommendation</h4>
+                  <h4 className="font-semibold text-gray-800 mb-2">Recommendation: Expand Schoolwide</h4>
                   <p className="text-sm text-gray-700 mb-3">
-                    Your Autism/Special Ed team is building strong foundations.
-                    During observations, we noticed most classrooms have multiple adults — and some opportunities for stronger alignment.
+                    Your Autism/Special Ed pilot team is building strong foundations.
+                    With proven strategies and growing momentum, Year 2 is the perfect time to bring more teachers into the fold.
                   </p>
                   <p className="text-sm text-gray-700 font-medium mb-2">Questions worth discussing:</p>
                   <ul className="text-sm text-gray-700 mb-4 space-y-2 ml-4">
                     <li className="flex items-start gap-2">
                       <span className="text-amber-600 mt-1">•</span>
-                      <span>Could paraprofessionals benefit from the same Hub access and training your teachers are receiving?</span>
+                      <span>Which grade levels or departments would benefit most from joining Year 2?</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-amber-600 mt-1">•</span>
-                      <span>Are there other teachers at Allenwood who could benefit from this support?</span>
+                      <span>Are there teachers who&apos;ve expressed interest in the strategies your pilot team is using?</span>
                     </li>
                   </ul>
                   <p className="text-sm text-gray-600 mb-4">
-                    Year 2 could bring everyone onto the same page — teachers AND paras with shared language, strategies, and community.
+                    Year 2 expands your impact — more teachers with shared language, strategies, and a schoolwide culture of support.
                   </p>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
