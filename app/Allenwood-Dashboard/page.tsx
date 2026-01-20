@@ -52,6 +52,18 @@ export default function AllenwoodDashboard() {
     'timeline-7': false,
     'timeline-8': false,
     'timeline-9': false,
+    // Observation Day #1 notes accordion
+    'obs-day-1': false,
+    'obs-teacher-1': false,
+    'obs-teacher-2': false,
+    'obs-teacher-3': false,
+    'obs-teacher-4': false,
+    'obs-teacher-5': false,
+    'obs-teacher-6': false,
+    'obs-teacher-7': false,
+    'obs-teacher-8': false,
+    'obs-teacher-9': false,
+    'obs-teacher-10': false,
   });
 
   const toggleSection = (id: string) => {
@@ -723,63 +735,70 @@ export default function AllenwoodDashboard() {
         {/* PROGRESS TAB */}
         {activeTab === 'progress' && (
           <div className="space-y-6">
-            {/* Observations */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-[#38618C]" />
-                  <span className="font-semibold text-[#1e2749]">Observations</span>
-                </div>
-                <span className="text-sm text-gray-500">1 of 2 Complete</span>
-              </div>
+            {/* 1. Partnership Goal */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <Target className="w-5 h-5 text-blue-500" />
+                Partnership Goal
+              </h3>
 
-              {/* Observation Day 1 */}
-              <div className="flex items-start gap-4 mb-4">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="font-medium text-[#1e2749]">Observation Day #1 — October 15, 2025</p>
-                  <p className="text-sm text-gray-500">10 teachers observed · 10 personalized Love Notes delivered</p>
-                </div>
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">COMPLETE</span>
-              </div>
+              <p className="text-gray-600 mb-6">
+                Support 10 new teachers (new to Allenwood and/or new to the profession) with
+                practical strategies for managing diverse classrooms and building confidence
+                in their first years.
+              </p>
 
-              {/* Observation Day 1 Key Findings */}
-              <div className="bg-[#F5F5F5] rounded-xl p-4 mb-6">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Key Findings</p>
-                <div className="grid grid-cols-3 gap-3 mb-4">
-                  <div className="text-center p-3 bg-white rounded-lg">
-                    <div className="text-xl font-bold text-[#38618C]">10</div>
-                    <div className="text-xs text-gray-600">Teachers Observed</div>
-                  </div>
-                  <div className="text-center p-3 bg-white rounded-lg">
-                    <div className="text-xl font-bold text-[#38618C]">~50%</div>
-                    <div className="text-xs text-gray-600">Strong Management</div>
-                  </div>
-                  <div className="text-center p-3 bg-white rounded-lg">
-                    <div className="text-xl font-bold text-[#38618C]">10</div>
-                    <div className="text-xs text-gray-600">Love Notes</div>
-                  </div>
+              {/* Visual flow */}
+              <div className="flex items-center justify-between">
+                <div className="text-center p-4 bg-blue-50 rounded-lg flex-1">
+                  <Heart className="w-6 h-6 text-blue-500 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-gray-700">Supported Teachers</p>
                 </div>
-                <div className="flex items-start gap-2">
-                  <Lightbulb className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-gray-700">
-                    <span className="font-medium">Insight:</span> About half the staff observed would benefit from more targeted, hands-on classroom management strategies.
-                  </p>
+                <ArrowRight className="w-5 h-5 text-gray-300 mx-2" />
+                <div className="text-center p-4 bg-blue-100 rounded-lg flex-1">
+                  <Users className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-gray-700">Confident Classrooms</p>
                 </div>
-              </div>
-
-              {/* Observation Day 2 */}
-              <div className="flex items-start gap-4">
-                <Calendar className="w-6 h-6 text-blue-500 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="font-medium text-[#1e2749]">Observation Day #2 — February 18, 2026</p>
-                  <p className="text-sm text-gray-500">Follow-up observations + continued coaching</p>
+                <ArrowRight className="w-5 h-5 text-gray-300 mx-2" />
+                <div className="text-center p-4 bg-amber-50 rounded-lg flex-1">
+                  <Star className="w-6 h-6 text-amber-500 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-gray-700">Student Success</p>
                 </div>
-                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">SCHEDULED</span>
               </div>
             </div>
 
-            {/* Support Delivered So Far */}
+            {/* 2. Leading Indicators */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-green-500" />
+                Leading Indicators
+              </h3>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-green-50 rounded-lg border border-green-100">
+                  <div className="text-2xl font-bold text-green-600">82%</div>
+                  <div className="text-xs text-gray-600 mt-1">Hub Login Rate</div>
+                  <div className="text-xs text-green-600 mt-1">9 of 11 active</div>
+                </div>
+                <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-100">
+                  <div className="text-2xl font-bold text-blue-600">100%</div>
+                  <div className="text-xs text-gray-600 mt-1">Love Notes Delivered</div>
+                  <div className="text-xs text-blue-600 mt-1">10 of 10</div>
+                </div>
+                <div className="text-center p-4 bg-amber-50 rounded-lg border border-amber-100">
+                  <div className="text-2xl font-bold text-amber-600">50%</div>
+                  <div className="text-xs text-gray-600 mt-1">Observations Complete</div>
+                  <div className="text-xs text-amber-600 mt-1">1 of 2</div>
+                </div>
+                <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-100">
+                  <div className="text-2xl font-bold text-purple-600">33%</div>
+                  <div className="text-xs text-gray-600 mt-1">Virtual Sessions</div>
+                  <div className="text-xs text-purple-600 mt-1">1 of 3 scheduled</div>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Support Delivered So Far */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
                 <Timer className="w-5 h-5 text-[#38618C]" />
@@ -810,7 +829,301 @@ export default function AllenwoodDashboard() {
               </p>
             </div>
 
-            {/* Observation Highlights */}
+            {/* 4. Observation Day #1 - Accordion with Teacher Notes */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <button
+                onClick={() => toggleSection('obs-day-1')}
+                className="w-full flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3">
+                  <CheckCircle className="w-6 h-6 text-green-500" />
+                  <div className="text-left">
+                    <h3 className="font-semibold text-gray-800">Observation Day #1 — October 15, 2025</h3>
+                    <p className="text-sm text-gray-500">10 teachers observed · 10 personalized Love Notes delivered</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">COMPLETE</span>
+                  {openSections['obs-day-1'] ? (
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                  )}
+                </div>
+              </button>
+
+              {openSections['obs-day-1'] && (
+                <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
+                  <p className="text-sm text-gray-600 mb-4">Click on each teacher to view their personalized observation notes:</p>
+
+                  {/* Teacher 1 */}
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('obs-teacher-1')}
+                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-medium text-gray-800">Georgette Cruickshank</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">Kindergarten Autism</span>
+                        {openSections['obs-teacher-1'] ? (
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        )}
+                      </div>
+                    </button>
+                    {openSections['obs-teacher-1'] && (
+                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
+                        <p><span className="font-medium text-green-700">Strengths:</span> Excellent rapport with students, calm demeanor, effective use of visual supports</p>
+                        <p><span className="font-medium text-amber-700">Growth area:</span> Consider adding more structured transitions between activities</p>
+                        <p><span className="font-medium text-blue-700">Resource shared:</span> Transition songs toolkit in Hub</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Teacher 2 */}
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('obs-teacher-2')}
+                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-medium text-gray-800">Alexander Summerlot</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">1st Autism</span>
+                        {openSections['obs-teacher-2'] ? (
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        )}
+                      </div>
+                    </button>
+                    {openSections['obs-teacher-2'] && (
+                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
+                        <p><span className="font-medium text-green-700">Strengths:</span> Strong classroom routines, positive reinforcement, engaging instruction</p>
+                        <p><span className="font-medium text-amber-700">Growth area:</span> Para communication and role clarity</p>
+                        <p><span className="font-medium text-blue-700">Resource shared:</span> Para alignment guide in Hub</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Teacher 3 */}
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('obs-teacher-3')}
+                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-medium text-gray-800">Alexander Holmes</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">3rd Grade</span>
+                        {openSections['obs-teacher-3'] ? (
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        )}
+                      </div>
+                    </button>
+                    {openSections['obs-teacher-3'] && (
+                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
+                        <p><span className="font-medium text-green-700">Strengths:</span> Great energy, students clearly engaged</p>
+                        <p><span className="font-medium text-amber-700">Growth area:</span> Attention signals and whole-group management</p>
+                        <p><span className="font-medium text-blue-700">Resource shared:</span> Call-and-response strategies in Hub</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Teacher 4 */}
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('obs-teacher-4')}
+                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-medium text-gray-800">Andrea Johnson</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">Kindergarten</span>
+                        {openSections['obs-teacher-4'] ? (
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        )}
+                      </div>
+                    </button>
+                    {openSections['obs-teacher-4'] && (
+                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
+                        <p><span className="font-medium text-green-700">Strengths:</span> Warm classroom environment, joyful learning atmosphere</p>
+                        <p><span className="font-medium text-amber-700">Growth area:</span> Consistent expectations and follow-through</p>
+                        <p><span className="font-medium text-blue-700">Resource shared:</span> Consequence consistency guide in Hub</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Teacher 5 */}
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('obs-teacher-5')}
+                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-medium text-gray-800">Jasmin Taylor</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">Kindergarten Autism</span>
+                        {openSections['obs-teacher-5'] ? (
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        )}
+                      </div>
+                    </button>
+                    {openSections['obs-teacher-5'] && (
+                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
+                        <p><span className="font-medium text-green-700">Strengths:</span> Patient and caring, strong sensory awareness</p>
+                        <p><span className="font-medium text-amber-700">Growth area:</span> Proactive behavior prevention strategies</p>
+                        <p><span className="font-medium text-blue-700">Resource shared:</span> Antecedent interventions toolkit in Hub</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Teacher 6 */}
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('obs-teacher-6')}
+                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-medium text-gray-800">Traci Wallace</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">4th Math & Science</span>
+                        {openSections['obs-teacher-6'] ? (
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        )}
+                      </div>
+                    </button>
+                    {openSections['obs-teacher-6'] && (
+                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
+                        <p><span className="font-medium text-green-700">Strengths:</span> Strong content knowledge, engaging lessons</p>
+                        <p><span className="font-medium text-amber-700">Growth area:</span> Managing off-task behavior during transitions</p>
+                        <p><span className="font-medium text-blue-700">Resource shared:</span> Quick transitions guide in Hub</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Teacher 7 */}
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('obs-teacher-7')}
+                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-medium text-gray-800">Yvette Whittaker</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">Kindergarten</span>
+                        {openSections['obs-teacher-7'] ? (
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        )}
+                      </div>
+                    </button>
+                    {openSections['obs-teacher-7'] && (
+                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
+                        <p><span className="font-medium text-green-700">Strengths:</span> Nurturing presence, strong relationships with students</p>
+                        <p><span className="font-medium text-amber-700">Growth area:</span> Building student independence</p>
+                        <p><span className="font-medium text-blue-700">Resource shared:</span> Gradual release strategies in Hub</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Teacher 8 */}
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('obs-teacher-8')}
+                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-medium text-gray-800">Carlita Law</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">3rd Grade Autism</span>
+                        {openSections['obs-teacher-8'] ? (
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        )}
+                      </div>
+                    </button>
+                    {openSections['obs-teacher-8'] && (
+                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
+                        <p><span className="font-medium text-green-700">Strengths:</span> Calm environment, consistent daily schedule</p>
+                        <p><span className="font-medium text-amber-700">Growth area:</span> Incorporating more student choice</p>
+                        <p><span className="font-medium text-blue-700">Resource shared:</span> Choice boards toolkit in Hub</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Teacher 9 */}
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('obs-teacher-9')}
+                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-medium text-gray-800">Tia Bowles-Simon</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">5th Grade Autism</span>
+                        {openSections['obs-teacher-9'] ? (
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        )}
+                      </div>
+                    </button>
+                    {openSections['obs-teacher-9'] && (
+                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
+                        <p><span className="font-medium text-green-700">Strengths:</span> Good pacing, age-appropriate expectations</p>
+                        <p><span className="font-medium text-amber-700">Growth area:</span> De-escalation techniques</p>
+                        <p><span className="font-medium text-blue-700">Resource shared:</span> Crisis prevention strategies in Hub</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Teacher 10 */}
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleSection('obs-teacher-10')}
+                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
+                    >
+                      <span className="font-medium text-gray-800">Rofiat Adigun</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-500">Teacher</span>
+                        {openSections['obs-teacher-10'] ? (
+                          <ChevronDown className="w-4 h-4 text-gray-400" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-gray-400" />
+                        )}
+                      </div>
+                    </button>
+                    {openSections['obs-teacher-10'] && (
+                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
+                        <p><span className="font-medium text-green-700">Strengths:</span> Enthusiastic, builds strong student rapport</p>
+                        <p><span className="font-medium text-amber-700">Growth area:</span> Classroom organization and systems</p>
+                        <p><span className="font-medium text-blue-700">Resource shared:</span> Classroom setup guide in Hub</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Observation Day 2 - Scheduled */}
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="w-6 h-6 text-blue-500" />
+                    <div>
+                      <h3 className="font-semibold text-gray-800">Observation Day #2 — February 18, 2026</h3>
+                      <p className="text-sm text-gray-500">Follow-up observations + continued coaching</p>
+                    </div>
+                  </div>
+                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">SCHEDULED</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 5. Observation Highlights */}
             <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
               <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
                 <Star className="w-5 h-5 text-green-600" />
@@ -838,7 +1151,7 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Hub Engagement Details */}
+            {/* 6. Hub Engagement Details */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-blue-500" />
@@ -932,7 +1245,7 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Teacher Roster */}
+            {/* 7. Teacher Roster */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
                 <Users className="w-5 h-5 text-[#38618C]" />
