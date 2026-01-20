@@ -243,7 +243,7 @@ export default function AllenwoodDashboard() {
                       <p className="text-sm text-gray-600 mt-1">Celebrate wins + discuss Year 2 options &middot; Complimentary</p>
                     </div>
                     <a
-                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                      href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="border border-[#1e2749] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100 transition-colors"
@@ -397,7 +397,7 @@ export default function AllenwoodDashboard() {
                   </span>
                 </a>
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-between p-3 bg-[#E07A5F]/5 rounded-lg border border-[#E07A5F]/20 hover:bg-[#E07A5F]/10 transition-colors group"
@@ -1063,7 +1063,7 @@ export default function AllenwoodDashboard() {
                     Year 2 could bring everyone onto the same page — teachers AND paras with shared language, strategies, and community.
                   </p>
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-sm font-medium text-amber-700 hover:text-amber-800"
@@ -1082,7 +1082,7 @@ export default function AllenwoodDashboard() {
                 We&apos;ll customize the plan to fit YOUR goals — whether that&apos;s expanding to more teachers, deepening with your current team, or something in between.
               </p>
               <a
-                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-6 py-3 rounded-xl font-semibold transition-all"
