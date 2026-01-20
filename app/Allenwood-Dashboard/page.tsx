@@ -845,12 +845,17 @@ export default function AllenwoodDashboard() {
 
             {/* 2. Leading Indicators */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-green-500" />
-                Leading Indicators
-              </h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-green-500" />
+                  Leading Indicators
+                </h3>
+                <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
+                  Progress Snapshot
+                </span>
+              </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="text-center p-4 bg-green-50 rounded-lg border border-green-100">
                   <div className="text-2xl font-bold text-green-600">82%</div>
                   <div className="text-xs text-gray-600 mt-1">Hub Login Rate</div>
@@ -867,9 +872,186 @@ export default function AllenwoodDashboard() {
                   <div className="text-xs text-amber-600 mt-1">1 of 2</div>
                 </div>
                 <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-100">
-                  <div className="text-2xl font-bold text-purple-600">33%</div>
+                  <div className="text-2xl font-bold text-purple-600">17%</div>
                   <div className="text-xs text-gray-600 mt-1">Virtual Sessions</div>
-                  <div className="text-xs text-purple-600 mt-1">1 of 3 scheduled</div>
+                  <div className="text-xs text-purple-600 mt-1">1 of 6 complete</div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2b. Success Metrics — Comparison Benchmarks */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-[#1e2749] flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-[#38618C]" />
+                  Success Metrics
+                </h3>
+                <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-3 py-1 rounded-full">
+                  To Be Measured
+                </span>
+              </div>
+
+              <p className="text-sm text-gray-600 mb-6">
+                Research shows these indicators are the strongest predictors of sustainable classroom change.
+                We&apos;ll measure Allenwood&apos;s baseline at your next virtual session.
+              </p>
+
+              {/* Indicator Bars */}
+              <div className="space-y-6">
+
+                {/* Teacher Stress (lower is better) */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Teacher Stress</span>
+                    <span className="text-xs text-gray-400">Lower is better</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-red-400" style={{ width: '15%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-red-500 w-14 text-right">8-9/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '45%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Allenwood</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Strategy Implementation (higher is better) */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Strategy Implementation</span>
+                    <span className="text-xs text-gray-400">Higher is better</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-red-400" style={{ width: '10%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-red-500 w-14 text-right">10%</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '65%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">65%</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Allenwood</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Retention Intent (higher is better) */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Retention Intent</span>
+                    <span className="text-xs text-gray-400">Higher is better</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-red-400" style={{ width: '30%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-red-500 w-14 text-right">2-4/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '98%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">98%</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Allenwood</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Planning Time (lower is better) */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Weekly Planning Time</span>
+                    <span className="text-xs text-gray-400">Lower is better</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-red-400" style={{ width: '20%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-red-500 w-14 text-right">12+ hrs</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '55%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">6-8 hrs</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Allenwood</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Source Citation */}
+              <p className="text-xs text-gray-400 text-center mt-6 pt-4 border-t border-gray-100">
+                Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys
+              </p>
+            </div>
+
+            {/* Virtual Session Measurement CTA */}
+            <div className="bg-gradient-to-r from-[#38618C]/10 to-[#35A7FF]/10 rounded-xl p-5 border border-[#38618C]/20">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-[#38618C] rounded-lg flex items-center justify-center flex-shrink-0">
+                  <LineChart className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h4 className="font-semibold text-[#1e2749] mb-1">Measure Your Baseline</h4>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Schedule your next virtual session to capture stress levels, implementation rates, and other
+                    key metrics. This gives us a starting point to track your team&apos;s growth.
+                  </p>
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-[#38618C] hover:text-[#35A7FF]"
+                  >
+                    Schedule Virtual Session
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
                 </div>
               </div>
             </div>
