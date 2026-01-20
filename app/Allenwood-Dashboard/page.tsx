@@ -297,7 +297,7 @@ export default function AllenwoodDashboard() {
                 <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
                   <div>
                     <p className="font-medium text-gray-800">Spring Leadership Celebration</p>
-                    <p className="text-sm text-gray-500">Celebrate wins + discuss Year 2 options · Complimentary</p>
+                    <p className="text-sm text-gray-500">Celebrate wins + discuss Year 2 options · Schedule before April 2026</p>
                   </div>
                   <a
                     href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
