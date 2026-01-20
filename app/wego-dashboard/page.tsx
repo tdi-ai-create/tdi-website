@@ -36,7 +36,8 @@ import {
   ChevronDown,
   ChevronUp,
   PartyPopper,
-  Award
+  Award,
+  MessageCircle
 } from 'lucide-react';
 
 export default function WegoDashboard() {
@@ -1593,6 +1594,38 @@ export default function WegoDashboard() {
               </div>
             </div>
 
+            {/* Expansion Discovery Card */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
+              <div className="flex items-start gap-3">
+                <Lightbulb className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <div>
+                  <h4 className="font-semibold text-gray-800 mb-2">Recommendation</h4>
+                  <p className="text-sm text-gray-700 mb-3">
+                    You&apos;re seeing strong results with your Bilingual and Special Ed paras.
+                    One thing we often see: when part of a team gets support and the rest
+                    doesn&apos;t, it can create unintended gaps.
+                  </p>
+                  <p className="text-sm text-gray-700 font-medium mb-4">
+                    Question worth discussing:<br />
+                    Are there other paras at WEGO who aren&apos;t part of this work yet?
+                  </p>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Year 2 could be an opportunity to bring everyone onto the same page —
+                    same language, same strategies, same community.
+                  </p>
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-amber-700 hover:text-amber-800"
+                  >
+                    Discuss at Year 2 Planning
+                    <ArrowRight className="w-4 h-4" />
+                  </a>
+                </div>
+              </div>
+            </div>
+
             {/* By The Numbers */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
@@ -1641,6 +1674,13 @@ export default function WegoDashboard() {
                       </div>
                       <h4 className="font-semibold text-[#1e2749] text-sm">Leadership Planning Session</h4>
                       <p className="text-xs text-gray-600 mt-1">Set goals for Year 2, review Year 1 wins, identify teachers to onboard alongside para team</p>
+                      {/* Expansion Discovery Note */}
+                      <div className="mt-3 pt-3 border-t border-gray-300">
+                        <p className="text-xs text-gray-500 italic flex items-start gap-2">
+                          <MessageCircle className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" />
+                          We&apos;ll also discuss: Are there other paras beyond Bilingual and Special Ed who should be part of Year 2?
+                        </p>
+                      </div>
                     </div>
                   </div>
 
