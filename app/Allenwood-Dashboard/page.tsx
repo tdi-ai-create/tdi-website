@@ -855,23 +855,186 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Package Summary */}
-            <div className="grid grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                <div className="text-3xl font-bold text-[#38618C]">2</div>
-                <div className="text-xs text-gray-600 mt-1">On-Site Observation Days</div>
+            {/* Proposed 2026-27 Timeline */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-800 mb-6">Proposed 2026-27 Timeline</h3>
+              <p className="text-sm text-gray-500 mb-6">Phase 2 (ACCELERATE) — Expanding Your Team</p>
+
+              <div className="relative">
+                {/* Timeline line */}
+                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200" />
+
+                <div className="space-y-6">
+                  {/* 1. July/August - Leadership Planning */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
+                      <span className="text-white text-xs font-bold">1</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-gray-800">Leadership Planning Session</p>
+                          <p className="text-sm text-gray-500">Set Year 2 goals, identify teachers &amp; paras to expand to</p>
+                        </div>
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Jul/Aug 2026</span>
+                      </div>
+                      <p className="text-sm text-gray-400 italic mt-2">
+                        💭 We&apos;ll discuss: Which additional teachers and paras should join Year 2?
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* 2. September - Kickoff + Observation */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
+                      <span className="text-white text-xs font-bold">2</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-gray-800">On-Site Kickoff + Observation Day #1</p>
+                          <p className="text-sm text-gray-500">New team onboarding, Hub access, classroom observations</p>
+                        </div>
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Sep 2026</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 3. October - Virtual #1 */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
+                      <span className="text-white text-xs font-bold">3</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-gray-800">Virtual Session #1</p>
+                          <p className="text-sm text-gray-500">Building on observation insights</p>
+                        </div>
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Oct 2026</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 4. November - Virtual #2 */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
+                      <span className="text-white text-xs font-bold">4</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-gray-800">Virtual Session #2</p>
+                          <p className="text-sm text-gray-500">Classroom management strategies</p>
+                        </div>
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Nov 2026</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 5. December - Mid-Year Check-in */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
+                      <span className="text-white text-xs font-bold">5</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-gray-800">Mid-Year Leadership Check-in</p>
+                          <p className="text-sm text-gray-500">Review progress, celebrate wins, adjust strategy</p>
+                        </div>
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Dec 2026</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 6. January - Virtual #3 */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
+                      <span className="text-white text-xs font-bold">6</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-gray-800">Virtual Session #3</p>
+                          <p className="text-sm text-gray-500">Para-teacher collaboration strategies</p>
+                        </div>
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Jan 2027</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 7. February - Observation #2 */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
+                      <span className="text-white text-xs font-bold">7</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-gray-800">On-Site Observation Day #2</p>
+                          <p className="text-sm text-gray-500">Follow-up observations, personalized Love Notes</p>
+                        </div>
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Feb 2027</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 8. March - Virtual #4 */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-[#1e2749] flex items-center justify-center z-10">
+                      <span className="text-white text-xs font-bold">8</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-gray-800">Virtual Session #4</p>
+                          <p className="text-sm text-gray-500">Leadership development, sustaining momentum</p>
+                        </div>
+                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Mar 2027</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 9. April - Celebration */}
+                  <div className="flex items-start gap-4 relative">
+                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center z-10">
+                      <span className="text-white text-xs font-bold">9</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-medium text-gray-800">Year 2 Celebration + Year 3 Planning</p>
+                          <p className="text-sm text-gray-500">Celebrate growth, review data, discuss Year 3 options</p>
+                        </div>
+                        <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Apr 2027</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="text-center p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                <div className="text-3xl font-bold text-[#38618C]">4</div>
-                <div className="text-xs text-gray-600 mt-1">Virtual Sessions</div>
-              </div>
-              <div className="text-center p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                <div className="text-3xl font-bold text-[#38618C]">3</div>
-                <div className="text-xs text-gray-600 mt-1">Leadership Sessions</div>
-              </div>
-              <div className="text-center p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                <div className="text-lg font-bold text-[#38618C]">Continued</div>
-                <div className="text-xs text-gray-600 mt-1">Hub Access</div>
+
+              {/* Year 2 Package Summary */}
+              <div className="mt-8 pt-6 border-t border-gray-200">
+                <h4 className="font-medium text-gray-700 mb-4">Year 2 Package Includes</h4>
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <p className="text-2xl font-bold text-[#1e2749]">2</p>
+                    <p className="text-xs text-gray-500">On-Site Observation Days</p>
+                  </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <p className="text-2xl font-bold text-[#1e2749]">4</p>
+                    <p className="text-xs text-gray-500">Virtual Sessions</p>
+                  </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <p className="text-2xl font-bold text-[#1e2749]">3</p>
+                    <p className="text-xs text-gray-500">Leadership Sessions</p>
+                  </div>
+                  <div className="text-center p-3 bg-gray-50 rounded-lg">
+                    <p className="text-2xl font-bold text-[#1e2749]">Hub</p>
+                    <p className="text-xs text-gray-500">Continued Access</p>
+                  </div>
+                </div>
               </div>
             </div>
 
