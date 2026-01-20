@@ -89,6 +89,7 @@ export default function WegoDashboard() {
             {[
               { id: 'overview', label: 'Overview', icon: Eye },
               { id: 'journey', label: 'Journey', icon: TrendingUp },
+              { id: 'progress', label: 'Progress', icon: Users },
               { id: 'blueprint', label: 'Blueprint', icon: Star },
               { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
               { id: 'team', label: 'Team', icon: User },
@@ -443,6 +444,179 @@ export default function WegoDashboard() {
                     </li>
                   </ul>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* PROGRESS TAB */}
+        {activeTab === 'progress' && (
+          <div className="space-y-6">
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Observation Data & Progress</h2>
+              <p className="text-gray-600">Tracking implementation through observation cycles</p>
+            </div>
+
+            {/* Observation Timeline */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-6">
+                <Eye className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749]">Observation Timeline</span>
+              </div>
+
+              {/* Observation Day 1 */}
+              <div className="mb-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Check className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <span className="font-semibold text-[#1e2749]">Observation Day 1</span>
+                    <span className="text-gray-500 mx-2">—</span>
+                    <span className="text-gray-600">November 12, 2025</span>
+                    <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">COMPLETE</span>
+                  </div>
+                </div>
+
+                <div className="ml-11 bg-gray-50 rounded-xl p-5 border border-gray-200">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Eye className="w-4 h-4 text-[#38618C]" />
+                    <span className="font-medium text-[#1e2749]">8 of 19 PAs Observed</span>
+                  </div>
+
+                  <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Key Findings</div>
+
+                  <div className="grid grid-cols-3 gap-4 mb-5">
+                    <div className="bg-white rounded-lg p-4 text-center border border-gray-200">
+                      <div className="text-2xl font-bold text-[#38618C]">62.5%</div>
+                      <div className="text-xs text-gray-600 mt-1">High Hub<br/>Engagement</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 text-center border border-gray-200">
+                      <div className="text-2xl font-bold text-[#38618C]">100%</div>
+                      <div className="text-xs text-gray-600 mt-1">Positive Student<br/>Relationships</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 text-center border border-gray-200">
+                      <div className="text-2xl font-bold text-[#38618C]">8</div>
+                      <div className="text-xs text-gray-600 mt-1">Personalized<br/>Love Notes Sent</div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3">
+                    <div className="flex items-start gap-2 bg-amber-50 rounded-lg p-3 border border-amber-200">
+                      <Lightbulb className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-semibold text-amber-800">Insight:</span>
+                        <span className="text-amber-700 ml-1">PAs with high Hub engagement showed the strongest instructional moves in classrooms.</span>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2 bg-blue-50 rounded-lg p-3 border border-blue-200">
+                      <Star className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <span className="font-semibold text-blue-800">Standouts:</span>
+                        <span className="text-blue-700 ml-1">Claudia C., Isaac Spear, Bob Talbot</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Observation Day 2 */}
+              <div className="mb-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Check className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <span className="font-semibold text-[#1e2749]">Observation Day 2</span>
+                    <span className="text-gray-500 mx-2">—</span>
+                    <span className="text-gray-600">[Date]</span>
+                    <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">COMPLETE</span>
+                  </div>
+                </div>
+
+                <div className="ml-11 bg-gray-50 rounded-xl p-5 border border-gray-200">
+                  <p className="text-gray-500 italic">Data to be added when available</p>
+                </div>
+              </div>
+
+              {/* Observation Day 3 */}
+              <div>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-8 h-8 bg-[#35A7FF] rounded-full flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-5 h-5 text-white" />
+                  </div>
+                  <div>
+                    <span className="font-semibold text-[#1e2749]">Observation Day 3</span>
+                    <span className="text-gray-500 mx-2">—</span>
+                    <span className="text-gray-600">February 25, 2026</span>
+                    <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">SCHEDULED</span>
+                  </div>
+                </div>
+
+                <div className="ml-11 bg-blue-50 rounded-xl p-5 border border-blue-200">
+                  <p className="text-blue-700">Remaining 11 PAs + follow-up observations</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Implementation Insights */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <BarChart3 className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749]">Implementation Insights</span>
+              </div>
+
+              <div className="mb-4">
+                <h3 className="font-semibold text-[#1e2749] mb-2">What We&apos;re Seeing</h3>
+                <div className="h-1 w-full bg-gradient-to-r from-[#38618C] to-[#35A7FF] rounded-full mb-4"></div>
+              </div>
+
+              <p className="text-gray-700 mb-6">
+                <span className="font-semibold">Hub Engagement → Classroom Impact:</span> PAs who actively use the Learning Hub are demonstrating stronger instructional moves in classrooms.
+              </p>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-green-50 rounded-xl p-5 border border-green-200">
+                  <div className="font-semibold text-green-800 mb-3 flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5" />
+                    High Hub Engagement
+                  </div>
+                  <ul className="text-sm text-green-700 space-y-2">
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      Stronger instructional moves observed
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      Confident strategies
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      62.5% of observed PAs
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                  <div className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                    <Clock className="w-5 h-5" />
+                    Low Hub Engagement
+                  </div>
+                  <ul className="text-sm text-gray-600 space-y-2">
+                    <li className="flex items-start gap-2">
+                      <ArrowRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      Still building habits
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <ArrowRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                      Targeted support in progress
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="mt-6 bg-[#1e2749] rounded-xl p-4 text-center">
+                <p className="text-white font-semibold">This confirms: Implementation support works.</p>
               </div>
             </div>
           </div>
