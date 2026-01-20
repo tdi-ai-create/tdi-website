@@ -90,14 +90,14 @@ h4 {
   }
 }
 
-/* Links */
-a {
+/* Links - only apply to plain links, not button-styled links */
+a:not([class*="bg-"]):not([class*="btn"]) {
   color: var(--tdi-navy);
   text-decoration: none;
   transition: color 0.2s ease;
 }
 
-a:hover {
+a:not([class*="bg-"]):not([class*="btn"]):hover {
   color: var(--tdi-navy);
   text-decoration: underline;
 }
