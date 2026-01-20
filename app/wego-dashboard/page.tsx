@@ -790,98 +790,33 @@ export default function WegoDashboard() {
               </div>
 
               {/* Observation Day 1 */}
-              <div className="mb-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Check className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <span className="font-semibold text-[#1e2749]">Observation Day 1</span>
-                    <span className="text-gray-500 mx-2">—</span>
-                    <span className="text-gray-600">November 12, 2025</span>
-                    <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">COMPLETE</span>
-                  </div>
+              <div className="flex items-start gap-4 mb-4">
+                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-medium text-[#1e2749]">Observation Day 1 — November 12, 2025</p>
+                  <p className="text-sm text-gray-500">8 of 19 PAs observed</p>
                 </div>
-
-                <div className="ml-11 bg-gray-50 rounded-xl p-5 border border-gray-200">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Eye className="w-4 h-4 text-[#38618C]" />
-                    <span className="font-medium text-[#1e2749]">8 of 19 PAs Observed</span>
-                  </div>
-
-                  <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">Key Findings</div>
-
-                  <div className="grid grid-cols-3 gap-4 mb-5">
-                    <div className="bg-white rounded-lg p-4 text-center border border-gray-200">
-                      <div className="text-2xl font-bold text-[#38618C]">62.5%</div>
-                      <div className="text-xs text-gray-600 mt-1">High Hub<br/>Engagement</div>
-                    </div>
-                    <div className="bg-white rounded-lg p-4 text-center border border-gray-200">
-                      <div className="text-2xl font-bold text-[#38618C]">100%</div>
-                      <div className="text-xs text-gray-600 mt-1">Positive Student<br/>Relationships</div>
-                    </div>
-                    <div className="bg-white rounded-lg p-4 text-center border border-gray-200">
-                      <div className="text-2xl font-bold text-[#38618C]">8</div>
-                      <div className="text-xs text-gray-600 mt-1">Personalized<br/>Love Notes Sent</div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-start gap-2 bg-amber-50 rounded-lg p-3 border border-amber-200">
-                      <Lightbulb className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <span className="font-semibold text-amber-800">Insight:</span>
-                        <span className="text-amber-700 ml-1">PAs with high Hub engagement showed the strongest instructional moves in classrooms.</span>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-2 bg-blue-50 rounded-lg p-3 border border-blue-200">
-                      <Star className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <span className="font-semibold text-blue-800">Standouts:</span>
-                        <span className="text-blue-700 ml-1">Claudia C., Isaac Spear, Bob Talbot, Quinn Ricci</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">COMPLETE</span>
               </div>
 
               {/* Observation Day 2 */}
-              <div className="mb-6">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Check className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <span className="font-semibold text-[#1e2749]">Observation Day 2</span>
-                    <span className="text-gray-500 mx-2">—</span>
-                    <span className="text-gray-600">[Date]</span>
-                    <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">COMPLETE</span>
-                  </div>
+              <div className="flex items-start gap-4 mb-4">
+                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-medium text-[#1e2749]">Observation Day 2 — December 3, 2025</p>
+                  <p className="text-sm text-gray-500">11 of 19 PAs observed</p>
                 </div>
-
-                <div className="ml-11 bg-gray-50 rounded-xl p-5 border border-gray-200">
-                  <p className="text-gray-700">Remaining 11 PAs observed</p>
-                  <p className="text-gray-500 text-sm italic mt-1">Specific data to be added when available</p>
-                </div>
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">COMPLETE</span>
               </div>
 
               {/* Observation Day 3 */}
-              <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-8 h-8 bg-[#35A7FF] rounded-full flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <span className="font-semibold text-[#1e2749]">Observation Day 3</span>
-                    <span className="text-gray-500 mx-2">—</span>
-                    <span className="text-gray-600">February 25, 2026</span>
-                    <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">SCHEDULED</span>
-                  </div>
+              <div className="flex items-start gap-4">
+                <Calendar className="w-6 h-6 text-blue-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="font-medium text-[#1e2749]">Observation Day 3 — February 25, 2026</p>
+                  <p className="text-sm text-gray-500">Follow-up observations</p>
                 </div>
-
-                <div className="ml-11 bg-blue-50 rounded-xl p-5 border border-blue-200">
-                  <p className="text-blue-700">Follow-up observations + continued coaching</p>
-                </div>
+                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">SCHEDULED</span>
               </div>
             </div>
 
