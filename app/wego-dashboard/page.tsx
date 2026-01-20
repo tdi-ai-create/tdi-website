@@ -28,7 +28,9 @@ import {
   GraduationCap,
   Handshake,
   RefreshCw,
-  LineChart
+  LineChart,
+  MessageSquare,
+  BookOpen
 } from 'lucide-react';
 
 export default function WegoDashboard() {
@@ -680,6 +682,54 @@ export default function WegoDashboard() {
                 </div>
               </div>
 
+              {/* Love Note 3 - Lizz Nieto */}
+              <div className="mt-6 bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-5 border border-[#ffba06]/30">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#ffba06] rounded-full flex items-center justify-center">
+                      <Star className="w-5 h-5 text-[#1e2749]" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-[#1e2749]">Lizz Nieto</div>
+                      <div className="text-sm text-gray-600">Classroom Observation</div>
+                    </div>
+                  </div>
+                  <span className="text-xs bg-white px-3 py-1 rounded-full text-gray-600 font-medium">Dec 3, 2025</span>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="bg-white rounded-lg p-4">
+                    <div className="text-sm font-semibold text-[#38618C] uppercase tracking-wide mb-2">What We Celebrated</div>
+                    <ul className="text-sm text-gray-700 space-y-2">
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span><strong>Natural relationship-building</strong> — with a talkative student, you didn&apos;t shut down the conversation, you leaned into it and bonded over TJ Maxx!</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span><strong>Intentional use of downtime</strong> — the puzzle wasn&apos;t just filler, it was an opportunity to keep students engaged and have real conversation</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span><strong>Warm communication style</strong> — clearly makes students feel comfortable around you</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span><strong>All Star Status!</strong> — knew how to engage students, use all forms of communication, and gave great reminders about charging tools at home</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Lightbulb className="w-4 h-4 text-amber-600" />
+                      <span className="text-sm font-semibold text-amber-700">Growth Opportunity</span>
+                    </div>
+                    <p className="text-sm text-gray-700">Hasn&apos;t explored Learning Hub yet — invited to share feedback on what resources would actually be useful for her day-to-day.</p>
+                  </div>
+                </div>
+              </div>
+
               {/* Standouts Summary */}
               <div className="mt-6 bg-[#1e2749] rounded-xl p-5">
                 <div className="flex items-center gap-2 mb-3">
@@ -688,7 +738,7 @@ export default function WegoDashboard() {
                 </div>
                 <p className="text-white/80 text-sm mb-3">PAs demonstrating exceptional practice across observation cycles:</p>
                 <div className="flex flex-wrap gap-2">
-                  {['Claudia C.', 'Isaac Spear', 'Bob Talbot', 'Quinn Ricci'].map((name, idx) => (
+                  {['Claudia C.', 'Isaac Spear', 'Bob Talbot', 'Quinn Ricci', 'Lizz Nieto'].map((name, idx) => (
                     <span key={idx} className="bg-[#ffba06] text-[#1e2749] px-3 py-1 rounded-full text-sm font-semibold">
                       {name}
                     </span>
@@ -785,6 +835,149 @@ export default function WegoDashboard() {
                   <p className="text-sm text-gray-600">
                     Practical strategies for inclusive support
                   </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Subgroup System in Action */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-6">
+                <Users className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749]">Subgroup System in Action</span>
+              </div>
+
+              {/* Weekly Cadence */}
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-[#38618C]/5 rounded-xl p-5 border border-[#38618C]/20">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Calendar className="w-5 h-5 text-[#38618C]" />
+                    <span className="font-semibold text-[#1e2749]">Every Monday (7:45-9:00 AM)</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3">Four subgroups meet weekly:</p>
+                  <div className="flex flex-wrap gap-2 mb-3">
+                    {['EL', 'Self Contained', 'DLP', 'Transition (Step)'].map((group, idx) => (
+                      <span key={idx} className="bg-white px-3 py-1 rounded-full text-xs font-medium text-[#38618C] border border-[#38618C]/20">
+                        {group}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600" />
+                      <span>3 key discussion points</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-green-600" />
+                      <span>2-3 solutions discussed</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-[#ffba06]/10 rounded-xl p-5 border border-[#ffba06]/30">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Users className="w-5 h-5 text-[#ffba06]" />
+                    <span className="font-semibold text-[#1e2749]">Monthly (Full Group with Rae)</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3">All PAs meet together for themed discussion</p>
+                  <div className="bg-white rounded-lg p-3">
+                    <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">November Theme Options</div>
+                    <ul className="text-sm text-gray-700 space-y-1">
+                      <li className="flex items-center gap-2">
+                        <ArrowRight className="w-3 h-3 text-[#38618C]" />
+                        Student needs and modifications
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <ArrowRight className="w-3 h-3 text-[#38618C]" />
+                        Communication with students
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Sample Subgroup Update */}
+              <div className="mb-6">
+                <div className="flex items-center gap-2 mb-3">
+                  <MessageSquare className="w-4 h-4 text-[#38618C]" />
+                  <span className="text-sm font-semibold text-[#1e2749]">Sample Weekly Update — December 15, 2025</span>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                  <div className="text-xs text-gray-500 mb-3">From: Denise, Eileen, Becky, Maricarmen</div>
+
+                  <div className="mb-4">
+                    <div className="text-sm font-semibold text-[#1e2749] mb-2">Key Discussion Points:</div>
+                    <ul className="text-sm text-gray-700 space-y-2">
+                      <li className="flex items-start gap-2">
+                        <span className="bg-[#38618C] text-white text-xs font-bold px-2 py-0.5 rounded mt-0.5">1</span>
+                        <span><strong>Early warning signs matter</strong> — recognizing dysregulation early helps prevent escalation in unstructured settings</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="bg-[#38618C] text-white text-xs font-bold px-2 py-0.5 rounded mt-0.5">2</span>
+                        <span><strong>Structure reduces stress</strong> — clear expectations, visuals, and adult presence help students navigate transitions</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <span className="bg-[#38618C] text-white text-xs font-bold px-2 py-0.5 rounded mt-0.5">3</span>
+                        <span><strong>Adult responses shape student regulation</strong> — calm, validating language supports self-regulation and builds trust</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div>
+                    <div className="text-sm font-semibold text-[#1e2749] mb-2">Solutions Discussed:</div>
+                    <ul className="text-sm text-gray-700 space-y-2">
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span>Plan proactively for transitions — use visual supports, routines, and peer supports before triggers arise</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span>Use consistent de-escalation language — training staff to respond calmly helps students reset and re-engage</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Hub Course Feedback */}
+              <div>
+                <div className="flex items-center gap-2 mb-3">
+                  <BookOpen className="w-4 h-4 text-[#35A7FF]" />
+                  <span className="text-sm font-semibold text-[#1e2749]">Hub Course Feedback — &quot;Building Strong Teacher-Para Partnerships&quot;</span>
+                </div>
+                <div className="bg-[#35A7FF]/5 rounded-xl p-5 border border-[#35A7FF]/20">
+                  <div className="text-xs text-gray-500 mb-3">From: Curt&apos;s Subgroup</div>
+
+                  <p className="text-gray-700 italic mb-4">&quot;We all agreed that this course was useful.&quot;</p>
+
+                  <div className="space-y-3">
+                    <div className="bg-white rounded-lg p-3">
+                      <span className="font-semibold text-[#1e2749]">Curt:</span>
+                      <span className="text-gray-700 ml-2">&quot;Helps clarify the PA role in the classroom.&quot;</span>
+                    </div>
+                    <div className="bg-white rounded-lg p-3">
+                      <span className="font-semibold text-[#1e2749]">Claudia:</span>
+                      <span className="text-gray-700 ml-2">&quot;Reinforces what we&apos;re practicing. I like how feedback is explained — it&apos;s been effective for me.&quot;</span>
+                    </div>
+                    <div className="bg-white rounded-lg p-3">
+                      <span className="font-semibold text-[#1e2749]">Cristina:</span>
+                      <span className="text-gray-700 ml-2">&quot;Important to have communication, boundaries, and respect for a good partnership with your teacher.&quot;</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 bg-[#1e2749] rounded-lg p-4">
+                    <div className="text-white font-semibold mb-2">Bob&apos;s 5 Takeaways:</div>
+                    <ol className="text-white/90 text-sm space-y-1">
+                      <li>1. Start the week with a 5-min check-in</li>
+                      <li>2. Stay professional and solution-focused, not blaming</li>
+                      <li>3. Clear role expectations for everyone</li>
+                      <li>4. Clear and constant communication</li>
+                      <li>5. Trust and shared goals to best serve students</li>
+                    </ol>
+                  </div>
+
+                  <div className="mt-4 text-center text-sm text-[#38618C] font-medium">
+                    This demonstrates the feedback loop: Observation → Hub Resources → Subgroup Discussion → Implementation
+                  </div>
                 </div>
               </div>
             </div>
