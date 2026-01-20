@@ -56,6 +56,7 @@ import {
 
 export default function ASD4Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
+  const [showAllItems, setShowAllItems] = useState(false);
   const tabContentRef = useRef<HTMLDivElement>(null);
 
   const handleTabClick = (tabId: string) => {
@@ -113,10 +114,24 @@ export default function ASD4Dashboard() {
             <h1 className="text-2xl md:text-3xl font-bold">Addison School District 4</h1>
             <p className="text-white/80 text-sm">Addison, Illinois | Paraprofessional Partnership</p>
           </div>
-          <div className="flex items-center gap-3 text-sm">
-            <div className="bg-white/10 px-3 py-1.5 rounded-lg">
-              <span className="text-white/60">Status:</span>
-              <span className="ml-2 font-semibold text-[#1e2749] bg-white px-2 py-0.5 rounded">Phase 1 - IGNITE</span>
+          <div className="text-sm">
+            <div className="bg-white/10 px-3 py-2 rounded-lg">
+              <div className="flex items-center gap-2">
+                <span className="text-white/60">Status:</span>
+                <span
+                  className="font-semibold text-[#1e2749] bg-white px-2 py-0.5 rounded cursor-help"
+                  title="Building your foundation with a pilot group"
+                >
+                  Phase 1 - IGNITE
+                </span>
+              </div>
+              <p className="text-white/70 text-xs mt-1">Building your foundation with a pilot group</p>
+              <button
+                onClick={() => handleTabClick('blueprint')}
+                className="text-[#35A7FF] hover:text-[#5bb8ff] text-xs mt-1 hover:underline"
+              >
+                See full Blueprint →
+              </button>
             </div>
           </div>
         </div>
@@ -176,6 +191,7 @@ export default function ASD4Dashboard() {
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">78%</div>
                 <div className="text-xs text-[#38618C] font-medium">91/117 logged in</div>
+                <div className="text-xs text-gray-400 mt-1">Goal: 100% before Observation Day 1</div>
               </div>
 
               <div
@@ -204,6 +220,28 @@ export default function ASD4Dashboard() {
               </div>
             </div>
 
+            {/* Credibility Badge */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+              <p className="text-sm font-semibold text-blue-900">TDI Partners: 65% implementation</p>
+              <p className="text-xs text-blue-700">vs 10% industry average</p>
+            </div>
+
+            {/* Hub Login Tip */}
+            <div className="bg-[#ffba06]/10 border border-[#ffba06]/30 rounded-lg p-3 flex items-start gap-2">
+              <Lightbulb className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-gray-700">
+                <strong className="text-[#1e2749]">26 paras haven&apos;t logged in yet</strong> — try a walkthrough at your next meeting
+              </p>
+            </div>
+
+            {/* Wins Banner */}
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2">
+              <CheckCircle className="text-green-600 w-5 h-5 flex-shrink-0" />
+              <span className="text-green-800 text-sm font-medium">
+                Kickoff complete · 91 paras logged in
+              </span>
+            </div>
+
             {/* Section 2: Needs Attention */}
             <div id="needs-attention-section" className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <div className="flex items-center gap-2 mb-5">
@@ -212,228 +250,246 @@ export default function ASD4Dashboard() {
                 <span className="bg-[#E07A5F]/10 text-[#E07A5F] text-xs font-medium px-2 py-0.5 rounded-full">9 items</span>
               </div>
 
-              <div className="space-y-3">
-                {/* Item 1: Partner Data Form */}
-                <a
-                  href="/asd4-dashboard/partner-data"
-                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <ClipboardList className="w-5 h-5 text-[#ffba06]" />
+              {/* Priority Now Section */}
+              <div className="mb-4">
+                <p className="text-xs font-semibold text-[#E07A5F] uppercase tracking-wide mb-3">Priority Now (3)</p>
+                <div className="space-y-3">
+                  {/* Item 1: Partner Data Form */}
+                  <a
+                    href="/asd4-dashboard/partner-data"
+                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#E07A5F] bg-gray-50 hover:bg-gray-100 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <ClipboardList className="w-5 h-5 text-[#E07A5F]" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-[#1e2749]">Complete Partner Data Form</div>
+                        <p className="text-sm text-gray-500">Help us customize your dashboard</p>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Complete Partner Data Form</div>
-                      <p className="text-sm text-gray-500">Help us customize your dashboard</p>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-400">SCHEDULE BY FEB 2026</span>
+                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                        Complete Your Form
+                        <ArrowRight className="w-4 h-4" />
+                      </span>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-400">DUE FEB 2026</span>
-                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                      Click to Complete
-                      <ArrowRight className="w-4 h-4" />
-                    </span>
-                  </div>
-                </a>
+                  </a>
 
-                {/* Item 2: Pilot Group */}
-                <a
-                  href="/asd4-dashboard/pilot-selection"
-                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Users className="w-5 h-5 text-[#ffba06]" />
+                  {/* Item 2: Pilot Group */}
+                  <a
+                    href="/asd4-dashboard/pilot-selection"
+                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#E07A5F] bg-gray-50 hover:bg-gray-100 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Users className="w-5 h-5 text-[#E07A5F]" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-[#1e2749]">Identify Pilot Group</div>
+                        <p className="text-sm text-gray-500">Select 10-20 paras for focused coaching</p>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Identify Pilot Group</div>
-                      <p className="text-sm text-gray-500">Select 10-20 paras for focused coaching</p>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-400">SCHEDULE BY FEB 2026</span>
+                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                        Choose Your Pilot Paras
+                        <ArrowRight className="w-4 h-4" />
+                      </span>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-400">DUE FEB 2026</span>
-                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                      Click to Select
-                      <ArrowRight className="w-4 h-4" />
-                    </span>
-                  </div>
-                </a>
+                  </a>
 
-                {/* Item 3: Observation Day 1 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Eye className="w-5 h-5 text-[#ffba06]" />
+                  {/* Item 3: Observation Day 1 */}
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#E07A5F] bg-gray-50 hover:bg-gray-100 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Eye className="w-5 h-5 text-[#E07A5F]" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-[#1e2749]">Schedule Observation Day 1</div>
+                        <p className="text-sm text-gray-500">On-site observation with pilot group</p>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Schedule Observation Day 1</div>
-                      <p className="text-sm text-gray-500">On-site observation with pilot group</p>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-400">SCHEDULE BY FEB 2026</span>
+                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                        <Calendar className="w-4 h-4" />
+                        Book Observation Day
+                      </span>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-400">DUE FEB 2026</span>
-                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                      <Calendar className="w-4 h-4" />
-                      Click to Schedule
-                    </span>
-                  </div>
-                </a>
-
-                {/* Item 4: Virtual Session 1 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Monitor className="w-5 h-5 text-[#ffba06]" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Schedule Virtual Session 1</div>
-                      <p className="text-sm text-gray-500">Kickoff session with baseline survey</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-400">DUE FEB 2026</span>
-                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                      <Calendar className="w-4 h-4" />
-                      Click to Schedule
-                    </span>
-                  </div>
-                </a>
-
-                {/* Item 5: Observation Day 2 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Eye className="w-5 h-5 text-[#ffba06]" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Schedule Observation Day 2</div>
-                      <p className="text-sm text-gray-500">Follow-up on-site observation</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-400">DUE FEB 2026</span>
-                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                      <Calendar className="w-4 h-4" />
-                      Click to Schedule
-                    </span>
-                  </div>
-                </a>
-
-                {/* Item 6: Virtual Session 2 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Monitor className="w-5 h-5 text-[#ffba06]" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Schedule Virtual Session 2</div>
-                      <p className="text-sm text-gray-500">Strategy implementation check-in</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-400">DUE MAR 2026</span>
-                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                      <Calendar className="w-4 h-4" />
-                      Click to Schedule
-                    </span>
-                  </div>
-                </a>
-
-                {/* Item 7: Virtual Session 3 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Monitor className="w-5 h-5 text-[#ffba06]" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Schedule Virtual Session 3</div>
-                      <p className="text-sm text-gray-500">Growth group deep-dive</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-400">DUE APR 2026</span>
-                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                      <Calendar className="w-4 h-4" />
-                      Click to Schedule
-                    </span>
-                  </div>
-                </a>
-
-                {/* Item 8: Virtual Session 4 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Monitor className="w-5 h-5 text-[#ffba06]" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Schedule Virtual Session 4</div>
-                      <p className="text-sm text-gray-500">Final strategy session</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-400">DUE MAY 2026</span>
-                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                      <Calendar className="w-4 h-4" />
-                      Click to Schedule
-                    </span>
-                  </div>
-                </a>
-
-                {/* Item 9: Executive Session 2 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Briefcase className="w-5 h-5 text-[#ffba06]" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Schedule Executive Session 2</div>
-                      <p className="text-sm text-gray-500">Results review with leadership</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-400">DUE APR 2026</span>
-                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                      <Calendar className="w-4 h-4" />
-                      Click to Schedule
-                    </span>
-                  </div>
-                </a>
+                  </a>
+                </div>
               </div>
+
+              {/* Accordion Toggle */}
+              <button
+                onClick={() => setShowAllItems(!showAllItems)}
+                className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-[#38618C] hover:text-[#2d4a6d] transition-colors border-t border-gray-100"
+              >
+                <ChevronDown className={`w-4 h-4 transition-transform ${showAllItems ? 'rotate-180' : ''}`} />
+                {showAllItems ? 'Hide Additional Items' : 'View All 9 Items'}
+              </button>
+
+              {/* Accordion Content */}
+              {showAllItems && (
+                <div className="space-y-3 pt-3 border-t border-gray-100">
+                  {/* Item 4: Virtual Session 1 */}
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Monitor className="w-5 h-5 text-[#ffba06]" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-[#1e2749]">Virtual Session 1 · 45 min</div>
+                        <p className="text-sm text-gray-500">Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-400">SCHEDULE BY FEB 2026</span>
+                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                        <Calendar className="w-4 h-4" />
+                        Book Your Session
+                      </span>
+                    </div>
+                  </a>
+
+                  {/* Item 5: Observation Day 2 */}
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Eye className="w-5 h-5 text-[#ffba06]" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-[#1e2749]">Schedule Observation Day 2</div>
+                        <p className="text-sm text-gray-500">Follow-up on-site observation</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-400">SCHEDULE BY MAR 2026</span>
+                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                        <Calendar className="w-4 h-4" />
+                        Book Observation Day
+                      </span>
+                    </div>
+                  </a>
+
+                  {/* Item 6: Virtual Session 2 */}
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Monitor className="w-5 h-5 text-[#ffba06]" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-[#1e2749]">Virtual Session 2 · 45 min</div>
+                        <p className="text-sm text-gray-500">Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-400">SCHEDULE BY MAR 2026</span>
+                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                        <Calendar className="w-4 h-4" />
+                        Book Your Session
+                      </span>
+                    </div>
+                  </a>
+
+                  {/* Item 7: Virtual Session 3 */}
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Monitor className="w-5 h-5 text-[#ffba06]" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-[#1e2749]">Virtual Session 3 · 45 min</div>
+                        <p className="text-sm text-gray-500">Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-400">SCHEDULE BY APR 2026</span>
+                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                        <Calendar className="w-4 h-4" />
+                        Book Your Session
+                      </span>
+                    </div>
+                  </a>
+
+                  {/* Item 8: Virtual Session 4 */}
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Monitor className="w-5 h-5 text-[#ffba06]" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-[#1e2749]">Virtual Session 4 · 45 min</div>
+                        <p className="text-sm text-gray-500">Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-400">SCHEDULE BY APR 2026</span>
+                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                        <Calendar className="w-4 h-4" />
+                        Book Your Session
+                      </span>
+                    </div>
+                  </a>
+
+                  {/* Item 9: Executive Session 2 */}
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Briefcase className="w-5 h-5 text-[#ffba06]" />
+                      </div>
+                      <div>
+                        <div className="font-medium text-[#1e2749]">Schedule Executive Session 2</div>
+                        <p className="text-sm text-gray-500">Results review with leadership</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-400">SCHEDULE BY APR 2026</span>
+                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
+                        <Calendar className="w-4 h-4" />
+                        Book Your Session
+                      </span>
+                    </div>
+                  </a>
+                </div>
+              )}
 
               {/* Virtual Sessions Flexibility Note */}
               <div className="mt-4 bg-[#35A7FF]/10 border border-[#35A7FF]/30 rounded-lg p-4 flex items-start gap-3">
@@ -441,7 +497,7 @@ export default function ASD4Dashboard() {
                 <div>
                   <p className="font-semibold text-[#1e2749] text-sm mb-1">Virtual Sessions are Flexible</p>
                   <p className="text-sm text-gray-600">
-                    Due dates indicate when sessions should be scheduled by. You have flexibility in how you use them — combine sessions back-to-back, spread them out, whatever works best for your team.
+                    Schedule by dates indicate when sessions should be scheduled by. You have flexibility in how you use them — combine sessions back-to-back, spread them out, whatever works best for your team.
                   </p>
                 </div>
               </div>
@@ -449,22 +505,33 @@ export default function ASD4Dashboard() {
 
             {/* Section 3: Recommendation Card */}
             <div className="bg-white border-l-4 border-[#38618C] rounded-r-xl p-5 shadow-sm">
-              <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex flex-col gap-4">
                 <div className="flex-1">
                   <h3 className="text-[#1e2749] font-bold mb-2 flex items-center gap-2">
                     <Lightbulb className="w-5 h-5 text-[#ffba06]" />
                     Recommendation: Dedicated Hub Time
                   </h3>
-                  <p className="text-gray-600 text-sm mb-3">
-                    Set aside 15 minutes during your next para meeting for a guided Hub walkthrough. Schools that do this see <strong>40% higher engagement</strong> in the first month.
+                  <p className="text-gray-600 text-sm mb-2">
+                    Districts that build in 15-30 minutes of protected time during para meetings see 3x higher implementation rates.
                   </p>
-                  <a
-                    href="#"
-                    className="inline-flex items-center gap-2 text-[#38618C] hover:text-[#2d4a6d] font-medium text-sm transition-colors"
-                  >
-                    View Hub Walkthrough Guide
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
+                  <p className="text-gray-600 text-sm mb-3">
+                    <strong className="text-[#38618C]">TDI partners see 65% strategy implementation</strong> vs 10% industry average.
+                  </p>
+                  <div className="flex flex-wrap gap-4">
+                    <a
+                      href="#"
+                      className="inline-flex items-center gap-2 text-[#38618C] hover:text-[#2d4a6d] font-medium text-sm transition-colors"
+                    >
+                      View Hub Walkthrough Guide
+                      <ArrowRight className="w-4 h-4" />
+                    </a>
+                    <a
+                      href="mailto:rae@teachersdeserveit.com"
+                      className="inline-flex items-center gap-2 text-[#38618C] hover:text-[#2d4a6d] font-medium text-sm transition-colors"
+                    >
+                      Questions? Reach out to Rae →
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -472,21 +539,30 @@ export default function ASD4Dashboard() {
             {/* 2026-27 Teaser */}
             <div
               className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-[1.01]"
-              onClick={() => setActiveTab('year2')}
+              onClick={() => handleTabClick('year2')}
             >
               <div className="flex justify-between items-center">
                 <div>
                   <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Looking Ahead</span>
                   <h3 className="text-lg font-bold mt-2">2026-27 Partnership Plan</h3>
                   <p className="text-sm opacity-80 mt-1">
-                    Continue building on your pilot group success with full-team implementation.
+                    Continue building on your pilot group success.
+                  </p>
+                  <p className="text-sm mt-1">
+                    <span className="text-[#ffba06] font-medium">TDI partners see 65% implementation</span>
+                    <span className="opacity-70"> vs 10% industry average.</span>
                   </p>
                 </div>
                 <div className="text-right flex flex-col items-center">
                   <ArrowRight className="w-8 h-8" />
-                  <p className="text-xs opacity-70">See the plan</p>
+                  <p className="text-xs opacity-70">See Your 2026-27 Options</p>
                 </div>
               </div>
+            </div>
+
+            {/* Partnership Period Footer */}
+            <div className="text-center text-xs text-gray-400 mt-8 pt-4 border-t border-gray-100">
+              Partnership Period: January 2026 – May 2026 · Hub Access: Through January 2027
             </div>
           </div>
         )}
@@ -1340,10 +1416,6 @@ export default function ASD4Dashboard() {
                     <a href="mailto:jdiaz@asd4.org" className="text-[#35A7FF] hover:underline">
                       jdiaz@asd4.org
                     </a>
-                  </div>
-                  <div className="pt-2 border-t border-gray-100 mt-2">
-                    <p className="text-xs text-gray-400 uppercase tracking-wide mb-1">Secondary Contact</p>
-                    <p className="font-medium text-gray-800">Katie Purse</p>
                   </div>
                 </div>
               </div>
