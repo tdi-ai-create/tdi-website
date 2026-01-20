@@ -220,26 +220,28 @@ export default function ASD4Dashboard() {
               </div>
             </div>
 
-            {/* Credibility Badge */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
-              <p className="text-sm font-semibold text-blue-900">TDI Partners: 65% implementation</p>
-              <p className="text-xs text-blue-700">vs 10% industry average</p>
-            </div>
+            {/* Feature Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Card 1: Wins */}
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
+                <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
+                <p className="text-sm font-semibold text-green-800">Kickoff Complete</p>
+                <p className="text-xs text-green-600">91 paras logged in</p>
+              </div>
 
-            {/* Hub Login Tip */}
-            <div className="bg-[#ffba06]/10 border border-[#ffba06]/30 rounded-lg p-3 flex items-start gap-2">
-              <Lightbulb className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-gray-700">
-                <strong className="text-[#1e2749]">26 paras haven&apos;t logged in yet</strong> — try a walkthrough at your next meeting
-              </p>
-            </div>
+              {/* Card 2: Action Needed */}
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
+                <Lightbulb className="w-8 h-8 text-amber-600 mx-auto mb-2" />
+                <p className="text-sm font-semibold text-amber-800">26 Paras Remaining</p>
+                <p className="text-xs text-amber-600">Try a walkthrough at your next meeting</p>
+              </div>
 
-            {/* Wins Banner */}
-            <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2">
-              <CheckCircle className="text-green-600 w-5 h-5 flex-shrink-0" />
-              <span className="text-green-800 text-sm font-medium">
-                Kickoff complete · 91 paras logged in
-              </span>
+              {/* Card 3: TDI Impact */}
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
+                <TrendingUp className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+                <p className="text-sm font-semibold text-blue-800">65% Implementation</p>
+                <p className="text-xs text-blue-600">vs 10% industry average</p>
+              </div>
             </div>
 
             {/* Section 2: Needs Attention */}
