@@ -304,7 +304,7 @@ export default function ASD4Dashboard() {
 
                   {/* Item 3: Observation Day 1 */}
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#E07A5F] bg-gray-50 hover:bg-gray-100 transition-colors group"
@@ -368,7 +368,7 @@ export default function ASD4Dashboard() {
 
                   {/* Item 5: Observation Day 2 */}
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
