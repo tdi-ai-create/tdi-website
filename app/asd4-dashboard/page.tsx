@@ -777,14 +777,14 @@ export default function ASD4Dashboard() {
                     <div className="font-medium text-[#1e2749]">Job Satisfaction</div>
                   </div>
                   <p className="text-sm text-gray-500 mb-3">&quot;How satisfied are you in your current role?&quot;</p>
-                  <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-6">
                     <div>
                       <span className="text-gray-400">Industry Avg:</span>
-                      <span className="font-medium text-gray-600 ml-1">5.1/10</span>
+                      <span className="font-semibold text-gray-600 ml-1 text-base">5.1/10</span>
                     </div>
                     <div>
                       <span className="text-gray-400">TDI Partners:</span>
-                      <span className="font-medium text-green-600 ml-1">7.2/10 ↑</span>
+                      <span className="font-semibold text-green-600 ml-1 text-base">7.2/10 ↑</span>
                     </div>
                   </div>
                 </div>
@@ -798,14 +798,14 @@ export default function ASD4Dashboard() {
                     <div className="font-medium text-[#1e2749]">Feeling Valued</div>
                   </div>
                   <p className="text-sm text-gray-500 mb-3">&quot;How valued do you feel by teachers and admin?&quot;</p>
-                  <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-6">
                     <div>
                       <span className="text-gray-400">Industry Avg:</span>
-                      <span className="font-medium text-gray-600 ml-1">3.8/10</span>
+                      <span className="font-semibold text-gray-600 ml-1 text-base">3.8/10</span>
                     </div>
                     <div>
                       <span className="text-gray-400">TDI Partners:</span>
-                      <span className="font-medium text-green-600 ml-1">6.5/10 ↑</span>
+                      <span className="font-semibold text-green-600 ml-1 text-base">6.5/10 ↑</span>
                     </div>
                   </div>
                 </div>
@@ -819,14 +819,14 @@ export default function ASD4Dashboard() {
                     <div className="font-medium text-[#1e2749]">Stress Level</div>
                   </div>
                   <p className="text-sm text-gray-500 mb-3">&quot;Rate your current stress level at work&quot;</p>
-                  <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-6">
                     <div>
                       <span className="text-gray-400">Industry Avg:</span>
-                      <span className="font-medium text-gray-600 ml-1">7.9/10</span>
+                      <span className="font-semibold text-gray-600 ml-1 text-base">7.9/10</span>
                     </div>
                     <div>
                       <span className="text-gray-400">TDI Partners:</span>
-                      <span className="font-medium text-green-600 ml-1">5.5/10 ↓</span>
+                      <span className="font-semibold text-green-600 ml-1 text-base">5.5/10 ↓</span>
                     </div>
                   </div>
                 </div>
@@ -840,14 +840,14 @@ export default function ASD4Dashboard() {
                     <div className="font-medium text-[#1e2749]">Retention Intent</div>
                   </div>
                   <p className="text-sm text-gray-500 mb-3">&quot;How likely are you to stay in this role next year?&quot;</p>
-                  <div className="flex items-center gap-4 text-sm">
+                  <div className="flex items-center gap-6">
                     <div>
                       <span className="text-gray-400">Industry Avg:</span>
-                      <span className="font-medium text-gray-600 ml-1">4.1/10</span>
+                      <span className="font-semibold text-gray-600 ml-1 text-base">4.1/10</span>
                     </div>
                     <div>
                       <span className="text-gray-400">TDI Partners:</span>
-                      <span className="font-medium text-green-600 ml-1">7.8/10 ↑</span>
+                      <span className="font-semibold text-green-600 ml-1 text-base">7.8/10 ↑</span>
                     </div>
                   </div>
                 </div>
