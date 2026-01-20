@@ -529,7 +529,7 @@ export default function WegoDashboard() {
                       <Star className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                       <div>
                         <span className="font-semibold text-blue-800">Standouts:</span>
-                        <span className="text-blue-700 ml-1">Claudia C., Isaac Spear, Bob Talbot</span>
+                        <span className="text-blue-700 ml-1">Claudia C., Isaac Spear, Bob Talbot, Quinn Ricci</span>
                       </div>
                     </div>
                   </div>
@@ -572,6 +572,127 @@ export default function WegoDashboard() {
 
                 <div className="ml-11 bg-blue-50 rounded-xl p-5 border border-blue-200">
                   <p className="text-blue-700">Follow-up observations + continued coaching</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Sample Love Notes */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-6">
+                <Star className="w-5 h-5 text-[#ffba06]" />
+                <span className="font-semibold text-[#1e2749]">Sample Love Notes</span>
+              </div>
+              <p className="text-gray-600 mb-6">Personalized feedback delivered to PAs after observations — celebrating wins and connecting growth to Hub resources.</p>
+
+              {/* Love Note 1 - Isaac Spear */}
+              <div className="mb-6 bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-5 border border-[#ffba06]/30">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#ffba06] rounded-full flex items-center justify-center">
+                      <Star className="w-5 h-5 text-[#1e2749]" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-[#1e2749]">Isaac Spear</div>
+                      <div className="text-sm text-gray-600">Step Center Observation</div>
+                    </div>
+                  </div>
+                  <span className="text-xs bg-white px-3 py-1 rounded-full text-gray-600 font-medium">Nov 12, 2025</span>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="bg-white rounded-lg p-4">
+                    <div className="text-sm font-semibold text-[#38618C] uppercase tracking-wide mb-2">What We Celebrated</div>
+                    <ul className="text-sm text-gray-700 space-y-2">
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span><strong>Calm, structured environment</strong> — students clearly knew expectations and felt safe</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span><strong>AAC tools integration</strong> — using devices to support communication for non-verbal learners</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span><strong>Goal review scaffolding</strong> — helping students track their own progress toward IEP goals</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span><strong>Multi-modal support</strong> — using visuals, verbal cues, and physical prompts appropriately</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span><strong>Leadership presence</strong> — confident, proactive, and clearly invested in student success</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-[#35A7FF]/10 rounded-lg p-4 border border-[#35A7FF]/30">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Lightbulb className="w-4 h-4 text-[#35A7FF]" />
+                      <span className="text-sm font-semibold text-[#35A7FF]">Hub Resource Recommended</span>
+                    </div>
+                    <p className="text-sm text-gray-700">&quot;Sentence Starter Guide&quot; — to expand student responses during goal review conversations</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Love Note 2 - Quinn Ricci */}
+              <div className="bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-5 border border-[#ffba06]/30">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-[#ffba06] rounded-full flex items-center justify-center">
+                      <Star className="w-5 h-5 text-[#1e2749]" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-[#1e2749]">Quinn Ricci</div>
+                      <div className="text-sm text-gray-600">Classroom Observation</div>
+                    </div>
+                  </div>
+                  <span className="text-xs bg-white px-3 py-1 rounded-full text-gray-600 font-medium">Dec 3, 2025</span>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="bg-white rounded-lg p-4">
+                    <div className="text-sm font-semibold text-[#38618C] uppercase tracking-wide mb-2">What We Celebrated</div>
+                    <ul className="text-sm text-gray-700 space-y-2">
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span><strong>Leadership with substitute</strong> — stepped up seamlessly when regular teacher was out</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span><strong>Device communication</strong> — effectively supported students using AAC devices throughout class</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                        <span><strong>Warm student relationships</strong> — students clearly trust and respond positively to Quinn</span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Users className="w-4 h-4 text-purple-600" />
+                      <span className="text-sm font-semibold text-purple-700">Student Feedback</span>
+                    </div>
+                    <p className="text-sm text-gray-700 italic">&quot;Quinn helps me use my device to say what I&apos;m thinking. She never rushes me.&quot;</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Standouts Summary */}
+              <div className="mt-6 bg-[#1e2749] rounded-xl p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Star className="w-5 h-5 text-[#ffba06]" />
+                  <span className="font-semibold text-white">Observation Standouts</span>
+                </div>
+                <p className="text-white/80 text-sm mb-3">PAs demonstrating exceptional practice across observation cycles:</p>
+                <div className="flex flex-wrap gap-2">
+                  {['Claudia C.', 'Isaac Spear', 'Bob Talbot', 'Quinn Ricci'].map((name, idx) => (
+                    <span key={idx} className="bg-[#ffba06] text-[#1e2749] px-3 py-1 rounded-full text-sm font-semibold">
+                      {name}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
