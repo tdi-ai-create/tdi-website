@@ -1082,7 +1082,7 @@ export default function HowWePartnerPage() {
           <div className="max-w-5xl mx-auto">
             <div className="grid md:grid-cols-2 gap-8 items-center">
               {/* Image */}
-              <a href="/Example-Dashboard" className="block group order-2 md:order-1">
+              <a href="/Example-Dashboard" target="_blank" rel="noopener noreferrer" className="block group order-2 md:order-1">
                 <div className="relative rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow">
                   <img
                     src="/images/dashboard-survey-results.png"
@@ -1103,6 +1103,8 @@ export default function HowWePartnerPage() {
                 </p>
                 <a
                   href="/Example-Dashboard"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 font-semibold transition-all hover:gap-3"
                   style={{ color: '#35A7FF' }}
                 >

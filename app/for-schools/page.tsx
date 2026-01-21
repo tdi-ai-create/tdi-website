@@ -659,7 +659,7 @@ export default function ForSchoolsPage() {
             <div className="grid md:grid-cols-3 gap-6 mb-10">
               {/* Column 1: At-a-Glance Progress */}
               <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-                <a href="/Example-Dashboard" className="block group">
+                <a href="/Example-Dashboard" target="_blank" rel="noopener noreferrer" className="block group">
                   <div className="relative overflow-hidden">
                     <img
                       src="/images/dashboard-overview.png"
@@ -679,7 +679,7 @@ export default function ForSchoolsPage() {
 
               {/* Column 2: Teacher Wellbeing Data */}
               <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-                <a href="/Example-Dashboard" className="block group">
+                <a href="/Example-Dashboard" target="_blank" rel="noopener noreferrer" className="block group">
                   <div className="relative overflow-hidden">
                     <img
                       src="/images/dashboard-survey-results.png"
@@ -699,7 +699,7 @@ export default function ForSchoolsPage() {
 
               {/* Column 3: Outcomes That Matter */}
               <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-                <a href="/Example-Dashboard" className="block group">
+                <a href="/Example-Dashboard" target="_blank" rel="noopener noreferrer" className="block group">
                   <div className="relative overflow-hidden">
                     <img
                       src="/images/dashboard-leading-indicators.png"
@@ -722,6 +722,8 @@ export default function ForSchoolsPage() {
             <div className="text-center">
               <a
                 href="/Example-Dashboard"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-all hover:opacity-90"
                 style={{ backgroundColor: '#35A7FF' }}
               >

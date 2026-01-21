@@ -428,15 +428,13 @@ export default function ExampleDashboard() {
               <span className="text-white font-semibold hidden sm:inline">Teachers Deserve It</span>
               <span className="text-white/60 hidden md:inline">| Partner Dashboard</span>
             </div>
-            <a 
-              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
+            <span
+              className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 opacity-50 cursor-not-allowed"
+              title="This is an example dashboard"
             >
               <Calendar className="w-4 h-4" />
               <span className="hidden sm:inline">Schedule Session</span>
-            </a>
+            </span>
           </div>
         </div>
       </nav>
@@ -571,16 +569,14 @@ export default function ExampleDashboard() {
                 </div>
 
                 {/* Virtual Sessions */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-center p-3 bg-[#E07A5F]/10 rounded-lg hover:bg-[#E07A5F]/20 transition-all cursor-pointer block"
+                <div
+                  className="text-center p-3 bg-[#E07A5F]/10 rounded-lg opacity-50 cursor-not-allowed"
+                  title="This is an example dashboard"
                 >
                   <div className="text-2xl font-bold text-[#E07A5F]">0/2</div>
                   <div className="text-xs text-gray-600 mt-1">Virtual Sessions</div>
-                  <div className="text-xs text-[#E07A5F] mt-1 font-medium hover:underline">Schedule Now →</div>
-                </a>
+                  <div className="text-xs text-[#E07A5F] mt-1 font-medium">Schedule Now →</div>
+                </div>
 
               </div>
 
@@ -632,15 +628,13 @@ export default function ExampleDashboard() {
 
               <div className="space-y-3">
                 {/* Item 1: Spring Leadership Recap */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`rounded-lg p-4 flex items-center justify-between hover:shadow-md border transition-all cursor-pointer block ${
+                <div
+                  className={`rounded-lg p-4 flex items-center justify-between border opacity-60 cursor-not-allowed ${
                     isOverdue(dueDates.leadershipRecap.month, dueDates.leadershipRecap.year)
                       ? 'border-red-500 bg-red-50'
-                      : 'bg-white border-transparent hover:border-[#35A7FF]'
+                      : 'bg-white border-gray-200'
                   }`}
+                  title="This is an example dashboard"
                 >
                   <div className="flex items-center gap-3">
                     <Calendar className={`w-5 h-5 ${
@@ -673,18 +667,16 @@ export default function ExampleDashboard() {
                     <Calendar className="w-4 h-4" />
                     Schedule
                   </span>
-                </a>
+                </div>
 
                 {/* Item 3: Virtual session for Instructional Design */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`rounded-lg p-4 flex items-center justify-between hover:shadow-md border transition-all cursor-pointer block ${
+                <div
+                  className={`rounded-lg p-4 flex items-center justify-between border opacity-60 cursor-not-allowed ${
                     isOverdue(dueDates.instructionalDesign.month, dueDates.instructionalDesign.year)
                       ? 'border-red-500 bg-red-50'
-                      : 'bg-white border-transparent hover:border-[#35A7FF]'
+                      : 'bg-white border-gray-200'
                   }`}
+                  title="This is an example dashboard"
                 >
                   <div className="flex items-center gap-3">
                     <Calendar className={`w-5 h-5 ${
@@ -717,18 +709,16 @@ export default function ExampleDashboard() {
                     <Calendar className="w-4 h-4" />
                     Schedule
                   </span>
-                </a>
+                </div>
 
                 {/* Item 4: Virtual session for Class Management */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`rounded-lg p-4 flex items-center justify-between hover:shadow-md border transition-all cursor-pointer block ${
+                <div
+                  className={`rounded-lg p-4 flex items-center justify-between border opacity-60 cursor-not-allowed ${
                     isOverdue(dueDates.classManagement.month, dueDates.classManagement.year)
                       ? 'border-red-500 bg-red-50'
-                      : 'bg-white border-transparent hover:border-[#35A7FF]'
+                      : 'bg-white border-gray-200'
                   }`}
+                  title="This is an example dashboard"
                 >
                   <div className="flex items-center gap-3">
                     <Calendar className={`w-5 h-5 ${
@@ -761,7 +751,7 @@ export default function ExampleDashboard() {
                     <Calendar className="w-4 h-4" />
                     Schedule
                   </span>
-                </a>
+                </div>
               </div>
             </div>
 
@@ -1773,15 +1763,13 @@ export default function ExampleDashboard() {
                     </p>
                   </div>
 
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full bg-[#35A7FF] hover:bg-[#2589db] text-white text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                  <div
+                    className="block w-full bg-[#35A7FF] text-white text-center py-3 rounded-xl font-semibold flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
+                    title="This is an example dashboard"
                   >
                     <Calendar className="w-4 h-4" />
                     Schedule This Session
-                  </a>
+                  </div>
                 </div>
 
                 {/* Group 2: Class Management */}
@@ -1825,15 +1813,13 @@ export default function ExampleDashboard() {
                     </p>
                   </div>
 
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full bg-[#35A7FF] hover:bg-[#2589db] text-white text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
+                  <div
+                    className="block w-full bg-[#35A7FF] text-white text-center py-3 rounded-xl font-semibold flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
+                    title="This is an example dashboard"
                   >
                     <Calendar className="w-4 h-4" />
                     Schedule This Session
-                  </a>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2578,14 +2564,12 @@ export default function ExampleDashboard() {
                 <p className="font-semibold text-lg">Ready to continue the journey?</p>
                 <p className="text-sm opacity-80">Let&apos;s lock in your 2026-27 partnership.</p>
               </div>
-              <a
-                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-white text-[#1e2749] px-8 py-3 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors whitespace-nowrap"
+              <span
+                className="bg-white text-[#1e2749] px-8 py-3 rounded-lg font-semibold text-sm whitespace-nowrap opacity-50 cursor-not-allowed"
+                title="This is an example dashboard"
               >
                 Schedule Renewal Chat →
-              </a>
+              </span>
             </div>
 
           </div>
@@ -2622,32 +2606,30 @@ export default function ExampleDashboard() {
                   </p>
 
                   <div className="space-y-2 mb-4">
-                    <a 
-                      href="mailto:rae@teachersdeserveit.com"
-                      className="flex items-center gap-2 text-gray-600 hover:text-[#38618C] transition-colors justify-center md:justify-start"
+                    <span
+                      className="flex items-center gap-2 text-gray-600 justify-center md:justify-start opacity-60 cursor-not-allowed"
+                      title="This is an example dashboard"
                     >
                       <Mail className="w-4 h-4 text-[#38618C]" />
                       rae@teachersdeserveit.com
-                    </a>
-                    <a 
-                      href="tel:8477215503"
-                      className="flex items-center gap-2 text-gray-600 hover:text-[#38618C] transition-colors justify-center md:justify-start"
+                    </span>
+                    <span
+                      className="flex items-center gap-2 text-gray-600 justify-center md:justify-start opacity-60 cursor-not-allowed"
+                      title="This is an example dashboard"
                     >
                       <Phone className="w-4 h-4 text-[#38618C]" />
                       847-721-5503
                       <span className="text-xs bg-[#F5F5F5] px-2 py-0.5 rounded-full text-gray-500">Text is great!</span>
-                    </a>
+                    </span>
                   </div>
 
-                  <a 
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-6 py-3 rounded-xl font-semibold transition-all"
+                  <span
+                    className="inline-flex items-center gap-2 bg-[#35A7FF] text-white px-6 py-3 rounded-xl font-semibold opacity-50 cursor-not-allowed"
+                    title="This is an example dashboard"
                   >
                     <Calendar className="w-5 h-5" />
                     Schedule Time with Rae
-                  </a>
+                  </span>
                 </div>
               </div>
             </div>
@@ -2699,15 +2681,13 @@ export default function ExampleDashboard() {
             <div className="font-bold">Teachers Deserve It</div>
             <p className="text-white/60 text-sm">Partner Dashboard for Motown Middle School</p>
           </div>
-          <a 
-            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm"
+          <span
+            className="inline-flex items-center gap-2 bg-[#35A7FF] text-white px-4 py-2 rounded-lg font-semibold text-sm opacity-50 cursor-not-allowed"
+            title="This is an example dashboard"
           >
             <Calendar className="w-4 h-4" />
             Schedule a Call
-          </a>
+          </span>
         </div>
       </footer>
     </div>

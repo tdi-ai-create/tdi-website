@@ -494,7 +494,7 @@ export default function Home() {
               Every partner school gets a personalized dashboard to track progress, celebrate wins, and stay connected.
             </p>
 
-            <Link href="/Example-Dashboard" className="block group">
+            <Link href="/Example-Dashboard" target="_blank" rel="noopener noreferrer" className="block group">
               <div className="relative rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow mx-auto" style={{ maxWidth: '900px' }}>
                 <img
                   src="/images/dashboard-overview.png"
@@ -508,6 +508,8 @@ export default function Home() {
             <div className="mt-8">
               <Link
                 href="/Example-Dashboard"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-all hover:opacity-90"
                 style={{ backgroundColor: '#35A7FF' }}
               >
