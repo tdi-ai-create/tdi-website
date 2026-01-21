@@ -47,7 +47,10 @@ import {
   ExternalLink,
   Zap,
   Shield,
-  HandHelping
+  HandHelping,
+  Link,
+  UserPlus,
+  LayoutDashboard
 } from 'lucide-react';
 
 // Tooltip component
@@ -208,10 +211,10 @@ export default function D41Dashboard() {
         <div className="max-w-5xl mx-auto px-4 py-3">
           <div className="flex justify-center gap-2">
             {[
-              { id: 'overview', label: 'Overview', icon: Eye },
+              { id: 'overview', label: 'Overview', icon: LayoutDashboard },
               { id: 'progress', label: 'Progress', icon: TrendingUp },
               { id: 'resources', label: 'Resources', icon: BookOpen },
-              { id: 'next-steps', label: '2026-2027', icon: Sparkles, badge: 'IGNITE' },
+              { id: 'next-steps', label: '2026-27', icon: Calendar },
               { id: 'contact', label: 'Contact', icon: User },
             ].map((tab) => (
               <button
@@ -225,11 +228,6 @@ export default function D41Dashboard() {
               >
                 <tab.icon className="w-4 h-4" />
                 <span>{tab.label}</span>
-                {tab.badge && (
-                  <span className="text-xs bg-[#35A7FF] text-white px-2 py-0.5 rounded-full">
-                    {tab.badge}
-                  </span>
-                )}
               </button>
             ))}
           </div>
@@ -242,107 +240,126 @@ export default function D41Dashboard() {
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            {/* Quick Stats */}
+            {/* Quick Stats - Reframed */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
                 <div className="flex items-center gap-2 mb-1">
                   <Users className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-xs text-gray-500 uppercase">Memberships</span>
+                  <span className="text-xs text-gray-500 uppercase">Team Access</span>
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">10</div>
-                <div className="text-xs text-[#38618C] font-medium">All-Access</div>
+                <div className="text-xs text-[#38618C] font-medium">All-Access Memberships</div>
               </div>
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
+              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#35A7FF]">
                 <div className="flex items-center gap-2 mb-1">
-                  <Laptop className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-xs text-gray-500 uppercase">Hub Accounts</span>
+                  <UserCheck className="w-4 h-4 text-[#35A7FF]" />
+                  <span className="text-xs text-gray-500 uppercase">Accounts Active</span>
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">5<span className="text-lg font-normal text-gray-400">/10</span></div>
-                <div className="text-xs text-[#E07A5F] font-medium">5 seats available</div>
-              </div>
-
-              <div
-                onClick={() => setActiveTab('progress')}
-                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#E07A5F] cursor-pointer hover:shadow-md transition-all"
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
-                  <span className="text-xs text-gray-500 uppercase">Hub Logins</span>
-                </div>
-                <div className="text-2xl font-bold text-[#E07A5F]">{loginRate}%</div>
-                <div className="text-xs text-[#E07A5F] font-medium">Needs attention →</div>
+                <div className="text-xs text-[#35A7FF] font-medium">5 more available to assign</div>
               </div>
 
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-green-500">
                 <div className="flex items-center gap-2 mb-1">
-                  <BookOpen className="w-4 h-4 text-green-500" />
+                  <Activity className="w-4 h-4 text-green-500" />
+                  <span className="text-xs text-gray-500 uppercase">First Login</span>
+                </div>
+                <div className="text-2xl font-bold text-green-600">✓</div>
+                <div className="text-xs text-green-600 font-medium">Oct 30, 2025</div>
+              </div>
+
+              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
+                <div className="flex items-center gap-2 mb-1">
+                  <BookOpen className="w-4 h-4 text-[#38618C]" />
                   <span className="text-xs text-gray-500 uppercase">Courses Available</span>
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">32</div>
-                <div className="text-xs text-green-600 font-medium">Full library access</div>
+                <div className="text-xs text-[#38618C] font-medium">Full library access</div>
               </div>
             </div>
 
-            {/* The Real Story - Hub Engagement */}
+            {/* Get Your Team Started */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-4">
+                <Zap className="w-5 h-5 text-[#35A7FF]" />
+                <span className="font-semibold text-[#1e2749]">Get Your Team Started</span>
+              </div>
+
+              <p className="text-sm text-gray-600 mb-4">
+                One team member has logged in — here&apos;s how to help the rest of your paraprofessionals get started with the Learning Hub.
+              </p>
+
+              <div className="grid sm:grid-cols-3 gap-3">
+                {/* Quick Action 1 */}
+                <a
+                  href="https://tdi.thinkific.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[#35A7FF] text-white rounded-lg p-4 hover:bg-[#2589db] transition-all text-center"
+                >
+                  <Laptop className="w-6 h-6 mx-auto mb-2" />
+                  <span className="text-sm font-semibold block">Access Hub</span>
+                  <span className="text-xs opacity-80">Share with team</span>
+                </a>
+
+                {/* Quick Action 2 */}
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText('https://tdi.thinkific.com');
+                  }}
+                  className="bg-gray-100 text-[#1e2749] rounded-lg p-4 hover:bg-gray-200 transition-all text-center"
+                >
+                  <Link className="w-6 h-6 mx-auto mb-2" />
+                  <span className="text-sm font-semibold block">Copy Link</span>
+                  <span className="text-xs text-gray-500">For team emails</span>
+                </button>
+
+                {/* Quick Action 3 */}
+                <button
+                  onClick={() => setActiveTab('resources')}
+                  className="bg-gray-100 text-[#1e2749] rounded-lg p-4 hover:bg-gray-200 transition-all text-center"
+                >
+                  <FileText className="w-6 h-6 mx-auto mb-2" />
+                  <span className="text-sm font-semibold block">First Course</span>
+                  <span className="text-xs text-gray-500">Recommended start</span>
+                </button>
+              </div>
+
+              <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-lg">
+                <p className="text-sm text-amber-800">
+                  <strong>Tip:</strong> Teams that introduce the Hub at a staff meeting see 5x higher engagement in the first month.
+                </p>
+              </div>
+            </div>
+
+            {/* Understanding Engagement */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-4">
                 <BarChart3 className="w-5 h-5 text-[#38618C]" />
-                <span className="font-semibold text-[#1e2749]">What the Data Tells Us</span>
+                <span className="font-semibold text-[#1e2749]">Understanding PD Engagement</span>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Current State */}
-                <div className="bg-[#E07A5F]/10 border border-[#E07A5F]/20 rounded-lg p-4">
-                  <p className="text-xs text-[#E07A5F] font-medium uppercase mb-2">Current: Hub-Only Access</p>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Hub Logins</span>
-                      <span className="font-bold text-[#E07A5F]">20%</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Courses Started</span>
-                      <span className="font-bold text-[#E07A5F]">Unknown</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Strategies Implemented</span>
-                      <span className="font-bold text-[#E07A5F]">~10%*</span>
-                    </div>
+              <p className="text-sm text-gray-600 mb-4">
+                Research shows that on-demand professional development — without coaching support — typically sees about 10% of strategies implemented in classrooms. This is true across the industry, not unique to any district.
+              </p>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <p className="text-xs text-gray-500 font-medium uppercase mb-3">Hub Access</p>
+                  <p className="text-sm text-gray-600">Self-directed learning with full course library. Great for building awareness and exploring strategies.</p>
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <span className="text-xs text-gray-500">Typical implementation: </span>
+                    <span className="text-sm font-semibold text-gray-700">~10%</span>
                   </div>
-                  <p className="text-xs text-gray-400 mt-3">*Industry average for PD without coaching</p>
                 </div>
 
-                {/* With IGNITE */}
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <p className="text-xs text-green-600 font-medium uppercase mb-2">With IGNITE: Personalized Support</p>
-                  <div className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Hub Logins</span>
-                      <span className="font-bold text-green-600">100%</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Personalized Feedback</span>
-                      <span className="font-bold text-green-600">Every Para</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">Strategies Implemented</span>
-                      <span className="font-bold text-green-600">65%</span>
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-400 mt-3">Based on TDI partner school data</p>
-                </div>
-              </div>
-
-              <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                <div className="flex items-start gap-3">
-                  <Lightbulb className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-amber-800">This is expected — and fixable.</p>
-                    <p className="text-sm text-amber-700 mt-1">
-                      Research shows on-demand PD without coaching support has only a <strong>10% implementation rate</strong>.
-                      Your paras need what Dee originally wanted: personalized observations, specific feedback, and accountability.
-                      That&apos;s exactly what IGNITE delivers.
-                    </p>
+                <div className="bg-[#38618C]/5 border border-[#38618C]/20 rounded-lg p-4">
+                  <p className="text-xs text-[#38618C] font-medium uppercase mb-3">Hub + Coaching</p>
+                  <p className="text-sm text-gray-600">Personalized observations, feedback, and accountability. Strategies are tailored to each educator&apos;s classroom.</p>
+                  <div className="mt-3 pt-3 border-t border-[#38618C]/20">
+                    <span className="text-xs text-[#38618C]">TDI partner implementation: </span>
+                    <span className="text-sm font-semibold text-[#38618C]">65%</span>
                   </div>
                 </div>
               </div>
@@ -350,218 +367,101 @@ export default function D41Dashboard() {
               <div className="mt-4 flex justify-end">
                 <button
                   onClick={() => setActiveTab('next-steps')}
-                  className="inline-flex items-center gap-2 bg-[#38618C] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#2d4f73] transition-all"
+                  className="text-sm text-[#35A7FF] hover:underline flex items-center gap-1"
                 >
-                  See IGNITE Plan →
+                  Learn about coaching options <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
-            {/* Partnership Summary */}
+            {/* Partnership Goals */}
             <div className="bg-white rounded-xl p-5 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <FileText className="w-5 h-5 text-[#38618C]" />
-                <span className="font-semibold text-[#1e2749]">Partnership Summary</span>
+              <div className="flex items-center gap-2 mb-2">
+                <Target className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749]">D41 Partnership Goals</span>
               </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <p className="text-sm text-gray-500 mb-3">Current Agreement</p>
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Service:</span>
-                      <span className="font-medium text-[#1e2749]">10 TDI All-Access Memberships</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Effective Date:</span>
-                      <span className="font-medium text-[#1e2749]">October 7, 2025</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Term:</span>
-                      <span className="font-medium text-[#1e2749]">Fall 2025 Semester</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Investment:</span>
-                      <span className="font-medium text-[#1e2749]">$600</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-[#38618C]/5 rounded-lg p-4">
-                  <p className="text-sm font-medium text-[#38618C] mb-2">What&apos;s Included:</p>
-                  <ul className="text-sm text-gray-600 space-y-1">
-                    <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      Unlimited access to all TDI courses
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      Monthly new course releases
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      Downloadable templates & tools
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      Private TDI Member Community
-                    </li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Dee's Goals */}
-            <div className="bg-white rounded-xl p-5 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <Target className="w-5 h-5 text-[#1e2749]" />
-                <span className="font-semibold text-[#1e2749]">Partnership Goals</span>
-              </div>
-              <p className="text-sm text-gray-500 mb-4">Based on conversations with Dee Neukirch</p>
+              <p className="text-sm text-gray-500 mb-4">Identified during our planning conversations</p>
 
               <div className="grid md:grid-cols-3 gap-4">
-                <div className="bg-[#35A7FF]/10 rounded-lg p-4 border border-[#35A7FF]/20">
-                  <div className="flex items-center gap-2 mb-2">
-                    <GraduationCap className="w-5 h-5 text-[#35A7FF]" />
-                    <span className="font-medium text-[#1e2749] text-sm">Student Language Growth</span>
-                  </div>
-                  <p className="text-xs text-gray-600">Support literacy curriculum rollout with effective small-group instruction</p>
+                <div className="bg-[#1e2749] text-white rounded-lg p-4">
+                  <GraduationCap className="w-5 h-5 mb-2 text-[#35A7FF]" />
+                  <h4 className="font-semibold mb-1">Student Language Growth</h4>
+                  <p className="text-sm opacity-80">Support literacy curriculum rollout with effective small-group instruction</p>
                 </div>
 
-                <div className="bg-[#38618C]/10 rounded-lg p-4 border border-[#38618C]/20">
-                  <div className="flex items-center gap-2 mb-2">
-                    <ClipboardList className="w-5 h-5 text-[#38618C]" />
-                    <span className="font-medium text-[#1e2749] text-sm">Instructional Consistency</span>
-                  </div>
-                  <p className="text-xs text-gray-600">Build shared practices across all paraprofessionals districtwide</p>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <ClipboardList className="w-5 h-5 mb-2 text-[#38618C]" />
+                  <h4 className="font-semibold text-[#1e2749] mb-1">Instructional Consistency</h4>
+                  <p className="text-sm text-gray-600">Build shared practices across all paraprofessionals districtwide</p>
                 </div>
 
-                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <HandHelping className="w-5 h-5 text-green-600" />
-                    <span className="font-medium text-[#1e2749] text-sm">Para–Teacher Collaboration</span>
-                  </div>
-                  <p className="text-xs text-gray-600">Strengthen communication and partnership between teachers and paras</p>
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                  <HandHelping className="w-5 h-5 mb-2 text-[#35A7FF]" />
+                  <h4 className="font-semibold text-[#1e2749] mb-1">Para–Teacher Collaboration</h4>
+                  <p className="text-sm text-gray-600">Strengthen communication and partnership between teachers and paras</p>
                 </div>
               </div>
             </div>
 
-            {/* Recommended Action */}
-            <div className="bg-white border-l-4 border-[#38618C] rounded-r-xl p-5 shadow-sm">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <h3 className="text-[#1e2749] font-bold mb-2 flex items-center gap-2">
-                    <Lightbulb className="w-5 h-5 text-[#38618C]" />
-                    Recommended Next Step
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-3">
-                    Introduce the Learning Hub at your next paraprofessional meeting. Teams that do a guided walkthrough see 5x higher engagement in the first month.
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="bg-[#F5F5F5] text-[#1e2749] px-3 py-1 rounded-full text-xs font-medium">Show &quot;How to Get the Most Out of TDI Hub&quot; course</span>
-                    <span className="bg-[#F5F5F5] text-[#1e2749] px-3 py-1 rounded-full text-xs font-medium">Share login credentials</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Spring Expansion Teaser */}
-            <div
-              className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-[1.01]"
-              onClick={() => setActiveTab('next-steps')}
-            >
-              <div className="flex justify-between items-center">
+            {/* Looking Ahead */}
+            <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                  <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Looking Ahead</span>
-                  <h3 className="text-lg font-bold mt-2">Ready to Expand to In-Person Support?</h3>
-                  <p className="text-sm opacity-80 mt-1">
-                    Once budget and team feedback stabilize, we can add on-site observation days — no sub coverage required.
+                  <h3 className="font-bold text-lg mb-1">When You&apos;re Ready to Go Deeper</h3>
+                  <p className="text-sm text-white/80 max-w-lg">
+                    TDI&apos;s IGNITE phase adds on-site observations, personalized feedback, and measurable outcomes —
+                    with no sub coverage required. Many districts explore this after building Hub familiarity.
                   </p>
                 </div>
-                <div className="text-right flex flex-col items-center">
-                  <span className="text-4xl">→</span>
-                  <p className="text-xs opacity-70">See options</p>
-                </div>
+                <button
+                  onClick={() => setActiveTab('next-steps')}
+                  className="bg-white/10 hover:bg-white/20 text-white border border-white/30 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all whitespace-nowrap"
+                >
+                  Explore Options
+                </button>
               </div>
             </div>
           </div>
         )}
 
-        {/* YOUR TEAM TAB */}
+        {/* PROGRESS TAB */}
         {activeTab === 'progress' && (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Paraprofessional Team</h2>
-              <p className="text-gray-600">Hub access status for your registered paraprofessionals</p>
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Team Progress</h2>
+              <p className="text-gray-600">Hub engagement for your paraprofessional team</p>
             </div>
 
-            {/* Engagement Summary */}
-            <div className="bg-white rounded-xl p-5 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-[#38618C]" />
-                  <span className="font-semibold text-[#1e2749]">Engagement Summary</span>
+            {/* Celebration Card */}
+            <div className="bg-green-50 border border-green-200 rounded-xl p-5">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                  <Check className="w-6 h-6 text-green-600" />
                 </div>
-                <span className="text-xs text-gray-400">Updated Jan 21, 2026</span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4 mb-4">
-                <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <div className="text-2xl font-bold text-[#1e2749]">{teamMembers.length}</div>
-                  <div className="text-xs text-gray-600 mt-1">Registered</div>
-                </div>
-                <div className={`text-center p-3 rounded-lg ${loggedInCount > 0 ? 'bg-green-50' : 'bg-red-50'}`}>
-                  <div className={`text-2xl font-bold ${loggedInCount > 0 ? 'text-green-600' : 'text-red-500'}`}>{loggedInCount}</div>
-                  <div className="text-xs text-gray-600 mt-1">Have Logged In</div>
-                </div>
-                <div className="text-center p-3 bg-[#35A7FF]/10 rounded-lg">
-                  <div className="text-2xl font-bold text-[#35A7FF]">5</div>
-                  <div className="text-xs text-gray-600 mt-1">Seats Available</div>
-                </div>
-              </div>
-
-              {/* Progress bar */}
-              <div className="mb-2">
-                <div className="flex justify-between text-xs text-gray-500 mb-1">
-                  <span>Login Progress</span>
-                  <span>{loginRate}% ({loggedInCount}/{teamMembers.length})</span>
-                </div>
-                <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all ${loginRate >= 80 ? 'bg-green-500' : loginRate >= 50 ? 'bg-[#35A7FF]' : 'bg-[#E07A5F]'}`}
-                    style={{ width: `${loginRate}%` }}
-                  />
-                </div>
-              </div>
-              <p className="text-xs text-gray-500">Goal: 100% of team logged in by end of semester</p>
-            </div>
-
-            {/* The Real Issue */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
-              <div className="flex items-start gap-4">
-                <Lightbulb className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" />
                 <div>
-                  <h3 className="font-bold text-amber-800 mb-1">Low Engagement Isn&apos;t a Motivation Problem</h3>
-                  <p className="text-amber-700 text-sm">
-                    Your paras are busy supporting students all day. Without protected time, guided direction, and personalized relevance,
-                    on-demand resources sit unused. <strong>This is exactly why IGNITE works:</strong> we observe each para, identify their specific
-                    growth areas, and point them to the exact resources that matter — plus hold them accountable to try new strategies.
+                  <h3 className="font-bold text-green-800">First Login Achieved!</h3>
+                  <p className="text-green-700 text-sm">
+                    Fatima Arjumand logged into the Learning Hub on October 30, 2025.
+                    Your team is getting started.
                   </p>
-                  <button
-                    onClick={() => setActiveTab('next-steps')}
-                    className="mt-3 inline-flex items-center gap-2 text-amber-800 font-medium text-sm hover:underline"
-                  >
-                    See how IGNITE solves this →
-                  </button>
                 </div>
               </div>
             </div>
 
             {/* Team Member List */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
-                <h3 className="font-semibold text-[#1e2749]">Team Members</h3>
-                <p className="text-sm text-gray-500">All accounts created October 29, 2025</p>
+              <div className="p-4 border-b border-gray-100 flex justify-between items-center">
+                <div>
+                  <h3 className="font-semibold text-[#1e2749]">Registered Team Members</h3>
+                  <p className="text-sm text-gray-500">Accounts created October 29, 2025</p>
+                </div>
+                <a
+                  href="mailto:rae@teachersdeserveit.com?subject=D41%20-%20Add%20Team%20Members"
+                  className="text-sm text-[#35A7FF] hover:underline flex items-center gap-1"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  Add members
+                </a>
               </div>
 
               <div className="divide-y divide-gray-100">
@@ -572,7 +472,7 @@ export default function D41Dashboard() {
                         {member.hasLoggedIn ? (
                           <UserCheck className="w-5 h-5 text-green-600" />
                         ) : (
-                          <UserX className="w-5 h-5 text-gray-400" />
+                          <User className="w-5 h-5 text-gray-400" />
                         )}
                       </div>
                       <div>
@@ -583,11 +483,11 @@ export default function D41Dashboard() {
                     <div className="text-right">
                       {member.hasLoggedIn ? (
                         <div>
-                          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Logged In</span>
+                          <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">Active</span>
                           <p className="text-xs text-gray-400 mt-1">Last: {member.lastLogin}</p>
                         </div>
                       ) : (
-                        <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full">Not Yet Logged In</span>
+                        <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full">Invite sent</span>
                       )}
                     </div>
                   </div>
@@ -595,67 +495,69 @@ export default function D41Dashboard() {
               </div>
             </div>
 
-            {/* Add More Members */}
-            <div className="bg-[#35A7FF]/10 border border-[#35A7FF]/30 rounded-xl p-5">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[#35A7FF] rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Users className="w-5 h-5 text-white" />
+            {/* Getting Everyone Started */}
+            <div className="bg-white rounded-xl p-5 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Lightbulb className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749]">Tips for Getting Everyone Started</span>
+              </div>
+
+              <p className="text-sm text-gray-600 mb-4">
+                Paraprofessionals are busy supporting students all day. Here&apos;s what helps teams get the most from the Hub:
+              </p>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-8 h-8 bg-[#38618C] rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">1</div>
+                  <div>
+                    <p className="font-medium text-[#1e2749] text-sm">Introduce at a Team Meeting</p>
+                    <p className="text-xs text-gray-500">Walk through the Hub together. Show the &quot;Getting Started&quot; course.</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-bold text-[#1e2749] mb-1">5 Memberships Still Available</h3>
-                  <p className="text-gray-600 text-sm mb-3">
-                    You have 10 memberships purchased but only 5 paraprofessionals registered.
-                    Send the remaining 5 to additional team members to maximize your investment.
-                  </p>
-                  <a
-                    href="mailto:rae@teachersdeserveit.com?subject=D41%20-%20Add%20More%20Team%20Members"
-                    className="inline-flex items-center gap-2 bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#2589db] transition-all"
-                  >
-                    <Mail className="w-4 h-4" />
-                    Request to Add Members
-                  </a>
+
+                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-8 h-8 bg-[#38618C] rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">2</div>
+                  <div>
+                    <p className="font-medium text-[#1e2749] text-sm">Share One Resource Weekly</p>
+                    <p className="text-xs text-gray-500">Point to a specific course that connects to current challenges.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-8 h-8 bg-[#38618C] rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">3</div>
+                  <div>
+                    <p className="font-medium text-[#1e2749] text-sm">Build in Protected Time</p>
+                    <p className="text-xs text-gray-500">Even 15 minutes during PD days makes a difference.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div className="w-8 h-8 bg-[#38618C] rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0">4</div>
+                  <div>
+                    <p className="font-medium text-[#1e2749] text-sm">Start with Para-Specific Courses</p>
+                    <p className="text-xs text-gray-500">&quot;Paraprofessional Foundations&quot; was built for their role.</p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Tips for Increasing Engagement */}
-            <div className="bg-white rounded-xl p-5 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <Lightbulb className="w-5 h-5 text-[#38618C]" />
-                <span className="font-semibold text-[#1e2749]">Tips to Boost Engagement</span>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-6 h-6 bg-[#38618C] rounded-full flex items-center justify-center text-white text-xs font-bold">1</div>
-                    <span className="font-medium text-[#1e2749] text-sm">Team Introduction</span>
-                  </div>
-                  <p className="text-xs text-gray-600">Walk through the Hub together at your next meeting. Show them the &quot;How to Get the Most Out of TDI Hub&quot; course.</p>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-6 h-6 bg-[#38618C] rounded-full flex items-center justify-center text-white text-xs font-bold">2</div>
-                    <span className="font-medium text-[#1e2749] text-sm">Resource of the Week</span>
-                  </div>
-                  <p className="text-xs text-gray-600">Share one specific course or resource each week that aligns with current challenges or goals.</p>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-6 h-6 bg-[#38618C] rounded-full flex items-center justify-center text-white text-xs font-bold">3</div>
-                    <span className="font-medium text-[#1e2749] text-sm">Protected Time</span>
-                  </div>
-                  <p className="text-xs text-gray-600">Build in 15-30 minutes of dedicated Hub time during professional development or planning periods.</p>
-                </div>
-
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-6 h-6 bg-[#38618C] rounded-full flex items-center justify-center text-white text-xs font-bold">4</div>
-                    <span className="font-medium text-[#1e2749] text-sm">Start with Para Courses</span>
-                  </div>
-                  <p className="text-xs text-gray-600">Point them to &quot;Paraprofessional Foundations&quot; first — it&apos;s designed specifically for their role.</p>
+            {/* What More Looks Like - Soft Bridge */}
+            <div className="bg-[#38618C]/5 border border-[#38618C]/20 rounded-xl p-5">
+              <div className="flex items-start gap-4">
+                <TrendingUp className="w-6 h-6 text-[#38618C] flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-semibold text-[#1e2749] mb-1">Want Deeper Progress Tracking?</h3>
+                  <p className="text-sm text-gray-600">
+                    With Hub access, we can track logins. With TDI&apos;s coaching model, we&apos;d also measure
+                    strategy implementation, confidence growth, and classroom impact — giving you real data
+                    to show progress over time.
+                  </p>
+                  <button
+                    onClick={() => setActiveTab('next-steps')}
+                    className="mt-2 text-sm text-[#35A7FF] hover:underline flex items-center gap-1"
+                  >
+                    Learn more <ArrowRight className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
             </div>
@@ -670,31 +572,43 @@ export default function D41Dashboard() {
               <p className="text-gray-600">Curated courses for paraprofessional development</p>
             </div>
 
-            {/* Resources Context */}
-            <div className="bg-[#38618C]/10 border border-[#38618C]/20 rounded-xl p-5">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-[#38618C] rounded-xl flex items-center justify-center flex-shrink-0">
-                  <BookOpen className="w-6 h-6 text-white" />
+            {/* D41 Recommended Path */}
+            <div className="bg-[#1e2749] rounded-xl p-6 text-white">
+              <div className="flex items-center gap-2 mb-3">
+                <Star className="w-5 h-5 text-[#35A7FF]" />
+                <span className="font-semibold">Recommended Starting Path for D41</span>
+              </div>
+              <p className="text-sm text-white/80 mb-4">
+                Based on your goals around literacy support and para-teacher collaboration, we recommend starting here:
+              </p>
+
+              <div className="grid md:grid-cols-3 gap-3">
+                <div className="bg-white/10 rounded-lg p-4">
+                  <div className="text-xs text-[#35A7FF] font-medium mb-1">START HERE</div>
+                  <p className="font-medium text-sm">Paraprofessional Foundations</p>
+                  <p className="text-xs text-white/60 mt-1">Understanding your role & impact</p>
                 </div>
-                <div>
-                  <h3 className="font-bold text-[#1e2749] mb-1">Great Resources — But Resources Alone Aren&apos;t Enough</h3>
-                  <p className="text-gray-700 text-sm mb-3">
-                    Your team has access to 32 high-quality courses designed for paraprofessionals. But here&apos;s what the research shows:
-                    <strong> without personalized coaching and accountability, only 10% of strategies get implemented</strong>.
-                    With TDI&apos;s IGNITE model, that jumps to 65%.
-                  </p>
-                  <div className="flex items-center gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-[#E07A5F]"></div>
-                      <span className="text-gray-600">Hub Only: 10% implementation</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      <span className="text-gray-600">Hub + IGNITE: 65% implementation</span>
-                    </div>
-                  </div>
+                <div className="bg-white/10 rounded-lg p-4">
+                  <div className="text-xs text-white/60 font-medium mb-1">THEN</div>
+                  <p className="font-medium text-sm">Effective Small-Group Instruction</p>
+                  <p className="text-xs text-white/60 mt-1">Supporting literacy groups</p>
+                </div>
+                <div className="bg-white/10 rounded-lg p-4">
+                  <div className="text-xs text-white/60 font-medium mb-1">THEN</div>
+                  <p className="font-medium text-sm">Building Teacher-Para Partnerships</p>
+                  <p className="text-xs text-white/60 mt-1">Communication & collaboration</p>
                 </div>
               </div>
+
+              <a
+                href="https://tdi.thinkific.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center gap-2 bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#2589db] transition-all"
+              >
+                <Laptop className="w-4 h-4" />
+                Start Learning Path
+              </a>
             </div>
 
             {/* Hub Access CTA */}
@@ -859,121 +773,76 @@ export default function D41Dashboard() {
               </div>
             </a>
 
-            {/* Bridge to IGNITE */}
-            <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
-              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                <div>
-                  <h3 className="font-bold text-lg mb-2">Make These Resources Actually Work</h3>
-                  <p className="text-sm text-white/80">
-                    With IGNITE, we observe your paras in action, give personalized feedback,
-                    and point them to the exact Hub resources that address their specific growth areas.
-                  </p>
+            {/* Resources + Coaching */}
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-5 h-5 text-[#38618C]" />
                 </div>
-                <button
-                  onClick={() => setActiveTab('next-steps')}
-                  className="bg-white text-[#1e2749] px-6 py-3 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors whitespace-nowrap flex items-center gap-2"
-                >
-                  <Sparkles className="w-4 h-4" />
-                  See IGNITE Plan
-                </button>
+                <div>
+                  <h3 className="font-semibold text-[#1e2749] mb-1">Getting More from These Resources</h3>
+                  <p className="text-sm text-gray-600">
+                    The Hub gives your team access to strategies. TDI&apos;s coaching model helps ensure those
+                    strategies make it into classrooms — through personalized observations and feedback
+                    tailored to each para&apos;s students and setting.
+                  </p>
+                  <button
+                    onClick={() => setActiveTab('next-steps')}
+                    className="mt-2 text-sm text-[#35A7FF] hover:underline flex items-center gap-1"
+                  >
+                    Explore coaching options <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         )}
 
-        {/* 2026-27 TAB - IGNITE IMPLEMENTATION PROPOSAL */}
+        {/* 2026-27 TAB */}
         {activeTab === 'next-steps' && (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-[#1e2749] mb-2">2026-27 Partnership Proposal</h2>
-              <p className="text-gray-600">Full IGNITE Implementation for Paraprofessionals</p>
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">2026-27 Partnership Options</h2>
+              <p className="text-gray-600">When you&apos;re ready to add personalized coaching support</p>
             </div>
 
-            {/* Why Upgrade - The Gap */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
-              <div className="flex items-start gap-4">
-                <AlertCircle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" />
-                <div>
-                  <p className="text-amber-800 font-medium mb-2">Hub Access Alone Isn&apos;t Enough</p>
-                  <p className="text-amber-700 text-sm">
-                    Industry data shows only <strong>10% of PD strategies</strong> get implemented without coaching support.
-                    With IGNITE, TDI partners see <strong>65% implementation rates</strong> — because personalized feedback
-                    and accountability make the difference.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* What Dee Wanted vs What She Got */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
+            {/* The TDI Partnership Journey */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-4">
-                <MessageSquare className="w-5 h-5 text-[#38618C]" />
-                <span className="font-semibold text-[#1e2749]">Bridging the Gap</span>
+                <Layers className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749]">The TDI Partnership Journey</span>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* What Dee Originally Wanted */}
-                <div>
-                  <p className="text-xs text-gray-500 uppercase mb-3">What Dee Originally Wanted</p>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      <span>In-person observation and feedback</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      <span>Measurable outcomes tied to student growth</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      <span>Support for literacy curriculum rollout</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      <span>Para–teacher collaboration building</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      <span>No sub coverage required</span>
-                    </div>
-                  </div>
-                  <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-                    <p className="text-xs text-gray-500 italic">
-                      &quot;I&apos;m interested in expanding to an in-person component once budget and team feedback stabilize.&quot; — Dee
-                    </p>
-                  </div>
+              <p className="text-sm text-gray-600 mb-6">
+                Most districts start with Hub access to explore resources, then add coaching when ready.
+                Here&apos;s what that progression looks like:
+              </p>
+
+              <div className="flex flex-col md:flex-row gap-4">
+                {/* Current */}
+                <div className="flex-1 bg-green-50 border-2 border-green-200 rounded-xl p-4 relative">
+                  <div className="absolute -top-3 left-4 bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">You Are Here</div>
+                  <h4 className="font-semibold text-[#1e2749] mt-2">Hub Access</h4>
+                  <p className="text-sm text-gray-600 mt-1">Full course library, self-directed learning, community access</p>
+                  <p className="text-xs text-gray-400 mt-2">D41 current plan</p>
                 </div>
 
-                {/* What IGNITE Delivers */}
-                <div>
-                  <p className="text-xs text-green-600 uppercase mb-3">What IGNITE Delivers</p>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span><strong>2 on-site days</strong> with classroom observations</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span><strong>KPIs tracked:</strong> implementation rate, confidence, retention</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span><strong>Focus areas</strong> aligned to literacy goals</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span><strong>Growth Groups</strong> for para collaboration</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                      <span><strong>Zero sub coverage</strong> — we observe during instruction</span>
-                    </div>
+                {/* IGNITE */}
+                <div className="flex-1 bg-[#38618C]/5 border border-[#38618C]/20 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="w-4 h-4 text-[#38618C]" />
+                    <span className="text-xs text-[#38618C] font-medium">RECOMMENDED NEXT</span>
                   </div>
-                  <div className="mt-4 p-3 bg-green-50 rounded-lg">
-                    <p className="text-xs text-green-700">
-                      <strong>IGNITE is exactly what Dee wanted</strong> — now with data to justify the investment.
-                    </p>
-                  </div>
+                  <h4 className="font-semibold text-[#1e2749]">Phase 1: IGNITE</h4>
+                  <p className="text-sm text-gray-600 mt-1">On-site observations, personalized Love Notes, baseline data</p>
+                  <p className="text-xs text-[#38618C] mt-2">Details below</p>
+                </div>
+
+                {/* Future Phases */}
+                <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-4 opacity-60">
+                  <h4 className="font-semibold text-[#1e2749]">Future Phases</h4>
+                  <p className="text-sm text-gray-600 mt-1">ACCELERATE & SUSTAIN — deeper coaching, Growth Groups, ongoing support</p>
+                  <p className="text-xs text-gray-400 mt-2">When you&apos;re ready</p>
                 </div>
               </div>
             </div>
@@ -1460,19 +1329,19 @@ export default function D41Dashboard() {
               </p>
             </div>
 
-            {/* CTA */}
+            {/* CTA - Softened */}
             <div className="bg-[#1e2749] rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-white">
-                <p className="font-semibold text-lg">Ready to give your paras personalized support?</p>
-                <p className="text-sm opacity-80">Let&apos;s build a 2026-27 plan that fits your budget and goals.</p>
+                <p className="font-semibold text-lg">Questions about coaching options?</p>
+                <p className="text-sm opacity-80">We&apos;re happy to talk through what might work for D41 — no commitment needed.</p>
               </div>
               <a
                 href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-white text-[#1e2749] px-8 py-3 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors whitespace-nowrap"
+                className="bg-white text-[#1e2749] px-6 py-3 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors whitespace-nowrap"
               >
-                Schedule Planning Call →
+                Schedule a Conversation
               </a>
             </div>
 
@@ -1537,6 +1406,49 @@ export default function D41Dashboard() {
                     Schedule Time with Rae
                   </a>
                 </div>
+              </div>
+            </div>
+
+            {/* Support Options */}
+            <div className="bg-white rounded-xl p-5 shadow-sm max-w-2xl mx-auto">
+              <h3 className="font-semibold text-[#1e2749] mb-4">How Can We Help?</h3>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/15-minute-hub-walkthrough"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border border-gray-200 rounded-xl p-4 hover:border-[#35A7FF] hover:shadow-md transition-all group"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-[#35A7FF]/10 rounded-lg flex items-center justify-center group-hover:bg-[#35A7FF]/20 transition-colors">
+                      <Laptop className="w-5 h-5 text-[#35A7FF]" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-[#1e2749]">Hub Walkthrough</p>
+                      <p className="text-xs text-gray-500">15 minutes</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600">Quick tour of the Learning Hub and best ways to get your team started.</p>
+                </a>
+
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="border border-gray-200 rounded-xl p-4 hover:border-[#35A7FF] hover:shadow-md transition-all group"
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center group-hover:bg-[#38618C]/20 transition-colors">
+                      <MessageSquare className="w-5 h-5 text-[#38618C]" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-[#1e2749]">Partnership Conversation</p>
+                      <p className="text-xs text-gray-500">30 minutes</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600">Discuss goals, explore options, or just catch up — no agenda required.</p>
+                </a>
               </div>
             </div>
 
