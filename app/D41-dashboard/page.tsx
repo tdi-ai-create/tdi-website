@@ -211,7 +211,7 @@ export default function D41Dashboard() {
               { id: 'overview', label: 'Overview', icon: Eye },
               { id: 'team', label: 'Your Team', icon: Users },
               { id: 'resources', label: 'Resources', icon: BookOpen },
-              { id: 'next-steps', label: 'Next Steps', icon: Sparkles, badge: 'Spring' },
+              { id: 'next-steps', label: '2026-27', icon: Sparkles, badge: 'Proposal' },
               { id: 'contact', label: 'Contact', icon: User },
             ].map((tab) => (
               <button
@@ -773,198 +773,461 @@ export default function D41Dashboard() {
           </div>
         )}
 
-        {/* NEXT STEPS TAB */}
+        {/* 2026-27 TAB - IGNITE IMPLEMENTATION PROPOSAL */}
         {activeTab === 'next-steps' && (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Spring 2026 Expansion Options</h2>
-              <p className="text-gray-600">When you&apos;re ready to add in-person support</p>
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">2026-27 Partnership Proposal</h2>
+              <p className="text-gray-600">Full IGNITE Implementation for Paraprofessionals</p>
             </div>
 
-            {/* Context */}
-            <div className="bg-[#38618C]/10 border border-[#38618C]/20 rounded-xl p-5">
+            {/* Why Upgrade - The Gap */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
               <div className="flex items-start gap-4">
-                <MessageSquare className="w-6 h-6 text-[#38618C] flex-shrink-0 mt-1" />
+                <AlertCircle className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" />
                 <div>
-                  <p className="text-[#1e2749] font-medium mb-2">From our conversations with Dee:</p>
-                  <p className="text-gray-700 text-sm italic">
-                    &quot;I just wanted the memberships for now, since the paras are currently included in districtwide teacher trainings this semester... I&apos;m interested in expanding to an in-person component once budget and team feedback stabilize.&quot;
+                  <p className="text-amber-800 font-medium mb-2">Hub Access Alone Isn&apos;t Enough</p>
+                  <p className="text-amber-700 text-sm">
+                    Industry data shows only <strong>10% of PD strategies</strong> get implemented without coaching support.
+                    With IGNITE, TDI partners see <strong>65% implementation rates</strong> — because personalized feedback
+                    and accountability make the difference.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Expansion Options */}
-            <Accordion
-              id="expansion-options"
-              title="In-Person Observation Options"
-              subtitle="Add on-site support when you're ready"
-              badge="Spring 2026"
-              badgeColor="bg-[#35A7FF]/20 text-[#35A7FF]"
-              icon={<School className="w-5 h-5" />}
-            >
-              <div className="pt-4 space-y-4">
-                {/* Option 1 */}
-                <div className="border border-gray-200 rounded-xl p-5 hover:border-[#35A7FF] transition-all">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-0.5 rounded-full">Recommended</span>
-                      <h4 className="font-bold text-[#1e2749] mt-2">1-Day Observation Visit</h4>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-[#1e2749]">$3,900</div>
-                      <div className="text-xs text-gray-500">+ memberships</div>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    We visit while students are in session — no sub coverage required. Observe, coach, and provide actionable feedback your team can use right away.
-                  </p>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      <span>Classroom observations</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      <span>1:1 coaching feedback</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      <span>Leadership debrief</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      <span>Implementation report</span>
-                    </div>
-                  </div>
+            {/* Package Summary */}
+            <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
+              <div className="flex flex-col md:flex-row justify-between gap-6">
+                <div>
+                  <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Recommended</span>
+                  <h3 className="text-2xl font-bold mt-3">Phase 1: IGNITE</h3>
+                  <p className="text-white/80 mt-1">Building baseline understanding and personalized support</p>
                 </div>
-
-                {/* Option 2 */}
-                <div className="border border-gray-200 rounded-xl p-5 hover:border-[#35A7FF] transition-all">
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Best Value</span>
-                      <h4 className="font-bold text-[#1e2749] mt-2">2-Day Observation Package</h4>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-[#1e2749]">$7,200</div>
-                      <div className="text-xs text-gray-500">+ memberships</div>
-                    </div>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Collect comparative data across the year and track measurable growth in key areas.
-                  </p>
-                  <div className="bg-gray-50 rounded-lg p-3 mb-4">
-                    <p className="text-xs font-medium text-gray-500 mb-2">Track measurable growth in:</p>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-gray-700">
-                      <span>• Student language acquisition</span>
-                      <span>• Progress monitoring data</span>
-                      <span>• Instructional consistency</span>
-                      <span>• Para–teacher collaboration</span>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      <span>Everything in 1-Day</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      <span>Pre/post comparison</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      <span>Progress tracking</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Check className="w-4 h-4 text-[#35A7FF]" />
-                      <span>Retention support</span>
-                    </div>
-                  </div>
+                <div className="text-right">
+                  <div className="text-3xl font-bold">$8,400</div>
+                  <div className="text-sm text-white/60">2026-27 School Year</div>
+                  <div className="text-xs text-white/40 mt-1">Includes 10 memberships</div>
                 </div>
               </div>
-            </Accordion>
 
-            {/* Why In-Person */}
-            <div className="bg-white rounded-xl p-5 shadow-sm">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/20">
+                <div className="text-center">
+                  <div className="text-2xl font-bold">2</div>
+                  <div className="text-xs text-white/70">On-Site Days</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold">10</div>
+                  <div className="text-xs text-white/70">Observations</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold">10</div>
+                  <div className="text-xs text-white/70">Love Notes</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold">2</div>
+                  <div className="text-xs text-white/70">Leadership Sessions</div>
+                </div>
+              </div>
+            </div>
+
+            {/* What's Included */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
-                <TrendingUp className="w-5 h-5 text-[#38618C]" />
-                <span className="font-semibold text-[#1e2749]">Why Add In-Person Support?</span>
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                <h4 className="font-semibold text-[#1e2749]">What&apos;s Included in IGNITE</h4>
               </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-[#38618C]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Eye className="w-4 h-4 text-[#38618C]" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-[#1e2749] text-sm">2 On-Site Observation Days</p>
+                      <p className="text-xs text-gray-500">Fall & Spring visits while students are in session</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-[#38618C]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Heart className="w-4 h-4 text-[#E07A5F]" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-[#1e2749] text-sm">Personalized Love Notes</p>
+                      <p className="text-xs text-gray-500">Individual feedback for each observed paraprofessional</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-[#38618C]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Users className="w-4 h-4 text-[#38618C]" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-[#1e2749] text-sm">Growth Group Formation</p>
+                      <p className="text-xs text-gray-500">Targeted support groups based on observation data</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-[#38618C]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Video className="w-4 h-4 text-[#35A7FF]" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-[#1e2749] text-sm">2 Executive Impact Sessions</p>
+                      <p className="text-xs text-gray-500">Leadership planning with Dee to align goals</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-[#38618C]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Laptop className="w-4 h-4 text-[#35A7FF]" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-[#1e2749] text-sm">10 All-Access Hub Memberships</p>
+                      <p className="text-xs text-gray-500">Continued unlimited access to all courses</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-[#38618C]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <ClipboardList className="w-4 h-4 text-[#38618C]" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-[#1e2749] text-sm">Baseline Survey & Data</p>
+                      <p className="text-xs text-gray-500">Measure stress, confidence, and retention intent</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2026-27 Focus Areas */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-4">
+                <Target className="w-5 h-5 text-[#1e2749]" />
+                <h4 className="font-semibold text-[#1e2749]">Year Focus: Paraprofessional Excellence</h4>
+              </div>
+              <p className="text-sm text-gray-600 mb-6">
+                Based on Dee&apos;s goals and the district&apos;s literacy curriculum rollout, we&apos;ve identified three strategic focus areas for 2026-27. Each includes measurable goals we&apos;ll track together.
+              </p>
 
               <div className="grid md:grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-3xl font-bold text-[#38618C] mb-1">65%</div>
-                  <div className="text-xs text-gray-600">Strategy implementation rate</div>
-                  <div className="text-xs text-gray-400 mt-1">vs 10% industry avg</div>
+
+                {/* Student Language Growth - Primary Focus */}
+                <div className="bg-[#1e2749] text-white rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <GraduationCap className="w-5 h-5" />
+                    <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">Primary Focus</span>
+                  </div>
+                  <h5 className="font-semibold text-lg mb-2">Student Language Growth</h5>
+                  <p className="text-sm opacity-80 mb-4">Supporting the new literacy curriculum through effective small-group instruction</p>
+                  <div className="border-t border-white/20 pt-3 mt-3">
+                    <p className="text-xs opacity-60 mb-2">Success Metrics:</p>
+                    <ul className="text-sm space-y-1">
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
+                        80% using targeted questioning
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
+                        Progress monitoring in 100% of groups
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
+                        Student language gains tracked
+                      </li>
+                    </ul>
+                  </div>
                 </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-3xl font-bold text-[#38618C] mb-1">3x</div>
-                  <div className="text-xs text-gray-600">Higher Hub engagement</div>
-                  <div className="text-xs text-gray-400 mt-1">with coaching support</div>
+
+                {/* Instructional Consistency */}
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <ClipboardList className="w-5 h-5 text-[#38618C]" />
+                    <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-0.5 rounded-full">Supporting Focus</span>
+                  </div>
+                  <h5 className="font-semibold text-lg text-[#1e2749] mb-2">Instructional Consistency</h5>
+                  <p className="text-sm text-gray-600 mb-4">Shared practices across all paraprofessionals districtwide</p>
+                  <div className="border-t border-gray-200 pt-3 mt-3">
+                    <p className="text-xs text-gray-500 mb-2">Success Metrics:</p>
+                    <ul className="text-sm text-gray-700 space-y-1">
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full" />
+                        Common instructional language
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full" />
+                        Aligned small-group protocols
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full" />
+                        65%+ strategy implementation
+                      </li>
+                    </ul>
+                  </div>
                 </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <div className="text-3xl font-bold text-[#38618C] mb-1">0</div>
-                  <div className="text-xs text-gray-600">Sub coverage needed</div>
-                  <div className="text-xs text-gray-400 mt-1">We observe during instruction</div>
+
+                {/* Para-Teacher Collaboration */}
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <HandHelping className="w-5 h-5 text-[#35A7FF]" />
+                    <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-0.5 rounded-full">Supporting Focus</span>
+                  </div>
+                  <h5 className="font-semibold text-lg text-[#1e2749] mb-2">Para–Teacher Collaboration</h5>
+                  <p className="text-sm text-gray-600 mb-4">Strengthening communication and partnership</p>
+                  <div className="border-t border-gray-200 pt-3 mt-3">
+                    <p className="text-xs text-gray-500 mb-2">Success Metrics:</p>
+                    <ul className="text-sm text-gray-700 space-y-1">
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
+                        Weekly planning check-ins
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
+                        Clear role expectations
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
+                        Para confidence: +20%
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Connection to Data */}
+              <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div className="flex items-start gap-3">
+                  <TrendingUp className="w-5 h-5 text-amber-600 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-amber-800">Why These Metrics?</p>
+                    <p className="text-sm text-amber-700 mt-1">
+                      These goals come directly from Dee&apos;s stated priorities: supporting the literacy curriculum rollout, building instructional consistency across paras, and strengthening para–teacher partnerships. We&apos;ll measure progress at each observation visit.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Relationship Timeline */}
-            <Accordion
-              id="relationship-timeline"
-              title="Our Partnership Journey"
-              subtitle="Building trust since July 2025"
-              icon={<Clock className="w-5 h-5" />}
-            >
-              <div className="pt-4 space-y-4">
-                <div className="border-l-2 border-[#38618C] pl-4 space-y-6">
-                  <div className="relative">
-                    <div className="absolute -left-[21px] w-3 h-3 bg-[#38618C] rounded-full" />
-                    <div className="text-xs text-gray-500">July 29, 2025</div>
-                    <div className="font-medium text-[#1e2749]">Initial Contact</div>
-                    <p className="text-sm text-gray-600">First conversation with Dee about paraprofessional PD needs</p>
+            {/* 2026-27 Timeline */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-[#1e2749]" />
+                  <h4 className="font-semibold text-[#1e2749]">Proposed 2026-27 Timeline</h4>
+                </div>
+                <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-3 py-1 rounded-full">Phase 1: IGNITE</span>
+              </div>
+              <p className="text-sm text-gray-500 mb-6">Building baseline understanding and personalized support</p>
+
+              <div className="space-y-4">
+
+                {/* July - Executive Impact Session #1 */}
+                <div className="border border-gray-200 rounded-xl p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-[#1e2749] rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-sm font-medium">1</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-[#1e2749]">Executive Impact Session #1</span>
+                        <span className="text-xs bg-[#1e2749] text-white px-2 py-0.5 rounded-full">Leadership</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-sm text-gray-500">
+                        <span>July 2026</span>
+                        <span>•</span>
+                        <span>90 minutes (virtual)</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="relative">
-                    <div className="absolute -left-[21px] w-3 h-3 bg-[#38618C] rounded-full" />
-                    <div className="text-xs text-gray-500">August 13-14, 2025</div>
-                    <div className="font-medium text-[#1e2749]">In-Person Meetings</div>
-                    <p className="text-sm text-gray-600">Met to understand Dee&apos;s new role, leadership style, and district priorities</p>
+                  <div className="ml-12 mt-3 text-sm text-gray-600">
+                    <p>Set goals for the year, review para team needs, align on success metrics, and plan fall observation logistics.</p>
                   </div>
-                  <div className="relative">
-                    <div className="absolute -left-[21px] w-3 h-3 bg-[#38618C] rounded-full" />
-                    <div className="text-xs text-gray-500">July - October 2025</div>
-                    <div className="font-medium text-[#1e2749]">6 Contract Revisions</div>
-                    <p className="text-sm text-gray-600">Adapted proposal as Dee&apos;s team and budget became clearer</p>
+                </div>
+
+                {/* Sept/Oct - On-Campus Day #1 */}
+                <div className="border border-gray-200 rounded-xl p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-[#38618C] rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-sm font-medium">2</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-[#1e2749]">On-Campus Observation Day #1</span>
+                        <span className="text-xs bg-[#38618C] text-white px-2 py-0.5 rounded-full">On-Site</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-sm text-gray-500">
+                        <span>September/October 2026</span>
+                        <span>•</span>
+                        <span>Full Day</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="relative">
-                    <div className="absolute -left-[21px] w-3 h-3 bg-green-500 rounded-full" />
-                    <div className="text-xs text-gray-500">October 7, 2025</div>
-                    <div className="font-medium text-[#1e2749]">Agreement Signed</div>
-                    <p className="text-sm text-gray-600">10 All-Access Memberships for Fall 2025</p>
+                  <div className="ml-12 mt-3 space-y-2">
+                    <div className="grid md:grid-cols-2 gap-3">
+                      <div className="bg-amber-50 rounded-lg p-3">
+                        <p className="text-xs font-medium text-amber-800 mb-1">Morning</p>
+                        <p className="text-sm text-amber-700">Classroom observations of paras during small-group instruction</p>
+                      </div>
+                      <div className="bg-blue-50 rounded-lg p-3">
+                        <p className="text-xs font-medium text-blue-800 mb-1">Afternoon</p>
+                        <p className="text-sm text-blue-700">Baseline survey, group discussion, Hub orientation</p>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500">Deliverable: Personalized Love Notes for each observed para + Growth Group recommendations</p>
                   </div>
-                  <div className="relative">
-                    <div className="absolute -left-[21px] w-3 h-3 bg-[#35A7FF] rounded-full" />
-                    <div className="text-xs text-gray-500">October 29, 2025</div>
-                    <div className="font-medium text-[#1e2749]">Hub Accounts Created</div>
-                    <p className="text-sm text-gray-600">5 paraprofessional accounts set up with full access</p>
+                </div>
+
+                {/* Nov - Virtual Check-in */}
+                <div className="border border-gray-200 rounded-xl p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-[#35A7FF] rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-sm font-medium">3</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-[#1e2749]">Virtual Strategy Session</span>
+                        <span className="text-xs bg-[#35A7FF] text-white px-2 py-0.5 rounded-full">Virtual</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-sm text-gray-500">
+                        <span>November 2026</span>
+                        <span>•</span>
+                        <span>60 minutes</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="relative">
-                    <div className="absolute -left-[21px] w-3 h-3 bg-gray-300 rounded-full border-2 border-dashed border-gray-400" />
-                    <div className="text-xs text-gray-400">Spring 2026</div>
-                    <div className="font-medium text-gray-400">Potential Expansion</div>
-                    <p className="text-sm text-gray-400">In-person observation component when ready</p>
+                  <div className="ml-12 mt-3 text-sm text-gray-600">
+                    <p>Growth Group session focused on observation themes. Peer sharing, Hub resource alignment, Q&A.</p>
+                  </div>
+                </div>
+
+                {/* Feb/Mar - On-Campus Day #2 */}
+                <div className="border border-gray-200 rounded-xl p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-[#38618C] rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-sm font-medium">4</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-[#1e2749]">On-Campus Observation Day #2</span>
+                        <span className="text-xs bg-[#38618C] text-white px-2 py-0.5 rounded-full">On-Site</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-sm text-gray-500">
+                        <span>February/March 2027</span>
+                        <span>•</span>
+                        <span>Full Day</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="ml-12 mt-3 space-y-2">
+                    <p className="text-sm text-gray-600">Follow-up observations to measure growth. Compare to fall baseline, celebrate progress, identify continued support needs.</p>
+                    <p className="text-xs text-gray-500">Deliverable: Progress comparison report + Updated Love Notes</p>
+                  </div>
+                </div>
+
+                {/* May - Executive Impact Session #2 */}
+                <div className="border border-gray-200 rounded-xl p-4">
+                  <div className="flex items-center gap-4">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                      <span className="text-white text-sm font-medium">5</span>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-[#1e2749]">Executive Impact Session #2 + Year-End Review</span>
+                        <span className="text-xs bg-green-500 text-white px-2 py-0.5 rounded-full">Celebration</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-sm text-gray-500">
+                        <span>May 2027</span>
+                        <span>•</span>
+                        <span>90 minutes</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="ml-12 mt-3 text-sm text-gray-600">
+                    <p>Celebrate growth, review year-end data, discuss retention, and plan for 2027-28 continuation (Phase 2: ACCELERATE).</p>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Ongoing Support */}
+              <div className="mt-6 pt-6 border-t border-gray-100">
+                <p className="text-sm font-medium text-[#1e2749] mb-3">Ongoing Throughout the Year:</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Laptop className="w-4 h-4 text-[#35A7FF]" />
+                    <span>Hub Access (10 Paras)</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Heart className="w-4 h-4 text-[#E07A5F]" />
+                    <span>Love Note Follow-ups</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Mail className="w-4 h-4 text-[#38618C]" />
+                    <span>Direct Line to Rae</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <TrendingUp className="w-4 h-4 text-green-500" />
+                    <span>Progress Tracking</span>
                   </div>
                 </div>
               </div>
-            </Accordion>
+            </div>
+
+            {/* Goals Alignment */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-4">
+                <Target className="w-5 h-5 text-[#1e2749]" />
+                <p className="font-semibold text-[#1e2749]">Aligned to Dee&apos;s Goals</p>
+              </div>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-xs text-gray-500 mb-1">Dee&apos;s Priority:</p>
+                  <p className="text-sm text-[#1e2749] font-medium">&quot;Support the literacy curriculum rollout with effective small-group instruction and para–teacher collaboration&quot;</p>
+                </div>
+                <div className="bg-[#35A7FF]/10 rounded-lg p-4">
+                  <p className="text-xs text-[#35A7FF] mb-1">TDI Commitment:</p>
+                  <p className="text-sm text-[#1e2749] font-medium">Personalized observations and Love Notes that give each para specific, actionable feedback — not generic PD</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Para Impact Stats */}
+            <div className="bg-green-50 border border-green-200 rounded-xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <Heart className="w-5 h-5 text-green-600" />
+                <p className="font-semibold text-green-800">What Your Paras Get</p>
+              </div>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <p className="text-3xl font-bold text-green-700">1:1</p>
+                  <p className="text-xs text-green-600">Personalized Feedback</p>
+                </div>
+                <div>
+                  <p className="text-3xl font-bold text-green-700">24/7</p>
+                  <p className="text-xs text-green-600">Hub Access</p>
+                </div>
+                <div>
+                  <p className="text-3xl font-bold text-green-700">65%</p>
+                  <p className="text-xs text-green-600">Implementation Rate</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Research Foundation */}
+            <div className="bg-gray-50 rounded-xl p-5">
+              <p className="text-xs text-gray-500 mb-2">Research Foundation:</p>
+              <p className="text-sm text-gray-600">
+                Paraprofessionals who receive personalized coaching show <strong>40% greater skill transfer</strong> to classroom practice (Giangreco, 2021). TDI&apos;s IGNITE model combines observation-based feedback with on-demand resources, achieving <strong>65% strategy implementation</strong> vs. 10% industry average.
+              </p>
+            </div>
 
             {/* CTA */}
             <div className="bg-[#1e2749] rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-white">
-                <p className="font-semibold text-lg">Ready to discuss expansion options?</p>
-                <p className="text-sm opacity-80">Let&apos;s find the right fit for your team and budget.</p>
+                <p className="font-semibold text-lg">Ready to give your paras personalized support?</p>
+                <p className="text-sm opacity-80">Let&apos;s build a 2026-27 plan that fits your budget and goals.</p>
               </div>
               <a
                 href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
@@ -972,9 +1235,10 @@ export default function D41Dashboard() {
                 rel="noopener noreferrer"
                 className="bg-white text-[#1e2749] px-8 py-3 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors whitespace-nowrap"
               >
-                Schedule a Call →
+                Schedule Planning Call →
               </a>
             </div>
+
           </div>
         )}
 
