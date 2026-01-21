@@ -490,76 +490,101 @@ function DashboardPanel() {
         </p>
       </div>
 
-      <div>
-        <h3 className="text-xl font-bold mb-4" style={{ color: '#1e2749' }}>What You Can Track</h3>
+      <div className="grid md:grid-cols-2 gap-8 items-start">
+        {/* Dashboard Image */}
+        <div className="order-2 md:order-1">
+          <a
+            href="/Example-Dashboard"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block group"
+          >
+            <div className="relative rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+              <img
+                src="/images/dashboard-overview.png"
+                alt="TDI Leadership Dashboard Preview"
+                className="w-full h-auto group-hover:scale-105 transition-transform duration-300"
+              />
+              <div className="absolute inset-0 bg-[#1e2749]/0 group-hover:bg-[#1e2749]/10 transition-colors" />
+            </div>
+          </a>
+          <p className="text-sm text-center mt-3" style={{ color: '#1e2749', opacity: 0.5 }}>
+            Example dashboard shown — yours is customized to your school
+          </p>
+        </div>
 
-        {/* Dashboard Mockup */}
-        <div className="rounded-xl overflow-hidden shadow-lg" style={{ border: '1px solid #e5e7eb' }}>
-          {/* Mockup Header */}
-          <div className="px-4 py-3 flex items-center gap-2" style={{ backgroundColor: '#1e2749' }}>
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#ff5f56' }} />
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#ffbd2e' }} />
-            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: '#27ca40' }} />
-            <span className="ml-4 text-sm text-white opacity-70">Leadership Dashboard</span>
-          </div>
-
-          {/* Dashboard Grid */}
-          <div className="p-4 grid grid-cols-2 gap-3" style={{ backgroundColor: '#f5f5f5' }}>
-            <div className="p-3 rounded-lg bg-white">
+        {/* What You Can Track */}
+        <div className="order-1 md:order-2">
+          <h3 className="text-xl font-bold mb-4" style={{ color: '#1e2749' }}>What You Can Track</h3>
+          <div className="space-y-3">
+            <div className="p-3 rounded-lg bg-white shadow-sm">
               <div className="flex items-center gap-2 mb-1">
                 <svg className="w-4 h-4" fill="#80a4ed" viewBox="0 0 24 24">
                   <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
                 </svg>
-                <p className="text-xs font-medium" style={{ color: '#1e2749', opacity: 0.6 }}>Staff Engagement</p>
+                <p className="text-sm font-medium" style={{ color: '#1e2749' }}>Staff Engagement</p>
               </div>
-              <p className="text-sm" style={{ color: '#1e2749' }}>Who is logging in, completing courses, using resources</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Who is logging in, completing courses, using resources</p>
             </div>
-            <div className="p-3 rounded-lg bg-white">
+            <div className="p-3 rounded-lg bg-white shadow-sm">
               <div className="flex items-center gap-2 mb-1">
                 <svg className="w-4 h-4" fill="#80a4ed" viewBox="0 0 24 24">
                   <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                 </svg>
-                <p className="text-xs font-medium" style={{ color: '#1e2749', opacity: 0.6 }}>Implementation Progress</p>
+                <p className="text-sm font-medium" style={{ color: '#1e2749' }}>Implementation Progress</p>
               </div>
-              <p className="text-sm" style={{ color: '#1e2749' }}>Which strategies are being used in classrooms</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Which strategies are being used in classrooms</p>
             </div>
-            <div className="p-3 rounded-lg bg-white">
+            <div className="p-3 rounded-lg bg-white shadow-sm">
               <div className="flex items-center gap-2 mb-1">
                 <svg className="w-4 h-4" fill="#80a4ed" viewBox="0 0 24 24">
                   <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
                 </svg>
-                <p className="text-xs font-medium" style={{ color: '#1e2749', opacity: 0.6 }}>Observation Insights</p>
+                <p className="text-sm font-medium" style={{ color: '#1e2749' }}>Observation Insights</p>
               </div>
-              <p className="text-sm" style={{ color: '#1e2749' }}>Trends from on-campus visits, themes across classrooms</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Trends from on-campus visits, themes across classrooms</p>
             </div>
-            <div className="p-3 rounded-lg bg-white">
+            <div className="p-3 rounded-lg bg-white shadow-sm">
               <div className="flex items-center gap-2 mb-1">
                 <svg className="w-4 h-4" fill="#80a4ed" viewBox="0 0 24 24">
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                 </svg>
-                <p className="text-xs font-medium" style={{ color: '#1e2749', opacity: 0.6 }}>Love Notes Delivered</p>
+                <p className="text-sm font-medium" style={{ color: '#1e2749' }}>Love Notes Delivered</p>
               </div>
-              <p className="text-sm" style={{ color: '#1e2749' }}>Personalized feedback your teachers have received</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Personalized feedback your teachers have received</p>
             </div>
-            <div className="p-3 rounded-lg bg-white">
+            <div className="p-3 rounded-lg bg-white shadow-sm">
               <div className="flex items-center gap-2 mb-1">
                 <svg className="w-4 h-4" fill="#80a4ed" viewBox="0 0 24 24">
                   <path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z"/>
                 </svg>
-                <p className="text-xs font-medium" style={{ color: '#1e2749', opacity: 0.6 }}>Wellness Trends</p>
+                <p className="text-sm font-medium" style={{ color: '#1e2749' }}>Wellness Trends</p>
               </div>
-              <p className="text-sm" style={{ color: '#1e2749' }}>Staff stress and satisfaction over time</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Staff stress and satisfaction over time</p>
             </div>
-            <div className="p-3 rounded-lg bg-white">
+            <div className="p-3 rounded-lg bg-white shadow-sm">
               <div className="flex items-center gap-2 mb-1">
                 <svg className="w-4 h-4" fill="#80a4ed" viewBox="0 0 24 24">
                   <path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1c-1.3 0-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm2 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
                 </svg>
-                <p className="text-xs font-medium" style={{ color: '#1e2749', opacity: 0.6 }}>Contract Delivery</p>
+                <p className="text-sm font-medium" style={{ color: '#1e2749' }}>Contract Delivery</p>
               </div>
-              <p className="text-sm" style={{ color: '#1e2749' }}>What you purchased vs. what has been delivered</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>What you purchased vs. what has been delivered</p>
             </div>
           </div>
+
+          <a
+            href="/Example-Dashboard"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 mt-4 font-semibold transition-all hover:gap-3"
+            style={{ color: '#35A7FF' }}
+          >
+            See full example dashboard
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+            </svg>
+          </a>
         </div>
       </div>
 
