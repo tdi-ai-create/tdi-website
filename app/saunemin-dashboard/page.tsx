@@ -1181,49 +1181,6 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
-            {/* Observed Implementation Visual */}
-            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
-              <h4 className="font-semibold text-[#1e2749] mb-4">Observed Strategy Implementation</h4>
-
-              <div className="flex items-center gap-8">
-                {/* Donut Chart */}
-                <div className="relative w-32 h-32">
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                    {/* Background circle */}
-                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
-                    {/* Progress circle - 100% implementation observed */}
-                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="#22c55e" strokeWidth="3"
-                      strokeDasharray="100, 100" strokeLinecap="round" />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-2xl font-bold text-green-600">9/9</span>
-                    <span className="text-xs text-gray-500">Observed</span>
-                  </div>
-                </div>
-
-                {/* Description */}
-                <div className="flex-1">
-                  <p className="text-sm text-gray-600 mb-3">
-                    All 9 observed staff members demonstrated at least one strategy from the Hub during November observations.
-                  </p>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
-                      <span className="text-sm text-gray-700">Relationship-building techniques</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
-                      <span className="text-sm text-gray-700">Positive reinforcement strategies</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
-                      <span className="text-sm text-gray-700">Student engagement practices</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Non-Active Users Recommendation */}
             <div className="bg-white border-l-4 border-[#E07A5F] rounded-r-xl p-5 shadow-sm mb-6">
               <div className="flex items-center gap-2 mb-2">
