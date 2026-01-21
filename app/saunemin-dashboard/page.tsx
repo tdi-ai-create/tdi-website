@@ -671,39 +671,6 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
-            {/* Movement Involvement Section */}
-            <Accordion
-              id="movement-involvement"
-              title="Your Movement Involvement"
-              subtitle="8 of 12 staff have engaged with TDI resources"
-              icon={<Heart className="w-5 h-5" />}
-              badge="67%"
-              badgeColor="bg-[#35A7FF]/10 text-[#35A7FF]"
-            >
-              <div className="pt-4 space-y-4">
-                <div className="grid sm:grid-cols-3 gap-4 text-center">
-                  <div className="p-3 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">9</div>
-                    <div className="text-sm text-gray-600">Hub Logins</div>
-                  </div>
-                  <div className="p-3 bg-[#35A7FF]/10 rounded-lg">
-                    <div className="text-2xl font-bold text-[#35A7FF]">9</div>
-                    <div className="text-sm text-gray-600">Love Notes Received</div>
-                  </div>
-                  <div className="p-3 bg-[#38618C]/10 rounded-lg">
-                    <div className="text-2xl font-bold text-[#38618C]">1</div>
-                    <div className="text-sm text-gray-600">On-Site Days</div>
-                  </div>
-                </div>
-
-                <div className="border-t pt-4">
-                  <p className="text-sm text-gray-600">
-                    <strong>3 staff</strong> haven&apos;t logged in yet (Amber, Lisa, Dan). Consider pairing them with active users or dedicating PD time for Hub exploration.
-                  </p>
-                </div>
-              </div>
-            </Accordion>
-
             {/* Looking Ahead Card */}
             <div
               className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-[1.01]"
