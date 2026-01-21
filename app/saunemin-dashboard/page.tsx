@@ -566,7 +566,7 @@ export default function SauneminDashboard() {
                         {isOverdue(dueDates.day2Observation.month, dueDates.day2Observation.year) ? (
                           <span className="text-red-700 font-bold">OVERDUE</span>
                         ) : (
-                          <span className="text-[#E07A5F] font-medium">DUE BY SPRING 2026</span>
+                          <span className="text-[#E07A5F] font-medium">SCHEDULE BY MARCH 2026</span>
                         )}
                       </div>
                     </div>
@@ -605,7 +605,7 @@ export default function SauneminDashboard() {
                         {isOverdue(dueDates.springMeeting.month, dueDates.springMeeting.year) ? (
                           <span className="text-red-700 font-bold">OVERDUE</span>
                         ) : (
-                          <span className="text-[#E07A5F] font-medium">DUE BY MAY 2026</span>
+                          <span className="text-[#E07A5F] font-medium">SCHEDULE BY MARCH 2026</span>
                         )}
                       </div>
                     </div>
@@ -630,7 +630,7 @@ export default function SauneminDashboard() {
                     <div>
                       <div className="font-medium text-[#1e2749]">Collect Baseline Data for Leading Indicators</div>
                       <div className="text-sm text-gray-500">
-                        Survey or in-person collection · <span className="text-[#E07A5F] font-medium">RECOMMENDED BEFORE DAY 2</span>
+                        Survey or in-person collection · <span className="text-[#E07A5F] font-medium">SCHEDULE BY MARCH 2026</span>
                       </div>
                       <div className="text-xs text-gray-400 mt-1">
                         Choose: digital survey during staff meeting or in-person during next visit
