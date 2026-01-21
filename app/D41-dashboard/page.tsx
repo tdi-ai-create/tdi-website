@@ -284,36 +284,76 @@ export default function D41Dashboard() {
               </div>
             </div>
 
-            {/* Hub Engagement Alert */}
-            <div className="bg-[#E07A5F]/10 border border-[#E07A5F]/30 rounded-xl p-5">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-[#E07A5F] rounded-xl flex items-center justify-center flex-shrink-0">
-                  <AlertCircle className="w-6 h-6 text-white" />
+            {/* The Real Story - Hub Engagement */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-4">
+                <BarChart3 className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749]">What the Data Tells Us</span>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Current State */}
+                <div className="bg-[#E07A5F]/10 border border-[#E07A5F]/20 rounded-lg p-4">
+                  <p className="text-xs text-[#E07A5F] font-medium uppercase mb-2">Current: Hub-Only Access</p>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Hub Logins</span>
+                      <span className="font-bold text-[#E07A5F]">20%</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Courses Started</span>
+                      <span className="font-bold text-[#E07A5F]">Unknown</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Strategies Implemented</span>
+                      <span className="font-bold text-[#E07A5F]">~10%*</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-3">*Industry average for PD without coaching</p>
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-bold text-[#E07A5F] mb-1">Hub Engagement Opportunity</h3>
-                  <p className="text-gray-700 text-sm mb-3">
-                    Only {loggedInCount} of {teamMembers.length} registered paraprofessionals have logged into the Learning Hub.
-                    To maximize your investment, we recommend introducing the Hub during your next team meeting.
-                  </p>
-                  <div className="flex flex-wrap gap-3">
-                    <a
-                      href="https://tdi.thinkific.com"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-[#E07A5F] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#c9664d] transition-all"
-                    >
-                      <ExternalLink className="w-4 h-4" />
-                      Access Learning Hub
-                    </a>
-                    <button
-                      onClick={() => setActiveTab('team')}
-                      className="inline-flex items-center gap-2 bg-white text-[#E07A5F] border border-[#E07A5F] px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#E07A5F]/10 transition-all"
-                    >
-                      View Team Status →
-                    </button>
+
+                {/* With IGNITE */}
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="text-xs text-green-600 font-medium uppercase mb-2">With IGNITE: Personalized Support</p>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Hub Logins</span>
+                      <span className="font-bold text-green-600">100%</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Personalized Feedback</span>
+                      <span className="font-bold text-green-600">Every Para</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Strategies Implemented</span>
+                      <span className="font-bold text-green-600">65%</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-3">Based on TDI partner school data</p>
+                </div>
+              </div>
+
+              <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                <div className="flex items-start gap-3">
+                  <Lightbulb className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-medium text-amber-800">This is expected — and fixable.</p>
+                    <p className="text-sm text-amber-700 mt-1">
+                      Research shows on-demand PD without coaching support has only a <strong>10% implementation rate</strong>.
+                      Your paras need what Dee originally wanted: personalized observations, specific feedback, and accountability.
+                      That&apos;s exactly what IGNITE delivers.
+                    </p>
                   </div>
                 </div>
+              </div>
+
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={() => setActiveTab('next-steps')}
+                  className="inline-flex items-center gap-2 bg-[#38618C] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#2d4f73] transition-all"
+                >
+                  See IGNITE Plan →
+                </button>
               </div>
             </div>
 
@@ -496,6 +536,27 @@ export default function D41Dashboard() {
               <p className="text-xs text-gray-500">Goal: 100% of team logged in by end of semester</p>
             </div>
 
+            {/* The Real Issue */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
+              <div className="flex items-start gap-4">
+                <Lightbulb className="w-6 h-6 text-amber-600 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-bold text-amber-800 mb-1">Low Engagement Isn&apos;t a Motivation Problem</h3>
+                  <p className="text-amber-700 text-sm">
+                    Your paras are busy supporting students all day. Without protected time, guided direction, and personalized relevance,
+                    on-demand resources sit unused. <strong>This is exactly why IGNITE works:</strong> we observe each para, identify their specific
+                    growth areas, and point them to the exact resources that matter — plus hold them accountable to try new strategies.
+                  </p>
+                  <button
+                    onClick={() => setActiveTab('next-steps')}
+                    className="mt-3 inline-flex items-center gap-2 text-amber-800 font-medium text-sm hover:underline"
+                  >
+                    See how IGNITE solves this →
+                  </button>
+                </div>
+              </div>
+            </div>
+
             {/* Team Member List */}
             <div className="bg-white rounded-xl shadow-sm overflow-hidden">
               <div className="p-4 border-b border-gray-100">
@@ -607,6 +668,33 @@ export default function D41Dashboard() {
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Learning Hub Resources</h2>
               <p className="text-gray-600">Curated courses for paraprofessional development</p>
+            </div>
+
+            {/* Resources Context */}
+            <div className="bg-[#38618C]/10 border border-[#38618C]/20 rounded-xl p-5">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-[#38618C] rounded-xl flex items-center justify-center flex-shrink-0">
+                  <BookOpen className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-[#1e2749] mb-1">Great Resources — But Resources Alone Aren&apos;t Enough</h3>
+                  <p className="text-gray-700 text-sm mb-3">
+                    Your team has access to 32 high-quality courses designed for paraprofessionals. But here&apos;s what the research shows:
+                    <strong> without personalized coaching and accountability, only 10% of strategies get implemented</strong>.
+                    With TDI&apos;s IGNITE model, that jumps to 65%.
+                  </p>
+                  <div className="flex items-center gap-4 text-sm">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-[#E07A5F]"></div>
+                      <span className="text-gray-600">Hub Only: 10% implementation</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      <span className="text-gray-600">Hub + IGNITE: 65% implementation</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Hub Access CTA */}
@@ -770,6 +858,26 @@ export default function D41Dashboard() {
                 <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#35A7FF]" />
               </div>
             </a>
+
+            {/* Bridge to IGNITE */}
+            <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
+              <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                <div>
+                  <h3 className="font-bold text-lg mb-2">Make These Resources Actually Work</h3>
+                  <p className="text-sm text-white/80">
+                    With IGNITE, we observe your paras in action, give personalized feedback,
+                    and point them to the exact Hub resources that address their specific growth areas.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setActiveTab('next-steps')}
+                  className="bg-white text-[#1e2749] px-6 py-3 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors whitespace-nowrap flex items-center gap-2"
+                >
+                  <Sparkles className="w-4 h-4" />
+                  See IGNITE Plan
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -792,6 +900,80 @@ export default function D41Dashboard() {
                     With IGNITE, TDI partners see <strong>65% implementation rates</strong> — because personalized feedback
                     and accountability make the difference.
                   </p>
+                </div>
+              </div>
+            </div>
+
+            {/* What Dee Wanted vs What She Got */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <MessageSquare className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749]">Bridging the Gap</span>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* What Dee Originally Wanted */}
+                <div>
+                  <p className="text-xs text-gray-500 uppercase mb-3">What Dee Originally Wanted</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <Check className="w-4 h-4 text-[#35A7FF]" />
+                      <span>In-person observation and feedback</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <Check className="w-4 h-4 text-[#35A7FF]" />
+                      <span>Measurable outcomes tied to student growth</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <Check className="w-4 h-4 text-[#35A7FF]" />
+                      <span>Support for literacy curriculum rollout</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <Check className="w-4 h-4 text-[#35A7FF]" />
+                      <span>Para–teacher collaboration building</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <Check className="w-4 h-4 text-[#35A7FF]" />
+                      <span>No sub coverage required</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                    <p className="text-xs text-gray-500 italic">
+                      &quot;I&apos;m interested in expanding to an in-person component once budget and team feedback stabilize.&quot; — Dee
+                    </p>
+                  </div>
+                </div>
+
+                {/* What IGNITE Delivers */}
+                <div>
+                  <p className="text-xs text-green-600 uppercase mb-3">What IGNITE Delivers</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span><strong>2 on-site days</strong> with classroom observations</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span><strong>KPIs tracked:</strong> implementation rate, confidence, retention</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span><strong>Focus areas</strong> aligned to literacy goals</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span><strong>Growth Groups</strong> for para collaboration</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span><strong>Zero sub coverage</strong> — we observe during instruction</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                    <p className="text-xs text-green-700">
+                      <strong>IGNITE is exactly what Dee wanted</strong> — now with data to justify the investment.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1172,6 +1354,61 @@ export default function D41Dashboard() {
                     <span>Progress Tracking</span>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Measurable KPIs */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-4">
+                <BarChart3 className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749]">Measurable KPIs We&apos;ll Track Together</span>
+              </div>
+              <p className="text-sm text-gray-500 mb-6">
+                Unlike generic PD, IGNITE gives you concrete data to show progress — and justify continued investment.
+              </p>
+
+              <div className="grid md:grid-cols-4 gap-4">
+                <div className="bg-gray-50 rounded-lg p-4 text-center">
+                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <TrendingUp className="w-5 h-5 text-[#38618C]" />
+                  </div>
+                  <p className="font-bold text-[#1e2749]">Strategy Implementation</p>
+                  <p className="text-xs text-gray-500 mt-1">% of paras using new strategies</p>
+                  <p className="text-lg font-bold text-[#38618C] mt-2">Target: 65%</p>
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-4 text-center">
+                  <div className="w-10 h-10 bg-[#35A7FF]/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Heart className="w-5 h-5 text-[#35A7FF]" />
+                  </div>
+                  <p className="font-bold text-[#1e2749]">Para Confidence</p>
+                  <p className="text-xs text-gray-500 mt-1">Self-reported confidence score</p>
+                  <p className="text-lg font-bold text-[#35A7FF] mt-2">Target: +20%</p>
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-4 text-center">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Users className="w-5 h-5 text-green-600" />
+                  </div>
+                  <p className="font-bold text-[#1e2749]">Retention Intent</p>
+                  <p className="text-xs text-gray-500 mt-1">&quot;I plan to stay next year&quot;</p>
+                  <p className="text-lg font-bold text-green-600 mt-2">Target: 90%+</p>
+                </div>
+
+                <div className="bg-gray-50 rounded-lg p-4 text-center">
+                  <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <GraduationCap className="w-5 h-5 text-[#E07A5F]" />
+                  </div>
+                  <p className="font-bold text-[#1e2749]">Student Impact</p>
+                  <p className="text-xs text-gray-500 mt-1">Language growth in small groups</p>
+                  <p className="text-lg font-bold text-[#E07A5F] mt-2">Tracked</p>
+                </div>
+              </div>
+
+              <div className="mt-6 p-4 bg-[#35A7FF]/10 rounded-lg">
+                <p className="text-sm text-[#1e2749]">
+                  <strong>Why this matters:</strong> When budget conversations happen, you&apos;ll have real data showing ROI — not just &quot;teachers liked it.&quot;
+                </p>
               </div>
             </div>
 
