@@ -861,22 +861,107 @@ export default function SauneminDashboard() {
               </div>
             </Accordion>
 
-            {/* Implementation Gap Recommendation */}
-            <div className="bg-white border-l-4 border-[#38618C] rounded-r-xl p-5 shadow-sm">
-              <div className="flex items-center gap-2 mb-2">
-                <Lightbulb className="w-5 h-5 text-[#38618C]" />
-                <h3 className="font-semibold text-[#1e2749]">Recommendation: Bridge the Implementation Gap</h3>
+            {/* Recommendation: Bridge the Implementation Gap - Expanded */}
+            <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-6 mb-6">
+              <div className="flex items-start gap-3 mb-4">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Lightbulb className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-[#1e2749] text-lg">Recommendation: Bridge the Implementation Gap</h4>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Research shows only 30% of professional development translates to classroom practice. Saunemin&apos;s November observations showed <strong>100% of observed staff</strong> implementing at least one strategy — that&apos;s exceptional! Day 2 will help sustain this momentum and deepen implementation.
+                  </p>
+                </div>
               </div>
-              <p className="text-sm text-gray-600 mb-3">
-                Research shows only 30% of professional development translates to classroom practice. Saunemin&apos;s November observations showed <strong>100% of observed staff</strong> implementing at least one strategy — that&apos;s exceptional! Day 2 will help sustain this momentum and deepen implementation.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-700 px-2 py-1 rounded-full">
-                  <Check className="w-3 h-3" /> 9/9 staff implementing strategies
-                </span>
-                <span className="inline-flex items-center gap-1 text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full">
-                  <Target className="w-3 h-3" /> Schedule Day 2 to sustain progress
-                </span>
+
+              {/* What Day 2 Will Accomplish */}
+              <div className="bg-white rounded-lg p-4 mb-4">
+                <h5 className="font-semibold text-[#1e2749] mb-3 flex items-center gap-2">
+                  <Target className="w-4 h-4 text-[#38618C]" />
+                  What Day 2 Will Accomplish
+                </h5>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-[#35A7FF]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <TrendingUp className="w-3 h-3 text-[#35A7FF]" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749]">Measure Progress After Feedback</p>
+                      <p className="text-xs text-gray-500">See how educators have grown since receiving their personalized Love Notes and Hub resources</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-[#35A7FF]/10 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Eye className="w-3 h-3 text-[#35A7FF]" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749]">Observe Strategy Implementation</p>
+                      <p className="text-xs text-gray-500">Look for specific Hub strategies showing up in daily practice — not just logins, but real change</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Star className="w-3 h-3 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749]">Build on Current Strengths</p>
+                      <p className="text-xs text-gray-500">Celebrate wins like Sam&apos;s student rapport, Lisa&apos;s PreK systems, and Cindy&apos;s phonics instruction</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Users className="w-3 h-3 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-[#1e2749]">Strengthen Para-Teacher Collaboration</p>
+                      <p className="text-xs text-gray-500">Deepen the already-strong teamwork we observed between Haylie, Grace, and their teachers</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Day 2 Focus Areas */}
+              <div className="bg-[#1e2749] rounded-lg p-4 text-white">
+                <h5 className="font-semibold mb-3 flex items-center gap-2">
+                  <ClipboardList className="w-4 h-4" />
+                  Day 2 Observation Focus Areas
+                </h5>
+                <div className="grid md:grid-cols-3 gap-3">
+                  <div className="bg-white/10 rounded-lg p-3">
+                    <p className="text-sm font-medium">Para Foundations</p>
+                    <p className="text-xs opacity-70">Are role clarity & boundaries clearer?</p>
+                  </div>
+                  <div className="bg-white/10 rounded-lg p-3">
+                    <p className="text-sm font-medium">Small Group Strategies</p>
+                    <p className="text-xs opacity-70">New techniques from Hub courses?</p>
+                  </div>
+                  <div className="bg-white/10 rounded-lg p-3">
+                    <p className="text-sm font-medium">De-Escalation Tools</p>
+                    <p className="text-xs opacity-70">Calmer transitions & redirections?</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Action Items */}
+              <div className="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-green-200">
+                <div className="flex items-center gap-2 text-sm text-green-700 bg-green-100 px-3 py-1.5 rounded-full">
+                  <Check className="w-4 h-4" />
+                  9/9 staff received personalized feedback
+                </div>
+                <div className="flex items-center gap-2 text-sm text-green-700 bg-green-100 px-3 py-1.5 rounded-full">
+                  <Check className="w-4 h-4" />
+                  Hub resources shared with each educator
+                </div>
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-white bg-[#35A7FF] hover:bg-[#2589db] px-4 py-1.5 rounded-full font-medium transition-colors"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Schedule Day 2 to See Progress
+                </a>
               </div>
             </div>
 
