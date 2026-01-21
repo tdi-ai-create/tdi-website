@@ -31,7 +31,8 @@ import {
   ChevronRight,
   Check,
   GraduationCap,
-  ExternalLink
+  ExternalLink,
+  Gift
 } from 'lucide-react';
 
 // Tooltip component
@@ -225,8 +226,8 @@ export default function TCCSDashboard() {
                   <Video className="w-4 h-4" />
                   Sessions
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">2/3</div>
-                <div className="text-xs text-amber-600 font-medium">1 Pending</div>
+                <div className="text-2xl font-bold text-[#1e2749]">2/4</div>
+                <div className="text-xs text-[#35A7FF] font-medium">2 Remaining</div>
               </div>
               <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                 <div className="flex items-center gap-2 text-gray-500 text-sm mb-1">
@@ -263,36 +264,90 @@ export default function TCCSDashboard() {
               </div>
             </div>
 
+            {/* The TDI Effect */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="mb-4">
+                <h2 className="text-lg font-bold text-[#1e2749] flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-[#35A7FF]" />
+                  The TDI Effect
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">What happens when educators follow our approach</p>
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 bg-[#35A7FF]/5 rounded-lg border border-[#35A7FF]/20">
+                  <div className="text-3xl font-bold text-[#1e2749]">65%</div>
+                  <div className="text-xs text-gray-600 mt-1">Strategy Implementation</div>
+                  <div className="text-xs text-[#E07A5F] mt-0.5">(vs 10% industry avg)</div>
+                </div>
+                <div className="text-center p-4 bg-[#35A7FF]/5 rounded-lg border border-[#35A7FF]/20">
+                  <div className="text-3xl font-bold text-[#1e2749]">47%</div>
+                  <div className="text-xs text-gray-600 mt-1">Report Feeling Better</div>
+                  <div className="text-xs text-gray-400 mt-0.5">(within 3-4 months)</div>
+                </div>
+                <div className="text-center p-4 bg-[#35A7FF]/5 rounded-lg border border-[#35A7FF]/20">
+                  <div className="text-3xl font-bold text-[#1e2749]">5-7/10</div>
+                  <div className="text-xs text-gray-600 mt-1">Avg Stress Level</div>
+                  <div className="text-xs text-[#E07A5F] mt-0.5">(down from 8-9/10)</div>
+                </div>
+                <div className="text-center p-4 bg-[#35A7FF]/5 rounded-lg border border-[#35A7FF]/20">
+                  <div className="text-3xl font-bold text-[#1e2749]">9.8/10</div>
+                  <div className="text-xs text-gray-600 mt-1">Retention Intent</div>
+                  <div className="text-xs text-[#E07A5F] mt-0.5">(vs 2-4/10 industry)</div>
+                </div>
+              </div>
+              <p className="text-xs text-gray-400 mt-4 text-center">Based on TDI partner school survey data</p>
+            </div>
+
             {/* Next Steps */}
             <div className="bg-[#38618C]/5 border border-[#38618C]/20 rounded-xl p-6">
               <h2 className="text-lg font-bold text-[#1e2749] mb-4 flex items-center gap-2">
                 <Target className="w-5 h-5 text-[#38618C]" />
                 Next Steps Together
               </h2>
-              <div className="space-y-3">
-                <div className="flex items-start gap-3 p-3 bg-white rounded-lg border border-gray-200">
-                  <div className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Clock className="w-4 h-4 text-amber-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-[#1e2749]">March 13 Session Needs Confirmation</p>
-                    <p className="text-sm text-gray-600 mt-1">Let&apos;s finalize the date for our spring follow-up session.</p>
-                    <a
-                      href="mailto:rae@teachersdeserveit.com?subject=TCCS%20March%20Session%20-%20Let's%20Finalize%20Our%20Plan"
-                      className="inline-flex items-center gap-1 text-[#35A7FF] hover:text-[#2896ee] font-medium text-sm mt-2"
-                    >
-                      Email Rae to Confirm
-                      <ArrowRight className="w-4 h-4" />
-                    </a>
+              <div className="grid md:grid-cols-2 gap-4">
+                {/* March Session */}
+                <div className="p-4 bg-white rounded-lg border border-gray-200">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                      <Calendar className="w-4 h-4 text-amber-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold text-[#1e2749]">March 13 Session</p>
+                      <p className="text-sm text-gray-600 mt-1">Confirm your goals for our March session</p>
+                      <p className="text-xs text-amber-600 mt-1">Date is on hold</p>
+                      <a
+                        href="mailto:rae@teachersdeserveit.com?subject=TCCS%20March%20Session%20-%20Let's%20Finalize%20Our%20Plan"
+                        className="inline-flex items-center gap-1 text-[#35A7FF] hover:text-[#2896ee] font-medium text-sm mt-2"
+                      >
+                        Email Rae to Confirm
+                        <ArrowRight className="w-4 h-4" />
+                      </a>
+                    </div>
                   </div>
                 </div>
-                <div className="flex items-start gap-3 p-3 bg-white rounded-lg border border-gray-200">
-                  <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <MessageSquare className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="font-medium text-[#1e2749]">Survey During March Session</p>
-                    <p className="text-sm text-gray-600 mt-1">Beth and James will complete a brief baseline survey to help us measure growth.</p>
+                {/* Bonus Session */}
+                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                      <Gift className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-[#1e2749]">Complimentary Spring Session</p>
+                        <span className="text-xs bg-green-600 text-white px-1.5 py-0.5 rounded font-medium">BONUS</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">A 45-minute bonus session — on us!</p>
+                      <p className="text-xs text-green-700 mt-1">Schedule by April 2026</p>
+                      <a
+                        href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-green-700 hover:text-green-800 font-medium text-sm mt-2"
+                      >
+                        Schedule Now
+                        <ArrowRight className="w-4 h-4" />
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -339,37 +394,38 @@ export default function TCCSDashboard() {
                 <TrendingUp className="w-5 h-5 text-[#38618C]" />
                 Leading Indicators
               </h2>
-              <p className="text-sm text-gray-500 mb-6">Tracking growth beyond course completions</p>
+              <p className="text-sm text-gray-500 mb-6">Research shows these metrics are the strongest predictors of sustainable change</p>
 
               <div className="space-y-6">
-                {/* Para Confidence */}
+                {/* Stress Level */}
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <Tooltip content="Self-reported confidence level in supporting students (1-10 scale)">
-                      <span className="font-medium text-[#1e2749]">Para Confidence</span>
+                    <Tooltip content="Self-reported stress level (lower is better)">
+                      <span className="font-medium text-[#1e2749]">Stress Level</span>
                     </Tooltip>
+                    <span className="text-xs text-gray-400">lower is better</span>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-24">Industry Avg</span>
                       <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '40%' }}></div>
+                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '85%' }}></div>
                       </div>
-                      <span className="text-sm font-medium text-gray-600 w-16 text-right">4/10</span>
+                      <span className="text-sm font-medium text-gray-600 w-16 text-right">8-9/10</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-24">TDI Partners</span>
                       <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#1e2749] rounded-full" style={{ width: '75%' }}></div>
+                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '60%' }}></div>
                       </div>
-                      <span className="text-sm font-medium text-gray-600 w-16 text-right">7.5/10</span>
+                      <span className="text-sm font-medium text-gray-600 w-16 text-right">5-7/10</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-24">TCCS</span>
                       <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
                         <div className="h-full bg-gray-300 rounded-full" style={{ width: '10%' }}></div>
                       </div>
-                      <span className="text-sm font-medium text-amber-600 w-16 text-right">Coming</span>
+                      <span className="text-sm font-medium text-amber-600 w-20 text-right">Survey Coming</span>
                     </div>
                   </div>
                 </div>
@@ -380,6 +436,7 @@ export default function TCCSDashboard() {
                     <Tooltip content="Percentage of learned strategies actively used in daily practice">
                       <span className="font-medium text-[#1e2749]">Strategy Implementation</span>
                     </Tooltip>
+                    <span className="text-xs text-gray-400">higher is better</span>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
@@ -392,7 +449,7 @@ export default function TCCSDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-24">TDI Partners</span>
                       <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#1e2749] rounded-full" style={{ width: '65%' }}></div>
+                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '65%' }}></div>
                       </div>
                       <span className="text-sm font-medium text-gray-600 w-16 text-right">65%</span>
                     </div>
@@ -401,7 +458,7 @@ export default function TCCSDashboard() {
                       <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
                         <div className="h-full bg-gray-300 rounded-full" style={{ width: '10%' }}></div>
                       </div>
-                      <span className="text-sm font-medium text-amber-600 w-16 text-right">Coming</span>
+                      <span className="text-sm font-medium text-amber-600 w-20 text-right">Survey Coming</span>
                     </div>
                   </div>
                 </div>
@@ -409,31 +466,32 @@ export default function TCCSDashboard() {
                 {/* Support Satisfaction */}
                 <div>
                   <div className="flex justify-between items-center mb-2">
-                    <Tooltip content="How supported paras feel by their school and administration">
+                    <Tooltip content="How supported staff feel by their school and administration">
                       <span className="font-medium text-[#1e2749]">Support Satisfaction</span>
                     </Tooltip>
+                    <span className="text-xs text-gray-400">higher is better</span>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-24">Industry Avg</span>
                       <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '35%' }}></div>
+                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '45%' }}></div>
                       </div>
-                      <span className="text-sm font-medium text-gray-600 w-16 text-right">35%</span>
+                      <span className="text-sm font-medium text-gray-600 w-16 text-right">4-5/10</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-24">TDI Partners</span>
                       <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#1e2749] rounded-full" style={{ width: '82%' }}></div>
+                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '85%' }}></div>
                       </div>
-                      <span className="text-sm font-medium text-gray-600 w-16 text-right">82%</span>
+                      <span className="text-sm font-medium text-gray-600 w-16 text-right">8-9/10</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-24">TCCS</span>
                       <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
                         <div className="h-full bg-gray-300 rounded-full" style={{ width: '10%' }}></div>
                       </div>
-                      <span className="text-sm font-medium text-amber-600 w-16 text-right">Coming</span>
+                      <span className="text-sm font-medium text-amber-600 w-20 text-right">Survey Coming</span>
                     </div>
                   </div>
                 </div>
@@ -444,28 +502,29 @@ export default function TCCSDashboard() {
                     <Tooltip content="Staff planning to return next year">
                       <span className="font-medium text-[#1e2749]">Retention Intent</span>
                     </Tooltip>
+                    <span className="text-xs text-gray-400">higher is better</span>
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-24">Industry Avg</span>
                       <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '70%' }}></div>
+                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '30%' }}></div>
                       </div>
-                      <span className="text-sm font-medium text-gray-600 w-16 text-right">70%</span>
+                      <span className="text-sm font-medium text-gray-600 w-16 text-right">2-4/10</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-24">TDI Partners</span>
                       <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#1e2749] rounded-full" style={{ width: '94%' }}></div>
+                        <div className="h-full bg-[#38618C] rounded-full" style={{ width: '60%' }}></div>
                       </div>
-                      <span className="text-sm font-medium text-gray-600 w-16 text-right">94%</span>
+                      <span className="text-sm font-medium text-gray-600 w-16 text-right">5-7/10</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-24">TCCS</span>
                       <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
                         <div className="h-full bg-gray-300 rounded-full" style={{ width: '10%' }}></div>
                       </div>
-                      <span className="text-sm font-medium text-amber-600 w-16 text-right">Coming</span>
+                      <span className="text-sm font-medium text-amber-600 w-20 text-right">Survey Coming</span>
                     </div>
                   </div>
                 </div>
@@ -478,7 +537,7 @@ export default function TCCSDashboard() {
                   <span className="text-xs text-gray-600">Industry Average</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 rounded bg-[#1e2749]"></div>
+                  <div className="w-4 h-4 rounded bg-[#38618C]"></div>
                   <span className="text-xs text-gray-600">TDI Partners</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -490,9 +549,12 @@ export default function TCCSDashboard() {
               {/* Survey Note */}
               <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
                 <p className="text-sm text-amber-800">
-                  <strong>Survey Coming:</strong> During our March virtual session, Beth and James will complete a brief survey to establish baseline metrics for TCCS.
+                  <strong>Survey Coming:</strong> During our March virtual session, Beth and James will complete a brief survey to establish baseline metrics. We&apos;ll update this dashboard with real data.
                 </p>
               </div>
+
+              {/* Source Citation */}
+              <p className="text-xs text-gray-400 mt-3">Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys</p>
             </div>
 
             {/* Session History */}
@@ -571,7 +633,7 @@ export default function TCCSDashboard() {
                   icon={<Clock className="w-5 h-5 text-amber-500" />}
                 >
                   <div className="space-y-3">
-                    <p className="text-gray-600">Final session of the pilot year to review growth and plan for 2026-27.</p>
+                    <p className="text-gray-600">Spring session to review growth and plan for 2026-27.</p>
                     <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
                       <p className="text-sm font-medium text-amber-800">Session Agenda:</p>
                       <ul className="text-sm text-amber-700 mt-2 space-y-1">
@@ -581,6 +643,7 @@ export default function TCCSDashboard() {
                         <li>• Q&A and growth planning</li>
                       </ul>
                     </div>
+                    <p className="text-xs text-amber-600">Date is on hold — needs confirmation</p>
                     <a
                       href="mailto:rae@teachersdeserveit.com?subject=TCCS%20March%20Session%20-%20Let's%20Finalize%20Our%20Plan"
                       className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2896ee] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -590,6 +653,35 @@ export default function TCCSDashboard() {
                     </a>
                   </div>
                 </Accordion>
+
+                {/* Session 4 - Bonus */}
+                <div className="border border-green-200 rounded-lg overflow-hidden bg-green-50">
+                  <div className="px-4 py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <Gift className="w-5 h-5 text-green-600" />
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-[#1e2749]">Session 4: Complimentary Spring Session</span>
+                          <span className="text-xs bg-green-600 text-white px-1.5 py-0.5 rounded font-medium">BONUS</span>
+                        </div>
+                        <p className="text-sm text-gray-500">By April 2026 • 45 minutes</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="p-4 border-t border-green-200 bg-white">
+                    <p className="text-gray-600 mb-3">A complimentary 45-minute bonus session — on us! Use it for extra coaching, planning, or questions.</p>
+                    <p className="text-xs text-green-700 mb-3">Schedule by April 2026</p>
+                    <a
+                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Schedule Now
+                    </a>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -694,11 +786,11 @@ export default function TCCSDashboard() {
 
             {/* Recommended Courses */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-bold text-[#1e2749] mb-4 flex items-center gap-2">
+              <h2 className="text-lg font-bold text-[#1e2749] mb-2 flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-[#38618C]" />
-                Highlighted Courses for Paras
+                Courses Built for Paraprofessionals
               </h2>
-              <p className="text-sm text-gray-600 mb-4">These courses from the Hub are specifically designed for paraprofessional success:</p>
+              <p className="text-sm text-gray-600 mb-4">These courses were designed specifically for Beth and James&apos;s role</p>
               <div className="grid md:grid-cols-2 gap-3">
                 {[
                   'Paraprofessional Foundations – Understanding Your Role & Impact',
@@ -706,7 +798,9 @@ export default function TCCSDashboard() {
                   'Building Strong Teacher-Para Partnerships',
                   'Effective Small-Group & One-on-One Instruction',
                   'De-Escalation Strategies for Unstructured Environments',
-                  'Supporting Students Through Their Daily Schedule'
+                  'Supporting Students Through Their Daily Schedule',
+                  'From Listening to Helping: Taking Notes during Class',
+                  'Explaining Homework Without Losing Your Mind'
                 ].map((course, idx) => (
                   <div key={idx} className="flex items-start gap-2 p-3 bg-gray-50 rounded-lg">
                     <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
@@ -723,7 +817,7 @@ export default function TCCSDashboard() {
                 <div>
                   <h3 className="font-bold mb-2">Recommendation</h3>
                   <p className="text-white/90 text-sm">
-                    Encourage Beth and James to continue exploring the Paraprofessional-specific courses in the Hub. These were designed specifically for their role and include practical strategies they can implement immediately.
+                    Encourage Beth and James to prioritize the Paraprofessional-specific courses. These were designed specifically for their role and will have the most immediate impact on their daily work.
                   </p>
                 </div>
               </div>
@@ -785,7 +879,7 @@ export default function TCCSDashboard() {
                 <div>
                   <h3 className="font-bold text-green-800 mb-1">Your Pilot Proves TDI Works for TCCS</h3>
                   <p className="text-green-700 text-sm">
-                    With 100% Hub engagement and two successful coaching sessions, you&apos;ve seen firsthand how targeted support helps your paras grow. Here&apos;s what expanding could look like.
+                    Beth and James are engaged, logging in, and accessing professional development built for their role. Here&apos;s what expanding could look like:
                   </p>
                 </div>
               </div>
