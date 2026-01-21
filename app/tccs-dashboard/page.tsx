@@ -197,17 +197,21 @@ export default function TCCSDashboard() {
         </div>
       </nav>
 
-      {/* Hero Section - Solid gradient (no background image) */}
-      <section className="relative text-white py-6 px-4 overflow-hidden bg-gradient-to-r from-[#1e2749] to-[#38618C]">
-        <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Tidioute Community Charter School</h1>
-            <p className="text-white/80 text-sm">Tidioute, Pennsylvania | Partner Dashboard</p>
-          </div>
-          <div className="flex items-center gap-3 text-sm">
-            <div className="bg-white/10 px-3 py-1.5 rounded-lg">
-              <span className="text-white/60">Status:</span>
-              <span className="ml-2 font-semibold text-[#35A7FF] bg-white px-2 py-0.5 rounded">Pilot Partnership</span>
+      {/* Compact Hero */}
+      <section className="relative text-white py-8 px-4 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1e2749] to-[#38618C]" />
+
+        <div className="relative max-w-5xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold">Tidioute Community Charter School</h1>
+              <p className="text-white/80 text-sm mt-1">Tidioute, Pennsylvania | Partner Dashboard</p>
+            </div>
+            <div className="flex-shrink-0">
+              <div className="bg-white/10 px-4 py-2 rounded-lg">
+                <span className="text-white/60 text-sm">Status:</span>
+                <span className="ml-2 font-semibold text-[#1e2749] bg-white px-2 py-0.5 rounded text-sm">Pilot Partnership</span>
+              </div>
             </div>
           </div>
         </div>
