@@ -204,7 +204,7 @@ export default function TCCSDashboard() {
         <div className="relative max-w-5xl mx-auto">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold">Tidioute Community Charter School</h1>
+              <h1 className="text-xl md:text-2xl lg:text-3xl font-bold">Tidioute Community<br />Charter School</h1>
               <p className="text-white/80 text-sm mt-1">Tidioute, Pennsylvania | Partner Dashboard</p>
             </div>
             <div className="flex-shrink-0">
