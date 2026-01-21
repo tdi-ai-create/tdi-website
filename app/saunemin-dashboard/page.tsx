@@ -487,25 +487,30 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
-            {/* Contract Deadline Warning */}
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
-                <div>
-                  <p className="font-semibold text-red-800">Important: Use It or Lose It</p>
-                  <p className="text-sm text-red-700 mt-1">
-                    Any unscheduled contract services will expire on <strong>July 1, 2026</strong>. You still have <strong>1 on-site day</strong> and a <strong>spring leadership meeting</strong> included in your partnership. Schedule these now to maximize your investment!
-                  </p>
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
-                  >
-                    <Calendar className="w-4 h-4" />
-                    Schedule Now Before July 2026
-                  </a>
+            {/* Contract Reminder - Subtle Version */}
+            <div className="bg-[#1e2749]/5 border border-[#1e2749]/10 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 bg-[#38618C]/10 rounded-full flex items-center justify-center">
+                    <Calendar className="w-4 h-4 text-[#38618C]" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-[#1e2749]">
+                      Reminder: 1 on-site day + spring meeting still available
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Contract services available through July 2026
+                    </p>
+                  </div>
                 </div>
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-[#35A7FF] hover:text-[#2589db] font-medium flex items-center gap-1 whitespace-nowrap"
+                >
+                  Schedule →
+                </a>
               </div>
             </div>
 
