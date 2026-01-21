@@ -211,7 +211,7 @@ export default function D41Dashboard() {
               { id: 'overview', label: 'Overview', icon: Eye },
               { id: 'team', label: 'Your Team', icon: Users },
               { id: 'resources', label: 'Resources', icon: BookOpen },
-              { id: 'next-steps', label: '2026-27', icon: Sparkles, badge: 'Proposal' },
+              { id: 'next-steps', label: '2026-27', icon: Sparkles, badge: 'IGNITE' },
               { id: 'contact', label: 'Contact', icon: User },
             ].map((tab) => (
               <button
