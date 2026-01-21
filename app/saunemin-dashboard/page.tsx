@@ -1564,7 +1564,7 @@ export default function SauneminDashboard() {
               </p>
               <div className="grid sm:grid-cols-2 gap-3">
                 <a
-                  href="https://learning.teachersdeserveit.com"
+                  href="https://tdi.thinkific.com/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors"
@@ -1573,7 +1573,7 @@ export default function SauneminDashboard() {
                   <div className="text-xs text-white/70 mt-1">Behavior support & classroom management</div>
                 </a>
                 <a
-                  href="https://learning.teachersdeserveit.com"
+                  href="https://tdi.thinkific.com/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors"
@@ -1582,7 +1582,7 @@ export default function SauneminDashboard() {
                   <div className="text-xs text-white/70 mt-1">Connection-first approaches</div>
                 </a>
                 <a
-                  href="https://learning.teachersdeserveit.com"
+                  href="https://tdi.thinkific.com/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors"
@@ -1591,7 +1591,7 @@ export default function SauneminDashboard() {
                   <div className="text-xs text-white/70 mt-1">5-minute strategies that work</div>
                 </a>
                 <a
-                  href="https://learning.teachersdeserveit.com"
+                  href="https://tdi.thinkific.com/"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors"
