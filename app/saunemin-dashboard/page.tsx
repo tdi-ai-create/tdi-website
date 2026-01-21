@@ -699,168 +699,174 @@ export default function SauneminDashboard() {
               <p className="text-gray-600">Tracking progress through Phase 1: IGNITE</p>
             </div>
 
-            {/* Leading Indicators */}
-            <Accordion
-              id="leading-indicators"
-              title="Leading Indicators"
-              subtitle="Research-backed metrics for measuring impact"
-              icon={<Activity className="w-5 h-5" />}
-              badge="Phase 1"
-              badgeColor="bg-[#35A7FF]/10 text-[#35A7FF]"
-            >
-              <div className="pt-4 grid md:grid-cols-2 gap-4">
-                {/* Educator Stress - TBD */}
-                <div className="bg-white rounded-xl p-5 border border-gray-200 relative overflow-hidden">
-                  {/* Mini chart decoration in corner */}
-                  <div className="absolute top-3 right-16 opacity-10">
-                    <svg width="60" height="40" viewBox="0 0 60 40">
-                      <polyline
-                        points="0,35 15,28 30,32 45,20 60,25"
-                        fill="none"
-                        stroke="#38618C"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </div>
+            {/* Leading Indicators Section - With Full Comparison Bars */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-5 h-5 text-[#38618C]" />
+                  <h3 className="text-xl font-bold text-[#1e2749]">Leading Indicators</h3>
+                </div>
+                <span className="text-xs bg-[#38618C] text-white px-3 py-1 rounded-full">Phase 1</span>
+              </div>
+              <p className="text-sm text-gray-500 mb-6">Research-backed metrics for measuring impact</p>
 
-                  <div className="flex items-start justify-between mb-3">
-                    <p className="text-3xl font-bold text-gray-300">TBD</p>
-                    <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-3 py-1 rounded-full">Survey Pending</span>
-                  </div>
-                  <h4 className="font-semibold text-[#1e2749] mb-2">Educator Stress</h4>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium text-gray-700">Research:</span> 73% of educators report frequent stress (NCES 2022)
-                  </p>
-                  <p className="text-sm text-green-600 mt-1">
-                    <span className="font-medium">TDI Partners:</span> Avg. 28% reduction after Year 1
-                  </p>
+              {/* Indicator Grid */}
+              <div className="space-y-8">
 
-                  {/* Mini progress indicator */}
-                  <div className="mt-4 pt-3 border-t border-gray-100">
+                {/* Educator Stress (lower is better — bars INVERTED) */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Educator Stress</span>
                     <div className="flex items-center gap-2">
-                      <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-gray-300 rounded-full" style={{ width: '0%' }} />
-                      </div>
-                      <span className="text-xs text-gray-400">Awaiting data</span>
+                      <span className="text-xs text-gray-400">Lower is better</span>
+                      <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-0.5 rounded-full">Survey Pending</span>
                     </div>
                   </div>
-                </div>
-
-                {/* Strategy Implementation - TBD */}
-                <div className="bg-white rounded-xl p-5 border border-gray-200 relative overflow-hidden">
-                  {/* Mini bar chart decoration */}
-                  <div className="absolute top-3 right-16 opacity-10">
-                    <svg width="50" height="40" viewBox="0 0 50 40">
-                      <rect x="0" y="25" width="10" height="15" fill="#38618C" rx="2" />
-                      <rect x="14" y="18" width="10" height="22" fill="#38618C" rx="2" />
-                      <rect x="28" y="10" width="10" height="30" fill="#38618C" rx="2" />
-                      <rect x="42" y="5" width="10" height="35" fill="#35A7FF" rx="2" />
-                    </svg>
-                  </div>
-
-                  <div className="flex items-start justify-between mb-3">
-                    <p className="text-3xl font-bold text-gray-300">TBD</p>
-                    <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-3 py-1 rounded-full">Survey Pending</span>
-                  </div>
-                  <h4 className="font-semibold text-[#1e2749] mb-2">Strategy Implementation</h4>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium text-gray-700">Research:</span> Only 30% of PD translates to practice (Joyce & Showers)
-                  </p>
-                  <p className="text-sm text-green-600 mt-1">
-                    <span className="font-medium">TDI Partners:</span> Avg. 85% report implementing strategies
-                  </p>
-
-                  {/* Mini progress indicator */}
-                  <div className="mt-4 pt-3 border-t border-gray-100">
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-gray-300 rounded-full" style={{ width: '0%' }} />
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '15%' }}></div>
                       </div>
-                      <span className="text-xs text-gray-400">Awaiting data</span>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-20 text-right">8-9/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '45%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-20 text-right">5-7/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Saunemin</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-400 w-20 text-right">TBD</span>
                     </div>
                   </div>
+                  <p className="text-xs text-gray-500 mt-2 ml-31">Research: 73% of educators report frequent stress (NCES 2022)</p>
                 </div>
 
-                {/* Educator-Para Collaboration - STRONG (Observed) */}
-                <div className="bg-green-50 rounded-xl p-5 border border-green-200 relative overflow-hidden">
-                  {/* Checkmark/success decoration */}
-                  <div className="absolute top-3 right-16 opacity-20">
-                    <svg width="40" height="40" viewBox="0 0 40 40">
-                      <circle cx="20" cy="20" r="18" fill="none" stroke="#22c55e" strokeWidth="3" />
-                      <polyline points="12,20 18,26 28,14" fill="none" stroke="#22c55e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </div>
-
-                  <div className="flex items-start justify-between mb-3">
-                    <p className="text-3xl font-bold text-green-600">Strong</p>
-                    <span className="text-xs bg-green-600 text-white px-3 py-1 rounded-full">Observed</span>
-                  </div>
-                  <h4 className="font-semibold text-[#1e2749] mb-2">Educator-Para Collaboration</h4>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium text-gray-700">Research:</span> Strong collaboration linked to 15% better outcomes
-                  </p>
-                  <p className="text-sm text-green-600 mt-1">
-                    <span className="font-medium">Saunemin:</span> Excellent collaboration observed Nov 2025
-                  </p>
-
-                  {/* Mini progress indicator - filled */}
-                  <div className="mt-4 pt-3 border-t border-green-200">
+                {/* Strategy Implementation (higher is better) */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Strategy Implementation</span>
                     <div className="flex items-center gap-2">
-                      <div className="flex-1 h-1.5 bg-green-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-green-500 rounded-full" style={{ width: '85%' }} />
-                      </div>
-                      <span className="text-xs text-green-600 font-medium">Verified</span>
+                      <span className="text-xs text-gray-400">Higher is better</span>
+                      <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-0.5 rounded-full">Survey Pending</span>
                     </div>
                   </div>
-                </div>
-
-                {/* Retention Intent - TBD */}
-                <div className="bg-white rounded-xl p-5 border border-gray-200 relative overflow-hidden">
-                  {/* Mini trend line decoration */}
-                  <div className="absolute top-3 right-16 opacity-10">
-                    <svg width="60" height="40" viewBox="0 0 60 40">
-                      <polyline
-                        points="0,30 20,25 40,15 60,10"
-                        fill="none"
-                        stroke="#38618C"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                      />
-                      <circle cx="60" cy="10" r="4" fill="#35A7FF" />
-                    </svg>
-                  </div>
-
-                  <div className="flex items-start justify-between mb-3">
-                    <p className="text-3xl font-bold text-gray-300">TBD</p>
-                    <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-3 py-1 rounded-full">Survey Pending</span>
-                  </div>
-                  <h4 className="font-semibold text-[#1e2749] mb-2">Retention Intent</h4>
-                  <p className="text-sm text-gray-600">
-                    <span className="font-medium text-gray-700">Research:</span> 44% of teachers leave within 5 years (NCES)
-                  </p>
-                  <p className="text-sm text-green-600 mt-1">
-                    <span className="font-medium">TDI Partners:</span> Avg. 91% retention rate
-                  </p>
-
-                  {/* Mini progress indicator */}
-                  <div className="mt-4 pt-3 border-t border-gray-100">
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-gray-300 rounded-full" style={{ width: '0%' }} />
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '10%' }}></div>
                       </div>
-                      <span className="text-xs text-gray-400">Awaiting data</span>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-20 text-right">10%</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '65%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-20 text-right">65%</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Saunemin</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-400 w-20 text-right">TBD</span>
                     </div>
                   </div>
+                  <p className="text-xs text-gray-500 mt-2 ml-31">Research: Only 30% of PD translates to practice (Joyce & Showers)</p>
                 </div>
+
+                {/* Educator-Para Collaboration (higher is better) - THIS ONE HAS DATA */}
+                <div className="bg-green-50 rounded-lg p-4 -mx-2">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Educator-Para Collaboration</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-400">Higher is better</span>
+                      <span className="text-xs bg-green-600 text-white px-2 py-0.5 rounded-full">Observed ✓</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
+                      <div className="flex-1 bg-green-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '40%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-20 text-right">4/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
+                      <div className="flex-1 bg-green-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '70%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-20 text-right">7/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-green-700 font-medium w-28 flex-shrink-0">Saunemin</span>
+                      <div className="flex-1 bg-green-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-green-500" style={{ width: '85%' }}></div>
+                      </div>
+                      <span className="text-xs font-bold text-green-600 w-20 text-right">Strong ✓</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-green-700 mt-2 ml-31">Excellent collaboration observed Nov 2025 — seamless teamwork across classrooms</p>
+                </div>
+
+                {/* Retention Intent (higher is better) */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Retention Intent</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-400">Higher is better</span>
+                      <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-0.5 rounded-full">Survey Pending</span>
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '30%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-20 text-right">2-4/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '70%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-20 text-right">7-8/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Saunemin</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-400 w-20 text-right">TBD</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2 ml-31">Research: 44% of teachers leave within 5 years (NCES)</p>
+                </div>
+
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
+              {/* Source Citation */}
+              <p className="text-xs text-gray-400 text-center mt-6 pt-4 border-t border-gray-100">
+                Industry data: RAND 2025, NCES, Learning Policy Institute · TDI data: Partner school surveys (n=87,000+ educators)
+              </p>
+
+              {/* Data Collection Note */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
                 <p className="text-sm text-blue-800">
                   <span className="font-semibold">Note:</span> Schools can collect their own baseline data using our survey templates or in person during a school visit. Please reach out to your Lead Partner for next steps.
                 </p>
               </div>
-            </Accordion>
+            </div>
 
             {/* Recommendation: Bridge the Implementation Gap - Expanded */}
             <div className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-xl p-6 mb-6">
