@@ -483,7 +483,49 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 11: FAQ */}
+      {/* SECTION 11: Dashboard Preview */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#f9fafb' }}>
+        <div className="container-default">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e2749' }}>
+              See Exactly What You Get
+            </h2>
+            <p className="text-lg mb-8" style={{ color: '#1e2749', opacity: 0.8 }}>
+              Every partner school gets a personalized dashboard to track progress, celebrate wins, and stay connected.
+            </p>
+
+            <Link href="/Example-Dashboard" className="block group">
+              <div className="relative rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow mx-auto" style={{ maxWidth: '900px' }}>
+                <img
+                  src="/images/dashboard-overview.png"
+                  alt="TDI Partner Dashboard Preview"
+                  className="w-full h-auto"
+                />
+                <div className="absolute inset-0 bg-[#1e2749]/0 group-hover:bg-[#1e2749]/10 transition-colors" />
+              </div>
+            </Link>
+
+            <div className="mt-8">
+              <Link
+                href="/Example-Dashboard"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-all hover:opacity-90"
+                style={{ backgroundColor: '#35A7FF' }}
+              >
+                Explore Example Dashboard
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
+
+            <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.5 }}>
+              This is a fictional example — your dashboard is customized to your school's goals.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 12: FAQ */}
       <FAQ limit={6} showSeeAll={true} />
 
       {/* SECTION 12: Final CTA */}

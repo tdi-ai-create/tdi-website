@@ -639,8 +639,107 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
+      {/* Your Partner Dashboard */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-default">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e2749' }}>
+                Your Partner Dashboard
+              </h2>
+              <p className="text-xl mb-4" style={{ color: '#38618C' }}>
+                Track progress, see real data, and stay connected — all in one place.
+              </p>
+              <p className="text-lg max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Every TDI partner gets a personalized dashboard. No more wondering if PD is working — you'll see the data yourself.
+              </p>
+            </div>
+
+            {/* Three-column feature grid */}
+            <div className="grid md:grid-cols-3 gap-6 mb-10">
+              {/* Column 1: At-a-Glance Progress */}
+              <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                <a href="/Example-Dashboard" className="block group">
+                  <div className="relative overflow-hidden">
+                    <img
+                      src="/images/dashboard-overview.png"
+                      alt="Dashboard Overview"
+                      className="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-[#1e2749]/0 group-hover:bg-[#1e2749]/10 transition-colors" />
+                  </div>
+                </a>
+                <div className="p-5">
+                  <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>At-a-Glance Progress</h4>
+                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                    See staff enrollment, observations completed, and what needs attention — updated in real-time.
+                  </p>
+                </div>
+              </div>
+
+              {/* Column 2: Teacher Wellbeing Data */}
+              <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                <a href="/Example-Dashboard" className="block group">
+                  <div className="relative overflow-hidden">
+                    <img
+                      src="/images/dashboard-survey-results.png"
+                      alt="Survey Results Dashboard"
+                      className="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-[#1e2749]/0 group-hover:bg-[#1e2749]/10 transition-colors" />
+                  </div>
+                </a>
+                <div className="p-5">
+                  <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Teacher Wellbeing Data</h4>
+                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                    Track stress levels, retention intent, and what teachers say would help — straight from their surveys.
+                  </p>
+                </div>
+              </div>
+
+              {/* Column 3: Outcomes That Matter */}
+              <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                <a href="/Example-Dashboard" className="block group">
+                  <div className="relative overflow-hidden">
+                    <img
+                      src="/images/dashboard-leading-indicators.png"
+                      alt="Leading Indicators Dashboard"
+                      className="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-[#1e2749]/0 group-hover:bg-[#1e2749]/10 transition-colors" />
+                  </div>
+                </a>
+                <div className="p-5">
+                  <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Outcomes That Matter</h4>
+                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                    Compare your school to industry benchmarks on the metrics that predict lasting change.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="text-center">
+              <a
+                href="/Example-Dashboard"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-all hover:opacity-90"
+                style={{ backgroundColor: '#35A7FF' }}
+              >
+                See Full Example Dashboard
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+              <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.5 }}>
+                Fictional example shown — your dashboard reflects your school's real goals and data.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Funding & Pricing Support */}
-      <section className="py-12 md:py-16" style={{ backgroundColor: '#ffffff' }}>
+      <section className="py-12 md:py-16" style={{ backgroundColor: '#f9fafb' }}>
         <div className="container-default">
           <div
             className="rounded-xl p-6 md:p-8 max-w-4xl mx-auto"

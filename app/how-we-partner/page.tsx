@@ -1076,6 +1076,47 @@ export default function HowWePartnerPage() {
         </div>
       </section>
 
+      {/* Stay Connected With Your Dashboard */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-default">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
+              {/* Image */}
+              <a href="/Example-Dashboard" className="block group order-2 md:order-1">
+                <div className="relative rounded-xl overflow-hidden shadow-xl hover:shadow-2xl transition-shadow">
+                  <img
+                    src="/images/dashboard-survey-results.png"
+                    alt="TDI Partner Dashboard - Survey Results"
+                    className="w-full h-auto group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-[#1e2749]/0 group-hover:bg-[#1e2749]/10 transition-colors" />
+                </div>
+              </a>
+
+              {/* Text */}
+              <div className="order-1 md:order-2">
+                <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#1e2749' }}>
+                  Stay Connected With Your Dashboard
+                </h2>
+                <p className="text-lg mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
+                  Your personalized dashboard keeps you informed between visits — see survey results, track implementation, and know exactly where your teachers are in their journey.
+                </p>
+                <a
+                  href="/Example-Dashboard"
+                  className="inline-flex items-center gap-2 font-semibold transition-all hover:gap-3"
+                  style={{ color: '#35A7FF' }}
+                >
+                  See an example
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Final CTA */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
