@@ -57,9 +57,10 @@ const Tooltip = ({ children, content }: { children: React.ReactNode; content: st
   </span>
 );
 
-export default function StPeterChanelDashboard() {
+export default function ExampleDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [activePhase, setActivePhase] = useState(2);
+  const [showBanner, setShowBanner] = useState(true);
 
   // Accordion state for collapsible sections
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -398,6 +399,26 @@ export default function StPeterChanelDashboard() {
 
   return (
     <div className="min-h-screen bg-[#F5F5F5]">
+      {/* Example Dashboard Banner */}
+      {showBanner && (
+        <div className="bg-[#35A7FF]/10 border-b border-[#35A7FF]/20 py-2 px-4">
+          <div className="max-w-5xl mx-auto flex items-center justify-center gap-3">
+            <span className="text-sm text-[#1e2749] text-center">
+              📋 This is a fictional example dashboard to showcase features schools often enjoy.
+            </span>
+            <button
+              onClick={() => setShowBanner(false)}
+              className="text-[#1e2749]/60 hover:text-[#1e2749] transition-colors flex-shrink-0"
+              aria-label="Dismiss banner"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Compact Navigation */}
       <nav className="bg-[#1e2749] sticky top-0 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -422,16 +443,12 @@ export default function StPeterChanelDashboard() {
 
       {/* Compact Hero */}
       <section className="relative text-white py-6 px-4 overflow-hidden">
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url('/images/st-peter-chanel-church.jpg')" }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#1e2749]/95 via-[#1e2749]/90 to-[#1e2749]/85" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#1e2749] via-[#38618C] to-[#1e2749]" />
         
         <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">St. Peter Chanel School</h1>
-            <p className="text-white/80 text-sm">Paulina, Louisiana | Partner Dashboard</p>
+            <h1 className="text-2xl md:text-3xl font-bold">Motown Middle School</h1>
+            <p className="text-white/80 text-sm">Glenview, Illinois | Partner Dashboard</p>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <div className="bg-white/10 px-3 py-1.5 rounded-lg">
@@ -969,9 +986,9 @@ export default function StPeterChanelDashboard() {
                   </span>
                 </div>
 
-                {/* Paula's Focus */}
+                {/* Principal Ford's Focus */}
                 <div className="bg-[#1e2749] text-white rounded-lg p-4 mt-4">
-                  <p className="text-sm font-medium mb-1">Paula&apos;s Goal for Next Year:</p>
+                  <p className="text-sm font-medium mb-1">Principal Ford&apos;s Goal for Next Year:</p>
                   <p className="text-sm opacity-90">&quot;More engaging lessons and differentiated learning in the regular classroom&quot;</p>
                 </div>
               </div>
@@ -987,7 +1004,7 @@ export default function StPeterChanelDashboard() {
               {/* Leading Indicators Description */}
               <div className="mb-6">
                 <p className="text-sm text-gray-600 mb-2">
-                  Research shows these four indicators are the strongest predictors of sustainable classroom change and student outcomes.<sup className="text-[#35A7FF]">1</sup> Each indicator is personalized to St. Peter Chanel&apos;s goals, established during our partnership kickoff.
+                  Research shows these four indicators are the strongest predictors of sustainable classroom change and student outcomes.<sup className="text-[#35A7FF]">1</sup> Each indicator is personalized to Motown Middle School&apos;s goals, established during our partnership kickoff.
                 </p>
                 <p className="text-xs text-gray-400">
                   <sup>1</sup> RAND Corporation (2025), Learning Policy Institute · Indicators selected based on your school&apos;s specific priorities
@@ -1020,9 +1037,9 @@ export default function StPeterChanelDashboard() {
                       </div>
                       <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
                     </div>
-                    {/* St. Peter Chanel 6.0/10 = LOW stress = BEST = LONGEST bar */}
+                    {/* Motown Middle School 6.0/10 = LOW stress = BEST = LONGEST bar */}
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">St. Peter Chanel</span>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown Middle School</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-green-500" style={{ width: '40%' }}></div>
                       </div>
@@ -1053,7 +1070,7 @@ export default function StPeterChanelDashboard() {
                       <span className="text-xs font-semibold text-[#38618C] w-14 text-right">65%</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">St. Peter Chanel</span>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown Middle School</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#35A7FF]" style={{ width: '21%' }}></div>
                       </div>
@@ -1077,7 +1094,7 @@ export default function StPeterChanelDashboard() {
                       <span className="text-xs font-semibold text-[#38618C] w-14 text-right">100%</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">St. Peter Chanel</span>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown Middle School</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
                       </div>
@@ -1108,7 +1125,7 @@ export default function StPeterChanelDashboard() {
                       <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">St. Peter Chanel</span>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown Middle School</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-green-500" style={{ width: '98%' }}></div>
                       </div>
@@ -2165,7 +2182,7 @@ export default function StPeterChanelDashboard() {
                   <div>
                     <p className="text-sm font-medium text-amber-800">Why These Metrics?</p>
                     <p className="text-sm text-amber-700 mt-1">
-                      These goals come directly from your Jan 2026 survey (84% cited time management, 53% cited behavior) and Paula&apos;s stated goal of &quot;more engaging lessons and differentiated learning.&quot; We&apos;ll measure progress at each touchpoint.
+                      These goals come directly from your Jan 2026 survey (84% cited time management, 53% cited behavior) and Principal Ford&apos;s stated goal of &quot;more engaging lessons and differentiated learning.&quot; We&apos;ll measure progress at each touchpoint.
                     </p>
                   </div>
                 </div>
@@ -2515,7 +2532,7 @@ export default function StPeterChanelDashboard() {
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-xs text-gray-500 mb-1">Paula&apos;s Goal:</p>
+                  <p className="text-xs text-gray-500 mb-1">Principal Ford&apos;s Goal:</p>
                   <p className="text-sm text-[#1e2749] font-medium">&quot;More engaging lessons and differentiated learning in the regular classroom&quot;</p>
                 </div>
                 <div className="bg-[#35A7FF]/10 rounded-lg p-4">
@@ -2598,7 +2615,7 @@ export default function StPeterChanelDashboard() {
                 {/* Rae's Info */}
                 <div className="flex-1 text-center md:text-left">
                   <h3 className="text-xl font-bold text-[#1e2749]">Rae Hughart</h3>
-                  <p className="text-[#38618C] font-medium mb-3">Lead Partner, St. Peter Chanel Account</p>
+                  <p className="text-[#38618C] font-medium mb-3">Lead Partner, Motown Middle School Account</p>
                   
                   <p className="text-gray-600 text-sm mb-4">
                     Rae is the co-founder of Teachers Deserve It and your dedicated partner throughout this journey. She is here to support your school's success every step of the way.
@@ -2653,26 +2670,20 @@ export default function StPeterChanelDashboard() {
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <div className="font-semibold text-gray-800">St. Peter Chanel Interparochial Elementary School</div>
+                  <div className="font-semibold text-gray-800">Motown Middle School</div>
                   <div className="text-sm text-gray-600 mt-2 flex items-start gap-2">
                     <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#38618C]" />
-                    <div>
-                      2590 Louisiana Hwy. 44<br />
-                      Paulina, LA 70763-2705
-                    </div>
+                    Glenview, Illinois
                   </div>
                 </div>
                 <div className="space-y-2 text-sm">
                   <div className="flex items-center gap-2 text-gray-600">
                     <Phone className="w-4 h-4 text-[#38618C]" />
-                    225-869-5778
+                    847-721-5503
                   </div>
                   <div className="flex items-center gap-2 text-gray-600">
                     <Mail className="w-4 h-4 text-[#38618C]" />
-                    chanel.school@stpchanel.org
-                  </div>
-                  <div className="text-gray-400 text-xs">
-                    Fax: 225-869-8131
+                    Info@TeachersDeserveit.com
                   </div>
                 </div>
               </div>
@@ -2686,7 +2697,7 @@ export default function StPeterChanelDashboard() {
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <div>
             <div className="font-bold">Teachers Deserve It</div>
-            <p className="text-white/60 text-sm">Partner Dashboard for St. Peter Chanel School</p>
+            <p className="text-white/60 text-sm">Partner Dashboard for Motown Middle School</p>
           </div>
           <a 
             href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
