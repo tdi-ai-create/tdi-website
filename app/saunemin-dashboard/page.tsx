@@ -41,7 +41,8 @@ import {
   Check,
   Layers,
   Sun,
-  Sunset
+  Sunset,
+  DollarSign
 } from 'lucide-react';
 
 // Tooltip component
@@ -309,16 +310,21 @@ export default function SauneminDashboard() {
     'Cindy Palen', 'Lisa Heiser', 'Grace McEathron', 'Karissa Gray'
   ];
 
-  // Tab configuration
+  // Tab configuration (removed 2025-26 tab - redundant with other content)
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Eye },
     { id: 'journey', label: 'Journey', icon: TrendingUp },
     { id: 'progress', label: 'Progress', icon: Users },
     { id: 'blueprint', label: 'Blueprint', icon: Star },
-    { id: 'timeline', label: '2025-26', icon: Calendar },
     { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
     { id: 'team', label: 'Team', icon: User },
   ];
+
+  // Tab click handler with scroll to top
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <div className="min-h-screen bg-[#F5F5F5]">
@@ -382,7 +388,7 @@ export default function SauneminDashboard() {
             {tabs.map(tab => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabClick(tab.id)}
                 className={`px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors flex items-center gap-2 ${
                   activeTab === tab.id
                     ? 'border-[#35A7FF] text-[#35A7FF]'
@@ -481,90 +487,71 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
-            {/* Partnership Progress Visual */}
-            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-              <h4 className="font-semibold text-[#1e2749] mb-4">Partnership Progress</h4>
-
-              <div className="relative">
-                {/* Progress bar background */}
-                <div className="h-2 bg-gray-200 rounded-full">
-                  <div className="h-full bg-gradient-to-r from-[#38618C] to-[#35A7FF] rounded-full" style={{ width: '40%' }} />
-                </div>
-
-                {/* Milestones */}
-                <div className="flex justify-between mt-4">
-                  <div className="text-center">
-                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-1">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                    <span className="text-xs text-gray-600">Contract<br/>Signed</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-1">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                    <span className="text-xs text-gray-600">Hub<br/>Activated</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-1">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                    <span className="text-xs text-gray-600">Day 1<br/>Complete</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-8 h-8 bg-[#E07A5F] rounded-full flex items-center justify-center mx-auto mb-1">
-                      <Clock className="w-4 h-4 text-white" />
-                    </div>
-                    <span className="text-xs text-[#E07A5F] font-medium">Day 2<br/>Pending</span>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center mx-auto mb-1">
-                      <Calendar className="w-4 h-4 text-white" />
-                    </div>
-                    <span className="text-xs text-gray-500">Spring<br/>Meeting</span>
-                  </div>
+            {/* Contract Deadline Warning */}
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-red-800">Important: Use It or Lose It</p>
+                  <p className="text-sm text-red-700 mt-1">
+                    Any unscheduled contract services will expire on <strong>July 1, 2026</strong>. You still have <strong>1 on-site day</strong> and a <strong>spring leadership meeting</strong> included in your partnership. Schedule these now to maximize your investment!
+                  </p>
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 mt-3 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Schedule Now Before July 2026
+                  </a>
                 </div>
               </div>
             </div>
 
-            {/* Movement Involvement */}
+            {/* Partnership Progress Visual - Fixed Alignment */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Heart className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-sm font-medium text-[#1e2749]">Movement Involvement</span>
+              <h4 className="font-semibold text-[#1e2749] mb-6">Partnership Progress</h4>
+
+              <div className="relative px-4">
+                {/* Progress bar background */}
+                <div className="h-2 bg-gray-200 rounded-full mb-8">
+                  <div className="h-full bg-gradient-to-r from-[#38618C] to-[#35A7FF] rounded-full" style={{ width: '60%' }} />
                 </div>
-                <span className="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
-                  To Be Collected
-                </span>
-              </div>
 
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
-                <p className="text-sm text-amber-800">
-                  Movement involvement data (blog readers, podcast listeners, community members) will be collected during our next on-site visit. This helps us understand how deeply engaged educators are with the TDI ecosystem beyond the Learning Hub.
-                </p>
-              </div>
-
-              {/* Still show the 3 cards but with "TBD" values */}
-              <div className="grid grid-cols-3 gap-4">
-                <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer"
-                   className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
-                  <Mail className="w-5 h-5 text-gray-400 group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-gray-400">TBD</div>
-                  <div className="text-xs text-gray-500 mt-1">Blog Readers</div>
-                </a>
-                <a href="https://teachersdeserveit.com/podcast" target="_blank" rel="noopener noreferrer"
-                   className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
-                  <Headphones className="w-5 h-5 text-gray-400 group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-gray-400">TBD</div>
-                  <div className="text-xs text-gray-500 mt-1">Podcast Listeners</div>
-                </a>
-                <a href="https://teachersdeserveit.com/community" target="_blank" rel="noopener noreferrer"
-                   className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
-                  <MessageCircle className="w-5 h-5 text-gray-400 group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-gray-400">TBD</div>
-                  <div className="text-xs text-gray-500 mt-1">Community Members</div>
-                </a>
+                {/* Milestones - use flex with equal spacing */}
+                <div className="flex justify-between">
+                  <div className="flex flex-col items-center" style={{ width: '20%' }}>
+                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mb-2 -mt-14">
+                      <Check className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="text-xs text-gray-600 text-center">Contract<br/>Signed</span>
+                  </div>
+                  <div className="flex flex-col items-center" style={{ width: '20%' }}>
+                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mb-2 -mt-14">
+                      <Check className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="text-xs text-gray-600 text-center">Hub<br/>Activated</span>
+                  </div>
+                  <div className="flex flex-col items-center" style={{ width: '20%' }}>
+                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mb-2 -mt-14">
+                      <Check className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="text-xs text-gray-600 text-center">Day 1<br/>Complete</span>
+                  </div>
+                  <div className="flex flex-col items-center" style={{ width: '20%' }}>
+                    <div className="w-10 h-10 bg-[#E07A5F] rounded-full flex items-center justify-center mb-2 -mt-14">
+                      <Clock className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="text-xs text-[#E07A5F] font-medium text-center">Day 2<br/>Pending</span>
+                  </div>
+                  <div className="flex flex-col items-center" style={{ width: '20%' }}>
+                    <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mb-2 -mt-14">
+                      <Calendar className="w-5 h-5 text-white" />
+                    </div>
+                    <span className="text-xs text-gray-500 text-center">Spring<br/>Meeting</span>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -679,6 +666,39 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
+            {/* Movement Involvement Section */}
+            <Accordion
+              id="movement-involvement"
+              title="Your Movement Involvement"
+              subtitle="8 of 12 staff have engaged with TDI resources"
+              icon={<Heart className="w-5 h-5" />}
+              badge="67%"
+              badgeColor="bg-[#35A7FF]/10 text-[#35A7FF]"
+            >
+              <div className="pt-4 space-y-4">
+                <div className="grid sm:grid-cols-3 gap-4 text-center">
+                  <div className="p-3 bg-green-50 rounded-lg">
+                    <div className="text-2xl font-bold text-green-600">9</div>
+                    <div className="text-sm text-gray-600">Hub Logins</div>
+                  </div>
+                  <div className="p-3 bg-[#35A7FF]/10 rounded-lg">
+                    <div className="text-2xl font-bold text-[#35A7FF]">9</div>
+                    <div className="text-sm text-gray-600">Love Notes Received</div>
+                  </div>
+                  <div className="p-3 bg-[#38618C]/10 rounded-lg">
+                    <div className="text-2xl font-bold text-[#38618C]">1</div>
+                    <div className="text-sm text-gray-600">On-Site Days</div>
+                  </div>
+                </div>
+
+                <div className="border-t pt-4">
+                  <p className="text-sm text-gray-600">
+                    <strong>3 staff</strong> haven&apos;t logged in yet (Amber, Lisa, Dan). Consider pairing them with active users or dedicating PD time for Hub exploration.
+                  </p>
+                </div>
+              </div>
+            </Accordion>
+
             {/* Looking Ahead Card */}
             <div
               className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-[1.01]"
@@ -714,37 +734,90 @@ export default function SauneminDashboard() {
             <Accordion
               id="leading-indicators"
               title="Leading Indicators"
-              subtitle="Baseline metrics for your partnership"
+              subtitle="Research-backed metrics for measuring impact"
               icon={<Activity className="w-5 h-5" />}
               badge="Phase 1"
               badgeColor="bg-[#35A7FF]/10 text-[#35A7FF]"
             >
-              <div className="pt-4 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-gray-400">TBD</div>
-                  <div className="text-sm text-gray-600 mt-1">Educator Stress</div>
-                  <div className="text-xs text-gray-400 mt-1">Survey pending</div>
+              <div className="pt-4 grid sm:grid-cols-2 gap-4">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="text-2xl font-bold text-gray-400">TBD</div>
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Survey Pending</span>
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Educator Stress</div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    <strong>Research:</strong> 73% of educators report frequent stress (NCES 2022)
+                  </div>
+                  <div className="text-xs text-[#35A7FF] mt-1">
+                    <strong>TDI Partners:</strong> Avg. 28% reduction after Year 1
+                  </div>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-gray-400">TBD</div>
-                  <div className="text-sm text-gray-600 mt-1">Strategy Implementation</div>
-                  <div className="text-xs text-gray-400 mt-1">Survey pending</div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="text-2xl font-bold text-gray-400">TBD</div>
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Survey Pending</span>
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Strategy Implementation</div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    <strong>Research:</strong> Only 30% of PD translates to practice (Joyce & Showers)
+                  </div>
+                  <div className="text-xs text-[#35A7FF] mt-1">
+                    <strong>TDI Partners:</strong> Avg. 85% report implementing strategies
+                  </div>
                 </div>
-                <div className="bg-green-50 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-green-600">Strong</div>
-                  <div className="text-sm text-gray-600 mt-1">Educator-Para Collaboration</div>
-                  <div className="text-xs text-green-600 mt-1">Observed</div>
+                <div className="bg-green-50 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="text-2xl font-bold text-green-600">Strong</div>
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Observed</span>
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Educator-Para Collaboration</div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    <strong>Research:</strong> Strong collaboration linked to 15% better outcomes
+                  </div>
+                  <div className="text-xs text-green-600 mt-1">
+                    <strong>Saunemin:</strong> Excellent collaboration observed Nov 2025
+                  </div>
                 </div>
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-gray-400">TBD</div>
-                  <div className="text-sm text-gray-600 mt-1">Retention Intent</div>
-                  <div className="text-xs text-gray-400 mt-1">Survey pending</div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="text-2xl font-bold text-gray-400">TBD</div>
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Survey Pending</span>
+                  </div>
+                  <div className="text-sm font-medium text-gray-700">Retention Intent</div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    <strong>Research:</strong> 44% of teachers leave within 5 years (NCES)
+                  </div>
+                  <div className="text-xs text-[#35A7FF] mt-1">
+                    <strong>TDI Partners:</strong> Avg. 91% retention rate
+                  </div>
                 </div>
               </div>
-              <p className="text-sm text-gray-500 mt-4 text-center italic">
-                Baseline data will be established during Year 2 partnership if renewed.
-              </p>
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> Schools can collect their own baseline data using our survey templates. Contact Rae to set up data collection for your 2026-27 partnership.
+                </p>
+              </div>
             </Accordion>
+
+            {/* Implementation Gap Recommendation */}
+            <div className="bg-white border-l-4 border-[#38618C] rounded-r-xl p-5 shadow-sm">
+              <div className="flex items-center gap-2 mb-2">
+                <Lightbulb className="w-5 h-5 text-[#38618C]" />
+                <h3 className="font-semibold text-[#1e2749]">Recommendation: Bridge the Implementation Gap</h3>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
+                Research shows only 30% of professional development translates to classroom practice. Saunemin&apos;s November observations showed <strong>100% of observed staff</strong> implementing at least one strategy — that&apos;s exceptional! Day 2 will help sustain this momentum and deepen implementation.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span className="inline-flex items-center gap-1 text-xs bg-green-50 text-green-700 px-2 py-1 rounded-full">
+                  <Check className="w-3 h-3" /> 9/9 staff implementing strategies
+                </span>
+                <span className="inline-flex items-center gap-1 text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full">
+                  <Target className="w-3 h-3" /> Schedule Day 2 to sustain progress
+                </span>
+              </div>
+            </div>
 
             {/* Phase Cards - Clickable */}
             <div className="bg-white rounded-xl p-5 shadow-sm">
@@ -762,9 +835,9 @@ export default function SauneminDashboard() {
                   <p className="text-sm opacity-80 mt-1">Building relationships and baseline understanding</p>
                 </div>
 
-                {/* Phase 2 - Teaser (clickable) */}
+                {/* Phase 2 - Teaser (links to Blueprint) */}
                 <button
-                  onClick={() => setShowPhase2Preview(true)}
+                  onClick={() => handleTabClick('blueprint')}
                   className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl p-5 text-left hover:border-[#35A7FF] hover:bg-[#35A7FF]/5 transition-all group"
                 >
                   <div className="flex items-center gap-2 mb-2">
@@ -774,12 +847,12 @@ export default function SauneminDashboard() {
                     <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">Coming Next</span>
                   </div>
                   <h4 className="font-bold text-lg text-gray-400 group-hover:text-[#1e2749]">ACCELERATE</h4>
-                  <p className="text-sm text-gray-400 mt-1 group-hover:text-gray-600">Click to preview what&apos;s included →</p>
+                  <p className="text-sm text-gray-400 mt-1 group-hover:text-gray-600">View in Blueprint →</p>
                 </button>
 
-                {/* Phase 3 - Locked */}
+                {/* Phase 3 - Locked (links to Blueprint) */}
                 <button
-                  onClick={() => setShowPhase3Preview(true)}
+                  onClick={() => handleTabClick('blueprint')}
                   className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-5 text-left hover:border-[#35A7FF]/50 transition-all group"
                 >
                   <div className="flex items-center gap-2 mb-2">
@@ -789,7 +862,7 @@ export default function SauneminDashboard() {
                     <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">Future</span>
                   </div>
                   <h4 className="font-bold text-lg text-gray-300">SUSTAIN</h4>
-                  <p className="text-sm text-gray-300 mt-1">Click to preview →</p>
+                  <p className="text-sm text-gray-300 mt-1">View in Blueprint →</p>
                 </button>
               </div>
 
@@ -1047,43 +1120,65 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
-            {/* Sign-in Frequency Bar Chart */}
+            {/* Observed Implementation Visual */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
-              <h4 className="font-semibold text-[#1e2749] mb-4">Sign-in Frequency Distribution</h4>
+              <h4 className="font-semibold text-[#1e2749] mb-4">Observed Strategy Implementation</h4>
 
-              <div className="space-y-3">
-                {/* Power Users (3+ logins) */}
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Power Users (3+ logins)</span>
-                    <span className="font-semibold text-green-600">4 educators</span>
-                  </div>
-                  <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-green-500 rounded-full" style={{ width: '33%' }} />
+              <div className="flex items-center gap-8">
+                {/* Donut Chart */}
+                <div className="relative w-32 h-32">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    {/* Background circle */}
+                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                    {/* Progress circle - 100% implementation observed */}
+                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="#22c55e" strokeWidth="3"
+                      strokeDasharray="100, 100" strokeLinecap="round" />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-2xl font-bold text-green-600">9/9</span>
+                    <span className="text-xs text-gray-500">Observed</span>
                   </div>
                 </div>
 
-                {/* Getting Started (1-2 logins) */}
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Getting Started (1-2 logins)</span>
-                    <span className="font-semibold text-[#38618C]">5 educators</span>
-                  </div>
-                  <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#38618C] rounded-full" style={{ width: '42%' }} />
+                {/* Description */}
+                <div className="flex-1">
+                  <p className="text-sm text-gray-600 mb-3">
+                    All 9 observed staff members demonstrated at least one strategy from the Hub during November observations.
+                  </p>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <span className="text-sm text-gray-700">Relationship-building techniques</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <span className="text-sm text-gray-700">Positive reinforcement strategies</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <span className="text-sm text-gray-700">Student engagement practices</span>
+                    </div>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                {/* Need Support (0 logins) */}
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Need Support (0 logins)</span>
-                    <span className="font-semibold text-[#E07A5F]">3 educators</span>
-                  </div>
-                  <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '25%' }} />
-                  </div>
-                </div>
+            {/* Non-Active Users Recommendation */}
+            <div className="bg-white border-l-4 border-[#E07A5F] rounded-r-xl p-5 shadow-sm mb-6">
+              <div className="flex items-center gap-2 mb-2">
+                <Lightbulb className="w-5 h-5 text-[#E07A5F]" />
+                <h3 className="font-semibold text-[#1e2749]">Recommendation: Support Non-Active Users</h3>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
+                <strong>Amber, Lisa, and Dan</strong> haven&apos;t logged into the Hub yet. Consider pairing them with power users like Sam or Haylie, or scheduling a dedicated Hub exploration session during PD time.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span className="inline-flex items-center gap-1 text-xs bg-[#E07A5F]/10 text-[#E07A5F] px-2 py-1 rounded-full">
+                  <Users className="w-3 h-3" /> Pair with power users
+                </span>
+                <span className="inline-flex items-center gap-1 text-xs bg-[#E07A5F]/10 text-[#E07A5F] px-2 py-1 rounded-full">
+                  <Clock className="w-3 h-3" /> Schedule PD Hub time
+                </span>
               </div>
             </div>
 
@@ -1163,6 +1258,55 @@ export default function SauneminDashboard() {
               </div>
             </Accordion>
 
+            {/* Recommended Resources Section */}
+            <div className="bg-gradient-to-r from-[#38618C] to-[#35A7FF] rounded-xl p-5 text-white mb-6">
+              <div className="flex items-center gap-2 mb-3">
+                <BookOpen className="w-5 h-5" />
+                <h3 className="font-bold">Recommended for Your Team</h3>
+              </div>
+              <p className="text-sm text-white/80 mb-4">
+                Based on November observations, here are Hub resources specifically relevant for Saunemin&apos;s para team:
+              </p>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <a
+                  href="https://learning.teachersdeserveit.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors"
+                >
+                  <div className="font-semibold text-sm">Para Strategies Collection</div>
+                  <div className="text-xs text-white/70 mt-1">Behavior support & classroom management</div>
+                </a>
+                <a
+                  href="https://learning.teachersdeserveit.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors"
+                >
+                  <div className="font-semibold text-sm">Building Student Relationships</div>
+                  <div className="text-xs text-white/70 mt-1">Connection-first approaches</div>
+                </a>
+                <a
+                  href="https://learning.teachersdeserveit.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors"
+                >
+                  <div className="font-semibold text-sm">Quick Wins for Paras</div>
+                  <div className="text-xs text-white/70 mt-1">5-minute strategies that work</div>
+                </a>
+                <a
+                  href="https://learning.teachersdeserveit.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/10 hover:bg-white/20 rounded-lg p-3 transition-colors"
+                >
+                  <div className="font-semibold text-sm">Teacher-Para Collaboration</div>
+                  <div className="text-xs text-white/70 mt-1">Communication & teamwork tools</div>
+                </a>
+              </div>
+            </div>
+
             {/* SECTION C: Sample Love Note */}
             <Accordion
               id="love-notes"
@@ -1181,6 +1325,42 @@ export default function SauneminDashboard() {
                 </div>
               </div>
             </Accordion>
+
+            {/* Blog & Weekly Resources Promotion */}
+            <div className="bg-[#1e2749] rounded-xl p-5 text-white">
+              <div className="flex flex-col md:flex-row gap-6 items-center">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Headphones className="w-5 h-5 text-[#35A7FF]" />
+                    <span className="text-xs bg-[#35A7FF]/20 text-[#35A7FF] px-2 py-0.5 rounded-full">New This Week</span>
+                  </div>
+                  <h3 className="font-bold text-lg mb-2">Fresh Resources Every Week</h3>
+                  <p className="text-sm text-white/70 mb-3">
+                    Get the latest strategies, research, and educator support tools delivered to your inbox. Plus, listen to the Teachers Deserve It podcast for real conversations about what&apos;s working in schools.
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <a
+                      href="https://www.teachersdeserveit.com/blog"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                    >
+                      <FileText className="w-4 h-4" />
+                      Read the Blog
+                    </a>
+                    <a
+                      href="https://www.teachersdeserveit.com/podcast"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                    >
+                      <Headphones className="w-4 h-4" />
+                      Listen to Podcast
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -1245,6 +1425,42 @@ export default function SauneminDashboard() {
                   <p className="flex items-center gap-2"><Check className="w-3 h-3" /> Leadership coaching</p>
                   <p className="flex items-center gap-2"><Check className="w-3 h-3" /> Data-driven refinement</p>
                   <p className="flex items-center gap-2"><Check className="w-3 h-3" /> Sustainability planning</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Partnership Impact Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 bg-gradient-to-r from-[#38618C] to-[#35A7FF] rounded-xl p-5 text-white">
+              <div className="text-center">
+                <div className="text-3xl font-bold">91%</div>
+                <div className="text-xs text-white/70">Partner Retention</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold">85%</div>
+                <div className="text-xs text-white/70">Strategy Implementation</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold">28%</div>
+                <div className="text-xs text-white/70">Stress Reduction</div>
+              </div>
+              <div className="text-center">
+                <div className="text-3xl font-bold">150+</div>
+                <div className="text-xs text-white/70">Partner Schools</div>
+              </div>
+            </div>
+
+            {/* Testimonial Section */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-[#38618C]/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <MessageCircle className="w-6 h-6 text-[#38618C]" />
+                </div>
+                <div>
+                  <p className="text-gray-700 italic mb-3">
+                    &quot;TDI has transformed how we support our educators. The personalized feedback and resources have made a real difference in teacher confidence and student outcomes.&quot;
+                  </p>
+                  <p className="text-sm font-medium text-[#1e2749]">— Partner School Administrator</p>
+                  <p className="text-xs text-gray-500">Year 2 ACCELERATE Partner</p>
                 </div>
               </div>
             </div>
@@ -1342,6 +1558,38 @@ export default function SauneminDashboard() {
               </div>
             </Accordion>
 
+            {/* Funding Options */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-4">
+                <DollarSign className="w-5 h-5 text-green-600" />
+                <h3 className="font-bold text-[#1e2749]">Funding Options for Your Partnership</h3>
+              </div>
+              <p className="text-sm text-gray-600 mb-4">
+                Many schools use the following funding sources to support their TDI partnership:
+              </p>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div className="p-3 bg-green-50 rounded-lg border border-green-100">
+                  <div className="font-medium text-[#1e2749] text-sm">Title II Funds</div>
+                  <div className="text-xs text-gray-500 mt-1">Professional development & educator support</div>
+                </div>
+                <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                  <div className="font-medium text-[#1e2749] text-sm">ESSER Funds</div>
+                  <div className="text-xs text-gray-500 mt-1">Learning loss & educator wellness recovery</div>
+                </div>
+                <div className="p-3 bg-purple-50 rounded-lg border border-purple-100">
+                  <div className="font-medium text-[#1e2749] text-sm">Title I Funds</div>
+                  <div className="text-xs text-gray-500 mt-1">Improved instruction & student outcomes</div>
+                </div>
+                <div className="p-3 bg-amber-50 rounded-lg border border-amber-100">
+                  <div className="font-medium text-[#1e2749] text-sm">General PD Budget</div>
+                  <div className="text-xs text-gray-500 mt-1">Staff development & retention initiatives</div>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-4 italic">
+                Need help identifying funding sources? Rae can provide documentation to support your grant applications.
+              </p>
+            </div>
+
             {/* Research Foundation */}
             <div className="bg-[#1e2749] rounded-xl p-5 text-white">
               <div className="flex items-start gap-3">
@@ -1364,137 +1612,6 @@ export default function SauneminDashboard() {
                 className="text-[#38618C] hover:text-[#2d4e73] font-medium underline underline-offset-4 transition-colors"
               >
                 View full partnership details on our website →
-              </a>
-            </div>
-          </div>
-        )}
-
-        {/* TIMELINE TAB (2025-26) */}
-        {activeTab === 'timeline' && (
-          <div className="space-y-6">
-            <div className="text-center mb-6">
-              <h2 className="text-xl font-bold text-[#1e2749] mb-2">2025-26 Partnership Timeline</h2>
-              <p className="text-gray-600">Your journey through the current partnership year</p>
-            </div>
-
-            <div className="space-y-4">
-              {/* May 2025 - Contract Signed */}
-              <div className="border border-green-200 rounded-xl overflow-hidden">
-                <div className="flex items-center gap-4 p-4 bg-green-50">
-                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-[#1e2749]">Contract Signed</span>
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Complete</span>
-                    </div>
-                    <div className="text-sm text-gray-500">May 23, 2025</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* April-Sept 2025 - Hub Accounts */}
-              <div className="border border-green-200 rounded-xl overflow-hidden">
-                <div className="flex items-center gap-4 p-4 bg-green-50">
-                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-[#1e2749]">Hub Accounts Activated</span>
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Complete</span>
-                    </div>
-                    <div className="text-sm text-gray-500">April-September 2025 · 12 staff members</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* November 19, 2025 - On-Site Day #1 */}
-              <div className="border border-green-200 rounded-xl overflow-hidden">
-                <div className="flex items-center gap-4 p-4 bg-green-50">
-                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-[#1e2749]">On-Site Day #1</span>
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Complete</span>
-                    </div>
-                    <div className="text-sm text-gray-500">November 19, 2025 · 9 observations, 9 Love Notes</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* TBD - On-Site Day #2 */}
-              <div className="border border-[#E07A5F]/30 rounded-xl overflow-hidden">
-                <div className="flex items-center gap-4 p-4 bg-[#E07A5F]/5">
-                  <div className="w-8 h-8 bg-[#E07A5F] rounded-full flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-[#1e2749]">On-Site Day #2</span>
-                      <span className="text-xs bg-[#E07A5F]/20 text-[#E07A5F] px-2 py-0.5 rounded-full">Pending</span>
-                    </div>
-                    <div className="text-sm text-gray-500">TBD (Feb/Mar 2026) · Implementation focus</div>
-                  </div>
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-[#35A7FF] font-medium hover:underline"
-                  >
-                    Schedule →
-                  </a>
-                </div>
-              </div>
-
-              {/* TBD - Spring Leadership Meeting */}
-              <div className="border border-[#E07A5F]/30 rounded-xl overflow-hidden">
-                <div className="flex items-center gap-4 p-4 bg-[#E07A5F]/5">
-                  <div className="w-8 h-8 bg-[#E07A5F] rounded-full flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-4 h-4 text-white" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-[#1e2749]">Leadership Meeting</span>
-                      <span className="text-xs bg-[#E07A5F]/20 text-[#E07A5F] px-2 py-0.5 rounded-full">Courtesy</span>
-                    </div>
-                    <div className="text-sm text-gray-500">TBD (Spring 2026) · Gary & Michael</div>
-                  </div>
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-[#35A7FF] font-medium hover:underline"
-                  >
-                    Schedule →
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* What's Next */}
-            <div className="bg-[#1e2749] rounded-xl p-6 text-white mt-8">
-              <h3 className="font-bold text-lg mb-2">What&apos;s Next?</h3>
-              <p className="text-white/80 text-sm mb-4">
-                If partnership continues into 2026-27, options include:
-              </p>
-              <ul className="text-sm text-white/70 space-y-1 mb-4">
-                <li>• Phase 2 ACCELERATE package with full staff access</li>
-                <li>• Book study for all staff</li>
-                <li>• Executive Impact Sessions</li>
-                <li>• Survey data collection for baseline metrics</li>
-              </ul>
-              <a
-                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-6 py-3 rounded-xl font-semibold transition-all"
-              >
-                <Calendar className="w-5 h-5" />
-                Schedule Renewal Conversation
               </a>
             </div>
           </div>
