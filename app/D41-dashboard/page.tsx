@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import {
   Calendar,
   CheckCircle,
@@ -50,7 +51,8 @@ import {
   HandHelping,
   Link,
   UserPlus,
-  LayoutDashboard
+  LayoutDashboard,
+  Map
 } from 'lucide-react';
 
 // Tooltip component
@@ -214,6 +216,7 @@ export default function D41Dashboard() {
               { id: 'overview', label: 'Overview', icon: LayoutDashboard },
               { id: 'progress', label: 'Progress', icon: TrendingUp },
               { id: 'resources', label: 'Resources', icon: BookOpen },
+              { id: 'blueprint', label: 'Blueprint', icon: Map },
               { id: 'next-steps', label: '2026-27', icon: Calendar },
               { id: 'contact', label: 'Contact', icon: User },
             ].map((tab) => (
@@ -794,6 +797,31 @@ export default function D41Dashboard() {
                   </button>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* BLUEPRINT TAB */}
+        {activeTab === 'blueprint' && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">The Full TDI Blueprint</h2>
+              <p className="text-gray-600">What becomes available when we continue our partnership</p>
+            </div>
+
+            {/* Embedded How We Partner Content */}
+            <HowWePartnerTabs excludeTabs={['dashboard', 'calculator']} showCTAs={false} />
+
+            {/* Learn more link */}
+            <div className="text-center mt-6">
+              <a
+                href="https://teachersdeserveit.com/how-we-partner"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#38618C] hover:text-[#2d4e73] font-medium underline underline-offset-4 transition-colors"
+              >
+                View full details on our website →
+              </a>
             </div>
           </div>
         )}
