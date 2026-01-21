@@ -487,33 +487,6 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
-            {/* Contract Reminder - Subtle Version */}
-            <div className="bg-[#1e2749]/5 border border-[#1e2749]/10 rounded-xl p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-[#38618C]/10 rounded-full flex items-center justify-center">
-                    <Calendar className="w-4 h-4 text-[#38618C]" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-[#1e2749]">
-                      Reminder: 1 on-site day + spring meeting still available
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      Contract services available through July 2026
-                    </p>
-                  </div>
-                </div>
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-[#35A7FF] hover:text-[#2589db] font-medium flex items-center gap-1 whitespace-nowrap"
-                >
-                  Schedule →
-                </a>
-              </div>
-            </div>
-
             {/* Partnership Progress Visual - Fixed Alignment */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
               <h4 className="font-semibold text-[#1e2749] mb-6">Partnership Progress</h4>
