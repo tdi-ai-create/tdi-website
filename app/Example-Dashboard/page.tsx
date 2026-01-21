@@ -404,7 +404,7 @@ export default function ExampleDashboard() {
         <div className="bg-[#35A7FF]/10 border-b border-[#35A7FF]/20 py-2 px-4">
           <div className="max-w-5xl mx-auto flex items-center justify-center gap-3">
             <span className="text-sm text-[#1e2749] text-center">
-              📋 This is a fictional example dashboard to showcase features schools often enjoy.
+              This is a fictional example dashboard to showcase features schools often enjoy.
             </span>
             <button
               onClick={() => setShowBanner(false)}
@@ -840,7 +840,7 @@ export default function ExampleDashboard() {
                 {/* The Gap Callout */}
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
                   <p className="text-sm font-medium text-amber-800">
-                    📊 The Gap: Classroom grades average <strong>A (90-100%)</strong>, but TerraNova scores for grades 3-6 range from <strong>30th-58th percentile</strong>.
+                    The Gap: Classroom grades average <strong>A (90-100%)</strong>, but TerraNova scores for grades 3-6 range from <strong>30th-58th percentile</strong>.
                   </p>
                 </div>
 
@@ -907,7 +907,7 @@ export default function ExampleDashboard() {
                       <div className="flex-1 h-2 bg-gray-100 rounded-full">
                         <div className="h-full bg-red-500 rounded-full" style={{ width: '30%' }} />
                       </div>
-                      <span className="text-xs text-red-500 font-medium">30th ⚠️</span>
+                      <span className="text-xs text-red-500 font-medium">30th</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-2 bg-gray-100 rounded-full">
@@ -1647,7 +1647,7 @@ export default function ExampleDashboard() {
                   <div className="space-y-2 pt-3 border-t border-gray-100">
                     <p className="text-xs font-semibold text-[#1e2749] mb-2">Top Engagers:</p>
                     <div className="flex items-center gap-2 text-xs">
-                      <span className="text-yellow-500">⭐</span>
+                      <Star className="w-4 h-4 text-yellow-500 inline" />
                       <span className="text-gray-600">Sandi Waguespack — 5 logins</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs">
@@ -1804,7 +1804,7 @@ export default function ExampleDashboard() {
                   <div className="mb-4">
                     <div className="text-sm font-semibold text-gray-600 mb-2">Teachers in This Group</div>
                     <div className="flex flex-wrap gap-2">
-                      <span className="bg-[#38618C]/10 text-[#38618C] px-3 py-1 rounded-full text-sm font-medium">Sandi Waguespack ⭐</span>
+                      <span className="bg-[#38618C]/10 text-[#38618C] px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">Sandi Waguespack <Star className="w-3 h-3 text-yellow-500" /></span>
                       <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Tori Warner</span>
                       <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Tori Guidry</span>
                       <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Maria Lambert</span>
