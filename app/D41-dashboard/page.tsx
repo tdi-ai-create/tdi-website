@@ -129,7 +129,7 @@ export default function D41Dashboard() {
     );
   };
 
-  // Team member data - from Thinkific export
+  // Team member data - from CSV
   const teamMembers = [
     { name: 'Efrain Hernandez', email: 'ehernandez@d41.org', hasLoggedIn: false, enrollments: 32 },
     { name: 'Jennifer Lopez', email: 'jlopez@d41.org', hasLoggedIn: false, enrollments: 32 },
@@ -161,7 +161,7 @@ export default function D41Dashboard() {
           <div className="flex items-center gap-4">
             <a href="https://teachersdeserveit.com" target="_blank" rel="noopener noreferrer">
               <Image
-                src="/images/logo.webp"
+                src="/images/tdi-logo.png"
                 alt="Teachers Deserve It"
                 width={140}
                 height={40}
@@ -206,7 +206,7 @@ export default function D41Dashboard() {
       {/* Tab Navigation */}
       <div className="bg-white border-b border-gray-200 sticky top-14 z-40 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-3">
-          <div className="flex justify-center gap-2 flex-wrap">
+          <div className="flex justify-center gap-2">
             {[
               { id: 'overview', label: 'Overview', icon: Eye },
               { id: 'team', label: 'Your Team', icon: Users },
