@@ -59,6 +59,8 @@ const Tooltip = ({ children, content }: { children: React.ReactNode; content: st
 export default function SauneminDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [activePhase, setActivePhase] = useState(1);
+  const [showPhase2Preview, setShowPhase2Preview] = useState(false);
+  const [showPhase3Preview, setShowPhase3Preview] = useState(false);
 
   // Accordion state for collapsible sections
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -309,12 +311,13 @@ export default function SauneminDashboard() {
 
   // Tab configuration
   const tabs = [
-    { id: 'overview', label: 'Overview' },
-    { id: 'journey', label: 'Journey' },
-    { id: 'progress', label: 'Progress' },
-    { id: 'blueprint', label: 'Blueprint' },
-    { id: 'timeline', label: '2025-26' },
-    { id: 'team', label: 'Team' },
+    { id: 'overview', label: 'Overview', icon: Eye },
+    { id: 'journey', label: 'Journey', icon: TrendingUp },
+    { id: 'progress', label: 'Progress', icon: Users },
+    { id: 'blueprint', label: 'Blueprint', icon: Star },
+    { id: 'timeline', label: '2025-26', icon: Calendar },
+    { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
+    { id: 'team', label: 'Team', icon: User },
   ];
 
   return (
@@ -380,13 +383,19 @@ export default function SauneminDashboard() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
+                className={`px-4 py-3 text-sm font-medium whitespace-nowrap border-b-2 transition-colors flex items-center gap-2 ${
                   activeTab === tab.id
                     ? 'border-[#35A7FF] text-[#35A7FF]'
                     : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
+                <tab.icon className="w-4 h-4" />
                 {tab.label}
+                {tab.badge && (
+                  <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-0.5 rounded-full">
+                    {tab.badge}
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -472,46 +481,92 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
+            {/* Partnership Progress Visual */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <h4 className="font-semibold text-[#1e2749] mb-4">Partnership Progress</h4>
+
+              <div className="relative">
+                {/* Progress bar background */}
+                <div className="h-2 bg-gray-200 rounded-full">
+                  <div className="h-full bg-gradient-to-r from-[#38618C] to-[#35A7FF] rounded-full" style={{ width: '40%' }} />
+                </div>
+
+                {/* Milestones */}
+                <div className="flex justify-between mt-4">
+                  <div className="text-center">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-1">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs text-gray-600">Contract<br/>Signed</span>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-1">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs text-gray-600">Hub<br/>Activated</span>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-1">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs text-gray-600">Day 1<br/>Complete</span>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-8 h-8 bg-[#E07A5F] rounded-full flex items-center justify-center mx-auto mb-1">
+                      <Clock className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs text-[#E07A5F] font-medium">Day 2<br/>Pending</span>
+                  </div>
+                  <div className="text-center">
+                    <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center mx-auto mb-1">
+                      <Calendar className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs text-gray-500">Spring<br/>Meeting</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Movement Involvement */}
-            <Accordion
-              id="movement-involvement"
-              title="Movement Involvement"
-              subtitle="Engagement with TDI community resources"
-              icon={<Sparkles className="w-5 h-5" />}
-            >
-              <div className="pt-4 grid grid-cols-3 gap-4">
-                <a
-                  href="https://teachersdeserveit.com/blog"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <BookOpen className="w-5 h-5 text-[#38618C] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-[#1e2749]">0</div>
-                  <div className="text-xs text-gray-600">Blog Readers</div>
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <Heart className="w-4 h-4 text-[#38618C]" />
+                  <span className="text-sm font-medium text-[#1e2749]">Movement Involvement</span>
+                </div>
+                <span className="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full">
+                  To Be Collected
+                </span>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-amber-800">
+                  Movement involvement data (blog readers, podcast listeners, community members) will be collected during our next on-site visit. This helps us understand how deeply engaged educators are with the TDI ecosystem beyond the Learning Hub.
+                </p>
+              </div>
+
+              {/* Still show the 3 cards but with "TBD" values */}
+              <div className="grid grid-cols-3 gap-4">
+                <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer"
+                   className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
+                  <Mail className="w-5 h-5 text-gray-400 group-hover:text-[#35A7FF] mx-auto mb-1" />
+                  <div className="text-lg font-bold text-gray-400">TBD</div>
+                  <div className="text-xs text-gray-500 mt-1">Blog Readers</div>
                 </a>
-                <a
-                  href="https://teachersdeserveit.com/podcast"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <Headphones className="w-5 h-5 text-[#38618C] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-[#1e2749]">0</div>
-                  <div className="text-xs text-gray-600">Podcast Listeners</div>
+                <a href="https://teachersdeserveit.com/podcast" target="_blank" rel="noopener noreferrer"
+                   className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
+                  <Headphones className="w-5 h-5 text-gray-400 group-hover:text-[#35A7FF] mx-auto mb-1" />
+                  <div className="text-lg font-bold text-gray-400">TBD</div>
+                  <div className="text-xs text-gray-500 mt-1">Podcast Listeners</div>
                 </a>
-                <a
-                  href="https://teachersdeserveit.com/community"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-center p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <MessageCircle className="w-5 h-5 text-[#38618C] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-[#1e2749]">0</div>
-                  <div className="text-xs text-gray-600">Community Members</div>
+                <a href="https://teachersdeserveit.com/community" target="_blank" rel="noopener noreferrer"
+                   className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
+                  <MessageCircle className="w-5 h-5 text-gray-400 group-hover:text-[#35A7FF] mx-auto mb-1" />
+                  <div className="text-lg font-bold text-gray-400">TBD</div>
+                  <div className="text-xs text-gray-500 mt-1">Community Members</div>
                 </a>
               </div>
-            </Accordion>
+            </div>
 
             {/* Needs Attention Section */}
             <div id="needs-attention-section" className="bg-[#FEF3E8] border border-[#E07A5F]/30 rounded-xl p-5">
@@ -667,7 +722,7 @@ export default function SauneminDashboard() {
               <div className="pt-4 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div className="bg-gray-50 rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold text-gray-400">TBD</div>
-                  <div className="text-sm text-gray-600 mt-1">Teacher Stress</div>
+                  <div className="text-sm text-gray-600 mt-1">Educator Stress</div>
                   <div className="text-xs text-gray-400 mt-1">Survey pending</div>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4 text-center">
@@ -677,7 +732,7 @@ export default function SauneminDashboard() {
                 </div>
                 <div className="bg-green-50 rounded-lg p-4 text-center">
                   <div className="text-2xl font-bold text-green-600">Strong</div>
-                  <div className="text-sm text-gray-600 mt-1">Para-Teacher Collaboration</div>
+                  <div className="text-sm text-gray-600 mt-1">Educator-Para Collaboration</div>
                   <div className="text-xs text-green-600 mt-1">Observed</div>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4 text-center">
@@ -691,46 +746,62 @@ export default function SauneminDashboard() {
               </p>
             </Accordion>
 
-            {/* Phase Selector */}
+            {/* Phase Cards - Clickable */}
             <div className="bg-white rounded-xl p-5 shadow-sm">
               <h3 className="font-semibold text-[#1e2749] mb-4">Partnership Phases</h3>
-              <div className="flex gap-2 mb-6 overflow-x-auto">
-                {phases.map(phase => (
-                  <button
-                    key={phase.id}
-                    onClick={() => !phase.isLocked && setActivePhase(phase.id)}
-                    disabled={phase.isLocked}
-                    className={`flex-1 min-w-[100px] px-4 py-3 rounded-lg text-sm font-medium transition-all ${
-                      activePhase === phase.id
-                        ? 'bg-[#35A7FF] text-white'
-                        : phase.isLocked
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    <div className="flex items-center justify-center gap-1">
-                      {phase.isLocked && <Lock className="w-3 h-3" />}
-                      {phase.isComplete && <CheckCircle className="w-3 h-3" />}
-                      <span>Phase {phase.id}</span>
+              <div className="grid md:grid-cols-3 gap-4">
+                {/* Phase 1 - Current */}
+                <div className="bg-[#38618C] text-white rounded-xl p-5 ring-2 ring-[#35A7FF] ring-offset-2">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                      <span className="font-bold">1</span>
                     </div>
-                    <div className="text-xs mt-1 opacity-80">{phase.name}</div>
-                  </button>
-                ))}
+                    <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">Current</span>
+                  </div>
+                  <h4 className="font-bold text-lg">IGNITE</h4>
+                  <p className="text-sm opacity-80 mt-1">Building relationships and baseline understanding</p>
+                </div>
+
+                {/* Phase 2 - Teaser (clickable) */}
+                <button
+                  onClick={() => setShowPhase2Preview(true)}
+                  className="bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl p-5 text-left hover:border-[#35A7FF] hover:bg-[#35A7FF]/5 transition-all group"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center group-hover:bg-[#35A7FF] transition-colors">
+                      <Lock className="w-4 h-4 text-white" />
+                    </div>
+                    <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">Coming Next</span>
+                  </div>
+                  <h4 className="font-bold text-lg text-gray-400 group-hover:text-[#1e2749]">ACCELERATE</h4>
+                  <p className="text-sm text-gray-400 mt-1 group-hover:text-gray-600">Click to preview what&apos;s included →</p>
+                </button>
+
+                {/* Phase 3 - Locked */}
+                <button
+                  onClick={() => setShowPhase3Preview(true)}
+                  className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-5 text-left hover:border-[#35A7FF]/50 transition-all group"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                      <Lock className="w-4 h-4 text-gray-400" />
+                    </div>
+                    <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">Future</span>
+                  </div>
+                  <h4 className="font-bold text-lg text-gray-300">SUSTAIN</h4>
+                  <p className="text-sm text-gray-300 mt-1">Click to preview →</p>
+                </button>
               </div>
 
               {/* Current Phase Details */}
-              <div className={`rounded-lg p-4 border ${currentPhase.isLocked ? 'bg-gray-50 border-gray-200' : 'bg-[#38618C]/5 border-[#38618C]/20'}`}>
+              <div className="mt-6 rounded-lg p-4 border bg-[#38618C]/5 border-[#38618C]/20">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h4 className="font-bold text-[#1e2749]">Phase {currentPhase.id}: {currentPhase.name}</h4>
-                    <p className="text-sm text-gray-600">{currentPhase.description}</p>
+                    <h4 className="font-bold text-[#1e2749]">Phase 1: IGNITE</h4>
+                    <p className="text-sm text-gray-600">Building baseline understanding and relationships</p>
                   </div>
-                  <span className={`text-xs px-3 py-1 rounded-full ${
-                    currentPhase.isCurrent ? 'bg-[#35A7FF] text-white' :
-                    currentPhase.isComplete ? 'bg-green-100 text-green-700' :
-                    'bg-gray-100 text-gray-500'
-                  }`}>
-                    {currentPhase.status}
+                  <span className="text-xs px-3 py-1 rounded-full bg-[#35A7FF] text-white">
+                    Current Phase
                   </span>
                 </div>
 
@@ -738,7 +809,7 @@ export default function SauneminDashboard() {
                   <div>
                     <p className="text-xs font-medium text-gray-500 uppercase mb-2">What&apos;s Included</p>
                     <ul className="grid sm:grid-cols-2 gap-1">
-                      {currentPhase.includes.map((item, i) => (
+                      {phases[0].includes.map((item, i) => (
                         <li key={i} className="text-sm text-gray-600 flex items-start gap-2">
                           <Check className="w-4 h-4 text-[#38618C] flex-shrink-0 mt-0.5" />
                           {item}
@@ -747,11 +818,11 @@ export default function SauneminDashboard() {
                     </ul>
                   </div>
 
-                  {currentPhase.completed && currentPhase.completed.length > 0 && (
+                  {phases[0].completed && phases[0].completed.length > 0 && (
                     <div>
                       <p className="text-xs font-medium text-green-600 uppercase mb-2">Completed</p>
                       <ul className="space-y-1">
-                        {currentPhase.completed.map((item, i) => (
+                        {phases[0].completed.map((item, i) => (
                           <li key={i} className="text-sm text-gray-600 flex items-start gap-2">
                             <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
                             {item}
@@ -761,11 +832,11 @@ export default function SauneminDashboard() {
                     </div>
                   )}
 
-                  {currentPhase.pending && currentPhase.pending.length > 0 && (
+                  {phases[0].pending && phases[0].pending.length > 0 && (
                     <div>
                       <p className="text-xs font-medium text-[#E07A5F] uppercase mb-2">Pending</p>
                       <ul className="space-y-1">
-                        {currentPhase.pending.map((item, i) => (
+                        {phases[0].pending.map((item, i) => (
                           <li key={i} className="text-sm text-gray-600 flex items-start gap-2">
                             <Clock className="w-4 h-4 text-[#E07A5F] flex-shrink-0 mt-0.5" />
                             {item}
@@ -798,7 +869,7 @@ export default function SauneminDashboard() {
                     <li>• <strong>Chris Logan:</strong> Gets down on the floor with PreK students and models learning alongside them</li>
                     <li>• <strong>Cindy Palen:</strong> Patient, structured, works at students' pace with excellent phonics instruction</li>
                     <li>• <strong>Lisa Heiser:</strong> Fantastic PreK classroom with movement, manipulatives, and student leadership opportunities</li>
-                    <li>• Seamless collaboration between paras and teachers</li>
+                    <li>• Seamless collaboration between educators</li>
                   </ul>
                 </div>
 
@@ -859,7 +930,7 @@ export default function SauneminDashboard() {
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                       <p className="text-sm font-medium text-green-800 mb-2">Session Wins:</p>
                       <ul className="text-sm text-green-700 space-y-1">
-                        <li>• Strong para-teacher collaboration observed</li>
+                        <li>• Strong educator-para collaboration observed</li>
                         <li>• Sam Woodcock building incredible student rapport</li>
                         <li>• Lisa Heiser&apos;s PreK classroom exemplary</li>
                         <li>• Chris Logan modeling learning alongside students</li>
@@ -926,6 +997,93 @@ export default function SauneminDashboard() {
                     </a>
                   </div>
                 </Accordion>
+              </div>
+            </div>
+
+            {/* Learning Hub Data Context Note */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-blue-600 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-blue-800">About Learning Hub Data</p>
+                  <p className="text-sm text-blue-700 mt-1">
+                    Hub logins are one indicator we track to understand tool engagement, but they don&apos;t tell the whole story. What matters most is whether strategies from the Hub are showing up in classroom practice — that&apos;s what we look for during observation days.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Hub Engagement Visual - Donut Chart */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
+              <h4 className="font-semibold text-[#1e2749] mb-4">Hub Engagement at a Glance</h4>
+
+              <div className="flex items-center gap-8">
+                {/* Donut Chart */}
+                <div className="relative w-32 h-32">
+                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    {/* Background circle */}
+                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                    {/* Progress circle - 75% = 75 stroke-dasharray */}
+                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="#38618C" strokeWidth="3"
+                      strokeDasharray="75, 100" strokeLinecap="round" />
+                  </svg>
+                  <div className="absolute inset-0 flex flex-col items-center justify-center">
+                    <span className="text-2xl font-bold text-[#1e2749]">75%</span>
+                    <span className="text-xs text-gray-500">Active</span>
+                  </div>
+                </div>
+
+                {/* Legend */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-[#38618C]" />
+                    <span className="text-sm text-gray-600">Active Users (9)</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-gray-200" />
+                    <span className="text-sm text-gray-600">Need Support (3)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sign-in Frequency Bar Chart */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
+              <h4 className="font-semibold text-[#1e2749] mb-4">Sign-in Frequency Distribution</h4>
+
+              <div className="space-y-3">
+                {/* Power Users (3+ logins) */}
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">Power Users (3+ logins)</span>
+                    <span className="font-semibold text-green-600">4 educators</span>
+                  </div>
+                  <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-green-500 rounded-full" style={{ width: '33%' }} />
+                  </div>
+                </div>
+
+                {/* Getting Started (1-2 logins) */}
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">Getting Started (1-2 logins)</span>
+                    <span className="font-semibold text-[#38618C]">5 educators</span>
+                  </div>
+                  <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-[#38618C] rounded-full" style={{ width: '42%' }} />
+                  </div>
+                </div>
+
+                {/* Need Support (0 logins) */}
+                <div>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="text-gray-600">Need Support (0 logins)</span>
+                    <span className="font-semibold text-[#E07A5F]">3 educators</span>
+                  </div>
+                  <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '25%' }} />
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -1030,16 +1188,75 @@ export default function SauneminDashboard() {
         {activeTab === 'blueprint' && (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Partnership Blueprint</h2>
-              <p className="text-gray-600">Contract signed May 23, 2025 · Total Investment: $6,600</p>
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">The TDI Blueprint</h2>
+              <p className="text-gray-600">A phased approach to educator support and school transformation</p>
             </div>
 
-            {/* Contract Deliverables */}
+            {/* Phase Overview Cards */}
+            <div className="grid md:grid-cols-3 gap-4">
+              {/* Phase 1 - IGNITE (Current) */}
+              <div className="bg-[#38618C] text-white rounded-xl p-5 ring-2 ring-[#35A7FF] ring-offset-2">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                    <span className="font-bold">1</span>
+                  </div>
+                  <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">Your Current Phase</span>
+                </div>
+                <h4 className="font-bold text-lg">IGNITE</h4>
+                <p className="text-sm opacity-80 mt-1 mb-4">Building relationships and baseline understanding</p>
+                <div className="border-t border-white/20 pt-3 space-y-1 text-sm">
+                  <p className="flex items-center gap-2"><Check className="w-3 h-3" /> Hub access for enrolled staff</p>
+                  <p className="flex items-center gap-2"><Check className="w-3 h-3" /> 2 on-site observation days</p>
+                  <p className="flex items-center gap-2"><Check className="w-3 h-3" /> Personalized Love Notes</p>
+                  <p className="flex items-center gap-2"><Check className="w-3 h-3" /> Direct line to Rae</p>
+                </div>
+              </div>
+
+              {/* Phase 2 - ACCELERATE */}
+              <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                    <span className="font-bold text-gray-500">2</span>
+                  </div>
+                  <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">Next Step</span>
+                </div>
+                <h4 className="font-bold text-lg text-gray-400">ACCELERATE</h4>
+                <p className="text-sm text-gray-400 mt-1 mb-4">Full implementation with comprehensive support</p>
+                <div className="border-t border-gray-200 pt-3 space-y-1 text-sm text-gray-400">
+                  <p className="flex items-center gap-2"><Check className="w-3 h-3" /> Hub for ALL staff</p>
+                  <p className="flex items-center gap-2"><Check className="w-3 h-3" /> Book study + PD</p>
+                  <p className="flex items-center gap-2"><Check className="w-3 h-3" /> Executive sessions</p>
+                  <p className="flex items-center gap-2"><Check className="w-3 h-3" /> Survey data collection</p>
+                </div>
+              </div>
+
+              {/* Phase 3 - SUSTAIN */}
+              <div className="bg-gray-50 border-2 border-dashed border-gray-100 rounded-xl p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                    <span className="font-bold text-gray-300">3</span>
+                  </div>
+                  <span className="text-xs bg-gray-100 text-gray-400 px-2 py-0.5 rounded-full">Future</span>
+                </div>
+                <h4 className="font-bold text-lg text-gray-300">SUSTAIN</h4>
+                <p className="text-sm text-gray-300 mt-1 mb-4">Long-term sustainability and growth</p>
+                <div className="border-t border-gray-100 pt-3 space-y-1 text-sm text-gray-300">
+                  <p className="flex items-center gap-2"><Check className="w-3 h-3" /> Annual cycles</p>
+                  <p className="flex items-center gap-2"><Check className="w-3 h-3" /> Leadership coaching</p>
+                  <p className="flex items-center gap-2"><Check className="w-3 h-3" /> Data-driven refinement</p>
+                  <p className="flex items-center gap-2"><Check className="w-3 h-3" /> Sustainability planning</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Your Current Contract */}
             <Accordion
               id="deliverables"
-              title="Contract Deliverables"
-              subtitle="What's included in your partnership"
+              title="Your Current Contract (2025-26)"
+              subtitle="Phase 1 IGNITE deliverables"
               icon={<FileText className="w-5 h-5" />}
+              badge="$6,600"
+              badgeColor="bg-[#38618C]/10 text-[#38618C]"
             >
               <div className="pt-4 space-y-3">
                 <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
@@ -1047,7 +1264,7 @@ export default function SauneminDashboard() {
                     <CheckCircle className="w-5 h-5 text-green-600" />
                     <div>
                       <p className="font-medium text-[#1e2749]">All Access Membership</p>
-                      <p className="text-sm text-gray-500">$600</p>
+                      <p className="text-sm text-gray-500">12 Hub users · $600</p>
                     </div>
                   </div>
                   <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full">COMPLETE</span>
@@ -1057,8 +1274,8 @@ export default function SauneminDashboard() {
                   <div className="flex items-center gap-3">
                     <CheckCircle className="w-5 h-5 text-green-600" />
                     <div>
-                      <p className="font-medium text-[#1e2749]">Full-Day PD Visit - Day 1</p>
-                      <p className="text-sm text-gray-500">November 19, 2025 · $3,000 value</p>
+                      <p className="font-medium text-[#1e2749]">On-Site Day #1</p>
+                      <p className="text-sm text-gray-500">November 19, 2025 · 9 observations</p>
                     </div>
                   </div>
                   <span className="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full">COMPLETE</span>
@@ -1068,50 +1285,23 @@ export default function SauneminDashboard() {
                   <div className="flex items-center gap-3">
                     <Clock className="w-5 h-5 text-[#E07A5F]" />
                     <div>
-                      <p className="font-medium text-[#1e2749]">Full-Day PD Visit - Day 2</p>
-                      <p className="text-sm text-gray-500">TBD · $3,000 value</p>
+                      <p className="font-medium text-[#1e2749]">On-Site Day #2</p>
+                      <p className="text-sm text-gray-500">TBD · Implementation focus</p>
                     </div>
                   </div>
                   <span className="text-xs bg-[#E07A5F]/20 text-[#E07A5F] px-3 py-1 rounded-full">PENDING</span>
                 </div>
 
-                <div className="flex items-center justify-between p-3 bg-[#E07A5F]/10 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <Clock className="w-5 h-5 text-[#E07A5F]" />
+                    <Calendar className="w-5 h-5 text-blue-600" />
                     <div>
                       <p className="font-medium text-[#1e2749]">Spring Leadership Meeting</p>
-                      <p className="text-sm text-gray-500">Courtesy addition</p>
+                      <p className="text-sm text-gray-500">With Gary & Michael</p>
                     </div>
                   </div>
-                  <span className="text-xs bg-[#E07A5F]/20 text-[#E07A5F] px-3 py-1 rounded-full">COURTESY</span>
+                  <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full">COURTESY</span>
                 </div>
-              </div>
-            </Accordion>
-
-            {/* What's Included */}
-            <Accordion
-              id="whats-included"
-              title="What's Included"
-              subtitle="Full breakdown of partnership benefits"
-              icon={<Layers className="w-5 h-5" />}
-            >
-              <div className="pt-4">
-                <ul className="space-y-2">
-                  {[
-                    'Learning Hub access for all enrolled staff (currently 12)',
-                    '2 Full-day on-site observation visits',
-                    'Personalized Love Notes for each observed staff member',
-                    'Targeted Hub resource recommendations',
-                    'Direct line to Rae',
-                    '30-day turnaround for custom course requests',
-                    '24-hour turnaround for tools and resources'
-                  ].map((item, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                      <Check className="w-4 h-4 text-[#38618C] flex-shrink-0 mt-0.5" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
               </div>
             </Accordion>
 
@@ -1119,7 +1309,7 @@ export default function SauneminDashboard() {
             <Accordion
               id="partnership-goals"
               title="Partnership Goals"
-              subtitle="Gary's stated interests and questions to explore"
+              subtitle="Gary's stated interests and priorities"
               icon={<Target className="w-5 h-5" />}
             >
               <div className="pt-4 space-y-4">
@@ -1141,7 +1331,7 @@ export default function SauneminDashboard() {
                     </li>
                     <li className="flex items-start gap-2">
                       <MessageSquare className="w-4 h-4 text-[#35A7FF] flex-shrink-0 mt-0.5" />
-                      Expanding Hub access to all teachers (not just paras)
+                      Expanding Hub access to all educators (not just paras)
                     </li>
                     <li className="flex items-start gap-2">
                       <MessageSquare className="w-4 h-4 text-[#35A7FF] flex-shrink-0 mt-0.5" />
@@ -1151,6 +1341,31 @@ export default function SauneminDashboard() {
                 </div>
               </div>
             </Accordion>
+
+            {/* Research Foundation */}
+            <div className="bg-[#1e2749] rounded-xl p-5 text-white">
+              <div className="flex items-start gap-3">
+                <BookOpen className="w-5 h-5 mt-0.5" />
+                <div>
+                  <p className="font-medium mb-1">Research Foundation</p>
+                  <p className="text-sm text-white/70">
+                    &quot;Teacher well-being and job satisfaction are among the strongest predictors of student achievement and school-wide success.&quot; — Hattie, J. (2023). Visible Learning: The Sequel.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Learn More CTA */}
+            <div className="text-center">
+              <a
+                href="https://teachersdeserveit.com/how-we-partner"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#38618C] hover:text-[#2d4e73] font-medium underline underline-offset-4 transition-colors"
+              >
+                View full partnership details on our website →
+              </a>
+            </div>
           </div>
         )}
 
@@ -1267,7 +1482,7 @@ export default function SauneminDashboard() {
                 If partnership continues into 2026-27, options include:
               </p>
               <ul className="text-sm text-white/70 space-y-1 mb-4">
-                <li>• Phase 2 ACCELERATE package with full teacher access</li>
+                <li>• Phase 2 ACCELERATE package with full staff access</li>
                 <li>• Book study for all staff</li>
                 <li>• Executive Impact Sessions</li>
                 <li>• Survey data collection for baseline metrics</li>
@@ -1282,6 +1497,230 @@ export default function SauneminDashboard() {
                 Schedule Renewal Conversation
               </a>
             </div>
+          </div>
+        )}
+
+        {/* 2026-27 PREVIEW TAB */}
+        {activeTab === 'next-year' && (
+          <div className="space-y-6">
+
+            {/* Renewal Recommendation */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
+              <div className="flex items-start gap-3">
+                <Lightbulb className="w-5 h-5 text-amber-600 mt-0.5" />
+                <div>
+                  <p className="font-semibold text-amber-800">Recommendation: Expand to Full Staff</p>
+                  <p className="text-sm text-amber-700 mt-1">
+                    Right now, only your paraprofessionals have Learning Hub access. But your paras work in every classroom alongside teachers — imagine the impact when everyone shares the same strategies, language, and tools. For 2026-27, we recommend expanding to include <strong>all educators</strong> for true whole-school transformation.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Header */}
+            <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] text-white rounded-xl p-6">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="w-5 h-5" />
+                <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Proposed for 2026-27</span>
+              </div>
+              <h3 className="text-2xl font-bold mb-2">Year 2: Full Staff Support</h3>
+              <p className="text-white/80 mb-4">
+                Expand from para-only support to whole-staff professional development, including all educators.
+              </p>
+              <div className="grid grid-cols-2 gap-4 mt-4">
+                <div className="bg-white/10 rounded-lg p-3">
+                  <p className="text-2xl font-bold">12 → 25+</p>
+                  <p className="text-xs opacity-70">Staff with Hub Access</p>
+                </div>
+                <div className="bg-white/10 rounded-lg p-3">
+                  <p className="text-2xl font-bold">Phase 2</p>
+                  <p className="text-xs opacity-70">ACCELERATE</p>
+                </div>
+              </div>
+            </div>
+
+            {/* What's New for 2026-27 */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <h4 className="font-semibold text-[#1e2749] mb-4">What&apos;s New for 2026-27</h4>
+
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-[#35A7FF]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Users className="w-4 h-4 text-[#35A7FF]" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Full Staff Access</p>
+                    <p className="text-sm text-gray-600">Expand Learning Hub access from paras only to include all educators. Your paras work across every classroom — now their teachers will have the same tools and language.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-[#35A7FF]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <BookOpen className="w-4 h-4 text-[#35A7FF]" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-[#1e2749]">TDI Book Study</p>
+                    <p className="text-sm text-gray-600">Every educator receives a copy of the Teachers Deserve It book. Facilitated discussions build shared vocabulary and commitment.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-[#35A7FF]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Target className="w-4 h-4 text-[#35A7FF]" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Intentional Kickoff System</p>
+                    <p className="text-sm text-gray-600">Next year, we&apos;ll launch with our new engagement system — designed to re-engage educators with what matters to them faster and easier than ever before.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-[#35A7FF]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <BarChart3 className="w-4 h-4 text-[#35A7FF]" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Baseline Survey Data</p>
+                    <p className="text-sm text-gray-600">Collect educator stress, retention intent, and implementation baseline data to track measurable growth throughout the year.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Proposed Timeline */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <h4 className="font-semibold text-[#1e2749] mb-4">Proposed 2026-27 Timeline</h4>
+              <p className="text-sm text-gray-500 mb-4">Phase 2 (ACCELERATE) — 10 touchpoints throughout the year</p>
+
+              <div className="space-y-3">
+                {[
+                  { number: 1, date: 'July 2026', title: 'Executive Impact Session #1', type: 'Leadership', color: 'bg-[#1e2749]' },
+                  { number: 2, date: 'Sept 2026', title: 'On-Campus Day #1 + All-Staff Kickoff', type: 'On-Site', color: 'bg-[#38618C]' },
+                  { number: 3, date: 'Oct 2026', title: 'Virtual Strategy Session #1', type: 'Virtual', color: 'bg-[#35A7FF]' },
+                  { number: 4, date: 'Dec 2026', title: 'Executive Impact Session #2', type: 'Leadership', color: 'bg-[#1e2749]' },
+                  { number: 5, date: 'Jan 2027', title: 'Virtual Strategy Session #2', type: 'Virtual', color: 'bg-[#35A7FF]' },
+                  { number: 6, date: 'Feb 2027', title: 'On-Campus Day #2', type: 'On-Site', color: 'bg-[#38618C]' },
+                  { number: 7, date: 'Mar 2027', title: 'Executive Impact Session #3', type: 'Leadership', color: 'bg-[#1e2749]' },
+                  { number: 8, date: 'Mar 2027', title: 'Virtual Strategy Session #3', type: 'Virtual', color: 'bg-[#35A7FF]' },
+                  { number: 9, date: 'Apr 2027', title: 'Virtual Strategy Session #4', type: 'Virtual', color: 'bg-[#35A7FF]' },
+                  { number: 10, date: 'May 2027', title: 'Year-End Celebration', type: 'Celebration', color: 'bg-green-500' },
+                ].map((event, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <div className={`w-8 h-8 ${event.color} text-white rounded-full flex items-center justify-center text-sm font-bold`}>
+                      {event.number}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-[#1e2749] text-sm">{event.title}</p>
+                      <p className="text-xs text-gray-500">{event.date}</p>
+                    </div>
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${
+                      event.type === 'Leadership' ? 'bg-[#1e2749]/10 text-[#1e2749]' :
+                      event.type === 'On-Site' ? 'bg-[#38618C]/10 text-[#38618C]' :
+                      event.type === 'Virtual' ? 'bg-[#35A7FF]/10 text-[#35A7FF]' :
+                      'bg-green-100 text-green-700'
+                    }`}>
+                      {event.type}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Summary Stats */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-100">
+                <div className="text-center">
+                  <School className="w-4 h-4 text-[#38618C] mx-auto mb-1" />
+                  <p className="text-2xl font-bold text-[#1e2749]">2</p>
+                  <p className="text-xs text-gray-500">On-Campus Days</p>
+                </div>
+                <div className="text-center">
+                  <Video className="w-4 h-4 text-[#35A7FF] mx-auto mb-1" />
+                  <p className="text-2xl font-bold text-[#35A7FF]">4</p>
+                  <p className="text-xs text-gray-500">Virtual Sessions</p>
+                </div>
+                <div className="text-center">
+                  <Users className="w-4 h-4 text-[#1e2749] mx-auto mb-1" />
+                  <p className="text-2xl font-bold text-[#1e2749]">4</p>
+                  <p className="text-xs text-gray-500">Executive Sessions</p>
+                </div>
+                <div className="text-center">
+                  <Award className="w-4 h-4 text-green-500 mx-auto mb-1" />
+                  <p className="text-2xl font-bold text-green-500">1</p>
+                  <p className="text-xs text-gray-500">Celebration</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Ongoing Support */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <h4 className="font-semibold text-[#1e2749] mb-4">Ongoing Support Included</h4>
+              <div className="grid sm:grid-cols-2 gap-3">
+                {[
+                  { icon: Laptop, label: 'Full Hub Access', desc: 'All staff, all year' },
+                  { icon: BookOpen, label: 'TDI Book', desc: 'For every educator' },
+                  { icon: BarChart3, label: 'Retention Tracking', desc: 'Year-over-year data' },
+                  { icon: Heart, label: 'Weekly Love Notes', desc: 'Ongoing recognition' },
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <item.icon className="w-5 h-5 text-[#38618C]" />
+                    <div>
+                      <p className="font-medium text-[#1e2749] text-sm">{item.label}</p>
+                      <p className="text-xs text-gray-500">{item.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Goals Alignment */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+              <h4 className="font-semibold text-[#1e2749] mb-4">Goals Alignment</h4>
+              <div className="space-y-4">
+                <div className="bg-[#38618C]/5 border border-[#38618C]/20 rounded-lg p-4">
+                  <p className="text-sm font-medium text-[#38618C] mb-2">Gary&apos;s Goals:</p>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li>• Staff development with positive feedback AND growth areas</li>
+                    <li>• Measurable success metrics (KPIs)</li>
+                    <li>• Continued observations that staff are &quot;craving&quot;</li>
+                  </ul>
+                </div>
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <p className="text-sm font-medium text-green-700 mb-2">TDI Commitment:</p>
+                  <p className="text-sm text-gray-600">
+                    Full staff support with measurable outcomes. We&apos;ll track educator stress levels, implementation rates, and retention intent — providing data Gary can use to demonstrate impact.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Research Foundation */}
+            <div className="bg-[#1e2749] rounded-xl p-5 text-white">
+              <div className="flex items-start gap-3">
+                <BookOpen className="w-5 h-5 mt-0.5" />
+                <div>
+                  <p className="font-medium mb-1">Research Foundation</p>
+                  <p className="text-sm text-white/70">
+                    &quot;Teacher well-being and job satisfaction are among the strongest predictors of student achievement and school-wide success.&quot; — Hattie, J. (2023). Visible Learning: The Sequel.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white text-center">
+              <h3 className="text-lg font-bold mb-2">Ready to discuss 2026-27?</h3>
+              <p className="text-white/80 text-sm mb-4">
+                Let&apos;s talk about expanding support to your full staff and what Phase 2 could look like for Saunemin.
+              </p>
+              <a
+                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-6 py-3 rounded-xl font-semibold transition-all"
+              >
+                <Calendar className="w-5 h-5" />
+                Schedule Renewal Conversation
+              </a>
+            </div>
+
           </div>
         )}
 
@@ -1395,6 +1834,96 @@ export default function SauneminDashboard() {
         )}
 
       </div>
+
+      {/* Phase 2 Preview Modal */}
+      {showPhase2Preview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowPhase2Preview(false)}>
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-xl" onClick={e => e.stopPropagation()}>
+            <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] p-6 rounded-t-2xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs bg-white/20 text-white px-3 py-1 rounded-full">Phase 2</span>
+                  <h3 className="text-xl font-bold text-white mt-2">ACCELERATE</h3>
+                  <p className="text-white/70 text-sm mt-1">Full implementation with comprehensive support</p>
+                </div>
+                <button onClick={() => setShowPhase2Preview(false)} className="text-white/70 hover:text-white">
+                  <span className="text-2xl">&times;</span>
+                </button>
+              </div>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-gray-600">Available when you continue your partnership for 2026-27:</p>
+              <ul className="space-y-2">
+                {[
+                  'Full Hub access for ALL staff (teachers + paras)',
+                  'TDI Book for every educator',
+                  '4 Executive Impact Sessions',
+                  '4 Virtual Strategy Sessions',
+                  '2 On-Campus Observation Days',
+                  'Weekly Love Notes',
+                  'Retention tracking & surveys',
+                  'Baseline data collection'
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                    <Check className="w-4 h-4 text-[#38618C] flex-shrink-0 mt-0.5" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <a
+                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full bg-[#35A7FF] hover:bg-[#2589db] text-white text-center py-3 rounded-xl font-semibold transition-all mt-4"
+              >
+                Learn More About Phase 2
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Phase 3 Preview Modal */}
+      {showPhase3Preview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50" onClick={() => setShowPhase3Preview(false)}>
+          <div className="bg-white rounded-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-xl" onClick={e => e.stopPropagation()}>
+            <div className="bg-gradient-to-r from-gray-600 to-gray-700 p-6 rounded-t-2xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-xs bg-white/20 text-white px-3 py-1 rounded-full">Phase 3</span>
+                  <h3 className="text-xl font-bold text-white mt-2">SUSTAIN</h3>
+                  <p className="text-white/70 text-sm mt-1">Long-term sustainability and continued growth</p>
+                </div>
+                <button onClick={() => setShowPhase3Preview(false)} className="text-white/70 hover:text-white">
+                  <span className="text-2xl">&times;</span>
+                </button>
+              </div>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-gray-600">Available after completing Phase 2:</p>
+              <ul className="space-y-2">
+                {[
+                  'Continued Hub access for all staff',
+                  'Annual observation cycles',
+                  'Leadership coaching',
+                  'Data-driven refinement',
+                  'Sustainability planning'
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                    <Check className="w-4 h-4 text-gray-500 flex-shrink-0 mt-0.5" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+              <div className="bg-gray-100 rounded-lg p-4 mt-4">
+                <p className="text-sm text-gray-600 text-center">
+                  Complete Phase 2 to unlock Phase 3 options
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Compact Footer */}
       <footer className="bg-[#1e2749] text-white py-4 px-4 mt-8">
