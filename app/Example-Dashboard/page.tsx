@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import {
@@ -42,7 +42,8 @@ import {
   Check,
   Layers,
   Sun,
-  Sunset
+  Sunset,
+  X
 } from 'lucide-react';
 
 // Tooltip component
@@ -114,6 +115,32 @@ export default function ExampleDashboard() {
     'contact-options': true,
     'about-tdi': false,
   });
+
+  // Toast notification state
+  const [showToast, setShowToast] = useState(false);
+
+  // Show toast with session limit (max 3 times per session)
+  const handleDisabledClick = () => {
+    if (showToast) return; // Don't stack toasts
+
+    // Check session storage for show count
+    const showCount = parseInt(sessionStorage.getItem('exampleDashboardToastCount') || '0', 10);
+    if (showCount >= 3) return; // Stop showing after 3 times
+
+    // Increment count and show toast
+    sessionStorage.setItem('exampleDashboardToastCount', String(showCount + 1));
+    setShowToast(true);
+  };
+
+  // Auto-dismiss toast after 5 seconds
+  useEffect(() => {
+    if (showToast) {
+      const timer = setTimeout(() => {
+        setShowToast(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showToast]);
 
   // Toggle function for accordions
   const toggleSection = (id: string) => {
@@ -431,6 +458,7 @@ export default function ExampleDashboard() {
             <span
               className="bg-[#35A7FF] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 opacity-50 cursor-not-allowed"
               title="This is an example dashboard"
+              onClick={handleDisabledClick}
             >
               <Calendar className="w-4 h-4" />
               <span className="hidden sm:inline">Schedule Session</span>
@@ -572,6 +600,7 @@ export default function ExampleDashboard() {
                 <div
                   className="text-center p-3 bg-[#E07A5F]/10 rounded-lg opacity-50 cursor-not-allowed"
                   title="This is an example dashboard"
+                  onClick={handleDisabledClick}
                 >
                   <div className="text-2xl font-bold text-[#E07A5F]">0/2</div>
                   <div className="text-xs text-gray-600 mt-1">Virtual Sessions</div>
@@ -635,6 +664,7 @@ export default function ExampleDashboard() {
                       : 'bg-white border-gray-200'
                   }`}
                   title="This is an example dashboard"
+                  onClick={handleDisabledClick}
                 >
                   <div className="flex items-center gap-3">
                     <Calendar className={`w-5 h-5 ${
@@ -677,6 +707,7 @@ export default function ExampleDashboard() {
                       : 'bg-white border-gray-200'
                   }`}
                   title="This is an example dashboard"
+                  onClick={handleDisabledClick}
                 >
                   <div className="flex items-center gap-3">
                     <Calendar className={`w-5 h-5 ${
@@ -719,6 +750,7 @@ export default function ExampleDashboard() {
                       : 'bg-white border-gray-200'
                   }`}
                   title="This is an example dashboard"
+                  onClick={handleDisabledClick}
                 >
                   <div className="flex items-center gap-3">
                     <Calendar className={`w-5 h-5 ${
@@ -1766,6 +1798,7 @@ export default function ExampleDashboard() {
                   <div
                     className="block w-full bg-[#35A7FF] text-white text-center py-3 rounded-xl font-semibold flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
                     title="This is an example dashboard"
+                    onClick={handleDisabledClick}
                   >
                     <Calendar className="w-4 h-4" />
                     Schedule This Session
@@ -1816,6 +1849,7 @@ export default function ExampleDashboard() {
                   <div
                     className="block w-full bg-[#35A7FF] text-white text-center py-3 rounded-xl font-semibold flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
                     title="This is an example dashboard"
+                    onClick={handleDisabledClick}
                   >
                     <Calendar className="w-4 h-4" />
                     Schedule This Session
@@ -2567,6 +2601,7 @@ export default function ExampleDashboard() {
               <span
                 className="bg-white text-[#1e2749] px-8 py-3 rounded-lg font-semibold text-sm whitespace-nowrap opacity-50 cursor-not-allowed"
                 title="This is an example dashboard"
+                onClick={handleDisabledClick}
               >
                 Schedule Renewal Chat →
               </span>
@@ -2609,6 +2644,7 @@ export default function ExampleDashboard() {
                     <span
                       className="flex items-center gap-2 text-gray-600 justify-center md:justify-start opacity-60 cursor-not-allowed"
                       title="This is an example dashboard"
+                      onClick={handleDisabledClick}
                     >
                       <Mail className="w-4 h-4 text-[#38618C]" />
                       rae@teachersdeserveit.com
@@ -2616,6 +2652,7 @@ export default function ExampleDashboard() {
                     <span
                       className="flex items-center gap-2 text-gray-600 justify-center md:justify-start opacity-60 cursor-not-allowed"
                       title="This is an example dashboard"
+                      onClick={handleDisabledClick}
                     >
                       <Phone className="w-4 h-4 text-[#38618C]" />
                       847-721-5503
@@ -2626,6 +2663,7 @@ export default function ExampleDashboard() {
                   <span
                     className="inline-flex items-center gap-2 bg-[#35A7FF] text-white px-6 py-3 rounded-xl font-semibold opacity-50 cursor-not-allowed"
                     title="This is an example dashboard"
+                    onClick={handleDisabledClick}
                   >
                     <Calendar className="w-5 h-5" />
                     Schedule Time with Rae
@@ -2684,12 +2722,57 @@ export default function ExampleDashboard() {
           <span
             className="inline-flex items-center gap-2 bg-[#35A7FF] text-white px-4 py-2 rounded-lg font-semibold text-sm opacity-50 cursor-not-allowed"
             title="This is an example dashboard"
+            onClick={handleDisabledClick}
           >
             <Calendar className="w-4 h-4" />
             Schedule a Call
           </span>
         </div>
       </footer>
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-slide-up">
+          <div className="bg-white rounded-xl shadow-xl px-6 py-4 flex items-center gap-4 max-w-lg border border-gray-100">
+            <div className="flex-1">
+              <p className="text-[#1e2749] font-medium text-sm">
+                This is an example dashboard. Ready to see what your school's dashboard could look like?
+              </p>
+            </div>
+            <a
+              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors"
+            >
+              Schedule a Call →
+            </a>
+            <button
+              onClick={() => setShowToast(false)}
+              className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+              aria-label="Dismiss"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      <style jsx>{`
+        @keyframes slide-up {
+          from {
+            opacity: 0;
+            transform: translate(-50%, 20px);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
+        }
+        .animate-slide-up {
+          animation: slide-up 0.3s ease-out forwards;
+        }
+      `}</style>
     </div>
   );
 }
