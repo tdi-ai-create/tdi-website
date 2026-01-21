@@ -476,7 +476,7 @@ export default function SauneminDashboard() {
                   <div className="text-xs text-green-600 mt-1">✓ Complete</div>
                 </div>
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-center p-3 bg-[#E07A5F]/10 rounded-lg hover:bg-[#E07A5F]/20 transition-colors"
@@ -544,7 +544,7 @@ export default function SauneminDashboard() {
               <div className="space-y-3">
                 {/* Item 1: Second On-Site Day */}
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone"
                   target="_blank"
                   rel="noopener noreferrer"
                   className={`rounded-lg p-4 flex items-center justify-between hover:shadow-md border transition-all cursor-pointer block ${
@@ -961,7 +961,7 @@ export default function SauneminDashboard() {
                   Hub resources shared with each educator
                 </div>
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-white bg-[#35A7FF] hover:bg-[#2589db] px-4 py-1.5 rounded-full font-medium transition-colors"
@@ -1213,7 +1213,7 @@ export default function SauneminDashboard() {
                     </div>
 
                     <a
-                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="block w-full bg-[#35A7FF] hover:bg-[#2589db] text-white text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
