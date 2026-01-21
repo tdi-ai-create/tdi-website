@@ -460,23 +460,6 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
-            {/* Investment Value Context */}
-            <div className="bg-[#1e2749]/5 rounded-lg p-3 mb-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-[#38618C]/10 rounded-full flex items-center justify-center">
-                  <TrendingUp className="w-4 h-4 text-[#38618C]" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-[#1e2749]">Your Partnership Investment</p>
-                  <p className="text-xs text-gray-500">$6,600 total · Industry equivalent: $15,000+</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-[#E07A5F] font-medium">~$3,000 in services remaining</p>
-                <p className="text-xs text-gray-400">Use by July 2026</p>
-              </div>
-            </div>
-
             {/* Health Check - Partnership Goals */}
             <div className="bg-white rounded-xl p-5 shadow-sm">
               <div className="flex items-center justify-between mb-4">
