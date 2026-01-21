@@ -209,7 +209,7 @@ export default function D41Dashboard() {
           <div className="flex justify-center gap-2">
             {[
               { id: 'overview', label: 'Overview', icon: Eye },
-              { id: 'team', label: 'Your Team', icon: Users },
+              { id: 'progress', label: 'Progress', icon: TrendingUp },
               { id: 'resources', label: 'Resources', icon: BookOpen },
               { id: 'next-steps', label: '2026-2027', icon: Sparkles, badge: 'IGNITE' },
               { id: 'contact', label: 'Contact', icon: User },
@@ -263,7 +263,7 @@ export default function D41Dashboard() {
               </div>
 
               <div
-                onClick={() => setActiveTab('team')}
+                onClick={() => setActiveTab('progress')}
                 className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#E07A5F] cursor-pointer hover:shadow-md transition-all"
               >
                 <div className="flex items-center gap-2 mb-1">
@@ -488,7 +488,7 @@ export default function D41Dashboard() {
         )}
 
         {/* YOUR TEAM TAB */}
-        {activeTab === 'team' && (
+        {activeTab === 'progress' && (
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Paraprofessional Team</h2>
