@@ -436,13 +436,18 @@ export default function SauneminDashboard() {
                 <div className="text-xs text-[#35A7FF]">1 remaining</div>
               </div>
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#E07A5F]">
+              <div
+                onClick={() => {
+                  document.getElementById('next-steps-section')?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#35A7FF] cursor-pointer hover:shadow-md transition-all"
+              >
                 <div className="flex items-center gap-2 mb-1">
-                  <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
-                  <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
+                  <Calendar className="w-4 h-4 text-[#35A7FF]" />
+                  <span className="text-xs text-gray-500 uppercase">Next Steps</span>
                 </div>
-                <div className="text-2xl font-bold text-[#E07A5F]">3</div>
-                <div className="text-xs text-[#E07A5F]">Items pending</div>
+                <div className="text-2xl font-bold text-[#35A7FF]">3</div>
+                <div className="text-xs text-[#35A7FF] font-medium">Ready to schedule</div>
               </div>
 
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
@@ -452,6 +457,23 @@ export default function SauneminDashboard() {
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">Phase 1</div>
                 <div className="text-xs text-[#38618C] font-medium">IGNITE</div>
+              </div>
+            </div>
+
+            {/* Investment Value Context */}
+            <div className="bg-[#1e2749]/5 rounded-lg p-3 mb-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 bg-[#38618C]/10 rounded-full flex items-center justify-center">
+                  <TrendingUp className="w-4 h-4 text-[#38618C]" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[#1e2749]">Your Partnership Investment</p>
+                  <p className="text-xs text-gray-500">$6,600 total · Industry equivalent: $15,000+</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-xs text-[#E07A5F] font-medium">~$3,000 in services remaining</p>
+                <p className="text-xs text-gray-400">Use by July 2026</p>
               </div>
             </div>
 
@@ -485,6 +507,60 @@ export default function SauneminDashboard() {
                   <div className="text-xs text-gray-600 mt-1">On-Site Days</div>
                   <div className="text-xs text-[#E07A5F] mt-1 font-medium">Schedule Day 2 →</div>
                 </a>
+              </div>
+            </div>
+
+            {/* November Highlights - Celebrating Your Team */}
+            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-5 border border-green-200 mb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Star className="w-5 h-5 text-green-600" />
+                <h3 className="font-bold text-[#1e2749]">November Observation Highlights</h3>
+                <span className="text-xs bg-green-600 text-white px-2 py-0.5 rounded-full ml-auto">Day 1 Wins</span>
+              </div>
+
+              <p className="text-sm text-gray-600 mb-4">
+                Here&apos;s what we celebrated during our November 19th visit — your team is doing incredible work!
+              </p>
+
+              <div className="grid md:grid-cols-2 gap-3">
+                <div className="bg-white rounded-lg p-3 border border-green-100">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Heart className="w-4 h-4 text-[#E07A5F]" />
+                    <span className="font-medium text-[#1e2749] text-sm">Sam Woodcock</span>
+                  </div>
+                  <p className="text-xs text-gray-600">Incredible rapport with students — lots of jokes, trust, and genuine connection. This is the foundation everything else is built on.</p>
+                </div>
+
+                <div className="bg-white rounded-lg p-3 border border-green-100">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Heart className="w-4 h-4 text-[#E07A5F]" />
+                    <span className="font-medium text-[#1e2749] text-sm">Lisa Heiser</span>
+                  </div>
+                  <p className="text-xs text-gray-600">Fantastic PreK classroom with movement, manipulatives, and student leadership opportunities. A space kids want to be in!</p>
+                </div>
+
+                <div className="bg-white rounded-lg p-3 border border-green-100">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Heart className="w-4 h-4 text-[#E07A5F]" />
+                    <span className="font-medium text-[#1e2749] text-sm">Chris Logan</span>
+                  </div>
+                  <p className="text-xs text-gray-600">Gets down on the floor with PreK students and models learning alongside them. True partnership in action.</p>
+                </div>
+
+                <div className="bg-white rounded-lg p-3 border border-green-100">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Heart className="w-4 h-4 text-[#E07A5F]" />
+                    <span className="font-medium text-[#1e2749] text-sm">Cindy Palen</span>
+                  </div>
+                  <p className="text-xs text-gray-600">Patient, structured, and works at students&apos; pace with excellent phonics instruction. Exactly what students need.</p>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-3 border-t border-green-200">
+                <div className="flex items-center gap-2 text-sm text-green-700">
+                  <Users className="w-4 h-4" />
+                  <span><strong>Team Win:</strong> Seamless para-teacher collaboration observed across classrooms — especially Haylie with her teacher, and Grace with Sam.</span>
+                </div>
               </div>
             </div>
 
@@ -534,11 +610,12 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
-            {/* Needs Attention Section */}
-            <div id="needs-attention-section" className="bg-[#FEF3E8] border border-[#E07A5F]/30 rounded-xl p-5">
+            {/* Next Steps Together Section */}
+            <div id="next-steps-section" className="bg-[#38618C]/5 border border-[#38618C]/20 rounded-xl p-5">
               <div className="flex items-center gap-2 mb-4">
-                <AlertCircle className="w-5 h-5 text-[#E07A5F]" />
-                <span className="font-semibold text-[#E07A5F] uppercase tracking-wide">Needs Attention</span>
+                <Calendar className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749]">Next Steps Together</span>
+                <span className="text-xs bg-[#E07A5F]/10 text-[#E07A5F] px-2 py-0.5 rounded-full ml-2">3 items</span>
               </div>
 
               <div className="space-y-3">
@@ -668,24 +745,104 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
-            {/* Looking Ahead Card */}
-            <div
-              className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-[1.01]"
-              onClick={() => setActiveTab('blueprint')}
-            >
-              <div className="flex justify-between items-center">
-                <div>
-                  <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Looking Ahead</span>
-                  <h3 className="text-lg font-bold mt-2">Partnership Blueprint</h3>
-                  <p className="text-sm opacity-80 mt-1">
-                    View your complete contract deliverables and what&apos;s included in your partnership.
+            {/* What Other Partners Are Saying */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <MessageSquare className="w-5 h-5 text-[#38618C]" />
+                <h3 className="font-semibold text-[#1e2749]">What Other Partners Are Saying</h3>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#38618C]">
+                  <p className="text-sm text-gray-700 italic mb-2">
+                    &quot;Professional development that finally meets the moment. Between burnout and new initiatives, our team needed clarity and care. TDI delivered both.&quot;
                   </p>
+                  <p className="text-xs text-gray-500">— Assistant Superintendent, Illinois</p>
                 </div>
-                <div className="text-right flex flex-col items-center">
-                  <span className="text-4xl">→</span>
-                  <p className="text-xs opacity-70">View Blueprint</p>
+
+                <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#35A7FF]">
+                  <p className="text-sm text-gray-700 italic mb-2">
+                    &quot;Our staff actually looked forward to PD. The personalized feedback made a huge difference — teachers felt seen and celebrated for their specific strengths.&quot;
+                  </p>
+                  <p className="text-xs text-gray-500">— Principal, K-8 School</p>
                 </div>
               </div>
+
+              <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+                <p className="text-xs text-gray-500">Join 87,000+ educators across 21 states</p>
+                <a
+                  href="https://teachersdeserveit.com/for-schools"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-[#35A7FF] hover:underline"
+                >
+                  See more results →
+                </a>
+              </div>
+            </div>
+
+            {/* Looking Ahead - Renewal Teaser */}
+            <div className="bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-xl p-5 text-white">
+              <div className="flex items-center gap-2 mb-3">
+                <Sparkles className="w-5 h-5 text-[#35A7FF]" />
+                <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">Looking Ahead</span>
+              </div>
+
+              <h3 className="font-bold text-lg mb-2">Ready for Even Bigger Impact?</h3>
+              <p className="text-sm opacity-90 mb-4">
+                Year 1 builds relationships. Year 2 drives measurable outcomes. See what becomes possible when we expand from <strong>12 paras</strong> to <strong>your entire staff</strong>.
+              </p>
+
+              <div className="grid grid-cols-3 gap-3 mb-4">
+                <div className="bg-white/10 rounded-lg p-2 text-center">
+                  <p className="text-lg font-bold">25+</p>
+                  <p className="text-xs opacity-70">All Staff Access</p>
+                </div>
+                <div className="bg-white/10 rounded-lg p-2 text-center">
+                  <p className="text-lg font-bold">65%</p>
+                  <p className="text-xs opacity-70">Implementation Rate</p>
+                </div>
+                <div className="bg-white/10 rounded-lg p-2 text-center">
+                  <p className="text-lg font-bold">Phase 2</p>
+                  <p className="text-xs opacity-70">ACCELERATE</p>
+                </div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setActiveTab('next-year');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="flex-1 bg-[#35A7FF] hover:bg-[#2589db] text-white py-2 px-4 rounded-lg text-sm font-semibold transition-colors text-center"
+                >
+                  Preview 2026-27 →
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveTab('blueprint');
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                  className="bg-white/20 hover:bg-white/30 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors"
+                >
+                  View Blueprint
+                </button>
+              </div>
+            </div>
+
+            {/* Soft Contract Reminder */}
+            <div className="text-center py-4 border-t border-gray-100 mt-6">
+              <p className="text-xs text-gray-400">
+                Partnership services available through July 2026 ·
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#35A7FF] hover:underline ml-1"
+                >
+                  Questions? Let&apos;s chat
+                </a>
+              </p>
             </div>
 
           </div>
@@ -1226,6 +1383,51 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
+            {/* From Hub to Classroom */}
+            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <TrendingUp className="w-5 h-5 text-[#38618C]" />
+                <h3 className="font-semibold text-[#1e2749]">From Hub to Classroom</h3>
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full ml-auto">Evidence</span>
+              </div>
+
+              <p className="text-sm text-gray-600 mb-4">
+                We&apos;re already seeing connections between Learning Hub engagement and classroom practice:
+              </p>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 bg-green-50 rounded-lg p-3">
+                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Check className="w-3 h-3 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-[#1e2749]">Most Active Hub Users = Strongest Practice</p>
+                    <p className="text-xs text-gray-600">Sam (4 logins), Cindy (4 logins), and Haylie (3 logins) demonstrated the strongest instructional strategies during observations.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 bg-blue-50 rounded-lg p-3">
+                  <div className="w-6 h-6 bg-[#35A7FF] rounded-full flex items-center justify-center flex-shrink-0">
+                    <Eye className="w-3 h-3 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-[#1e2749]">Para-Teacher Collaboration Shining</p>
+                    <p className="text-xs text-gray-600">The &quot;Building Strong Teacher-Para Partnerships&quot; course content was visible in how Haylie and Grace work seamlessly with their classroom teachers.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 bg-amber-50 rounded-lg p-3">
+                  <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Target className="w-3 h-3 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-[#1e2749]">Day 2 Focus: Deeper Implementation</p>
+                    <p className="text-xs text-gray-600">We&apos;ll look for specific strategies from Para Foundations, De-Escalation, and Small Group Instruction showing up in practice.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Learning Hub Data Context Note */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
@@ -1496,6 +1698,29 @@ export default function SauneminDashboard() {
                 View full details on our website →
               </a>
             </div>
+
+            {/* Funding Options */}
+            <div className="bg-[#1e2749] rounded-xl p-5 text-white mt-6">
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <DollarSign className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="font-semibold mb-1">Funding Options Available</h4>
+                  <p className="text-sm opacity-80 mb-3">
+                    TDI partnerships qualify for Title II, ESSER, state PD funds, and more. We&apos;ve helped dozens of districts secure funding for educator support.
+                  </p>
+                  <a
+                    href="https://www.teachersdeserveit.com/funding"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                  >
+                    Explore Funding Options →
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -1503,14 +1728,37 @@ export default function SauneminDashboard() {
         {activeTab === 'next-year' && (
           <div className="space-y-6">
 
-            {/* Renewal Recommendation */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
+            {/* Why Year 2 Matters */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6">
               <div className="flex items-start gap-3">
-                <Lightbulb className="w-5 h-5 text-amber-600 mt-0.5" />
+                <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Lightbulb className="w-5 h-5 text-amber-600" />
+                </div>
                 <div>
-                  <p className="font-semibold text-amber-800">Recommendation: Expand to Full Staff</p>
-                  <p className="text-sm text-amber-700 mt-1">
-                    Right now, only your paraprofessionals have Learning Hub access. But your paras work in every classroom alongside teachers — imagine the impact when everyone shares the same strategies, language, and tools. For 2026-27, we recommend expanding to include <strong>all educators</strong> for true whole-school transformation.
+                  <h4 className="font-bold text-amber-800 mb-2">Why Year 2 is Where the Magic Happens</h4>
+                  <p className="text-sm text-amber-700 mb-3">
+                    Year 1 builds trust, establishes relationships, and creates foundation. Year 2 is where we see <strong>measurable transformation</strong>:
+                  </p>
+                  <ul className="text-sm text-amber-700 space-y-1">
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-amber-600" />
+                      Expand from 12 paras to <strong>ALL staff</strong> including teachers
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-amber-600" />
+                      Collect baseline data to track <strong>measurable outcomes</strong>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-amber-600" />
+                      Move from relationship-building to <strong>65%+ implementation rates</strong>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-amber-600" />
+                      Book study creates <strong>shared language</strong> across your whole team
+                    </li>
+                  </ul>
+                  <p className="text-sm text-amber-800 font-medium mt-3">
+                    Most partner schools see breakthrough results in Year 2. You&apos;ve built the foundation — now let&apos;s build on it.
                   </p>
                 </div>
               </div>
