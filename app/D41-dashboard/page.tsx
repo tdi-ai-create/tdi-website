@@ -876,17 +876,10 @@ export default function D41Dashboard() {
 
             {/* Package Summary */}
             <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
-              <div className="flex flex-col md:flex-row justify-between gap-6">
-                <div>
-                  <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Recommended</span>
-                  <h3 className="text-2xl font-bold mt-3">Phase 1: IGNITE</h3>
-                  <p className="text-white/80 mt-1">Building baseline understanding and personalized support</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold">$8,400</div>
-                  <div className="text-sm text-white/60">2026-27 School Year</div>
-                  <div className="text-xs text-white/40 mt-1">Includes 10 memberships</div>
-                </div>
+              <div>
+                <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Recommended</span>
+                <h3 className="text-2xl font-bold mt-3">Phase 1: IGNITE</h3>
+                <p className="text-white/80 mt-1">Building baseline understanding and personalized support</p>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/20">
