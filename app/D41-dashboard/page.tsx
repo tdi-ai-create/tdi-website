@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import {
@@ -69,6 +69,7 @@ const Tooltip = ({ children, content }: { children: React.ReactNode; content: st
 
 export default function D41Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
+  const tabContentRef = useRef<HTMLDivElement>(null);
 
   // Accordion state for collapsible sections
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -217,7 +218,10 @@ export default function D41Dashboard() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
                 className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                   activeTab === tab.id
                     ? 'bg-[#1e2749] text-white shadow-md'
@@ -233,7 +237,7 @@ export default function D41Dashboard() {
       </div>
 
       {/* Tab Content */}
-      <div className="max-w-5xl mx-auto px-4 py-6">
+      <div ref={tabContentRef} className="max-w-5xl mx-auto px-4 py-6">
 
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
