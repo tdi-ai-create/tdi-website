@@ -151,15 +151,6 @@ export default function CreateWithUsPage() {
       : formState.referral;
     formData.set('referral_source', referralValue);
 
-    // Check if headshot file is empty or too large, remove it if so
-    const headshotFile = formData.get('headshot') as File;
-    if (!headshotFile || headshotFile.size === 0 || headshotFile.size > 1000000) {
-      formData.delete('headshot');
-      // Add a note if they tried to upload but it was too large
-      if (headshotFile && headshotFile.size > 1000000) {
-        formData.append('headshot_note', 'User uploaded file was over 1MB - please request headshot via email');
-      }
-    }
 
     try {
       const response = await fetch('https://api.web3forms.com/submit', {
@@ -179,9 +170,6 @@ export default function CreateWithUsPage() {
           referral: '',
           otherReferral: '',
         });
-        // Reset the file input
-        const fileInput = document.getElementById('headshot') as HTMLInputElement;
-        if (fileInput) fileInput.value = '';
       } else {
         console.error('Web3Forms error:', result);
         setSubmitStatus('error');
@@ -391,7 +379,7 @@ export default function CreateWithUsPage() {
                 data-animate="true"
               >
                 Tell us about yourself and the strategies you'd love to share.
-                Rachel from our team will be in touch within a few days.
+                Rachel from our team will be in touch within a few days to discuss next steps and get your headshot.
               </p>
             </div>
 
@@ -448,22 +436,6 @@ export default function CreateWithUsPage() {
                   />
                 </div>
 
-                {/* Headshot Upload */}
-                <div>
-                  <label htmlFor="headshot" className="block text-sm font-medium text-gray-700 mb-2">
-                    Headshot (optional)
-                  </label>
-                  <p className="text-sm text-gray-500 mb-2">
-                    Upload a professional photo we can use on the website if you join our team.
-                  </p>
-                  <input
-                    type="file"
-                    id="headshot"
-                    name="headshot"
-                    accept="image/*"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffba06] focus:border-transparent transition-all duration-300 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#ffba06]/20 file:text-[#1e2749] file:font-medium hover:file:bg-[#ffba06]/30 file:cursor-pointer file:transition-colors"
-                  />
-                </div>
 
                 {/* Strategy/Topic */}
                 <div>
