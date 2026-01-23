@@ -151,6 +151,16 @@ export default function CreateWithUsPage() {
       : formState.referral;
     formData.set('referral_source', referralValue);
 
+    // Check if headshot file is empty or too large, remove it if so
+    const headshotFile = formData.get('headshot') as File;
+    if (!headshotFile || headshotFile.size === 0 || headshotFile.size > 1000000) {
+      formData.delete('headshot');
+      // Add a note if they tried to upload but it was too large
+      if (headshotFile && headshotFile.size > 1000000) {
+        formData.append('headshot_note', 'User uploaded file was over 1MB - please request headshot via email');
+      }
+    }
+
     try {
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
@@ -173,9 +183,11 @@ export default function CreateWithUsPage() {
         const fileInput = document.getElementById('headshot') as HTMLInputElement;
         if (fileInput) fileInput.value = '';
       } else {
+        console.error('Web3Forms error:', result);
         setSubmitStatus('error');
       }
-    } catch {
+    } catch (err) {
+      console.error('Form submission error:', err);
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
