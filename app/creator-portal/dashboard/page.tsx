@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { LogOut, Loader2, AlertCircle, Mail, User, CheckCircle, X } from 'lucide-react';
@@ -11,9 +11,27 @@ import { CourseDetailsPanel } from '@/components/creator-portal/CourseDetailsPan
 import { NotesPanel } from '@/components/creator-portal/NotesPanel';
 import type { CreatorDashboardData } from '@/types/creator-portal';
 
+// Component to handle search params (must be wrapped in Suspense)
+function SearchParamsHandler({
+  onAgreementSigned,
+}: {
+  onAgreementSigned: () => void;
+}) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('agreement') === 'signed') {
+      onAgreementSigned();
+      // Clear the URL param without refreshing
+      window.history.replaceState({}, '', '/creator-portal/dashboard');
+    }
+  }, [searchParams, onAgreementSigned]);
+
+  return null;
+}
+
 export default function CreatorDashboardPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [dashboardData, setDashboardData] = useState<CreatorDashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -21,16 +39,12 @@ export default function CreatorDashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-  // Check for success messages from query params
-  useEffect(() => {
-    if (searchParams.get('agreement') === 'signed') {
-      setSuccessMessage("Agreement signed! You're officially a TDI Creator 🎉");
-      // Clear the URL param without refreshing
-      window.history.replaceState({}, '', '/creator-portal/dashboard');
-      // Auto-hide after 6 seconds
-      setTimeout(() => setSuccessMessage(null), 6000);
-    }
-  }, [searchParams]);
+  // Callback for when agreement is signed
+  const handleAgreementSigned = () => {
+    setSuccessMessage("Agreement signed! You're officially a TDI Creator 🎉");
+    // Auto-hide after 6 seconds
+    setTimeout(() => setSuccessMessage(null), 6000);
+  };
 
   useEffect(() => {
     const checkAuthAndLoad = async () => {
@@ -205,6 +219,11 @@ export default function CreatorDashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
+      {/* Handle search params with Suspense boundary */}
+      <Suspense fallback={null}>
+        <SearchParamsHandler onAgreementSigned={handleAgreementSigned} />
+      </Suspense>
+
       {/* Studio Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="container-wide py-4 flex items-center justify-between">
