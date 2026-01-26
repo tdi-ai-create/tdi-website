@@ -184,6 +184,24 @@ export default function CreateWithUsPage() {
 
   return (
     <main className="min-h-screen overflow-x-hidden">
+      {/* Existing Creator Banner */}
+      <div className="bg-[#1e2749] border-b border-[#2a3459]">
+        <div className="max-w-6xl mx-auto px-6 py-3 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-center">
+          <span className="text-white/90 text-sm">
+            Already a TDI Creator?
+          </span>
+          <Link
+            href="/creator-portal"
+            className="text-[#ffba06] hover:text-[#ffe066] text-sm font-medium transition-colors inline-flex items-center gap-1"
+          >
+            Access your Creator Portal
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <section className="relative py-20 md:py-28 overflow-hidden">
         <div className="absolute inset-0">
