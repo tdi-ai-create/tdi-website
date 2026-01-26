@@ -184,15 +184,15 @@ export default function CreateWithUsPage() {
 
   return (
     <main className="min-h-screen overflow-x-hidden">
-      {/* Existing Creator Banner */}
-      <div className="bg-[#1e2749] border-b border-[#2a3459]">
+      {/* Creator Portal Banner - Yellow for visibility */}
+      <div className="bg-[#ffba06] w-full">
         <div className="max-w-6xl mx-auto px-6 py-3 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-center">
-          <span className="text-white/90 text-sm">
+          <span className="text-[#1e2749] text-sm font-medium">
             Already a TDI Creator?
           </span>
           <Link
             href="/creator-portal"
-            className="text-[#ffba06] hover:text-[#ffe066] text-sm font-medium transition-colors inline-flex items-center gap-1"
+            className="text-[#1e2749] hover:underline text-sm font-semibold transition-all inline-flex items-center gap-1"
           >
             Access your Creator Portal
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

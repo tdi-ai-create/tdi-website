@@ -1,4 +1,15 @@
+'use client';
+
+import { usePathname } from 'next/navigation';
+
 export function AnnouncementBar() {
+  const pathname = usePathname();
+
+  // Hide on create-with-us page (has its own Creator Portal banner)
+  if (pathname === '/create-with-us') {
+    return null;
+  }
+
   return (
     <div
       className="w-full py-2 px-4 flex items-center justify-center"
