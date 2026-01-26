@@ -5,7 +5,21 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Mail, Loader2, CheckCircle, AlertCircle, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { canLogin, getUserType } from '@/lib/creator-portal-data';
+
+// Server-side API call to check email (bypasses RLS)
+async function checkEmailExists(email: string): Promise<{ exists: boolean; type: 'creator' | 'admin' | null }> {
+  try {
+    const response = await fetch('/api/creator-portal/check-email', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await response.json();
+    return { exists: data.exists, type: data.type };
+  } catch {
+    return { exists: false, type: null };
+  }
+}
 
 type LoginState = 'idle' | 'loading' | 'sent' | 'error' | 'not_found';
 
@@ -21,7 +35,7 @@ function CreatorPortalLoginContent() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.email) {
-        const userType = await getUserType(session.user.email);
+        const { type: userType } = await checkEmailExists(session.user.email);
         if (userType === 'admin') {
           router.push('/admin/creators');
         } else if (userType === 'creator') {
@@ -47,7 +61,7 @@ function CreatorPortalLoginContent() {
       // Check for session after redirect
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.email) {
-        const userType = await getUserType(session.user.email);
+        const { type: userType } = await checkEmailExists(session.user.email);
         if (userType === 'admin') {
           router.push('/admin/creators');
         } else if (userType === 'creator') {
@@ -67,10 +81,10 @@ function CreatorPortalLoginContent() {
     setErrorMessage('');
 
     try {
-      // Check if this email exists in creators or admin_users table
-      const { canLogin: allowed } = await canLogin(email);
+      // Check if this email exists in creators or admin_users table (server-side to bypass RLS)
+      const { exists } = await checkEmailExists(email);
 
-      if (!allowed) {
+      if (!exists) {
         setLoginState('not_found');
         return;
       }
