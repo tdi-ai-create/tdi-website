@@ -2,7 +2,6 @@
 
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Image from 'next/image';
 import { Mail, Loader2, CheckCircle, AlertCircle, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -110,157 +109,153 @@ function CreatorPortalLoginContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f5f5f5] to-white flex flex-col">
-      {/* Header */}
-      <header className="p-6">
-        <div className="container-wide">
-          <Image
-            src="/images/logo.webp"
-            alt="Teachers Deserve It"
-            width={160}
-            height={48}
-            className="h-12 w-auto"
-          />
-        </div>
-      </header>
-
-      {/* Main content */}
-      <main className="flex-grow flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100">
-            <div className="text-center mb-8">
-              <div className="inline-flex items-center gap-2 text-[#ffba06] mb-4">
-                <Sparkles className="w-5 h-5" />
-                <span className="text-sm font-medium">Creator Portal</span>
-              </div>
-              <h1 className="text-2xl font-bold text-[#1e2749]">
-                Welcome Back, Creator!
-              </h1>
-              <p className="text-gray-600 mt-2">
-                Sign in to track your course progress and connect with the TDI team.
-              </p>
+    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center px-4 py-12 bg-gradient-to-b from-gray-50 to-white">
+      <div className="w-full max-w-md">
+        {/* Login Card */}
+        <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+          {/* Header */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center gap-2 text-[#ffba06] mb-4">
+              <Sparkles className="w-5 h-5" />
+              <span className="text-sm font-semibold uppercase tracking-wide">Creator Portal</span>
             </div>
-
-            {loginState === 'sent' ? (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="w-8 h-8 text-green-600" />
-                </div>
-                <h2 className="text-xl font-semibold text-[#1e2749] mb-2">
-                  Check your email!
-                </h2>
-                <p className="text-gray-600">
-                  We sent a magic link to <strong>{email}</strong>. Click the link in
-                  your email to sign in.
-                </p>
-                <button
-                  onClick={() => setLoginState('idle')}
-                  className="mt-6 text-[#80a4ed] hover:text-[#1e2749] text-sm font-medium"
-                >
-                  Use a different email
-                </button>
-              </div>
-            ) : loginState === 'not_found' ? (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <AlertCircle className="w-8 h-8 text-orange-500" />
-                </div>
-                <h2 className="text-xl font-semibold text-[#1e2749] mb-2">
-                  Not Found
-                </h2>
-                <p className="text-gray-600">
-                  We couldn&apos;t find a creator account with that email. If you&apos;re
-                  interested in creating content with TDI, please{' '}
-                  <a
-                    href="/create-with-us"
-                    className="text-[#80a4ed] hover:text-[#1e2749] font-medium"
-                  >
-                    apply here
-                  </a>
-                  .
-                </p>
-                <button
-                  onClick={() => {
-                    setLoginState('idle');
-                    setEmail('');
-                  }}
-                  className="mt-6 text-[#80a4ed] hover:text-[#1e2749] text-sm font-medium"
-                >
-                  Try a different email
-                </button>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit}>
-                <div className="mb-6">
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-medium text-gray-700 mb-2"
-                  >
-                    Email address
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
-                      type="email"
-                      id="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@example.com"
-                      required
-                      disabled={loginState === 'loading'}
-                      className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent transition-all disabled:bg-gray-50 disabled:cursor-not-allowed"
-                    />
-                  </div>
-                </div>
-
-                {loginState === 'error' && errorMessage && (
-                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700 text-sm">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                    {errorMessage}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  disabled={loginState === 'loading' || !email}
-                  className="w-full bg-[#1e2749] text-white py-3 px-6 rounded-xl font-medium hover:bg-[#2a3459] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {loginState === 'loading' ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Sending link...
-                    </>
-                  ) : (
-                    <>
-                      <Mail className="w-5 h-5" />
-                      Send Magic Link
-                    </>
-                  )}
-                </button>
-              </form>
-            )}
+            <h1 className="text-2xl font-bold text-[#1e2749]">
+              Welcome Back, Creator!
+            </h1>
+            <p className="text-gray-600 mt-2 text-sm">
+              Sign in to track your course progress and connect with the TDI team.
+            </p>
           </div>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
-            Looking to partner with TDI?{' '}
-            <a
-              href="/create-with-us"
-              className="text-[#80a4ed] hover:text-[#1e2749] font-medium"
-            >
-              Apply to create content
-            </a>
-          </p>
+          {/* Success State - Email Sent */}
+          {loginState === 'sent' && (
+            <div className="text-center py-6">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-green-600" />
+              </div>
+              <h2 className="text-xl font-semibold text-[#1e2749] mb-2">
+                Check your email!
+              </h2>
+              <p className="text-gray-600 text-sm">
+                We sent a magic link to <strong className="text-[#1e2749]">{email}</strong>.
+                <br />Click the link in your email to sign in.
+              </p>
+              <button
+                onClick={() => setLoginState('idle')}
+                className="mt-6 text-[#80a4ed] hover:text-[#1e2749] text-sm font-medium transition-colors"
+              >
+                Use a different email
+              </button>
+            </div>
+          )}
+
+          {/* Not Found State */}
+          {loginState === 'not_found' && (
+            <div className="text-center py-6">
+              <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="w-8 h-8 text-orange-500" />
+              </div>
+              <h2 className="text-xl font-semibold text-[#1e2749] mb-2">
+                Account Not Found
+              </h2>
+              <p className="text-gray-600 text-sm">
+                We couldn&apos;t find a creator account with that email.
+                <br />
+                If you&apos;re interested in creating content with TDI,{' '}
+                <a
+                  href="/create-with-us"
+                  className="text-[#80a4ed] hover:text-[#1e2749] font-medium transition-colors"
+                >
+                  apply here
+                </a>.
+              </p>
+              <button
+                onClick={() => {
+                  setLoginState('idle');
+                  setEmail('');
+                }}
+                className="mt-6 text-[#80a4ed] hover:text-[#1e2749] text-sm font-medium transition-colors"
+              >
+                Try a different email
+              </button>
+            </div>
+          )}
+
+          {/* Login Form */}
+          {loginState !== 'sent' && loginState !== 'not_found' && (
+            <form onSubmit={handleSubmit}>
+              <div className="mb-6">
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Email address
+                </label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    required
+                    disabled={loginState === 'loading'}
+                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#ffba06] focus:border-[#ffba06] transition-all disabled:bg-gray-50 disabled:cursor-not-allowed text-[#1e2749]"
+                  />
+                </div>
+              </div>
+
+              {/* Error Message */}
+              {loginState === 'error' && errorMessage && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700 text-sm">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  {errorMessage}
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loginState === 'loading' || !email}
+                className="w-full bg-[#1e2749] text-white py-3 px-6 rounded-xl font-medium hover:bg-[#2a3459] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              >
+                {loginState === 'loading' ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Sending link...
+                  </>
+                ) : (
+                  <>
+                    <Mail className="w-5 h-5" />
+                    Send Magic Link
+                  </>
+                )}
+              </button>
+            </form>
+          )}
         </div>
-      </main>
+
+        {/* Footer Link */}
+        <p className="text-center text-sm text-gray-500 mt-6">
+          Looking to partner with TDI?{' '}
+          <a
+            href="/create-with-us"
+            className="text-[#80a4ed] hover:text-[#1e2749] font-medium transition-colors"
+          >
+            Apply to create content
+          </a>
+        </p>
+      </div>
     </div>
   );
 }
 
 function LoadingFallback() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f5f5f5] to-white flex items-center justify-center">
+    <div className="min-h-[calc(100vh-200px)] flex items-center justify-center">
       <div className="text-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#80a4ed] mx-auto mb-4" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#ffba06] mx-auto mb-4" />
         <p className="text-gray-600">Loading...</p>
       </div>
     </div>
