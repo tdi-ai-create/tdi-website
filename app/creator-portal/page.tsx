@@ -192,7 +192,7 @@ function CreatorPortalLoginContent() {
                   Email address
                 </label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 pointer-events-none" />
                   <input
                     type="email"
                     id="email"
@@ -201,7 +201,7 @@ function CreatorPortalLoginContent() {
                     placeholder="you@example.com"
                     required
                     disabled={loginState === 'loading'}
-                    className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#ffba06] focus:border-[#ffba06] transition-all disabled:bg-gray-50 disabled:cursor-not-allowed text-[#1e2749]"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-[#ffba06] focus:border-[#ffba06] transition-all disabled:bg-gray-50 disabled:cursor-not-allowed text-[#1e2749]"
                   />
                 </div>
               </div>
