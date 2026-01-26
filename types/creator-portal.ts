@@ -46,6 +46,9 @@ export interface Creator {
   target_launch_month: string | null;
   discount_code: string | null;
   current_phase: PhaseId;
+  agreement_signed: boolean;
+  agreement_signed_at: string | null;
+  agreement_signed_name: string | null;
   created_at: string;
   updated_at: string;
 }

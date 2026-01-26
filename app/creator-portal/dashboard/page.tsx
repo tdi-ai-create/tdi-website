@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { LogOut, Loader2, AlertCircle, Mail, User } from 'lucide-react';
+import { LogOut, Loader2, AlertCircle, Mail, User, CheckCircle, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CreatorDashboardHeader } from '@/components/creator-portal/CreatorDashboardHeader';
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
@@ -13,11 +13,24 @@ import type { CreatorDashboardData } from '@/types/creator-portal';
 
 export default function CreatorDashboardPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [dashboardData, setDashboardData] = useState<CreatorDashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Check for success messages from query params
+  useEffect(() => {
+    if (searchParams.get('agreement') === 'signed') {
+      setSuccessMessage('Agreement signed successfully! Your milestone has been marked complete.');
+      // Clear the URL param without refreshing
+      window.history.replaceState({}, '', '/creator-portal/dashboard');
+      // Auto-hide after 5 seconds
+      setTimeout(() => setSuccessMessage(null), 5000);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     const checkAuthAndLoad = async () => {
@@ -220,6 +233,24 @@ export default function CreatorDashboardPage() {
           </button>
         </div>
       </header>
+
+      {/* Success Message */}
+      {successMessage && (
+        <div className="bg-green-50 border-b border-green-200">
+          <div className="container-wide py-3 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <CheckCircle className="w-5 h-5 text-green-600" />
+              <p className="text-sm text-green-800">{successMessage}</p>
+            </div>
+            <button
+              onClick={() => setSuccessMessage(null)}
+              className="text-green-600 hover:text-green-800"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main content */}
       <main className="container-wide py-8">

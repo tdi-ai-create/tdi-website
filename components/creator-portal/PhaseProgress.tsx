@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import {
   Check,
   Clock,
@@ -11,6 +12,7 @@ import {
   ChevronUp,
   Calendar,
   CheckCircle2,
+  FileSignature,
 } from 'lucide-react';
 import type { PhaseWithMilestones, MilestoneWithStatus, MilestoneStatus } from '@/types/creator-portal';
 
@@ -70,8 +72,15 @@ function MilestoneItem({
   const isActionable =
     milestone.status === 'available' || milestone.status === 'in_progress';
   const hasCalendly = milestone.calendly_link && isActionable;
+
+  // Check if this is the "Sign Agreement" milestone
+  const isAgreementMilestone =
+    milestone.phase_id === 'agreement' &&
+    milestone.title.toLowerCase().includes('sign') &&
+    milestone.title.toLowerCase().includes('agreement');
+
   const canMarkComplete =
-    isActionable && !milestone.requires_team_action && onMarkComplete;
+    isActionable && !milestone.requires_team_action && !isAgreementMilestone && onMarkComplete;
 
   return (
     <div
@@ -116,7 +125,7 @@ function MilestoneItem({
           </span>
         </div>
 
-        {(hasCalendly || canMarkComplete) && (
+        {(hasCalendly || canMarkComplete || (isAgreementMilestone && isActionable)) && (
           <div className="flex items-center gap-3 mt-3">
             {hasCalendly && (
               <a
@@ -128,6 +137,15 @@ function MilestoneItem({
                 <Calendar className="w-4 h-4" />
                 Book Meeting
               </a>
+            )}
+            {isAgreementMilestone && isActionable && (
+              <Link
+                href="/creator-portal/agreement"
+                className="inline-flex items-center gap-2 text-sm font-medium bg-[#1e2749] text-white px-4 py-2 rounded-lg hover:bg-[#2a3459] transition-colors"
+              >
+                <FileSignature className="w-4 h-4" />
+                View & Sign Agreement
+              </Link>
             )}
             {canMarkComplete && (
               <button
