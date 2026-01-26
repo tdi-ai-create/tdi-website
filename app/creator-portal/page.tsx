@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Mail, Loader2, CheckCircle, AlertCircle, Sparkles } from 'lucide-react';
@@ -9,7 +9,7 @@ import { creatorExists, getCreatorByEmail } from '@/lib/creator-portal-data';
 
 type LoginState = 'idle' | 'loading' | 'sent' | 'error' | 'not_found';
 
-export default function CreatorPortalLoginPage() {
+function CreatorPortalLoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
@@ -236,5 +236,24 @@ export default function CreatorPortalLoginPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+function LoadingFallback() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#f5f5f5] to-white flex items-center justify-center">
+      <div className="text-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#80a4ed] mx-auto mb-4" />
+        <p className="text-gray-600">Loading...</p>
+      </div>
+    </div>
+  );
+}
+
+export default function CreatorPortalPage() {
+  return (
+    <Suspense fallback={<LoadingFallback />}>
+      <CreatorPortalLoginContent />
+    </Suspense>
   );
 }
