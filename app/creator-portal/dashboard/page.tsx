@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { LogOut, Loader2, AlertCircle } from 'lucide-react';
+import { LogOut, Loader2, AlertCircle, Mail, User } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CreatorDashboardHeader } from '@/components/creator-portal/CreatorDashboardHeader';
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
@@ -249,6 +249,32 @@ export default function CreatorDashboardPage() {
           <div className="space-y-6">
             <CourseDetailsPanel creator={dashboardData.creator} />
             <NotesPanel notes={dashboardData.notes} />
+
+            {/* TDI Contact Card */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+              <h3 className="text-lg font-semibold text-[#1e2749] mb-4">
+                Need Help?
+              </h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Questions about your course? Reach out anytime!
+              </p>
+              <div className="flex items-start gap-3">
+                <div className="w-10 h-10 bg-[#80a4ed]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <User className="w-5 h-5 text-[#80a4ed]" />
+                </div>
+                <div>
+                  <p className="font-medium text-[#1e2749]">Rachel Patragas</p>
+                  <p className="text-sm text-gray-500">Director of Creative Solutions</p>
+                  <a
+                    href="mailto:rachel@teachersdeserveit.com"
+                    className="inline-flex items-center gap-1.5 text-sm text-[#80a4ed] hover:text-[#1e2749] mt-2 transition-colors"
+                  >
+                    <Mail className="w-4 h-4" />
+                    rachel@teachersdeserveit.com
+                  </a>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </main>
