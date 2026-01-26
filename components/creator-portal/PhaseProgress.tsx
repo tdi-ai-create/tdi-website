@@ -13,6 +13,8 @@ import {
   Calendar,
   CheckCircle2,
   FileSignature,
+  Hourglass,
+  HelpCircle,
 } from 'lucide-react';
 import type { PhaseWithMilestones, MilestoneWithStatus, MilestoneStatus } from '@/types/creator-portal';
 
@@ -24,7 +26,7 @@ interface PhaseProgressProps {
 
 const statusConfig: Record<
   MilestoneStatus,
-  { icon: typeof Check; color: string; bg: string; label: string }
+  { icon: typeof Check; color: string; bg: string; label: string; helper?: string }
 > = {
   completed: {
     icon: Check,
@@ -48,14 +50,25 @@ const statusConfig: Record<
     icon: Circle,
     color: 'text-[#80a4ed]',
     bg: 'bg-blue-50',
-    label: 'Available',
+    label: 'Ready for You',
+    helper: 'This step is ready for you to complete',
   },
   locked: {
     icon: Lock,
     color: 'text-gray-400',
     bg: 'bg-gray-100',
     label: 'Locked',
+    helper: 'Complete the previous steps to unlock this',
   },
+};
+
+// Special config for "Waiting on TDI" status
+const waitingOnTdiConfig = {
+  icon: Hourglass,
+  color: 'text-amber-600',
+  bg: 'bg-amber-100',
+  label: 'Waiting on TDI',
+  helper: 'Our team will complete this step and update your portal',
 };
 
 function MilestoneItem({
@@ -67,8 +80,6 @@ function MilestoneItem({
   onMarkComplete?: (milestoneId: string) => Promise<void>;
   isLoading?: boolean;
 }) {
-  const config = statusConfig[milestone.status];
-  const Icon = config.icon;
   const isActionable =
     milestone.status === 'available' || milestone.status === 'in_progress';
   const hasCalendly = milestone.calendly_link && isActionable;
@@ -79,8 +90,52 @@ function MilestoneItem({
     milestone.title.toLowerCase().includes('sign') &&
     milestone.title.toLowerCase().includes('agreement');
 
+  // Check if this milestone is "Waiting on TDI Team"
+  const isWaitingOnTdi = milestone.requires_team_action &&
+    (milestone.status === 'available' || milestone.status === 'in_progress');
+
+  // Use special config for waiting on TDI, otherwise use standard config
+  const config = isWaitingOnTdi ? waitingOnTdiConfig : statusConfig[milestone.status];
+  const Icon = config.icon;
+
   const canMarkComplete =
     isActionable && !milestone.requires_team_action && !isAgreementMilestone && onMarkComplete;
+
+  // Special "Waiting on TDI" card style
+  if (isWaitingOnTdi) {
+    const emailSubject = encodeURIComponent('Checking in on my Creator Portal progress');
+    const emailBody = encodeURIComponent(`Hi Rachel,\n\nI wanted to check in on my progress. I'm currently waiting on: ${milestone.title}\n\nThanks!`);
+
+    return (
+      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center mt-0.5">
+            <Hourglass className="w-4 h-4 text-amber-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-2">
+              <h4 className="font-medium text-[#1e2749]">{milestone.title}</h4>
+              <span className="flex-shrink-0 text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 font-medium">
+                Waiting on TDI
+              </span>
+            </div>
+            {milestone.description && (
+              <p className="text-sm text-gray-600 mt-1">{milestone.description}</p>
+            )}
+            <p className="text-sm text-amber-700 mt-2">
+              Our team is working on this — we&apos;ll update your portal once complete.
+            </p>
+            <a
+              href={`mailto:rachel@teachersdeserveit.com?subject=${emailSubject}&body=${emailBody}`}
+              className="text-sm text-amber-600 hover:text-amber-800 underline mt-2 inline-block"
+            >
+              Taking longer than expected? Let us know →
+            </a>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -111,10 +166,12 @@ function MilestoneItem({
             {milestone.description && (
               <p className="text-sm text-gray-600 mt-1">{milestone.description}</p>
             )}
-            {milestone.requires_team_action && milestone.status !== 'completed' && (
-              <span className="inline-block mt-2 text-xs bg-[#ffba06]/20 text-[#1e2749] px-2 py-1 rounded-full">
-                TDI team action required
-              </span>
+            {/* Show helper text for locked milestones */}
+            {milestone.status === 'locked' && config.helper && (
+              <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                <HelpCircle className="w-3 h-3" />
+                {config.helper}
+              </p>
             )}
           </div>
 
@@ -126,7 +183,7 @@ function MilestoneItem({
         </div>
 
         {(hasCalendly || canMarkComplete || (isAgreementMilestone && isActionable)) && (
-          <div className="flex items-center gap-3 mt-3">
+          <div className="flex flex-wrap items-center gap-3 mt-3">
             {hasCalendly && (
               <a
                 href={milestone.calendly_link!}
