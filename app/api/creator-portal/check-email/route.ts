@@ -53,39 +53,45 @@ export async function POST(request: NextRequest) {
     const normalizedEmail = email.toLowerCase().trim();
     console.log('[check-email] Checking normalized email:', normalizedEmail);
 
-    // Check creators table first (use maybeSingle to avoid error when not found)
+    // Check creators table first (use ilike for case-insensitive match)
     const { data: creatorData, error: creatorError } = await supabase
       .from('creators')
-      .select('id')
-      .eq('email', normalizedEmail)
+      .select('id, email')
+      .ilike('email', normalizedEmail)
       .maybeSingle();
 
-    console.log('[check-email] Creator query result:', { creatorData, creatorError });
+    console.log('[check-email] Creator query result:', {
+      creatorData,
+      creatorError: creatorError?.message || null
+    });
 
     if (creatorError) {
-      console.error('[check-email] Creator query error:', creatorError);
+      console.error('[check-email] Creator query error:', creatorError.message, creatorError.details);
     }
 
     if (creatorData) {
-      console.log('[check-email] Found in creators table');
+      console.log('[check-email] Found in creators table:', creatorData.email);
       return NextResponse.json({ exists: true, type: 'creator' });
     }
 
-    // Check admin_users table
+    // Check admin_users table (use ilike for case-insensitive match)
     const { data: adminData, error: adminError } = await supabase
       .from('admin_users')
-      .select('id')
-      .eq('email', normalizedEmail)
+      .select('id, email')
+      .ilike('email', normalizedEmail)
       .maybeSingle();
 
-    console.log('[check-email] Admin query result:', { adminData, adminError });
+    console.log('[check-email] Admin query result:', {
+      adminData,
+      adminError: adminError?.message || null
+    });
 
     if (adminError) {
-      console.error('[check-email] Admin query error:', adminError);
+      console.error('[check-email] Admin query error:', adminError.message, adminError.details);
     }
 
     if (adminData) {
-      console.log('[check-email] Found in admin_users table');
+      console.log('[check-email] Found in admin_users table:', adminData.email);
       return NextResponse.json({ exists: true, type: 'admin' });
     }
 
