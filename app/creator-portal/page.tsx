@@ -128,17 +128,11 @@ function CreatorPortalLoginContent() {
         {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center gap-2 text-[#ffba06] mb-4">
+          <div className="text-center mb-6">
+            <div className="inline-flex items-center gap-2 text-[#ffba06]">
               <Sparkles className="w-5 h-5" />
-              <span className="text-sm font-semibold uppercase tracking-wide">Creator Portal</span>
+              <span className="text-sm font-semibold uppercase tracking-wide">TDI Creator Studio</span>
             </div>
-            <h1 className="text-2xl font-bold text-[#1e2749]">
-              Welcome Back, Creator!
-            </h1>
-            <p className="text-gray-600 mt-2 text-sm">
-              Sign in to track your course progress and connect with the TDI team.
-            </p>
           </div>
 
           {/* Success State - Email Sent */}
