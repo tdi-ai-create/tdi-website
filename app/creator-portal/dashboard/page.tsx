@@ -46,6 +46,23 @@ export default function CreatorDashboardPage() {
         return;
       }
 
+      // Check if user is an admin - redirect to admin panel
+      try {
+        const response = await fetch('/api/creator-portal/check-email', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: session.user.email }),
+        });
+        const data = await response.json();
+
+        if (data.type === 'admin') {
+          router.push('/admin/creators');
+          return;
+        }
+      } catch (error) {
+        console.error('Error checking user type:', error);
+      }
+
       setUserEmail(session.user.email);
       await loadDashboard(session.user.email);
     };
