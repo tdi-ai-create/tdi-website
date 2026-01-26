@@ -29,7 +29,7 @@ function CreatorPortalLoginContent() {
   const [loginState, setLoginState] = useState<LoginState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Check if user is already logged in
+  // Check if user is already logged in and valid
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -39,13 +39,16 @@ function CreatorPortalLoginContent() {
           router.push('/admin/creators');
         } else if (userType === 'creator') {
           router.push('/creator-portal/dashboard');
+        } else {
+          // User has a session but isn't in our system - sign them out silently
+          await supabase.auth.signOut();
         }
       }
     };
     checkSession();
   }, [router]);
 
-  // Handle magic link callback
+  // Handle magic link callback - only process if coming from a magic link redirect
   useEffect(() => {
     const handleAuthCallback = async () => {
       const error = searchParams.get('error');
@@ -57,7 +60,16 @@ function CreatorPortalLoginContent() {
         return;
       }
 
-      // Check for session after redirect
+      // Only check session if there's a hash in the URL (magic link redirect)
+      // This prevents showing "Account Not Found" on normal page loads
+      const hasAuthParams = window.location.hash.includes('access_token') ||
+                           searchParams.get('code') !== null;
+
+      if (!hasAuthParams) {
+        return;
+      }
+
+      // Check for session after magic link redirect
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.email) {
         const { type: userType } = await checkEmailExists(session.user.email);
@@ -66,6 +78,8 @@ function CreatorPortalLoginContent() {
         } else if (userType === 'creator') {
           router.push('/creator-portal/dashboard');
         } else {
+          // User authenticated but not in our system - sign them out
+          await supabase.auth.signOut();
           setLoginState('not_found');
         }
       }
