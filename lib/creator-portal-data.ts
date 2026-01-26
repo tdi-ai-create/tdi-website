@@ -127,7 +127,7 @@ export async function createCreator(data: {
   const { data: milestones, error: milestonesError } = await serviceSupabase
     .from('milestones')
     .select('*')
-    .order('order_index');
+    .order('sort_order');
 
   if (milestonesError || !milestones) {
     console.error('Error fetching milestones:', milestonesError);
@@ -256,7 +256,7 @@ async function unlockNextMilestone(
     .from('milestones')
     .select('*')
     .eq('phase_id', completedMilestone.phase_id)
-    .order('order_index');
+    .order('sort_order');
 
   if (phaseError || !phaseMilestones) {
     console.error('Error fetching phase milestones:', phaseError);
@@ -312,7 +312,7 @@ async function unlockNextMilestone(
           .from('milestones')
           .select('*')
           .eq('phase_id', nextPhaseId)
-          .order('order_index')
+          .order('sort_order')
           .limit(1);
 
         if (nextPhaseMilestones && nextPhaseMilestones[0]) {
@@ -392,7 +392,7 @@ export async function getCreatorDashboardData(
   const { data: phases, error: phasesError } = await supabase
     .from('phases')
     .select('*')
-    .order('order_index');
+    .order('sort_order');
 
   if (phasesError || !phases) {
     console.error('Error fetching phases:', phasesError);
@@ -403,7 +403,7 @@ export async function getCreatorDashboardData(
   const { data: milestones, error: milestonesError } = await supabase
     .from('milestones')
     .select('*')
-    .order('order_index');
+    .order('sort_order');
 
   if (milestonesError || !milestones) {
     console.error('Error fetching milestones:', milestonesError);

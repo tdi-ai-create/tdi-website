@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     const { data: phases, error: phasesError } = await supabase
       .from('phases')
       .select('*')
-      .order('order_index');
+      .order('sort_order');
 
     console.log('[dashboard-api] Phases:', { count: phases?.length, error: phasesError?.message });
 
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     const { data: milestones, error: milestonesError } = await supabase
       .from('milestones')
       .select('*')
-      .order('order_index');
+      .order('sort_order');
 
     console.log('[dashboard-api] Milestones:', { count: milestones?.length, error: milestonesError?.message });
 

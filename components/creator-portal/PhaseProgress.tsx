@@ -204,7 +204,7 @@ function PhaseCard({
               <Check className="w-5 h-5 text-white" />
             ) : (
               <span className="text-white font-semibold text-sm">
-                {phase.order_index + 1}
+                {phase.sort_order + 1}
               </span>
             )}
           </div>

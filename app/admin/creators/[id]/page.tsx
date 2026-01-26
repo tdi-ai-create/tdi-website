@@ -566,7 +566,7 @@ function PhaseSection({
           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium ${
             phase.isComplete ? 'bg-green-500' : phase.isCurrentPhase ? 'bg-[#80a4ed]' : 'bg-gray-400'
           }`}>
-            {phase.isComplete ? <Check className="w-4 h-4" /> : phase.order_index + 1}
+            {phase.isComplete ? <Check className="w-4 h-4" /> : phase.sort_order + 1}
           </div>
           <div>
             <div className="flex items-center gap-2">
