@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, CheckCircle, FileText, Calendar, Mail } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function AgreementPage() {
@@ -161,6 +161,20 @@ export default function AgreementPage() {
 
       {/* Agreement Content */}
       <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Warm Intro */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center gap-2 text-[#ffba06] font-medium mb-4">
+            <FileText className="w-5 h-5" />
+            CREATOR AGREEMENT
+          </div>
+          <h1 className="text-3xl font-bold text-[#1e2749] mb-4">
+            Let&apos;s Make It Official
+          </h1>
+          <p className="text-gray-600 max-w-xl mx-auto">
+            This agreement outlines our partnership. Take your time reading through it — and if you have any questions, we&apos;re just a click away.
+          </p>
+        </div>
+
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           {/* Agreement Text */}
           <div className="p-6 sm:p-8 prose prose-slate max-w-none">
@@ -236,6 +250,32 @@ export default function AgreementPage() {
             <p>
               Please keep any behind-the-scenes TDI materials confidential. Public TDI content is fine to share.
             </p>
+
+            {/* Questions Section */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
+              <h3 className="text-lg font-semibold text-[#1e2749] mb-2">Have Questions Before Signing?</h3>
+              <p className="text-gray-600 mb-4">
+                We want you to feel confident about this partnership. If anything is unclear or you&apos;d like to chat through the details, we&apos;re here for you.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/creator-questions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center px-4 py-2 bg-white border border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Calendar className="w-4 h-4 mr-2" />
+                  Book a Call with Rae
+                </a>
+                <a
+                  href="mailto:rachel@teachersdeserveit.com?subject=Question about Creator Agreement"
+                  className="inline-flex items-center justify-center px-4 py-2 bg-white border border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Email Rachel
+                </a>
+              </div>
+            </div>
           </div>
 
           {/* Signature Section */}

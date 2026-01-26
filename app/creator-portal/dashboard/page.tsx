@@ -24,11 +24,11 @@ export default function CreatorDashboardPage() {
   // Check for success messages from query params
   useEffect(() => {
     if (searchParams.get('agreement') === 'signed') {
-      setSuccessMessage('Agreement signed successfully! Your milestone has been marked complete.');
+      setSuccessMessage("Agreement signed! You're officially a TDI Creator 🎉");
       // Clear the URL param without refreshing
       window.history.replaceState({}, '', '/creator-portal/dashboard');
-      // Auto-hide after 5 seconds
-      setTimeout(() => setSuccessMessage(null), 5000);
+      // Auto-hide after 6 seconds
+      setTimeout(() => setSuccessMessage(null), 6000);
     }
   }, [searchParams]);
 

@@ -139,13 +139,24 @@ function MilestoneItem({
               </a>
             )}
             {isAgreementMilestone && isActionable && (
-              <Link
-                href="/creator-portal/agreement"
-                className="inline-flex items-center gap-2 text-sm font-medium bg-[#1e2749] text-white px-4 py-2 rounded-lg hover:bg-[#2a3459] transition-colors"
-              >
-                <FileSignature className="w-4 h-4" />
-                View & Sign Agreement
-              </Link>
+              <>
+                <Link
+                  href="/creator-portal/agreement"
+                  className="inline-flex items-center gap-2 text-sm font-medium bg-[#1e2749] text-white px-4 py-2 rounded-lg hover:bg-[#2a3459] transition-colors"
+                >
+                  <FileSignature className="w-4 h-4" />
+                  Review & Sign Agreement
+                </Link>
+                <a
+                  href="https://calendly.com/rae-teachersdeserveit/creator-questions"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-medium border border-[#1e2749] text-[#1e2749] px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Have Questions? Book a Call
+                </a>
+              </>
             )}
             {canMarkComplete && (
               <button
