@@ -496,3 +496,61 @@ export async function creatorExists(email: string): Promise<boolean> {
   }
   return !!data;
 }
+
+// Check if email can log in (either as creator or admin)
+export async function canLogin(email: string): Promise<{ canLogin: boolean; userType: 'creator' | 'admin' | null }> {
+  const normalizedEmail = email.toLowerCase();
+
+  // Check creators table first
+  const { data: creatorData } = await supabase
+    .from('creators')
+    .select('id')
+    .eq('email', normalizedEmail)
+    .single();
+
+  if (creatorData) {
+    return { canLogin: true, userType: 'creator' };
+  }
+
+  // Check admin_users table
+  const { data: adminData } = await supabase
+    .from('admin_users')
+    .select('id')
+    .eq('email', normalizedEmail)
+    .single();
+
+  if (adminData) {
+    return { canLogin: true, userType: 'admin' };
+  }
+
+  return { canLogin: false, userType: null };
+}
+
+// Get user type for redirect after login
+export async function getUserType(email: string): Promise<'creator' | 'admin' | null> {
+  const normalizedEmail = email.toLowerCase();
+
+  // Check creators table first
+  const { data: creatorData } = await supabase
+    .from('creators')
+    .select('id')
+    .eq('email', normalizedEmail)
+    .single();
+
+  if (creatorData) {
+    return 'creator';
+  }
+
+  // Check admin_users table
+  const { data: adminData } = await supabase
+    .from('admin_users')
+    .select('id')
+    .eq('email', normalizedEmail)
+    .single();
+
+  if (adminData) {
+    return 'admin';
+  }
+
+  return null;
+}

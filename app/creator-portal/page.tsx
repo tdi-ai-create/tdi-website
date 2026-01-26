@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import { Mail, Loader2, CheckCircle, AlertCircle, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import { creatorExists, getCreatorByEmail } from '@/lib/creator-portal-data';
+import { canLogin, getUserType } from '@/lib/creator-portal-data';
 
 type LoginState = 'idle' | 'loading' | 'sent' | 'error' | 'not_found';
 
@@ -21,9 +21,10 @@ function CreatorPortalLoginContent() {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.email) {
-        // Check if they're a creator
-        const creator = await getCreatorByEmail(session.user.email);
-        if (creator) {
+        const userType = await getUserType(session.user.email);
+        if (userType === 'admin') {
+          router.push('/admin/creators');
+        } else if (userType === 'creator') {
           router.push('/creator-portal/dashboard');
         }
       }
@@ -46,8 +47,10 @@ function CreatorPortalLoginContent() {
       // Check for session after redirect
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.email) {
-        const creator = await getCreatorByEmail(session.user.email);
-        if (creator) {
+        const userType = await getUserType(session.user.email);
+        if (userType === 'admin') {
+          router.push('/admin/creators');
+        } else if (userType === 'creator') {
           router.push('/creator-portal/dashboard');
         } else {
           setLoginState('not_found');
@@ -64,10 +67,10 @@ function CreatorPortalLoginContent() {
     setErrorMessage('');
 
     try {
-      // First check if this email exists in our creators table
-      const exists = await creatorExists(email);
+      // Check if this email exists in creators or admin_users table
+      const { canLogin: allowed } = await canLogin(email);
 
-      if (!exists) {
+      if (!allowed) {
         setLoginState('not_found');
         return;
       }
