@@ -148,7 +148,7 @@ function MilestoneItem({
                   Review & Sign Agreement
                 </Link>
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/creator-questions"
+                  href="https://calendly.com/rae-teachersdeserveit/creator-chat"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 text-sm font-medium border border-[#1e2749] text-[#1e2749] px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
