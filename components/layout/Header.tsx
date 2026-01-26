@@ -19,6 +19,7 @@ export function Header() {
     { href: '/for-schools', label: 'For Schools' },
     { href: '/join', label: 'For Teachers' },
     { href: '/how-we-partner', label: 'How We Partner' },
+    { href: '/create-with-us', label: 'Creator' },
     { href: 'https://raehughart.substack.com', label: 'Blog', external: true },
     { href: 'https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274', label: 'Podcast', external: true },
     { href: '/about', label: 'About' },
