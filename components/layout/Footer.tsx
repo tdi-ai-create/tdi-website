@@ -1,6 +1,20 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 
 export function Footer() {
+  const pathname = usePathname();
+
+  // Hide on creator-portal/dashboard (focused studio experience)
+  // Hide on admin pages (has its own footer)
+  if (
+    pathname?.startsWith('/creator-portal/dashboard') ||
+    pathname?.startsWith('/admin')
+  ) {
+    return null;
+  }
+
   return (
     <footer style={{ backgroundColor: '#1e2749' }}>
       {/* Main Footer */}

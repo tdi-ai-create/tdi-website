@@ -6,7 +6,13 @@ export function AnnouncementBar() {
   const pathname = usePathname();
 
   // Hide on create-with-us page (has its own Creator Portal banner)
-  if (pathname === '/create-with-us') {
+  // Hide on creator-portal/dashboard (focused studio experience)
+  // Hide on admin pages
+  if (
+    pathname === '/create-with-us' ||
+    pathname?.startsWith('/creator-portal/dashboard') ||
+    pathname?.startsWith('/admin')
+  ) {
     return null;
   }
 

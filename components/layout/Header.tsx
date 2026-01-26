@@ -9,6 +9,15 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
+  // Hide on creator-portal/dashboard (has its own studio header)
+  // Hide on admin pages (has its own header)
+  if (
+    pathname?.startsWith('/creator-portal/dashboard') ||
+    pathname?.startsWith('/admin')
+  ) {
+    return null;
+  }
+
   const isActive = (href: string) => {
     if (href === '/') return pathname === '/';
     return pathname.startsWith(href);

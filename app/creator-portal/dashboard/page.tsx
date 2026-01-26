@@ -192,16 +192,24 @@ export default function CreatorDashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
-      {/* Header */}
+      {/* Studio Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="container-wide py-4 flex items-center justify-between">
-          <Image
-            src="/images/logo.webp"
-            alt="Teachers Deserve It"
-            width={140}
-            height={42}
-            className="h-10 w-auto"
-          />
+          <div className="flex items-center gap-3">
+            <Image
+              src="/images/logo.webp"
+              alt="Teachers Deserve It"
+              width={120}
+              height={36}
+              className="h-9 w-auto"
+            />
+            <div className="hidden sm:flex items-center">
+              <span className="text-gray-300 mx-2">|</span>
+              <span className="text-[#ffba06] font-semibold text-sm uppercase tracking-wide">
+                Creator Studio
+              </span>
+            </div>
+          </div>
 
           <button
             onClick={handleSignOut}
