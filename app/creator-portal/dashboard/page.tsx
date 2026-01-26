@@ -1,15 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { LogOut, Loader2 } from 'lucide-react';
+import { LogOut, Loader2, AlertCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
-import {
-  getCreatorByEmail,
-  getCreatorDashboardData,
-  updateMilestoneStatus,
-} from '@/lib/creator-portal-data';
 import { CreatorDashboardHeader } from '@/components/creator-portal/CreatorDashboardHeader';
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
 import { CourseDetailsPanel } from '@/components/creator-portal/CourseDetailsPanel';
@@ -22,52 +17,67 @@ export default function CreatorDashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
-
-  const loadDashboard = useCallback(async (email: string) => {
-    const creator = await getCreatorByEmail(email);
-    if (!creator) {
-      router.push('/creator-portal');
-      return;
-    }
-
-    const data = await getCreatorDashboardData(creator.id);
-    if (data) {
-      setDashboardData(data);
-    }
-    setIsLoading(false);
-  }, [router]);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+    const checkAuthAndLoad = async () => {
+      console.log('[Dashboard] Starting auth check...');
 
-      if (!session?.user?.email) {
-        router.push('/creator-portal');
-        return;
-      }
-
-      // Check if user is an admin - redirect to admin panel
       try {
-        const response = await fetch('/api/creator-portal/check-email', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: session.user.email }),
-        });
-        const data = await response.json();
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
 
-        if (data.type === 'admin') {
-          router.push('/admin/creators');
+        if (sessionError) {
+          console.error('[Dashboard] Session error:', sessionError);
+          setError(`Session error: ${sessionError.message}`);
+          setIsLoading(false);
           return;
         }
-      } catch (error) {
-        console.error('Error checking user type:', error);
-      }
 
-      setUserEmail(session.user.email);
-      await loadDashboard(session.user.email);
+        if (!session?.user?.email) {
+          console.log('[Dashboard] No session, redirecting to login');
+          router.push('/creator-portal');
+          return;
+        }
+
+        const email = session.user.email;
+        console.log('[Dashboard] User email:', email);
+        setUserEmail(email);
+
+        // Fetch dashboard data via API (uses service role to bypass RLS)
+        console.log('[Dashboard] Fetching dashboard data...');
+        const response = await fetch('/api/creator-portal/dashboard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email }),
+        });
+
+        const data = await response.json();
+        console.log('[Dashboard] API response:', { status: response.status, data });
+
+        if (!response.ok) {
+          // Check if user is admin
+          if (data.isAdmin) {
+            console.log('[Dashboard] User is admin, redirecting...');
+            router.push('/admin/creators');
+            return;
+          }
+
+          setError(data.error || `API error: ${response.status}`);
+          setIsLoading(false);
+          return;
+        }
+
+        setDashboardData(data);
+        setIsLoading(false);
+
+      } catch (err) {
+        console.error('[Dashboard] Unexpected error:', err);
+        setError(err instanceof Error ? err.message : 'Unexpected error loading dashboard');
+        setIsLoading(false);
+      }
     };
 
-    checkAuth();
+    checkAuthAndLoad();
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -81,7 +91,7 @@ export default function CreatorDashboardPage() {
     return () => {
       subscription.unsubscribe();
     };
-  }, [router, loadDashboard]);
+  }, [router]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -93,29 +103,33 @@ export default function CreatorDashboardPage() {
 
     setIsSaving(true);
     try {
-      // Mark as waiting_approval first (for team-action milestones) or completed
-      const milestone = dashboardData.phases
-        .flatMap((p) => p.milestones)
-        .find((m) => m.id === milestoneId);
+      // Call API to update milestone
+      const response = await fetch('/api/creator-portal/update-milestone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId: dashboardData.creator.id,
+          milestoneId,
+          status: 'completed',
+          completedBy: userEmail,
+        }),
+      });
 
-      if (!milestone) return;
-
-      // Creator actions go straight to completed
-      const newStatus = 'completed';
-
-      const success = await updateMilestoneStatus(
-        dashboardData.creator.id,
-        milestoneId,
-        newStatus,
-        userEmail
-      );
-
-      if (success) {
+      if (response.ok) {
         // Reload dashboard data
-        await loadDashboard(userEmail);
+        const refreshResponse = await fetch('/api/creator-portal/dashboard', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: userEmail }),
+        });
+
+        if (refreshResponse.ok) {
+          const newData = await refreshResponse.json();
+          setDashboardData(newData);
+        }
       }
-    } catch (error) {
-      console.error('Error marking milestone complete:', error);
+    } catch (err) {
+      console.error('Error marking milestone complete:', err);
     } finally {
       setIsSaving(false);
     }
@@ -132,11 +146,45 @@ export default function CreatorDashboardPage() {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
+        <div className="text-center max-w-md mx-auto p-6">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <AlertCircle className="w-8 h-8 text-red-500" />
+          </div>
+          <h2 className="text-xl font-semibold text-[#1e2749] mb-2">Unable to Load Dashboard</h2>
+          <p className="text-gray-600 mb-4">{error}</p>
+          <div className="space-y-2">
+            <button
+              onClick={() => window.location.reload()}
+              className="w-full px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3459] transition-colors"
+            >
+              Try Again
+            </button>
+            <button
+              onClick={handleSignOut}
+              className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (!dashboardData) {
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-600">Unable to load dashboard. Please try again.</p>
+          <p className="text-gray-600">No dashboard data available.</p>
+          <button
+            onClick={handleSignOut}
+            className="mt-4 px-4 py-2 text-[#80a4ed] hover:text-[#1e2749]"
+          >
+            Sign Out
+          </button>
         </div>
       </div>
     );
