@@ -1,135 +1,124 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
 
 export async function GET() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
   const debug: Record<string, unknown> = {
     timestamp: new Date().toISOString(),
-    environment: {},
-    tests: {},
+    env: {
+      url: supabaseUrl ? `SET (${supabaseUrl.substring(0, 40)}...)` : 'NOT SET',
+      key: supabaseKey ? `SET (starts with ${supabaseKey.substring(0, 15)}...)` : 'NOT SET',
+      urlLength: supabaseUrl?.length || 0,
+      keyLength: supabaseKey?.length || 0,
+    },
   };
 
+  if (!supabaseUrl || !supabaseKey) {
+    debug.error = 'Missing environment variables';
+    return NextResponse.json(debug);
+  }
+
+  // Test 1: Raw fetch to Supabase REST API - count creators
   try {
-    // Check environment variables
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-    debug.environment = {
-      NEXT_PUBLIC_SUPABASE_URL: supabaseUrl
-        ? `SET (${supabaseUrl.substring(0, 30)}...)`
-        : 'NOT SET',
-      SUPABASE_SERVICE_ROLE_KEY: serviceRoleKey
-        ? 'SET (hidden)'
-        : 'NOT SET',
-    };
-
-    if (!supabaseUrl || !serviceRoleKey) {
-      debug.error = 'Missing environment variables - cannot proceed with tests';
-      return NextResponse.json(debug);
-    }
-
-    // Create Supabase client with service role
-    const supabase = createClient(supabaseUrl, serviceRoleKey, {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
+    const creatorsResponse = await fetch(`${supabaseUrl}/rest/v1/creators?select=count`, {
+      headers: {
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${supabaseKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'count=exact',
       },
     });
 
-    // Test 1: Count creators
-    const { count: creatorsCount, error: creatorsCountError } = await supabase
-      .from('creators')
-      .select('*', { count: 'exact', head: true });
+    const creatorsStatus = creatorsResponse.status;
+    const creatorsText = await creatorsResponse.text();
 
-    debug.tests = {
-      ...debug.tests as object,
-      creatorsCount: {
-        count: creatorsCount,
-        error: creatorsCountError?.message || null,
-      },
+    debug.creatorsTest = {
+      status: creatorsStatus,
+      response: creatorsText,
+      ok: creatorsResponse.ok,
     };
-
-    // Test 2: Count admin_users
-    const { count: adminsCount, error: adminsCountError } = await supabase
-      .from('admin_users')
-      .select('*', { count: 'exact', head: true });
-
-    debug.tests = {
-      ...debug.tests as object,
-      adminsCount: {
-        count: adminsCount,
-        error: adminsCountError?.message || null,
-      },
+  } catch (error: unknown) {
+    debug.creatorsTest = {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
     };
+  }
 
-    // Test 3: Look for specific admin email
-    const testEmail = 'rae@teachersdeserveit.com';
-
-    const { data: adminLookup, error: adminLookupError } = await supabase
-      .from('admin_users')
-      .select('id, email')
-      .ilike('email', testEmail)
-      .maybeSingle();
-
-    debug.tests = {
-      ...debug.tests as object,
-      adminLookup: {
-        searchedFor: testEmail,
-        found: !!adminLookup,
-        data: adminLookup,
-        error: adminLookupError?.message || null,
+  // Test 2: Raw fetch to Supabase REST API - count admin_users
+  try {
+    const adminsResponse = await fetch(`${supabaseUrl}/rest/v1/admin_users?select=count`, {
+      headers: {
+        'apikey': supabaseKey,
+        'Authorization': `Bearer ${supabaseKey}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'count=exact',
       },
+    });
+
+    const adminsStatus = adminsResponse.status;
+    const adminsText = await adminsResponse.text();
+
+    debug.adminsTest = {
+      status: adminsStatus,
+      response: adminsText,
+      ok: adminsResponse.ok,
     };
-
-    // Test 4: Look for same email in creators
-    const { data: creatorLookup, error: creatorLookupError } = await supabase
-      .from('creators')
-      .select('id, email')
-      .ilike('email', testEmail)
-      .maybeSingle();
-
-    debug.tests = {
-      ...debug.tests as object,
-      creatorLookup: {
-        searchedFor: testEmail,
-        found: !!creatorLookup,
-        data: creatorLookup,
-        error: creatorLookupError?.message || null,
-      },
+  } catch (error: unknown) {
+    debug.adminsTest = {
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
+  }
 
-    // Test 5: List all emails in admin_users (for debugging)
-    const { data: allAdmins, error: allAdminsError } = await supabase
-      .from('admin_users')
-      .select('email');
+  // Test 3: Look for specific email in admin_users
+  try {
+    const emailResponse = await fetch(
+      `${supabaseUrl}/rest/v1/admin_users?email=ilike.rae@teachersdeserveit.com&select=id,email`,
+      {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
-    debug.tests = {
-      ...debug.tests as object,
-      allAdminEmails: {
-        emails: allAdmins?.map(a => a.email) || [],
-        error: allAdminsError?.message || null,
-      },
+    const emailData = await emailResponse.json();
+
+    debug.emailLookup = {
+      status: emailResponse.status,
+      found: Array.isArray(emailData) && emailData.length > 0,
+      data: emailData,
     };
-
-    // Test 6: List all emails in creators (first 10)
-    const { data: allCreators, error: allCreatorsError } = await supabase
-      .from('creators')
-      .select('email')
-      .limit(10);
-
-    debug.tests = {
-      ...debug.tests as object,
-      creatorEmails: {
-        emails: allCreators?.map(c => c.email) || [],
-        note: 'First 10 only',
-        error: allCreatorsError?.message || null,
-      },
+  } catch (error: unknown) {
+    debug.emailLookup = {
+      error: error instanceof Error ? error.message : 'Unknown error',
     };
+  }
 
-    debug.success = true;
+  // Test 4: List all admin emails
+  try {
+    const allAdminsResponse = await fetch(
+      `${supabaseUrl}/rest/v1/admin_users?select=email`,
+      {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
-  } catch (error) {
-    debug.error = error instanceof Error ? error.message : 'Unknown error';
-    debug.success = false;
+    const allAdminsData = await allAdminsResponse.json();
+
+    debug.allAdmins = {
+      status: allAdminsResponse.status,
+      data: allAdminsData,
+    };
+  } catch (error: unknown) {
+    debug.allAdmins = {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
   }
 
   return NextResponse.json(debug, {
