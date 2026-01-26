@@ -1,0 +1,498 @@
+import { supabase, getServiceSupabase } from './supabase';
+import type {
+  Creator,
+  CreatorMilestone,
+  CreatorNote,
+  Phase,
+  PhaseId,
+  Milestone,
+  MilestoneStatus,
+  MilestoneWithStatus,
+  PhaseWithMilestones,
+  CreatorDashboardData,
+  CreatorListItem,
+} from '@/types/creator-portal';
+
+// Phase order for progression
+const PHASE_ORDER: PhaseId[] = [
+  'onboarding',
+  'agreement',
+  'course_design',
+  'test_prep',
+  'production',
+  'launch',
+];
+
+// ============================================
+// Creator Functions
+// ============================================
+
+export async function getCreatorByEmail(email: string): Promise<Creator | null> {
+  const { data, error } = await supabase
+    .from('creators')
+    .select('*')
+    .eq('email', email.toLowerCase())
+    .single();
+
+  if (error) {
+    console.error('Error fetching creator by email:', error);
+    return null;
+  }
+  return data;
+}
+
+export async function getCreatorById(id: string): Promise<Creator | null> {
+  const { data, error } = await supabase
+    .from('creators')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    console.error('Error fetching creator by id:', error);
+    return null;
+  }
+  return data;
+}
+
+export async function getAllCreators(): Promise<CreatorListItem[]> {
+  const { data: creators, error: creatorsError } = await supabase
+    .from('creators')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (creatorsError || !creators) {
+    console.error('Error fetching creators:', creatorsError);
+    return [];
+  }
+
+  // Get total milestone count
+  const { count: totalMilestones } = await supabase
+    .from('milestones')
+    .select('*', { count: 'exact', head: true });
+
+  // Get completed milestones for each creator
+  const creatorList: CreatorListItem[] = await Promise.all(
+    creators.map(async (creator) => {
+      const { count: completedCount } = await supabase
+        .from('creator_milestones')
+        .select('*', { count: 'exact', head: true })
+        .eq('creator_id', creator.id)
+        .eq('status', 'completed');
+
+      const completed = completedCount || 0;
+      const total = totalMilestones || 27;
+
+      return {
+        ...creator,
+        completedMilestones: completed,
+        totalMilestones: total,
+        progressPercentage: Math.round((completed / total) * 100),
+      };
+    })
+  );
+
+  return creatorList;
+}
+
+export async function createCreator(data: {
+  email: string;
+  name: string;
+  course_title?: string;
+  course_audience?: string;
+  target_launch_month?: string;
+}): Promise<Creator | null> {
+  const serviceSupabase = getServiceSupabase();
+
+  // Create the creator
+  const { data: creator, error: creatorError } = await serviceSupabase
+    .from('creators')
+    .insert({
+      email: data.email.toLowerCase(),
+      name: data.name,
+      course_title: data.course_title || null,
+      course_audience: data.course_audience || null,
+      target_launch_month: data.target_launch_month || null,
+      current_phase: 'onboarding',
+    })
+    .select()
+    .single();
+
+  if (creatorError || !creator) {
+    console.error('Error creating creator:', creatorError);
+    return null;
+  }
+
+  // Get all milestones
+  const { data: milestones, error: milestonesError } = await serviceSupabase
+    .from('milestones')
+    .select('*')
+    .order('order_index');
+
+  if (milestonesError || !milestones) {
+    console.error('Error fetching milestones:', milestonesError);
+    return creator;
+  }
+
+  // Create milestone progress records
+  const milestoneRecords = milestones.map((milestone, index) => ({
+    creator_id: creator.id,
+    milestone_id: milestone.id,
+    // First milestone is available, rest are locked
+    status: index === 0 ? 'available' : 'locked',
+  }));
+
+  const { error: progressError } = await serviceSupabase
+    .from('creator_milestones')
+    .insert(milestoneRecords);
+
+  if (progressError) {
+    console.error('Error creating milestone progress:', progressError);
+  }
+
+  return creator;
+}
+
+export async function updateCreator(
+  id: string,
+  data: Partial<Pick<Creator, 'course_title' | 'course_audience' | 'target_launch_month' | 'discount_code'>>
+): Promise<Creator | null> {
+  const serviceSupabase = getServiceSupabase();
+
+  const { data: creator, error } = await serviceSupabase
+    .from('creators')
+    .update({
+      ...data,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error updating creator:', error);
+    return null;
+  }
+  return creator;
+}
+
+// ============================================
+// Milestone Functions
+// ============================================
+
+export async function getCreatorMilestones(
+  creatorId: string
+): Promise<CreatorMilestone[]> {
+  const { data, error } = await supabase
+    .from('creator_milestones')
+    .select('*')
+    .eq('creator_id', creatorId);
+
+  if (error) {
+    console.error('Error fetching creator milestones:', error);
+    return [];
+  }
+  return data || [];
+}
+
+export async function updateMilestoneStatus(
+  creatorId: string,
+  milestoneId: string,
+  status: MilestoneStatus,
+  completedBy?: string
+): Promise<boolean> {
+  const serviceSupabase = getServiceSupabase();
+
+  // Update the milestone status
+  const updateData: Partial<CreatorMilestone> = {
+    status,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (status === 'completed') {
+    updateData.completed_at = new Date().toISOString();
+    updateData.completed_by = completedBy || null;
+  }
+
+  const { error: updateError } = await serviceSupabase
+    .from('creator_milestones')
+    .update(updateData)
+    .eq('creator_id', creatorId)
+    .eq('milestone_id', milestoneId);
+
+  if (updateError) {
+    console.error('Error updating milestone status:', updateError);
+    return false;
+  }
+
+  // If completed, unlock the next milestone
+  if (status === 'completed') {
+    await unlockNextMilestone(creatorId, milestoneId);
+  }
+
+  return true;
+}
+
+async function unlockNextMilestone(
+  creatorId: string,
+  completedMilestoneId: string
+): Promise<void> {
+  const serviceSupabase = getServiceSupabase();
+
+  // Get the completed milestone details
+  const { data: completedMilestone, error: milestoneError } = await serviceSupabase
+    .from('milestones')
+    .select('*')
+    .eq('id', completedMilestoneId)
+    .single();
+
+  if (milestoneError || !completedMilestone) {
+    console.error('Error fetching completed milestone:', milestoneError);
+    return;
+  }
+
+  // Get all milestones in the same phase
+  const { data: phaseMilestones, error: phaseError } = await serviceSupabase
+    .from('milestones')
+    .select('*')
+    .eq('phase_id', completedMilestone.phase_id)
+    .order('order_index');
+
+  if (phaseError || !phaseMilestones) {
+    console.error('Error fetching phase milestones:', phaseError);
+    return;
+  }
+
+  // Find the next milestone in this phase
+  const currentIndex = phaseMilestones.findIndex(
+    (m) => m.id === completedMilestoneId
+  );
+  const nextMilestone = phaseMilestones[currentIndex + 1];
+
+  if (nextMilestone) {
+    // Unlock the next milestone in this phase
+    await serviceSupabase
+      .from('creator_milestones')
+      .update({ status: 'available', updated_at: new Date().toISOString() })
+      .eq('creator_id', creatorId)
+      .eq('milestone_id', nextMilestone.id)
+      .eq('status', 'locked');
+  } else {
+    // This was the last milestone in the phase
+    // Check if ALL milestones in this phase are completed
+    const { data: creatorPhaseMilestones } = await serviceSupabase
+      .from('creator_milestones')
+      .select('*, milestones!inner(*)')
+      .eq('creator_id', creatorId)
+      .eq('milestones.phase_id', completedMilestone.phase_id);
+
+    const allPhaseComplete = creatorPhaseMilestones?.every(
+      (cm) => cm.status === 'completed'
+    );
+
+    if (allPhaseComplete) {
+      // Find the next phase
+      const currentPhaseIndex = PHASE_ORDER.indexOf(
+        completedMilestone.phase_id as PhaseId
+      );
+      const nextPhaseId = PHASE_ORDER[currentPhaseIndex + 1];
+
+      if (nextPhaseId) {
+        // Update creator's current phase
+        await serviceSupabase
+          .from('creators')
+          .update({
+            current_phase: nextPhaseId,
+            updated_at: new Date().toISOString(),
+          })
+          .eq('id', creatorId);
+
+        // Get first milestone of next phase
+        const { data: nextPhaseMilestones } = await serviceSupabase
+          .from('milestones')
+          .select('*')
+          .eq('phase_id', nextPhaseId)
+          .order('order_index')
+          .limit(1);
+
+        if (nextPhaseMilestones && nextPhaseMilestones[0]) {
+          // Unlock first milestone of next phase
+          await serviceSupabase
+            .from('creator_milestones')
+            .update({ status: 'available', updated_at: new Date().toISOString() })
+            .eq('creator_id', creatorId)
+            .eq('milestone_id', nextPhaseMilestones[0].id)
+            .eq('status', 'locked');
+        }
+      }
+    }
+  }
+}
+
+// ============================================
+// Notes Functions
+// ============================================
+
+export async function getCreatorNotes(
+  creatorId: string,
+  includeInternal = false
+): Promise<CreatorNote[]> {
+  let query = supabase
+    .from('creator_notes')
+    .select('*')
+    .eq('creator_id', creatorId)
+    .order('created_at', { ascending: false });
+
+  if (!includeInternal) {
+    query = query.eq('visible_to_creator', true);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error fetching creator notes:', error);
+    return [];
+  }
+  return data || [];
+}
+
+export async function addNote(data: {
+  creator_id: string;
+  note: string;
+  created_by: string;
+  visible_to_creator: boolean;
+}): Promise<CreatorNote | null> {
+  const serviceSupabase = getServiceSupabase();
+
+  const { data: note, error } = await serviceSupabase
+    .from('creator_notes')
+    .insert(data)
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Error adding note:', error);
+    return null;
+  }
+  return note;
+}
+
+// ============================================
+// Dashboard Data Functions
+// ============================================
+
+export async function getCreatorDashboardData(
+  creatorId: string
+): Promise<CreatorDashboardData | null> {
+  // Get creator
+  const creator = await getCreatorById(creatorId);
+  if (!creator) return null;
+
+  // Get all phases
+  const { data: phases, error: phasesError } = await supabase
+    .from('phases')
+    .select('*')
+    .order('order_index');
+
+  if (phasesError || !phases) {
+    console.error('Error fetching phases:', phasesError);
+    return null;
+  }
+
+  // Get all milestones
+  const { data: milestones, error: milestonesError } = await supabase
+    .from('milestones')
+    .select('*')
+    .order('order_index');
+
+  if (milestonesError || !milestones) {
+    console.error('Error fetching milestones:', milestonesError);
+    return null;
+  }
+
+  // Get creator's milestone progress
+  const creatorMilestones = await getCreatorMilestones(creatorId);
+
+  // Get visible notes
+  const notes = await getCreatorNotes(creatorId, false);
+
+  // Build phases with milestones
+  const phasesWithMilestones: PhaseWithMilestones[] = phases.map((phase) => {
+    const phaseMilestones = milestones.filter((m) => m.phase_id === phase.id);
+
+    const milestonesWithStatus: MilestoneWithStatus[] = phaseMilestones.map(
+      (milestone) => {
+        const progress = creatorMilestones.find(
+          (cm) => cm.milestone_id === milestone.id
+        );
+        return {
+          ...milestone,
+          status: (progress?.status || 'locked') as MilestoneStatus,
+          completed_at: progress?.completed_at || null,
+          progress_id: progress?.id || null,
+        };
+      }
+    );
+
+    const isComplete = milestonesWithStatus.every(
+      (m) => m.status === 'completed'
+    );
+    const isCurrentPhase = phase.id === creator.current_phase;
+
+    return {
+      ...phase,
+      milestones: milestonesWithStatus,
+      isComplete,
+      isCurrentPhase,
+    };
+  });
+
+  // Calculate progress
+  const totalMilestones = milestones.length;
+  const completedMilestones = creatorMilestones.filter(
+    (cm) => cm.status === 'completed'
+  ).length;
+  const progressPercentage =
+    totalMilestones > 0
+      ? Math.round((completedMilestones / totalMilestones) * 100)
+      : 0;
+
+  return {
+    creator,
+    phases: phasesWithMilestones,
+    notes,
+    totalMilestones,
+    completedMilestones,
+    progressPercentage,
+  };
+}
+
+// ============================================
+// Admin Functions
+// ============================================
+
+export async function isAdmin(email: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('admin_users')
+    .select('id')
+    .eq('email', email.toLowerCase())
+    .single();
+
+  if (error) {
+    return false;
+  }
+  return !!data;
+}
+
+export async function creatorExists(email: string): Promise<boolean> {
+  const { data, error } = await supabase
+    .from('creators')
+    .select('id')
+    .eq('email', email.toLowerCase())
+    .single();
+
+  if (error) {
+    return false;
+  }
+  return !!data;
+}

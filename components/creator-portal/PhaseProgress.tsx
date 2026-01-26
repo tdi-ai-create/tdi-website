@@ -1,0 +1,280 @@
+'use client';
+
+import { useState } from 'react';
+import {
+  Check,
+  Clock,
+  AlertCircle,
+  Circle,
+  Lock,
+  ChevronDown,
+  ChevronUp,
+  Calendar,
+  CheckCircle2,
+} from 'lucide-react';
+import type { PhaseWithMilestones, MilestoneWithStatus, MilestoneStatus } from '@/types/creator-portal';
+
+interface PhaseProgressProps {
+  phases: PhaseWithMilestones[];
+  onMarkComplete?: (milestoneId: string) => Promise<void>;
+  isLoading?: boolean;
+}
+
+const statusConfig: Record<
+  MilestoneStatus,
+  { icon: typeof Check; color: string; bg: string; label: string }
+> = {
+  completed: {
+    icon: Check,
+    color: 'text-green-600',
+    bg: 'bg-green-100',
+    label: 'Completed',
+  },
+  in_progress: {
+    icon: Clock,
+    color: 'text-blue-600',
+    bg: 'bg-blue-100',
+    label: 'In Progress',
+  },
+  waiting_approval: {
+    icon: AlertCircle,
+    color: 'text-orange-500',
+    bg: 'bg-orange-100',
+    label: 'Waiting for Approval',
+  },
+  available: {
+    icon: Circle,
+    color: 'text-[#80a4ed]',
+    bg: 'bg-blue-50',
+    label: 'Available',
+  },
+  locked: {
+    icon: Lock,
+    color: 'text-gray-400',
+    bg: 'bg-gray-100',
+    label: 'Locked',
+  },
+};
+
+function MilestoneItem({
+  milestone,
+  onMarkComplete,
+  isLoading,
+}: {
+  milestone: MilestoneWithStatus;
+  onMarkComplete?: (milestoneId: string) => Promise<void>;
+  isLoading?: boolean;
+}) {
+  const config = statusConfig[milestone.status];
+  const Icon = config.icon;
+  const isActionable =
+    milestone.status === 'available' || milestone.status === 'in_progress';
+  const hasCalendly = milestone.calendly_link && isActionable;
+  const canMarkComplete =
+    isActionable && !milestone.requires_team_action && onMarkComplete;
+
+  return (
+    <div
+      className={`flex items-start gap-4 p-4 rounded-lg border transition-all ${
+        milestone.status === 'locked'
+          ? 'bg-gray-50 border-gray-200 opacity-60'
+          : milestone.status === 'completed'
+          ? 'bg-green-50/50 border-green-200'
+          : milestone.status === 'waiting_approval'
+          ? 'bg-orange-50/50 border-orange-200'
+          : 'bg-white border-gray-200 hover:border-[#80a4ed]'
+      }`}
+    >
+      <div className={`flex-shrink-0 w-8 h-8 rounded-full ${config.bg} flex items-center justify-center`}>
+        <Icon className={`w-4 h-4 ${config.color}`} />
+      </div>
+
+      <div className="flex-grow min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <div>
+            <h4
+              className={`font-medium ${
+                milestone.status === 'locked' ? 'text-gray-500' : 'text-[#1e2749]'
+              }`}
+            >
+              {milestone.title}
+            </h4>
+            {milestone.description && (
+              <p className="text-sm text-gray-600 mt-1">{milestone.description}</p>
+            )}
+            {milestone.requires_team_action && milestone.status !== 'completed' && (
+              <span className="inline-block mt-2 text-xs bg-[#ffba06]/20 text-[#1e2749] px-2 py-1 rounded-full">
+                TDI team action required
+              </span>
+            )}
+          </div>
+
+          <span
+            className={`flex-shrink-0 text-xs px-2 py-1 rounded-full ${config.bg} ${config.color}`}
+          >
+            {config.label}
+          </span>
+        </div>
+
+        {(hasCalendly || canMarkComplete) && (
+          <div className="flex items-center gap-3 mt-3">
+            {hasCalendly && (
+              <a
+                href={milestone.calendly_link!}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm font-medium text-[#80a4ed] hover:text-[#1e2749] transition-colors"
+              >
+                <Calendar className="w-4 h-4" />
+                Book Meeting
+              </a>
+            )}
+            {canMarkComplete && (
+              <button
+                onClick={() => onMarkComplete(milestone.id)}
+                disabled={isLoading}
+                className="inline-flex items-center gap-2 text-sm font-medium bg-[#1e2749] text-white px-4 py-2 rounded-lg hover:bg-[#2a3459] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                {isLoading ? 'Saving...' : 'Mark Complete'}
+              </button>
+            )}
+          </div>
+        )}
+
+        {milestone.completed_at && (
+          <p className="text-xs text-gray-500 mt-2">
+            Completed on {new Date(milestone.completed_at).toLocaleDateString()}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PhaseCard({
+  phase,
+  onMarkComplete,
+  isLoading,
+  defaultExpanded = false,
+}: {
+  phase: PhaseWithMilestones;
+  onMarkComplete?: (milestoneId: string) => Promise<void>;
+  isLoading?: boolean;
+  defaultExpanded?: boolean;
+}) {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const completedCount = phase.milestones.filter(
+    (m) => m.status === 'completed'
+  ).length;
+  const totalCount = phase.milestones.length;
+  const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+
+  return (
+    <div
+      className={`rounded-xl border overflow-hidden transition-all ${
+        phase.isCurrentPhase
+          ? 'border-[#80a4ed] shadow-md'
+          : phase.isComplete
+          ? 'border-green-300'
+          : 'border-gray-200'
+      }`}
+    >
+      <button
+        onClick={() => setIsExpanded(!isExpanded)}
+        className={`w-full px-6 py-4 flex items-center justify-between text-left transition-colors ${
+          phase.isComplete
+            ? 'bg-green-50'
+            : phase.isCurrentPhase
+            ? 'bg-[#80a4ed]/10'
+            : 'bg-gray-50 hover:bg-gray-100'
+        }`}
+      >
+        <div className="flex items-center gap-4">
+          <div
+            className={`w-10 h-10 rounded-full flex items-center justify-center ${
+              phase.isComplete
+                ? 'bg-green-500'
+                : phase.isCurrentPhase
+                ? 'bg-[#80a4ed]'
+                : 'bg-gray-300'
+            }`}
+          >
+            {phase.isComplete ? (
+              <Check className="w-5 h-5 text-white" />
+            ) : (
+              <span className="text-white font-semibold text-sm">
+                {phase.order_index + 1}
+              </span>
+            )}
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-[#1e2749]">{phase.name}</h3>
+              {phase.isCurrentPhase && (
+                <span className="text-xs bg-[#ffba06] text-[#1e2749] px-2 py-0.5 rounded-full font-medium">
+                  Current Phase
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-gray-600">{phase.description}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <div className="text-right hidden sm:block">
+            <p className="text-sm font-medium text-[#1e2749]">
+              {completedCount} of {totalCount}
+            </p>
+            <div className="w-24 h-2 bg-gray-200 rounded-full mt-1 overflow-hidden">
+              <div
+                className={`h-full rounded-full transition-all ${
+                  phase.isComplete ? 'bg-green-500' : 'bg-[#80a4ed]'
+                }`}
+                style={{ width: `${progressPercent}%` }}
+              />
+            </div>
+          </div>
+          {isExpanded ? (
+            <ChevronUp className="w-5 h-5 text-gray-400" />
+          ) : (
+            <ChevronDown className="w-5 h-5 text-gray-400" />
+          )}
+        </div>
+      </button>
+
+      {isExpanded && (
+        <div className="p-4 bg-white space-y-3">
+          {phase.milestones.map((milestone) => (
+            <MilestoneItem
+              key={milestone.id}
+              milestone={milestone}
+              onMarkComplete={onMarkComplete}
+              isLoading={isLoading}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function PhaseProgress({
+  phases,
+  onMarkComplete,
+  isLoading,
+}: PhaseProgressProps) {
+  return (
+    <div className="space-y-4">
+      {phases.map((phase) => (
+        <PhaseCard
+          key={phase.id}
+          phase={phase}
+          onMarkComplete={onMarkComplete}
+          isLoading={isLoading}
+          defaultExpanded={phase.isCurrentPhase}
+        />
+      ))}
+    </div>
+  );
+}
