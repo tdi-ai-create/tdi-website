@@ -20,7 +20,7 @@ export interface Phase {
   id: PhaseId;
   name: string;
   description: string;
-  order_index: number;
+  sort_order: number;
   created_at: string;
 }
 
@@ -30,7 +30,7 @@ export interface Milestone {
   phase_id: PhaseId;
   title: string;
   description: string | null;
-  order_index: number;
+  sort_order: number;
   requires_team_action: boolean;
   calendly_link: string | null;
   created_at: string;
