@@ -14,8 +14,11 @@ export function EmailPopup({ delay = 30000 }: EmailPopupProps) {
   const [dismissed, setDismissed] = useState(false);
   const pathname = usePathname();
 
-  // Don't show on dashboard pages or internal team pages
-  const isDashboardPage = pathname?.includes('-dashboard') || pathname?.includes('dashboard-creation');
+  // Don't show on dashboard pages, internal team pages, creator portal, or admin pages
+  const isDashboardPage = pathname?.includes('-dashboard') ||
+    pathname?.includes('dashboard-creation') ||
+    pathname?.startsWith('/creator-portal') ||
+    pathname?.startsWith('/admin');
 
   useEffect(() => {
     // Skip on dashboard pages

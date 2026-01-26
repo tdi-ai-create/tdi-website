@@ -57,8 +57,10 @@ export function SocialProofPopup() {
   const [isHovered, setIsHovered] = useState(false);
   const pathname = usePathname();
 
-  // Only hide on internal team pages (show on partner dashboards)
-  const isInternalPage = pathname?.includes('dashboard-creation');
+  // Hide on internal team pages, creator portal, and admin pages
+  const isInternalPage = pathname?.includes('dashboard-creation') ||
+    pathname?.startsWith('/creator-portal') ||
+    pathname?.startsWith('/admin');
 
   const messagesRef = useRef<NotificationMessage[]>([]);
   const messageIndexRef = useRef(0);
