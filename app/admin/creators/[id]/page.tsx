@@ -18,7 +18,9 @@ import {
   EyeOff,
   ChevronDown,
   ChevronUp,
+  Info,
 } from 'lucide-react';
+import { Tooltip } from '@/components/ui/Tooltip';
 import { supabase } from '@/lib/supabase';
 import {
   isAdmin,
@@ -37,38 +39,52 @@ import type {
 
 const statusConfig: Record<
   MilestoneStatus,
-  { icon: typeof Check; color: string; bg: string; label: string }
+  { icon: typeof Check; color: string; bg: string; label: string; tooltip: string }
 > = {
   completed: {
     icon: Check,
     color: 'text-green-600',
     bg: 'bg-green-100',
     label: 'Completed',
+    tooltip: 'This step has been finished successfully',
   },
   in_progress: {
     icon: Clock,
     color: 'text-blue-600',
     bg: 'bg-blue-100',
     label: 'In Progress',
+    tooltip: 'The creator is currently working on this step',
   },
   waiting_approval: {
     icon: AlertCircle,
     color: 'text-orange-500',
     bg: 'bg-orange-100',
     label: 'Waiting Approval',
+    tooltip: 'The creator has completed this step and is waiting for your review',
   },
   available: {
     icon: Circle,
     color: 'text-[#80a4ed]',
     bg: 'bg-blue-50',
     label: 'Available',
+    tooltip: 'Ready for action - either by the creator or the TDI team',
   },
   locked: {
     icon: Lock,
     color: 'text-gray-400',
     bg: 'bg-gray-100',
     label: 'Locked',
+    tooltip: 'Previous steps must be completed before this unlocks',
   },
+};
+
+// Phase descriptions for admin context
+const phaseDescriptions: Record<string, string> = {
+  onboarding: 'Getting the creator set up and aligned with TDI\'s process. Review their intake form and schedule a kickoff meeting.',
+  agreement: 'Formalizing the partnership. Send the agreement and ensure it\'s signed before moving forward.',
+  course_design: 'Collaborating on course structure. Review outlines and provide feedback during milestone meetings.',
+  production: 'The creator is building their course. Review test videos and provide editing support as needed.',
+  launch: 'Final preparations for publishing. Create marketing materials and coordinate the launch date.',
 };
 
 export default function AdminCreatorDetailPage() {
@@ -610,20 +626,28 @@ function PhaseSection({
       </button>
 
       {isExpanded && (
-        <div className="border-t border-gray-100 divide-y divide-gray-100">
-          {phase.milestones.map((milestone) => {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            const m = milestone as any;
-            const milestoneTitle = m.title || m.name || m.admin_description || `Milestone`;
-            return (
-              <MilestoneRow
-                key={milestone.id}
-                milestone={milestone}
-                onApprove={() => onApprove(milestone.id, milestoneTitle)}
-                isApproving={approvingMilestoneId === milestone.id}
-              />
-            );
-          })}
+        <div className="border-t border-gray-100">
+          {/* Phase description */}
+          {phaseDescriptions[phase.id] && (
+            <div className="px-6 py-3 bg-gray-50 border-b border-gray-100">
+              <p className="text-sm text-gray-600">{phaseDescriptions[phase.id]}</p>
+            </div>
+          )}
+          <div className="divide-y divide-gray-100">
+            {phase.milestones.map((milestone) => {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              const m = milestone as any;
+              const milestoneTitle = m.title || m.name || m.admin_description || `Milestone`;
+              return (
+                <MilestoneRow
+                  key={milestone.id}
+                  milestone={milestone}
+                  onApprove={() => onApprove(milestone.id, milestoneTitle)}
+                  isApproving={approvingMilestoneId === milestone.id}
+                />
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
@@ -647,48 +671,70 @@ function MilestoneRow({
       milestone.status === 'in_progress' ||
       milestone.status === 'waiting_approval');
 
-  // Handle different possible field names for milestone title
+  // Handle different possible field names for milestone title and description
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const m = milestone as any;
-  const milestoneTitle = m.title || m.name || m.admin_description || m.creator_description ||
-    `Milestone ${milestone.id.slice(0, 8)}`;
+  const milestoneTitle = m.title || m.name || `Milestone ${milestone.id.slice(0, 8)}`;
+  const adminDescription = m.admin_description || m.description || null;
+  const creatorDescription = m.creator_description || null;
 
   return (
-    <div className="px-6 py-4 flex items-center justify-between gap-4">
-      <div className="flex items-center gap-3 min-w-0">
-        <div className={`flex-shrink-0 w-8 h-8 rounded-full ${config.bg} flex items-center justify-center`}>
-          <Icon className={`w-4 h-4 ${config.color}`} />
+    <div className="px-6 py-4">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-3 min-w-0 flex-1">
+          <div className={`flex-shrink-0 w-8 h-8 rounded-full ${config.bg} flex items-center justify-center mt-0.5`}>
+            <Icon className={`w-4 h-4 ${config.color}`} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className={`font-medium ${
+              milestone.status === 'locked' ? 'text-gray-400' : 'text-[#1e2749]'
+            }`}>
+              {milestoneTitle}
+            </p>
+            {adminDescription && (
+              <p className="text-sm text-gray-500 mt-1">{adminDescription}</p>
+            )}
+            {creatorDescription && creatorDescription !== adminDescription && (
+              <p className="text-xs text-gray-400 mt-1 italic">
+                Creator sees: {creatorDescription}
+              </p>
+            )}
+            {milestone.requires_team_action && milestone.status !== 'completed' && (
+              <div className="flex items-center gap-1.5 mt-2">
+                <span className="text-xs text-amber-700 bg-amber-50 px-2 py-0.5 rounded">
+                  Team action required
+                </span>
+                <Tooltip content="This milestone requires TDI team review or action before the creator can proceed." position="right">
+                  <Info className="w-3.5 h-3.5 text-amber-400 cursor-help" />
+                </Tooltip>
+              </div>
+            )}
+          </div>
         </div>
-        <div className="min-w-0">
-          <p className={`font-medium truncate ${
-            milestone.status === 'locked' ? 'text-gray-400' : 'text-[#1e2749]'
-          }`}>
-            {milestoneTitle}
-          </p>
-          {milestone.requires_team_action && milestone.status !== 'completed' && (
-            <p className="text-xs text-[#ffba06]">Team action required</p>
+
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <Tooltip content={config.tooltip} position="left">
+            <span className={`text-xs px-2 py-1 rounded-full cursor-help ${config.bg} ${config.color}`}>
+              {config.label}
+            </span>
+          </Tooltip>
+          {canApprove && (
+            <Tooltip content="Mark this step as complete and unlock the next step. The creator will receive an email notification." position="left">
+              <button
+                onClick={onApprove}
+                disabled={isApproving}
+                className="inline-flex items-center gap-1 bg-green-600 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-green-700 transition-colors disabled:opacity-50"
+              >
+                {isApproving ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Check className="w-4 h-4" />
+                )}
+                Approve
+              </button>
+            </Tooltip>
           )}
         </div>
-      </div>
-
-      <div className="flex items-center gap-3 flex-shrink-0">
-        <span className={`text-xs px-2 py-1 rounded-full ${config.bg} ${config.color}`}>
-          {config.label}
-        </span>
-        {canApprove && (
-          <button
-            onClick={onApprove}
-            disabled={isApproving}
-            className="inline-flex items-center gap-1 bg-green-600 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-green-700 transition-colors disabled:opacity-50"
-          >
-            {isApproving ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Check className="w-4 h-4" />
-            )}
-            Approve
-          </button>
-        )}
       </div>
     </div>
   );
