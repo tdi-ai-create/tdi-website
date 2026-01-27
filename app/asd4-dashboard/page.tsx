@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import { Tooltip } from '@/components/Tooltip';
@@ -57,7 +57,8 @@ import {
   CreditCard,
   HelpCircle,
   FileText,
-  Send
+  Send,
+  Check
 } from 'lucide-react';
 
 export default function ASD4Dashboard() {
@@ -67,6 +68,140 @@ export default function ASD4Dashboard() {
   const [showNotLoggedIn, setShowNotLoggedIn] = useState(false);
   const [showPolicy, setShowPolicy] = useState(false);
   const tabContentRef = useRef<HTMLDivElement>(null);
+
+  // Needs Attention completion state with localStorage persistence
+  const [completedItems, setCompletedItems] = useState<string[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('asd4-completed-items');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+
+  // Save to localStorage whenever completedItems changes
+  useEffect(() => {
+    localStorage.setItem('asd4-completed-items', JSON.stringify(completedItems));
+  }, [completedItems]);
+
+  // Toggle completion
+  const toggleComplete = (itemId: string) => {
+    setCompletedItems(prev =>
+      prev.includes(itemId)
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  // Check if item is complete
+  const isComplete = (itemId: string) => completedItems.includes(itemId);
+
+  // Needs Attention items data
+  const needsAttentionItems = [
+    {
+      id: 'partner-data-form',
+      title: 'Complete Partner Data Form',
+      description: 'Help us customize your dashboard',
+      deadline: 'FEB 2026',
+      actionLabel: 'Complete Your Form',
+      actionUrl: '/asd4-dashboard/partner-data',
+      icon: ClipboardList,
+      priority: 'now'
+    },
+    {
+      id: 'pilot-group',
+      title: 'Identify Pilot Group',
+      description: 'Select 10-20 paras for focused coaching',
+      deadline: 'FEB 2026',
+      actionLabel: 'Choose Your Pilot Paras',
+      actionUrl: '/asd4-dashboard/pilot-selection',
+      icon: Users,
+      priority: 'now'
+    },
+    {
+      id: 'observation-day-1',
+      title: 'Schedule Observation Day 1',
+      description: 'On-site observation with pilot group',
+      deadline: 'FEB 2026',
+      actionLabel: 'Book Observation Day',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone',
+      icon: Eye,
+      priority: 'now',
+      external: true,
+      showCalendar: true
+    },
+    {
+      id: 'virtual-session-1',
+      title: 'Virtual Session 1 · 45 min',
+      description: 'Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
+      deadline: 'FEB 2026',
+      actionLabel: 'Book Your Session',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      icon: Monitor,
+      priority: 'upcoming',
+      external: true,
+      showCalendar: true
+    },
+    {
+      id: 'observation-day-2',
+      title: 'Schedule Observation Day 2',
+      description: 'Follow-up on-site observation',
+      deadline: 'MAR 2026',
+      actionLabel: 'Book Observation Day',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone',
+      icon: Eye,
+      priority: 'upcoming',
+      external: true,
+      showCalendar: true
+    },
+    {
+      id: 'virtual-session-2',
+      title: 'Virtual Session 2 · 45 min',
+      description: 'Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
+      deadline: 'MAR 2026',
+      actionLabel: 'Book Your Session',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      icon: Monitor,
+      priority: 'upcoming',
+      external: true,
+      showCalendar: true
+    },
+    {
+      id: 'virtual-session-3',
+      title: 'Virtual Session 3 · 45 min',
+      description: 'Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
+      deadline: 'APR 2026',
+      actionLabel: 'Book Your Session',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      icon: Monitor,
+      priority: 'upcoming',
+      external: true,
+      showCalendar: true
+    },
+    {
+      id: 'virtual-session-4',
+      title: 'Virtual Session 4 · 45 min',
+      description: 'Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
+      deadline: 'APR 2026',
+      actionLabel: 'Book Your Session',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      icon: Monitor,
+      priority: 'upcoming',
+      external: true,
+      showCalendar: true
+    },
+    {
+      id: 'executive-session-2',
+      title: 'Schedule Executive Session 2',
+      description: 'Results review with leadership',
+      deadline: 'APR 2026',
+      actionLabel: 'Book Your Session',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone',
+      icon: Briefcase,
+      priority: 'upcoming',
+      external: true,
+      showCalendar: true
+    }
+  ];
 
   // Progress tab data
   const topEngagedParas = [
@@ -392,247 +527,145 @@ Thanks for everything you do.`
               <div className="flex items-center gap-2 mb-5">
                 <AlertCircle className="w-5 h-5 text-[#E07A5F]" />
                 <h3 className="text-lg font-bold text-[#1e2749]">Needs Attention</h3>
-                <span className="bg-[#E07A5F]/10 text-[#E07A5F] text-xs font-medium px-2 py-0.5 rounded-full">9 items</span>
+                <span className="bg-[#E07A5F]/10 text-[#E07A5F] text-xs font-medium px-2 py-0.5 rounded-full">
+                  {needsAttentionItems.filter(item => !isComplete(item.id)).length} items
+                </span>
               </div>
 
               {/* Priority Now Section */}
-              <div className="mb-4">
-                <p className="text-xs font-semibold text-[#E07A5F] uppercase tracking-wide mb-3">Priority Now (3)</p>
-                <div className="space-y-3">
-                  {/* Item 1: Partner Data Form */}
-                  <a
-                    href="/asd4-dashboard/partner-data"
-                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#E07A5F] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <ClipboardList className="w-5 h-5 text-[#E07A5F]" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-[#1e2749]">Complete Partner Data Form</div>
-                        <p className="text-sm text-gray-500">Help us customize your dashboard</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-400">SCHEDULE BY FEB 2026</span>
-                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                        Complete Your Form
-                        <ArrowRight className="w-4 h-4" />
-                      </span>
-                    </div>
-                  </a>
-
-                  {/* Item 2: Pilot Group */}
-                  <a
-                    href="/asd4-dashboard/pilot-selection"
-                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#E07A5F] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Users className="w-5 h-5 text-[#E07A5F]" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-[#1e2749]">Identify Pilot Group</div>
-                        <p className="text-sm text-gray-500">Select 10-20 paras for focused coaching</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-400">SCHEDULE BY FEB 2026</span>
-                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                        Choose Your Pilot Paras
-                        <ArrowRight className="w-4 h-4" />
-                      </span>
-                    </div>
-                  </a>
-
-                  {/* Item 3: Observation Day 1 */}
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#E07A5F] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Eye className="w-5 h-5 text-[#E07A5F]" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-[#1e2749]">Schedule Observation Day 1</div>
-                        <p className="text-sm text-gray-500">On-site observation with pilot group</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-400">SCHEDULE BY FEB 2026</span>
-                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                        <Calendar className="w-4 h-4" />
-                        Book Observation Day
-                      </span>
-                    </div>
-                  </a>
+              {needsAttentionItems.filter(item => item.priority === 'now' && !isComplete(item.id)).length > 0 && (
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-[#E07A5F] uppercase tracking-wide mb-3">
+                    Priority Now ({needsAttentionItems.filter(item => item.priority === 'now' && !isComplete(item.id)).length})
+                  </p>
+                  <div className="space-y-3">
+                    {needsAttentionItems
+                      .filter(item => item.priority === 'now' && !isComplete(item.id))
+                      .map(item => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#E07A5F] bg-gray-50"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <item.icon className="w-5 h-5 text-[#E07A5F]" />
+                            </div>
+                            <div>
+                              <div className="font-medium text-[#1e2749]">{item.title}</div>
+                              <p className="text-sm text-gray-500">{item.description}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-xs text-gray-400 hidden sm:inline">SCHEDULE BY {item.deadline}</span>
+                            <a
+                              href={item.actionUrl}
+                              target={item.external ? '_blank' : undefined}
+                              rel={item.external ? 'noopener noreferrer' : undefined}
+                              className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 hover:bg-[#2d3a5c] transition-colors"
+                            >
+                              {item.showCalendar && <Calendar className="w-4 h-4" />}
+                              {item.actionLabel}
+                              {!item.showCalendar && <ArrowRight className="w-4 h-4" />}
+                            </a>
+                            <button
+                              onClick={() => toggleComplete(item.id)}
+                              className="inline-flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-700 text-sm font-medium rounded-lg transition-colors"
+                              title="Mark as complete"
+                            >
+                              <Check className="w-4 h-4" />
+                              Done
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
                 </div>
-              </div>
+              )}
 
               {/* Accordion Toggle */}
-              <button
-                onClick={() => setShowAllItems(!showAllItems)}
-                className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-[#38618C] hover:text-[#2d4a6d] transition-colors border-t border-gray-100"
-              >
-                <ChevronDown className={`w-4 h-4 transition-transform ${showAllItems ? 'rotate-180' : ''}`} />
-                {showAllItems ? 'Hide Additional Items' : 'View All 9 Items'}
-              </button>
+              {needsAttentionItems.filter(item => item.priority === 'upcoming' && !isComplete(item.id)).length > 0 && (
+                <button
+                  onClick={() => setShowAllItems(!showAllItems)}
+                  className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-[#38618C] hover:text-[#2d4a6d] transition-colors border-t border-gray-100"
+                >
+                  <ChevronDown className={`w-4 h-4 transition-transform ${showAllItems ? 'rotate-180' : ''}`} />
+                  {showAllItems ? 'Hide Additional Items' : `View All ${needsAttentionItems.filter(item => !isComplete(item.id)).length} Items`}
+                </button>
+              )}
 
-              {/* Accordion Content */}
-              {showAllItems && (
+              {/* Accordion Content - Upcoming Items */}
+              {showAllItems && needsAttentionItems.filter(item => item.priority === 'upcoming' && !isComplete(item.id)).length > 0 && (
                 <div className="space-y-3 pt-3 border-t border-gray-100">
-                  {/* Item 4: Virtual Session 1 */}
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Monitor className="w-5 h-5 text-[#ffba06]" />
+                  {needsAttentionItems
+                    .filter(item => item.priority === 'upcoming' && !isComplete(item.id))
+                    .map(item => (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <item.icon className="w-5 h-5 text-[#ffba06]" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-[#1e2749]">{item.title}</div>
+                            <p className="text-sm text-gray-500">{item.description}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs text-gray-400 hidden sm:inline">SCHEDULE BY {item.deadline}</span>
+                          <a
+                            href={item.actionUrl}
+                            target={item.external ? '_blank' : undefined}
+                            rel={item.external ? 'noopener noreferrer' : undefined}
+                            className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 hover:bg-[#2d3a5c] transition-colors"
+                          >
+                            {item.showCalendar && <Calendar className="w-4 h-4" />}
+                            {item.actionLabel}
+                          </a>
+                          <button
+                            onClick={() => toggleComplete(item.id)}
+                            className="inline-flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-700 text-sm font-medium rounded-lg transition-colors"
+                            title="Mark as complete"
+                          >
+                            <Check className="w-4 h-4" />
+                            Done
+                          </button>
+                        </div>
                       </div>
-                      <div>
-                        <div className="font-medium text-[#1e2749]">Virtual Session 1 · 45 min</div>
-                        <p className="text-sm text-gray-500">Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-400">SCHEDULE BY FEB 2026</span>
-                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                        <Calendar className="w-4 h-4" />
-                        Book Your Session
-                      </span>
-                    </div>
-                  </a>
+                    ))}
+                </div>
+              )}
 
-                  {/* Item 5: Observation Day 2 */}
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Eye className="w-5 h-5 text-[#ffba06]" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-[#1e2749]">Schedule Observation Day 2</div>
-                        <p className="text-sm text-gray-500">Follow-up on-site observation</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-400">SCHEDULE BY MAR 2026</span>
-                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                        <Calendar className="w-4 h-4" />
-                        Book Observation Day
-                      </span>
-                    </div>
-                  </a>
-
-                  {/* Item 6: Virtual Session 2 */}
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Monitor className="w-5 h-5 text-[#ffba06]" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-[#1e2749]">Virtual Session 2 · 45 min</div>
-                        <p className="text-sm text-gray-500">Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-400">SCHEDULE BY MAR 2026</span>
-                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                        <Calendar className="w-4 h-4" />
-                        Book Your Session
-                      </span>
-                    </div>
-                  </a>
-
-                  {/* Item 7: Virtual Session 3 */}
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Monitor className="w-5 h-5 text-[#ffba06]" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-[#1e2749]">Virtual Session 3 · 45 min</div>
-                        <p className="text-sm text-gray-500">Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-400">SCHEDULE BY APR 2026</span>
-                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                        <Calendar className="w-4 h-4" />
-                        Book Your Session
-                      </span>
-                    </div>
-                  </a>
-
-                  {/* Item 8: Virtual Session 4 */}
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Monitor className="w-5 h-5 text-[#ffba06]" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-[#1e2749]">Virtual Session 4 · 45 min</div>
-                        <p className="text-sm text-gray-500">Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-400">SCHEDULE BY APR 2026</span>
-                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                        <Calendar className="w-4 h-4" />
-                        Book Your Session
-                      </span>
-                    </div>
-                  </a>
-
-                  {/* Item 9: Executive Session 2 */}
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50 hover:bg-gray-100 transition-colors group"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <Briefcase className="w-5 h-5 text-[#ffba06]" />
-                      </div>
-                      <div>
-                        <div className="font-medium text-[#1e2749]">Schedule Executive Session 2</div>
-                        <p className="text-sm text-gray-500">Results review with leadership</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-400">SCHEDULE BY APR 2026</span>
-                      <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                        <Calendar className="w-4 h-4" />
-                        Book Your Session
-                      </span>
-                    </div>
-                  </a>
+              {/* Completed Items */}
+              {needsAttentionItems.filter(item => isComplete(item.id)).length > 0 && (
+                <div className="mt-6 pt-4 border-t border-gray-100">
+                  <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                    Completed ({needsAttentionItems.filter(item => isComplete(item.id)).length})
+                  </div>
+                  <div className="space-y-2">
+                    {needsAttentionItems
+                      .filter(item => isComplete(item.id))
+                      .map(item => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg opacity-60"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
+                              <Check className="w-4 h-4 text-emerald-600" />
+                            </div>
+                            <span className="text-gray-500 line-through">{item.title}</span>
+                          </div>
+                          <button
+                            onClick={() => toggleComplete(item.id)}
+                            className="text-xs text-gray-400 hover:text-gray-600 underline"
+                          >
+                            Undo
+                          </button>
+                        </div>
+                      ))}
+                  </div>
                 </div>
               )}
 
