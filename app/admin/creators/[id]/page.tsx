@@ -611,14 +611,19 @@ function PhaseSection({
 
       {isExpanded && (
         <div className="border-t border-gray-100 divide-y divide-gray-100">
-          {phase.milestones.map((milestone) => (
-            <MilestoneRow
-              key={milestone.id}
-              milestone={milestone}
-              onApprove={() => onApprove(milestone.id, milestone.title)}
-              isApproving={approvingMilestoneId === milestone.id}
-            />
-          ))}
+          {phase.milestones.map((milestone) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            const m = milestone as any;
+            const milestoneTitle = m.title || m.name || m.admin_description || `Milestone`;
+            return (
+              <MilestoneRow
+                key={milestone.id}
+                milestone={milestone}
+                onApprove={() => onApprove(milestone.id, milestoneTitle)}
+                isApproving={approvingMilestoneId === milestone.id}
+              />
+            );
+          })}
         </div>
       )}
     </div>
@@ -642,6 +647,12 @@ function MilestoneRow({
       milestone.status === 'in_progress' ||
       milestone.status === 'waiting_approval');
 
+  // Handle different possible field names for milestone title
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const m = milestone as any;
+  const milestoneTitle = m.title || m.name || m.admin_description || m.creator_description ||
+    `Milestone ${milestone.id.slice(0, 8)}`;
+
   return (
     <div className="px-6 py-4 flex items-center justify-between gap-4">
       <div className="flex items-center gap-3 min-w-0">
@@ -652,7 +663,7 @@ function MilestoneRow({
           <p className={`font-medium truncate ${
             milestone.status === 'locked' ? 'text-gray-400' : 'text-[#1e2749]'
           }`}>
-            {milestone.title}
+            {milestoneTitle}
           </p>
           {milestone.requires_team_action && milestone.status !== 'completed' && (
             <p className="text-xs text-[#ffba06]">Team action required</p>
