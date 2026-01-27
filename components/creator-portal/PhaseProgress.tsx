@@ -91,11 +91,15 @@ function MilestoneItem({
     milestone.status === 'available' || milestone.status === 'in_progress';
   const hasCalendly = milestone.calendly_link && isActionable;
 
+  // Get milestone title (handle both 'title' and 'name' fields from database)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const milestoneTitle = (milestone as any).title || (milestone as any).name || '';
+
   // Check if this is the "Sign Agreement" milestone
   const isAgreementMilestone =
     milestone.phase_id === 'agreement' &&
-    milestone.title.toLowerCase().includes('sign') &&
-    milestone.title.toLowerCase().includes('agreement');
+    milestoneTitle.toLowerCase().includes('sign') &&
+    milestoneTitle.toLowerCase().includes('agreement');
 
   // Check if this milestone is "Waiting on TDI Team"
   const isWaitingOnTdi = milestone.requires_team_action &&
@@ -111,7 +115,7 @@ function MilestoneItem({
   // Special "Waiting on TDI" card style
   if (isWaitingOnTdi) {
     const emailSubject = encodeURIComponent('Checking in on my Creator Portal progress');
-    const emailBody = encodeURIComponent(`Hi Rachel,\n\nI wanted to check in on my progress. I'm currently waiting on: ${milestone.title}\n\nThanks!`);
+    const emailBody = encodeURIComponent(`Hi Rachel,\n\nI wanted to check in on my progress. I'm currently waiting on: ${milestoneTitle}\n\nThanks!`);
 
     return (
       <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
@@ -121,7 +125,7 @@ function MilestoneItem({
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
-              <h4 className="font-medium text-[#1e2749]">{milestone.title}</h4>
+              <h4 className="font-medium text-[#1e2749]">{milestoneTitle}</h4>
               <span className="flex-shrink-0 text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 font-medium">
                 Waiting on TDI
               </span>
@@ -168,7 +172,7 @@ function MilestoneItem({
                 milestone.status === 'locked' ? 'text-gray-500' : 'text-[#1e2749]'
               }`}
             >
-              {milestone.title}
+              {milestoneTitle}
             </h4>
             {milestone.description && (
               <p className="text-sm text-gray-600 mt-1">{milestone.description}</p>
@@ -197,7 +201,7 @@ function MilestoneItem({
               <MilestoneAction
                 milestone={{
                   id: milestone.id,
-                  title: milestone.title,
+                  title: milestoneTitle,
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   action_type: (milestone as any).action_type,
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
