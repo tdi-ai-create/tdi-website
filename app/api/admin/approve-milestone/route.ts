@@ -54,13 +54,12 @@ export async function POST(request: Request) {
     }
     console.log('[approve-milestone] Found milestone:', milestone);
 
-    // 3. Mark milestone as completed
+    // 3. Mark milestone as completed (only update columns that exist)
     const { data: updateData, error: updateError } = await supabase
       .from('creator_milestones')
       .update({
         status: 'completed',
-        completed_at: new Date().toISOString(),
-        completed_by: adminEmail
+        updated_at: new Date().toISOString()
       })
       .eq('creator_id', creatorId)
       .eq('milestone_id', milestoneId)
