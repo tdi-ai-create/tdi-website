@@ -362,6 +362,18 @@ export default function CreatorPortalDemoPage() {
     setTimeout(() => setToast(null), 3000);
   };
 
+  // Reset demo to initial state
+  const handleResetDemo = () => {
+    setCompletedMilestones(initialCompleted);
+    setExpandedPhases(['agreement']);
+    setShowSubmitModal(null);
+    setSubmitLink('');
+    setSubmitNotes('');
+    setToast(null);
+    setConfetti(false);
+    showToast('Demo reset - starting at Agreement phase', 'info');
+  };
+
   // Handle completing a milestone
   const handleComplete = (milestoneId: string, message?: string) => {
     if (completedMilestones.includes(milestoneId)) return;
@@ -723,10 +735,7 @@ export default function CreatorPortalDemoPage() {
 
           <div className="flex items-center gap-4">
             <button
-              onClick={() => {
-                setCompletedMilestones(initialCompleted);
-                showToast('Demo reset to initial state', 'info');
-              }}
+              onClick={handleResetDemo}
               className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
             >
               Reset Demo
@@ -734,7 +743,7 @@ export default function CreatorPortalDemoPage() {
             <button
               onClick={() => {
                 if (expandedPhases.length === allPhaseIds.length) {
-                  setExpandedPhases(['course_design']);
+                  setExpandedPhases(['agreement']);
                 } else {
                   setExpandedPhases(allPhaseIds);
                 }
@@ -929,10 +938,7 @@ export default function CreatorPortalDemoPage() {
                   You&apos;ve completed all milestones in the demo. Your course is ready to launch!
                 </p>
                 <button
-                  onClick={() => {
-                    setCompletedMilestones(initialCompleted);
-                    showToast('Demo reset - try again!', 'info');
-                  }}
+                  onClick={handleResetDemo}
                   className="mt-4 px-6 py-2 bg-white text-green-600 rounded-lg font-medium hover:bg-white/90 transition-colors"
                 >
                   Reset Demo
