@@ -33,7 +33,6 @@ import {
   isAdmin,
   getCreatorDashboardData,
   updateCreator,
-  addNote,
   getCreatorNotes,
 } from '@/lib/creator-portal-data';
 import type {
@@ -235,18 +234,30 @@ export default function AdminCreatorDetailPage() {
 
     setIsAddingNote(true);
     try {
-      await addNote({
-        creator_id: creatorId,
-        note: newNote.trim(),
-        created_by: adminEmail,
-        visible_to_creator: noteVisibleToCreator,
+      const response = await fetch('/api/admin/add-note', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          note: newNote.trim(),
+          createdBy: adminEmail,
+          visibleToCreator: noteVisibleToCreator,
+        }),
       });
 
-      setNewNote('');
-      const notes = await getCreatorNotes(creatorId, true);
-      setAllNotes(notes);
+      const result = await response.json();
+
+      if (result.success) {
+        setNewNote('');
+        const notes = await getCreatorNotes(creatorId, true);
+        setAllNotes(notes);
+      } else {
+        console.error('Error adding note:', result.error);
+        alert('Failed to add note: ' + result.error);
+      }
     } catch (error) {
       console.error('Error adding note:', error);
+      alert('Error adding note. Please try again.');
     } finally {
       setIsAddingNote(false);
     }
