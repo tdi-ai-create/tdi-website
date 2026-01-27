@@ -17,10 +17,13 @@ import {
   HelpCircle,
 } from 'lucide-react';
 import type { PhaseWithMilestones, MilestoneWithStatus, MilestoneStatus } from '@/types/creator-portal';
+import { MilestoneAction } from './MilestoneAction';
 
 interface PhaseProgressProps {
   phases: PhaseWithMilestones[];
+  creatorId?: string;
   onMarkComplete?: (milestoneId: string) => Promise<void>;
+  onRefresh?: () => void;
   isLoading?: boolean;
 }
 
@@ -73,11 +76,15 @@ const waitingOnTdiConfig = {
 
 function MilestoneItem({
   milestone,
+  creatorId,
   onMarkComplete,
+  onRefresh,
   isLoading,
 }: {
   milestone: MilestoneWithStatus;
+  creatorId?: string;
   onMarkComplete?: (milestoneId: string) => Promise<void>;
+  onRefresh?: () => void;
   isLoading?: boolean;
 }) {
   const isActionable =
@@ -182,48 +189,69 @@ function MilestoneItem({
           </span>
         </div>
 
-        {(hasCalendly || canMarkComplete || (isAgreementMilestone && isActionable)) && (
+        {/* Action buttons - use MilestoneAction if creatorId available, otherwise fallback to legacy */}
+        {isActionable && (
           <div className="flex flex-wrap items-center gap-3 mt-3">
-            {hasCalendly && (
-              <a
-                href={milestone.calendly_link!}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm font-medium text-[#80a4ed] hover:text-[#1e2749] transition-colors"
-              >
-                <Calendar className="w-4 h-4" />
-                Book Meeting
-              </a>
-            )}
-            {isAgreementMilestone && isActionable && (
+            {creatorId ? (
+              /* New action system based on action_type */
+              <MilestoneAction
+                milestone={{
+                  id: milestone.id,
+                  title: milestone.title,
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  action_type: (milestone as any).action_type,
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  action_config: (milestone as any).action_config,
+                  status: milestone.status,
+                }}
+                creatorId={creatorId}
+                onComplete={onRefresh || (() => window.location.reload())}
+              />
+            ) : (
+              /* Legacy fallback for backwards compatibility */
               <>
-                <Link
-                  href="/creator-portal/agreement"
-                  className="inline-flex items-center gap-2 text-sm font-medium bg-[#1e2749] text-white px-4 py-2 rounded-lg hover:bg-[#2a3459] transition-colors"
-                >
-                  <FileSignature className="w-4 h-4" />
-                  Review & Sign Agreement
-                </Link>
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/creator-chat"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm font-medium border border-[#1e2749] text-[#1e2749] px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <Calendar className="w-4 h-4" />
-                  Have Questions? Book a Call
-                </a>
+                {hasCalendly && (
+                  <a
+                    href={milestone.calendly_link!}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm font-medium text-[#80a4ed] hover:text-[#1e2749] transition-colors"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Book Meeting
+                  </a>
+                )}
+                {isAgreementMilestone && (
+                  <>
+                    <Link
+                      href="/creator-portal/agreement"
+                      className="inline-flex items-center gap-2 text-sm font-medium bg-[#1e2749] text-white px-4 py-2 rounded-lg hover:bg-[#2a3459] transition-colors"
+                    >
+                      <FileSignature className="w-4 h-4" />
+                      Review & Sign Agreement
+                    </Link>
+                    <a
+                      href="https://calendly.com/rae-teachersdeserveit/creator-chat"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm font-medium border border-[#1e2749] text-[#1e2749] px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Have Questions? Book a Call
+                    </a>
+                  </>
+                )}
+                {canMarkComplete && onMarkComplete && (
+                  <button
+                    onClick={() => onMarkComplete(milestone.id)}
+                    disabled={isLoading}
+                    className="inline-flex items-center gap-2 text-sm font-medium bg-[#1e2749] text-white px-4 py-2 rounded-lg hover:bg-[#2a3459] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    {isLoading ? 'Saving...' : 'Mark Complete'}
+                  </button>
+                )}
               </>
-            )}
-            {canMarkComplete && (
-              <button
-                onClick={() => onMarkComplete(milestone.id)}
-                disabled={isLoading}
-                className="inline-flex items-center gap-2 text-sm font-medium bg-[#1e2749] text-white px-4 py-2 rounded-lg hover:bg-[#2a3459] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                {isLoading ? 'Saving...' : 'Mark Complete'}
-              </button>
             )}
           </div>
         )}
@@ -240,12 +268,16 @@ function MilestoneItem({
 
 function PhaseCard({
   phase,
+  creatorId,
   onMarkComplete,
+  onRefresh,
   isLoading,
   defaultExpanded = false,
 }: {
   phase: PhaseWithMilestones;
+  creatorId?: string;
   onMarkComplete?: (milestoneId: string) => Promise<void>;
+  onRefresh?: () => void;
   isLoading?: boolean;
   defaultExpanded?: boolean;
 }) {
@@ -335,7 +367,9 @@ function PhaseCard({
             <MilestoneItem
               key={milestone.id}
               milestone={milestone}
+              creatorId={creatorId}
               onMarkComplete={onMarkComplete}
+              onRefresh={onRefresh}
               isLoading={isLoading}
             />
           ))}
@@ -347,7 +381,9 @@ function PhaseCard({
 
 export function PhaseProgress({
   phases,
+  creatorId,
   onMarkComplete,
+  onRefresh,
   isLoading,
 }: PhaseProgressProps) {
   return (
@@ -356,7 +392,9 @@ export function PhaseProgress({
         <PhaseCard
           key={phase.id}
           phase={phase}
+          creatorId={creatorId}
           onMarkComplete={onMarkComplete}
+          onRefresh={onRefresh}
           isLoading={isLoading}
           defaultExpanded={phase.isCurrentPhase}
         />

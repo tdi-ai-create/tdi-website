@@ -709,6 +709,18 @@ function MilestoneRow({
                 </Tooltip>
               </div>
             )}
+            {/* Show submission indicator when waiting for approval */}
+            {milestone.status === 'waiting_approval' && (
+              <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <p className="text-sm text-orange-800 font-medium flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4" />
+                  Creator submitted - awaiting your review
+                </p>
+                <p className="text-xs text-orange-600 mt-1">
+                  Click &quot;Approve&quot; to complete this milestone and notify the creator.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 

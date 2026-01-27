@@ -125,6 +125,25 @@ export default function CreatorDashboardPage() {
     router.push('/creator-portal');
   };
 
+  // Refresh dashboard data
+  const refreshDashboard = async () => {
+    if (!userEmail) return;
+    try {
+      const refreshResponse = await fetch('/api/creator-portal/dashboard', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: userEmail }),
+      });
+
+      if (refreshResponse.ok) {
+        const newData = await refreshResponse.json();
+        setDashboardData(newData);
+      }
+    } catch (err) {
+      console.error('Error refreshing dashboard:', err);
+    }
+  };
+
   const handleMarkComplete = async (milestoneId: string) => {
     if (!dashboardData || !userEmail) return;
 
@@ -290,7 +309,9 @@ export default function CreatorDashboardPage() {
             </h2>
             <PhaseProgress
               phases={dashboardData.phases}
+              creatorId={dashboardData.creator.id}
               onMarkComplete={handleMarkComplete}
+              onRefresh={refreshDashboard}
               isLoading={isSaving}
             />
           </div>
