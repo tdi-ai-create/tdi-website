@@ -467,17 +467,25 @@ export default function CreatorPortalDemoPage() {
     switch (milestone.action_type) {
       case 'calendly':
         return (
-          <a
-            href={config.url || 'https://calendly.com/rae-teachersdeserveit/creator-chat'}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => showToast('Opening Calendly...', 'info')}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-all hover:scale-105 active:scale-95"
-          >
-            <Calendar className="w-4 h-4" />
-            {config.label || 'Book Call'}
-            <ExternalLink className="w-3 h-3" />
-          </a>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <a
+              href={config.url || 'https://calendly.com/rae-teachersdeserveit/creator-chat'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-all hover:scale-105 active:scale-95"
+            >
+              <Calendar className="w-4 h-4" />
+              {config.label || 'Book Call'}
+              <ExternalLink className="w-3 h-3" />
+            </a>
+            <button
+              onClick={() => handleComplete(milestone.id, `"${milestone.title}" marked as scheduled!`)}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 transition-all hover:scale-105 active:scale-95"
+            >
+              <CheckCircle className="w-4 h-4" />
+              I&apos;ve Scheduled
+            </button>
+          </div>
         );
 
       case 'submit_link':
@@ -920,16 +928,25 @@ export default function CreatorPortalDemoPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="border border-gray-200 rounded-lg p-4">
                   <p className="text-xs text-gray-500 uppercase tracking-wide mb-3">Book a Call</p>
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/creator-chat"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-all hover:scale-105 active:scale-95"
-                  >
-                    <Calendar className="w-4 h-4" />
-                    Book Call
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
+                  <div className="flex flex-col gap-2">
+                    <a
+                      href="https://calendly.com/rae-teachersdeserveit/creator-chat"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-all hover:scale-105 active:scale-95"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Book Call
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                    <button
+                      onClick={() => showToast("Call scheduled!", 'success')}
+                      className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 transition-all hover:scale-105 active:scale-95"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      I&apos;ve Scheduled
+                    </button>
+                  </div>
                 </div>
 
                 <div className="border border-gray-200 rounded-lg p-4">
