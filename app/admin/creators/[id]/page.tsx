@@ -129,6 +129,9 @@ export default function AdminCreatorDetailPage() {
   // Reopen milestone state
   const [reopeningMilestone, setReopeningMilestone] = useState<string | null>(null);
 
+  // Toggle milestone state (for checkbox clicks)
+  const [togglingMilestone, setTogglingMilestone] = useState<string | null>(null);
+
   const loadData = useCallback(async () => {
     const data = await getCreatorDashboardData(creatorId);
     if (data) {
@@ -330,6 +333,61 @@ export default function AdminCreatorDetailPage() {
     }
   };
 
+  const handleToggleMilestone = async (milestoneId: string, milestoneTitle: string, currentStatus: string) => {
+    // Don't allow toggling locked milestones
+    if (currentStatus === 'locked') {
+      alert('This milestone is locked. Complete previous milestones first.');
+      return;
+    }
+
+    setTogglingMilestone(milestoneId);
+
+    try {
+      if (currentStatus === 'completed') {
+        // Reopen the milestone (quietly, no email)
+        const response = await fetch('/api/admin/reopen-milestone', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            milestoneId,
+            creatorId,
+            adminEmail,
+          }),
+        });
+
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error || 'Failed to reopen');
+
+        await loadData();
+        setSuccessMessage(`Reopened: ${milestoneTitle}`);
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        // Complete the milestone
+        const response = await fetch('/api/admin/approve-milestone', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            milestoneId,
+            creatorId,
+            adminEmail,
+          }),
+        });
+
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error || 'Failed to complete');
+
+        await loadData();
+        setSuccessMessage(`Completed: ${milestoneTitle}`);
+        setTimeout(() => setSuccessMessage(null), 3000);
+      }
+    } catch (error) {
+      console.error('Error toggling milestone:', error);
+      alert('Error updating milestone');
+    } finally {
+      setTogglingMilestone(null);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
@@ -434,7 +492,10 @@ export default function AdminCreatorDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main content - Milestones */}
           <div className="lg:col-span-2 space-y-4">
-            <h2 className="text-xl font-semibold text-[#1e2749]">Milestones</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-[#1e2749]">Milestones</h2>
+              <p className="text-sm text-gray-500">Click checkboxes to mark complete during calls</p>
+            </div>
 
             {/* Success message */}
             {successMessage && (
@@ -453,8 +514,10 @@ export default function AdminCreatorDetailPage() {
                 onApprove={handleApprove}
                 onRequestRevision={handleRequestRevision}
                 onReopen={handleReopen}
+                onToggleMilestone={handleToggleMilestone}
                 approvingMilestoneId={approvingMilestoneId}
                 reopeningMilestone={reopeningMilestone}
+                togglingMilestone={togglingMilestone}
               />
             ))}
           </div>
@@ -748,8 +811,10 @@ function PhaseSection({
   onApprove,
   onRequestRevision,
   onReopen,
+  onToggleMilestone,
   approvingMilestoneId,
   reopeningMilestone,
+  togglingMilestone,
 }: {
   phase: PhaseWithMilestones;
   isExpanded: boolean;
@@ -757,8 +822,10 @@ function PhaseSection({
   onApprove: (milestoneId: string, milestoneTitle: string) => void;
   onRequestRevision: (milestoneId: string, milestoneTitle: string) => void;
   onReopen: (milestoneId: string, milestoneTitle: string) => void;
+  onToggleMilestone: (milestoneId: string, milestoneTitle: string, currentStatus: string) => void;
   approvingMilestoneId: string | null;
   reopeningMilestone: string | null;
+  togglingMilestone: string | null;
 }) {
   const completedCount = phase.milestones.filter((m) => m.status === 'completed').length;
 
@@ -817,8 +884,10 @@ function PhaseSection({
                   onApprove={() => onApprove(milestone.id, milestoneTitle)}
                   onRequestRevision={() => onRequestRevision(milestone.id, milestoneTitle)}
                   onReopen={() => onReopen(milestone.id, milestoneTitle)}
+                  onToggle={() => onToggleMilestone(milestone.id, milestoneTitle, milestone.status)}
                   isApproving={approvingMilestoneId === milestone.id}
                   isReopening={reopeningMilestone === milestone.id}
+                  isToggling={togglingMilestone === milestone.id}
                 />
               );
             })}
@@ -834,18 +903,21 @@ function MilestoneRow({
   onApprove,
   onRequestRevision,
   onReopen,
+  onToggle,
   isApproving,
   isReopening,
+  isToggling,
 }: {
   milestone: MilestoneWithStatus;
   onApprove: () => void;
   onRequestRevision: () => void;
   onReopen: () => void;
+  onToggle: () => void;
   isApproving: boolean;
   isReopening: boolean;
+  isToggling: boolean;
 }) {
   const config = statusConfig[milestone.status];
-  const Icon = config.icon;
   const canApprove =
     milestone.requires_team_action &&
     (milestone.status === 'available' ||
@@ -859,13 +931,35 @@ function MilestoneRow({
   const adminDescription = m.admin_description || m.description || null;
   const creatorDescription = m.creator_description || null;
 
+  const isLocked = milestone.status === 'locked';
+  const isCompleted = milestone.status === 'completed';
+  const isClickable = !isLocked && !isToggling;
+
   return (
     <div className="px-6 py-4">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3 min-w-0 flex-1">
-          <div className={`flex-shrink-0 w-8 h-8 rounded-full ${config.bg} flex items-center justify-center mt-0.5`}>
-            <Icon className={`w-4 h-4 ${config.color}`} />
-          </div>
+          {/* Clickable checkbox */}
+          <button
+            onClick={onToggle}
+            disabled={isLocked || isToggling}
+            className={`flex-shrink-0 mt-0.5 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${
+              isCompleted
+                ? 'bg-green-500 border-green-500 text-white hover:bg-green-600'
+                : isLocked
+                ? 'border-gray-300 bg-gray-100 cursor-not-allowed'
+                : 'border-[#1e2749] hover:bg-gray-100 cursor-pointer'
+            }`}
+            title={isCompleted ? 'Click to reopen' : isLocked ? 'Locked - complete previous steps first' : 'Click to mark complete'}
+          >
+            {isToggling ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : isCompleted ? (
+              <Check className="w-4 h-4" />
+            ) : isLocked ? (
+              <Lock className="w-3 h-3 text-gray-400" />
+            ) : null}
+          </button>
           <div className="min-w-0 flex-1">
             <p className={`font-medium ${
               milestone.status === 'locked' ? 'text-gray-400' : 'text-[#1e2749]'
