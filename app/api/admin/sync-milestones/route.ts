@@ -19,20 +19,20 @@ export async function GET() {
 
     console.log('[sync-milestones] Starting sync...');
 
-    // 1. Delete old Agreement milestones
+    // 1. Delete ALL Agreement milestones (by phase_id to catch any)
     const { error: deleteError } = await supabase
       .from('milestones')
       .delete()
-      .in('id', ['agreement_team_sends', 'agreement_creator_signs', 'agreement_added_to_log']);
+      .eq('phase_id', 'agreement');
 
     if (deleteError) {
       console.log('[sync-milestones] Delete error (may be ok if not found):', deleteError);
     }
 
-    // 2. Insert new simplified Agreement milestone
-    const { error: upsertError } = await supabase
+    // 2. Insert new single Agreement milestone
+    const { error: insertError } = await supabase
       .from('milestones')
-      .upsert({
+      .insert({
         id: 'agreement_sign',
         phase_id: 'agreement',
         name: 'Sign Agreement',
@@ -45,8 +45,27 @@ export async function GET() {
         action_config: { label: 'Sign Agreement' }
       });
 
-    if (upsertError) {
-      console.error('[sync-milestones] Upsert milestone error:', upsertError);
+    if (insertError) {
+      console.log('[sync-milestones] Insert error, trying upsert:', insertError);
+      // Try upsert instead
+      const { error: upsertError } = await supabase
+        .from('milestones')
+        .upsert({
+          id: 'agreement_sign',
+          phase_id: 'agreement',
+          name: 'Sign Agreement',
+          description: 'Digitally sign your creator agreement',
+          creator_description: 'Digitally sign your creator agreement',
+          admin_description: 'Creator signs the Independent Content Creator Agreement',
+          sort_order: 1,
+          requires_team_action: false,
+          action_type: 'sign_agreement',
+          action_config: { label: 'Sign Agreement' }
+        });
+
+      if (upsertError) {
+        console.error('[sync-milestones] Upsert milestone error:', upsertError);
+      }
     }
 
     // 3. Update phases to have correct descriptions
@@ -65,11 +84,11 @@ export async function GET() {
       console.error('[sync-milestones] Upsert phases error:', phasesError);
     }
 
-    // 4. Clean up old milestone references for existing creators
+    // 4. Clean up old milestone references for existing creators (catch any agreement-related)
     const { error: cleanupError } = await supabase
       .from('creator_milestones')
       .delete()
-      .in('milestone_id', ['agreement_team_sends', 'agreement_creator_signs', 'agreement_added_to_log']);
+      .like('milestone_id', 'agreement%');
 
     if (cleanupError) {
       console.log('[sync-milestones] Cleanup error (may be ok if not found):', cleanupError);
@@ -96,8 +115,14 @@ export async function GET() {
       console.log(`[sync-milestones] Updated ${creators.length} creators`);
     }
 
-    // 7. Get current milestones to verify
-    const { data: milestones } = await supabase
+    // 7. Get agreement milestones to verify (should be just one)
+    const { data: agreementMilestones } = await supabase
+      .from('milestones')
+      .select('*')
+      .eq('phase_id', 'agreement');
+
+    // 8. Get all milestones for overview
+    const { data: allMilestones } = await supabase
       .from('milestones')
       .select('id, phase_id, name, sort_order')
       .order('phase_id')
@@ -112,10 +137,11 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      message: 'Milestones synced successfully',
+      message: 'Agreement milestones synced to single step',
       creatorsUpdated: creators?.length || 0,
+      agreementMilestones,
       phases,
-      milestones
+      allMilestones
     });
   } catch (error) {
     console.error('[sync-milestones] Unexpected error:', error);
