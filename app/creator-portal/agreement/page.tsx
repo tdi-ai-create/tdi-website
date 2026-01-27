@@ -4,15 +4,16 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, CheckCircle, FileText, Calendar, Mail } from 'lucide-react';
+import { ArrowLeft, Loader2, CheckCircle, ChevronDown, Calendar, Mail } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function AgreementPage() {
   const router = useRouter();
   const [creatorName, setCreatorName] = useState('');
   const [creatorId, setCreatorId] = useState<string | null>(null);
-  const [isChecked, setIsChecked] = useState(false);
-  const [signedName, setSignedName] = useState('');
+  const [agreed, setAgreed] = useState(false);
+  const [signatureName, setSignatureName] = useState('');
+  const [showFullAgreement, setShowFullAgreement] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSigning, setIsSigning] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -48,7 +49,7 @@ export default function AgreementPage() {
       const data = await response.json();
       setCreatorName(data.creator.name);
       setCreatorId(data.creator.id);
-      setSignedName(data.creator.name);
+      setSignatureName(data.creator.name);
 
       // Check if already signed
       if (data.creator.agreement_signed) {
@@ -62,7 +63,7 @@ export default function AgreementPage() {
   }, [router]);
 
   const handleSign = async () => {
-    if (!isChecked || !signedName.trim() || !creatorId) return;
+    if (!agreed || !signatureName.trim() || !creatorId) return;
 
     setIsSigning(true);
     setError(null);
@@ -73,7 +74,7 @@ export default function AgreementPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           creatorId,
-          signedName: signedName.trim(),
+          signedName: signatureName.trim(),
         }),
       });
 
@@ -102,7 +103,7 @@ export default function AgreementPage() {
     return (
       <div className="min-h-screen bg-[#f5f5f5]">
         <header className="bg-white border-b border-gray-200">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <Link
               href="/creator-portal/dashboard"
               className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-[#1e2749]"
@@ -112,7 +113,7 @@ export default function AgreementPage() {
             </Link>
           </div>
         </header>
-        <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <CheckCircle className="w-8 h-8 text-green-600" />
@@ -136,217 +137,254 @@ export default function AgreementPage() {
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
       {/* Header */}
-      <header className="bg-[#1e2749] text-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Link
             href="/creator-portal/dashboard"
-            className="inline-flex items-center gap-2 text-sm text-white/70 hover:text-white mb-4"
+            className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-[#1e2749]"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Dashboard
           </Link>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 mt-4">
             <Image
               src="/images/logo.webp"
               alt="Teachers Deserve It"
               width={100}
               height={30}
-              className="h-8 w-auto brightness-0 invert"
+              className="h-8 w-auto"
             />
-            <div className="h-6 w-px bg-white/30" />
-            <h1 className="text-xl font-semibold">Independent Content Creator Agreement</h1>
+            <div className="h-6 w-px bg-gray-300" />
+            <span className="text-[#ffba06] font-semibold text-sm uppercase tracking-wide">
+              Creator Agreement
+            </span>
           </div>
         </div>
       </header>
 
-      {/* Agreement Content */}
-      <main className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Warm Intro */}
+      {/* Main Content */}
+      <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Friendly Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 text-[#ffba06] font-medium mb-4">
-            <FileText className="w-5 h-5" />
-            CREATOR AGREEMENT
-          </div>
-          <h1 className="text-3xl font-bold text-[#1e2749] mb-4">
-            Let&apos;s Make It Official
-          </h1>
-          <p className="text-gray-600 max-w-xl mx-auto">
-            This agreement outlines our partnership. Take your time reading through it — and if you have any questions, we&apos;re just a click away.
-          </p>
+          <h1 className="text-3xl font-bold text-[#1e2749] mb-2">Let&apos;s Make It Official</h1>
+          <p className="text-gray-600">Review the highlights below, then scroll down to sign. No scary legal stuff here!</p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          {/* Agreement Text */}
-          <div className="p-6 sm:p-8 prose prose-slate max-w-none">
-            <p className="text-sm text-gray-500 mb-6">
-              <strong>Effective Date:</strong> {today}
-            </p>
+        {/* TLDR / Highlights Section */}
+        <div className="bg-[#fef9eb] border border-[#ffba06] rounded-xl p-6 mb-6">
+          <h2 className="text-xl font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
+            <span className="text-2xl">✨</span> The Quick Version (TLDR)
+          </h2>
 
-            <p>
-              This Independent Content Creator Agreement (&ldquo;Agreement&rdquo;) is made between Teachers Deserve It, LLC (&ldquo;TDI&rdquo;) and you (&ldquo;Creator&rdquo;) as of the date signed below.
-            </p>
+          <div className="space-y-4">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">📹</span>
+              <div>
+                <p className="font-medium text-[#1e2749]">What you&apos;re creating</p>
+                <p className="text-gray-600 text-sm">1-2 hours of video content + 2-6 downloadable resources for ONE course</p>
+              </div>
+            </div>
 
-            <h2 className="text-lg font-semibold text-[#1e2749] mt-8 mb-4">1. What You&apos;re Creating</h2>
-            <p>You agree to develop one original professional learning course for the TDI Learning Hub, including:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>1&ndash;2 hours of pre-recorded video content (broken into 3&ndash;5 minute videos)</li>
-              <li>2&ndash;6 downloadable resources (templates, checklists, guides, etc.)</li>
-              <li>Course title, description, and implementation notes</li>
-            </ul>
-            <p>All content must align with TDI&apos;s mission and be submitted by your agreed-upon target launch date.</p>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">💰</span>
+              <div>
+                <p className="font-medium text-[#1e2749]">How you get paid</p>
+                <p className="text-gray-600 text-sm">30% commission on sales using your personal discount code. Paid quarterly. No upfront fee.</p>
+              </div>
+            </div>
 
-            <h2 className="text-lg font-semibold text-[#1e2749] mt-8 mb-4">2. Timeline</h2>
-            <p>
-              You&apos;ll work with your TDI contact to set a target publish month. If you need more time, just communicate with us&mdash;we&apos;re flexible and want to set you up for success.
-            </p>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">📝</span>
+              <div>
+                <p className="font-medium text-[#1e2749]">Who owns what</p>
+                <p className="text-gray-600 text-sm">TDI owns the course, but you can share it on your resume, portfolio, and social media as a TDI project.</p>
+              </div>
+            </div>
 
-            <h2 className="text-lg font-semibold text-[#1e2749] mt-8 mb-4">3. How You Get Paid</h2>
-            <p>Instead of a flat fee, you&apos;ll earn ongoing commission:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>You&apos;ll receive a custom discount code to share publicly</li>
-              <li>You earn 30% commission on any purchases made with your code (courses or All Access Memberships)</li>
-              <li>Commissions are calculated after discounts, excluding taxes/fees</li>
-              <li>Payouts happen quarterly</li>
-            </ul>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">🤝</span>
+              <div>
+                <p className="font-medium text-[#1e2749]">Support you&apos;ll receive</p>
+                <p className="text-gray-600 text-sm">Access to Creator Studio, templates, light editing support, and Rachel as your dedicated contact.</p>
+              </div>
+            </div>
 
-            <h2 className="text-lg font-semibold text-[#1e2749] mt-8 mb-4">4. Who Owns What</h2>
-            <p>Once submitted, your course materials become the property of Teachers Deserve It, LLC. This means:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>TDI can host, distribute, promote, edit, and adapt the content</li>
-              <li>TDI can use your name, bio, and photo in connection with the course</li>
-              <li>You cannot sell or publish the same course elsewhere</li>
-            </ul>
-            <p className="mt-4">However, you CAN (and should!):</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Celebrate and share your course publicly</li>
-              <li>Add it to your portfolio, resume, and LinkedIn</li>
-              <li>Reference it as a &ldquo;TDI-branded project&rdquo;</li>
-              <li>Share similar strategies in other contexts (speaking, coaching)&mdash;just not the exact course content</li>
-            </ul>
-
-            <h2 className="text-lg font-semibold text-[#1e2749] mt-8 mb-4">5. Support You&apos;ll Receive</h2>
-            <p>TDI provides:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Access to the Creator Studio to track your progress</li>
-              <li>Templates and guidance for course development</li>
-              <li>Light editing and formatting support</li>
-              <li>A dedicated contact (Rachel, Director of Creative Solutions) for questions</li>
-            </ul>
-
-            <h2 className="text-lg font-semibold text-[#1e2749] mt-8 mb-4">6. Good Faith & Communication</h2>
-            <p>We&apos;re building something together. If something isn&apos;t working, let&apos;s talk about it. TDI reserves the right to:</p>
-            <ul className="list-disc pl-6 space-y-2">
-              <li>Delay publishing if content needs more work</li>
-              <li>Update or archive courses that become outdated</li>
-              <li>Pause commissions if discount codes are misused</li>
-            </ul>
-
-            <h2 className="text-lg font-semibold text-[#1e2749] mt-8 mb-4">7. Independent Contractor</h2>
-            <p>
-              You&apos;re an independent contractor, not a TDI employee. You&apos;re responsible for your own taxes and don&apos;t receive employee benefits.
-            </p>
-
-            <h2 className="text-lg font-semibold text-[#1e2749] mt-8 mb-4">8. Confidentiality</h2>
-            <p>
-              Please keep any behind-the-scenes TDI materials confidential. Public TDI content is fine to share.
-            </p>
-
-            {/* Questions Section */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
-              <h3 className="text-lg font-semibold text-[#1e2749] mb-2">Have Questions Before Signing?</h3>
-              <p className="text-gray-600 mb-4">
-                We want you to feel confident about this partnership. If anything is unclear or you&apos;d like to chat through the details, we&apos;re here for you.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/creator-chat"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center px-4 py-2 bg-white border border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <Calendar className="w-4 h-4 mr-2" />
-                  Book a Call with Rae
-                </a>
-                <a
-                  href="mailto:rachel@teachersdeserveit.com?subject=Question about Creator Agreement"
-                  className="inline-flex items-center justify-center px-4 py-2 bg-white border border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <Mail className="w-4 h-4 mr-2" />
-                  Email Rachel
-                </a>
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">📋</span>
+              <div>
+                <p className="font-medium text-[#1e2749]">The fine print</p>
+                <p className="text-gray-600 text-sm">You&apos;re an independent contractor (not an employee). Course stays exclusive to TDI. Standard stuff!</p>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Signature Section */}
-          <div className="border-t border-gray-200 bg-gray-50 p-6 sm:p-8">
-            <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Your Signature</h2>
-            <p className="text-gray-600 mb-6">
-              By signing below, you confirm that you&apos;ve read, understand, and agree to this agreement.
-            </p>
+        {/* Full Agreement (Expandable) */}
+        <div className="bg-white border border-gray-200 rounded-xl mb-6 overflow-hidden">
+          <button
+            onClick={() => setShowFullAgreement(!showFullAgreement)}
+            className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
+          >
+            <span className="font-medium text-[#1e2749] flex items-center gap-2">
+              <span>📄</span> Read Full Agreement
+            </span>
+            <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showFullAgreement ? 'rotate-180' : ''}`} />
+          </button>
 
-            {/* Checkbox */}
-            <label className="flex items-start gap-3 mb-6 cursor-pointer">
+          {showFullAgreement && (
+            <div className="p-6 border-t border-gray-200 prose prose-sm max-w-none">
+              <p className="text-sm text-gray-500 mb-4">
+                <strong>Effective Date:</strong> {today}
+              </p>
+
+              <p className="text-sm text-gray-700">
+                This Independent Content Creator Agreement (&ldquo;Agreement&rdquo;) is made between Teachers Deserve It, LLC (&ldquo;TDI&rdquo;) and you (&ldquo;Creator&rdquo;) as of the date signed below.
+              </p>
+
+              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">1. What You&apos;re Creating</h3>
+              <p className="text-sm text-gray-700">You agree to develop one original professional learning course for the TDI Learning Hub, including:</p>
+              <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
+                <li>1&ndash;2 hours of pre-recorded video content (broken into 3&ndash;5 minute videos)</li>
+                <li>2&ndash;6 downloadable resources (templates, checklists, guides, etc.)</li>
+                <li>Course title, description, and implementation notes</li>
+              </ul>
+              <p className="text-sm text-gray-700">All content must align with TDI&apos;s mission and be submitted by your agreed-upon target launch date.</p>
+
+              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">2. Timeline</h3>
+              <p className="text-sm text-gray-700">
+                You&apos;ll work with your TDI contact to set a target publish month. If you need more time, just communicate with us&mdash;we&apos;re flexible and want to set you up for success.
+              </p>
+
+              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">3. How You Get Paid</h3>
+              <p className="text-sm text-gray-700">Instead of a flat fee, you&apos;ll earn ongoing commission:</p>
+              <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
+                <li>You&apos;ll receive a custom discount code to share publicly</li>
+                <li>You earn 30% commission on any purchases made with your code (courses or All Access Memberships)</li>
+                <li>Commissions are calculated after discounts, excluding taxes/fees</li>
+                <li>Payouts happen quarterly</li>
+              </ul>
+
+              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">4. Who Owns What</h3>
+              <p className="text-sm text-gray-700">Once submitted, your course materials become the property of Teachers Deserve It, LLC. This means:</p>
+              <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
+                <li>TDI can host, distribute, promote, edit, and adapt the content</li>
+                <li>TDI can use your name, bio, and photo in connection with the course</li>
+                <li>You cannot sell or publish the same course elsewhere</li>
+              </ul>
+              <p className="text-sm text-gray-700 mt-2">However, you CAN (and should!):</p>
+              <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
+                <li>Celebrate and share your course publicly</li>
+                <li>Add it to your portfolio, resume, and LinkedIn</li>
+                <li>Reference it as a &ldquo;TDI-branded project&rdquo;</li>
+                <li>Share similar strategies in other contexts (speaking, coaching)&mdash;just not the exact course content</li>
+              </ul>
+
+              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">5. Support You&apos;ll Receive</h3>
+              <p className="text-sm text-gray-700">TDI provides:</p>
+              <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
+                <li>Access to the Creator Studio to track your progress</li>
+                <li>Templates and guidance for course development</li>
+                <li>Light editing and formatting support</li>
+                <li>A dedicated contact (Rachel, Director of Creative Solutions) for questions</li>
+              </ul>
+
+              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">6. Good Faith & Communication</h3>
+              <p className="text-sm text-gray-700">We&apos;re building something together. If something isn&apos;t working, let&apos;s talk about it. TDI reserves the right to:</p>
+              <ul className="list-disc pl-5 space-y-1 text-sm text-gray-700">
+                <li>Delay publishing if content needs more work</li>
+                <li>Update or archive courses that become outdated</li>
+                <li>Pause commissions if discount codes are misused</li>
+              </ul>
+
+              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">7. Independent Contractor</h3>
+              <p className="text-sm text-gray-700">
+                You&apos;re an independent contractor, not a TDI employee. You&apos;re responsible for your own taxes and don&apos;t receive employee benefits.
+              </p>
+
+              <h3 className="text-base font-semibold text-[#1e2749] mt-6 mb-2">8. Confidentiality</h3>
+              <p className="text-sm text-gray-700">
+                Please keep any behind-the-scenes TDI materials confidential. Public TDI content is fine to share.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* Questions Section */}
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
+          <h3 className="font-semibold text-[#1e2749] mb-2">Have Questions?</h3>
+          <p className="text-gray-600 text-sm mb-4">We want you to feel confident. Reach out anytime!</p>
+          <div className="flex flex-wrap gap-3">
+            <a
+              href="https://calendly.com/rae-teachersdeserveit/creator-chat"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 text-sm transition-colors"
+            >
+              <Calendar className="w-4 h-4" />
+              Book a Call with Rae
+            </a>
+            <a
+              href="mailto:rachel@teachersdeserveit.com?subject=Question about Creator Agreement"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 text-sm transition-colors"
+            >
+              <Mail className="w-4 h-4" />
+              Email Rachel
+            </a>
+          </div>
+        </div>
+
+        {/* Signature Section */}
+        <div className="bg-white border-2 border-[#1e2749] rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-[#1e2749] mb-4">Sign Agreement</h3>
+
+          <div className="space-y-4">
+            <label className="flex items-start gap-3 cursor-pointer">
               <input
                 type="checkbox"
-                checked={isChecked}
-                onChange={(e) => setIsChecked(e.target.checked)}
-                className="w-5 h-5 rounded border-gray-300 text-[#1e2749] focus:ring-[#80a4ed] mt-0.5"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                className="mt-1 w-5 h-5 rounded border-gray-300 text-[#1e2749] focus:ring-[#ffba06]"
               />
-              <span className="text-sm text-gray-700">
-                I have read and understand this agreement
-              </span>
+              <span className="text-gray-700">I have read and agree to the Independent Content Creator Agreement</span>
             </label>
 
-            {/* Name Field */}
-            <div className="mb-6">
-              <label htmlFor="signedName" className="block text-sm font-medium text-gray-700 mb-2">
-                Your Full Name
-              </label>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Your Full Name</label>
               <input
                 type="text"
-                id="signedName"
-                value={signedName}
-                onChange={(e) => setSignedName(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
-                placeholder="Enter your full name"
+                value={signatureName}
+                onChange={(e) => setSignatureName(e.target.value)}
+                placeholder="Type your full name"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffba06] focus:border-transparent"
               />
             </div>
 
-            {/* Date */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Date
-              </label>
-              <div className="px-4 py-3 bg-gray-100 border border-gray-200 rounded-lg text-gray-600">
-                {today}
-              </div>
+            <div className="text-sm text-gray-500">
+              Date: {today}
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
                 {error}
               </div>
             )}
 
-            {/* Sign Button */}
             <button
               onClick={handleSign}
-              disabled={!isChecked || !signedName.trim() || isSigning}
-              className={`w-full px-6 py-4 rounded-lg font-semibold text-white transition-all ${
-                isChecked && signedName.trim() && !isSigning
-                  ? 'bg-[#1e2749] hover:bg-[#2a3459]'
-                  : 'bg-gray-300 cursor-not-allowed'
-              }`}
+              disabled={!agreed || !signatureName.trim() || isSigning}
+              className="w-full py-3 bg-[#1e2749] text-white rounded-lg font-medium hover:bg-[#2a3459] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
             >
               {isSigning ? (
-                <span className="flex items-center justify-center gap-2">
+                <>
                   <Loader2 className="w-5 h-5 animate-spin" />
                   Signing...
-                </span>
+                </>
               ) : (
-                'Sign Agreement'
+                <>
+                  <CheckCircle className="w-5 h-5" />
+                  Sign Agreement
+                </>
               )}
             </button>
           </div>
