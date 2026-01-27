@@ -2493,17 +2493,20 @@ export default function AllenwoodDashboard() {
         {activeTab === 'billing' && (
           <div className="space-y-6">
 
-            {/* Thank You Banner */}
+            {/* Section 1: Thank You Banner */}
             <div className="bg-[#1e2749] rounded-xl p-4">
-              <p className="text-white">
-                <span className="font-medium">Thank you for investing in your team.</span>
-                <span className="text-white/80 ml-1">Partnerships like yours help us support 87,000+ educators nationwide.</span>
-              </p>
+              <div className="flex items-center gap-3">
+                <Heart className="w-6 h-6 text-[#ffba06] fill-[#ffba06] flex-shrink-0" />
+                <p className="text-white">
+                  <span className="font-medium">Thank you for investing in your team.</span>
+                  <span className="text-white/80 ml-1">Partnerships like yours help us support 87,000+ educators nationwide.</span>
+                </p>
+              </div>
             </div>
 
-            {/* Status Banner - Overdue */}
+            {/* Section 2: Overdue Status Banner */}
             <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
                     <AlertCircle className="w-5 h-5 text-red-600" />
@@ -2514,7 +2517,7 @@ export default function AllenwoodDashboard() {
                   </div>
                 </div>
                 <a
-                  href="mailto:jevon@secureplusfinancial.com?subject=Payment Resolution - Allenwood Elementary"
+                  href="mailto:jevon@secureplusfinancial.com?subject=Payment Resolution - Allenwood Elementary School"
                   className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
                 >
                   <Mail className="w-4 h-4" />
@@ -2523,7 +2526,7 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Your Agreements */}
+            {/* Section 3: Your Agreements (NO amounts shown) */}
             <div className="bg-white rounded-xl p-5 shadow-sm">
               <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
                 <FileText className="w-5 h-5" />
@@ -2532,44 +2535,35 @@ export default function AllenwoodDashboard() {
 
               <div className="space-y-4">
 
-                {/* Agreement: Partnership Services */}
+                {/* Agreement Card */}
                 <div className="border border-gray-200 rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <div className="font-medium text-[#1e2749]">Partnership Services (IGNITE Phase)</div>
-                      <div className="text-sm text-gray-500">Signed November 2024</div>
+                      <div className="font-medium text-[#1e2749]">Partnership Services</div>
+                      <div className="text-sm text-gray-500">Signed July 3, 2025</div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-semibold text-[#1e2749]">$7,700</div>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
-                        Unpaid
-                      </span>
-                    </div>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                      Unpaid
+                    </span>
                   </div>
-                  <div className="text-sm text-gray-600 mb-2">
-                    Includes: 2 Observation Days, 6 Virtual Sessions, 10 Hub Memberships
+                  <div className="text-sm text-gray-600 mb-3">
+                    Includes: 10 All Access Hub Memberships, 2 Full-Day PD Visits, 6 Virtual Coaching Sessions
                   </div>
                   <a
-                    href="https://my.anchor.sh/agreements"
+                    href="https://my.anchor.sh/notification/ng-notification-LvCb8ZqiOfc-iYOG3HcaPuFzkMef"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-sm text-[#35A7FF] hover:underline"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    View Agreement
+                    View Agreement & Invoice Details
                   </a>
                 </div>
 
               </div>
-
-              {/* Total Outstanding */}
-              <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
-                <span className="font-medium text-gray-600">Total Outstanding</span>
-                <span className="text-xl font-bold text-red-600">$7,700</span>
-              </div>
             </div>
 
-            {/* Impact Callout */}
+            {/* Section 4: Impact Callout */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
               <div className="flex items-center gap-3">
                 <Sparkles className="w-5 h-5 text-amber-600 flex-shrink-0" />
@@ -2579,7 +2573,7 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Payment Policy */}
+            {/* Section 5: Payment Policy */}
             <div className="bg-white rounded-xl p-5 shadow-sm">
               <button
                 onClick={() => setShowPolicy(!showPolicy)}
@@ -2601,7 +2595,7 @@ export default function AllenwoodDashboard() {
               )}
             </div>
 
-            {/* Questions? Contact Cards */}
+            {/* Section 6: Questions + Testimonial */}
             <div className="bg-white rounded-xl p-5 shadow-sm">
               <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
                 <HelpCircle className="w-5 h-5" />
@@ -2609,14 +2603,12 @@ export default function AllenwoodDashboard() {
               </h3>
 
               <div className="grid md:grid-cols-2 gap-4">
-
-                {/* Billing Contact */}
                 <div className="border border-gray-200 rounded-lg p-4">
                   <div className="text-sm text-gray-500 mb-1">Billing & Payment Questions</div>
                   <div className="font-medium text-[#1e2749]">Jevon Suralie</div>
                   <div className="text-sm text-gray-600 mb-3">Secure Plus Financial</div>
                   <a
-                    href="mailto:jevon@secureplusfinancial.com?subject=Billing Question - Allenwood Elementary"
+                    href="mailto:jevon@secureplusfinancial.com?subject=Billing Question - Allenwood Elementary School"
                     className="inline-flex items-center gap-2 bg-[#1e2749] hover:bg-[#2a3a5c] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                   >
                     <Mail className="w-4 h-4" />
@@ -2624,13 +2616,12 @@ export default function AllenwoodDashboard() {
                   </a>
                 </div>
 
-                {/* Fulfillment Contact */}
                 <div className="border border-gray-200 rounded-lg p-4">
                   <div className="text-sm text-gray-500 mb-1">Contract & Fulfillment Questions</div>
                   <div className="font-medium text-[#1e2749]">Rae Hughart</div>
                   <div className="text-sm text-gray-600 mb-3">Teachers Deserve It</div>
                   <a
-                    href="mailto:rae@teachersdeserveit.com?subject=Partnership Question - Allenwood Elementary"
+                    href="mailto:rae@teachersdeserveit.com?subject=Partnership Question - Allenwood Elementary School"
                     className="inline-flex items-center gap-2 bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                   >
                     <Mail className="w-4 h-4" />
@@ -2640,10 +2631,9 @@ export default function AllenwoodDashboard() {
 
               </div>
 
-              {/* Testimonial */}
               <div className="mt-6 pt-5 border-t border-gray-100">
                 <p className="text-gray-600 italic">
-                  &quot;TDI changed the way our teachers approach their day. The strategies actually stick.&quot;
+                  &quot;The implementation support makes all the difference.&quot;
                 </p>
                 <p className="text-sm text-gray-400 mt-1">— Partner School Administrator</p>
               </div>
