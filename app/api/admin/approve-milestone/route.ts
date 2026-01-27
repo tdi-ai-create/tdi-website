@@ -56,7 +56,7 @@ export async function POST(request: Request) {
         .gt('sort_order', milestone.sort_order)
         .order('sort_order', { ascending: true })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (nextMilestone) {
         await supabase
