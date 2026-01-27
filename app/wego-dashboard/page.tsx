@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import {
@@ -49,6 +49,46 @@ export default function WegoDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [showAllLoveNotes, setShowAllLoveNotes] = useState(false);
   const [showPolicy, setShowPolicy] = useState(false);
+
+  // Needs Attention completion state
+  const [completedItems, setCompletedItems] = useState<string[]>([]);
+
+  // Load completed items from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('wego-completed-items');
+    if (saved) {
+      setCompletedItems(JSON.parse(saved));
+    }
+  }, []);
+
+  // Save to localStorage when completedItems changes
+  useEffect(() => {
+    localStorage.setItem('wego-completed-items', JSON.stringify(completedItems));
+  }, [completedItems]);
+
+  // Toggle completion
+  const toggleComplete = (itemId: string) => {
+    setCompletedItems(prev =>
+      prev.includes(itemId)
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  // Check if item is complete
+  const isComplete = (itemId: string) => completedItems.includes(itemId);
+
+  // Needs Attention items
+  const needsAttentionItems = [
+    {
+      id: 'year1-celebration',
+      title: 'Year 1 Celebration + Year 2 Planning',
+      description: 'Review wins, insights, and plan your next chapter',
+      deadline: 'APRIL 2026',
+      actionLabel: 'Schedule Your Session',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone',
+    },
+  ];
 
   // Scroll to top when changing tabs
   const handleTabChange = (tabId: string) => {
@@ -408,39 +448,89 @@ export default function WegoDashboard() {
                   <AlertCircle className="w-5 h-5 text-[#E07A5F]" />
                   <span className="font-semibold text-[#1e2749] uppercase tracking-wide">Needs Attention</span>
                 </div>
-                <span className="text-sm text-green-600 font-medium flex items-center gap-1">
-                  <CheckCircle className="w-4 h-4" />
-                  You&apos;re in great shape! Only 1 priority item remaining.
+                <span className="text-sm text-orange-500 bg-orange-50 px-2 py-1 rounded-full">
+                  {needsAttentionItems.filter(item => !isComplete(item.id)).length} items
                 </span>
               </div>
 
-              {/* Priority Item */}
-              <div className="mb-4">
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Priority</div>
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#E07A5F] bg-[#E07A5F]/5 hover:bg-[#E07A5F]/10 transition-colors group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Briefcase className="w-5 h-5 text-[#E07A5F]" />
-                    </div>
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Year 1 Celebration + Year 2 Planning</div>
-                      <p className="text-sm text-gray-500">Review wins, insights, and plan your next chapter</p>
-                    </div>
+              {/* Active Items */}
+              {needsAttentionItems.filter(item => !isComplete(item.id)).length > 0 && (
+                <div className="mb-4">
+                  <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Priority</div>
+                  <div className="space-y-3">
+                    {needsAttentionItems
+                      .filter(item => !isComplete(item.id))
+                      .map(item => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#E07A5F] bg-[#E07A5F]/5"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Briefcase className="w-5 h-5 text-[#E07A5F]" />
+                            </div>
+                            <div>
+                              <div className="font-medium text-[#1e2749]">{item.title}</div>
+                              <p className="text-sm text-gray-500">{item.description}</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 ml-4">
+                            <span className="text-xs text-gray-400 hidden sm:block">DUE BY {item.deadline}</span>
+                            <a
+                              href={item.actionUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 hover:bg-[#2d3a5c] transition-colors"
+                            >
+                              <Calendar className="w-4 h-4" />
+                              {item.actionLabel}
+                            </a>
+                            <button
+                              onClick={() => toggleComplete(item.id)}
+                              className="px-3 py-2 bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-700 text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
+                              title="Mark as complete"
+                            >
+                              <Check className="w-4 h-4" />
+                              Done
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-400">SCHEDULE BY APR 2026</span>
-                    <span className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 group-hover:bg-[#2d3a5c] transition-colors">
-                      <Calendar className="w-4 h-4" />
-                      Schedule Your Session
-                    </span>
+                </div>
+              )}
+
+              {/* Completed Needs Attention Items */}
+              {needsAttentionItems.filter(item => isComplete(item.id)).length > 0 && (
+                <div className="mb-4 pt-4 border-t border-gray-100">
+                  <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                    Completed Tasks ({needsAttentionItems.filter(item => isComplete(item.id)).length})
                   </div>
-                </a>
-              </div>
+                  <div className="space-y-2">
+                    {needsAttentionItems
+                      .filter(item => isComplete(item.id))
+                      .map(item => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg opacity-60"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
+                              <Check className="w-4 h-4 text-emerald-600" />
+                            </div>
+                            <span className="text-gray-500 line-through">{item.title}</span>
+                          </div>
+                          <button
+                            onClick={() => toggleComplete(item.id)}
+                            className="text-xs text-gray-400 hover:text-gray-600 underline"
+                          >
+                            Undo
+                          </button>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
 
               {/* Scheduled Items */}
               <div>

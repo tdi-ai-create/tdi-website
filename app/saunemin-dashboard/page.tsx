@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import {
   Calendar,
@@ -67,6 +67,71 @@ export default function SauneminDashboard() {
   const [showPhase2Preview, setShowPhase2Preview] = useState(false);
   const [showPhase3Preview, setShowPhase3Preview] = useState(false);
   const [showPolicy, setShowPolicy] = useState(false);
+
+  // Needs Attention completion state
+  const [completedItems, setCompletedItems] = useState<string[]>([]);
+
+  // Load completed items from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('saunemin-completed-items');
+    if (saved) {
+      setCompletedItems(JSON.parse(saved));
+    }
+  }, []);
+
+  // Save to localStorage when completedItems changes
+  useEffect(() => {
+    localStorage.setItem('saunemin-completed-items', JSON.stringify(completedItems));
+  }, [completedItems]);
+
+  // Toggle completion
+  const toggleComplete = (itemId: string) => {
+    setCompletedItems(prev =>
+      prev.includes(itemId)
+        ? prev.filter(id => id !== itemId)
+        : [...prev, itemId]
+    );
+  };
+
+  // Check if item is complete
+  const isComplete = (itemId: string) => completedItems.includes(itemId);
+
+  // Needs Attention items
+  const needsAttentionItems = [
+    {
+      id: 'observation-day-2',
+      title: 'Second On-Site Observation Day',
+      description: 'Included in contract',
+      deadline: 'MARCH 2026',
+      deadlineMonth: 3,
+      deadlineYear: 2026,
+      actionLabel: 'Schedule',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone',
+      icon: 'calendar',
+    },
+    {
+      id: 'spring-leadership',
+      title: 'Spring Leadership Meeting with Gary & Michael',
+      description: 'Courtesy session',
+      deadline: 'MARCH 2026',
+      deadlineMonth: 3,
+      deadlineYear: 2026,
+      actionLabel: 'Schedule',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      icon: 'calendar',
+    },
+    {
+      id: 'baseline-data',
+      title: 'Collect Baseline Data for Leading Indicators',
+      description: 'Survey or in-person collection',
+      deadline: 'MARCH 2026',
+      deadlineMonth: 3,
+      deadlineYear: 2026,
+      actionLabel: 'Email Preference',
+      actionUrl: 'mailto:rae@teachersdeserveit.com?subject=Baseline Data Collection - Saunemin&body=Hi Rae,%0D%0A%0D%0AWe would like to set up baseline data collection for our team.',
+      icon: 'clipboard',
+    },
+  ];
 
   // Accordion state for collapsible sections
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -600,114 +665,109 @@ export default function SauneminDashboard() {
 
             {/* Next Steps Together Section */}
             <div id="next-steps-section" className="bg-[#38618C]/5 border border-[#38618C]/20 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <Calendar className="w-5 h-5 text-[#38618C]" />
-                <span className="font-semibold text-[#1e2749]">Next Steps Together</span>
-                <span className="text-xs bg-[#E07A5F]/10 text-[#E07A5F] px-2 py-0.5 rounded-full ml-2">3 items</span>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-[#38618C]" />
+                  <span className="font-semibold text-[#1e2749]">Next Steps Together</span>
+                </div>
+                <span className="text-sm text-[#E07A5F] bg-white px-2 py-1 rounded-full">
+                  {needsAttentionItems.filter(item => !isComplete(item.id)).length} items
+                </span>
               </div>
 
+              {/* Active Items */}
               <div className="space-y-3">
-                {/* Item 1: Second On-Site Day */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`rounded-lg p-4 flex items-center justify-between hover:shadow-md border transition-all cursor-pointer block ${
-                    isOverdue(dueDates.day2Observation.month, dueDates.day2Observation.year)
-                      ? 'border-red-500 bg-red-50'
-                      : 'bg-white border-transparent hover:border-[#35A7FF]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Calendar className={`w-5 h-5 ${
-                      isOverdue(dueDates.day2Observation.month, dueDates.day2Observation.year)
-                        ? 'text-red-700'
-                        : 'text-[#E07A5F]'
-                    }`} />
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Second On-Site Observation Day</div>
-                      <div className="text-sm text-gray-500">
-                        Included in contract ·{' '}
-                        {isOverdue(dueDates.day2Observation.month, dueDates.day2Observation.year) ? (
-                          <span className="text-red-700 font-bold">OVERDUE</span>
+                {needsAttentionItems
+                  .filter(item => !isComplete(item.id))
+                  .map(item => (
+                    <div
+                      key={item.id}
+                      className={`rounded-lg p-4 flex items-center justify-between border transition-all ${
+                        isOverdue(item.deadlineMonth, item.deadlineYear)
+                          ? 'border-red-500 bg-red-50'
+                          : 'bg-white border-gray-100'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {item.icon === 'clipboard' ? (
+                          <ClipboardList className={`w-5 h-5 ${
+                            isOverdue(item.deadlineMonth, item.deadlineYear) ? 'text-red-700' : 'text-[#E07A5F]'
+                          }`} />
                         ) : (
-                          <span className="text-[#E07A5F] font-medium">SCHEDULE BY MARCH 2026</span>
+                          <Calendar className={`w-5 h-5 ${
+                            isOverdue(item.deadlineMonth, item.deadlineYear) ? 'text-red-700' : 'text-[#E07A5F]'
+                          }`} />
                         )}
+                        <div>
+                          <div className="font-medium text-[#1e2749]">{item.title}</div>
+                          <div className="text-sm text-gray-500">
+                            {item.description} ·{' '}
+                            {isOverdue(item.deadlineMonth, item.deadlineYear) ? (
+                              <span className="text-red-700 font-bold">OVERDUE</span>
+                            ) : (
+                              <span className="text-[#E07A5F] font-medium">DUE BY {item.deadline}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 ml-4">
+                        <a
+                          href={item.actionUrl}
+                          target={item.actionUrl.startsWith('mailto:') ? undefined : '_blank'}
+                          rel={item.actionUrl.startsWith('mailto:') ? undefined : 'noopener noreferrer'}
+                          className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 ${
+                            isOverdue(item.deadlineMonth, item.deadlineYear)
+                              ? 'bg-red-700 text-white'
+                              : 'bg-[#35A7FF] text-white'
+                          }`}
+                        >
+                          {item.icon === 'clipboard' ? <Mail className="w-4 h-4" /> : <Calendar className="w-4 h-4" />}
+                          {item.actionLabel}
+                        </a>
+                        <button
+                          onClick={() => toggleComplete(item.id)}
+                          className="px-3 py-2 bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-700 text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
+                          title="Mark as complete"
+                        >
+                          <Check className="w-4 h-4" />
+                          Done
+                        </button>
                       </div>
                     </div>
-                  </div>
-                  <span className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 ${
-                    isOverdue(dueDates.day2Observation.month, dueDates.day2Observation.year)
-                      ? 'bg-red-700 text-white'
-                      : 'bg-[#35A7FF] text-white'
-                  }`}>
-                    <Calendar className="w-4 h-4" />
-                    Schedule
-                  </span>
-                </a>
-
-                {/* Item 2: Spring Leadership Meeting */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`rounded-lg p-4 flex items-center justify-between hover:shadow-md border transition-all cursor-pointer block ${
-                    isOverdue(dueDates.springMeeting.month, dueDates.springMeeting.year)
-                      ? 'border-red-500 bg-red-50'
-                      : 'bg-white border-transparent hover:border-[#35A7FF]'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <Calendar className={`w-5 h-5 ${
-                      isOverdue(dueDates.springMeeting.month, dueDates.springMeeting.year)
-                        ? 'text-red-700'
-                        : 'text-[#E07A5F]'
-                    }`} />
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Spring Leadership Meeting with Gary & Michael</div>
-                      <div className="text-sm text-gray-500">
-                        Courtesy session ·{' '}
-                        {isOverdue(dueDates.springMeeting.month, dueDates.springMeeting.year) ? (
-                          <span className="text-red-700 font-bold">OVERDUE</span>
-                        ) : (
-                          <span className="text-[#E07A5F] font-medium">SCHEDULE BY MARCH 2026</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <span className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 ${
-                    isOverdue(dueDates.springMeeting.month, dueDates.springMeeting.year)
-                      ? 'bg-red-700 text-white'
-                      : 'bg-[#35A7FF] text-white'
-                  }`}>
-                    <Calendar className="w-4 h-4" />
-                    Schedule
-                  </span>
-                </a>
-
-                {/* Item 3: Baseline Data Collection */}
-                <a
-                  href="mailto:rae@teachersdeserveit.com?subject=Baseline Data Collection - Saunemin&body=Hi Rae,%0D%0A%0D%0AWe'd like to set up baseline data collection for our team. Please let us know the options:%0D%0A%0D%0A[ ] Send us the survey template to use during a staff meeting%0D%0A[ ] Collect data in person during our next on-site visit%0D%0A%0D%0AThanks!"
-                  className="rounded-lg p-4 flex items-center justify-between hover:shadow-md border bg-white border-transparent hover:border-[#35A7FF] transition-all cursor-pointer block"
-                >
-                  <div className="flex items-center gap-3">
-                    <ClipboardList className="w-5 h-5 text-[#E07A5F]" />
-                    <div>
-                      <div className="font-medium text-[#1e2749]">Collect Baseline Data for Leading Indicators</div>
-                      <div className="text-sm text-gray-500">
-                        Survey or in-person collection · <span className="text-[#E07A5F] font-medium">SCHEDULE BY MARCH 2026</span>
-                      </div>
-                      <div className="text-xs text-gray-400 mt-1">
-                        Choose: digital survey during staff meeting or in-person during next visit
-                      </div>
-                    </div>
-                  </div>
-                  <span className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2">
-                    <Mail className="w-4 h-4" />
-                    Email Preference
-                  </span>
-                </a>
+                  ))}
               </div>
+
+              {/* Completed Items */}
+              {needsAttentionItems.filter(item => isComplete(item.id)).length > 0 && (
+                <div className="mt-6 pt-4 border-t border-[#38618C]/20">
+                  <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                    Completed ({needsAttentionItems.filter(item => isComplete(item.id)).length})
+                  </div>
+                  <div className="space-y-2">
+                    {needsAttentionItems
+                      .filter(item => isComplete(item.id))
+                      .map(item => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between p-3 bg-white/50 rounded-lg opacity-60"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
+                              <Check className="w-4 h-4 text-emerald-600" />
+                            </div>
+                            <span className="text-gray-500 line-through">{item.title}</span>
+                          </div>
+                          <button
+                            onClick={() => toggleComplete(item.id)}
+                            className="text-xs text-gray-400 hover:text-gray-600 underline"
+                          >
+                            Undo
+                          </button>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Hub Time Recommendation */}
