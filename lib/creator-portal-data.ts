@@ -416,6 +416,23 @@ export async function getCreatorDashboardData(
   // Get visible notes
   const notes = await getCreatorNotes(creatorId, false);
 
+  // Get content path from creator
+  const contentPath = (creator.content_path as 'blog' | 'download' | 'course' | null) || null;
+
+  // Helper to check if milestone applies to content path
+  const milestoneAppliesTo = (milestone: { applies_to?: string[] | null }) => {
+    if (!contentPath) {
+      if (!milestone.applies_to) return true;
+      return milestone.applies_to.includes('blog') &&
+             milestone.applies_to.includes('download') &&
+             milestone.applies_to.includes('course');
+    }
+    if (!milestone.applies_to || milestone.applies_to.length === 0) {
+      return contentPath === 'course';
+    }
+    return milestone.applies_to.includes(contentPath);
+  };
+
   // Build phases with milestones
   const phasesWithMilestones: PhaseWithMilestones[] = phases.map((phase) => {
     const phaseMilestones = milestones.filter((m) => m.phase_id === phase.id);
@@ -425,32 +442,41 @@ export async function getCreatorDashboardData(
         const progress = creatorMilestones.find(
           (cm) => cm.milestone_id === milestone.id
         );
+        const isApplicable = milestoneAppliesTo(milestone);
         return {
           ...milestone,
           status: (progress?.status || 'locked') as MilestoneStatus,
           completed_at: progress?.completed_at || null,
           progress_id: progress?.id || null,
+          metadata: progress?.metadata || null,
+          isApplicable,
         };
       }
     );
 
-    const isComplete = milestonesWithStatus.every(
+    const applicableMilestones = milestonesWithStatus.filter(m => m.isApplicable);
+    const isComplete = applicableMilestones.length > 0 && applicableMilestones.every(
       (m) => m.status === 'completed'
     );
     const isCurrentPhase = phase.id === creator.current_phase;
+    const isSkipped = applicableMilestones.length === 0;
 
     return {
       ...phase,
       milestones: milestonesWithStatus,
       isComplete,
       isCurrentPhase,
+      isSkipped,
+      applicableMilestoneCount: applicableMilestones.length,
     };
   });
 
-  // Calculate progress
-  const totalMilestones = milestones.length;
+  // Calculate progress based only on applicable milestones
+  const applicableMilestones = milestones.filter(m => milestoneAppliesTo(m));
+  const applicableMilestoneIds = new Set(applicableMilestones.map(m => m.id));
+  const totalMilestones = applicableMilestones.length;
   const completedMilestones = creatorMilestones.filter(
-    (cm) => cm.status === 'completed'
+    (cm) => cm.status === 'completed' && applicableMilestoneIds.has(cm.milestone_id)
   ).length;
   const progressPercentage =
     totalMilestones > 0
@@ -464,6 +490,7 @@ export async function getCreatorDashboardData(
     totalMilestones,
     completedMilestones,
     progressPercentage,
+    contentPath,
   };
 }
 

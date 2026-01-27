@@ -1,6 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+// Helper to check if a milestone applies to a content path
+function milestoneAppliesTo(milestone: { applies_to?: string[] | null }, contentPath: string | null): boolean {
+  // If path not yet selected, only show intake and path selection milestones
+  if (!contentPath) {
+    if (milestone.applies_to === null) return true;
+    if (!milestone.applies_to) return true;
+    return milestone.applies_to.includes('blog') &&
+           milestone.applies_to.includes('download') &&
+           milestone.applies_to.includes('course');
+  }
+
+  // If applies_to is null or empty, default to course only (backwards compatibility)
+  if (!milestone.applies_to || milestone.applies_to.length === 0) {
+    return contentPath === 'course';
+  }
+
+  return milestone.applies_to.includes(contentPath);
+}
+
 export async function POST(request: NextRequest) {
   console.log('[dashboard-api] Called');
 
@@ -51,6 +70,8 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({ error: 'Creator not found' }, { status: 404 });
     }
+
+    const contentPath = creator.content_path as string | null;
 
     // Get all phases
     const { data: phases, error: phasesError } = await supabase
@@ -121,23 +142,40 @@ export async function POST(request: NextRequest) {
       .eq('visible_to_creator', true)
       .order('created_at', { ascending: false });
 
+    // Filter milestones based on content path
+    const applicableMilestones = milestones.filter(m => milestoneAppliesTo(m, contentPath));
+    const applicableMilestoneIds = new Set(applicableMilestones.map(m => m.id));
+
     // Build phases with milestones
     const phasesWithMilestones = phases.map((phase) => {
       const phaseMilestones = milestones.filter((m) => m.phase_id === phase.id);
+      const applicablePhaseMilestones = phaseMilestones.filter(m => milestoneAppliesTo(m, contentPath));
 
       const milestonesWithStatus = phaseMilestones.map((milestone) => {
         const progress = (creatorMilestones || []).find(
           (cm) => cm.milestone_id === milestone.id
         );
+        const isApplicable = milestoneAppliesTo(milestone, contentPath);
+
         return {
           ...milestone,
           status: progress?.status || 'locked',
           completed_at: progress?.completed_at || null,
           progress_id: progress?.id || null,
+          metadata: progress?.metadata || null,
+          isApplicable,
         };
       });
 
-      const isComplete = milestonesWithStatus.every((m) => m.status === 'completed');
+      // Phase is complete if all applicable milestones are completed
+      const isComplete = applicablePhaseMilestones.length > 0 &&
+        applicablePhaseMilestones.every((m) => {
+          const progress = (creatorMilestones || []).find(cm => cm.milestone_id === m.id);
+          return progress?.status === 'completed';
+        });
+
+      // Phase is skipped if no milestones apply to this content path
+      const isSkipped = applicablePhaseMilestones.length === 0;
       const isCurrentPhase = phase.id === creator.current_phase;
 
       return {
@@ -145,13 +183,15 @@ export async function POST(request: NextRequest) {
         milestones: milestonesWithStatus,
         isComplete,
         isCurrentPhase,
+        isSkipped,
+        applicableMilestoneCount: applicablePhaseMilestones.length,
       };
     });
 
-    // Calculate progress
-    const totalMilestones = milestones.length;
+    // Calculate progress based only on applicable milestones
+    const totalMilestones = applicableMilestones.length;
     const completedMilestones = (creatorMilestones || []).filter(
-      (cm) => cm.status === 'completed'
+      (cm) => cm.status === 'completed' && applicableMilestoneIds.has(cm.milestone_id)
     ).length;
     const progressPercentage =
       totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0;
@@ -163,6 +203,7 @@ export async function POST(request: NextRequest) {
       totalMilestones,
       completedMilestones,
       progressPercentage,
+      contentPath,
     };
 
     console.log('[dashboard-api] Success, returning data');

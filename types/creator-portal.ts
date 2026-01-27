@@ -33,8 +33,14 @@ export interface Milestone {
   sort_order: number;
   requires_team_action: boolean;
   calendly_link: string | null;
+  applies_to: string[] | null;
+  action_type: string | null;
+  action_config: Record<string, unknown> | null;
   created_at: string;
 }
+
+// Content path types
+export type ContentPath = 'blog' | 'download' | 'course';
 
 // Creator from database
 export interface Creator {
@@ -46,6 +52,7 @@ export interface Creator {
   target_launch_month: string | null;
   discount_code: string | null;
   current_phase: PhaseId;
+  content_path: ContentPath | null;
   agreement_signed: boolean;
   agreement_signed_at: string | null;
   agreement_signed_name: string | null;
@@ -71,6 +78,7 @@ export interface CreatorMilestone {
   completed_at: string | null;
   completed_by: string | null;
   notes: string | null;
+  metadata: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
 }
@@ -100,6 +108,8 @@ export interface MilestoneWithStatus extends Milestone {
   status: MilestoneStatus;
   completed_at: string | null;
   progress_id: string | null;
+  metadata: Record<string, unknown> | null;
+  isApplicable: boolean;
 }
 
 // Phase with milestones for display
@@ -107,6 +117,8 @@ export interface PhaseWithMilestones extends Phase {
   milestones: MilestoneWithStatus[];
   isComplete: boolean;
   isCurrentPhase: boolean;
+  isSkipped: boolean;
+  applicableMilestoneCount: number;
 }
 
 // Creator dashboard data
@@ -117,6 +129,7 @@ export interface CreatorDashboardData {
   totalMilestones: number;
   completedMilestones: number;
   progressPercentage: number;
+  contentPath: ContentPath | null;
 }
 
 // Admin creator list item

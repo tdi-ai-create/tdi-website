@@ -28,6 +28,7 @@ interface PhaseProgressProps {
   isAdminPreview?: boolean;
   teamNotes?: string;
   creatorName?: string;
+  contentPath?: string | null;
   creator?: {
     google_doc_link?: string | null;
     drive_folder_link?: string | null;
@@ -36,6 +37,7 @@ interface PhaseProgressProps {
     discount_code?: string | null;
     wants_video_editing?: boolean;
     wants_download_design?: boolean;
+    content_path?: string | null;
   };
 }
 
@@ -115,6 +117,7 @@ function MilestoneItem({
     discount_code?: string | null;
     wants_video_editing?: boolean;
     wants_download_design?: boolean;
+    content_path?: string | null;
   };
 }) {
   const isActionable =
@@ -327,6 +330,7 @@ function PhaseCard({
   isAdminPreview = false,
   teamNotes,
   creatorName,
+  contentPath,
   creator,
 }: {
   phase: PhaseWithMilestones;
@@ -339,6 +343,7 @@ function PhaseCard({
   isAdminPreview?: boolean;
   teamNotes?: string;
   creatorName?: string;
+  contentPath?: string | null;
   creator?: {
     google_doc_link?: string | null;
     drive_folder_link?: string | null;
@@ -347,14 +352,60 @@ function PhaseCard({
     discount_code?: string | null;
     wants_video_editing?: boolean;
     wants_download_design?: boolean;
+    content_path?: string | null;
   };
 }) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
-  const completedCount = phase.milestones.filter(
+
+  // Filter milestones to only show applicable ones
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const applicableMilestones = phase.milestones.filter((m: any) => m.isApplicable !== false);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isSkipped = (phase as any).isSkipped || applicableMilestones.length === 0;
+
+  const completedCount = applicableMilestones.filter(
     (m) => m.status === 'completed'
   ).length;
-  const totalCount = phase.milestones.length;
+  const totalCount = applicableMilestones.length;
   const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
+
+  // Get content path label for skipped message
+  const getPathLabel = (path: string | null | undefined) => {
+    switch (path) {
+      case 'blog': return 'Blog';
+      case 'download': return 'Download';
+      case 'course': return 'Course';
+      default: return 'your';
+    }
+  };
+
+  // Render skipped phase
+  if (isSkipped && contentPath) {
+    return (
+      <div className="rounded-xl border-2 border-gray-200 border-dashed overflow-hidden bg-gray-50/50 opacity-60">
+        <div className="px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-200">
+              <span className="text-gray-400 font-semibold text-sm">
+                {phase.sort_order + 1}
+              </span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold text-gray-400">{phase.name}</h3>
+                <span className="text-xs bg-gray-200 text-gray-500 px-2 py-0.5 rounded-full font-medium">
+                  Not Required
+                </span>
+              </div>
+              <p className="text-sm text-gray-400">
+                Not required for {getPathLabel(contentPath)} path
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -441,7 +492,7 @@ function PhaseCard({
 
       {isExpanded && (
         <div className={`p-4 space-y-3 ${isActionPhase ? 'bg-[#fef9eb]' : 'bg-white'}`}>
-          {phase.milestones.map((milestone) => (
+          {applicableMilestones.map((milestone) => (
             <MilestoneItem
               key={milestone.id}
               milestone={milestone}
@@ -471,14 +522,22 @@ export function PhaseProgress({
   isAdminPreview = false,
   teamNotes,
   creatorName,
+  contentPath,
   creator,
 }: PhaseProgressProps) {
-  // Find the FIRST phase that has a current actionable milestone (not team action)
-  const firstActionPhaseId = phases.find((phase) =>
-    phase.milestones.some(
+  // Find the FIRST non-skipped phase that has a current actionable milestone (not team action)
+  const firstActionPhaseId = phases.find((phase) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const isSkipped = (phase as any).isSkipped;
+    if (isSkipped) return false;
+
+    // Filter to applicable milestones
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const applicableMilestones = phase.milestones.filter((m: any) => m.isApplicable !== false);
+    return applicableMilestones.some(
       (m) => (m.status === 'available' || m.status === 'in_progress') && !m.requires_team_action
-    )
-  )?.id;
+    );
+  })?.id;
 
   return (
     <div className="space-y-4">
@@ -495,6 +554,7 @@ export function PhaseProgress({
           isAdminPreview={isAdminPreview}
           teamNotes={teamNotes}
           creatorName={creatorName}
+          contentPath={contentPath}
           creator={creator}
         />
       ))}

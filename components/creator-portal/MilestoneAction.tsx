@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, FileText, Upload, CheckCircle, ExternalLink, Send, Loader2, Eye, Mail, MessageSquare, PartyPopper, Copy, Check, AlertCircle } from 'lucide-react';
+import { Calendar, FileText, Upload, CheckCircle, ExternalLink, Send, Loader2, Eye, Mail, MessageSquare, PartyPopper, Copy, Check, AlertCircle, Link2, PenLine, GraduationCap, Package, BookOpen } from 'lucide-react';
 
 interface MilestoneActionProps {
   milestone: {
@@ -25,6 +25,7 @@ interface MilestoneActionProps {
     discount_code?: string | null;
     wants_video_editing?: boolean;
     wants_download_design?: boolean;
+    content_path?: string | null;
   };
 }
 
@@ -43,6 +44,10 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
   // Preferences form state
   const [wantsVideoEditing, setWantsVideoEditing] = useState(creator?.wants_video_editing ?? false);
   const [wantsDownloadDesign, setWantsDownloadDesign] = useState(creator?.wants_download_design ?? false);
+  // Form fields state (for dynamic forms)
+  const [formData, setFormData] = useState<Record<string, string>>({});
+  // Selected path state (for content path selection)
+  const [selectedPath, setSelectedPath] = useState<string | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config = (milestone.action_config || {}) as any;
@@ -232,6 +237,140 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
     navigator.clipboard.writeText(text);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  // Handle content path selection
+  const handlePathSelection = async (path: string) => {
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/creator-portal/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          milestoneId: milestone.id,
+          submissionType: 'path_selection',
+          content: { selected_path: path },
+          notifyTeam: true
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        onComplete();
+      } else {
+        setError(data.error || 'Failed to save selection. Please try again.');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+      console.error('Path selection error:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle dynamic form submission
+  const handleFormSubmit = async () => {
+    // Validate required fields
+    const fields = config.fields || [];
+    for (const field of fields) {
+      if (field.required && !formData[field.name]) {
+        setError(`Please fill in the "${field.label}" field.`);
+        return;
+      }
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/creator-portal/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          milestoneId: milestone.id,
+          submissionType: 'form',
+          content: formData,
+          notifyTeam: true
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setIsOpen(false);
+        setFormData({});
+        onComplete();
+      } else {
+        setError(data.error || 'Failed to submit. Please try again.');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+      console.error('Form submit error:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Handle simple link submission (link_submit action type)
+  const handleLinkSubmitAction = async () => {
+    if (!link) {
+      setError('Please enter a link.');
+      return;
+    }
+
+    // Basic URL validation
+    try {
+      new URL(link);
+    } catch {
+      setError('Please enter a valid URL.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/creator-portal/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          milestoneId: milestone.id,
+          submissionType: 'link',
+          content: { link },
+          notifyTeam: true
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setLink('');
+        onComplete();
+      } else {
+        setError(data.error || 'Failed to submit. Please try again.');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+      console.error('Link submit error:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Get icon for content path
+  const getPathIcon = (pathValue: string) => {
+    switch (pathValue) {
+      case 'blog': return <PenLine className="w-8 h-8" />;
+      case 'download': return <Package className="w-8 h-8" />;
+      case 'course': return <GraduationCap className="w-8 h-8" />;
+      default: return <BookOpen className="w-8 h-8" />;
+    }
   };
 
   // Admin preview wrapper - shows what creator sees with a label
@@ -801,6 +940,209 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
             <p className="text-center text-green-700 font-medium">
               Thank you for creating with TDI. You&apos;re officially part of the Learning Hub family!
             </p>
+          </div>
+        </AdminPreviewWrapper>
+      );
+
+    case 'select':
+      // Content path selection with visual cards
+      return (
+        <AdminPreviewWrapper actionLabel={config.label || 'Select an Option'}>
+          <div className="space-y-4">
+            <div className="grid gap-4">
+              {(config.options || []).map((option: { value: string; label: string; emoji?: string; description: string }) => (
+                <button
+                  key={option.value}
+                  onClick={() => {
+                    if (!isAdminPreview) {
+                      setSelectedPath(option.value);
+                      handlePathSelection(option.value);
+                    }
+                  }}
+                  disabled={isSubmitting || isAdminPreview}
+                  className={`relative flex items-start gap-4 p-5 rounded-xl border-2 transition-all text-left ${
+                    selectedPath === option.value
+                      ? 'border-[#ffba06] bg-[#fff9eb] ring-2 ring-[#ffba06] ring-offset-2'
+                      : 'border-gray-200 bg-white hover:border-[#80a4ed] hover:shadow-md'
+                  } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  <div className={`flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center ${
+                    selectedPath === option.value
+                      ? 'bg-[#ffba06] text-white'
+                      : 'bg-gray-100 text-[#1e2749]'
+                  }`}>
+                    {option.emoji ? (
+                      <span className="text-2xl">{option.emoji}</span>
+                    ) : (
+                      getPathIcon(option.value)
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-semibold text-[#1e2749] text-lg mb-1">
+                      {option.label}
+                    </div>
+                    <p className="text-sm text-gray-600 leading-relaxed">
+                      {option.description}
+                    </p>
+                  </div>
+                  {selectedPath === option.value && isSubmitting && (
+                    <div className="absolute top-4 right-4">
+                      <Loader2 className="w-5 h-5 animate-spin text-[#ffba06]" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+            {error && (
+              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                {error}
+              </div>
+            )}
+          </div>
+        </AdminPreviewWrapper>
+      );
+
+    case 'form':
+      // Multi-field form submission
+      return (
+        <AdminPreviewWrapper actionLabel={config.label || 'Submit Form'}>
+          <button
+            onClick={() => !isAdminPreview && setIsOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors"
+          >
+            <FileText className="w-4 h-4" />
+            {config.label || 'Fill Out Form'}
+          </button>
+
+          {isOpen && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+                <h3 className="text-lg font-semibold text-[#1e2749] mb-4">
+                  {config.label || 'Submit Information'}
+                </h3>
+
+                <div className="space-y-4">
+                  {(config.fields || []).map((field: { name: string; label: string; type: string; placeholder?: string; options?: string[]; required: boolean }) => (
+                    <div key={field.name}>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        {field.label}
+                        {field.required && <span className="text-red-500 ml-1">*</span>}
+                      </label>
+                      {field.type === 'textarea' ? (
+                        <textarea
+                          value={formData[field.name] || ''}
+                          onChange={(e) => setFormData(prev => ({ ...prev, [field.name]: e.target.value }))}
+                          placeholder={field.placeholder}
+                          rows={3}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffba06] focus:border-transparent resize-none"
+                        />
+                      ) : field.type === 'select' ? (
+                        <select
+                          value={formData[field.name] || ''}
+                          onChange={(e) => setFormData(prev => ({ ...prev, [field.name]: e.target.value }))}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffba06] focus:border-transparent"
+                        >
+                          <option value="">Select an option...</option>
+                          {(field.options || []).map((opt: string) => (
+                            <option key={opt} value={opt}>{opt}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          value={formData[field.name] || ''}
+                          onChange={(e) => setFormData(prev => ({ ...prev, [field.name]: e.target.value }))}
+                          placeholder={field.placeholder}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffba06] focus:border-transparent"
+                        />
+                      )}
+                    </div>
+                  ))}
+
+                  {error && (
+                    <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                      <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                      {error}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      setError(null);
+                    }}
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleFormSubmit}
+                    disabled={isSubmitting}
+                    className="flex-1 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Submitting...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        Submit
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </AdminPreviewWrapper>
+      );
+
+    case 'link_submit':
+      // Simple link submission inline
+      return (
+        <AdminPreviewWrapper actionLabel={config.label || 'Submit Link'}>
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <Link2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <input
+                  type="url"
+                  value={link}
+                  onChange={(e) => setLink(e.target.value)}
+                  placeholder={config.placeholder || 'Paste your link here'}
+                  disabled={isAdminPreview}
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffba06] focus:border-transparent"
+                />
+              </div>
+              <button
+                onClick={() => !isAdminPreview && handleLinkSubmitAction()}
+                disabled={!link || isSubmitting || isAdminPreview}
+                className="px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors whitespace-nowrap"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    {config.button_text || 'Submit'}
+                  </>
+                )}
+              </button>
+            </div>
+            {error && (
+              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                {error}
+              </div>
+            )}
           </div>
         </AdminPreviewWrapper>
       );

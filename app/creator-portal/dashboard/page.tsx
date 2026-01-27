@@ -315,6 +315,7 @@ export default function CreatorDashboardPage() {
               isLoading={isSaving}
               teamNotes={dashboardData.notes.filter(n => n.visible_to_creator).map(n => n.note).join('\n\n')}
               creatorName={dashboardData.creator.name}
+              contentPath={dashboardData.contentPath || dashboardData.creator.content_path}
               creator={{
                 google_doc_link: dashboardData.creator.google_doc_link,
                 drive_folder_link: dashboardData.creator.drive_folder_link,
@@ -323,6 +324,7 @@ export default function CreatorDashboardPage() {
                 discount_code: dashboardData.creator.discount_code,
                 wants_video_editing: dashboardData.creator.wants_video_editing,
                 wants_download_design: dashboardData.creator.wants_download_design,
+                content_path: dashboardData.creator.content_path,
               }}
             />
           </div>

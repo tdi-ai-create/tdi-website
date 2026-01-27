@@ -57,11 +57,32 @@ export async function POST(request: Request) {
       }
     }
 
+    // 2b. Handle content path selection - update creator table
+    if (submissionType === 'path_selection') {
+      const selectedPath = content.selected_path;
+      if (!selectedPath || !['blog', 'download', 'course'].includes(selectedPath)) {
+        return NextResponse.json({ success: false, error: 'Invalid content path' }, { status: 400 });
+      }
+
+      const { error: pathError } = await supabase
+        .from('creators')
+        .update({
+          content_path: selectedPath,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', creatorId);
+
+      if (pathError) {
+        console.error('[submit] Error saving content path:', pathError);
+        return NextResponse.json({ success: false, error: pathError.message }, { status: 500 });
+      }
+    }
+
     // 3. Update milestone status
-    // For confirmations, meeting_scheduled, and preferences, mark as complete
+    // For confirmations, meeting_scheduled, preferences, path_selection, and form submissions, mark as complete
     // For change_request, mark as in_progress (pending team review)
-    // For submissions needing review, mark as waiting_approval
-    const completionTypes = ['confirmation', 'meeting_scheduled', 'preferences'];
+    // For link submissions needing review, mark as waiting_approval
+    const completionTypes = ['confirmation', 'meeting_scheduled', 'preferences', 'path_selection', 'form'];
     let newStatus = completionTypes.includes(submissionType) ? 'completed' : 'waiting_approval';
 
     // Change requests go back to in_progress as team needs to make updates
@@ -90,6 +111,31 @@ export async function POST(request: Request) {
       updateData.metadata = {
         change_request: content.request,
         requested_at: new Date().toISOString()
+      };
+    }
+
+    // If path selection, store the selected path in metadata
+    if (submissionType === 'path_selection' && content.selected_path) {
+      updateData.metadata = {
+        selected_path: content.selected_path,
+        selected_at: new Date().toISOString()
+      };
+    }
+
+    // If form submission, store all form data in metadata
+    if (submissionType === 'form') {
+      updateData.metadata = {
+        ...content,
+        submitted_at: new Date().toISOString()
+      };
+    }
+
+    // If link submission, store link in metadata
+    if (submissionType === 'link' && content.link) {
+      updateData.metadata = {
+        link: content.link,
+        notes: content.notes || null,
+        submitted_at: new Date().toISOString()
       };
     }
 
