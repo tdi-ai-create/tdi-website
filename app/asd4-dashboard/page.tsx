@@ -182,17 +182,19 @@ Thanks for everything you do.`
 
     const subject = encodeURIComponent('Thank you for leading the way');
 
-    const body = encodeURIComponent(
-`Hi ${firstName},
+    const bodyText = [
+      `Hi ${firstName},`,
+      '',
+      'I was looking at our TDI Learning Hub progress and wanted to reach out personally.',
+      '',
+      `You've completed ${para.coursesStarted} courses with a ${para.avgCompletion}% average — that puts you at the top of our team. That kind of dedication doesn't go unnoticed.`,
+      '',
+      'I know your time is limited and there\'s always more to do. The fact that you\'re investing in your own growth shows real commitment to our students and to yourself.',
+      '',
+      'Thank you for setting the example. It matters more than you know.'
+    ].join('\n');
 
-I was looking at our TDI Learning Hub progress and wanted to reach out personally.
-
-You've completed ${para.coursesStarted} courses with a ${para.avgCompletion}% average — that puts you at the top of our team. That kind of dedication doesn't go unnoticed.
-
-I know your time is limited and there's always more to do. The fact that you're investing in your own growth shows real commitment to our students and to yourself.
-
-Thank you for setting the example. It matters more than you know.`
-    );
+    const body = encodeURIComponent(bodyText);
 
     return `mailto:${para.email}?subject=${subject}&body=${body}`;
   };
