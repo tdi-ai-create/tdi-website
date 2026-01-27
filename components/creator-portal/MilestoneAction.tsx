@@ -950,7 +950,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
         <AdminPreviewWrapper actionLabel={config.label || 'Select an Option'}>
           <div className="space-y-4">
             <div className="grid gap-4">
-              {(config.options || []).map((option: { value: string; label: string; emoji?: string; description: string }) => (
+              {(config.options || []).map((option: { value: string; label: string; description: string }) => (
                 <button
                   key={option.value}
                   onClick={() => {
@@ -971,11 +971,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                       ? 'bg-[#ffba06] text-white'
                       : 'bg-gray-100 text-[#1e2749]'
                   }`}>
-                    {option.emoji ? (
-                      <span className="text-2xl">{option.emoji}</span>
-                    ) : (
-                      getPathIcon(option.value)
-                    )}
+                    {getPathIcon(option.value)}
                   </div>
                   <div className="flex-1">
                     <div className="font-semibold text-[#1e2749] text-lg mb-1">
