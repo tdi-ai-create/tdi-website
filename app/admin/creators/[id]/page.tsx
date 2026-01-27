@@ -167,7 +167,8 @@ export default function AdminCreatorDetailPage() {
         setSuccessMessage(`Approved: ${milestoneTitle} (creator notified)`);
         setTimeout(() => setSuccessMessage(null), 3000);
       } else {
-        alert('Failed to approve milestone. Please try again.');
+        console.error('Approve failed:', result);
+        alert(`Failed to approve milestone: ${result.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error approving milestone:', error);

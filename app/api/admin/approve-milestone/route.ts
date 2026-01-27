@@ -7,6 +7,7 @@ export async function POST(request: Request) {
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
     if (!supabaseUrl || !serviceRoleKey) {
+      console.error('[approve-milestone] Missing env vars');
       return NextResponse.json({ success: false, error: 'Server config error' }, { status: 500 });
     }
 
@@ -14,24 +15,47 @@ export async function POST(request: Request) {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    const { milestoneId, creatorId, adminEmail } = await request.json();
+    const body = await request.json();
+    console.log('[approve-milestone] Request body:', body);
+
+    const { milestoneId, creatorId, adminEmail } = body;
+
+    if (!milestoneId || !creatorId) {
+      console.error('[approve-milestone] Missing required fields:', { milestoneId, creatorId });
+      return NextResponse.json({
+        success: false,
+        error: 'Missing milestoneId or creatorId'
+      }, { status: 400 });
+    }
 
     // 1. Get creator info
-    const { data: creator } = await supabase
+    const { data: creator, error: creatorError } = await supabase
       .from('creators')
       .select('name, email')
       .eq('id', creatorId)
       .single();
 
+    if (creatorError) {
+      console.error('[approve-milestone] Creator fetch error:', creatorError);
+      return NextResponse.json({ success: false, error: `Creator not found: ${creatorError.message}` }, { status: 404 });
+    }
+    console.log('[approve-milestone] Found creator:', creator?.name);
+
     // 2. Get milestone info
-    const { data: milestone } = await supabase
+    const { data: milestone, error: milestoneError } = await supabase
       .from('milestones')
       .select('name, creator_description, sort_order, phase_id')
       .eq('id', milestoneId)
       .single();
 
+    if (milestoneError) {
+      console.error('[approve-milestone] Milestone fetch error:', milestoneError);
+      return NextResponse.json({ success: false, error: `Milestone not found: ${milestoneError.message}` }, { status: 404 });
+    }
+    console.log('[approve-milestone] Found milestone:', milestone?.name);
+
     // 3. Mark milestone as completed
-    const { error: updateError } = await supabase
+    const { data: updateData, error: updateError } = await supabase
       .from('creator_milestones')
       .update({
         status: 'completed',
@@ -39,10 +63,22 @@ export async function POST(request: Request) {
         completed_by: adminEmail
       })
       .eq('creator_id', creatorId)
-      .eq('milestone_id', milestoneId);
+      .eq('milestone_id', milestoneId)
+      .select();
+
+    console.log('[approve-milestone] Update result:', { updateData, updateError });
 
     if (updateError) {
+      console.error('[approve-milestone] Update error:', updateError);
       return NextResponse.json({ success: false, error: updateError.message }, { status: 500 });
+    }
+
+    if (!updateData || updateData.length === 0) {
+      console.error('[approve-milestone] No rows updated - creator_milestone record may not exist');
+      return NextResponse.json({
+        success: false,
+        error: 'No matching creator_milestone record found'
+      }, { status: 404 });
     }
 
     // 4. Find and unlock the next milestone
