@@ -42,7 +42,10 @@ import {
   Layers,
   Sun,
   Sunset,
-  DollarSign
+  DollarSign,
+  CreditCard,
+  ExternalLink,
+  HelpCircle
 } from 'lucide-react';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 
@@ -63,6 +66,7 @@ export default function SauneminDashboard() {
   const [activePhase, setActivePhase] = useState(1);
   const [showPhase2Preview, setShowPhase2Preview] = useState(false);
   const [showPhase3Preview, setShowPhase3Preview] = useState(false);
+  const [showPolicy, setShowPolicy] = useState(false);
 
   // Accordion state for collapsible sections
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
@@ -319,6 +323,7 @@ export default function SauneminDashboard() {
     { id: 'blueprint', label: 'Blueprint', icon: Star },
     { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
     { id: 'team', label: 'Team', icon: User },
+    { id: 'billing', label: 'Billing', icon: CreditCard },
   ];
 
   // Tab click handler with scroll to top
@@ -2086,6 +2091,149 @@ export default function SauneminDashboard() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* BILLING TAB */}
+        {activeTab === 'billing' && (
+          <div className="space-y-6">
+
+            {/* Section 1: Thank You Banner */}
+            <div className="bg-[#1e2749] rounded-xl p-4">
+              <p className="text-white">
+                <span className="font-medium">Thank you for investing in your team.</span>
+                <span className="text-white/80 ml-1">Partnerships like yours help us support 87,000+ educators nationwide.</span>
+              </p>
+            </div>
+
+            {/* Section 2: Payment Complete Banner */}
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-green-800">All Payments Complete</div>
+                  <div className="text-sm text-green-600">Thank you for your prompt payment. We appreciate you!</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: Your Partnership */}
+            <div className="bg-white rounded-xl p-5 shadow-sm">
+              <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Your Partnership
+              </h3>
+
+              <div className="space-y-4">
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <div className="font-medium text-[#1e2749]">IGNITE Partnership</div>
+                      <div className="text-sm text-gray-500">Signed May 23, 2025</div>
+                    </div>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                      Paid in Full
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-600 mb-3">
+                    Includes: All Access Learning Hub Membership, Full-Day Professional Development Visit
+                  </div>
+                  <a
+                    href="https://my.anchor.sh/notification/ng-notification-Q6Xyx9riOfc-hUJRlc0aTRGGCHro"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-[#35A7FF] hover:underline"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    View Agreement
+                  </a>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <p className="text-sm text-gray-600 italic">
+                  Your investment is already making a difference. We&apos;re honored to partner with you on this journey.
+                </p>
+              </div>
+            </div>
+
+            {/* Section 4: Impact Callout */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                <p className="text-amber-900">
+                  <span className="font-medium">Did you know?</span> TDI partners see a 65% implementation rate (vs. 10% industry average).
+                </p>
+              </div>
+            </div>
+
+            {/* Section 5: Payment Policy */}
+            <div className="bg-white rounded-xl p-5 shadow-sm">
+              <button
+                onClick={() => setShowPolicy(!showPolicy)}
+                className="w-full flex items-center justify-between"
+              >
+                <h3 className="font-semibold text-[#1e2749] flex items-center gap-2">
+                  <Info className="w-5 h-5" />
+                  Payment Policy
+                </h3>
+                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showPolicy ? 'rotate-180' : ''}`} />
+              </button>
+
+              {showPolicy && (
+                <div className="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-600 space-y-2">
+                  <p>Payment is due within 30 days of signing and is processed automatically through your saved payment method on file.</p>
+                  <p>Any changes to your agreement require written approval from both parties.</p>
+                  <p>Questions about billing? Contact our billing team using the information below.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Section 6: Questions + Testimonial */}
+            <div className="bg-white rounded-xl p-5 shadow-sm">
+              <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
+                <HelpCircle className="w-5 h-5" />
+                Questions?
+              </h3>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="text-sm text-gray-500 mb-1">Billing & Payment Questions</div>
+                  <div className="font-medium text-[#1e2749]">Jevon Suralie</div>
+                  <div className="text-sm text-gray-600 mb-3">Secure Plus Financial</div>
+                  <a
+                    href="mailto:jevon@secureplusfinancial.com?subject=Billing Question - Saunemin Community School District"
+                    className="inline-flex items-center gap-2 bg-[#1e2749] hover:bg-[#2a3a5c] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <Mail className="w-4 h-4" />
+                    Email Billing Team
+                  </a>
+                </div>
+
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="text-sm text-gray-500 mb-1">Contract & Fulfillment Questions</div>
+                  <div className="font-medium text-[#1e2749]">Rae Hughart</div>
+                  <div className="text-sm text-gray-600 mb-3">Teachers Deserve It</div>
+                  <a
+                    href="mailto:rae@teachersdeserveit.com?subject=Partnership Question - Saunemin Community School District"
+                    className="inline-flex items-center gap-2 bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <Mail className="w-4 h-4" />
+                    Email Rae
+                  </a>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-5 border-t border-gray-100">
+                <p className="text-gray-600 italic">
+                  &quot;Finally, PD that doesn&apos;t add to our plate. It actually helps.&quot;
+                </p>
+                <p className="text-sm text-gray-400 mt-1">— Illinois Principal</p>
+              </div>
+            </div>
+
           </div>
         )}
 
