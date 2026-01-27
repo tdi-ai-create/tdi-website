@@ -81,6 +81,8 @@ export default function AdminCreatorDetailPage() {
   const [allNotes, setAllNotes] = useState<CreatorNote[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [approvingMilestoneId, setApprovingMilestoneId] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [adminEmail, setAdminEmail] = useState('');
 
   // Course details editing
@@ -144,10 +146,10 @@ export default function AdminCreatorDetailPage() {
     checkAuth();
   }, [router, loadData]);
 
-  const handleApprove = async (milestoneId: string) => {
+  const handleApprove = async (milestoneId: string, milestoneTitle: string) => {
     if (!dashboardData) return;
 
-    setIsSaving(true);
+    setApprovingMilestoneId(milestoneId);
     try {
       const success = await updateMilestoneStatus(
         creatorId,
@@ -158,11 +160,16 @@ export default function AdminCreatorDetailPage() {
 
       if (success) {
         await loadData();
+        setSuccessMessage(`Approved: ${milestoneTitle}`);
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        alert('Failed to approve milestone. Please try again.');
       }
     } catch (error) {
       console.error('Error approving milestone:', error);
+      alert('Error approving milestone. Please try again.');
     } finally {
-      setIsSaving(false);
+      setApprovingMilestoneId(null);
     }
   };
 
@@ -318,6 +325,14 @@ export default function AdminCreatorDetailPage() {
           <div className="lg:col-span-2 space-y-4">
             <h2 className="text-xl font-semibold text-[#1e2749]">Milestones</h2>
 
+            {/* Success message */}
+            {successMessage && (
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+                <Check className="w-5 h-5 text-green-600" />
+                <p className="text-green-800 font-medium">{successMessage}</p>
+              </div>
+            )}
+
             {phases.map((phase) => (
               <PhaseSection
                 key={phase.id}
@@ -325,7 +340,7 @@ export default function AdminCreatorDetailPage() {
                 isExpanded={expandedPhases.has(phase.id)}
                 onToggle={() => togglePhase(phase.id)}
                 onApprove={handleApprove}
-                isSaving={isSaving}
+                approvingMilestoneId={approvingMilestoneId}
               />
             ))}
           </div>
@@ -544,13 +559,13 @@ function PhaseSection({
   isExpanded,
   onToggle,
   onApprove,
-  isSaving,
+  approvingMilestoneId,
 }: {
   phase: PhaseWithMilestones;
   isExpanded: boolean;
   onToggle: () => void;
-  onApprove: (milestoneId: string) => void;
-  isSaving: boolean;
+  onApprove: (milestoneId: string, milestoneTitle: string) => void;
+  approvingMilestoneId: string | null;
 }) {
   const completedCount = phase.milestones.filter((m) => m.status === 'completed').length;
 
@@ -595,8 +610,8 @@ function PhaseSection({
             <MilestoneRow
               key={milestone.id}
               milestone={milestone}
-              onApprove={() => onApprove(milestone.id)}
-              isSaving={isSaving}
+              onApprove={() => onApprove(milestone.id, milestone.title)}
+              isApproving={approvingMilestoneId === milestone.id}
             />
           ))}
         </div>
@@ -608,11 +623,11 @@ function PhaseSection({
 function MilestoneRow({
   milestone,
   onApprove,
-  isSaving,
+  isApproving,
 }: {
   milestone: MilestoneWithStatus;
   onApprove: () => void;
-  isSaving: boolean;
+  isApproving: boolean;
 }) {
   const config = statusConfig[milestone.status];
   const Icon = config.icon;
@@ -647,10 +662,10 @@ function MilestoneRow({
         {canApprove && (
           <button
             onClick={onApprove}
-            disabled={isSaving}
+            disabled={isApproving}
             className="inline-flex items-center gap-1 bg-green-600 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-green-700 transition-colors disabled:opacity-50"
           >
-            {isSaving ? (
+            {isApproving ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
               <Check className="w-4 h-4" />
