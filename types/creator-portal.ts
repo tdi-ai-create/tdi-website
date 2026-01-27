@@ -87,8 +87,8 @@ export interface CreatorMilestone {
 export interface CreatorNote {
   id: string;
   creator_id: string;
-  note: string;
-  created_by: string;
+  content: string;
+  author: string;
   visible_to_creator: boolean;
   created_at: string;
 }

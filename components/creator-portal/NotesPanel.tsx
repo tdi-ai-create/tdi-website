@@ -35,9 +35,9 @@ export function NotesPanel({ notes }: NotesPanelProps) {
             key={note.id}
             className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#80a4ed]"
           >
-            <p className="text-sm text-gray-700 whitespace-pre-wrap">{note.note}</p>
+            <p className="text-sm text-gray-700 whitespace-pre-wrap">{note.content}</p>
             <div className="flex items-center justify-between mt-3 text-xs text-gray-500">
-              <span>{note.created_by}</span>
+              <span>{note.author}</span>
               <span>{new Date(note.created_at).toLocaleDateString()}</span>
             </div>
           </div>

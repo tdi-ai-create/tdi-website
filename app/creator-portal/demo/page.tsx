@@ -69,16 +69,16 @@ const mockNotes: CreatorNote[] = [
   {
     id: 'note-1',
     creator_id: 'demo-creator-123',
-    note: 'Great progress on your course outline! The structure looks solid. Looking forward to our next check-in.',
-    created_by: 'Rachel Patragas',
+    content: 'Great progress on your course outline! The structure looks solid. Looking forward to our next check-in.',
+    author: 'Rachel Patragas',
     visible_to_creator: true,
     created_at: '2025-01-15T10:30:00Z',
   },
   {
     id: 'note-2',
     creator_id: 'demo-creator-123',
-    note: 'Welcome to the TDI Creator family! So excited to work with you on this course.',
-    created_by: 'Rachel Patragas',
+    content: 'Welcome to the TDI Creator family! So excited to work with you on this course.',
+    author: 'Rachel Patragas',
     visible_to_creator: true,
     created_at: '2024-12-01T09:00:00Z',
   },
@@ -1106,9 +1106,9 @@ export default function CreatorPortalDemoPage() {
               <div className="space-y-4">
                 {mockNotes.map((note) => (
                   <div key={note.id} className="border-l-2 border-[#80a4ed] pl-4">
-                    <p className="text-sm text-gray-700">{note.note}</p>
+                    <p className="text-sm text-gray-700">{note.content}</p>
                     <p className="text-xs text-gray-400 mt-2">
-                      {note.created_by} - {new Date(note.created_at).toLocaleDateString()}
+                      {note.author} - {new Date(note.created_at).toLocaleDateString()}
                     </p>
                   </div>
                 ))}

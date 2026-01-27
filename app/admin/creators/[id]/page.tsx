@@ -592,7 +592,7 @@ export default function AdminCreatorDetailPage() {
                 isLoading={false}
                 isAdminPreview={true}
                 onRefresh={loadData}
-                teamNotes={allNotes.filter(n => n.visible_to_creator).map(n => n.note).join('\n\n')}
+                teamNotes={allNotes.filter(n => n.visible_to_creator).map(n => n.content).join('\n\n')}
                 creatorName={creator.name}
                 creator={{
                   google_doc_link: creator.google_doc_link,
@@ -792,7 +792,7 @@ export default function AdminCreatorDetailPage() {
                           : 'bg-gray-50 border-gray-400'
                       }`}
                     >
-                      <p className="text-gray-700 whitespace-pre-wrap">{note.note}</p>
+                      <p className="text-gray-700 whitespace-pre-wrap">{note.content}</p>
                       <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
                         <span className="flex items-center gap-1">
                           {note.visible_to_creator ? (
@@ -800,7 +800,7 @@ export default function AdminCreatorDetailPage() {
                           ) : (
                             <EyeOff className="w-3 h-3" />
                           )}
-                          {note.created_by}
+                          {note.author}
                         </span>
                         <span>{new Date(note.created_at).toLocaleDateString()}</span>
                       </div>

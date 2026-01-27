@@ -313,7 +313,7 @@ export default function CreatorDashboardPage() {
               onMarkComplete={handleMarkComplete}
               onRefresh={refreshDashboard}
               isLoading={isSaving}
-              teamNotes={dashboardData.notes.filter(n => n.visible_to_creator).map(n => n.note).join('\n\n')}
+              teamNotes={dashboardData.notes.filter(n => n.visible_to_creator).map(n => n.content).join('\n\n')}
               creatorName={dashboardData.creator.name}
               contentPath={dashboardData.contentPath || dashboardData.creator.content_path}
               creator={{
