@@ -70,13 +70,13 @@ export default function ASD4Dashboard() {
 
   // Progress tab data
   const topEngagedParas = [
-    { name: "Melissa Velazquez", coursesStarted: 9, avgCompletion: 91 },
-    { name: "Scott Nyquist", coursesStarted: 6, avgCompletion: 81 },
-    { name: "J Perez", coursesStarted: 5, avgCompletion: 100 },
-    { name: "Tracy Wojnicki", coursesStarted: 4, avgCompletion: 100 },
-    { name: "Ingrid Balbuena", coursesStarted: 4, avgCompletion: 100 },
-    { name: "Ruby Medina", coursesStarted: 4, avgCompletion: 100 },
-    { name: "Sandra DeLaGarza", coursesStarted: 4, avgCompletion: 100 }
+    { name: "Melissa Velazquez", email: "mvelazquez@asd4.org", coursesStarted: 9, avgCompletion: 91 },
+    { name: "Scott Nyquist", email: "snyquist@asd4.org", coursesStarted: 6, avgCompletion: 81 },
+    { name: "J Perez", email: "jperez@asd4.org", coursesStarted: 5, avgCompletion: 100 },
+    { name: "Tracy Wojnicki", email: "twojnicki@asd4.org", coursesStarted: 4, avgCompletion: 100 },
+    { name: "Ingrid Balbuena", email: "ibalbuena@asd4.org", coursesStarted: 4, avgCompletion: 100 },
+    { name: "Ruby Medina", email: "rmedina@asd4.org", coursesStarted: 4, avgCompletion: 100 },
+    { name: "Sandra DeLaGarza", email: "sdelagarza@asd4.org", coursesStarted: 4, avgCompletion: 100 }
   ];
 
   const topCourses = [
@@ -172,6 +172,25 @@ Thanks for all you do!`
 
     // Using BCC for privacy so recipients don't see each other's emails
     return `mailto:?bcc=${allEmails}&subject=${subject}&body=${body}`;
+  };
+
+  // Generate "High Five" celebration email for top performers
+  const generateHighFiveEmail = (para: { name: string; email: string; coursesStarted: number; avgCompletion: number }) => {
+    const firstName = para.name.split(' ')[0];
+
+    const subject = encodeURIComponent(`You're a rockstar, ${firstName}!`);
+
+    const body = encodeURIComponent(
+`Hi ${firstName},
+
+I just wanted to take a moment to say THANK YOU for diving into the TDI Learning Hub!
+
+You've completed ${para.coursesStarted} courses with an average of ${para.avgCompletion}% completion — that's incredible. Your dedication to growing your skills makes a real difference for our students every day.
+
+Keep being amazing!`
+    );
+
+    return `mailto:${para.email}?subject=${subject}&body=${body}`;
   };
 
   const handleTabClick = (tabId: string) => {
@@ -956,8 +975,17 @@ Thanks for all you do!`
                       </div>
                       <span className="font-medium text-gray-900">{para.name}</span>
                     </div>
-                    <div className="text-sm text-gray-500">
-                      {para.coursesStarted} courses · {para.avgCompletion}% avg
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm text-gray-500">
+                        {para.coursesStarted} courses · {para.avgCompletion}% avg
+                      </span>
+                      <a
+                        href={generateHighFiveEmail(para)}
+                        className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-medium rounded-full transition-colors"
+                      >
+                        <Award className="w-3 h-3" />
+                        High Five
+                      </a>
                     </div>
                   </div>
                 ))}
