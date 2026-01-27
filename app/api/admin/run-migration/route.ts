@@ -36,7 +36,22 @@ ADD COLUMN IF NOT EXISTS action_config JSONB;
       });
     }
 
-    // Step 2: Set calendly action for booking milestones
+    // Step 2: Set sign_agreement for the agreement milestone (opens in new tab)
+    const { error: agreementError } = await supabase
+      .from('milestones')
+      .update({
+        action_type: 'sign_agreement',
+        action_config: { label: 'Review & Sign Agreement' },
+      })
+      .eq('id', 'agreement_sign');
+
+    results.push({
+      step: 'Set sign_agreement for agreement_sign',
+      success: !agreementError,
+      error: agreementError?.message,
+    });
+
+    // Step 3: Set calendly action for booking milestones
     const calendlyMilestones = [
       { id: 'rae_meeting_scheduled', label: 'Book Kickoff Meeting' },
       { id: 'outline_meeting_scheduled', label: 'Book Outline Review' },
@@ -62,7 +77,7 @@ ADD COLUMN IF NOT EXISTS action_config JSONB;
       });
     }
 
-    // Step 3: Set 'confirm' action for non-team-action milestones
+    // Step 4: Set 'confirm' action for non-team-action milestones (excluding those already set)
     const { data: nonTeamMilestones } = await supabase
       .from('milestones')
       .select('id, name')
@@ -87,7 +102,7 @@ ADD COLUMN IF NOT EXISTS action_config JSONB;
       }
     }
 
-    // Step 4: Set 'team_action' for team-action milestones
+    // Step 5: Set 'team_action' for team-action milestones
     const { data: teamMilestones } = await supabase
       .from('milestones')
       .select('id, name')
@@ -112,7 +127,7 @@ ADD COLUMN IF NOT EXISTS action_config JSONB;
       }
     }
 
-    // Step 5: Get all milestones to verify
+    // Step 6: Get all milestones to verify
     const { data: allMilestones } = await supabase
       .from('milestones')
       .select('id, name, phase_id, action_type, action_config, requires_team_action')
