@@ -289,6 +289,7 @@ function PhaseCard({
   onRefresh,
   isLoading,
   defaultExpanded = false,
+  isActionPhase = false,
 }: {
   phase: PhaseWithMilestones;
   creatorId?: string;
@@ -296,6 +297,7 @@ function PhaseCard({
   onRefresh?: () => void;
   isLoading?: boolean;
   defaultExpanded?: boolean;
+  isActionPhase?: boolean;
 }) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const completedCount = phase.milestones.filter(
@@ -304,15 +306,10 @@ function PhaseCard({
   const totalCount = phase.milestones.length;
   const progressPercent = totalCount > 0 ? (completedCount / totalCount) * 100 : 0;
 
-  // Check if this phase contains the current actionable milestone
-  const hasCurrentAction = phase.milestones.some(
-    (m) => (m.status === 'available' || m.status === 'in_progress') && !m.requires_team_action
-  );
-
   return (
     <div
       className={`rounded-xl border-2 overflow-hidden transition-all ${
-        hasCurrentAction
+        isActionPhase
           ? 'border-[#F5A623] shadow-lg bg-[#fef9eb]'
           : phase.isComplete
           ? 'border-green-300'
@@ -324,7 +321,7 @@ function PhaseCard({
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className={`w-full px-6 py-4 flex items-center justify-between text-left transition-colors ${
-          hasCurrentAction
+          isActionPhase
             ? 'bg-[#fef9eb]'
             : phase.isComplete
             ? 'bg-green-50'
@@ -336,7 +333,7 @@ function PhaseCard({
         <div className="flex items-center gap-4">
           <div
             className={`w-10 h-10 rounded-full flex items-center justify-center ${
-              hasCurrentAction
+              isActionPhase
                 ? 'bg-[#ffba06]'
                 : phase.isComplete
                 ? 'bg-green-500'
@@ -356,7 +353,7 @@ function PhaseCard({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-[#1e2749]">{phase.name}</h3>
-              {hasCurrentAction ? (
+              {isActionPhase ? (
                 <span className="text-xs bg-[#ffba06] text-[#1e2749] px-2 py-0.5 rounded-full font-medium">
                   Action Needed
                 </span>
@@ -378,7 +375,7 @@ function PhaseCard({
             <div className="w-24 h-2 bg-gray-200 rounded-full mt-1 overflow-hidden">
               <div
                 className={`h-full rounded-full transition-all ${
-                  phase.isComplete ? 'bg-green-500' : hasCurrentAction ? 'bg-[#F5A623]' : 'bg-[#80a4ed]'
+                  phase.isComplete ? 'bg-green-500' : isActionPhase ? 'bg-[#F5A623]' : 'bg-[#80a4ed]'
                 }`}
                 style={{ width: `${progressPercent}%` }}
               />
@@ -393,7 +390,7 @@ function PhaseCard({
       </button>
 
       {isExpanded && (
-        <div className={`p-4 space-y-3 ${hasCurrentAction ? 'bg-[#fef9eb]' : 'bg-white'}`}>
+        <div className={`p-4 space-y-3 ${isActionPhase ? 'bg-[#fef9eb]' : 'bg-white'}`}>
           {phase.milestones.map((milestone) => (
             <MilestoneItem
               key={milestone.id}
@@ -417,6 +414,13 @@ export function PhaseProgress({
   onRefresh,
   isLoading,
 }: PhaseProgressProps) {
+  // Find the FIRST phase that has a current actionable milestone (not team action)
+  const firstActionPhaseId = phases.find((phase) =>
+    phase.milestones.some(
+      (m) => (m.status === 'available' || m.status === 'in_progress') && !m.requires_team_action
+    )
+  )?.id;
+
   return (
     <div className="space-y-4">
       {phases.map((phase) => (
@@ -427,7 +431,8 @@ export function PhaseProgress({
           onMarkComplete={onMarkComplete}
           onRefresh={onRefresh}
           isLoading={isLoading}
-          defaultExpanded={phase.isCurrentPhase}
+          defaultExpanded={phase.isCurrentPhase || phase.id === firstActionPhaseId}
+          isActionPhase={phase.id === firstActionPhaseId}
         />
       ))}
     </div>
