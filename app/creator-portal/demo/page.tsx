@@ -343,12 +343,12 @@ const initialPhases: DemoPhase[] = [
 // Get all milestone IDs in order
 const allMilestoneIds = initialPhases.flatMap(p => p.milestones.map(m => m.id));
 
-// Initial completed milestones (first 6 are pre-completed)
-const initialCompleted = ['m1', 'm2', 'm3', 'm4', 'm5', 'm6'];
+// Initial completed milestones (only onboarding is complete)
+const initialCompleted = ['m1', 'm2', 'm3'];
 
 export default function CreatorPortalDemoPage() {
   const [completedMilestones, setCompletedMilestones] = useState<string[]>(initialCompleted);
-  const [expandedPhases, setExpandedPhases] = useState<string[]>(['course_design']);
+  const [expandedPhases, setExpandedPhases] = useState<string[]>(['agreement']);
   const allPhaseIds = initialPhases.map(p => p.id);
   const [showSubmitModal, setShowSubmitModal] = useState<DemoMilestone | null>(null);
   const [submitLink, setSubmitLink] = useState('');
@@ -513,13 +513,26 @@ export default function CreatorPortalDemoPage() {
 
       case 'sign_agreement':
         return (
-          <button
-            onClick={() => handleComplete(milestone.id, 'Agreement signed! Welcome to the TDI Creator family!')}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-all hover:scale-105 active:scale-95"
-          >
-            <FileText className="w-4 h-4" />
-            {config.label || 'Sign Agreement'}
-          </button>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+            <Link
+              href="/creator-portal/agreement"
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-all hover:scale-105 active:scale-95"
+            >
+              <FileText className="w-4 h-4" />
+              {config.label || 'Review & Sign Agreement'}
+            </Link>
+            <button
+              onClick={() => {
+                handleComplete(milestone.id, 'Agreement signed! Welcome to the TDI Creator family!');
+                setConfetti(true);
+                setTimeout(() => setConfetti(false), 3000);
+              }}
+              className="inline-flex items-center justify-center gap-2 px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 transition-all hover:scale-105 active:scale-95"
+            >
+              <CheckCircle className="w-4 h-4" />
+              Skip (Demo)
+            </button>
+          </div>
         );
 
       case 'team_action':
