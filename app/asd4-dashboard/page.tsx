@@ -56,7 +56,8 @@ import {
   Trophy,
   CreditCard,
   HelpCircle,
-  FileText
+  FileText,
+  Send
 } from 'lucide-react';
 
 export default function ASD4Dashboard() {
@@ -123,6 +124,55 @@ export default function ASD4Dashboard() {
     { name: "Melany Tinajero Monroy", email: "mtinajero@asd4.org" },
     { name: "Natalia Villalobos", email: "nvillalobos@asd4.org" }
   ];
+
+  // Generate individual nudge email
+  const generateNudgeEmail = (para: { name: string; email: string }) => {
+    const firstName = para.name.split(' ')[0];
+
+    const subject = encodeURIComponent('Quick help getting started with the TDI Learning Hub');
+
+    const body = encodeURIComponent(
+`Hi ${firstName},
+
+I noticed you haven't had a chance to log into the Teachers Deserve It Learning Hub yet — no worries, I wanted to make sure you have what you need!
+
+Here's how to get started:
+1. Go to: tdi.thinkific.com
+2. Log in with your @asd4.org email
+3. Start with "Paraprofessional Foundations" — it's a quick win!
+
+If you're having trouble logging in or need a walkthrough, let me know and I can help.
+
+Thanks for all you do!`
+    );
+
+    return `mailto:${para.email}?subject=${subject}&body=${body}`;
+  };
+
+  // Generate "Nudge All" bulk email (BCC for privacy)
+  const generateNudgeAllEmail = () => {
+    const allEmails = notLoggedInParas.map(p => p.email).join(',');
+
+    const subject = encodeURIComponent('Quick help getting started with the TDI Learning Hub');
+
+    const body = encodeURIComponent(
+`Hi team,
+
+I noticed some of you haven't had a chance to log into the Teachers Deserve It Learning Hub yet — no worries, I wanted to make sure you have what you need!
+
+Here's how to get started:
+1. Go to: tdi.thinkific.com
+2. Log in with your @asd4.org email
+3. Start with "Paraprofessional Foundations" — it's a quick win!
+
+If you're having trouble logging in or need a walkthrough, let me know and I can help. We can also do a quick group walkthrough at our next meeting if that's helpful.
+
+Thanks for all you do!`
+    );
+
+    // Using BCC for privacy so recipients don't see each other's emails
+    return `mailto:?bcc=${allEmails}&subject=${subject}&body=${body}`;
+  };
 
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId);
@@ -984,6 +1034,18 @@ export default function ASD4Dashboard() {
                     </div>
                   </div>
 
+                  {/* Nudge All Button */}
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-sm text-gray-500">Click &quot;Nudge&quot; to send a friendly reminder email</span>
+                    <a
+                      href={generateNudgeAllEmail()}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                      <Mail className="w-4 h-4" />
+                      Nudge All ({notLoggedInParas.length})
+                    </a>
+                  </div>
+
                   <div className="bg-white rounded-lg overflow-hidden">
                     <table className="w-full text-sm">
                       <thead className="bg-gray-50">
@@ -991,14 +1053,24 @@ export default function ASD4Dashboard() {
                           <th className="text-left py-2 px-3 font-medium text-gray-600">#</th>
                           <th className="text-left py-2 px-3 font-medium text-gray-600">Name</th>
                           <th className="text-left py-2 px-3 font-medium text-gray-600">Email</th>
+                          <th className="text-right py-2 px-3 font-medium text-gray-600">Action</th>
                         </tr>
                       </thead>
                       <tbody>
                         {notLoggedInParas.map((para, index) => (
-                          <tr key={index} className="border-t border-gray-100">
+                          <tr key={index} className="border-t border-gray-100 hover:bg-gray-50">
                             <td className="py-2 px-3 text-gray-400">{index + 1}</td>
                             <td className="py-2 px-3 text-gray-900">{para.name}</td>
                             <td className="py-2 px-3 text-gray-500">{para.email}</td>
+                            <td className="py-2 px-3 text-right">
+                              <a
+                                href={generateNudgeEmail(para)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-amber-600 hover:text-white hover:bg-amber-500 border border-amber-300 hover:border-amber-500 rounded-lg text-xs font-medium transition-colors"
+                              >
+                                <Send className="w-3 h-3" />
+                                Nudge
+                              </a>
+                            </td>
                           </tr>
                         ))}
                       </tbody>
