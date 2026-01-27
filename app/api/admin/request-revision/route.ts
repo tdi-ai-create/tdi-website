@@ -65,8 +65,6 @@ export async function POST(request: NextRequest) {
       .from('creator_milestones')
       .update({
         status: 'available',
-        completed_at: null,
-        completed_by: null,
         updated_at: new Date().toISOString(),
       })
       .eq('creator_id', creatorId)
@@ -100,8 +98,6 @@ export async function POST(request: NextRequest) {
             .from('creator_milestones')
             .update({
               status: 'locked',
-              completed_at: null,
-              completed_by: null,
               updated_at: new Date().toISOString(),
             })
             .eq('creator_id', creatorId)
