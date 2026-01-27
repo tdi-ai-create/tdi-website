@@ -32,8 +32,8 @@ export async function POST(request: NextRequest) {
       .from('creator_notes')
       .insert({
         creator_id: creatorId,
-        note: note.trim(),
-        created_by: createdBy,
+        content: note.trim(),
+        author: createdBy,
         visible_to_creator: visibleToCreator ?? true,
       })
       .select()
