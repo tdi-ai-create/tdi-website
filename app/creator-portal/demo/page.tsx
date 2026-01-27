@@ -141,28 +141,15 @@ const initialPhases: DemoPhase[] = [
       {
         id: 'm4',
         phase_id: 'agreement',
-        title: 'Review Creator Agreement',
-        description: 'Read through the TDI Creator Agreement',
+        title: 'Sign Agreement',
+        description: 'Digitally sign your creator agreement',
         sort_order: 1,
         requires_team_action: false,
         created_at: '',
         completed_at: '2024-12-15T00:00:00Z',
         progress_id: 'p4',
-        action_type: 'review',
-        action_config: { label: "I've Reviewed the Agreement" },
-      },
-      {
-        id: 'm5',
-        phase_id: 'agreement',
-        title: 'Sign Agreement',
-        description: 'Digitally sign your creator agreement',
-        sort_order: 2,
-        requires_team_action: false,
-        created_at: '',
-        completed_at: '2024-12-18T00:00:00Z',
-        progress_id: 'p5',
         action_type: 'sign_agreement',
-        action_config: { label: 'Review & Sign Agreement' },
+        action_config: { label: 'Sign Agreement' },
       },
     ],
   },
@@ -362,11 +349,10 @@ export default function CreatorPortalDemoPage() {
       const params = new URLSearchParams(window.location.search);
       const agreementSigned = params.get('agreement') === 'signed' || params.get('signed') === 'true';
       if (agreementSigned) {
-        // Mark agreement milestones as complete (m4 is Review, m5 is Sign Agreement)
+        // Mark agreement milestone as complete
         setCompletedMilestones(prev => {
           const newCompleted = [...prev];
           if (!newCompleted.includes('m4')) newCompleted.push('m4');
-          if (!newCompleted.includes('m5')) newCompleted.push('m5');
           return newCompleted;
         });
         // Show success message and confetti
@@ -408,7 +394,7 @@ export default function CreatorPortalDemoPage() {
     showToast(message || 'Milestone completed!', 'success');
 
     // Show confetti for special milestones
-    if (['m5', 'm9', 'm16'].includes(milestoneId)) {
+    if (['m4', 'm9', 'm16'].includes(milestoneId)) {
       setConfetti(true);
       setTimeout(() => setConfetti(false), 3000);
     }
@@ -552,13 +538,16 @@ export default function CreatorPortalDemoPage() {
       case 'sign_agreement':
         return (
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-            <Link
+            <a
               href="/creator-portal/agreement?demo=true"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-all hover:scale-105 active:scale-95"
             >
               <FileText className="w-4 h-4" />
-              {config.label || 'Review & Sign Agreement'}
-            </Link>
+              {config.label || 'Sign Agreement'}
+              <ExternalLink className="w-3 h-3" />
+            </a>
             <button
               onClick={() => {
                 handleComplete(milestone.id, 'Agreement signed! Welcome to the TDI Creator family!');
