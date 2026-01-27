@@ -19,79 +19,58 @@ export async function GET() {
 
     console.log('[sync-milestones] Starting sync...');
 
-    // 1. Delete ALL Agreement milestones (by phase_id to catch any)
-    const { error: deleteError } = await supabase
+    // Old agreement milestone IDs to delete
+    const oldAgreementIds = ['agreement_sent', 'agreement_signed', 'added_to_log'];
+
+    // 1. FIRST: Delete creator_milestones that reference old agreement milestones
+    // This must happen BEFORE deleting the milestones due to foreign key constraint
+    const { data: deletedCreatorMilestones, error: cleanupError } = await supabase
+      .from('creator_milestones')
+      .delete()
+      .in('milestone_id', oldAgreementIds)
+      .select();
+
+    console.log('[sync-milestones] Deleted creator_milestones:', {
+      count: deletedCreatorMilestones?.length,
+      error: cleanupError?.message
+    });
+
+    // 2. NOW delete the old agreement milestones from milestones table
+    const { data: deletedMilestones, error: deleteError } = await supabase
       .from('milestones')
       .delete()
-      .eq('phase_id', 'agreement');
+      .in('id', oldAgreementIds)
+      .select();
 
-    if (deleteError) {
-      console.log('[sync-milestones] Delete error (may be ok if not found):', deleteError);
-    }
+    console.log('[sync-milestones] Deleted milestones:', {
+      count: deletedMilestones?.length,
+      error: deleteError?.message
+    });
 
-    // 2. Insert new single Agreement milestone
+    // 3. Insert new single Agreement milestone
     const { error: insertError } = await supabase
       .from('milestones')
-      .insert({
+      .upsert({
         id: 'agreement_sign',
         phase_id: 'agreement',
         name: 'Sign Agreement',
         description: 'Digitally sign your creator agreement',
-        creator_description: 'Digitally sign your creator agreement',
-        admin_description: 'Creator signs the Independent Content Creator Agreement',
-        sort_order: 1,
         requires_team_action: false,
-        action_type: 'sign_agreement',
-        action_config: { label: 'Sign Agreement' }
+        sort_order: 1
       });
 
     if (insertError) {
-      console.log('[sync-milestones] Insert error, trying upsert:', insertError);
-      // Try upsert instead
-      const { error: upsertError } = await supabase
-        .from('milestones')
-        .upsert({
-          id: 'agreement_sign',
-          phase_id: 'agreement',
-          name: 'Sign Agreement',
-          description: 'Digitally sign your creator agreement',
-          creator_description: 'Digitally sign your creator agreement',
-          admin_description: 'Creator signs the Independent Content Creator Agreement',
-          sort_order: 1,
-          requires_team_action: false,
-          action_type: 'sign_agreement',
-          action_config: { label: 'Sign Agreement' }
-        });
-
-      if (upsertError) {
-        console.error('[sync-milestones] Upsert milestone error:', upsertError);
-      }
+      console.error('[sync-milestones] Insert milestone error:', insertError);
     }
 
-    // 3. Update phases to have correct descriptions
-    const { error: phasesError } = await supabase
+    // 4. Update phase description
+    const { error: phaseError } = await supabase
       .from('phases')
-      .upsert([
-        { id: 'onboarding', name: 'Onboarding', description: 'Get set up and ready to create', sort_order: 1 },
-        { id: 'agreement', name: 'Agreement', description: 'Finalize your creator agreement', sort_order: 2 },
-        { id: 'course_design', name: 'Course Design', description: 'Plan and outline your course content', sort_order: 3 },
-        { id: 'test_prep', name: 'Test & Prep', description: 'Prepare for recording', sort_order: 4 },
-        { id: 'production', name: 'Production', description: 'Record your course content', sort_order: 5 },
-        { id: 'launch', name: 'Launch', description: 'Go live!', sort_order: 6 }
-      ]);
+      .update({ description: 'Finalize your creator agreement' })
+      .eq('id', 'agreement');
 
-    if (phasesError) {
-      console.error('[sync-milestones] Upsert phases error:', phasesError);
-    }
-
-    // 4. Clean up old milestone references for existing creators (catch any agreement-related)
-    const { error: cleanupError } = await supabase
-      .from('creator_milestones')
-      .delete()
-      .like('milestone_id', 'agreement%');
-
-    if (cleanupError) {
-      console.log('[sync-milestones] Cleanup error (may be ok if not found):', cleanupError);
+    if (phaseError) {
+      console.error('[sync-milestones] Update phase error:', phaseError);
     }
 
     // 5. Get all creators
