@@ -53,7 +53,10 @@ import {
   Shield,
   Award,
   Quote,
-  Trophy
+  Trophy,
+  CreditCard,
+  HelpCircle,
+  FileText
 } from 'lucide-react';
 
 export default function ASD4Dashboard() {
@@ -61,6 +64,7 @@ export default function ASD4Dashboard() {
   const [showAllItems, setShowAllItems] = useState(false);
   const [showAllCourses, setShowAllCourses] = useState(false);
   const [showNotLoggedIn, setShowNotLoggedIn] = useState(false);
+  const [showPolicy, setShowPolicy] = useState(false);
   const tabContentRef = useRef<HTMLDivElement>(null);
 
   // Progress tab data
@@ -136,6 +140,7 @@ export default function ASD4Dashboard() {
     { id: 'blueprint', label: 'Blueprint', icon: Star },
     { id: 'year2', label: '2026-27', icon: Sparkles, badge: 'Preview' },
     { id: 'team', label: 'Team', icon: User },
+    { id: 'billing', label: 'Billing', icon: CreditCard },
   ];
 
   return (
@@ -1531,6 +1536,159 @@ export default function ASD4Dashboard() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ==================== BILLING TAB ==================== */}
+        {activeTab === 'billing' && (
+          <div className="space-y-6">
+
+            {/* Status Banner - Overdue */}
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <AlertCircle className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-red-800">Payment Overdue</div>
+                  <div className="text-sm text-red-600">Please contact our billing team to resolve</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Your Agreements */}
+            <div className="bg-white rounded-xl p-5 shadow-sm">
+              <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Your Agreements
+              </h3>
+
+              <div className="space-y-4">
+
+                {/* Agreement 1: Keynote */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Keynote</div>
+                      <div className="text-sm text-gray-500">Signed October 28, 2025</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-[#1e2749]">$4,500</div>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                        Unpaid
+                      </span>
+                    </div>
+                  </div>
+                  <a
+                    href="https://my.anchor.sh/notification/ng-notification-z26iTfxrGsja-02XKxObaAoLgCP2p"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-[#35A7FF] hover:underline mt-2"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    View Agreement
+                  </a>
+                </div>
+
+                {/* Agreement 2: Partnership Services */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Partnership Services (IGNITE Phase)</div>
+                      <div className="text-sm text-gray-500">Signed December 9, 2025</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-[#1e2749]">$35,640</div>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
+                        Unpaid
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-600 mb-2">
+                    Includes: 2 On-Campus Observations, 4 Virtual Sessions, 2 Executive Sessions, 94 Hub Memberships
+                  </div>
+                  <a
+                    href="https://my.anchor.sh/notification/ng-notification-z26iTfR37lyk-wqykbBVowcAkXsBr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-[#35A7FF] hover:underline"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    View Agreement
+                  </a>
+                </div>
+
+              </div>
+
+              {/* Total Outstanding */}
+              <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
+                <span className="font-medium text-gray-600">Total Outstanding</span>
+                <span className="text-xl font-bold text-red-600">$40,140</span>
+              </div>
+            </div>
+
+            {/* Payment Policy */}
+            <div className="bg-white rounded-xl p-5 shadow-sm">
+              <button
+                onClick={() => setShowPolicy(!showPolicy)}
+                className="w-full flex items-center justify-between"
+              >
+                <h3 className="font-semibold text-[#1e2749] flex items-center gap-2">
+                  <Info className="w-5 h-5" />
+                  Payment Policy
+                </h3>
+                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showPolicy ? 'rotate-180' : ''}`} />
+              </button>
+
+              {showPolicy && (
+                <div className="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-600 space-y-2">
+                  <p>Payment is due within 30 days of signing and is processed automatically through your saved payment method on file.</p>
+                  <p>Any changes to your agreement require written approval from both parties.</p>
+                  <p>Questions about billing? Contact our billing team using the information below.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Questions? Contact Cards */}
+            <div className="bg-white rounded-xl p-5 shadow-sm">
+              <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
+                <HelpCircle className="w-5 h-5" />
+                Questions?
+              </h3>
+
+              <div className="grid md:grid-cols-2 gap-4">
+
+                {/* Billing Contact */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="text-sm text-gray-500 mb-1">Billing & Payment Questions</div>
+                  <div className="font-medium text-[#1e2749]">Jevon Suralie</div>
+                  <div className="text-sm text-gray-600 mb-3">Secure Plus Financial</div>
+                  <a
+                    href="mailto:jevon@secureplusfinancial.com?subject=Billing Question - Addison School District 4"
+                    className="inline-flex items-center gap-2 bg-[#1e2749] hover:bg-[#2a3a5c] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <Mail className="w-4 h-4" />
+                    Email Billing Team
+                  </a>
+                </div>
+
+                {/* Fulfillment Contact */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="text-sm text-gray-500 mb-1">Contract & Fulfillment Questions</div>
+                  <div className="font-medium text-[#1e2749]">Rae Hughart</div>
+                  <div className="text-sm text-gray-600 mb-3">Teachers Deserve It</div>
+                  <a
+                    href="mailto:rae@teachersdeserveit.com?subject=Partnership Question - Addison School District 4"
+                    className="inline-flex items-center gap-2 bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <Mail className="w-4 h-4" />
+                    Email Rae
+                  </a>
+                </div>
+
+              </div>
+            </div>
+
           </div>
         )}
       </div>
