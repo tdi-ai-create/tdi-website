@@ -20,6 +20,9 @@ export function MilestoneAction({ milestone, creatorId, onComplete }: MilestoneA
   const [isOpen, setIsOpen] = useState(false);
   const [link, setLink] = useState('');
   const [notes, setNotes] = useState('');
+  const [scheduledDate, setScheduledDate] = useState('');
+  const [scheduledTime, setScheduledTime] = useState('');
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -95,20 +98,159 @@ export function MilestoneAction({ milestone, creatorId, onComplete }: MilestoneA
     }
   };
 
+  const handleSubmitMeeting = async () => {
+    if (!scheduledDate || !scheduledTime) return;
+
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/creator-portal/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          milestoneId: milestone.id,
+          submissionType: 'meeting_scheduled',
+          content: {
+            scheduled_date: scheduledDate,
+            scheduled_time: scheduledTime,
+            notes
+          },
+          notifyTeam: true
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setShowDatePicker(false);
+        setScheduledDate('');
+        setScheduledTime('');
+        setNotes('');
+        onComplete();
+      } else {
+        setError(data.error || 'Failed to submit. Please try again.');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+      console.error('Submit meeting error:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   // Render based on action type
   switch (actionType) {
     case 'calendly':
       return (
-        <a
-          href={config.url || 'https://calendly.com/rae-teachersdeserveit/creator-chat'}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors"
-        >
-          <Calendar className="w-4 h-4" />
-          {config.label || 'Book a Call'}
-          <ExternalLink className="w-3 h-3" />
-        </a>
+        <>
+          <div className="flex flex-wrap items-center gap-3">
+            <a
+              href={config.url || 'https://calendly.com/rae-teachersdeserveit/creator-chat'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors"
+            >
+              <Calendar className="w-4 h-4" />
+              {config.label || 'Book a Call'}
+              <ExternalLink className="w-3 h-3" />
+            </a>
+            <button
+              onClick={() => setShowDatePicker(true)}
+              className="inline-flex items-center gap-2 px-4 py-2 border-2 border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <CheckCircle className="w-4 h-4" />
+              I&apos;ve Booked It
+            </button>
+          </div>
+
+          {showDatePicker && (
+            <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+              <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl">
+                <h3 className="text-lg font-semibold text-[#1e2749] mb-2">
+                  When is your meeting scheduled?
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Enter the date and time you booked so your TDI team can prepare.
+                </p>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Date
+                    </label>
+                    <input
+                      type="date"
+                      value={scheduledDate}
+                      onChange={(e) => setScheduledDate(e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffba06] focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Time
+                    </label>
+                    <input
+                      type="time"
+                      value={scheduledTime}
+                      onChange={(e) => setScheduledTime(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffba06] focus:border-transparent"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Notes (optional)
+                    </label>
+                    <textarea
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="Anything you want to discuss or questions you have?"
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffba06] focus:border-transparent resize-none"
+                    />
+                  </div>
+
+                  {error && (
+                    <p className="text-sm text-red-600 bg-red-50 p-2 rounded">{error}</p>
+                  )}
+                </div>
+
+                <div className="flex gap-3 mt-6">
+                  <button
+                    onClick={() => {
+                      setShowDatePicker(false);
+                      setError(null);
+                    }}
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSubmitMeeting}
+                    disabled={!scheduledDate || !scheduledTime || isSubmitting}
+                    className="flex-1 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        Confirm Meeting
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       );
 
     case 'submit_link':

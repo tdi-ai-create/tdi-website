@@ -22,6 +22,7 @@ import {
   RotateCcw,
   X,
   Unlock,
+  Calendar,
 } from 'lucide-react';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { supabase } from '@/lib/supabase';
@@ -982,6 +983,30 @@ function MilestoneRow({
                 <Tooltip content="This milestone requires TDI team review or action before the creator can proceed." position="right">
                   <Info className="w-3.5 h-3.5 text-amber-400 cursor-help" />
                 </Tooltip>
+              </div>
+            )}
+            {/* Show scheduled meeting date if exists */}
+            {m.metadata?.scheduled_date && (
+              <div className="mt-2 flex items-center gap-2 text-sm">
+                <Calendar className="w-4 h-4 text-[#F5A623]" />
+                <span className="text-[#1e2749] font-medium">
+                  Meeting: {new Date(m.metadata.scheduled_date + 'T' + (m.metadata.scheduled_time || '12:00')).toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    month: 'short',
+                    day: 'numeric',
+                  })}
+                  {m.metadata.scheduled_time && (
+                    <> at {new Date('2000-01-01T' + m.metadata.scheduled_time).toLocaleTimeString('en-US', {
+                      hour: 'numeric',
+                      minute: '2-digit',
+                    })}</>
+                  )}
+                </span>
+                {m.metadata.notes && (
+                  <Tooltip content={`Creator notes: ${m.metadata.notes}`} position="right">
+                    <Info className="w-3.5 h-3.5 text-gray-400 cursor-help" />
+                  </Tooltip>
+                )}
               </div>
             )}
             {/* Show submission indicator when waiting for approval */}

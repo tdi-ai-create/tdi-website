@@ -41,15 +41,29 @@ export async function POST(request: Request) {
     }
 
     // 2. Update milestone status
-    // For confirmations, mark as complete. For submissions needing review, mark as waiting_approval
-    const newStatus = submissionType === 'confirmation' ? 'completed' : 'waiting_approval';
+    // For confirmations and meeting_scheduled, mark as complete. For submissions needing review, mark as waiting_approval
+    const completionTypes = ['confirmation', 'meeting_scheduled'];
+    const newStatus = completionTypes.includes(submissionType) ? 'completed' : 'waiting_approval';
+
+    // Build update object - include scheduled_date if it's a meeting
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const updateData: any = {
+      status: newStatus,
+      updated_at: new Date().toISOString()
+    };
+
+    // If meeting scheduled, store the date/time in metadata
+    if (submissionType === 'meeting_scheduled' && content.scheduled_date) {
+      updateData.metadata = {
+        scheduled_date: content.scheduled_date,
+        scheduled_time: content.scheduled_time,
+        notes: content.notes
+      };
+    }
 
     const { error: updateError } = await supabase
       .from('creator_milestones')
-      .update({
-        status: newStatus,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('creator_id', creatorId)
       .eq('milestone_id', milestoneId);
 
@@ -58,8 +72,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: updateError.message }, { status: 500 });
     }
 
-    // 3. If this is a confirmation (not needing review), unlock next milestone
-    if (submissionType === 'confirmation') {
+    // 3. If this is a completion type (not needing review), unlock next milestone
+    if (completionTypes.includes(submissionType)) {
       // Get current milestone info
       const { data: milestone } = await supabase
         .from('milestones')
@@ -110,6 +124,33 @@ export async function POST(request: Request) {
       const resendApiKey = process.env.RESEND_API_KEY;
       if (resendApiKey && creator) {
         try {
+          // Format meeting date nicely if it's a meeting submission
+          let meetingInfo = '';
+          if (submissionType === 'meeting_scheduled' && content.scheduled_date) {
+            const date = new Date(content.scheduled_date + 'T' + (content.scheduled_time || '12:00'));
+            const formattedDate = date.toLocaleDateString('en-US', {
+              weekday: 'long',
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric'
+            });
+            const formattedTime = content.scheduled_time
+              ? date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+              : '';
+            meetingInfo = `
+              <div style="background: #fef9eb; border: 2px solid #F5A623; border-radius: 8px; padding: 16px; margin: 16px 0;">
+                <p style="margin: 0; font-size: 14px; color: #666;">📅 Meeting Scheduled</p>
+                <p style="margin: 8px 0 0 0; font-size: 18px; font-weight: 600; color: #1e2749;">
+                  ${formattedDate}${formattedTime ? ` at ${formattedTime}` : ''}
+                </p>
+              </div>
+            `;
+          }
+
+          const emailSubject = submissionType === 'meeting_scheduled'
+            ? `📅 ${creator.name} scheduled a meeting`
+            : `New Submission from ${creator.name}`;
+
           await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
@@ -119,20 +160,21 @@ export async function POST(request: Request) {
             body: JSON.stringify({
               from: 'TDI Creator Studio <onboarding@resend.dev>',
               to: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
-              subject: `New Submission from ${creator.name}`,
+              subject: emailSubject,
               html: `
                 <div style="font-family: sans-serif; max-width: 600px;">
-                  <h2 style="color: #1e2749;">New Submission Ready for Review</h2>
+                  <h2 style="color: #1e2749;">${submissionType === 'meeting_scheduled' ? 'Meeting Scheduled' : 'New Submission Ready for Review'}</h2>
 
                   <p><strong>Creator:</strong> ${creator.name} (${creator.email})</p>
                   <p><strong>Milestone:</strong> ${milestoneName}</p>
 
+                  ${meetingInfo}
                   ${content.link ? `<p><strong>Submitted Link:</strong> <a href="${content.link}">${content.link}</a></p>` : ''}
                   ${content.notes ? `<p><strong>Creator Notes:</strong> ${content.notes}</p>` : ''}
 
                   <a href="https://www.teachersdeserveit.com/admin/creators/${creatorId}"
                      style="display: inline-block; background: #1e2749; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin-top: 16px;">
-                    Review in Admin Portal
+                    View in Admin Portal
                   </a>
                 </div>
               `,
@@ -145,12 +187,16 @@ export async function POST(request: Request) {
       }
 
       // Also create admin notification
+      const notificationMessage = submissionType === 'meeting_scheduled'
+        ? `${creator?.name || 'A creator'} scheduled a meeting for ${milestoneName}`
+        : `${creator?.name || 'A creator'} submitted ${milestoneName}`;
+
       await supabase
         .from('admin_notifications')
         .insert({
           creator_id: creatorId,
-          type: 'submission',
-          message: `${creator?.name || 'A creator'} submitted ${milestoneName}`,
+          type: submissionType === 'meeting_scheduled' ? 'meeting' : 'submission',
+          message: notificationMessage,
           link: `/admin/creators/${creatorId}`,
         });
     }
