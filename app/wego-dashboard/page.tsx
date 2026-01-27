@@ -2102,7 +2102,7 @@ export default function WegoDashboard() {
               </div>
             </div>
 
-            {/* Section 3: Your Agreements (Shows Amounts - Mixed Status) */}
+            {/* Section 3: Your Agreements (NO amounts shown) */}
             <div className="bg-white rounded-xl p-5 shadow-sm">
               <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
                 <FileText className="w-5 h-5" />
@@ -2118,12 +2118,9 @@ export default function WegoDashboard() {
                       <div className="font-medium text-[#1e2749]">Partnership Services</div>
                       <div className="text-sm text-gray-500">Signed September 25, 2025</div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-semibold text-[#1e2749]">$9,999</div>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
-                        Paid
-                      </span>
-                    </div>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                      Paid
+                    </span>
                   </div>
                   <div className="text-sm text-gray-600 mb-3">
                     Includes: 19 Hub Memberships, 2 Full-Day Visits, 6 Virtual Coaching Sessions
@@ -2146,12 +2143,9 @@ export default function WegoDashboard() {
                       <div className="font-medium text-[#1e2749]">Observation & Feedback Day</div>
                       <div className="text-sm text-gray-500">Signed December 1, 2025</div>
                     </div>
-                    <div className="text-right">
-                      <div className="font-semibold text-[#1e2749]">$6,000</div>
-                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">
-                        Pending
-                      </span>
-                    </div>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">
+                      Pending
+                    </span>
                   </div>
                   <div className="text-sm text-gray-600 mb-3">
                     Includes: 1 Full-Day On-Site PD
@@ -2163,16 +2157,10 @@ export default function WegoDashboard() {
                     className="inline-flex items-center gap-1 text-sm text-[#35A7FF] hover:underline"
                   >
                     <ExternalLink className="w-4 h-4" />
-                    View Agreement
+                    View Agreement & Invoice Details
                   </a>
                 </div>
 
-              </div>
-
-              {/* Total Outstanding */}
-              <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
-                <span className="font-medium text-gray-600">Total Outstanding</span>
-                <span className="text-xl font-bold text-amber-600">$6,000</span>
               </div>
             </div>
 
