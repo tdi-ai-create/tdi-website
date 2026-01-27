@@ -356,11 +356,12 @@ export default function CreatorPortalDemoPage() {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
   const [confetti, setConfetti] = useState(false);
 
-  // Handle agreement signed query parameter
+  // Handle agreement signed query parameter (supports both ?agreement=signed and ?signed=true)
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      if (params.get('agreement') === 'signed') {
+      const agreementSigned = params.get('agreement') === 'signed' || params.get('signed') === 'true';
+      if (agreementSigned) {
         // Mark agreement milestones as complete (m4 is Review, m5 is Sign Agreement)
         setCompletedMilestones(prev => {
           const newCompleted = [...prev];
@@ -552,7 +553,7 @@ export default function CreatorPortalDemoPage() {
         return (
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <Link
-              href="/creator-portal/demo/agreement"
+              href="/creator-portal/agreement?demo=true"
               className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-all hover:scale-105 active:scale-95"
             >
               <FileText className="w-4 h-4" />

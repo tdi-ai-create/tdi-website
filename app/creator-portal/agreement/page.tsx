@@ -1,14 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, CheckCircle, ChevronDown, Calendar, Mail, Video, DollarSign, Share2, HeartHandshake, FileText } from 'lucide-react';
+import { ArrowLeft, Loader2, CheckCircle, ChevronDown, Calendar, Mail, Video, DollarSign, Share2, HeartHandshake, FileText, Eye, PartyPopper } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
-export default function AgreementPage() {
+// Component to handle search params (must be wrapped in Suspense)
+function AgreementContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isDemo = searchParams.get('demo') === 'true';
+
   const [creatorName, setCreatorName] = useState('');
   const [creatorId, setCreatorId] = useState<string | null>(null);
   const [agreed, setAgreed] = useState(false);
@@ -16,6 +20,7 @@ export default function AgreementPage() {
   const [showFullAgreement, setShowFullAgreement] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSigning, setIsSigning] = useState(false);
+  const [isSigned, setIsSigned] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [alreadySigned, setAlreadySigned] = useState(false);
 
@@ -25,8 +30,19 @@ export default function AgreementPage() {
     day: 'numeric',
   });
 
+  const backLink = isDemo ? '/creator-portal/demo' : '/creator-portal/dashboard';
+
   useEffect(() => {
     const checkAuth = async () => {
+      // Demo mode - skip auth, use demo data
+      if (isDemo) {
+        setCreatorName('Sarah Johnson');
+        setSignatureName('Sarah Johnson');
+        setIsLoading(false);
+        return;
+      }
+
+      // Real mode - check authentication
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session?.user?.email) {
@@ -60,13 +76,22 @@ export default function AgreementPage() {
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, isDemo]);
 
   const handleSign = async () => {
-    if (!agreed || !signatureName.trim() || !creatorId) return;
+    if (!agreed || !signatureName.trim()) return;
 
     setIsSigning(true);
     setError(null);
+
+    // Demo mode - just show success and redirect
+    if (isDemo) {
+      setIsSigned(true);
+      return;
+    }
+
+    // Real mode - save to database
+    if (!creatorId) return;
 
     try {
       const response = await fetch('/api/creator-portal/sign-agreement', {
@@ -91,6 +116,14 @@ export default function AgreementPage() {
     }
   };
 
+  const handleContinue = () => {
+    if (isDemo) {
+      router.push('/creator-portal/demo?signed=true');
+    } else {
+      router.push('/creator-portal/dashboard?agreement=signed');
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
@@ -99,7 +132,55 @@ export default function AgreementPage() {
     );
   }
 
-  if (alreadySigned) {
+  // Success state after signing
+  if (isSigned) {
+    return (
+      <div className="min-h-screen bg-[#f5f5f5]">
+        {/* Demo Banner */}
+        {isDemo && (
+          <div className="bg-[#ffba06] text-[#1e2749] py-2 px-4 text-center text-sm font-medium">
+            <Eye className="w-4 h-4 inline mr-2" />
+            DEMO MODE - This is a preview of the agreement signing experience
+          </div>
+        )}
+
+        <main className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <PartyPopper className="w-10 h-10 text-green-600" />
+            </div>
+            <h1 className="text-3xl font-bold text-[#1e2749] mb-4">
+              Welcome to the TDI Creator Family!
+            </h1>
+            <p className="text-gray-600 mb-2">
+              <strong>{signatureName}</strong>, you&apos;ve officially signed the Independent Content Creator Agreement.
+            </p>
+            <p className="text-gray-500 text-sm mb-8">
+              Signed on {today}
+            </p>
+
+            {isDemo && (
+              <div className="bg-[#ffba06]/10 border border-[#ffba06] rounded-lg p-4 mb-8">
+                <p className="text-sm text-[#1e2749]">
+                  <strong>Demo Mode:</strong> In the real portal, this would update your milestone status and send a notification to the TDI team.
+                </p>
+              </div>
+            )}
+
+            <button
+              onClick={handleContinue}
+              className="inline-flex items-center gap-2 px-8 py-4 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3459] transition-colors text-lg font-semibold"
+            >
+              <CheckCircle className="w-5 h-5" />
+              Continue to Dashboard
+            </button>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (alreadySigned && !isDemo) {
     return (
       <div className="min-h-screen bg-[#f5f5f5]">
         <header className="bg-white border-b border-gray-200">
@@ -136,11 +217,22 @@ export default function AgreementPage() {
 
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
+      {/* Demo Banner */}
+      {isDemo && (
+        <div className="bg-[#ffba06] text-[#1e2749] py-2 px-4 text-center text-sm font-medium">
+          <Eye className="w-4 h-4 inline mr-2" />
+          DEMO MODE - This is a preview of the agreement signing experience
+          <Link href="/creator-portal/demo" className="ml-4 underline hover:no-underline">
+            Back to Demo Dashboard
+          </Link>
+        </div>
+      )}
+
       {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <Link
-            href="/creator-portal/dashboard"
+            href={backLink}
             className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-[#1e2749]"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -323,7 +415,7 @@ export default function AgreementPage() {
         {/* Questions Section */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
           <h3 className="font-semibold text-[#1e2749] mb-2">Have Questions?</h3>
-          <p className="text-gray-600 text-sm mb-4">We want you to feel confident. Reach out anytime!</p>
+          <p className="text-gray-600 text-sm mb-4">We want you to feel confident about this partnership. Reach out anytime!</p>
           <div className="flex flex-wrap gap-3">
             <a
               href="https://calendly.com/rae-teachersdeserveit/creator-chat"
@@ -365,7 +457,7 @@ export default function AgreementPage() {
                 type="text"
                 value={signatureName}
                 onChange={(e) => setSignatureName(e.target.value)}
-                placeholder="Type your full name"
+                placeholder="Type your full name to sign"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffba06] focus:border-transparent"
               />
             </div>
@@ -402,5 +494,17 @@ export default function AgreementPage() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function AgreementPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-[#80a4ed]" />
+      </div>
+    }>
+      <AgreementContent />
+    </Suspense>
   );
 }
