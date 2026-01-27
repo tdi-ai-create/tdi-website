@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { Calendar, FileText, Upload, CheckCircle, ExternalLink, Send, Loader2 } from 'lucide-react';
 
 interface MilestoneActionProps {
@@ -238,13 +237,16 @@ export function MilestoneAction({ milestone, creatorId, onComplete }: MilestoneA
 
     case 'sign_agreement':
       return (
-        <Link
+        <a
           href="/creator-portal/agreement"
+          target="_blank"
+          rel="noopener noreferrer"
           className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors"
         >
           <FileText className="w-4 h-4" />
           {config.label || 'Review & Sign Agreement'}
-        </Link>
+          <ExternalLink className="w-3 h-3" />
+        </a>
       );
 
     case 'team_action':
