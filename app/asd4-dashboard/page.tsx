@@ -851,7 +851,10 @@ Thanks for all you do!`
 
             {/* Section 1: Hero Win Stat */}
             <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-8 text-white text-center">
-              <div className="text-5xl font-bold mb-2">🎉 49</div>
+              <div className="text-5xl font-bold mb-2 flex items-center justify-center gap-3">
+                <Trophy className="w-10 h-10" />
+                49
+              </div>
               <div className="text-xl font-medium mb-1">Courses Completed</div>
               <div className="text-emerald-100 text-sm">
                 by your paraprofessionals — and counting!
@@ -982,8 +985,9 @@ Thanks for all you do!`
                       <span className="text-gray-400 text-sm w-4">{index + 1}.</span>
                       <span className="text-gray-700">{course.name}</span>
                       {course.completionRate === 100 && (
-                        <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
-                          ✨ 100% finish rate
+                        <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                          <Star className="w-3 h-3" />
+                          100% finish rate
                         </span>
                       )}
                     </div>
@@ -1623,7 +1627,7 @@ Thanks for all you do!`
             {/* Thank You Banner */}
             <div className="bg-[#1e2749] rounded-xl p-4">
               <div className="flex items-center gap-3">
-                <span className="text-2xl">💛</span>
+                <Heart className="w-6 h-6 text-[#ffba06] fill-[#ffba06] flex-shrink-0" />
                 <p className="text-white">
                   <span className="font-medium">Thank you for investing in your team.</span>
                   <span className="text-white/80 ml-1">Partnerships like yours help us support 87,000+ educators nationwide.</span>
