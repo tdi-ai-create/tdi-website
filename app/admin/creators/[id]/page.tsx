@@ -581,6 +581,17 @@ export default function AdminCreatorDetailPage() {
                 isLoading={false}
                 isAdminPreview={true}
                 onRefresh={loadData}
+                teamNotes={allNotes.filter(n => n.visible_to_creator).map(n => n.note).join('\n\n')}
+                creatorName={creator.name}
+                creator={{
+                  google_doc_link: creator.google_doc_link,
+                  drive_folder_link: creator.drive_folder_link,
+                  marketing_doc_link: creator.marketing_doc_link,
+                  course_url: creator.course_url,
+                  discount_code: creator.discount_code,
+                  wants_video_editing: creator.wants_video_editing,
+                  wants_download_design: creator.wants_download_design,
+                }}
               />
             )}
           </div>

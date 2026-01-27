@@ -26,6 +26,17 @@ interface PhaseProgressProps {
   onRefresh?: () => void;
   isLoading?: boolean;
   isAdminPreview?: boolean;
+  teamNotes?: string;
+  creatorName?: string;
+  creator?: {
+    google_doc_link?: string | null;
+    drive_folder_link?: string | null;
+    marketing_doc_link?: string | null;
+    course_url?: string | null;
+    discount_code?: string | null;
+    wants_video_editing?: boolean;
+    wants_download_design?: boolean;
+  };
 }
 
 const statusConfig: Record<
@@ -83,6 +94,9 @@ function MilestoneItem({
   isLoading,
   isInActionPhase = false,
   isAdminPreview = false,
+  teamNotes,
+  creatorName,
+  creator,
 }: {
   milestone: MilestoneWithStatus;
   creatorId?: string;
@@ -91,6 +105,17 @@ function MilestoneItem({
   isLoading?: boolean;
   isInActionPhase?: boolean;
   isAdminPreview?: boolean;
+  teamNotes?: string;
+  creatorName?: string;
+  creator?: {
+    google_doc_link?: string | null;
+    drive_folder_link?: string | null;
+    marketing_doc_link?: string | null;
+    course_url?: string | null;
+    discount_code?: string | null;
+    wants_video_editing?: boolean;
+    wants_download_design?: boolean;
+  };
 }) {
   const isActionable =
     milestone.status === 'available' || milestone.status === 'in_progress';
@@ -228,6 +253,9 @@ function MilestoneItem({
                 creatorId={creatorId}
                 onComplete={onRefresh || (() => window.location.reload())}
                 isAdminPreview={isAdminPreview}
+                teamNotes={teamNotes}
+                creatorName={creatorName}
+                creator={creator}
               />
             ) : (
               /* Legacy fallback for backwards compatibility */
@@ -297,6 +325,9 @@ function PhaseCard({
   defaultExpanded = false,
   isActionPhase = false,
   isAdminPreview = false,
+  teamNotes,
+  creatorName,
+  creator,
 }: {
   phase: PhaseWithMilestones;
   creatorId?: string;
@@ -306,6 +337,17 @@ function PhaseCard({
   defaultExpanded?: boolean;
   isActionPhase?: boolean;
   isAdminPreview?: boolean;
+  teamNotes?: string;
+  creatorName?: string;
+  creator?: {
+    google_doc_link?: string | null;
+    drive_folder_link?: string | null;
+    marketing_doc_link?: string | null;
+    course_url?: string | null;
+    discount_code?: string | null;
+    wants_video_editing?: boolean;
+    wants_download_design?: boolean;
+  };
 }) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const completedCount = phase.milestones.filter(
@@ -409,6 +451,9 @@ function PhaseCard({
               isLoading={isLoading}
               isInActionPhase={isActionPhase}
               isAdminPreview={isAdminPreview}
+              teamNotes={teamNotes}
+              creatorName={creatorName}
+              creator={creator}
             />
           ))}
         </div>
@@ -424,6 +469,9 @@ export function PhaseProgress({
   onRefresh,
   isLoading,
   isAdminPreview = false,
+  teamNotes,
+  creatorName,
+  creator,
 }: PhaseProgressProps) {
   // Find the FIRST phase that has a current actionable milestone (not team action)
   const firstActionPhaseId = phases.find((phase) =>
@@ -445,6 +493,9 @@ export function PhaseProgress({
           defaultExpanded={phase.isCurrentPhase || phase.id === firstActionPhaseId}
           isActionPhase={phase.id === firstActionPhaseId}
           isAdminPreview={isAdminPreview}
+          teamNotes={teamNotes}
+          creatorName={creatorName}
+          creator={creator}
         />
       ))}
     </div>

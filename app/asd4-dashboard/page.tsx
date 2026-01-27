@@ -48,16 +48,77 @@ import {
   Thermometer,
   RefreshCw,
   BarChart,
+  BarChart3,
   TrendingDown,
   Shield,
   Award,
-  Quote
+  Quote,
+  Trophy
 } from 'lucide-react';
 
 export default function ASD4Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [showAllItems, setShowAllItems] = useState(false);
+  const [showAllCourses, setShowAllCourses] = useState(false);
+  const [showNotLoggedIn, setShowNotLoggedIn] = useState(false);
   const tabContentRef = useRef<HTMLDivElement>(null);
+
+  // Progress tab data
+  const topEngagedParas = [
+    { name: "Melissa Velazquez", coursesStarted: 9, avgCompletion: 91 },
+    { name: "Scott Nyquist", coursesStarted: 6, avgCompletion: 81 },
+    { name: "J Perez", coursesStarted: 5, avgCompletion: 100 },
+    { name: "Tracy Wojnicki", coursesStarted: 4, avgCompletion: 100 },
+    { name: "Ingrid Balbuena", coursesStarted: 4, avgCompletion: 100 },
+    { name: "Ruby Medina", coursesStarted: 4, avgCompletion: 100 },
+    { name: "Sandra DeLaGarza", coursesStarted: 4, avgCompletion: 100 }
+  ];
+
+  const topCourses = [
+    { name: "Paraprofessional Foundations", started: 19, completed70: 11, completionRate: 58 },
+    { name: "Understanding Student Needs & Modifications", started: 9, completed70: 6, completionRate: 67 },
+    { name: "Classroom Management Toolkit", started: 8, completed70: 5, completionRate: 63 },
+    { name: "Calm Classrooms, Not Chaos", started: 5, completed70: 5, completionRate: 100 },
+    { name: "Building Strong Teacher-Para Partnerships", started: 6, completed70: 4, completionRate: 67 },
+    { name: "Effective Small-Group & One-on-One Instruction", started: 6, completed70: 3, completionRate: 50 },
+    { name: "Differentiated Choice Boards", started: 9, completed70: 3, completionRate: 33 },
+    { name: "Streamline Your Inbox", started: 9, completed70: 3, completionRate: 33 },
+    { name: "Connected Educators", started: 5, completed70: 1, completionRate: 20 },
+    { name: "Maximize Impact: One-on-One Conferences", started: 5, completed70: 3, completionRate: 60 },
+    { name: "How to get the MOST out of the TDI Hub", started: 5, completed70: 1, completionRate: 20 },
+    { name: "De-Escalation Strategies", started: 3, completed70: 3, completionRate: 100 },
+    { name: "Communication that Clicks", started: 2, completed70: 2, completionRate: 100 },
+    { name: "Parent Tools That Support Student Success", started: 1, completed70: 1, completionRate: 100 },
+    { name: "Supporting Students Through Their Daily Schedule", started: 1, completed70: 1, completionRate: 100 },
+    { name: "The Differentiation Fix", started: 1, completed70: 1, completionRate: 100 },
+    { name: "Effective Communication Strategies for Leaders", started: 1, completed70: 0, completionRate: 0 }
+  ];
+
+  const notLoggedInParas = [
+    { name: "Michelle Bezdicek", email: "mbezdicek@asd4.org" },
+    { name: "Aysha Chaudary", email: "achaudary@asd4.org" },
+    { name: "Kristine Colbert", email: "kcolbert@asd4.org" },
+    { name: "Daniela Cova Gonzalez", email: "dcgonzalez@asd4.org" },
+    { name: "Mary Falco", email: "mfalco@asd4.org" },
+    { name: "Jessica Gonzalez", email: "jesgonzalez@asd4.org" },
+    { name: "Nancy Gremo", email: "ngremo@asd4.org" },
+    { name: "Sarah Hendricks", email: "shendricks@asd4.org" },
+    { name: "Mirela Hodo", email: "mhodo@asd4.org" },
+    { name: "Alexia Juarez", email: "ajuarez@asd4.org" },
+    { name: "Brittany Lanzo", email: "blanzo@asd4.org" },
+    { name: "Maribel Marquez", email: "mmarquez@asd4.org" },
+    { name: "Irma Martinez", email: "imartinez@asd4.org" },
+    { name: "Georjina Mendiola", email: "gmendiola@asd4.org" },
+    { name: "Sugey Mondragon", email: "smondragon@asd4.org" },
+    { name: "Monika Nicieja", email: "mnicieja@asd4.org" },
+    { name: "Leslie Olvera", email: "lolvera@asd4.org" },
+    { name: "Maribel Ontiveros", email: "montiveros@asd4.org" },
+    { name: "Maria Ortiz", email: "mortiz@asd4.org" },
+    { name: "Patricia Schlesser", email: "pschlesser@asd4.org" },
+    { name: "Patricia Simone", email: "psimone@asd4.org" },
+    { name: "Melany Tinajero Monroy", email: "mtinajero@asd4.org" },
+    { name: "Natalia Villalobos", email: "nvillalobos@asd4.org" }
+  ];
 
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId);
@@ -728,275 +789,264 @@ export default function ASD4Dashboard() {
         {activeTab === 'progress' && (
           <div className="space-y-6">
 
-            {/* Section 1: Your Next Steps */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h3 className="text-lg font-bold text-[#1e2749] mb-5">Your Next Steps</h3>
+            {/* Section 1: Hero Win Stat */}
+            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-8 text-white text-center">
+              <div className="text-5xl font-bold mb-2">🎉 49</div>
+              <div className="text-xl font-medium mb-1">Courses Completed</div>
+              <div className="text-emerald-100 text-sm">
+                by your paraprofessionals — and counting!
+              </div>
+              <div className="text-emerald-100 text-sm mt-2">
+                That&apos;s 49 strategies ready to use in classrooms tomorrow.
+              </div>
+            </div>
 
-              <div className="space-y-4">
-                {/* Step 1 */}
-                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                  <div className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-bold text-gray-400">1</span>
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-medium text-[#1e2749]">Identify Pilot Group (10-20 paras)</div>
-                    <p className="text-sm text-gray-500 mb-3">Select the paras who will participate in focused coaching this spring.</p>
-                    <a
-                      href="/asd4-dashboard/pilot-selection"
-                      className="inline-flex items-center gap-2 bg-[#1e2749] hover:bg-[#2d3a5c] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
-                    >
-                      Select Pilot Group
-                      <ArrowRight className="w-4 h-4" />
-                    </a>
+            {/* Section 2: Progress Snapshot (3 Cards with Progress Bars) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Hub Access Card */}
+              <div className="bg-white rounded-xl p-6 shadow-sm border">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-500 text-sm">Hub Access</span>
+                  <div className="relative group">
+                    <Info className="w-4 h-4 text-gray-400 cursor-help" />
+                    <div className="absolute z-10 w-48 p-2 text-xs text-white bg-gray-900 rounded-lg shadow-lg -top-2 left-6 hidden group-hover:block">
+                      Paras who have logged into the Learning Hub at least once
+                    </div>
                   </div>
                 </div>
-
-                {/* Step 2 */}
-                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                  <div className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-bold text-gray-400">2</span>
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-medium text-[#1e2749]">Schedule Virtual Session 1</div>
-                    <p className="text-sm text-gray-500 mb-3">Your kickoff session includes baseline survey collection.</p>
-                    <a
-                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-[#1e2749] hover:bg-[#2d3a5c] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      Schedule Session
-                    </a>
-                  </div>
-                </div>
-
-                {/* Step 3 */}
-                <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl">
-                  <div className="w-8 h-8 rounded-full border-2 border-gray-300 flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-bold text-gray-400">3</span>
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-medium text-[#1e2749]">Schedule Observation Day 1</div>
-                    <p className="text-sm text-gray-500 mb-3">On-site classroom visits with personalized Love Notes.</p>
-                    <a
-                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-[#1e2749] hover:bg-[#2d3a5c] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      Schedule Observation
-                    </a>
-                  </div>
+                <div className="text-3xl font-bold text-gray-900">88<span className="text-lg text-gray-400">/111</span></div>
+                <div className="text-sm text-gray-500 mb-3">79% logged in</div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-teal-500 h-2 rounded-full" style={{width: '79%'}}></div>
                 </div>
               </div>
 
-              {/* Link to full list */}
+              {/* Courses Started Card */}
+              <div className="bg-white rounded-xl p-6 shadow-sm border">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-500 text-sm">Courses Started</span>
+                  <div className="relative group">
+                    <Info className="w-4 h-4 text-gray-400 cursor-help" />
+                    <div className="absolute z-10 w-48 p-2 text-xs text-white bg-gray-900 rounded-lg shadow-lg -top-2 left-6 hidden group-hover:block">
+                      Paras who opened a course and began learning
+                    </div>
+                  </div>
+                </div>
+                <div className="text-3xl font-bold text-gray-900">51</div>
+                <div className="text-sm text-gray-500 mb-3">paras exploring content</div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '46%'}}></div>
+                </div>
+              </div>
+
+              {/* Deep Engagement Card */}
+              <div className="bg-white rounded-xl p-6 shadow-sm border">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-500 text-sm">Deep Engagement</span>
+                  <div className="relative group">
+                    <Info className="w-4 h-4 text-gray-400 cursor-help" />
+                    <div className="absolute z-10 w-48 p-2 text-xs text-white bg-gray-900 rounded-lg shadow-lg -top-2 left-6 hidden group-hover:block">
+                      Course completions at 70% or higher — our threshold for meaningful learning
+                    </div>
+                  </div>
+                </div>
+                <div className="text-3xl font-bold text-gray-900">53</div>
+                <div className="text-sm text-gray-500 mb-3">completions at 70%+</div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="bg-emerald-500 h-2 rounded-full" style={{width: '96%'}}></div>
+                </div>
+                <div className="text-xs text-emerald-600 mt-2">96% of starters finish!</div>
+              </div>
+            </div>
+
+            {/* Section 3: TDI Benchmark Callout */}
+            <div className="bg-slate-50 border border-slate-200 rounded-xl p-5">
+              <div className="flex items-start gap-3">
+                <BarChart3 className="w-5 h-5 text-slate-600 mt-0.5" />
+                <div>
+                  <div className="font-medium text-slate-700 mb-1">How ASD4 compares</div>
+                  <div className="text-sm text-slate-600">
+                    <span className="font-semibold text-teal-600">Your implementation rate: 65%</span>
+                    <span className="mx-2">·</span>
+                    <span>Industry average: 10%</span>
+                  </div>
+                  <div className="text-sm text-slate-500 mt-1">
+                    Your paras are <span className="font-medium text-slate-700">6x more likely</span> to use what they learn than the national average.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 4: Top Engaged Paras (Recognition Section) */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <div className="flex items-center gap-2 mb-4">
+                <Trophy className="w-5 h-5 text-amber-500" />
+                <h3 className="text-lg font-semibold text-gray-900">Your Para Champions</h3>
+              </div>
+
+              <div className="space-y-3">
+                {topEngagedParas.map((para, index) => (
+                  <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-medium text-sm">
+                        {index + 1}
+                      </div>
+                      <span className="font-medium text-gray-900">{para.name}</span>
+                    </div>
+                    <div className="text-sm text-gray-500">
+                      {para.coursesStarted} courses · {para.avgCompletion}% avg
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="flex items-start gap-2 text-sm text-slate-600 bg-amber-50 rounded-lg p-3">
+                  <Lightbulb className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                  <span>These paras could mentor peers who need support getting started.</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 5: What's Resonating (Top Courses, Expandable) */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <div className="flex items-center gap-2 mb-4">
+                <BookOpen className="w-5 h-5 text-blue-500" />
+                <h3 className="text-lg font-semibold text-gray-900">What&apos;s Resonating</h3>
+              </div>
+
+              <div className="space-y-3">
+                {topCourses.slice(0, showAllCourses ? topCourses.length : 5).map((course, index) => (
+                  <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                    <div className="flex items-center gap-3">
+                      <span className="text-gray-400 text-sm w-4">{index + 1}.</span>
+                      <span className="text-gray-700">{course.name}</span>
+                      {course.completionRate === 100 && (
+                        <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">
+                          ✨ 100% finish rate
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-500 whitespace-nowrap">
+                      {course.started} started · {course.completed70} completed
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {topCourses.length > 5 && (
+                <button
+                  onClick={() => setShowAllCourses(!showAllCourses)}
+                  className="mt-4 text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1"
+                >
+                  {showAllCourses ? 'Show less' : `View all ${topCourses.length} courses`}
+                  <ChevronDown className={`w-4 h-4 transform transition-transform ${showAllCourses ? 'rotate-180' : ''}`} />
+                </button>
+              )}
+            </div>
+
+            {/* Section 6: Needs Attention (Collapsible, Soft Tone) */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
               <button
-                onClick={() => handleTabClick('overview')}
-                className="w-full mt-4 pt-4 border-t border-gray-100 text-center text-sm text-[#38618C] hover:text-[#2d4a6d] font-medium transition-colors flex items-center justify-center gap-2"
+                onClick={() => setShowNotLoggedIn(!showNotLoggedIn)}
+                className="w-full flex items-center justify-between"
               >
-                View all 9 action items on Overview
-                <ArrowRight className="w-4 h-4" />
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-semibold text-gray-900">23 paras haven&apos;t logged in yet</div>
+                    <div className="text-sm text-amber-700">They may need a quick walkthrough to get started</div>
+                  </div>
+                </div>
+                <ChevronDown className={`w-5 h-5 text-amber-600 transform transition-transform ${showNotLoggedIn ? 'rotate-180' : ''}`} />
               </button>
+
+              {showNotLoggedIn && (
+                <div className="mt-4 pt-4 border-t border-amber-200">
+                  <div className="bg-white rounded-lg p-4 mb-4">
+                    <div className="flex items-start gap-2 text-sm text-slate-600">
+                      <Lightbulb className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
+                      <span>
+                        <strong>Tip:</strong> Districts that build in 15 minutes of protected Hub time during para meetings see <strong>3x higher engagement</strong>.
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="bg-white rounded-lg overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="text-left py-2 px-3 font-medium text-gray-600">#</th>
+                          <th className="text-left py-2 px-3 font-medium text-gray-600">Name</th>
+                          <th className="text-left py-2 px-3 font-medium text-gray-600">Email</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {notLoggedInParas.map((para, index) => (
+                          <tr key={index} className="border-t border-gray-100">
+                            <td className="py-2 px-3 text-gray-400">{index + 1}</td>
+                            <td className="py-2 px-3 text-gray-900">{para.name}</td>
+                            <td className="py-2 px-3 text-gray-500">{para.email}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Section 2: Hub Engagement (REAL DATA) */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h3 className="text-lg font-bold text-[#1e2749] mb-5">Hub Engagement</h3>
+            {/* Section 7: Suggested Next Steps */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <div className="flex items-center gap-2 mb-4">
+                <ClipboardList className="w-5 h-5 text-teal-600" />
+                <h3 className="text-lg font-semibold text-gray-900">Suggested Next Steps</h3>
+              </div>
 
-              <div className="flex flex-col md:flex-row items-center gap-8">
-                {/* Progress Ring */}
-                <div className="relative w-36 h-36 flex-shrink-0">
-                  <svg className="w-36 h-36 transform -rotate-90">
-                    <circle cx="72" cy="72" r="60" stroke="#E5E7EB" strokeWidth="12" fill="none"/>
-                    <circle cx="72" cy="72" r="60" stroke="#ffba06" strokeWidth="12" fill="none"
-                      strokeDasharray="377" strokeDashoffset="83" strokeLinecap="round"/>
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-4xl font-bold text-[#1e2749]">78%</span>
-                    <span className="text-sm text-gray-500">logged in</span>
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 mt-0.5"></div>
+                  <div>
+                    <div className="font-medium text-gray-900">Schedule Observation Day 1</div>
+                    <div className="text-sm text-gray-500">23 paras still need their first login before then</div>
                   </div>
                 </div>
 
-                <div className="flex-1 text-center md:text-left">
-                  <div className="text-3xl font-bold text-[#1e2749]">91 <span className="text-xl font-normal text-gray-400">of 117</span></div>
-                  <div className="text-gray-600 mb-4">paras have logged in</div>
-
-                  <div className="bg-gray-100 rounded-full h-3 overflow-hidden mb-2">
-                    <div className="bg-[#ffba06] h-full rounded-full" style={{ width: '78%' }}></div>
+                <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 mt-0.5"></div>
+                  <div>
+                    <div className="font-medium text-gray-900">Recognize your top engaged paras</div>
+                    <div className="text-sm text-gray-500">A quick shout-out at your next meeting goes a long way</div>
                   </div>
+                </div>
 
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-500">Current: 78%</span>
-                    <span className="text-[#38618C] font-medium">Goal: 100% before Virtual Session 1</span>
+                <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 mt-0.5"></div>
+                  <div>
+                    <div className="font-medium text-gray-900">Try a 15-min Hub walkthrough</div>
+                    <div className="text-sm text-gray-500">For paras who haven&apos;t logged in — we can help facilitate</div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 mt-0.5"></div>
+                  <div>
+                    <div className="font-medium text-gray-900">Share &quot;Paraprofessional Foundations&quot; as the starting course</div>
+                    <div className="text-sm text-gray-500">It&apos;s your most popular course with 19 paras already engaged</div>
                   </div>
                 </div>
               </div>
 
-              {/* Tip */}
-              <div className="bg-[#ffba06]/10 rounded-xl p-4 mt-6 flex items-start gap-3">
-                <Lightbulb className="w-5 h-5 text-[#ffba06] flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-gray-700">
-                  <strong className="text-[#1e2749]">26 paras haven&apos;t logged in yet</strong> — try a walkthrough at your next staff meeting or share the &quot;Getting Started&quot; video in your para newsletter.
-                </div>
-              </div>
-            </div>
-
-            {/* Section 4: What We'll Measure */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-bold text-[#1e2749]">What We&apos;ll Measure</h3>
-              </div>
-              <p className="text-sm text-gray-500 mb-6">Baseline collected during Virtual Session 1</p>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Job Satisfaction */}
-                <div className="p-4 border border-gray-200 rounded-xl">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center">
-                      <Smile className="w-5 h-5 text-[#38618C]" />
-                    </div>
-                    <div className="font-medium text-[#1e2749]">Job Satisfaction</div>
-                  </div>
-                  <p className="text-sm text-gray-500 mb-3">&quot;How satisfied are you in your current role?&quot;</p>
-                  <div className="flex items-center gap-6">
-                    <div>
-                      <span className="text-gray-400">Industry Avg:</span>
-                      <span className="font-semibold text-gray-600 ml-1 text-base">5.1/10</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">TDI Partners:</span>
-                      <span className="font-semibold text-green-600 ml-1 text-base">7.2/10 ↑</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Feeling Valued */}
-                <div className="p-4 border border-gray-200 rounded-xl">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center">
-                      <Heart className="w-5 h-5 text-[#38618C]" />
-                    </div>
-                    <div className="font-medium text-[#1e2749]">Feeling Valued</div>
-                  </div>
-                  <p className="text-sm text-gray-500 mb-3">&quot;How valued do you feel by teachers and admin?&quot;</p>
-                  <div className="flex items-center gap-6">
-                    <div>
-                      <span className="text-gray-400">Industry Avg:</span>
-                      <span className="font-semibold text-gray-600 ml-1 text-base">3.8/10</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">TDI Partners:</span>
-                      <span className="font-semibold text-green-600 ml-1 text-base">6.5/10 ↑</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Stress Level */}
-                <div className="p-4 border border-gray-200 rounded-xl">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center">
-                      <Activity className="w-5 h-5 text-[#38618C]" />
-                    </div>
-                    <div className="font-medium text-[#1e2749]">Stress Level</div>
-                  </div>
-                  <p className="text-sm text-gray-500 mb-3">&quot;Rate your current stress level at work&quot;</p>
-                  <div className="flex items-center gap-6">
-                    <div>
-                      <span className="text-gray-400">Industry Avg:</span>
-                      <span className="font-semibold text-gray-600 ml-1 text-base">7.9/10</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">TDI Partners:</span>
-                      <span className="font-semibold text-green-600 ml-1 text-base">5.5/10 ↓</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Retention Intent */}
-                <div className="p-4 border border-gray-200 rounded-xl">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-[#38618C]/10 rounded-lg flex items-center justify-center">
-                      <RefreshCw className="w-5 h-5 text-[#38618C]" />
-                    </div>
-                    <div className="font-medium text-[#1e2749]">Retention Intent</div>
-                  </div>
-                  <p className="text-sm text-gray-500 mb-3">&quot;How likely are you to stay in this role next year?&quot;</p>
-                  <div className="flex items-center gap-6">
-                    <div>
-                      <span className="text-gray-400">Industry Avg:</span>
-                      <span className="font-semibold text-gray-600 ml-1 text-base">4.1/10</span>
-                    </div>
-                    <div>
-                      <span className="text-gray-400">TDI Partners:</span>
-                      <span className="font-semibold text-green-600 ml-1 text-base">7.8/10 ↑</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-xs text-gray-400 text-center mt-6 pt-4 border-t border-gray-100">
-                Your ASD4 baseline will appear here after Virtual Session 1 · Sources: RAND, NCTQ, Learning Policy Institute
-              </p>
-            </div>
-
-            {/* Section 5: Observation Preview */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="p-6">
-                <h3 className="text-lg font-bold text-[#1e2749] mb-2">What Your Observation Day Looks Like</h3>
-                <p className="text-gray-600 mb-6">
-                  During each on-site visit, Rae observes classrooms and creates personalized feedback for every para in your pilot group.
-                </p>
-
-                {/* Love Note Format Example */}
-                <div className="bg-[#ffba06]/10 rounded-xl p-5 border-2 border-dashed border-[#ffba06]/40">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Heart className="w-5 h-5 text-[#E07A5F]" />
-                    <span className="font-semibold text-[#1e2749]">Love Note Format</span>
-                    <span className="px-2 py-0.5 bg-[#ffba06]/30 text-[#1e2749] text-xs rounded font-medium">FORMAT EXAMPLE</span>
-                  </div>
-
-                  <div className="bg-white rounded-lg p-5 border border-gray-200">
-                    <div className="text-sm text-gray-500 mb-4">
-                      <div><strong className="text-gray-700">To:</strong> [Para Name]</div>
-                      <div><strong className="text-gray-700">From:</strong> Rae Hughart, TDI</div>
-                      <div><strong className="text-gray-700">Observed:</strong> [Date]</div>
-                    </div>
-
-                    <div className="mb-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Sparkles className="w-4 h-4 text-green-600" />
-                        <span className="font-semibold text-green-700 text-sm">WHAT WE CELEBRATED</span>
-                      </div>
-                      <ul className="text-sm text-gray-600 space-y-1 ml-6">
-                        <li>• The way you redirected Marcus with a quiet word instead of calling him out — that&apos;s relationship-building in action</li>
-                        <li>• Your small group station was organized and inviting</li>
-                        <li>• Students clearly trust you — I saw 3 kids come to you for help before asking the lead teacher</li>
-                      </ul>
-                    </div>
-
-                    <div className="mb-4">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Sprout className="w-4 h-4 text-[#35A7FF]" />
-                        <span className="font-semibold text-[#38618C] text-sm">WHERE WE&apos;RE GROWING</span>
-                      </div>
-                      <ul className="text-sm text-gray-600 space-y-1 ml-6">
-                        <li>• Try the &quot;2x10&quot; strategy with Jaylen — 2 minutes of personal conversation for 10 days can transform challenging relationships</li>
-                      </ul>
-                    </div>
-
-                    <div className="bg-[#38618C]/5 rounded-lg p-3">
-                      <div className="text-xs font-semibold text-[#38618C] mb-1">HUB RESOURCE FOR YOU</div>
-                      <div className="text-sm text-gray-600">→ &quot;Building Relationships with Reluctant Students&quot; (Course 4.2)</div>
-                    </div>
-                  </div>
-                </div>
-
-                <p className="text-sm text-gray-500 mt-4 text-center">
-                  After observations, paras are grouped by growth area for targeted support through Growth Groups.
-                </p>
+              <div className="mt-6 pt-4 border-t border-gray-100">
+                <a
+                  href="mailto:rae@teachersdeserveit.com"
+                  className="inline-flex items-center gap-2 text-teal-600 hover:text-teal-700 font-medium text-sm"
+                >
+                  Questions? Reach out to Rae
+                  <ArrowRight className="w-4 h-4" />
+                </a>
               </div>
             </div>
 

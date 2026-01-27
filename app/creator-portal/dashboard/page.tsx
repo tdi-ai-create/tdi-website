@@ -313,6 +313,17 @@ export default function CreatorDashboardPage() {
               onMarkComplete={handleMarkComplete}
               onRefresh={refreshDashboard}
               isLoading={isSaving}
+              teamNotes={dashboardData.notes.filter(n => n.visible_to_creator).map(n => n.note).join('\n\n')}
+              creatorName={dashboardData.creator.name}
+              creator={{
+                google_doc_link: dashboardData.creator.google_doc_link,
+                drive_folder_link: dashboardData.creator.drive_folder_link,
+                marketing_doc_link: dashboardData.creator.marketing_doc_link,
+                course_url: dashboardData.creator.course_url,
+                discount_code: dashboardData.creator.discount_code,
+                wants_video_editing: dashboardData.creator.wants_video_editing,
+                wants_download_design: dashboardData.creator.wants_download_design,
+              }}
             />
           </div>
 

@@ -49,6 +49,15 @@ export interface Creator {
   agreement_signed: boolean;
   agreement_signed_at: string | null;
   agreement_signed_name: string | null;
+  // New link fields
+  google_doc_link: string | null;
+  drive_folder_link: string | null;
+  marketing_doc_link: string | null;
+  course_url: string | null;
+  launch_date: string | null;
+  // Production preference fields
+  wants_video_editing: boolean;
+  wants_download_design: boolean;
   created_at: string;
   updated_at: string;
 }

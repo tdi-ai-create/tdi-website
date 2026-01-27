@@ -40,10 +40,34 @@ export async function POST(request: Request) {
       console.log('[submit] Note: creator_submissions insert:', submitError.message);
     }
 
-    // 2. Update milestone status
-    // For confirmations and meeting_scheduled, mark as complete. For submissions needing review, mark as waiting_approval
-    const completionTypes = ['confirmation', 'meeting_scheduled'];
-    const newStatus = completionTypes.includes(submissionType) ? 'completed' : 'waiting_approval';
+    // 2. Handle preferences submission - update creator table
+    if (submissionType === 'preferences') {
+      const { error: prefsError } = await supabase
+        .from('creators')
+        .update({
+          wants_video_editing: content.wants_video_editing || false,
+          wants_download_design: content.wants_download_design || false,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', creatorId);
+
+      if (prefsError) {
+        console.error('[submit] Error saving preferences:', prefsError);
+        return NextResponse.json({ success: false, error: prefsError.message }, { status: 500 });
+      }
+    }
+
+    // 3. Update milestone status
+    // For confirmations, meeting_scheduled, and preferences, mark as complete
+    // For change_request, mark as in_progress (pending team review)
+    // For submissions needing review, mark as waiting_approval
+    const completionTypes = ['confirmation', 'meeting_scheduled', 'preferences'];
+    let newStatus = completionTypes.includes(submissionType) ? 'completed' : 'waiting_approval';
+
+    // Change requests go back to in_progress as team needs to make updates
+    if (submissionType === 'change_request') {
+      newStatus = 'in_progress';
+    }
 
     // Build update object - include scheduled_date if it's a meeting
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -61,6 +85,14 @@ export async function POST(request: Request) {
       };
     }
 
+    // If change request, store the request in metadata
+    if (submissionType === 'change_request' && content.request) {
+      updateData.metadata = {
+        change_request: content.request,
+        requested_at: new Date().toISOString()
+      };
+    }
+
     const { error: updateError } = await supabase
       .from('creator_milestones')
       .update(updateData)
@@ -72,7 +104,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: updateError.message }, { status: 500 });
     }
 
-    // 3. If this is a completion type (not needing review), unlock next milestone
+    // 4. If this is a completion type (not needing review), unlock next milestone
     if (completionTypes.includes(submissionType)) {
       // Get current milestone info
       const { data: milestone } = await supabase
@@ -103,8 +135,8 @@ export async function POST(request: Request) {
       }
     }
 
-    // 4. Send email notification to team if needed
-    if (notifyTeam) {
+    // 5. Send email notification to team if needed (also always for change requests)
+    if (notifyTeam || submissionType === 'change_request') {
       const { data: creator } = await supabase
         .from('creators')
         .select('name, email')
@@ -147,9 +179,29 @@ export async function POST(request: Request) {
             `;
           }
 
-          const emailSubject = submissionType === 'meeting_scheduled'
-            ? `📅 ${creator.name} scheduled a meeting`
-            : `New Submission from ${creator.name}`;
+          // Format change request info
+          let changeRequestInfo = '';
+          if (submissionType === 'change_request' && content.request) {
+            changeRequestInfo = `
+              <div style="background: #fff7ed; border: 2px solid #ea580c; border-radius: 8px; padding: 16px; margin: 16px 0;">
+                <p style="margin: 0; font-size: 14px; color: #666;">📝 Change Request</p>
+                <p style="margin: 8px 0 0 0; font-size: 16px; color: #1e2749; white-space: pre-wrap;">
+                  ${content.request}
+                </p>
+              </div>
+            `;
+          }
+
+          // Determine email subject based on type
+          let emailSubject = `New Submission from ${creator.name}`;
+          let emailHeading = 'New Submission Ready for Review';
+          if (submissionType === 'meeting_scheduled') {
+            emailSubject = `📅 ${creator.name} scheduled a meeting`;
+            emailHeading = 'Meeting Scheduled';
+          } else if (submissionType === 'change_request') {
+            emailSubject = `📝 ${creator.name} requested changes`;
+            emailHeading = 'Change Request';
+          }
 
           await fetch('https://api.resend.com/emails', {
             method: 'POST',
@@ -163,14 +215,15 @@ export async function POST(request: Request) {
               subject: emailSubject,
               html: `
                 <div style="font-family: sans-serif; max-width: 600px;">
-                  <h2 style="color: #1e2749;">${submissionType === 'meeting_scheduled' ? 'Meeting Scheduled' : 'New Submission Ready for Review'}</h2>
+                  <h2 style="color: #1e2749;">${emailHeading}</h2>
 
                   <p><strong>Creator:</strong> ${creator.name} (${creator.email})</p>
                   <p><strong>Milestone:</strong> ${milestoneName}</p>
 
                   ${meetingInfo}
+                  ${changeRequestInfo}
                   ${content.link ? `<p><strong>Submitted Link:</strong> <a href="${content.link}">${content.link}</a></p>` : ''}
-                  ${content.notes ? `<p><strong>Creator Notes:</strong> ${content.notes}</p>` : ''}
+                  ${content.notes && !changeRequestInfo ? `<p><strong>Creator Notes:</strong> ${content.notes}</p>` : ''}
 
                   <a href="https://www.teachersdeserveit.com/admin/creators/${creatorId}"
                      style="display: inline-block; background: #1e2749; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin-top: 16px;">
@@ -187,15 +240,22 @@ export async function POST(request: Request) {
       }
 
       // Also create admin notification
-      const notificationMessage = submissionType === 'meeting_scheduled'
-        ? `${creator?.name || 'A creator'} scheduled a meeting for ${milestoneName}`
-        : `${creator?.name || 'A creator'} submitted ${milestoneName}`;
+      let notificationMessage = `${creator?.name || 'A creator'} submitted ${milestoneName}`;
+      let notificationType = 'submission';
+
+      if (submissionType === 'meeting_scheduled') {
+        notificationMessage = `${creator?.name || 'A creator'} scheduled a meeting for ${milestoneName}`;
+        notificationType = 'meeting';
+      } else if (submissionType === 'change_request') {
+        notificationMessage = `${creator?.name || 'A creator'} requested changes for ${milestoneName}`;
+        notificationType = 'change_request';
+      }
 
       await supabase
         .from('admin_notifications')
         .insert({
           creator_id: creatorId,
-          type: submissionType === 'meeting_scheduled' ? 'meeting' : 'submission',
+          type: notificationType,
           message: notificationMessage,
           link: `/admin/creators/${creatorId}`,
         });
