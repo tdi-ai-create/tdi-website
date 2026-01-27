@@ -80,12 +80,14 @@ function MilestoneItem({
   onMarkComplete,
   onRefresh,
   isLoading,
+  isInActionPhase = false,
 }: {
   milestone: MilestoneWithStatus;
   creatorId?: string;
   onMarkComplete?: (milestoneId: string) => Promise<void>;
   onRefresh?: () => void;
   isLoading?: boolean;
+  isInActionPhase?: boolean;
 }) {
   const isActionable =
     milestone.status === 'available' || milestone.status === 'in_progress';
@@ -105,8 +107,8 @@ function MilestoneItem({
   const isWaitingOnTdi = milestone.requires_team_action &&
     (milestone.status === 'available' || milestone.status === 'in_progress');
 
-  // Check if this is the current actionable milestone (needs creator attention)
-  const isCurrentAction = isActionable && !milestone.requires_team_action;
+  // Only highlight as current action if this phase is the action phase
+  const isCurrentAction = isInActionPhase && isActionable && !milestone.requires_team_action;
 
   // Use special config for waiting on TDI, otherwise use standard config
   const config = isWaitingOnTdi ? waitingOnTdiConfig : statusConfig[milestone.status];
@@ -399,6 +401,7 @@ function PhaseCard({
               onMarkComplete={onMarkComplete}
               onRefresh={onRefresh}
               isLoading={isLoading}
+              isInActionPhase={isActionPhase}
             />
           ))}
         </div>
