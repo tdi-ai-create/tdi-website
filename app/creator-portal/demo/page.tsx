@@ -356,6 +356,31 @@ export default function CreatorPortalDemoPage() {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'info' } | null>(null);
   const [confetti, setConfetti] = useState(false);
 
+  // Handle agreement signed query parameter
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('agreement') === 'signed') {
+        // Mark agreement milestones as complete (m4 is "Review & Sign Agreement")
+        setCompletedMilestones(prev => {
+          if (!prev.includes('m4')) {
+            return [...prev, 'm4'];
+          }
+          return prev;
+        });
+        // Show success message and confetti
+        setToast({ message: "Agreement signed! Welcome to the TDI Creator family!", type: 'success' });
+        setConfetti(true);
+        setTimeout(() => setConfetti(false), 3000);
+        setTimeout(() => setToast(null), 5000);
+        // Expand the Agreement phase to show the completion
+        setExpandedPhases(prev => prev.includes('agreement') ? prev : [...prev, 'agreement']);
+        // Clear the URL param without refreshing
+        window.history.replaceState({}, '', '/creator-portal/demo');
+      }
+    }
+  }, []);
+
   // Show toast helper
   const showToast = (message: string, type: 'success' | 'info' = 'success') => {
     setToast({ message, type });
@@ -527,7 +552,7 @@ export default function CreatorPortalDemoPage() {
         return (
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <Link
-              href="/creator-portal/agreement"
+              href="/creator-portal/demo/agreement"
               className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-all hover:scale-105 active:scale-95"
             >
               <FileText className="w-4 h-4" />
