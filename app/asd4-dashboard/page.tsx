@@ -288,9 +288,6 @@ Keep being amazing!`
                     : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
                 }`}
               >
-                {tab.alert && activeTab !== tab.id && (
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full" />
-                )}
                 <tab.icon className={`w-4 h-4 ${tab.alert && activeTab !== tab.id ? 'text-red-600' : ''}`} />
                 <span>{tab.label}</span>
                 {tab.badge && (
