@@ -37,12 +37,18 @@ import {
   ChevronUp,
   PartyPopper,
   Award,
-  MessageCircle
+  MessageCircle,
+  CreditCard,
+  FileText,
+  Info,
+  HelpCircle,
+  Heart
 } from 'lucide-react';
 
 export default function WegoDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [showAllLoveNotes, setShowAllLoveNotes] = useState(false);
+  const [showPolicy, setShowPolicy] = useState(false);
 
   // Scroll to top when changing tabs
   const handleTabChange = (tabId: string) => {
@@ -103,6 +109,7 @@ export default function WegoDashboard() {
               { id: 'blueprint', label: 'Blueprint', icon: Star },
               { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
               { id: 'team', label: 'Team', icon: User },
+              { id: 'billing', label: 'Billing', icon: CreditCard, alert: true },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -110,10 +117,12 @@ export default function WegoDashboard() {
                 className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                   activeTab === tab.id
                     ? 'bg-[#1e2749] text-white shadow-md'
+                    : tab.alert
+                    ? 'bg-amber-50 text-amber-700 ring-2 ring-amber-400 ring-offset-2 hover:bg-amber-100'
                     : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
                 }`}
               >
-                <tab.icon className="w-4 h-4" />
+                <tab.icon className={`w-4 h-4 ${tab.alert && activeTab !== tab.id ? 'text-amber-600' : ''}`} />
                 <span>{tab.label}</span>
                 {tab.badge && (
                   <span className="text-xs bg-[#35A7FF] text-white px-2 py-0.5 rounded-full">
@@ -1963,6 +1972,195 @@ export default function WegoDashboard() {
                 <span className="font-medium">Hub Access Until:</span> June 2027
               </div>
             </div>
+          </div>
+        )}
+
+        {/* BILLING TAB */}
+        {activeTab === 'billing' && (
+          <div className="space-y-6">
+
+            {/* Section 1: Thank You Banner */}
+            <div className="bg-[#1e2749] rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <Heart className="w-6 h-6 text-[#ffba06] fill-[#ffba06] flex-shrink-0" />
+                <p className="text-white">
+                  <span className="font-medium">Thank you for investing in your team.</span>
+                  <span className="text-white/80 ml-1">Partnerships like yours help us support 87,000+ educators nationwide.</span>
+                </p>
+              </div>
+            </div>
+
+            {/* Section 2: Pending Status Banner (Yellow) */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <div className="flex items-center justify-between flex-wrap gap-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
+                    <Clock className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <div>
+                    <div className="font-semibold text-amber-800">Payment in Process</div>
+                    <div className="text-sm text-amber-600">We&apos;re awaiting your mailed check. Questions? Contact us below.</div>
+                  </div>
+                </div>
+                <a
+                  href="mailto:jevon@secureplusfinancial.com?subject=Payment Status - West Chicago"
+                  className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                >
+                  <Mail className="w-4 h-4" />
+                  Contact Jevon Suralie
+                </a>
+              </div>
+            </div>
+
+            {/* Section 3: Your Agreements (Shows Amounts - Mixed Status) */}
+            <div className="bg-white rounded-xl p-5 shadow-sm">
+              <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
+                <FileText className="w-5 h-5" />
+                Your Agreements
+              </h3>
+
+              <div className="space-y-4">
+
+                {/* Agreement 1: West Chicago - PAID */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Partnership Services</div>
+                      <div className="text-sm text-gray-500">Signed September 25, 2025</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-[#1e2749]">$9,999</div>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                        Paid
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-600 mb-3">
+                    Includes: 19 Hub Memberships, 2 Full-Day Visits, 6 Virtual Coaching Sessions
+                  </div>
+                  <a
+                    href="https://my.anchor.sh/notification/ng-notification-z26iWdV1mDmJ-hfiylgybm3YieJQN"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-[#35A7FF] hover:underline"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    View Agreement
+                  </a>
+                </div>
+
+                {/* Agreement 2: West Chicago CHS - PENDING */}
+                <div className="border border-amber-200 bg-amber-50/50 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Observation & Feedback Day</div>
+                      <div className="text-sm text-gray-500">Signed December 1, 2025</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-semibold text-[#1e2749]">$6,000</div>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">
+                        Pending
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-sm text-gray-600 mb-3">
+                    Includes: 1 Full-Day On-Site PD
+                  </div>
+                  <a
+                    href="https://my.anchor.sh/notification/ng-notification-z26iWcrti2RP-nX8HIg4ALPEYs8Bg"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-[#35A7FF] hover:underline"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    View Agreement
+                  </a>
+                </div>
+
+              </div>
+
+              {/* Total Outstanding */}
+              <div className="mt-4 pt-4 border-t border-gray-200 flex justify-between items-center">
+                <span className="font-medium text-gray-600">Total Outstanding</span>
+                <span className="text-xl font-bold text-amber-600">$6,000</span>
+              </div>
+            </div>
+
+            {/* Section 4: Impact Callout */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                <p className="text-amber-900">
+                  <span className="font-medium">Did you know?</span> TDI partners see a 65% implementation rate (vs. 10% industry average).
+                </p>
+              </div>
+            </div>
+
+            {/* Section 5: Payment Policy */}
+            <div className="bg-white rounded-xl p-5 shadow-sm">
+              <button
+                onClick={() => setShowPolicy(!showPolicy)}
+                className="w-full flex items-center justify-between"
+              >
+                <h3 className="font-semibold text-[#1e2749] flex items-center gap-2">
+                  <Info className="w-5 h-5" />
+                  Payment Policy
+                </h3>
+                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showPolicy ? 'rotate-180' : ''}`} />
+              </button>
+
+              {showPolicy && (
+                <div className="mt-4 pt-4 border-t border-gray-100 text-sm text-gray-600 space-y-2">
+                  <p>Payment is due within 30 days of signing and is processed automatically through your saved payment method on file.</p>
+                  <p>Any changes to your agreement require written approval from both parties.</p>
+                  <p>Questions about billing? Contact our billing team using the information below.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Section 6: Questions + Testimonial */}
+            <div className="bg-white rounded-xl p-5 shadow-sm">
+              <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
+                <HelpCircle className="w-5 h-5" />
+                Questions?
+              </h3>
+
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="text-sm text-gray-500 mb-1">Billing & Payment Questions</div>
+                  <div className="font-medium text-[#1e2749]">Jevon Suralie</div>
+                  <div className="text-sm text-gray-600 mb-3">Secure Plus Financial</div>
+                  <a
+                    href="mailto:jevon@secureplusfinancial.com?subject=Billing Question - West Chicago"
+                    className="inline-flex items-center gap-2 bg-[#1e2749] hover:bg-[#2a3a5c] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <Mail className="w-4 h-4" />
+                    Email Billing Team
+                  </a>
+                </div>
+
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="text-sm text-gray-500 mb-1">Contract & Fulfillment Questions</div>
+                  <div className="font-medium text-[#1e2749]">Rae Hughart</div>
+                  <div className="text-sm text-gray-600 mb-3">Teachers Deserve It</div>
+                  <a
+                    href="mailto:rae@teachersdeserveit.com?subject=Partnership Question - West Chicago"
+                    className="inline-flex items-center gap-2 bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  >
+                    <Mail className="w-4 h-4" />
+                    Email Rae
+                  </a>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-5 border-t border-gray-100">
+                <p className="text-gray-600 italic">
+                  &quot;TDI changed the way our teachers approach their day. The strategies actually stick.&quot;
+                </p>
+                <p className="text-sm text-gray-400 mt-1">— Partner School Administrator</p>
+              </div>
+            </div>
+
           </div>
         )}
       </div>
