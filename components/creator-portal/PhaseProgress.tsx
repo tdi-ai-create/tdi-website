@@ -105,6 +105,9 @@ function MilestoneItem({
   const isWaitingOnTdi = milestone.requires_team_action &&
     (milestone.status === 'available' || milestone.status === 'in_progress');
 
+  // Check if this is the current actionable milestone (needs creator attention)
+  const isCurrentAction = isActionable && !milestone.requires_team_action;
+
   // Use special config for waiting on TDI, otherwise use standard config
   const config = isWaitingOnTdi ? waitingOnTdiConfig : statusConfig[milestone.status];
   const Icon = config.icon;
@@ -157,23 +160,32 @@ function MilestoneItem({
           ? 'bg-green-50/50 border-green-200'
           : milestone.status === 'waiting_approval'
           ? 'bg-orange-50/50 border-orange-200'
+          : isCurrentAction
+          ? 'bg-[#fef9eb] border-[#F5A623] border-2 shadow-md'
           : 'bg-white border-gray-200 hover:border-[#80a4ed]'
       }`}
     >
-      <div className={`flex-shrink-0 w-8 h-8 rounded-full ${config.bg} flex items-center justify-center`}>
-        <Icon className={`w-4 h-4 ${config.color}`} />
+      <div className={`flex-shrink-0 w-8 h-8 rounded-full ${isCurrentAction ? 'bg-[#ffba06]' : config.bg} flex items-center justify-center`}>
+        <Icon className={`w-4 h-4 ${isCurrentAction ? 'text-[#1e2749]' : config.color}`} />
       </div>
 
       <div className="flex-grow min-w-0">
         <div className="flex items-start justify-between gap-2">
           <div>
-            <h4
-              className={`font-medium ${
-                milestone.status === 'locked' ? 'text-gray-500' : 'text-[#1e2749]'
-              }`}
-            >
-              {milestoneTitle}
-            </h4>
+            <div className="flex items-center gap-2">
+              <h4
+                className={`font-medium ${
+                  milestone.status === 'locked' ? 'text-gray-500' : 'text-[#1e2749]'
+                }`}
+              >
+                {milestoneTitle}
+              </h4>
+              {isCurrentAction && (
+                <span className="text-xs bg-[#ffba06] text-[#1e2749] px-2 py-0.5 rounded-full font-medium">
+                  Your Next Step
+                </span>
+              )}
+            </div>
             {milestone.description && (
               <p className="text-sm text-gray-600 mt-1">{milestone.description}</p>
             )}
