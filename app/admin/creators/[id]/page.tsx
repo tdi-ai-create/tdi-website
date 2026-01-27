@@ -21,6 +21,7 @@ import {
   Info,
   RotateCcw,
   X,
+  Unlock,
 } from 'lucide-react';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { supabase } from '@/lib/supabase';
@@ -124,6 +125,9 @@ export default function AdminCreatorDetailPage() {
   const [selectedMilestoneForRevision, setSelectedMilestoneForRevision] = useState<{id: string; title: string} | null>(null);
   const [revisionNote, setRevisionNote] = useState('');
   const [isRequestingRevision, setIsRequestingRevision] = useState(false);
+
+  // Reopen milestone state
+  const [reopeningMilestone, setReopeningMilestone] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     const data = await getCreatorDashboardData(creatorId);
@@ -291,6 +295,41 @@ export default function AdminCreatorDetailPage() {
     }
   };
 
+  const handleReopen = async (milestoneId: string, milestoneTitle: string) => {
+    if (!confirm('Are you sure you want to reopen this milestone? The creator will need to complete it again.')) {
+      return;
+    }
+
+    setReopeningMilestone(milestoneId);
+
+    try {
+      const response = await fetch('/api/admin/reopen-milestone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          milestoneId,
+          creatorId,
+          adminEmail,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        await loadData();
+        setSuccessMessage(`Reopened: ${milestoneTitle}`);
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        alert('Failed to reopen: ' + data.error);
+      }
+    } catch (error) {
+      console.error('Error reopening milestone:', error);
+      alert('Error reopening milestone');
+    } finally {
+      setReopeningMilestone(null);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
@@ -413,7 +452,9 @@ export default function AdminCreatorDetailPage() {
                 onToggle={() => togglePhase(phase.id)}
                 onApprove={handleApprove}
                 onRequestRevision={handleRequestRevision}
+                onReopen={handleReopen}
                 approvingMilestoneId={approvingMilestoneId}
+                reopeningMilestone={reopeningMilestone}
               />
             ))}
           </div>
@@ -706,14 +747,18 @@ function PhaseSection({
   onToggle,
   onApprove,
   onRequestRevision,
+  onReopen,
   approvingMilestoneId,
+  reopeningMilestone,
 }: {
   phase: PhaseWithMilestones;
   isExpanded: boolean;
   onToggle: () => void;
   onApprove: (milestoneId: string, milestoneTitle: string) => void;
   onRequestRevision: (milestoneId: string, milestoneTitle: string) => void;
+  onReopen: (milestoneId: string, milestoneTitle: string) => void;
   approvingMilestoneId: string | null;
+  reopeningMilestone: string | null;
 }) {
   const completedCount = phase.milestones.filter((m) => m.status === 'completed').length;
 
@@ -771,7 +816,9 @@ function PhaseSection({
                   milestone={milestone}
                   onApprove={() => onApprove(milestone.id, milestoneTitle)}
                   onRequestRevision={() => onRequestRevision(milestone.id, milestoneTitle)}
+                  onReopen={() => onReopen(milestone.id, milestoneTitle)}
                   isApproving={approvingMilestoneId === milestone.id}
+                  isReopening={reopeningMilestone === milestone.id}
                 />
               );
             })}
@@ -786,12 +833,16 @@ function MilestoneRow({
   milestone,
   onApprove,
   onRequestRevision,
+  onReopen,
   isApproving,
+  isReopening,
 }: {
   milestone: MilestoneWithStatus;
   onApprove: () => void;
   onRequestRevision: () => void;
+  onReopen: () => void;
   isApproving: boolean;
+  isReopening: boolean;
 }) {
   const config = statusConfig[milestone.status];
   const Icon = config.icon;
@@ -889,15 +940,31 @@ function MilestoneRow({
             </>
           )}
           {milestone.status === 'completed' && (
-            <Tooltip content="Send this back to the creator with feedback for revision." position="left">
-              <button
-                onClick={onRequestRevision}
-                className="inline-flex items-center gap-1 text-amber-600 hover:bg-amber-50 px-2 py-1 rounded text-xs transition-colors"
-              >
-                <RotateCcw className="w-3 h-3" />
-                Request Revision
-              </button>
-            </Tooltip>
+            <div className="flex items-center gap-2">
+              <Tooltip content="Quietly reopen this milestone so the creator can redo it (no email sent)." position="left">
+                <button
+                  onClick={onReopen}
+                  disabled={isReopening}
+                  className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 p-1 rounded transition-colors disabled:opacity-50"
+                  title="Reopen this milestone"
+                >
+                  {isReopening ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Unlock className="w-3.5 h-3.5" />
+                  )}
+                </button>
+              </Tooltip>
+              <Tooltip content="Send this back to the creator with feedback for revision (sends email)." position="left">
+                <button
+                  onClick={onRequestRevision}
+                  className="inline-flex items-center gap-1 text-amber-600 hover:bg-amber-50 px-2 py-1 rounded text-xs transition-colors"
+                >
+                  <RotateCcw className="w-3 h-3" />
+                  Request Revision
+                </button>
+              </Tooltip>
+            </div>
           )}
         </div>
       </div>
