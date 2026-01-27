@@ -524,9 +524,17 @@ export default function CreatorPortalDemoPage() {
 
       case 'team_action':
         return (
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-sm">
-            <Hourglass className="w-4 h-4" />
-            Waiting on TDI
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-sm">
+              <Hourglass className="w-4 h-4" />
+              Waiting on TDI
+            </span>
+            <button
+              onClick={() => handleComplete(milestone.id, `"${milestone.title}" approved by TDI!`)}
+              className="text-xs px-3 py-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors font-medium"
+            >
+              ✓ Simulate Approval
+            </button>
           </div>
         );
 
@@ -1014,9 +1022,17 @@ export default function CreatorPortalDemoPage() {
 
                 <div className="border border-gray-200 rounded-lg p-4">
                   <p className="text-xs text-gray-500 uppercase tracking-wide mb-3">Team Action</p>
-                  <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-sm">
-                    <Hourglass className="w-4 h-4" />
-                    Waiting on TDI
+                  <div className="flex flex-col gap-2">
+                    <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-sm">
+                      <Hourglass className="w-4 h-4" />
+                      Waiting on TDI
+                    </span>
+                    <button
+                      onClick={() => showToast('TDI approved this step!', 'success')}
+                      className="text-xs px-3 py-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors font-medium"
+                    >
+                      ✓ Simulate Approval
+                    </button>
                   </div>
                 </div>
               </div>
