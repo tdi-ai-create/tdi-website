@@ -361,12 +361,12 @@ export default function CreatorPortalDemoPage() {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
       if (params.get('agreement') === 'signed') {
-        // Mark agreement milestones as complete (m4 is "Review & Sign Agreement")
+        // Mark agreement milestones as complete (m4 is Review, m5 is Sign Agreement)
         setCompletedMilestones(prev => {
-          if (!prev.includes('m4')) {
-            return [...prev, 'm4'];
-          }
-          return prev;
+          const newCompleted = [...prev];
+          if (!newCompleted.includes('m4')) newCompleted.push('m4');
+          if (!newCompleted.includes('m5')) newCompleted.push('m5');
+          return newCompleted;
         });
         // Show success message and confetti
         setToast({ message: "Agreement signed! Welcome to the TDI Creator family!", type: 'success' });

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle, ChevronDown, Calendar, Mail, Eye, PartyPopper } from 'lucide-react';
+import { ArrowLeft, CheckCircle, ChevronDown, Calendar, Mail, Eye, PartyPopper, Video, DollarSign, Share2, HeartHandshake, FileText } from 'lucide-react';
 
 export default function DemoAgreementPage() {
   const router = useRouter();
@@ -118,48 +118,58 @@ export default function DemoAgreementPage() {
 
         {/* TLDR / Highlights Section */}
         <div className="bg-[#fef9eb] border border-[#ffba06] rounded-xl p-6 mb-6">
-          <h2 className="text-xl font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
-            <span className="text-2xl">✨</span> The Quick Version (TLDR)
+          <h2 className="text-xl font-semibold text-[#1e2749] mb-4">
+            The Quick Version (TLDR)
           </h2>
 
           <div className="space-y-4">
             <div className="flex items-start gap-3">
-              <span className="text-2xl">📹</span>
+              <div className="w-10 h-10 bg-[#1e2749] rounded-full flex items-center justify-center flex-shrink-0">
+                <Video className="w-5 h-5 text-white" />
+              </div>
               <div>
                 <p className="font-medium text-[#1e2749]">What you&apos;re creating</p>
-                <p className="text-gray-600 text-sm">1-2 hours of video content + 2-6 downloadable resources for ONE course</p>
+                <p className="text-gray-600 text-sm">1-2 hours of video content + 2-6 downloadable resources for a course. Don&apos;t worry about these numbers! We&apos;ll help you make sure your tools are valuable and best for our audience!</p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <span className="text-2xl">💰</span>
+              <div className="w-10 h-10 bg-[#1e2749] rounded-full flex items-center justify-center flex-shrink-0">
+                <DollarSign className="w-5 h-5 text-white" />
+              </div>
               <div>
                 <p className="font-medium text-[#1e2749]">How you get paid</p>
-                <p className="text-gray-600 text-sm">30% commission on sales using your personal discount code. Paid quarterly. No upfront fee.</p>
+                <p className="text-gray-600 text-sm">30% commission on sales using your code. We want you to feel valued! If you have questions, we are here to help!</p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <span className="text-2xl">📝</span>
+              <div className="w-10 h-10 bg-[#1e2749] rounded-full flex items-center justify-center flex-shrink-0">
+                <Share2 className="w-5 h-5 text-white" />
+              </div>
               <div>
-                <p className="font-medium text-[#1e2749]">Who owns what</p>
-                <p className="text-gray-600 text-sm">TDI owns the course, but you can share it on your resume, portfolio, and social media as a TDI project.</p>
+                <p className="font-medium text-[#1e2749]">How can I celebrate this?</p>
+                <p className="text-gray-600 text-sm">Share it out! We will help you a TON with this. Feel free to share it on your resume, portfolio, and social media as a Teachers Deserve It Content Creator.</p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <span className="text-2xl">🤝</span>
+              <div className="w-10 h-10 bg-[#1e2749] rounded-full flex items-center justify-center flex-shrink-0">
+                <HeartHandshake className="w-5 h-5 text-white" />
+              </div>
               <div>
                 <p className="font-medium text-[#1e2749]">Support you&apos;ll receive</p>
-                <p className="text-gray-600 text-sm">Access to Creator Studio, templates, light editing support, and Rachel as your dedicated contact.</p>
+                <p className="text-gray-600 text-sm">We want to make this as easy as possible! With access to Creator Studio, templates, editing support, design support and Rachel as your dedicated contact... you are going to look like such a pro!</p>
               </div>
             </div>
 
             <div className="flex items-start gap-3">
-              <span className="text-2xl">📋</span>
+              <div className="w-10 h-10 bg-[#1e2749] rounded-full flex items-center justify-center flex-shrink-0">
+                <FileText className="w-5 h-5 text-white" />
+              </div>
               <div>
                 <p className="font-medium text-[#1e2749]">The fine print</p>
-                <p className="text-gray-600 text-sm">You&apos;re an independent contractor (not an employee). Course stays exclusive to TDI. Standard stuff!</p>
+                <p className="text-gray-600 text-sm">You&apos;re an independent contractor. Standard stuff!</p>
               </div>
             </div>
           </div>
@@ -172,7 +182,8 @@ export default function DemoAgreementPage() {
             className="w-full p-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors"
           >
             <span className="font-medium text-[#1e2749] flex items-center gap-2">
-              <span>📄</span> Read Full Agreement
+              <FileText className="w-5 h-5" />
+              Read Full Agreement
             </span>
             <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${showFullAgreement ? 'rotate-180' : ''}`} />
           </button>
