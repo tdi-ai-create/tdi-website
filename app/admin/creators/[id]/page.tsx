@@ -19,6 +19,8 @@ import {
   ChevronDown,
   ChevronUp,
   Info,
+  RotateCcw,
+  X,
 } from 'lucide-react';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { supabase } from '@/lib/supabase';
@@ -116,6 +118,12 @@ export default function AdminCreatorDetailPage() {
 
   // Expanded phases
   const [expandedPhases, setExpandedPhases] = useState<Set<string>>(new Set());
+
+  // Revision request state
+  const [showRevisionModal, setShowRevisionModal] = useState(false);
+  const [selectedMilestoneForRevision, setSelectedMilestoneForRevision] = useState<{id: string; title: string} | null>(null);
+  const [revisionNote, setRevisionNote] = useState('');
+  const [isRequestingRevision, setIsRequestingRevision] = useState(false);
 
   const loadData = useCallback(async () => {
     const data = await getCreatorDashboardData(creatorId);
@@ -240,6 +248,49 @@ export default function AdminCreatorDetailPage() {
     setExpandedPhases(newExpanded);
   };
 
+  const handleRequestRevision = (milestoneId: string, milestoneTitle: string) => {
+    setSelectedMilestoneForRevision({ id: milestoneId, title: milestoneTitle });
+    setRevisionNote('');
+    setShowRevisionModal(true);
+  };
+
+  const submitRevisionRequest = async () => {
+    if (!selectedMilestoneForRevision || !revisionNote.trim()) return;
+
+    setIsRequestingRevision(true);
+
+    try {
+      const response = await fetch('/api/admin/request-revision', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          milestoneId: selectedMilestoneForRevision.id,
+          creatorId,
+          adminEmail,
+          note: revisionNote.trim(),
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setShowRevisionModal(false);
+        setSelectedMilestoneForRevision(null);
+        setRevisionNote('');
+        await loadData();
+        setSuccessMessage(`Revision requested for: ${selectedMilestoneForRevision.title}`);
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        alert(`Failed to request revision: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error requesting revision:', error);
+      alert('Error requesting revision. Please try again.');
+    } finally {
+      setIsRequestingRevision(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
@@ -361,6 +412,7 @@ export default function AdminCreatorDetailPage() {
                 isExpanded={expandedPhases.has(phase.id)}
                 onToggle={() => togglePhase(phase.id)}
                 onApprove={handleApprove}
+                onRequestRevision={handleRequestRevision}
                 approvingMilestoneId={approvingMilestoneId}
               />
             ))}
@@ -571,6 +623,79 @@ export default function AdminCreatorDetailPage() {
           </div>
         </div>
       </main>
+
+      {/* Revision Request Modal */}
+      {showRevisionModal && selectedMilestoneForRevision && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-[#1e2749]">Request Revision</h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  For: {selectedMilestoneForRevision.title}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setShowRevisionModal(false);
+                  setSelectedMilestoneForRevision(null);
+                  setRevisionNote('');
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <p className="text-gray-600 text-sm mb-4">
+              This will move the creator back to this step. They&apos;ll receive an email with your feedback.
+            </p>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                What needs to be revised? <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                value={revisionNote}
+                onChange={(e) => setRevisionNote(e.target.value)}
+                placeholder="Please re-record your test video with better lighting..."
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowRevisionModal(false);
+                  setSelectedMilestoneForRevision(null);
+                  setRevisionNote('');
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitRevisionRequest}
+                disabled={!revisionNote.trim() || isRequestingRevision}
+                className="flex-1 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+              >
+                {isRequestingRevision ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw className="w-4 h-4" />
+                    Send Request
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -580,12 +705,14 @@ function PhaseSection({
   isExpanded,
   onToggle,
   onApprove,
+  onRequestRevision,
   approvingMilestoneId,
 }: {
   phase: PhaseWithMilestones;
   isExpanded: boolean;
   onToggle: () => void;
   onApprove: (milestoneId: string, milestoneTitle: string) => void;
+  onRequestRevision: (milestoneId: string, milestoneTitle: string) => void;
   approvingMilestoneId: string | null;
 }) {
   const completedCount = phase.milestones.filter((m) => m.status === 'completed').length;
@@ -643,6 +770,7 @@ function PhaseSection({
                   key={milestone.id}
                   milestone={milestone}
                   onApprove={() => onApprove(milestone.id, milestoneTitle)}
+                  onRequestRevision={() => onRequestRevision(milestone.id, milestoneTitle)}
                   isApproving={approvingMilestoneId === milestone.id}
                 />
               );
@@ -657,10 +785,12 @@ function PhaseSection({
 function MilestoneRow({
   milestone,
   onApprove,
+  onRequestRevision,
   isApproving,
 }: {
   milestone: MilestoneWithStatus;
   onApprove: () => void;
+  onRequestRevision: () => void;
   isApproving: boolean;
 }) {
   const config = statusConfig[milestone.status];
@@ -731,18 +861,41 @@ function MilestoneRow({
             </span>
           </Tooltip>
           {canApprove && (
-            <Tooltip content="Mark this step as complete and unlock the next step. The creator will receive an email notification." position="left">
+            <>
+              <Tooltip content="Mark this step as complete and unlock the next step. The creator will receive an email notification." position="left">
+                <button
+                  onClick={onApprove}
+                  disabled={isApproving}
+                  className="inline-flex items-center gap-1 bg-green-600 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-green-700 transition-colors disabled:opacity-50"
+                >
+                  {isApproving ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Check className="w-4 h-4" />
+                  )}
+                  Approve
+                </button>
+              </Tooltip>
+              <Tooltip content="Send this back to the creator with feedback for revision." position="left">
+                <button
+                  onClick={onRequestRevision}
+                  disabled={isApproving}
+                  className="inline-flex items-center gap-1 bg-white border border-amber-500 text-amber-600 px-3 py-1.5 rounded-lg text-sm hover:bg-amber-50 transition-colors disabled:opacity-50"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Revise
+                </button>
+              </Tooltip>
+            </>
+          )}
+          {milestone.status === 'completed' && (
+            <Tooltip content="Send this back to the creator with feedback for revision." position="left">
               <button
-                onClick={onApprove}
-                disabled={isApproving}
-                className="inline-flex items-center gap-1 bg-green-600 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-green-700 transition-colors disabled:opacity-50"
+                onClick={onRequestRevision}
+                className="inline-flex items-center gap-1 text-amber-600 hover:bg-amber-50 px-2 py-1 rounded text-xs transition-colors"
               >
-                {isApproving ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Check className="w-4 h-4" />
-                )}
-                Approve
+                <RotateCcw className="w-3 h-3" />
+                Request Revision
               </button>
             </Tooltip>
           )}
