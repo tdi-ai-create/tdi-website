@@ -23,7 +23,6 @@ import { supabase } from '@/lib/supabase';
 import {
   isAdmin,
   getCreatorDashboardData,
-  updateMilestoneStatus,
   updateCreator,
   addNote,
   getCreatorNotes,
@@ -151,16 +150,21 @@ export default function AdminCreatorDetailPage() {
 
     setApprovingMilestoneId(milestoneId);
     try {
-      const success = await updateMilestoneStatus(
-        creatorId,
-        milestoneId,
-        'completed',
-        adminEmail
-      );
+      const response = await fetch('/api/admin/approve-milestone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          milestoneId,
+          creatorId,
+          adminEmail,
+        }),
+      });
 
-      if (success) {
+      const result = await response.json();
+
+      if (result.success) {
         await loadData();
-        setSuccessMessage(`Approved: ${milestoneTitle}`);
+        setSuccessMessage(`Approved: ${milestoneTitle} (creator notified)`);
         setTimeout(() => setSuccessMessage(null), 3000);
       } else {
         alert('Failed to approve milestone. Please try again.');
