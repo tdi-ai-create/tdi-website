@@ -129,21 +129,21 @@ export default function ASD4Dashboard() {
   const generateNudgeEmail = (para: { name: string; email: string }) => {
     const firstName = para.name.split(' ')[0];
 
-    const subject = encodeURIComponent('Quick help getting started with the TDI Learning Hub');
+    const subject = encodeURIComponent('Quick help getting into the TDI Learning Hub');
 
     const body = encodeURIComponent(
 `Hi ${firstName},
 
-I noticed you haven't had a chance to log into the Teachers Deserve It Learning Hub yet — no worries, I wanted to make sure you have what you need!
+I noticed you haven't had a chance to log into the TDI Learning Hub yet — no worries, just wanted to make sure you have what you need.
 
-Here's how to get started:
+This isn't like typical PD — it's short, practical stuff you can actually use. No 3-hour sessions, no sitting and listening. Just strategies from real educators.
+
+Here's how to get in:
 1. Go to: tdi.thinkific.com
 2. Log in with your @asd4.org email
-3. Start with "Paraprofessional Foundations" — it's a quick win!
+3. Try "Paraprofessional Foundations" — it's a quick win
 
-If you're having trouble logging in or need a walkthrough, let me know and I can help.
-
-Thanks for all you do!`
+Let me know if you run into any issues and I'll help you out.`
     );
 
     return `mailto:${para.email}?subject=${subject}&body=${body}`;
@@ -153,21 +153,23 @@ Thanks for all you do!`
   const generateNudgeAllEmail = () => {
     const allEmails = notLoggedInParas.map(p => p.email).join(',');
 
-    const subject = encodeURIComponent('Quick help getting started with the TDI Learning Hub');
+    const subject = encodeURIComponent('A quick note about the TDI Learning Hub');
 
     const body = encodeURIComponent(
 `Hi team,
 
-I noticed some of you haven't had a chance to log into the Teachers Deserve It Learning Hub yet — no worries, I wanted to make sure you have what you need!
+Quick check-in — some of you haven't had a chance to log into the TDI Learning Hub yet, and I wanted to make sure you have what you need to get started.
 
-Here's how to get started:
+I know "professional development" can feel like one more thing on your plate. But this one's different — short, practical strategies you can actually use. No sitting through hours of slides.
+
+Here's how to get in:
 1. Go to: tdi.thinkific.com
 2. Log in with your @asd4.org email
-3. Start with "Paraprofessional Foundations" — it's a quick win!
+3. Start with "Paraprofessional Foundations" — it's a good first step
 
-If you're having trouble logging in or need a walkthrough, let me know and I can help. We can also do a quick group walkthrough at our next meeting if that's helpful.
+If you'd like, we can do a quick 15-minute walkthrough at our next meeting. Just let me know.
 
-Thanks for all you do!`
+Thanks for everything you do.`
     );
 
     // Using BCC for privacy so recipients don't see each other's emails
@@ -178,16 +180,18 @@ Thanks for all you do!`
   const generateHighFiveEmail = (para: { name: string; email: string; coursesStarted: number; avgCompletion: number }) => {
     const firstName = para.name.split(' ')[0];
 
-    const subject = encodeURIComponent(`You're a rockstar, ${firstName}!`);
+    const subject = encodeURIComponent('Thank you for leading the way');
 
     const body = encodeURIComponent(
 `Hi ${firstName},
 
-I just wanted to take a moment to say THANK YOU for diving into the TDI Learning Hub!
+I was looking at our TDI Learning Hub progress and wanted to reach out personally.
 
-You've completed ${para.coursesStarted} courses with an average of ${para.avgCompletion}% completion — that's incredible. Your dedication to growing your skills makes a real difference for our students every day.
+You've completed ${para.coursesStarted} courses with a ${para.avgCompletion}% average — that puts you at the top of our team. That kind of dedication doesn't go unnoticed.
 
-Keep being amazing!`
+I know your time is limited and there's always more to do. The fact that you're investing in your own growth shows real commitment to our students and to yourself.
+
+Thank you for setting the example. It matters more than you know.`
     );
 
     return `mailto:${para.email}?subject=${subject}&body=${body}`;
