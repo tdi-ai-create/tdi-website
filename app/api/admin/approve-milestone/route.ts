@@ -41,10 +41,10 @@ export async function POST(request: Request) {
     }
     console.log('[approve-milestone] Found creator:', creator?.name);
 
-    // 2. Get milestone info
+    // 2. Get milestone info (title is the display name in this schema)
     const { data: milestone, error: milestoneError } = await supabase
       .from('milestones')
-      .select('name, creator_description, sort_order, phase_id')
+      .select('id, title, sort_order, phase_id')
       .eq('id', milestoneId)
       .single();
 
@@ -52,7 +52,7 @@ export async function POST(request: Request) {
       console.error('[approve-milestone] Milestone fetch error:', milestoneError);
       return NextResponse.json({ success: false, error: `Milestone not found: ${milestoneError.message}` }, { status: 404 });
     }
-    console.log('[approve-milestone] Found milestone:', milestone?.name);
+    console.log('[approve-milestone] Found milestone:', milestone?.title);
 
     // 3. Mark milestone as completed
     const { data: updateData, error: updateError } = await supabase
@@ -87,7 +87,7 @@ export async function POST(request: Request) {
     if (milestone) {
       const { data: nextMilestone } = await supabase
         .from('milestones')
-        .select('id, name, creator_description')
+        .select('id, title')
         .eq('phase_id', milestone.phase_id)
         .gt('sort_order', milestone.sort_order)
         .order('sort_order', { ascending: true })
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
           .eq('milestone_id', nextMilestone.id)
           .eq('status', 'locked');
 
-        nextMilestoneName = nextMilestone.creator_description || nextMilestone.name;
+        nextMilestoneName = nextMilestone.title;
       }
     }
 
@@ -131,7 +131,7 @@ export async function POST(request: Request) {
               <p>The TDI team has reviewed and approved your progress:</p>
 
               <div style="background: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px; margin: 20px 0;">
-                <strong style="color: #166534;">✓ Completed:</strong> ${milestone?.creator_description || milestone?.name}
+                <strong style="color: #166534;">✓ Completed:</strong> ${milestone?.title}
               </div>
 
               <p>${nextStepText}</p>
