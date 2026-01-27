@@ -349,7 +349,7 @@ const initialCompleted = ['m1', 'm2', 'm3', 'm4', 'm5', 'm6'];
 export default function CreatorPortalDemoPage() {
   const [completedMilestones, setCompletedMilestones] = useState<string[]>(initialCompleted);
   const [expandedPhases, setExpandedPhases] = useState<string[]>(['course_design']);
-  const [showAllMilestones, setShowAllMilestones] = useState(false);
+  const allPhaseIds = initialPhases.map(p => p.id);
   const [showSubmitModal, setShowSubmitModal] = useState<DemoMilestone | null>(null);
   const [submitLink, setSubmitLink] = useState('');
   const [submitNotes, setSubmitNotes] = useState('');
@@ -711,15 +711,21 @@ export default function CreatorPortalDemoPage() {
               Reset Demo
             </button>
             <button
-              onClick={() => setShowAllMilestones(!showAllMilestones)}
+              onClick={() => {
+                if (expandedPhases.length === allPhaseIds.length) {
+                  setExpandedPhases(['course_design']);
+                } else {
+                  setExpandedPhases(allPhaseIds);
+                }
+              }}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                showAllMilestones
+                expandedPhases.length === allPhaseIds.length
                   ? 'bg-[#ffba06] text-[#1e2749]'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
-              {showAllMilestones ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              {showAllMilestones ? 'Hide Locked' : 'Show All'}
+              {expandedPhases.length === allPhaseIds.length ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              {expandedPhases.length === allPhaseIds.length ? 'Collapse All' : 'Expand All'}
             </button>
 
             <button className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#1e2749] transition-colors">
@@ -854,9 +860,6 @@ export default function CreatorPortalDemoPage() {
                       <div className="border-t border-gray-100">
                         {phase.milestones.map((milestone, idx) => {
                           const status = getMilestoneStatus(milestone);
-                          const shouldShow = showAllMilestones || status !== 'locked';
-
-                          if (!shouldShow) return null;
 
                           return (
                             <div
