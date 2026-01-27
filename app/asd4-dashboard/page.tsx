@@ -270,7 +270,7 @@ Thanks for all you do!`
                 }`}
               >
                 {tab.alert && activeTab !== tab.id && (
-                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" />
+                  <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full" />
                 )}
                 <tab.icon className={`w-4 h-4 ${tab.alert && activeTab !== tab.id ? 'text-red-600' : ''}`} />
                 <span>{tab.label}</span>
@@ -1620,6 +1620,17 @@ Thanks for all you do!`
         {activeTab === 'billing' && (
           <div className="space-y-6">
 
+            {/* Thank You Banner */}
+            <div className="bg-[#1e2749] rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">💛</span>
+                <p className="text-white">
+                  <span className="font-medium">Thank you for investing in your team.</span>
+                  <span className="text-white/80 ml-1">Partnerships like yours help us support 87,000+ educators nationwide.</span>
+                </p>
+              </div>
+            </div>
+
             {/* Status Banner - Overdue */}
             <div className="bg-red-50 border border-red-200 rounded-xl p-4">
               <div className="flex items-center justify-between">
@@ -1713,6 +1724,16 @@ Thanks for all you do!`
               </div>
             </div>
 
+            {/* Impact Callout */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <div className="flex items-center gap-3">
+                <Sparkles className="w-5 h-5 text-amber-600 flex-shrink-0" />
+                <p className="text-amber-900">
+                  <span className="font-medium">Did you know?</span> Schools using TDI strategies see a 65% implementation rate — compared to the 10% industry average.
+                </p>
+              </div>
+            </div>
+
             {/* Payment Policy */}
             <div className="bg-white rounded-xl p-5 shadow-sm">
               <button
@@ -1772,6 +1793,14 @@ Thanks for all you do!`
                   </a>
                 </div>
 
+              </div>
+
+              {/* Testimonial */}
+              <div className="mt-6 pt-5 border-t border-gray-100">
+                <p className="text-gray-600 italic">
+                  &quot;TDI changed the way our teachers approach their day. The strategies actually stick.&quot;
+                </p>
+                <p className="text-sm text-gray-400 mt-1">— Partner School Administrator</p>
               </div>
             </div>
 
