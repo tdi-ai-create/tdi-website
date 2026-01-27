@@ -23,9 +23,12 @@ import {
   X,
   Unlock,
   Calendar,
+  Users,
+  UserCircle,
 } from 'lucide-react';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { supabase } from '@/lib/supabase';
+import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
 import {
   isAdmin,
   getCreatorDashboardData,
@@ -132,6 +135,9 @@ export default function AdminCreatorDetailPage() {
 
   // Toggle milestone state (for checkbox clicks)
   const [togglingMilestone, setTogglingMilestone] = useState<string | null>(null);
+
+  // View mode toggle (admin vs creator preview)
+  const [viewMode, setViewMode] = useState<'admin' | 'creator'>('admin');
 
   const loadData = useCallback(async () => {
     const data = await getCreatorDashboardData(creatorId);
@@ -493,10 +499,53 @@ export default function AdminCreatorDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main content - Milestones */}
           <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-[#1e2749]">Milestones</h2>
-              <p className="text-sm text-gray-500">Click checkboxes to mark complete during calls</p>
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <h2 className="text-xl font-semibold text-[#1e2749]">
+                {viewMode === 'admin' ? 'Milestones' : 'Creator View Preview'}
+              </h2>
+
+              {/* View Mode Toggle */}
+              <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode('admin')}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    viewMode === 'admin'
+                      ? 'bg-white text-[#1e2749] shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <Users className="w-4 h-4" />
+                  Admin
+                </button>
+                <button
+                  onClick={() => setViewMode('creator')}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    viewMode === 'creator'
+                      ? 'bg-white text-[#1e2749] shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <UserCircle className="w-4 h-4" />
+                  Creator View
+                </button>
+              </div>
             </div>
+
+            {/* Creator View Banner */}
+            {viewMode === 'creator' && (
+              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center gap-3">
+                <Eye className="w-5 h-5 text-blue-600" />
+                <div>
+                  <p className="text-blue-800 font-medium">Viewing as: {creator.name}</p>
+                  <p className="text-blue-600 text-sm">This is exactly what the creator sees in their dashboard</p>
+                </div>
+              </div>
+            )}
+
+            {/* Admin Helper Text */}
+            {viewMode === 'admin' && (
+              <p className="text-sm text-gray-500">Click checkboxes to mark complete during calls</p>
+            )}
 
             {/* Success message */}
             {successMessage && (
@@ -506,21 +555,34 @@ export default function AdminCreatorDetailPage() {
               </div>
             )}
 
-            {phases.map((phase) => (
-              <PhaseSection
-                key={phase.id}
-                phase={phase}
-                isExpanded={expandedPhases.has(phase.id)}
-                onToggle={() => togglePhase(phase.id)}
-                onApprove={handleApprove}
-                onRequestRevision={handleRequestRevision}
-                onReopen={handleReopen}
-                onToggleMilestone={handleToggleMilestone}
-                approvingMilestoneId={approvingMilestoneId}
-                reopeningMilestone={reopeningMilestone}
-                togglingMilestone={togglingMilestone}
+            {/* Conditional View Rendering */}
+            {viewMode === 'admin' ? (
+              // Admin View - Original milestone management
+              phases.map((phase) => (
+                <PhaseSection
+                  key={phase.id}
+                  phase={phase}
+                  isExpanded={expandedPhases.has(phase.id)}
+                  onToggle={() => togglePhase(phase.id)}
+                  onApprove={handleApprove}
+                  onRequestRevision={handleRequestRevision}
+                  onReopen={handleReopen}
+                  onToggleMilestone={handleToggleMilestone}
+                  approvingMilestoneId={approvingMilestoneId}
+                  reopeningMilestone={reopeningMilestone}
+                  togglingMilestone={togglingMilestone}
+                />
+              ))
+            ) : (
+              // Creator View Preview - Uses the same component creators see
+              <PhaseProgress
+                phases={phases}
+                creatorId={creatorId}
+                isLoading={false}
+                isAdminPreview={true}
+                onRefresh={loadData}
               />
-            ))}
+            )}
           </div>
 
           {/* Sidebar */}

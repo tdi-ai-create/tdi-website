@@ -25,6 +25,7 @@ interface PhaseProgressProps {
   onMarkComplete?: (milestoneId: string) => Promise<void>;
   onRefresh?: () => void;
   isLoading?: boolean;
+  isAdminPreview?: boolean;
 }
 
 const statusConfig: Record<
@@ -81,6 +82,7 @@ function MilestoneItem({
   onRefresh,
   isLoading,
   isInActionPhase = false,
+  isAdminPreview = false,
 }: {
   milestone: MilestoneWithStatus;
   creatorId?: string;
@@ -88,6 +90,7 @@ function MilestoneItem({
   onRefresh?: () => void;
   isLoading?: boolean;
   isInActionPhase?: boolean;
+  isAdminPreview?: boolean;
 }) {
   const isActionable =
     milestone.status === 'available' || milestone.status === 'in_progress';
@@ -224,6 +227,7 @@ function MilestoneItem({
                 }}
                 creatorId={creatorId}
                 onComplete={onRefresh || (() => window.location.reload())}
+                isAdminPreview={isAdminPreview}
               />
             ) : (
               /* Legacy fallback for backwards compatibility */
@@ -292,6 +296,7 @@ function PhaseCard({
   isLoading,
   defaultExpanded = false,
   isActionPhase = false,
+  isAdminPreview = false,
 }: {
   phase: PhaseWithMilestones;
   creatorId?: string;
@@ -300,6 +305,7 @@ function PhaseCard({
   isLoading?: boolean;
   defaultExpanded?: boolean;
   isActionPhase?: boolean;
+  isAdminPreview?: boolean;
 }) {
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const completedCount = phase.milestones.filter(
@@ -402,6 +408,7 @@ function PhaseCard({
               onRefresh={onRefresh}
               isLoading={isLoading}
               isInActionPhase={isActionPhase}
+              isAdminPreview={isAdminPreview}
             />
           ))}
         </div>
@@ -416,6 +423,7 @@ export function PhaseProgress({
   onMarkComplete,
   onRefresh,
   isLoading,
+  isAdminPreview = false,
 }: PhaseProgressProps) {
   // Find the FIRST phase that has a current actionable milestone (not team action)
   const firstActionPhaseId = phases.find((phase) =>
@@ -436,6 +444,7 @@ export function PhaseProgress({
           isLoading={isLoading}
           defaultExpanded={phase.isCurrentPhase || phase.id === firstActionPhaseId}
           isActionPhase={phase.id === firstActionPhaseId}
+          isAdminPreview={isAdminPreview}
         />
       ))}
     </div>

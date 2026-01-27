@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, FileText, Upload, CheckCircle, ExternalLink, Send, Loader2 } from 'lucide-react';
+import { Calendar, FileText, Upload, CheckCircle, ExternalLink, Send, Loader2, Eye } from 'lucide-react';
 
 interface MilestoneActionProps {
   milestone: {
@@ -14,9 +14,10 @@ interface MilestoneActionProps {
   };
   creatorId: string;
   onComplete: () => void;
+  isAdminPreview?: boolean;
 }
 
-export function MilestoneAction({ milestone, creatorId, onComplete }: MilestoneActionProps) {
+export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPreview = false }: MilestoneActionProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [link, setLink] = useState('');
   const [notes, setNotes] = useState('');
@@ -140,24 +141,41 @@ export function MilestoneAction({ milestone, creatorId, onComplete }: MilestoneA
     }
   };
 
+  // Admin preview wrapper - shows what creator sees with a label
+  const AdminPreviewWrapper = ({ children, actionLabel }: { children: React.ReactNode; actionLabel: string }) => {
+    if (!isAdminPreview) return <>{children}</>;
+
+    return (
+      <div className="relative">
+        <div className="flex items-center gap-2 text-xs text-blue-600 mb-2">
+          <Eye className="w-3 h-3" />
+          <span>Creator sees: <span className="font-medium">{actionLabel}</span></span>
+        </div>
+        <div className="opacity-90 pointer-events-none">
+          {children}
+        </div>
+      </div>
+    );
+  };
+
   // Render based on action type
   switch (actionType) {
     case 'calendly':
       return (
-        <>
+        <AdminPreviewWrapper actionLabel={config.label || 'Book a Call'}>
           <div className="flex flex-wrap items-center gap-3">
             <a
               href={config.url || 'https://calendly.com/rae-teachersdeserveit/creator-chat'}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors"
+              className={`inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors ${isAdminPreview ? 'pointer-events-auto' : ''}`}
             >
               <Calendar className="w-4 h-4" />
               {config.label || 'Book a Call'}
               <ExternalLink className="w-3 h-3" />
             </a>
             <button
-              onClick={() => setShowDatePicker(true)}
+              onClick={() => !isAdminPreview && setShowDatePicker(true)}
               className="inline-flex items-center gap-2 px-4 py-2 border-2 border-[#1e2749] text-[#1e2749] rounded-lg hover:bg-gray-50 transition-colors"
             >
               <CheckCircle className="w-4 h-4" />
@@ -250,14 +268,14 @@ export function MilestoneAction({ milestone, creatorId, onComplete }: MilestoneA
               </div>
             </div>
           )}
-        </>
+        </AdminPreviewWrapper>
       );
 
     case 'submit_link':
       return (
-        <>
+        <AdminPreviewWrapper actionLabel={config.label || 'Submit'}>
           <button
-            onClick={() => setIsOpen(true)}
+            onClick={() => !isAdminPreview && setIsOpen(true)}
             className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors"
           >
             <Upload className="w-4 h-4" />
@@ -336,84 +354,94 @@ export function MilestoneAction({ milestone, creatorId, onComplete }: MilestoneA
               </div>
             </div>
           )}
-        </>
+        </AdminPreviewWrapper>
       );
 
     case 'confirm':
       return (
-        <div className="flex flex-col items-start gap-2">
-          <button
-            onClick={handleConfirm}
-            disabled={isSubmitting}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors disabled:opacity-50"
-          >
-            {isSubmitting ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <CheckCircle className="w-4 h-4" />
-            )}
-            {isSubmitting ? 'Confirming...' : (config.label || 'Mark Complete')}
-          </button>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-        </div>
+        <AdminPreviewWrapper actionLabel={config.label || 'Mark Complete'}>
+          <div className="flex flex-col items-start gap-2">
+            <button
+              onClick={() => !isAdminPreview && handleConfirm()}
+              disabled={isSubmitting || isAdminPreview}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <CheckCircle className="w-4 h-4" />
+              )}
+              {isSubmitting ? 'Confirming...' : (config.label || 'Mark Complete')}
+            </button>
+            {error && <p className="text-sm text-red-600">{error}</p>}
+          </div>
+        </AdminPreviewWrapper>
       );
 
     case 'review':
       return (
-        <div className="flex flex-col items-start gap-2">
-          <button
-            onClick={handleConfirm}
-            disabled={isSubmitting}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors disabled:opacity-50"
-          >
-            {isSubmitting ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <CheckCircle className="w-4 h-4" />
-            )}
-            {isSubmitting ? 'Confirming...' : (config.label || "I've reviewed this")}
-          </button>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-        </div>
+        <AdminPreviewWrapper actionLabel={config.label || "I've reviewed this"}>
+          <div className="flex flex-col items-start gap-2">
+            <button
+              onClick={() => !isAdminPreview && handleConfirm()}
+              disabled={isSubmitting || isAdminPreview}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors disabled:opacity-50"
+            >
+              {isSubmitting ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <CheckCircle className="w-4 h-4" />
+              )}
+              {isSubmitting ? 'Confirming...' : (config.label || "I've reviewed this")}
+            </button>
+            {error && <p className="text-sm text-red-600">{error}</p>}
+          </div>
+        </AdminPreviewWrapper>
       );
 
     case 'sign_agreement':
       return (
-        <a
-          href="/creator-portal/agreement"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors"
-        >
-          <FileText className="w-4 h-4" />
-          {config.label || 'Review & Sign Agreement'}
-          <ExternalLink className="w-3 h-3" />
-        </a>
+        <AdminPreviewWrapper actionLabel={config.label || 'Review & Sign Agreement'}>
+          <a
+            href="/creator-portal/agreement"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors ${isAdminPreview ? 'pointer-events-auto' : ''}`}
+          >
+            <FileText className="w-4 h-4" />
+            {config.label || 'Review & Sign Agreement'}
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        </AdminPreviewWrapper>
       );
 
     case 'team_action':
       return (
-        <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-sm">
-          <span>⏳</span>
-          Waiting on TDI Team
-        </div>
+        <AdminPreviewWrapper actionLabel="Waiting on TDI Team">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-sm">
+            <span>⏳</span>
+            Waiting on TDI Team
+          </div>
+        </AdminPreviewWrapper>
       );
 
     default:
       // Default to a simple confirm button
       return (
-        <button
-          onClick={handleConfirm}
-          disabled={isSubmitting}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors disabled:opacity-50"
-        >
-          {isSubmitting ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <CheckCircle className="w-4 h-4" />
-          )}
-          {isSubmitting ? 'Completing...' : 'Mark Complete'}
-        </button>
+        <AdminPreviewWrapper actionLabel="Mark Complete">
+          <button
+            onClick={() => !isAdminPreview && handleConfirm()}
+            disabled={isSubmitting || isAdminPreview}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors disabled:opacity-50"
+          >
+            {isSubmitting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <CheckCircle className="w-4 h-4" />
+            )}
+            {isSubmitting ? 'Completing...' : 'Mark Complete'}
+          </button>
+        </AdminPreviewWrapper>
       );
   }
 }
