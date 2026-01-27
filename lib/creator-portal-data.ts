@@ -554,3 +554,77 @@ export async function getUserType(email: string): Promise<'creator' | 'admin' | 
 
   return null;
 }
+
+// ============================================
+// Notification Functions
+// ============================================
+
+export type NotificationType =
+  | 'milestone_waiting'
+  | 'new_creator'
+  | 'agreement_signed'
+  | 'milestone_completed'
+  | 'phase_completed';
+
+export interface NotifyTeamParams {
+  creatorId: string;
+  creatorName: string;
+  creatorEmail: string;
+  milestoneId?: string;
+  notificationType: NotificationType;
+  title: string;
+  message?: string;
+}
+
+/**
+ * Send a notification to the TDI team about a creator action
+ * This creates a database notification and optionally sends an email
+ */
+export async function notifyTeam(params: NotifyTeamParams): Promise<boolean> {
+  try {
+    const response = await fetch('/api/admin/send-notification', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+
+    if (!response.ok) {
+      console.error('[notifyTeam] Failed to send notification');
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('[notifyTeam] Error:', error);
+    return false;
+  }
+}
+
+/**
+ * Server-side notification function (for use in API routes)
+ */
+export async function notifyTeamServer(params: NotifyTeamParams): Promise<boolean> {
+  const serviceSupabase = getServiceSupabase();
+
+  try {
+    // Save notification to database
+    const { error } = await serviceSupabase.from('admin_notifications').insert({
+      creator_id: params.creatorId,
+      milestone_id: params.milestoneId || null,
+      notification_type: params.notificationType,
+      title: params.title,
+      message: params.message || null,
+    });
+
+    if (error) {
+      console.error('[notifyTeamServer] Failed to save notification:', error);
+      return false;
+    }
+
+    // Email sending is handled by the API route
+    return true;
+  } catch (error) {
+    console.error('[notifyTeamServer] Error:', error);
+    return false;
+  }
+}

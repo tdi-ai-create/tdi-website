@@ -13,19 +13,23 @@ import {
   X,
   Loader2,
   ChevronRight,
+  CheckCircle,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { isAdmin, getAllCreators, createCreator } from '@/lib/creator-portal-data';
+import { AdminTasks, type AdminNotification } from '@/components/admin/AdminTasks';
 import type { CreatorListItem } from '@/types/creator-portal';
 
 export default function AdminCreatorsPage() {
   const router = useRouter();
   const [creators, setCreators] = useState<CreatorListItem[]>([]);
   const [filteredCreators, setFilteredCreators] = useState<CreatorListItem[]>([]);
+  const [notifications, setNotifications] = useState<AdminNotification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
+  const [adminEmail, setAdminEmail] = useState<string | null>(null);
   const [newCreator, setNewCreator] = useState({
     name: '',
     email: '',
@@ -40,6 +44,50 @@ export default function AdminCreatorsPage() {
     setFilteredCreators(data);
     setIsLoading(false);
   }, []);
+
+  const loadNotifications = useCallback(async () => {
+    try {
+      const response = await fetch('/api/admin/notifications');
+      if (response.ok) {
+        const data = await response.json();
+        setNotifications(data.notifications || []);
+      }
+    } catch (error) {
+      console.error('Failed to load notifications:', error);
+    }
+  }, []);
+
+  const handleMarkAsRead = async (notificationId: string) => {
+    try {
+      const response = await fetch('/api/admin/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notificationId, adminEmail }),
+      });
+
+      if (response.ok) {
+        setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
+      }
+    } catch (error) {
+      console.error('Failed to mark notification as read:', error);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    try {
+      const response = await fetch('/api/admin/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ markAll: true, adminEmail }),
+      });
+
+      if (response.ok) {
+        setNotifications([]);
+      }
+    } catch (error) {
+      console.error('Failed to mark all notifications as read:', error);
+    }
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -56,11 +104,12 @@ export default function AdminCreatorsPage() {
         return;
       }
 
-      await loadCreators();
+      setAdminEmail(session.user.email);
+      await Promise.all([loadCreators(), loadNotifications()]);
     };
 
     checkAuth();
-  }, [router, loadCreators]);
+  }, [router, loadCreators, loadNotifications]);
 
   useEffect(() => {
     if (!searchQuery) {
@@ -165,6 +214,21 @@ export default function AdminCreatorsPage() {
             Add Creator
           </button>
         </div>
+
+        {/* Admin Tasks / Notifications */}
+        <AdminTasks
+          notifications={notifications}
+          onMarkAsRead={handleMarkAsRead}
+          onMarkAllAsRead={handleMarkAllAsRead}
+        />
+
+        {/* All caught up message when no notifications */}
+        {notifications.length === 0 && creators.length > 0 && (
+          <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <p className="text-green-800 font-medium">All caught up! No pending actions.</p>
+          </div>
+        )}
 
         {/* Stats cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
