@@ -47,7 +47,11 @@ import {
   Info,
   HelpCircle,
   Zap,
-  Play
+  Play,
+  Flame,
+  TreePine,
+  Circle,
+  CheckSquare
 } from 'lucide-react';
 
 export default function AllenwoodDashboard() {
@@ -321,7 +325,7 @@ export default function AllenwoodDashboard() {
                   <AlertCircle className="w-4 h-4 text-orange-500" />
                   <span className="text-xs text-gray-500 uppercase">Actions Needed</span>
                 </div>
-                <div className="text-2xl font-bold text-orange-600">6</div>
+                <div className="text-2xl font-bold text-orange-600">2</div>
                 <div className="text-xs text-orange-600 font-medium">Click to view ↓</div>
               </button>
 
@@ -332,91 +336,6 @@ export default function AllenwoodDashboard() {
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">IGNITE</div>
                 <div className="text-xs text-[#38618C] font-medium">Phase 1</div>
-              </div>
-            </div>
-
-            {/* Pro Tip - Dashboard Overview */}
-            <div className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
-              <Lightbulb className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-amber-800">
-                <span className="font-semibold">Pro tip:</span> Green borders = on track.
-                The Hub login rate (82%) shows early engagement — our goal is to turn those logins into consistent strategy use.
-              </p>
-            </div>
-
-            {/* Feature Cards - matches WEGO */}
-            <div className="grid md:grid-cols-2 gap-4">
-              {/* Obs Day 2 - BLUE */}
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 text-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Calendar className="w-6 h-6 text-blue-600" />
-                </div>
-                <div className="text-lg font-bold text-blue-700">Obs Day 2</div>
-                <div className="text-blue-600 font-semibold">Feb 18, 2026</div>
-                <div className="text-sm text-blue-600 mt-1 flex items-center justify-center gap-1">
-                  <CheckCircle className="w-4 h-4" /> Scheduled
-                </div>
-              </div>
-
-              {/* 65% Implementation - BLUE */}
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 text-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <BarChart3 className="w-6 h-6 text-blue-600" />
-                </div>
-                <div className="text-2xl font-bold text-blue-700">65%</div>
-                <div className="text-blue-600 font-semibold">Implementation Target</div>
-                <div className="text-sm text-blue-600 mt-1">vs 10% industry avg</div>
-              </div>
-            </div>
-
-            {/* Health Check Section */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-green-500" />
-                  Health Check
-                </h3>
-                <span className="text-sm text-gray-400">Updated Jan 20, 2026</span>
-              </div>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <Check className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-gray-800">82%</p>
-                    <p className="text-xs text-gray-500">Hub Logins</p>
-                    <p className="text-xs text-green-600">✓ On Track</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                    <Check className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-gray-800">10</p>
-                    <p className="text-xs text-gray-500">Love Notes Sent</p>
-                    <p className="text-xs text-green-600">✓ Complete</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
-                    <Calendar className="w-4 h-4 text-amber-600" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-gray-800">1/6</p>
-                    <p className="text-xs text-gray-500">Virtual Sessions</p>
-                    <p className="text-xs text-amber-600">5 Available</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Health Check Tip */}
-              <div className="mt-4 pt-3 border-t border-gray-100">
-                <p className="text-xs text-gray-500 flex items-start gap-2">
-                  <Lightbulb className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
-                  <span><strong>Why these 3?</strong> Hub engagement predicts implementation. Love Notes build trust. Virtual sessions create accountability. Together, they drive sustainable change.</span>
-                </p>
               </div>
             </div>
 
@@ -432,99 +351,6 @@ export default function AllenwoodDashboard() {
                     the team and highlight new resources.
                   </p>
                 </div>
-              </div>
-            </div>
-
-            {/* TDI Impact Section */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-              <h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
-                What Schools Like Yours Are Achieving
-              </h3>
-              <p className="text-sm text-gray-500 mb-6">
-                When schools lean into the TDI partnership, here&apos;s what we see:
-              </p>
-
-              {/* Impact Stats */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-                  <p className="text-3xl font-bold text-green-600">65%</p>
-                  <p className="text-sm text-gray-600">Implementation Rate</p>
-                  <p className="text-xs text-gray-400">vs 10% industry average</p>
-                </div>
-                <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-                  <p className="text-3xl font-bold text-blue-600">9→5</p>
-                  <p className="text-sm text-gray-600">Stress Level Drop</p>
-                  <p className="text-xs text-gray-400">on 10-point scale</p>
-                </div>
-                <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-                  <p className="text-3xl font-bold text-purple-600">40%</p>
-                  <p className="text-sm text-gray-600">Less Planning Time</p>
-                  <p className="text-xs text-gray-400">12hrs → 6-8hrs weekly</p>
-                </div>
-              </div>
-
-              {/* Additional Stats Row */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
-                      <Heart className="w-5 h-5 text-amber-600" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-gray-800">98%</p>
-                      <p className="text-sm text-gray-500">Plan to return next year</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-white rounded-lg p-4 shadow-sm">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                      <Users className="w-5 h-5 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-gray-800">87K+</p>
-                      <p className="text-sm text-gray-500">Educators in the movement</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Testimonials */}
-              <div className="space-y-4">
-                <h4 className="font-medium text-gray-700">From Teachers Like Yours:</h4>
-
-                <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 border-green-500">
-                  <p className="text-sm text-gray-600 italic mb-2">
-                    &quot;I went from crying in my car every day to actually enjoying my job again.
-                    The strategies are practical and the community gets it.&quot;
-                  </p>
-                  <p className="text-xs text-gray-400">— 3rd year teacher, Louisiana</p>
-                </div>
-
-                <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 border-blue-500">
-                  <p className="text-sm text-gray-600 italic mb-2">
-                    &quot;My stress went from a 9 to a 5. I finally have time to plan AND
-                    have a life outside of school.&quot;
-                  </p>
-                  <p className="text-xs text-gray-400">— Special Education teacher, Illinois</p>
-                </div>
-
-                <div className="bg-white rounded-lg p-4 shadow-sm border-l-4 border-purple-500">
-                  <p className="text-sm text-gray-600 italic mb-2">
-                    &quot;As a new teacher, I felt lost. TDI gave me a roadmap and a community
-                    that actually understands what I&apos;m going through.&quot;
-                  </p>
-                  <p className="text-xs text-gray-400">— 1st year teacher, Maryland</p>
-                </div>
-              </div>
-
-              {/* Call to Action */}
-              <div className="mt-6 pt-4 border-t border-blue-200">
-                <p className="text-sm text-gray-600">
-                  <strong>Your team has the same potential.</strong> The key is consistent
-                  engagement with the Hub and implementing strategies from your coaching sessions.
-                </p>
               </div>
             </div>
 
@@ -628,20 +454,6 @@ export default function AllenwoodDashboard() {
                 </div>
               )}
 
-              {/* Already Scheduled - Same Style */}
-              <div className="mt-6 pt-4 border-t border-gray-200">
-                <h4 className="font-medium text-gray-700 mb-3">Already Scheduled</h4>
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-blue-600 w-24">Feb 18</span>
-                    <span className="text-gray-800 font-medium">Observation Day #2</span>
-                  </div>
-                  <span className="text-sm text-green-600 flex items-center gap-1">
-                    <Check className="w-4 h-4" />
-                    Scheduled
-                  </span>
-                </div>
-              </div>
             </div>
 
             {/* Looking Ahead Teaser */}
@@ -1432,21 +1244,6 @@ export default function AllenwoodDashboard() {
                   </div>
                 </div>
               )}
-            </div>
-
-            {/* SECTION 5: Hub Utilization Note */}
-            <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-              <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-500 mt-0.5" />
-                <div>
-                  <p className="text-gray-700">
-                    <span className="text-gray-900 font-medium">A Note on Hub Engagement:</span> We know your team has the heart and dedication. The observation proved that. The Learning Hub is ready when they are.
-                  </p>
-                  <p className="text-gray-600 text-sm mt-2">
-                    <span className="text-yellow-600 font-medium">Recommended next step:</span> Pick ONE course from the curated list below and share it at your next staff meeting. Even watching the 3-minute welcome video together can spark interest.
-                  </p>
-                </div>
-              </div>
             </div>
 
             {/* 1. Partnership Goal */}
@@ -2272,21 +2069,6 @@ export default function AllenwoodDashboard() {
               <p className="text-xs text-gray-500 mt-4 italic">
                 Note: 11 people enrolled (contract is for 10). Last activity was November 6, 2025.
               </p>
-            </div>
-
-            {/* Hub Utilization Note */}
-            <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 mt-4">
-              <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-500 mt-0.5" />
-                <div>
-                  <p className="text-gray-700">
-                    <span className="text-gray-900 font-medium">A Note on Hub Engagement:</span> We know your team has the heart and dedication. The observation proved that. The Learning Hub is ready when they are.
-                  </p>
-                  <p className="text-gray-600 text-sm mt-2">
-                    <span className="text-yellow-600 font-medium">Recommended next step:</span> Pick ONE course from the curated list below and share it at your next staff meeting. Even watching the 3-minute welcome video together can spark interest.
-                  </p>
-                </div>
-              </div>
             </div>
 
             {/* Curated Starting Points */}
