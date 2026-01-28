@@ -1393,45 +1393,6 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* 3. Support Delivered So Far */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <Timer className="w-5 h-5 text-[#38618C]" />
-                <span className="font-semibold text-[#1e2749] uppercase tracking-wide">Support Delivered So Far</span>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-[#38618C]">6+</div>
-                  <div className="text-xs text-gray-600 mt-1">Hours On-Site<br/>Observation</div>
-                </div>
-                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-[#38618C]">1</div>
-                  <div className="text-xs text-gray-600 mt-1">Virtual<br/>Session</div>
-                </div>
-                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-[#38618C]">10</div>
-                  <div className="text-xs text-gray-600 mt-1">Love Notes<br/>Delivered</div>
-                </div>
-                <div className="bg-[#38618C]/5 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-[#38618C]">11</div>
-                  <div className="text-xs text-gray-600 mt-1">Hub<br/>Memberships</div>
-                </div>
-              </div>
-
-              <p className="text-sm text-gray-600 text-center">
-                Your team receives dedicated, personalized support — not one-size-fits-all PD.
-              </p>
-
-              {/* Support Tip */}
-              <div className="mt-4 pt-3 border-t border-gray-100">
-                <p className="text-xs text-gray-500 flex items-start gap-2">
-                  <Lightbulb className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
-                  <span><strong>What are Love Notes?</strong> Personalized feedback letters for each teacher based on classroom observations — celebrating strengths and offering targeted resources.</span>
-                </p>
-              </div>
-            </div>
-
             {/* 4. Observation Day #1 - Accordion with Teacher Notes */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <button
