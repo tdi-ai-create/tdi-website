@@ -420,6 +420,120 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
+            {/* Curated Starting Points */}
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                  <Target className="w-5 h-5 text-yellow-500" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">Curated Starting Points for Your Team</h3>
+              </div>
+              <p className="text-gray-600 mb-6">
+                Based on our October classroom visits, here are resources that align with what your team is already doing well and where small shifts could make a big difference.
+              </p>
+
+              {/* Quick-Win Downloads */}
+              <div className="mb-6">
+                <h4 className="text-gray-900 font-semibold mb-3 flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-green-500" />
+                  Quick-Win Downloads
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">5 min or less</span>
+                </h4>
+
+                <div className="grid md:grid-cols-3 gap-3">
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
+                    <FileText className="w-5 h-5 text-green-500 mb-2" />
+                    <p className="text-gray-900 font-medium text-sm">The Sentence Starter Guide</p>
+                    <p className="text-gray-500 text-xs mt-1">We saw teachers using calm, clear phrasing. This takes it further.</p>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
+                    <FileText className="w-5 h-5 text-green-500 mb-2" />
+                    <p className="text-gray-900 font-medium text-sm">No-Hands-Up Help Systems</p>
+                    <p className="text-gray-500 text-xs mt-1">Perfect for classrooms managing multiple adults and student needs.</p>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
+                    <FileText className="w-5 h-5 text-green-500 mb-2" />
+                    <p className="text-gray-900 font-medium text-sm">Daily Support Cheat Sheet</p>
+                    <p className="text-gray-500 text-xs mt-1">Great for para consistency across all rooms.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recommended First Courses */}
+              <div className="mb-6">
+                <h4 className="text-gray-900 font-semibold mb-3 flex items-center gap-2">
+                  <Play className="w-4 h-4 text-blue-500" />
+                  Recommended First Courses
+                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">25-30 min each</span>
+                </h4>
+
+                <div className="space-y-3">
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-gray-900 font-medium">K-2 Station Rotation Routines</p>
+                        <p className="text-gray-500 text-sm mt-1">Color-coded systems, transition countdowns. Matches what&apos;s already working in classrooms like Yvette&apos;s.</p>
+                      </div>
+                      <span className="text-gray-500 text-xs whitespace-nowrap">~25 min</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-gray-900 font-medium">Your Class Runs Smoother When the Flow Makes Sense</p>
+                        <p className="text-gray-500 text-sm mt-1">Transitions and predictable routines. The most common growth area we identified.</p>
+                      </div>
+                      <span className="text-gray-500 text-xs whitespace-nowrap">~25 min</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-gray-900 font-medium">Classroom Management Toolkit</p>
+                        <p className="text-gray-500 text-sm mt-1">Our most-recommended resource from observation feedback. Short videos perfect for lunch or commute.</p>
+                      </div>
+                      <span className="text-gray-500 text-xs whitespace-nowrap">~30 min</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-gray-900 font-medium">Building Strong Teacher-Para Partnerships</p>
+                        <p className="text-gray-500 text-sm mt-1">We saw strong teamwork. This course deepens that foundation.</p>
+                      </div>
+                      <span className="text-gray-500 text-xs whitespace-nowrap">~30 min</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Autism Bundle - NOW LIVE */}
+              <div className="bg-purple-50 border border-purple-200 rounded-xl p-5">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-6 h-6 text-purple-500" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-gray-900 font-semibold">Autism Support Bundle</h4>
+                      <span className="text-xs bg-purple-200 text-purple-700 px-2 py-0.5 rounded-full">NOW LIVE</span>
+                    </div>
+                    <p className="text-gray-600 text-sm">
+                      Designed for exactly what we saw at Allenwood: visual routines, communication supports, and sensory-safe transitions. Built for both teachers and paras working with unique learners.
+                    </p>
+                    <p className="text-purple-700 text-sm mt-2 font-medium">
+                      Your team has full access. Perfect for classrooms like Carlita&apos;s and Rofiat&apos;s.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Next Steps - Dynamic with completion toggle */}
             <div id="next-steps-section" className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-4">
@@ -1914,200 +2028,6 @@ export default function AllenwoodDashboard() {
               </p>
             </div>
 
-            {/* Curated Starting Points */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 mt-6 shadow-sm">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                  <Target className="w-5 h-5 text-yellow-500" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900">Curated Starting Points for Your Team</h3>
-              </div>
-              <p className="text-gray-600 mb-6">
-                Based on our October classroom visits, here are resources that align with what your team is already doing well and where small shifts could make a big difference.
-              </p>
-
-              {/* Quick-Win Downloads */}
-              <div className="mb-6">
-                <h4 className="text-gray-900 font-semibold mb-3 flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-green-500" />
-                  Quick-Win Downloads
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">5 min or less</span>
-                </h4>
-
-                <div className="grid md:grid-cols-3 gap-3">
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
-                    <FileText className="w-5 h-5 text-green-500 mb-2" />
-                    <p className="text-gray-900 font-medium text-sm">The Sentence Starter Guide</p>
-                    <p className="text-gray-500 text-xs mt-1">We saw teachers using calm, clear phrasing. This takes it further.</p>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
-                    <FileText className="w-5 h-5 text-green-500 mb-2" />
-                    <p className="text-gray-900 font-medium text-sm">No-Hands-Up Help Systems</p>
-                    <p className="text-gray-500 text-xs mt-1">Perfect for classrooms managing multiple adults and student needs.</p>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
-                    <FileText className="w-5 h-5 text-green-500 mb-2" />
-                    <p className="text-gray-900 font-medium text-sm">Daily Support Cheat Sheet</p>
-                    <p className="text-gray-500 text-xs mt-1">Great for para consistency across all rooms.</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recommended First Courses */}
-              <div className="mb-6">
-                <h4 className="text-gray-900 font-semibold mb-3 flex items-center gap-2">
-                  <Play className="w-4 h-4 text-blue-500" />
-                  Recommended First Courses
-                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">25-30 min each</span>
-                </h4>
-
-                <div className="space-y-3">
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-gray-900 font-medium">K-2 Station Rotation Routines</p>
-                        <p className="text-gray-500 text-sm mt-1">Color-coded systems, transition countdowns. Matches what&apos;s already working in classrooms like Yvette&apos;s.</p>
-                      </div>
-                      <span className="text-gray-500 text-xs whitespace-nowrap">~25 min</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-gray-900 font-medium">Your Class Runs Smoother When the Flow Makes Sense</p>
-                        <p className="text-gray-500 text-sm mt-1">Transitions and predictable routines. The most common growth area we identified.</p>
-                      </div>
-                      <span className="text-gray-500 text-xs whitespace-nowrap">~25 min</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-gray-900 font-medium">Classroom Management Toolkit</p>
-                        <p className="text-gray-500 text-sm mt-1">Our most-recommended resource from observation feedback. Short videos perfect for lunch or commute.</p>
-                      </div>
-                      <span className="text-gray-500 text-xs whitespace-nowrap">~30 min</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-gray-900 font-medium">Building Strong Teacher-Para Partnerships</p>
-                        <p className="text-gray-500 text-sm mt-1">We saw strong teamwork. This course deepens that foundation.</p>
-                      </div>
-                      <span className="text-gray-500 text-xs whitespace-nowrap">~30 min</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Autism Bundle - NOW LIVE */}
-              <div className="bg-purple-50 border border-purple-200 rounded-xl p-5">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-6 h-6 text-purple-500" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="text-gray-900 font-semibold">Autism Support Bundle</h4>
-                      <span className="text-xs bg-purple-200 text-purple-700 px-2 py-0.5 rounded-full">NOW LIVE</span>
-                    </div>
-                    <p className="text-gray-600 text-sm">
-                      Designed for exactly what we saw at Allenwood: visual routines, communication supports, and sensory-safe transitions. Built for both teachers and paras working with unique learners.
-                    </p>
-                    <p className="text-purple-700 text-sm mt-2 font-medium">
-                      Your team has full access. Perfect for classrooms like Carlita&apos;s and Rofiat&apos;s.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* SECTION 7: Support Delivered Timeline */}
-            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
-              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                Support Delivered
-              </h3>
-
-              <div className="relative">
-                {/* Timeline line */}
-                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
-
-                <div className="space-y-4">
-                  {/* Contract Signed */}
-                  <div className="flex gap-4 items-start relative">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center z-10">
-                      <Check className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div className="flex-1 pb-4">
-                      <p className="font-medium text-gray-900">Contract Signed</p>
-                      <p className="text-sm text-gray-500">July 3, 2025</p>
-                    </div>
-                  </div>
-
-                  {/* Summer Leadership Meeting */}
-                  <div className="flex gap-4 items-start relative">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center z-10">
-                      <Check className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div className="flex-1 pb-4">
-                      <p className="font-medium text-gray-900">Summer Leadership Meeting</p>
-                      <p className="text-sm text-gray-500">July 25, 2025</p>
-                    </div>
-                  </div>
-
-                  {/* Virtual Session #1 */}
-                  <div className="flex gap-4 items-start relative">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center z-10">
-                      <Check className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div className="flex-1 pb-4">
-                      <p className="font-medium text-gray-900">Virtual Session #1</p>
-                      <p className="text-sm text-gray-500">September 17, 2025</p>
-                    </div>
-                  </div>
-
-                  {/* Hub Access */}
-                  <div className="flex gap-4 items-start relative">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center z-10">
-                      <Check className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div className="flex-1 pb-4">
-                      <p className="font-medium text-gray-900">Hub Access Activated</p>
-                      <p className="text-sm text-gray-500">October 6, 2025</p>
-                    </div>
-                  </div>
-
-                  {/* Observation Day #1 */}
-                  <div className="flex gap-4 items-start relative">
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center z-10">
-                      <Check className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div className="flex-1 pb-4">
-                      <p className="font-medium text-gray-900">Observation Day #1</p>
-                      <p className="text-sm text-gray-500">October 15, 2025 - 10 classrooms visited</p>
-                    </div>
-                  </div>
-
-                  {/* Upcoming: Observation Day #2 */}
-                  <div className="flex gap-4 items-start relative">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center z-10">
-                      <Calendar className="w-4 h-4 text-blue-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">Observation Day #2</p>
-                      <p className="text-sm text-blue-600">February 18, 2026 - Scheduled</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
         )}
 
