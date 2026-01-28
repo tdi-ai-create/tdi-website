@@ -53,6 +53,7 @@ import {
 export default function AllenwoodDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [showPolicy, setShowPolicy] = useState(false);
+  const [engagementExpanded, setEngagementExpanded] = useState(false);
 
   // Needs Attention completion state
   const [completedItems, setCompletedItems] = useState<string[]>([]);
@@ -1059,16 +1060,390 @@ export default function AllenwoodDashboard() {
         {/* PROGRESS TAB */}
         {activeTab === 'progress' && (
           <div className="space-y-6">
-            {/* Momentum Moment */}
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <TrendingUp className="w-5 h-5 text-green-500" />
+            {/* SECTION 1: Observation Day #1 Highlights */}
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
+                  <Star className="w-5 h-5 text-yellow-500" />
                 </div>
                 <div>
-                  <p className="text-green-700 font-semibold">First Mover! 🎉</p>
+                  <h3 className="text-xl font-bold text-gray-900">Observation Day #1 Highlights</h3>
+                  <p className="text-gray-500 text-sm">October 15, 2025 - 10 Classrooms Visited</p>
+                </div>
+              </div>
+
+              <p className="text-gray-600 mb-6">
+                We spent a full day in your classrooms and left inspired. Here&apos;s what we celebrated:
+              </p>
+
+              {/* Themes Grid */}
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Heart className="w-4 h-4 text-pink-500" />
+                    <span className="text-gray-900 font-medium">Calm, Connected Classrooms</span>
+                  </div>
                   <p className="text-gray-600 text-sm">
-                    One team member has already started <span className="text-gray-900 font-medium">Supporting Students Through Their Daily Schedule</span>. The momentum is building!
+                    Students felt safe, supported, and excited to learn. The relational foundation is strong.
+                  </p>
+                </div>
+
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Users className="w-4 h-4 text-blue-500" />
+                    <span className="text-gray-900 font-medium">Strong Teacher-Para Teamwork</span>
+                  </div>
+                  <p className="text-gray-600 text-sm">
+                    Adults worked seamlessly together, mirroring tone and supporting transitions with consistency.
+                  </p>
+                </div>
+
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="w-4 h-4 text-yellow-500" />
+                    <span className="text-gray-900 font-medium">Student Independence</span>
+                  </div>
+                  <p className="text-gray-600 text-sm">
+                    We saw students self-regulate, follow multi-step directions, and take ownership of their learning.
+                  </p>
+                </div>
+
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Zap className="w-4 h-4 text-green-500" />
+                    <span className="text-gray-900 font-medium">Adaptability Under Pressure</span>
+                  </div>
+                  <p className="text-gray-600 text-sm">
+                    Teachers pivoted smoothly through tech challenges, testing schedules, and transitions without missing a beat.
+                  </p>
+                </div>
+              </div>
+
+              {/* Teacher Shoutouts with High Five Buttons */}
+              <div className="bg-yellow-50 rounded-xl p-5 border border-yellow-200">
+                <h4 className="text-gray-900 font-semibold mb-4 flex items-center gap-2">
+                  <Award className="w-5 h-5 text-yellow-500" />
+                  Classroom Standouts
+                </h4>
+
+                <div className="space-y-4">
+                  {/* Andrea Johnson */}
+                  <div className="border-l-2 border-yellow-400 pl-4 flex justify-between items-start">
+                    <div className="flex-1">
+                      <p className="text-gray-700 italic">&quot;Within five minutes I found myself wishing I could be one of your students. You&apos;ve built a classroom where kids feel excited, safe, and seen.&quot;</p>
+                      <p className="text-yellow-600 text-sm mt-1 font-medium">- About Andrea Johnson&apos;s classroom</p>
+                    </div>
+                    <a
+                      href="mailto:andrea6.johnson@pgcps.org?subject=You're%20amazing%2C%20Andrea!%20🎉&body=Hi%20Andrea%2C%0A%0AI%20just%20wanted%20to%20take%20a%20moment%20to%20recognize%20your%20incredible%20work%20in%20the%20classroom!%0A%0ADuring%20our%20TDI%20observation%2C%20we%20noted%3A%20%22Within%20five%20minutes%20I%20found%20myself%20wishing%20I%20could%20be%20one%20of%20your%20students.%22%0A%0AThank%20you%20for%20everything%20you%20do%20for%20our%20students!%0A%0A"
+                      className="ml-3 inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-medium rounded-full transition-colors whitespace-nowrap"
+                    >
+                      <span>🎉</span>
+                      High Five
+                    </a>
+                  </div>
+
+                  {/* Yvette Whittaker */}
+                  <div className="border-l-2 border-yellow-400 pl-4 flex justify-between items-start">
+                    <div className="flex-1">
+                      <p className="text-gray-700 italic">&quot;Your color-coded station system had students moving with purpose. The countdowns kept everything calm and clear. When tech glitched, you pivoted to paper without missing a beat.&quot;</p>
+                      <p className="text-yellow-600 text-sm mt-1 font-medium">- About Yvette Whittaker&apos;s classroom</p>
+                    </div>
+                    <a
+                      href="mailto:yvette.whittaker@pgcps.org?subject=You're%20amazing%2C%20Yvette!%20🎉&body=Hi%20Yvette%2C%0A%0AI%20just%20wanted%20to%20take%20a%20moment%20to%20recognize%20your%20incredible%20work%20in%20the%20classroom!%0A%0ADuring%20our%20TDI%20observation%2C%20we%20noted%3A%20%22Your%20color-coded%20station%20system%20had%20students%20moving%20with%20purpose.%22%0A%0AThank%20you%20for%20everything%20you%20do%20for%20our%20students!%0A%0A"
+                      className="ml-3 inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-medium rounded-full transition-colors whitespace-nowrap"
+                    >
+                      <span>🎉</span>
+                      High Five
+                    </a>
+                  </div>
+
+                  {/* Georgette Cruickshank */}
+                  <div className="border-l-2 border-yellow-400 pl-4 flex justify-between items-start">
+                    <div className="flex-1">
+                      <p className="text-gray-700 italic">&quot;The alphabet sing-and-sign moment was absolutely adorable. Your space is clearly designed for movement and engagement. It feels like a room where learning lives.&quot;</p>
+                      <p className="text-yellow-600 text-sm mt-1 font-medium">- About Georgette Cruickshank&apos;s classroom</p>
+                    </div>
+                    <a
+                      href="mailto:georgett.cruickshank@pgcps.org?subject=You're%20amazing%2C%20Georgette!%20🎉&body=Hi%20Georgette%2C%0A%0AI%20just%20wanted%20to%20take%20a%20moment%20to%20recognize%20your%20incredible%20work%20in%20the%20classroom!%0A%0ADuring%20our%20TDI%20observation%2C%20we%20noted%3A%20%22Your%20space%20is%20clearly%20designed%20for%20movement%20and%20engagement.%22%0A%0AThank%20you%20for%20everything%20you%20do%20for%20our%20students!%0A%0A"
+                      className="ml-3 inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-medium rounded-full transition-colors whitespace-nowrap"
+                    >
+                      <span>🎉</span>
+                      High Five
+                    </a>
+                  </div>
+
+                  {/* Jasmin Taylor */}
+                  <div className="border-l-2 border-yellow-400 pl-4 flex justify-between items-start">
+                    <div className="flex-1">
+                      <p className="text-gray-700 italic">&quot;Your call-and-response routines were easy, fun, and consistent. Students responded quickly to your calm tone and respectful redirections.&quot;</p>
+                      <p className="text-yellow-600 text-sm mt-1 font-medium">- About Jasmin Taylor&apos;s classroom</p>
+                    </div>
+                    <a
+                      href="mailto:jasmine3.taylor@pgcps.org?subject=You're%20amazing%2C%20Jasmin!%20🎉&body=Hi%20Jasmin%2C%0A%0AI%20just%20wanted%20to%20take%20a%20moment%20to%20recognize%20your%20incredible%20work%20in%20the%20classroom!%0A%0ADuring%20our%20TDI%20observation%2C%20we%20noted%3A%20%22Your%20call-and-response%20routines%20were%20easy%2C%20fun%2C%20and%20consistent.%22%0A%0AThank%20you%20for%20everything%20you%20do%20for%20our%20students!%0A%0A"
+                      className="ml-3 inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-medium rounded-full transition-colors whitespace-nowrap"
+                    >
+                      <span>🎉</span>
+                      High Five
+                    </a>
+                  </div>
+
+                  {/* Alexander Summerlot */}
+                  <div className="border-l-2 border-yellow-400 pl-4 flex justify-between items-start">
+                    <div className="flex-1">
+                      <p className="text-gray-700 italic">&quot;The laughter, smiles, and small celebrations showed genuine joy and connection. Your teamwork with the additional adults was seamless.&quot;</p>
+                      <p className="text-yellow-600 text-sm mt-1 font-medium">- About Alexander Summerlot&apos;s classroom</p>
+                    </div>
+                    <a
+                      href="mailto:alexander.summerlot@pgcps.org?subject=You're%20amazing%2C%20Alexander!%20🎉&body=Hi%20Alexander%2C%0A%0AI%20just%20wanted%20to%20take%20a%20moment%20to%20recognize%20your%20incredible%20work%20in%20the%20classroom!%0A%0ADuring%20our%20TDI%20observation%2C%20we%20noted%3A%20%22The%20laughter%2C%20smiles%2C%20and%20small%20celebrations%20showed%20genuine%20joy%20and%20connection.%22%0A%0AThank%20you%20for%20everything%20you%20do%20for%20our%20students!%0A%0A"
+                      className="ml-3 inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-medium rounded-full transition-colors whitespace-nowrap"
+                    >
+                      <span>🎉</span>
+                      High Five
+                    </a>
+                  </div>
+
+                  {/* Traci Wallace */}
+                  <div className="border-l-2 border-yellow-400 pl-4 flex justify-between items-start">
+                    <div className="flex-1">
+                      <p className="text-gray-700 italic">&quot;Low voice = high control. You modeled the volume you wanted, and students mirrored you. I&apos;d want to be a student in your classroom!&quot;</p>
+                      <p className="text-yellow-600 text-sm mt-1 font-medium">- About Traci Wallace&apos;s classroom</p>
+                    </div>
+                    <a
+                      href="mailto:traci.wallace@pgcps.org?subject=You're%20amazing%2C%20Traci!%20🎉&body=Hi%20Traci%2C%0A%0AI%20just%20wanted%20to%20take%20a%20moment%20to%20recognize%20your%20incredible%20work%20in%20the%20classroom!%0A%0ADuring%20our%20TDI%20observation%2C%20we%20noted%3A%20%22Low%20voice%20%3D%20high%20control.%20You%20modeled%20the%20volume%20you%20wanted%2C%20and%20students%20mirrored%20you.%22%0A%0AThank%20you%20for%20everything%20you%20do%20for%20our%20students!%0A%0A"
+                      className="ml-3 inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-medium rounded-full transition-colors whitespace-nowrap"
+                    >
+                      <span>🎉</span>
+                      High Five
+                    </a>
+                  </div>
+
+                  {/* Carlita Law */}
+                  <div className="border-l-2 border-yellow-400 pl-4 flex justify-between items-start">
+                    <div className="flex-1">
+                      <p className="text-gray-700 italic">&quot;Even with tech hiccups and parade prep, your calm, clear voice anchored the whole space. The playful maraca transition showed such intentional planning.&quot;</p>
+                      <p className="text-yellow-600 text-sm mt-1 font-medium">- About Carlita Law&apos;s classroom</p>
+                    </div>
+                    <a
+                      href="mailto:carlita.law@pgcps.org?subject=You're%20amazing%2C%20Carlita!%20🎉&body=Hi%20Carlita%2C%0A%0AI%20just%20wanted%20to%20take%20a%20moment%20to%20recognize%20your%20incredible%20work%20in%20the%20classroom!%0A%0ADuring%20our%20TDI%20observation%2C%20we%20noted%3A%20%22Your%20calm%2C%20clear%20voice%20anchored%20the%20whole%20space.%22%0A%0AThank%20you%20for%20everything%20you%20do%20for%20our%20students!%0A%0A"
+                      className="ml-3 inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-medium rounded-full transition-colors whitespace-nowrap"
+                    >
+                      <span>🎉</span>
+                      High Five
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Yvette Follow-up Callout */}
+              <div className="mt-4 bg-green-50 border border-green-200 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <MessageCircle className="w-5 h-5 text-green-500 mt-0.5" />
+                  <div>
+                    <p className="text-green-700 font-medium">The conversation is already happening!</p>
+                    <p className="text-gray-600 text-sm mt-1">
+                      After our visit, Yvette reached out asking for more age-appropriate independent center activities for kindergarten. That&apos;s exactly the kind of engagement we love to see and we delivered resources within days.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 2: What We've Learned Together */}
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Lightbulb className="w-5 h-5 text-blue-500" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">What We&apos;ve Learned Together</h3>
+              </div>
+
+              <div className="space-y-4 text-gray-600">
+                <p>
+                  During our observation, we saw incredible classroom practices: calm environments, strong routines, and teachers who genuinely care. <span className="text-gray-900 font-medium">The foundation is absolutely there.</span>
+                </p>
+
+                <p>
+                  Here&apos;s what we&apos;ve noticed across schools like Allenwood: when staff are told to &quot;explore the Hub during planning time,&quot; that time gets consumed by the urgent: grading, emails, copies, putting out fires, finally getting a bathroom break.
+                </p>
+
+                <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 my-4">
+                  <p className="text-blue-700 font-semibold text-center text-lg">
+                    Planning time ≠ PD time
+                  </p>
+                  <p className="text-gray-600 text-sm text-center mt-2">
+                    Meaningful professional development happens when there&apos;s <span className="text-gray-900 font-medium">protected time with a specific resource in mind.</span>
+                  </p>
+                </div>
+
+                <p>
+                  The good news? Even 15 minutes with a targeted course or download can create immediate classroom impact. We&apos;ve curated starting points below based on what we saw during our visit.
+                </p>
+              </div>
+            </div>
+
+            {/* SECTION 3: Momentum + Hub Login Progress Ring */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Momentum Moment */}
+              <div className="bg-green-50 border border-green-200 rounded-xl p-5">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-green-500" />
+                  </div>
+                  <div>
+                    <p className="text-green-700 font-semibold">First Mover! 🎉</p>
+                  </div>
+                </div>
+                <p className="text-gray-600 text-sm">
+                  One team member has already started <span className="text-gray-900 font-medium">Supporting Students Through Their Daily Schedule</span>. The momentum is building!
+                </p>
+              </div>
+
+              {/* Hub Login Progress Ring */}
+              <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="text-sm font-semibold text-gray-900">Hub Login Progress</div>
+                  <span className="text-xs text-gray-400">Goal: 100%</span>
+                </div>
+
+                <div className="flex items-center gap-6">
+                  {/* Progress Ring */}
+                  <div className="relative w-24 h-24">
+                    <svg className="w-24 h-24 transform -rotate-90">
+                      <circle
+                        cx="48"
+                        cy="48"
+                        r="40"
+                        stroke="#E5E7EB"
+                        strokeWidth="8"
+                        fill="none"
+                      />
+                      <circle
+                        cx="48"
+                        cy="48"
+                        r="40"
+                        stroke="#3B82F6"
+                        strokeWidth="8"
+                        fill="none"
+                        strokeDasharray="251"
+                        strokeDashoffset="45"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-2xl font-bold text-gray-900">82%</span>
+                    </div>
+                  </div>
+
+                  {/* Details */}
+                  <div className="flex-1">
+                    <div className="text-xl font-bold text-gray-900">9 <span className="text-base font-normal text-gray-400">/ 11</span></div>
+                    <div className="text-sm text-gray-500 mb-2">teachers logged in</div>
+
+                    <div className="flex gap-3 text-xs">
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                        <span className="text-gray-600">Logged in</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <div className="w-2 h-2 rounded-full bg-gray-200"></div>
+                        <span className="text-gray-600">Not yet (2)</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 4: Hub Engagement Details - Collapsible */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <button
+                onClick={() => setEngagementExpanded(!engagementExpanded)}
+                className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Users className="w-5 h-5 text-gray-500" />
+                  <span className="font-semibold text-gray-900">Team Engagement Details</span>
+                </div>
+                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${engagementExpanded ? 'rotate-180' : ''}`} />
+              </button>
+
+              {engagementExpanded && (
+                <div className="p-4 pt-0 border-t border-gray-100">
+
+                  {/* High Engagement */}
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
+                      <span className="text-sm font-medium text-gray-700">High Engagement: 1 Teacher</span>
+                      <span className="text-xs text-gray-400">Logging in regularly (3+ logins)</span>
+                    </div>
+                    <div className="ml-4 text-sm text-gray-600">Georgette Cruickshank</div>
+                  </div>
+
+                  {/* Building Habits */}
+                  <div className="mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                      <span className="text-sm font-medium text-gray-700">Building Habits: 8 Teachers</span>
+                      <span className="text-xs text-gray-400">Logged in 1-2 times</span>
+                    </div>
+                    <div className="ml-4 text-sm text-gray-600">Alexander H., Alexander S., Andrea J., Jasmin T., Traci W., Yvette W., Jovy O., Rofiat A.</div>
+                  </div>
+
+                  {/* Needs Support - with Nudge Buttons */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-amber-500"></div>
+                        <span className="text-sm font-medium text-gray-700">Needs Support: 2 Teachers</span>
+                        <span className="text-xs text-gray-400">Haven&apos;t logged in yet</span>
+                      </div>
+                      <a
+                        href="mailto:?bcc=carlita.law@pgcps.org,tia.bowles@pgcps.org&subject=The%20TDI%20Hub%20misses%20you%20(and%20it's%20nothing%20like%20that%20PD%20from%202019)&body=Hi%20team%2C%0A%0AI%20know%2C%20I%20know%20-%20%22another%20thing%20to%20log%20into.%22%20😅%0A%0ABut%20here's%20the%20thing%3A%20the%20TDI%20Learning%20Hub%20isn't%20like%20that%206-hour%20PD%20where%20someone%20read%20PowerPoint%20slides%20at%20you%20while%20you%20secretly%20graded%20papers.%0A%0AThis%20is%20actually...%20dare%20I%20say...%20useful%3F%0A%0AHere's%20how%20to%20jump%20in%3A%0A1.%20Go%20to%3A%20tdi.thinkific.com%0A2.%20Log%20in%20with%20your%20school%20email%0A3.%20Try%20%22Classroom%20Management%20Toolkit%22%20-%20it's%20short%2C%20practical%2C%20and%20you%20might%20actually%20use%20it%20tomorrow%0A%0AIf%20you%20get%20stuck%2C%20just%20reply%20to%20this%20email%20and%20I'll%20help%20you%20out.%0A%0AYou've%20got%20this!"
+                        className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-medium rounded-full transition-colors"
+                      >
+                        <Mail className="w-3 h-3" />
+                        Nudge All (2)
+                      </a>
+                    </div>
+
+                    <div className="ml-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Carlita Law</span>
+                        <a
+                          href="mailto:carlita.law@pgcps.org?subject=The%20TDI%20Hub%20misses%20you%2C%20Carlita!&body=Hi%20Carlita%2C%0A%0AI%20know%2C%20I%20know%20-%20%22another%20thing%20to%20log%20into.%22%20😅%0A%0ABut%20here's%20the%20thing%3A%20the%20TDI%20Learning%20Hub%20isn't%20like%20that%206-hour%20PD%20where%20someone%20read%20PowerPoint%20slides%20at%20you%20while%20you%20secretly%20graded%20papers.%0A%0AThis%20is%20actually...%20dare%20I%20say...%20useful%3F%0A%0AHere's%20how%20to%20jump%20in%3A%0A1.%20Go%20to%3A%20tdi.thinkific.com%0A2.%20Log%20in%20with%20your%20school%20email%0A3.%20Try%20%22Classroom%20Management%20Toolkit%22%0A%0AIf%20you%20get%20stuck%2C%20just%20reply%20and%20I'll%20help!%0A%0A"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-600 text-xs rounded-full transition-colors"
+                        >
+                          <Mail className="w-3 h-3" />
+                          Nudge
+                        </a>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-gray-600">Tia Bowles-Simon</span>
+                        <a
+                          href="mailto:tia.bowles@pgcps.org?subject=The%20TDI%20Hub%20misses%20you%2C%20Tia!&body=Hi%20Tia%2C%0A%0AI%20know%2C%20I%20know%20-%20%22another%20thing%20to%20log%20into.%22%20😅%0A%0ABut%20here's%20the%20thing%3A%20the%20TDI%20Learning%20Hub%20isn't%20like%20that%206-hour%20PD%20where%20someone%20read%20PowerPoint%20slides%20at%20you%20while%20you%20secretly%20graded%20papers.%0A%0AThis%20is%20actually...%20dare%20I%20say...%20useful%3F%0A%0AHere's%20how%20to%20jump%20in%3A%0A1.%20Go%20to%3A%20tdi.thinkific.com%0A2.%20Log%20in%20with%20your%20school%20email%0A3.%20Try%20%22Classroom%20Management%20Toolkit%22%0A%0AIf%20you%20get%20stuck%2C%20just%20reply%20and%20I'll%20help!%0A%0A"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-600 text-xs rounded-full transition-colors"
+                        >
+                          <Mail className="w-3 h-3" />
+                          Nudge
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* SECTION 5: Hub Utilization Note */}
+            <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+              <div className="flex items-start gap-3">
+                <Info className="w-5 h-5 text-blue-500 mt-0.5" />
+                <div>
+                  <p className="text-gray-700">
+                    <span className="text-gray-900 font-medium">A Note on Hub Engagement:</span> We know your team has the heart and dedication. The observation proved that. The Learning Hub is ready when they are.
+                  </p>
+                  <p className="text-gray-600 text-sm mt-2">
+                    <span className="text-yellow-600 font-medium">Recommended next step:</span> Pick ONE course from the curated list below and share it at your next staff meeting. Even watching the 3-minute welcome video together can spark interest.
                   </p>
                 </div>
               </div>
@@ -2023,6 +2398,87 @@ export default function AllenwoodDashboard() {
                     <p className="text-purple-700 text-sm mt-2 font-medium">
                       Your team has full access. Perfect for classrooms like Carlita&apos;s and Rofiat&apos;s.
                     </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 7: Support Delivered Timeline */}
+            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <CheckCircle className="w-5 h-5 text-green-500" />
+                Support Delivered
+              </h3>
+
+              <div className="relative">
+                {/* Timeline line */}
+                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+
+                <div className="space-y-4">
+                  {/* Contract Signed */}
+                  <div className="flex gap-4 items-start relative">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center z-10">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div className="flex-1 pb-4">
+                      <p className="font-medium text-gray-900">Contract Signed</p>
+                      <p className="text-sm text-gray-500">July 3, 2025</p>
+                    </div>
+                  </div>
+
+                  {/* Summer Leadership Meeting */}
+                  <div className="flex gap-4 items-start relative">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center z-10">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div className="flex-1 pb-4">
+                      <p className="font-medium text-gray-900">Summer Leadership Meeting</p>
+                      <p className="text-sm text-gray-500">July 25, 2025</p>
+                    </div>
+                  </div>
+
+                  {/* Virtual Session #1 */}
+                  <div className="flex gap-4 items-start relative">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center z-10">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div className="flex-1 pb-4">
+                      <p className="font-medium text-gray-900">Virtual Session #1</p>
+                      <p className="text-sm text-gray-500">September 17, 2025</p>
+                    </div>
+                  </div>
+
+                  {/* Hub Access */}
+                  <div className="flex gap-4 items-start relative">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center z-10">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div className="flex-1 pb-4">
+                      <p className="font-medium text-gray-900">Hub Access Activated</p>
+                      <p className="text-sm text-gray-500">October 6, 2025</p>
+                    </div>
+                  </div>
+
+                  {/* Observation Day #1 */}
+                  <div className="flex gap-4 items-start relative">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center z-10">
+                      <Check className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div className="flex-1 pb-4">
+                      <p className="font-medium text-gray-900">Observation Day #1</p>
+                      <p className="text-sm text-gray-500">October 15, 2025 - 10 classrooms visited</p>
+                    </div>
+                  </div>
+
+                  {/* Upcoming: Observation Day #2 */}
+                  <div className="flex gap-4 items-start relative">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center z-10">
+                      <Calendar className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium text-gray-900">Observation Day #2</p>
+                      <p className="text-sm text-blue-600">February 18, 2026 - Scheduled</p>
+                    </div>
                   </div>
                 </div>
               </div>
