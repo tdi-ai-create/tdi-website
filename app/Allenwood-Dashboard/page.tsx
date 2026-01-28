@@ -420,6 +420,108 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
+            {/* Next Steps - Dynamic with completion toggle */}
+            <div id="next-steps-section" className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                  <Calendar className="w-5 h-5 text-orange-500" />
+                  Next Steps
+                </h3>
+                <span className="text-sm text-orange-500 bg-orange-50 px-2 py-1 rounded-full">
+                  {needsAttentionItems.filter(item => !isComplete(item.id)).length} items
+                </span>
+              </div>
+
+              {/* Active Items */}
+              <div className="space-y-3">
+                {needsAttentionItems
+                  .filter(item => !isComplete(item.id))
+                  .map(item => (
+                    <div
+                      key={item.id}
+                      className={`rounded-lg p-4 flex items-center justify-between border transition-all ${
+                        isOverdue(item.deadlineMonth, item.deadlineYear)
+                          ? 'border-red-500 bg-red-50'
+                          : 'bg-orange-50 border-orange-100'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <Calendar className={`w-5 h-5 ${
+                          isOverdue(item.deadlineMonth, item.deadlineYear) ? 'text-red-700' : 'text-orange-500'
+                        }`} />
+                        <div>
+                          <div className="font-medium text-gray-800">{item.title}</div>
+                          <div className="text-sm text-gray-500">
+                            {item.description} ·{' '}
+                            {isOverdue(item.deadlineMonth, item.deadlineYear) ? (
+                              <span className="text-red-700 font-bold">OVERDUE</span>
+                            ) : (
+                              <span className="text-orange-500 font-medium">DUE BY {item.deadline}</span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 ml-4">
+                        <a
+                          href={item.actionUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 ${
+                            isOverdue(item.deadlineMonth, item.deadlineYear)
+                              ? 'bg-red-700 text-white'
+                              : 'bg-orange-500 text-white hover:bg-orange-600'
+                          }`}
+                        >
+                          <Calendar className="w-4 h-4" />
+                          {item.actionLabel}
+                        </a>
+                        <button
+                          onClick={() => toggleComplete(item.id)}
+                          className="px-3 py-2 bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-700 text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
+                          title="Mark as complete"
+                        >
+                          <Check className="w-4 h-4" />
+                          Done
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+
+              {/* Completed Items */}
+              {needsAttentionItems.filter(item => isComplete(item.id)).length > 0 && (
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
+                    Completed ({needsAttentionItems.filter(item => isComplete(item.id)).length})
+                  </div>
+                  <div className="space-y-2">
+                    {needsAttentionItems
+                      .filter(item => isComplete(item.id))
+                      .map(item => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg opacity-60"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
+                              <Check className="w-4 h-4 text-emerald-600" />
+                            </div>
+                            <span className="text-gray-500 line-through">{item.title}</span>
+                          </div>
+                          <button
+                            onClick={() => toggleComplete(item.id)}
+                            className="text-xs text-gray-400 hover:text-gray-600 underline"
+                          >
+                            Undo
+                          </button>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
+
             {/* Curated Starting Points */}
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
               <div className="flex items-center gap-3 mb-2">
@@ -532,108 +634,6 @@ export default function AllenwoodDashboard() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Next Steps - Dynamic with completion toggle */}
-            <div id="next-steps-section" className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-orange-500" />
-                  Next Steps
-                </h3>
-                <span className="text-sm text-orange-500 bg-orange-50 px-2 py-1 rounded-full">
-                  {needsAttentionItems.filter(item => !isComplete(item.id)).length} items
-                </span>
-              </div>
-
-              {/* Active Items */}
-              <div className="space-y-3">
-                {needsAttentionItems
-                  .filter(item => !isComplete(item.id))
-                  .map(item => (
-                    <div
-                      key={item.id}
-                      className={`rounded-lg p-4 flex items-center justify-between border transition-all ${
-                        isOverdue(item.deadlineMonth, item.deadlineYear)
-                          ? 'border-red-500 bg-red-50'
-                          : 'bg-orange-50 border-orange-100'
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <Calendar className={`w-5 h-5 ${
-                          isOverdue(item.deadlineMonth, item.deadlineYear) ? 'text-red-700' : 'text-orange-500'
-                        }`} />
-                        <div>
-                          <div className="font-medium text-gray-800">{item.title}</div>
-                          <div className="text-sm text-gray-500">
-                            {item.description} ·{' '}
-                            {isOverdue(item.deadlineMonth, item.deadlineYear) ? (
-                              <span className="text-red-700 font-bold">OVERDUE</span>
-                            ) : (
-                              <span className="text-orange-500 font-medium">DUE BY {item.deadline}</span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2 ml-4">
-                        <a
-                          href={item.actionUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 ${
-                            isOverdue(item.deadlineMonth, item.deadlineYear)
-                              ? 'bg-red-700 text-white'
-                              : 'bg-orange-500 text-white hover:bg-orange-600'
-                          }`}
-                        >
-                          <Calendar className="w-4 h-4" />
-                          {item.actionLabel}
-                        </a>
-                        <button
-                          onClick={() => toggleComplete(item.id)}
-                          className="px-3 py-2 bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-700 text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
-                          title="Mark as complete"
-                        >
-                          <Check className="w-4 h-4" />
-                          Done
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-
-              {/* Completed Items */}
-              {needsAttentionItems.filter(item => isComplete(item.id)).length > 0 && (
-                <div className="mt-6 pt-4 border-t border-gray-200">
-                  <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
-                    Completed ({needsAttentionItems.filter(item => isComplete(item.id)).length})
-                  </div>
-                  <div className="space-y-2">
-                    {needsAttentionItems
-                      .filter(item => isComplete(item.id))
-                      .map(item => (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg opacity-60"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
-                              <Check className="w-4 h-4 text-emerald-600" />
-                            </div>
-                            <span className="text-gray-500 line-through">{item.title}</span>
-                          </div>
-                          <button
-                            onClick={() => toggleComplete(item.id)}
-                            className="text-xs text-gray-400 hover:text-gray-600 underline"
-                          >
-                            Undo
-                          </button>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              )}
-
             </div>
 
             {/* Looking Ahead Teaser */}
