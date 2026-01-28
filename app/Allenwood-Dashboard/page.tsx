@@ -1522,86 +1522,6 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* SECTION 4: Hub Engagement Details - Collapsible */}
-            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-              <button
-                onClick={() => setEngagementExpanded(!engagementExpanded)}
-                className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex items-center gap-2">
-                  <Users className="w-5 h-5 text-gray-500" />
-                  <span className="font-semibold text-gray-900">Team Engagement Details</span>
-                </div>
-                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${engagementExpanded ? 'rotate-180' : ''}`} />
-              </button>
-
-              {engagementExpanded && (
-                <div className="p-4 pt-0 border-t border-gray-100">
-
-                  {/* High Engagement */}
-                  <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                      <span className="text-sm font-medium text-gray-700">High Engagement: 1 Teacher</span>
-                      <span className="text-xs text-gray-400">Logging in regularly (3+ logins)</span>
-                    </div>
-                    <div className="ml-4 text-sm text-gray-600">Georgette Cruickshank</div>
-                  </div>
-
-                  {/* Building Habits */}
-                  <div className="mb-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                      <span className="text-sm font-medium text-gray-700">Building Habits: 8 Teachers</span>
-                      <span className="text-xs text-gray-400">Logged in 1-2 times</span>
-                    </div>
-                    <div className="ml-4 text-sm text-gray-600">Alexander H., Alexander S., Andrea J., Jasmin T., Traci W., Yvette W., Jovy O., Rofiat A.</div>
-                  </div>
-
-                  {/* Needs Support - with Nudge Buttons */}
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-amber-500"></div>
-                        <span className="text-sm font-medium text-gray-700">Needs Support: 2 Teachers</span>
-                        <span className="text-xs text-gray-400">Haven&apos;t logged in yet</span>
-                      </div>
-                      <a
-                        href="mailto:?bcc=carlita.law@pgcps.org,tia.bowles@pgcps.org&subject=The%20TDI%20Hub%20misses%20you%20(and%20it's%20nothing%20like%20that%20PD%20from%202019)&body=Hi%20team%2C%0A%0AI%20know%2C%20I%20know%20-%20%22another%20thing%20to%20log%20into.%22%20😅%0A%0ABut%20here's%20the%20thing%3A%20the%20TDI%20Learning%20Hub%20isn't%20like%20that%206-hour%20PD%20where%20someone%20read%20PowerPoint%20slides%20at%20you%20while%20you%20secretly%20graded%20papers.%0A%0AThis%20is%20actually...%20dare%20I%20say...%20useful%3F%0A%0AHere's%20how%20to%20jump%20in%3A%0A1.%20Go%20to%3A%20tdi.thinkific.com%0A2.%20Log%20in%20with%20your%20school%20email%0A3.%20Try%20%22Classroom%20Management%20Toolkit%22%20-%20it's%20short%2C%20practical%2C%20and%20you%20might%20actually%20use%20it%20tomorrow%0A%0AIf%20you%20get%20stuck%2C%20just%20reply%20to%20this%20email%20and%20I'll%20help%20you%20out.%0A%0AYou've%20got%20this!"
-                        className="inline-flex items-center gap-1 px-3 py-1 bg-amber-100 hover:bg-amber-200 text-amber-700 text-xs font-medium rounded-full transition-colors"
-                      >
-                        <Mail className="w-3 h-3" />
-                        Nudge All (2)
-                      </a>
-                    </div>
-
-                    <div className="ml-4 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Carlita Law</span>
-                        <a
-                          href="mailto:carlita.law@pgcps.org?subject=The%20TDI%20Hub%20misses%20you%2C%20Carlita!&body=Hi%20Carlita%2C%0A%0AI%20know%2C%20I%20know%20-%20%22another%20thing%20to%20log%20into.%22%20😅%0A%0ABut%20here's%20the%20thing%3A%20the%20TDI%20Learning%20Hub%20isn't%20like%20that%206-hour%20PD%20where%20someone%20read%20PowerPoint%20slides%20at%20you%20while%20you%20secretly%20graded%20papers.%0A%0AThis%20is%20actually...%20dare%20I%20say...%20useful%3F%0A%0AHere's%20how%20to%20jump%20in%3A%0A1.%20Go%20to%3A%20tdi.thinkific.com%0A2.%20Log%20in%20with%20your%20school%20email%0A3.%20Try%20%22Classroom%20Management%20Toolkit%22%0A%0AIf%20you%20get%20stuck%2C%20just%20reply%20and%20I'll%20help!%0A%0A"
-                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-600 text-xs rounded-full transition-colors"
-                        >
-                          <Mail className="w-3 h-3" />
-                          Nudge
-                        </a>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Tia Bowles-Simon</span>
-                        <a
-                          href="mailto:tia.bowles@pgcps.org?subject=The%20TDI%20Hub%20misses%20you%2C%20Tia!&body=Hi%20Tia%2C%0A%0AI%20know%2C%20I%20know%20-%20%22another%20thing%20to%20log%20into.%22%20😅%0A%0ABut%20here's%20the%20thing%3A%20the%20TDI%20Learning%20Hub%20isn't%20like%20that%206-hour%20PD%20where%20someone%20read%20PowerPoint%20slides%20at%20you%20while%20you%20secretly%20graded%20papers.%0A%0AThis%20is%20actually...%20dare%20I%20say...%20useful%3F%0A%0AHere's%20how%20to%20jump%20in%3A%0A1.%20Go%20to%3A%20tdi.thinkific.com%0A2.%20Log%20in%20with%20your%20school%20email%0A3.%20Try%20%22Classroom%20Management%20Toolkit%22%0A%0AIf%20you%20get%20stuck%2C%20just%20reply%20and%20I'll%20help!%0A%0A"
-                          className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-600 text-xs rounded-full transition-colors"
-                        >
-                          <Mail className="w-3 h-3" />
-                          Nudge
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
             {/* 1. Partnership Goal */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
@@ -1799,34 +1719,6 @@ export default function AllenwoodDashboard() {
               <p className="text-xs text-gray-400 text-center mt-6 pt-4 border-t border-gray-100">
                 Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys
               </p>
-            </div>
-
-            {/* 5. Observation Highlights */}
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100">
-              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <Star className="w-5 h-5 text-green-600" />
-                Observation Day #1 Highlights
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">October 15, 2025 — All 10 teachers observed</p>
-
-              <div className="space-y-2">
-                <p className="text-sm text-gray-700">
-                  <span className="font-medium">Strong foundations observed:</span> Calm classroom management,
-                  joyful learning environments, effective call-and-response routines, and strong
-                  adult teamwork across multiple classrooms.
-                </p>
-                <p className="text-sm text-gray-700">
-                  <span className="font-medium">Growth areas identified:</span> Targeted support for
-                  classroom structure and para alignment — resources shared in personalized Love Notes.
-                </p>
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-green-200">
-                <p className="text-sm text-gray-500 italic">
-                  &quot;Your team has the heart and dedication — we&apos;re here to make sure they have
-                  the structure and support to match.&quot; — Rae
-                </p>
-              </div>
             </div>
 
             {/* 6. Hub Engagement Details */}
