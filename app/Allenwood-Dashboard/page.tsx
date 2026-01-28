@@ -354,6 +354,72 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
+            {/* Virtual Sessions — Ideas & Scheduling */}
+            <div className="bg-gradient-to-r from-[#38618C]/10 to-[#35A7FF]/10 rounded-xl p-5 border border-[#38618C]/20">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-[#38618C] rounded-lg flex items-center justify-center flex-shrink-0">
+                  <MessageCircle className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-semibold text-[#1e2749]">5 Virtual Sessions Available</h4>
+                    <span className="text-xs bg-[#35A7FF] text-white px-2 py-1 rounded-full">Flexible Use</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    Your remaining virtual sessions are yours to shape. Here are some ways other schools use them:
+                  </p>
+
+                  <div className="grid grid-cols-2 gap-2 mb-4">
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                      <span>Office hours / drop-in support</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                      <span>1:1 teacher coaching</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                      <span>Team Q&amp;A sessions</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                      <span>Teachable moments / mini PD</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                      <span>Reflection &amp; goal-setting</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                      <span>Survey &amp; metrics check-in</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                      <span>Strategy deep-dives</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
+                      <span>Leadership planning</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-[#38618C]/20">
+                    <p className="text-xs text-gray-500">Mix and match based on your team&apos;s needs</p>
+                    <a
+                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 text-sm font-medium text-[#38618C] hover:text-[#35A7FF]"
+                    >
+                      Schedule Now
+                      <ArrowRight className="w-4 h-4" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Next Steps - Dynamic with completion toggle */}
             <div id="next-steps-section" className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-4">
@@ -1325,72 +1391,6 @@ export default function AllenwoodDashboard() {
               <p className="text-xs text-gray-400 text-center mt-6 pt-4 border-t border-gray-100">
                 Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys
               </p>
-            </div>
-
-            {/* Virtual Sessions — Ideas & Scheduling */}
-            <div className="bg-gradient-to-r from-[#38618C]/10 to-[#35A7FF]/10 rounded-xl p-5 border border-[#38618C]/20">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[#38618C] rounded-lg flex items-center justify-center flex-shrink-0">
-                  <MessageCircle className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-[#1e2749]">5 Virtual Sessions Available</h4>
-                    <span className="text-xs bg-[#35A7FF] text-white px-2 py-1 rounded-full">Flexible Use</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Your remaining virtual sessions are yours to shape. Here are some ways other schools use them:
-                  </p>
-
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>Office hours / drop-in support</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>1:1 teacher coaching</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>Team Q&amp;A sessions</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>Teachable moments / mini PD</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>Reflection &amp; goal-setting</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>Survey &amp; metrics check-in</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>Strategy deep-dives</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>Leadership planning</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between pt-3 border-t border-[#38618C]/20">
-                    <p className="text-xs text-gray-500">Mix and match based on your team&apos;s needs</p>
-                    <a
-                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-medium text-[#38618C] hover:text-[#35A7FF]"
-                    >
-                      Schedule Now
-                      <ArrowRight className="w-4 h-4" />
-                    </a>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* 4. Observation Day #1 - Accordion with Teacher Notes */}
