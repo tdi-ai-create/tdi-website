@@ -680,6 +680,205 @@ export default function AllenwoodDashboard() {
         {/* JOURNEY TAB */}
         {activeTab === 'journey' && (
           <div className="space-y-6">
+            {/* 1. Partnership Goal */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <Target className="w-5 h-5 text-blue-500" />
+                Partnership Goal
+              </h3>
+
+              <p className="text-gray-600 mb-6">
+                Support 10 new teachers (new to Allenwood and/or new to the profession) with
+                practical strategies for managing diverse classrooms and building confidence
+                in their first years.
+              </p>
+
+              {/* Visual flow */}
+              <div className="flex items-center justify-between">
+                <div className="text-center p-4 bg-blue-50 rounded-lg flex-1">
+                  <Heart className="w-6 h-6 text-blue-500 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-gray-700">Supported Teachers</p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-gray-300 mx-2" />
+                <div className="text-center p-4 bg-blue-100 rounded-lg flex-1">
+                  <Users className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-gray-700">Confident Classrooms</p>
+                </div>
+                <ArrowRight className="w-5 h-5 text-gray-300 mx-2" />
+                <div className="text-center p-4 bg-amber-50 rounded-lg flex-1">
+                  <Star className="w-6 h-6 text-amber-500 mx-auto mb-2" />
+                  <p className="text-sm font-medium text-gray-700">Student Success</p>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Leading Indicators */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
+                  <TrendingUp className="w-5 h-5 text-green-500" />
+                  Leading Indicators
+                </h3>
+                <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
+                  Progress Snapshot
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div className="text-center p-4 bg-green-50 rounded-lg border border-green-100">
+                  <div className="text-2xl font-bold text-green-600">82%</div>
+                  <div className="text-xs text-gray-600 mt-1">Hub Login Rate</div>
+                  <div className="text-xs text-green-600 mt-1">9 of 11 active</div>
+                </div>
+                <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-100">
+                  <div className="text-2xl font-bold text-blue-600">100%</div>
+                  <div className="text-xs text-gray-600 mt-1">Love Notes Delivered</div>
+                  <div className="text-xs text-blue-600 mt-1">10 of 10</div>
+                </div>
+                <div className="text-center p-4 bg-amber-50 rounded-lg border border-amber-100">
+                  <div className="text-2xl font-bold text-amber-600">50%</div>
+                  <div className="text-xs text-gray-600 mt-1">Observations Complete</div>
+                  <div className="text-xs text-amber-600 mt-1">1 of 2</div>
+                </div>
+                <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-100">
+                  <div className="text-2xl font-bold text-purple-600">17%</div>
+                  <div className="text-xs text-gray-600 mt-1">Virtual Sessions</div>
+                  <div className="text-xs text-purple-600 mt-1">1 of 6 complete</div>
+                </div>
+              </div>
+            </div>
+
+            {/* 2b. Success Metrics — Card Grid with Clear Goals */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="font-semibold text-[#1e2749] flex items-center gap-2">
+                    <Target className="w-5 h-5 text-[#38618C]" />
+                    Success Metrics
+                  </h3>
+                  <p className="text-sm text-gray-500">What we&apos;ll measure together</p>
+                </div>
+                <span className="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full">Baseline: TBD</span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                {/* Teacher Stress */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <p className="font-medium text-[#1e2749]">Teacher Stress</p>
+                      <p className="text-xs text-gray-400">Lower is better ↓</p>
+                    </div>
+                    <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
+                      <Heart className="w-4 h-4 text-red-500" />
+                    </div>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Industry Avg</span>
+                      <span className="text-red-500 font-medium">8-9/10</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">TDI Partners</span>
+                      <span className="text-[#38618C] font-medium">5-7/10</span>
+                    </div>
+                    <div className="flex justify-between pt-2 border-t border-gray-100">
+                      <span className="text-green-700 font-medium">Your Goal</span>
+                      <span className="text-green-700 font-bold">≤5/10</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Strategy Implementation */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <p className="font-medium text-[#1e2749]">Implementation</p>
+                      <p className="text-xs text-gray-400">Higher is better ↑</p>
+                    </div>
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                      <CheckCircle className="w-4 h-4 text-green-500" />
+                    </div>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Industry Avg</span>
+                      <span className="text-red-500 font-medium">10%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">TDI Partners</span>
+                      <span className="text-[#38618C] font-medium">65%</span>
+                    </div>
+                    <div className="flex justify-between pt-2 border-t border-gray-100">
+                      <span className="text-green-700 font-medium">Your Goal</span>
+                      <span className="text-green-700 font-bold">≥65%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Retention Intent */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <p className="font-medium text-[#1e2749]">Retention Intent</p>
+                      <p className="text-xs text-gray-400">Higher is better ↑</p>
+                    </div>
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <Users className="w-4 h-4 text-blue-500" />
+                    </div>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Industry Avg</span>
+                      <span className="text-red-500 font-medium">20-40%</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">TDI Partners</span>
+                      <span className="text-[#38618C] font-medium">98%</span>
+                    </div>
+                    <div className="flex justify-between pt-2 border-t border-gray-100">
+                      <span className="text-green-700 font-medium">Your Goal</span>
+                      <span className="text-green-700 font-bold">≥95%</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Weekly Planning Time */}
+                <div className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <p className="font-medium text-[#1e2749]">Planning Time</p>
+                      <p className="text-xs text-gray-400">Lower is better ↓</p>
+                    </div>
+                    <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
+                      <Clock className="w-4 h-4 text-amber-500" />
+                    </div>
+                  </div>
+                  <div className="space-y-2 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">Industry Avg</span>
+                      <span className="text-red-500 font-medium">12+ hrs</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-500">TDI Partners</span>
+                      <span className="text-[#38618C] font-medium">6-8 hrs</span>
+                    </div>
+                    <div className="flex justify-between pt-2 border-t border-gray-100">
+                      <span className="text-green-700 font-medium">Your Goal</span>
+                      <span className="text-green-700 font-bold">≤8 hrs</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              {/* Source Citation */}
+              <p className="text-xs text-gray-400 text-center mt-6 pt-4 border-t border-gray-100">
+                Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys
+              </p>
+            </div>
+
             {/* Journey Tip */}
             <div className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
               <Lightbulb className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
@@ -934,6 +1133,39 @@ export default function AllenwoodDashboard() {
         {/* PROGRESS TAB */}
         {activeTab === 'progress' && (
           <div className="space-y-6">
+            {/* What We've Learned Together */}
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Lightbulb className="w-5 h-5 text-blue-500" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">What We&apos;ve Learned Together</h3>
+              </div>
+
+              <div className="space-y-4 text-gray-600">
+                <p>
+                  During our observation, we saw incredible classroom practices: calm environments, strong routines, and teachers who genuinely care. <span className="text-gray-900 font-medium">The foundation is absolutely there.</span>
+                </p>
+
+                <p>
+                  Here&apos;s what we&apos;ve noticed across schools like Allenwood: when staff are told to &quot;explore the Hub during planning time,&quot; that time gets consumed by the urgent: grading, emails, copies, putting out fires, finally getting a bathroom break.
+                </p>
+
+                <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 my-4">
+                  <p className="text-blue-700 font-semibold text-center text-lg">
+                    Planning time ≠ PD time
+                  </p>
+                  <p className="text-gray-600 text-sm text-center mt-2">
+                    Meaningful professional development happens when there&apos;s <span className="text-gray-900 font-medium">protected time with a specific resource in mind.</span>
+                  </p>
+                </div>
+
+                <p>
+                  The good news? Even 15 minutes with a targeted course or download can create immediate classroom impact. We&apos;ve curated starting points below based on what we saw during our visit.
+                </p>
+              </div>
+            </div>
+
             {/* SECTION 1: Observation Day #1 Highlights */}
             <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
               <div className="flex items-center gap-3 mb-4">
@@ -1416,39 +1648,6 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* SECTION 2: What We've Learned Together */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Lightbulb className="w-5 h-5 text-blue-500" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900">What We&apos;ve Learned Together</h3>
-              </div>
-
-              <div className="space-y-4 text-gray-600">
-                <p>
-                  During our observation, we saw incredible classroom practices: calm environments, strong routines, and teachers who genuinely care. <span className="text-gray-900 font-medium">The foundation is absolutely there.</span>
-                </p>
-
-                <p>
-                  Here&apos;s what we&apos;ve noticed across schools like Allenwood: when staff are told to &quot;explore the Hub during planning time,&quot; that time gets consumed by the urgent: grading, emails, copies, putting out fires, finally getting a bathroom break.
-                </p>
-
-                <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 my-4">
-                  <p className="text-blue-700 font-semibold text-center text-lg">
-                    Planning time ≠ PD time
-                  </p>
-                  <p className="text-gray-600 text-sm text-center mt-2">
-                    Meaningful professional development happens when there&apos;s <span className="text-gray-900 font-medium">protected time with a specific resource in mind.</span>
-                  </p>
-                </div>
-
-                <p>
-                  The good news? Even 15 minutes with a targeted course or download can create immediate classroom impact. We&apos;ve curated starting points below based on what we saw during our visit.
-                </p>
-              </div>
-            </div>
-
             {/* SECTION 3: Momentum + Hub Login Progress Ring */}
             <div className="grid md:grid-cols-2 gap-6">
               {/* Momentum Moment */}
@@ -1520,205 +1719,6 @@ export default function AllenwoodDashboard() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* 1. Partnership Goal */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <Target className="w-5 h-5 text-blue-500" />
-                Partnership Goal
-              </h3>
-
-              <p className="text-gray-600 mb-6">
-                Support 10 new teachers (new to Allenwood and/or new to the profession) with
-                practical strategies for managing diverse classrooms and building confidence
-                in their first years.
-              </p>
-
-              {/* Visual flow */}
-              <div className="flex items-center justify-between">
-                <div className="text-center p-4 bg-blue-50 rounded-lg flex-1">
-                  <Heart className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-gray-700">Supported Teachers</p>
-                </div>
-                <ArrowRight className="w-5 h-5 text-gray-300 mx-2" />
-                <div className="text-center p-4 bg-blue-100 rounded-lg flex-1">
-                  <Users className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-gray-700">Confident Classrooms</p>
-                </div>
-                <ArrowRight className="w-5 h-5 text-gray-300 mx-2" />
-                <div className="text-center p-4 bg-amber-50 rounded-lg flex-1">
-                  <Star className="w-6 h-6 text-amber-500 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-gray-700">Student Success</p>
-                </div>
-              </div>
-            </div>
-
-            {/* 2. Leading Indicators */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-green-500" />
-                  Leading Indicators
-                </h3>
-                <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
-                  Progress Snapshot
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="text-center p-4 bg-green-50 rounded-lg border border-green-100">
-                  <div className="text-2xl font-bold text-green-600">82%</div>
-                  <div className="text-xs text-gray-600 mt-1">Hub Login Rate</div>
-                  <div className="text-xs text-green-600 mt-1">9 of 11 active</div>
-                </div>
-                <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-100">
-                  <div className="text-2xl font-bold text-blue-600">100%</div>
-                  <div className="text-xs text-gray-600 mt-1">Love Notes Delivered</div>
-                  <div className="text-xs text-blue-600 mt-1">10 of 10</div>
-                </div>
-                <div className="text-center p-4 bg-amber-50 rounded-lg border border-amber-100">
-                  <div className="text-2xl font-bold text-amber-600">50%</div>
-                  <div className="text-xs text-gray-600 mt-1">Observations Complete</div>
-                  <div className="text-xs text-amber-600 mt-1">1 of 2</div>
-                </div>
-                <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-100">
-                  <div className="text-2xl font-bold text-purple-600">17%</div>
-                  <div className="text-xs text-gray-600 mt-1">Virtual Sessions</div>
-                  <div className="text-xs text-purple-600 mt-1">1 of 6 complete</div>
-                </div>
-              </div>
-            </div>
-
-            {/* 2b. Success Metrics — Card Grid with Clear Goals */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <h3 className="font-semibold text-[#1e2749] flex items-center gap-2">
-                    <Target className="w-5 h-5 text-[#38618C]" />
-                    Success Metrics
-                  </h3>
-                  <p className="text-sm text-gray-500">What we&apos;ll measure together</p>
-                </div>
-                <span className="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full">Baseline: TBD</span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
-                {/* Teacher Stress */}
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <p className="font-medium text-[#1e2749]">Teacher Stress</p>
-                      <p className="text-xs text-gray-400">Lower is better ↓</p>
-                    </div>
-                    <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                      <Heart className="w-4 h-4 text-red-500" />
-                    </div>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Industry Avg</span>
-                      <span className="text-red-500 font-medium">8-9/10</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">TDI Partners</span>
-                      <span className="text-[#38618C] font-medium">5-7/10</span>
-                    </div>
-                    <div className="flex justify-between pt-2 border-t border-gray-100">
-                      <span className="text-green-700 font-medium">Your Goal</span>
-                      <span className="text-green-700 font-bold">≤5/10</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Strategy Implementation */}
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <p className="font-medium text-[#1e2749]">Implementation</p>
-                      <p className="text-xs text-gray-400">Higher is better ↑</p>
-                    </div>
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                    </div>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Industry Avg</span>
-                      <span className="text-red-500 font-medium">10%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">TDI Partners</span>
-                      <span className="text-[#38618C] font-medium">65%</span>
-                    </div>
-                    <div className="flex justify-between pt-2 border-t border-gray-100">
-                      <span className="text-green-700 font-medium">Your Goal</span>
-                      <span className="text-green-700 font-bold">≥65%</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Retention Intent */}
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <p className="font-medium text-[#1e2749]">Retention Intent</p>
-                      <p className="text-xs text-gray-400">Higher is better ↑</p>
-                    </div>
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Users className="w-4 h-4 text-blue-500" />
-                    </div>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Industry Avg</span>
-                      <span className="text-red-500 font-medium">20-40%</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">TDI Partners</span>
-                      <span className="text-[#38618C] font-medium">98%</span>
-                    </div>
-                    <div className="flex justify-between pt-2 border-t border-gray-100">
-                      <span className="text-green-700 font-medium">Your Goal</span>
-                      <span className="text-green-700 font-bold">≥95%</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Weekly Planning Time */}
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <p className="font-medium text-[#1e2749]">Planning Time</p>
-                      <p className="text-xs text-gray-400">Lower is better ↓</p>
-                    </div>
-                    <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
-                      <Clock className="w-4 h-4 text-amber-500" />
-                    </div>
-                  </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Industry Avg</span>
-                      <span className="text-red-500 font-medium">12+ hrs</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">TDI Partners</span>
-                      <span className="text-[#38618C] font-medium">6-8 hrs</span>
-                    </div>
-                    <div className="flex justify-between pt-2 border-t border-gray-100">
-                      <span className="text-green-700 font-medium">Your Goal</span>
-                      <span className="text-green-700 font-bold">≤8 hrs</span>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Source Citation */}
-              <p className="text-xs text-gray-400 text-center mt-6 pt-4 border-t border-gray-100">
-                Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys
-              </p>
             </div>
 
             {/* 6. Hub Engagement Details */}
