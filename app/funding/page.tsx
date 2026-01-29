@@ -1,5 +1,4 @@
 import { Metadata } from 'next';
-import FundingFinder from '@/components/FundingFinder';
 
 export const metadata: Metadata = {
   title: 'Funding Options | Teachers Deserve It',
@@ -252,7 +251,7 @@ export default function FundingPage() {
         </div>
       </section>
 
-      {/* Funding Finder Questionnaire */}
+      {/* Funding Finder Questionnaire - INLINE TEST */}
       <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <div className="text-center mb-8">
@@ -266,7 +265,14 @@ export default function FundingPage() {
               Answer a few quick questions and we'll identify the best funding options for your school.
             </p>
           </div>
-          <FundingFinder />
+          {/* INLINE TEST - No component import */}
+          <div className="bg-white rounded-2xl shadow-xl p-10 max-w-2xl mx-auto text-center">
+            <h3 className="text-2xl font-bold mb-4" style={{ color: '#1e2749' }}>
+              INLINE TEST - If you see this, the section exists!
+            </h3>
+            <p className="mb-4">This is pure server-rendered HTML, no client component.</p>
+            <p className="text-red-500 font-bold">Version: INLINE-v1</p>
+          </div>
         </div>
       </section>
 
