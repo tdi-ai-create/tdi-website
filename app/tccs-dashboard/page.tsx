@@ -298,57 +298,46 @@ export default function TCCSDashboard() {
               <p className="text-xs text-gray-400 mt-4 text-center">Based on TDI partner school survey data</p>
             </div>
 
-            {/* Next Steps */}
-            <div className="bg-[#38618C]/5 border border-[#38618C]/20 rounded-xl p-6">
-              <h2 className="text-lg font-bold text-[#1e2749] mb-4 flex items-center gap-2">
-                <Target className="w-5 h-5 text-[#38618C]" />
-                Next Steps Together
-              </h2>
-              <div className="grid md:grid-cols-2 gap-4">
-                {/* March Session */}
-                <div className="p-4 bg-white rounded-lg border border-gray-200">
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                      <Calendar className="w-4 h-4 text-amber-600" />
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-semibold text-[#1e2749]">March 13 Session</p>
-                      <p className="text-sm text-gray-600 mt-1">Confirm your goals for our March session</p>
-                      <p className="text-xs text-amber-600 mt-1">Date is on hold</p>
-                      <a
-                        href="mailto:rae@teachersdeserveit.com?subject=TCCS%20March%20Session%20-%20Let's%20Finalize%20Our%20Plan"
-                        className="inline-flex items-center gap-1 text-[#35A7FF] hover:text-[#2896ee] font-medium text-sm mt-2"
-                      >
-                        Email Rae to Confirm
-                        <ArrowRight className="w-4 h-4" />
-                      </a>
-                    </div>
+            {/* Next Steps Section */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h3 className="font-bold text-[#1e2749] text-lg mb-4 flex items-center gap-2">
+                <Clock className="w-5 h-5 text-[#E07A5F]" />
+                Next Steps
+              </h3>
+
+              <div className="space-y-4">
+                {/* Session 3: March Confirmation */}
+                <div className="flex items-center justify-between p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-800">Session 3: Spring Follow-Up</p>
+                    <p className="text-sm text-gray-500">March 13, 2026 · Date needs confirmation</p>
                   </div>
+                  <a
+                    href="mailto:rae@teachersdeserveit.com?subject=TCCS%20March%20Session%20-%20Let's%20Finalize%20Our%20Plan"
+                    className="px-4 py-2 bg-[#38618C] hover:bg-[#2d4e73] text-white rounded-lg text-sm font-medium transition-colors"
+                  >
+                    Email Rae to Confirm
+                  </a>
                 </div>
-                {/* Bonus Session */}
-                <div className="p-4 bg-green-50 rounded-lg border border-green-200">
+
+                {/* Session 4: Complimentary Spring Session (Bonus) */}
+                <div className="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                      <Gift className="w-4 h-4 text-green-600" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold text-[#1e2749]">Complimentary Spring Session</p>
-                        <span className="text-xs bg-green-600 text-white px-1.5 py-0.5 rounded font-medium">BONUS</span>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">A 45-minute bonus session — on us!</p>
-                      <p className="text-xs text-green-700 mt-1">Schedule by April 2026</p>
-                      <a
-                        href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-green-700 hover:text-green-800 font-medium text-sm mt-2"
-                      >
-                        Schedule Now
-                        <ArrowRight className="w-4 h-4" />
-                      </a>
+                    <Gift className="w-5 h-5 text-emerald-600 mt-0.5" />
+                    <div>
+                      <p className="font-medium text-gray-800">Complimentary Spring Session</p>
+                      <p className="text-sm text-gray-500">45 min bonus session — on us! · Schedule by April 2026</p>
                     </div>
                   </div>
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Schedule Now
+                  </a>
                 </div>
               </div>
             </div>
