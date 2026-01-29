@@ -226,8 +226,8 @@ export default function TCCSDashboard() {
                   <Video className="w-4 h-4" />
                   Sessions
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">2/4</div>
-                <div className="text-xs text-[#35A7FF] font-medium">2 Remaining</div>
+                <div className="text-2xl font-bold text-[#1e2749]">2/5</div>
+                <div className="text-xs text-[#35A7FF] font-medium">3 Remaining</div>
               </div>
               <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                 <div className="flex items-center gap-2 text-gray-500 text-sm mb-1">
@@ -320,7 +320,24 @@ export default function TCCSDashboard() {
                   </a>
                 </div>
 
-                {/* Session 4: Complimentary Spring Session (Bonus) */}
+                {/* Virtual Session */}
+                <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
+                  <div>
+                    <p className="font-medium text-gray-800">Virtual Session</p>
+                    <p className="text-sm text-gray-500">45 min · Included in contract</p>
+                  </div>
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Schedule
+                  </a>
+                </div>
+
+                {/* Complimentary Spring Session (Bonus) */}
                 <div className="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
                   <div className="flex items-start gap-3">
                     <Gift className="w-5 h-5 text-emerald-600 mt-0.5" />
