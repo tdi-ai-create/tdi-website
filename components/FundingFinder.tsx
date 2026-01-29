@@ -7,8 +7,6 @@ import {
   DollarSign,
   Target,
   User,
-  Mail,
-  Phone,
 } from 'lucide-react';
 
 type Step = 'commitments' | 'school-info' | 'funding-context' | 'goals' | 'contact' | 'success';
@@ -550,44 +548,35 @@ Best Time to Call: ${formData.bestTimeToCall || 'Not specified'}
           <div className="space-y-4">
             <div>
               <label className={labelClass}>Your Name *</label>
-              <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => updateFormData('name', e.target.value)}
-                  className={`${inputClass} pl-10`}
-                  placeholder="Full name"
-                />
-              </div>
+              <input
+                type="text"
+                value={formData.name}
+                onChange={(e) => updateFormData('name', e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-yellow-400 focus:outline-none"
+                placeholder="Full name"
+              />
             </div>
 
             <div>
               <label className={labelClass}>Email Address *</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => updateFormData('email', e.target.value)}
-                  className={`${inputClass} pl-10`}
-                  placeholder="you@school.edu"
-                />
-              </div>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => updateFormData('email', e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-yellow-400 focus:outline-none"
+                placeholder="you@school.edu"
+              />
             </div>
 
             <div>
               <label className={labelClass}>Phone Number</label>
-              <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                <input
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => updateFormData('phone', e.target.value)}
-                  className={`${inputClass} pl-10`}
-                  placeholder="(555) 555-5555"
-                />
-              </div>
+              <input
+                type="tel"
+                value={formData.phone}
+                onChange={(e) => updateFormData('phone', e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border-2 border-gray-200 focus:border-yellow-400 focus:outline-none"
+                placeholder="(555) 123-4567"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
