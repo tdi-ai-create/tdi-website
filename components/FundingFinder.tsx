@@ -81,6 +81,7 @@ export default function FundingFinder() {
   const [step, setStep] = useState<Step>('commitments');
   const [formData, setFormData] = useState<FormData>(initialFormData);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const updateFormData = (field: keyof FormData, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -90,6 +91,7 @@ export default function FundingFinder() {
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setSubmitError(null);
 
     try {
       const response = await fetch('https://api.web3forms.com/submit', {
@@ -101,37 +103,55 @@ export default function FundingFinder() {
           access_key: process.env.NEXT_PUBLIC_WEB3FORMS_KEY,
           subject: `Funding Finder Request: ${formData.schoolName}`,
           from_name: formData.name,
-          to: 'Info@teachersdeserveit.com',
-          // School Info
-          school_name: formData.schoolName,
-          district: formData.district,
-          state: formData.state,
-          school_type: formData.schoolType,
-          student_count: formData.studentCount,
-          title_i_status: formData.titleIStatus,
-          // Funding Context
-          current_budget: formData.currentBudget,
-          budget_cycle: formData.budgetCycle,
-          previous_funding: formData.previousFunding,
-          decision_makers: formData.decisionMakers,
-          // Goals
-          primary_goal: formData.primaryGoal,
-          timeline: formData.timeline,
-          additional_context: formData.additionalContext,
-          // Contact
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          role: formData.role,
-          best_time_to_call: formData.bestTimeToCall,
+          replyto: formData.email,
+          // Formatted message
+          message: `
+FUNDING FINDER REQUEST
+======================
+
+SCHOOL INFORMATION
+------------------
+School Name: ${formData.schoolName}
+District: ${formData.district || 'Not provided'}
+State: ${formData.state}
+School Type: ${formData.schoolType}
+Student Count: ${formData.studentCount || 'Not provided'}
+Title I Status: ${formData.titleIStatus || 'Not provided'}
+
+FUNDING CONTEXT
+---------------
+Current PD Budget: ${formData.currentBudget || 'Not provided'}
+Budget Cycle End: ${formData.budgetCycle || 'Not provided'}
+Previous Grant Funding: ${formData.previousFunding || 'Not provided'}
+Decision Makers: ${formData.decisionMakers || 'Not provided'}
+
+GOALS
+-----
+Primary Goal: ${formData.primaryGoal}
+Timeline: ${formData.timeline}
+Additional Context: ${formData.additionalContext || 'None provided'}
+
+CONTACT INFORMATION
+-------------------
+Name: ${formData.name}
+Email: ${formData.email}
+Phone: ${formData.phone || 'Not provided'}
+Role: ${formData.role}
+Best Time to Call: ${formData.bestTimeToCall || 'Not specified'}
+          `.trim(),
         }),
       });
 
-      if (response.ok) {
+      const data = await response.json();
+
+      if (data.success) {
         setStep('success');
+      } else {
+        setSubmitError(data.message || 'Something went wrong. Please try again.');
       }
     } catch (error) {
       console.error('Form submission error:', error);
+      setSubmitError('Unable to submit form. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -611,6 +631,12 @@ export default function FundingFinder() {
               </div>
             </div>
           </div>
+
+          {submitError && (
+            <div className="p-4 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm">
+              {submitError}
+            </div>
+          )}
 
           <div className="flex gap-4">
             <button
