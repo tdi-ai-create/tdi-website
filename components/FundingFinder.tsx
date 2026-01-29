@@ -196,57 +196,37 @@ Best Time to Call: ${formData.bestTimeToCall || 'Not specified'}
           </div>
 
           <div className="space-y-4">
-            <label className="flex items-start gap-4 p-4 rounded-xl border-2 border-gray-200 hover:border-[#ffba06] cursor-pointer transition-all">
-              <input
-                type="checkbox"
-                checked={formData.commitment1}
-                onChange={(e) => updateFormData('commitment1', e.target.checked)}
-                className="mt-1 w-5 h-5 rounded border-gray-300 text-[#ffba06] focus:ring-[#ffba06]"
-              />
-              <div>
-                <p className="font-medium text-[#1e2749]">Yes, research my funding options for me</p>
-                <p className="text-sm text-gray-500">You don't have to research anything</p>
-              </div>
-            </label>
-
-            <label className="flex items-start gap-4 p-4 rounded-xl border-2 border-gray-200 hover:border-[#ffba06] cursor-pointer transition-all">
-              <input
-                type="checkbox"
-                checked={formData.commitment2}
-                onChange={(e) => updateFormData('commitment2', e.target.checked)}
-                className="mt-1 w-5 h-5 rounded border-gray-300 text-[#ffba06] focus:ring-[#ffba06]"
-              />
-              <div>
-                <p className="font-medium text-[#1e2749]">Yes, write my grant language for me</p>
-                <p className="text-sm text-gray-500">You don't have to write a single word</p>
-              </div>
-            </label>
-
-            <label className="flex items-start gap-4 p-4 rounded-xl border-2 border-gray-200 hover:border-[#ffba06] cursor-pointer transition-all">
-              <input
-                type="checkbox"
-                checked={formData.commitment3}
-                onChange={(e) => updateFormData('commitment3', e.target.checked)}
-                className="mt-1 w-5 h-5 rounded border-gray-300 text-[#ffba06] focus:ring-[#ffba06]"
-              />
-              <div>
-                <p className="font-medium text-[#1e2749]">Yes, prepare my board proposal for me</p>
-                <p className="text-sm text-gray-500">You just review and submit</p>
-              </div>
-            </label>
-
-            <label className="flex items-start gap-4 p-4 rounded-xl border-2 border-gray-200 hover:border-[#ffba06] cursor-pointer transition-all">
-              <input
-                type="checkbox"
-                checked={formData.commitment4}
-                onChange={(e) => updateFormData('commitment4', e.target.checked)}
-                className="mt-1 w-5 h-5 rounded border-gray-300 text-[#ffba06] focus:ring-[#ffba06]"
-              />
-              <div>
-                <p className="font-medium text-[#1e2749]">Yes, I want this free service</p>
-                <p className="text-sm text-gray-500">No obligation, no pressure</p>
-              </div>
-            </label>
+            {[
+              { field: 'commitment1' as const, label: 'Yes, research my funding options for me', subtext: "You don't have to research anything" },
+              { field: 'commitment2' as const, label: 'Yes, write my grant language for me', subtext: "You don't have to write a single word" },
+              { field: 'commitment3' as const, label: 'Yes, prepare my board proposal for me', subtext: "You just review and submit" },
+              { field: 'commitment4' as const, label: 'Yes, I want this free service', subtext: "No obligation, no pressure" },
+            ].map(({ field, label, subtext }) => (
+              <label
+                key={field}
+                className={`flex items-start gap-4 p-5 rounded-xl border-2 cursor-pointer transition-all ${
+                  formData[field]
+                    ? 'border-yellow-400 bg-yellow-50'
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={formData[field]}
+                  onChange={(e) => updateFormData(field, e.target.checked)}
+                  className="w-5 h-5 mt-1 rounded border-gray-300 text-yellow-500 focus:ring-yellow-400"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold" style={{ color: '#1e2749' }}>{label}</span>
+                    {formData[field] && (
+                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    )}
+                  </div>
+                  <p className="text-sm text-gray-500 mt-1">{subtext}</p>
+                </div>
+              </label>
+            ))}
           </div>
 
           <button
