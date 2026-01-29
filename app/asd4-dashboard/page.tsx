@@ -68,6 +68,7 @@ export default function ASD4Dashboard() {
   const [showNotLoggedIn, setShowNotLoggedIn] = useState(false);
   const [showPolicy, setShowPolicy] = useState(false);
   const tabContentRef = useRef<HTMLDivElement>(null);
+  const [expandedSchool, setExpandedSchool] = useState<string | null>(null);
 
   // Needs Attention completion state with localStorage persistence
   const [completedItems, setCompletedItems] = useState<string[]>(() => {
@@ -234,6 +235,186 @@ export default function ASD4Dashboard() {
     { name: "Effective Communication Strategies for Leaders", started: 1, completed70: 0, completionRate: 0 }
   ];
 
+  // School-level engagement data
+  const schoolData = [
+    {
+      id: 'wesley',
+      name: 'Wesley',
+      paras: [
+        { name: 'Delgado, Beatriz', email: 'bdelgado@asd4.org', loggedIn: true },
+        { name: 'Garcia, Claudia', email: 'cgarcia@asd4.org', loggedIn: true },
+        { name: 'Mendiola, Georjina', email: 'gmendiola@asd4.org', loggedIn: false },
+        { name: 'Simone, Patricia', email: 'psimone@asd4.org', loggedIn: false },
+        { name: 'Padilla, Jayla', email: 'japadilla@asd4.org', loggedIn: true },
+        { name: 'Tirado, Carmen', email: 'ctirado@asd4.org', loggedIn: true },
+        { name: 'Reyes, Kelly', email: 'kreyes@asd4.org', loggedIn: true },
+        { name: 'Velazquez, Melissa', email: 'mvelazquez@asd4.org', loggedIn: true },
+        { name: 'Alecksen, Michelle', email: 'malecksen@asd4.org', loggedIn: true },
+        { name: 'Balbuena, Ingrid', email: 'ibalbuena@asd4.org', loggedIn: true },
+        { name: 'Baumgartner, Allison', email: 'abaumgartner@asd4.org', loggedIn: true },
+        { name: 'Boucekkine, Beata', email: 'bboucekkine@asd4.org', loggedIn: true },
+        { name: 'Figueroa, Iliana', email: 'ifsanchez@asd4.org', loggedIn: true },
+        { name: 'Padilla, Jackie', email: 'jpadilla@asd4.org', loggedIn: true },
+      ],
+      themes: ['Classroom Management', 'Student Relationships', 'Communication'],
+    },
+    {
+      id: 'fullerton',
+      name: 'Fullerton',
+      paras: [
+        { name: 'Bekhrani, Fatema', email: 'fbakhrani@asd4.org', loggedIn: true },
+        { name: 'Guzman, Norma', email: 'nguzman@asd4.org', loggedIn: true },
+        { name: 'Gremo, Nancy', email: 'ngremo@asd4.org', loggedIn: false },
+        { name: 'Nyquist, Scott', email: 'snyquist@asd4.org', loggedIn: true },
+        { name: 'Migas, Paulina', email: 'pmigas@asd4.org', loggedIn: true },
+        { name: 'Roeglin, Jonathan', email: 'jroeglin@asd4.org', loggedIn: true },
+        { name: 'Castillo, Evelyn', email: 'evcastillo@asd4.org', loggedIn: true },
+        { name: 'Dunkel, Mary', email: 'mdunkel@asd4.org', loggedIn: true },
+        { name: 'Garcia, Esperanza', email: 'egarcia@asd4.org', loggedIn: true },
+        { name: 'Garcia, Maria', email: 'msgarcia@asd4.org', loggedIn: true },
+        { name: 'Hendricks, Sarah', email: 'shendricks@asd4.org', loggedIn: false },
+        { name: 'Garica, Jacquelynn', email: 'jagarcia@asd4.org', loggedIn: true },
+        { name: 'Orellana, Kristina', email: 'korellana@asd4.org', loggedIn: true },
+      ],
+      themes: ['Student Support', 'Time Management', 'Para-Teacher Collaboration'],
+    },
+    {
+      id: 'indian-trail',
+      name: 'Indian Trail',
+      paras: [
+        { name: 'Gorostieta, Michele', email: 'mgorostieta@asd4.org', loggedIn: true },
+        { name: 'Beahan, Linda', email: 'lbeahan@asd4.org', loggedIn: true },
+        { name: 'Magnuson, Karen', email: 'kmagnuson@asd4.org', loggedIn: true },
+        { name: 'Pajova, Albana', email: 'apajova@asd4.org', loggedIn: true },
+        { name: 'Hodo, Mirela', email: 'mhodo@asd4.org', loggedIn: false },
+        { name: 'Miller, Paula', email: 'pmiller@asd4.org', loggedIn: true },
+        { name: 'Judd, Marisa', email: 'mjudd@asd4.org', loggedIn: true },
+        { name: 'Juarez, Alexia', email: 'ajuarez@asd4.org', loggedIn: false },
+        { name: 'Salerno, Cori', email: 'csalerno@asd4.org', loggedIn: true },
+        { name: 'Zarate, Claudia', email: 'czarate@asd4.org', loggedIn: true },
+        { name: 'Sanchez, Maria', email: 'msanchez@asd4.org', loggedIn: true },
+        { name: 'Zaborowski, Samantha', email: 'szaborowski@asd4.org', loggedIn: true },
+      ],
+      themes: ['Behavior Support', 'Small Group Instruction', 'Student Engagement'],
+    },
+    {
+      id: 'lincoln',
+      name: 'Lincoln',
+      paras: [
+        { name: 'Hawkins, Michelina', email: 'mhawkins@asd4.org', loggedIn: true },
+        { name: 'Aguilar, Denys', email: 'daguilar@asd4.org', loggedIn: true },
+        { name: 'Chavez, Carlos', email: 'cchavez@asd4.org', loggedIn: true },
+        { name: 'Lopez-Castaneda, Victoria', email: 'vcastaneda@asd4.org', loggedIn: true },
+        { name: 'Montalvo, Jazzleen', email: 'jmontalvo@asd4.org', loggedIn: true },
+        { name: 'Ortiz, Maria', email: 'mortiz@asd4.org', loggedIn: false },
+        { name: 'Torres, Manuela', email: 'matorres@asd4.org', loggedIn: true },
+        { name: 'Bezdicek, Michelle', email: 'mbezdicek@asd4.org', loggedIn: false },
+        { name: 'Arredondo, Gregoria', email: 'garredondo@asd4.org', loggedIn: true },
+        { name: 'Marinelli, Rosemarie', email: 'rmarinelli@asd4.org', loggedIn: true },
+        { name: 'Iturbe Vaszquez, Xochitl', email: 'xiturbevazquez@asd4.org', loggedIn: true },
+      ],
+      themes: ['Reading Support', 'Math Intervention', 'Classroom Routines'],
+    },
+    {
+      id: 'stone',
+      name: 'Stone',
+      paras: [
+        { name: 'Castro, Caprice', email: 'ccastro@asd4.org', loggedIn: true },
+        { name: 'Gorostieta, Jessica', email: 'jgorostieta@asd4.org', loggedIn: true },
+        { name: 'Vairo, Danielle', email: 'dvairo@asd4.org', loggedIn: true },
+        { name: 'Wojnicki, Tracy', email: 'twojnicki@asd4.org', loggedIn: true },
+        { name: 'Camaci, Franchesca', email: 'fcamaci@asd4.org', loggedIn: true },
+        { name: 'Dourlain, Karen', email: 'kdourlain@asd4.org', loggedIn: true },
+        { name: 'Lanzo, Brittany', email: 'blanzo@asd4.org', loggedIn: false },
+        { name: 'Navarrete, Ericka', email: 'enavarrete@asd4.org', loggedIn: true },
+        { name: 'Umana, Melvi', email: 'mumana@asd4.org', loggedIn: true },
+        { name: 'Wheeler, Michelle', email: 'mwheeler@asd4.org', loggedIn: true },
+        { name: 'Schlesser, Patricia', email: 'pschlesser@asd4.org', loggedIn: false },
+      ],
+      themes: ['Special Education Support', 'Behavior Strategies', 'Documentation'],
+    },
+    {
+      id: 'army-trail',
+      name: 'Army Trail',
+      paras: [
+        { name: 'Zaragoza Aguilar, Ana', email: 'azaragoza@asd4.org', loggedIn: true },
+        { name: 'Cantu, Imelda', email: 'icantu@asd4.org', loggedIn: true },
+        { name: 'Anweiler-Stanford, Nicole', email: 'nstanford@asd4.org', loggedIn: true },
+        { name: 'Colbert, Kristine', email: 'kcolbert@asd4.org', loggedIn: false },
+        { name: 'Hoppensteadt, Emilia', email: 'ehoppensteadt@asd4.org', loggedIn: true },
+        { name: 'Marquez, Maribel', email: 'mmarquez@asd4.org', loggedIn: false },
+        { name: 'Martinez, Giselle', email: 'gmartinez@asd4.org', loggedIn: true },
+        { name: 'Nicieja, Monika', email: 'mnicieja@asd4.org', loggedIn: false },
+        { name: 'Perez, Mariela', email: 'maperez@asd4.org', loggedIn: true },
+        { name: 'Roman, Abigail', email: 'aroman@asd4.org', loggedIn: true },
+        { name: 'Samayoa, Yadira', email: 'ysamayoa@asd4.org', loggedIn: true },
+        { name: 'Villegas, Giovanni', email: 'gvillegas@asd4.org', loggedIn: true },
+        { name: 'Lugo Saldivar, Selene', email: 'slugo@asd4.org', loggedIn: true },
+      ],
+      themes: ['ELL Support', 'Cultural Responsiveness', 'Family Communication'],
+    },
+    {
+      id: 'ardmore',
+      name: 'Ardmore',
+      paras: [
+        { name: 'Mondragon, Sugey', email: 'smondragon@asd4.org', loggedIn: false },
+        { name: 'Peters, Maddalena', email: 'mpeters@asd4.org', loggedIn: true },
+        { name: 'Weissgerber, Sara', email: 'sweissgerber@asd4.org', loggedIn: true },
+      ],
+      themes: ['Intervention Support', 'Data Collection', 'Student Progress'],
+    },
+    {
+      id: 'lake-park',
+      name: 'Lake Park',
+      paras: [
+        { name: 'Alvarado, Patricia', email: 'palvarado@asd4.org', loggedIn: true },
+        { name: 'Marquez, Claudia', email: 'cmarquez@asd4.org', loggedIn: true },
+        { name: 'Ontiveros, Maribel', email: 'montiveros@asd4.org', loggedIn: false },
+        { name: 'Villalobos, Natalia', email: 'nvillalobos@asd4.org', loggedIn: false },
+        { name: 'Chairez Rodriguez, Sabina', email: 'schairez@asd4.org', loggedIn: true },
+        { name: 'DeLaGarza, Sandra', email: 'sdelagarza@asd4.org', loggedIn: true },
+        { name: 'Chaudary, Aysha', email: 'achaudary@asd4.org', loggedIn: false },
+        { name: 'Falco, Mary', email: 'mfalco@asd4.org', loggedIn: false },
+        { name: 'Martinez, Eriana', email: 'ermartinez@asd4.org', loggedIn: true },
+        { name: 'Mayer, Shelly', email: 'smayer@asd4.org', loggedIn: true },
+        { name: 'Medina, Ruby', email: 'rmedina@asd4.org', loggedIn: true },
+        { name: 'Trujillo, Fabiola', email: 'ftrujillo@asd4.org', loggedIn: true },
+      ],
+      themes: ['Reading Intervention', 'Student Motivation', 'Progress Monitoring'],
+    },
+    {
+      id: 'elc',
+      name: 'ELC (Early Learning Center)',
+      paras: [
+        { name: 'Tinajero Monroy, Melany', email: 'mtinajero@asd4.org', loggedIn: false },
+        { name: 'Katherine De La Cruz', email: 'kdelacruz@asd4.org', loggedIn: true },
+        { name: 'Melanie Diaz', email: 'mdiaz@asd4.org', loggedIn: true },
+        { name: 'Rosa Torres', email: 'rtorres@asd4.org', loggedIn: true },
+        { name: 'Yasmin Villa Casillas', email: 'yvillacasillas@asd4.org', loggedIn: false },
+        { name: 'Esmeralda Calderon', email: 'ecalderon@asd4.org', loggedIn: true },
+        { name: 'Marcela Lara Ruiz', email: 'mruiz@asd4.org', loggedIn: true },
+        { name: 'Giselle Galvan', email: 'ggalvan@asd4.org', loggedIn: false },
+        { name: 'Irma Robles', email: 'irobles@asd4.org', loggedIn: false },
+        { name: 'Jacqueline Vazquez', email: 'jvazquez@asd4.org', loggedIn: true },
+        { name: 'Miriam Carbajal', email: 'mcarbajal@asd4.org', loggedIn: true },
+        { name: 'Leslie Olvera', email: 'lolvera@asd4.org', loggedIn: true },
+        { name: 'Nuvia Rodriguez Luna', email: 'nurodriguez@asd4.org', loggedIn: false },
+        { name: 'Marie Cano', email: 'mcano@asd4.org', loggedIn: false },
+        { name: 'Anahi Carrera', email: 'ancarrera@asd4.org', loggedIn: false },
+        { name: 'Yesenia Perez', email: 'yperez@asd4.org', loggedIn: true },
+        { name: 'Michelle Samples', email: 'msamples@asd4.org', loggedIn: false },
+        { name: 'Daniela Juarez', email: 'djuarez@asd4.org', loggedIn: false },
+        { name: 'Mayra Saucedo', email: 'msaucedo@asd4.org', loggedIn: false },
+        { name: 'Katherine Ruffolo', email: 'kruffolo@asd4.org', loggedIn: true },
+        { name: 'Maria Lopez', email: 'mlopez@asd4.org', loggedIn: true },
+        { name: 'Ruby Valois-Suarez', email: 'rvalois@asd4.org', loggedIn: true },
+        { name: 'Kimberly Martinez', email: 'kmartinez@asd4.org', loggedIn: true },
+        { name: 'Kayla Carrillo', email: 'kcarrillo@asd4.org', loggedIn: false },
+      ],
+      themes: ['Early Childhood Development', 'Play-Based Learning', 'Social-Emotional Skills'],
+    },
+  ];
+
   const notLoggedInParas = [
     { name: "Michelle Bezdicek", email: "mbezdicek@asd4.org" },
     { name: "Aysha Chaudary", email: "achaudary@asd4.org" },
@@ -347,6 +528,7 @@ Thanks for everything you do.`
     { id: 'overview', label: 'Overview', icon: Eye },
     { id: 'journey', label: 'Journey', icon: TrendingUp },
     { id: 'progress', label: 'Progress', icon: Users },
+    { id: 'schools', label: 'Schools', icon: School },
     { id: 'blueprint', label: 'Blueprint', icon: Star },
     { id: 'year2', label: '2026-27', icon: Sparkles, badge: 'Preview' },
     { id: 'team', label: 'Team', icon: User },
@@ -1200,6 +1382,280 @@ Thanks for everything you do.`
               </div>
             </div>
 
+          </div>
+        )}
+
+        {/* ==================== SCHOOLS TAB ==================== */}
+        {activeTab === 'schools' && (
+          <div className="space-y-6">
+            {/* Summary Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white rounded-xl p-4 border border-gray-200">
+                <div className="text-2xl font-bold text-gray-900">9</div>
+                <div className="text-sm text-gray-500">Schools</div>
+              </div>
+              <div className="bg-white rounded-xl p-4 border border-gray-200">
+                <div className="text-2xl font-bold text-emerald-600">5</div>
+                <div className="text-sm text-gray-500">Above 80%</div>
+              </div>
+              <div className="bg-white rounded-xl p-4 border border-gray-200">
+                <div className="text-2xl font-bold text-amber-600">3</div>
+                <div className="text-sm text-gray-500">60-79%</div>
+              </div>
+              <div className="bg-white rounded-xl p-4 border border-gray-200">
+                <div className="text-2xl font-bold text-red-600">1</div>
+                <div className="text-sm text-gray-500">Below 60%</div>
+              </div>
+            </div>
+
+            {/* ELC Alert Banner */}
+            <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
+              <div>
+                <span className="font-medium text-red-800">ELC needs attention:</span>
+                <span className="text-red-700 ml-1">11 paras haven&apos;t logged in yet (54% login rate)</span>
+              </div>
+              <button
+                onClick={() => setExpandedSchool('elc')}
+                className="ml-auto text-sm text-red-600 hover:text-red-800 font-medium underline"
+              >
+                View ELC →
+              </button>
+            </div>
+
+            {/* Schools Accordion */}
+            <div className="space-y-3">
+              {schoolData
+                .map(school => {
+                  const total = school.paras.length;
+                  const loggedIn = school.paras.filter(p => p.loggedIn).length;
+                  const rate = Math.round((loggedIn / total) * 100);
+                  return { ...school, total, loggedIn, notLoggedIn: total - loggedIn, rate };
+                })
+                .sort((a, b) => b.rate - a.rate)
+                .map(school => {
+                  const isExpanded = expandedSchool === school.id;
+                  const loggedInParas = school.paras.filter(p => p.loggedIn);
+                  const notLoggedInParas = school.paras.filter(p => !p.loggedIn);
+
+                  return (
+                    <div
+                      key={school.id}
+                      className={`bg-white rounded-xl border overflow-hidden transition-all ${
+                        isExpanded ? 'border-blue-300 shadow-md' : 'border-gray-200'
+                      }`}
+                    >
+                      {/* Accordion Header */}
+                      <button
+                        onClick={() => setExpandedSchool(isExpanded ? null : school.id)}
+                        className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className={`w-3 h-3 rounded-full ${
+                            school.rate >= 80 ? 'bg-emerald-500' :
+                            school.rate >= 60 ? 'bg-amber-500' : 'bg-red-500'
+                          }`} />
+                          <div className="text-left">
+                            <h4 className="font-semibold text-gray-900">{school.name}</h4>
+                            <p className="text-sm text-gray-500">
+                              {school.total} paras · {school.loggedIn} logged in
+                              {school.notLoggedIn > 0 && (
+                                <span className="text-amber-600 ml-2">
+                                  · {school.notLoggedIn} need{school.notLoggedIn === 1 ? 's' : ''} support
+                                </span>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                          {/* Progress Bar */}
+                          <div className="hidden sm:block w-32">
+                            <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                              <div
+                                className={`h-full rounded-full transition-all ${
+                                  school.rate >= 80 ? 'bg-emerald-500' :
+                                  school.rate >= 60 ? 'bg-amber-500' : 'bg-red-500'
+                                }`}
+                                style={{ width: `${school.rate}%` }}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Percentage */}
+                          <span className={`text-lg font-bold min-w-[3rem] text-right ${
+                            school.rate >= 80 ? 'text-emerald-600' :
+                            school.rate >= 60 ? 'text-amber-600' : 'text-red-600'
+                          }`}>
+                            {school.rate}%
+                          </span>
+
+                          {/* Chevron */}
+                          <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${
+                            isExpanded ? 'rotate-180' : ''
+                          }`} />
+                        </div>
+                      </button>
+
+                      {/* Accordion Content */}
+                      {isExpanded && (
+                        <div className="px-4 pb-4 border-t border-gray-100">
+                          {/* Email Action Buttons */}
+                          <div className="flex flex-wrap gap-3 py-4">
+                            {notLoggedInParas.length > 0 && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const emails = notLoggedInParas.map(p => p.email).join(',');
+                                  const subject = encodeURIComponent(`Getting Started with the TDI Learning Hub`);
+                                  const body = encodeURIComponent(
+                                    `Hi ${school.name} Team,\n\n` +
+                                    `I wanted to reach out because I noticed you haven't had a chance to log into the TDI Learning Hub yet.\n\n` +
+                                    `No pressure — I know things get busy! But when you have 10-15 minutes, the Hub has some really practical resources that might help with your day-to-day work.\n\n` +
+                                    `Here's how to get started:\n` +
+                                    `1. Go to tdi.thinkific.com\n` +
+                                    `2. Log in with your school email\n` +
+                                    `3. Check out "Getting Started" or browse topics that interest you\n\n` +
+                                    `If you run into any issues logging in, just let me know and I'll help you get set up.\n\n` +
+                                    `Thanks!\n` +
+                                    `Leslie`
+                                  );
+                                  window.open(`mailto:${emails}?subject=${subject}&body=${body}`);
+                                }}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg transition-colors"
+                              >
+                                <Mail className="w-4 h-4" />
+                                Nudge Not Logged In ({notLoggedInParas.length})
+                              </button>
+                            )}
+
+                            {loggedInParas.length > 0 && (
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  const emails = loggedInParas.map(p => p.email).join(',');
+                                  const subject = encodeURIComponent(`Keep up the great work! 🎉`);
+                                  const body = encodeURIComponent(
+                                    `Hi ${school.name} Team,\n\n` +
+                                    `Just wanted to send a quick note to say thank you for diving into the TDI Learning Hub!\n\n` +
+                                    `Your engagement makes a difference — not just for your own growth, but for the students you support every day.\n\n` +
+                                    `If you've found any resources particularly helpful, I'd love to hear about it. And if there's something you wish the Hub had, let me know that too!\n\n` +
+                                    `Keep up the great work!\n` +
+                                    `Leslie`
+                                  );
+                                  window.open(`mailto:?bcc=${emails}&subject=${subject}&body=${body}`);
+                                }}
+                                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition-colors"
+                              >
+                                <Heart className="w-4 h-4" />
+                                High Five Logged In ({loggedInParas.length})
+                              </button>
+                            )}
+
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                const emails = school.paras.map(p => p.email).join(',');
+                                const subject = encodeURIComponent(`A note for the ${school.name} team`);
+                                const body = encodeURIComponent(
+                                  `Hi ${school.name} Team,\n\n` +
+                                  `[Your message here]\n\n` +
+                                  `Thanks!\n` +
+                                  `Leslie`
+                                );
+                                window.open(`mailto:?bcc=${emails}&subject=${subject}&body=${body}`);
+                              }}
+                              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors"
+                            >
+                              <Mail className="w-4 h-4" />
+                              Email All ({school.paras.length})
+                            </button>
+                          </div>
+
+                          {/* Themes Section */}
+                          <div className="mb-4">
+                            <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                              What {school.name} Is Exploring
+                            </h5>
+                            <div className="flex flex-wrap gap-2">
+                              {school.themes.map((theme, i) => (
+                                <span
+                                  key={i}
+                                  className="px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full"
+                                >
+                                  {theme}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Para Roster - Two Columns */}
+                          <div className="grid md:grid-cols-2 gap-4">
+                            {/* Logged In Column */}
+                            <div className="bg-emerald-50 rounded-lg p-4">
+                              <h5 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
+                                <Check className="w-4 h-4" />
+                                Logged In ({loggedInParas.length})
+                              </h5>
+                              <div className="space-y-2 max-h-48 overflow-y-auto">
+                                {loggedInParas.map((para, i) => (
+                                  <div key={i} className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-700">{para.name}</span>
+                                    <span className="text-gray-400 text-xs">{para.email}</span>
+                                  </div>
+                                ))}
+                                {loggedInParas.length === 0 && (
+                                  <p className="text-sm text-gray-400 italic">No paras logged in yet</p>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Not Logged In Column */}
+                            <div className="bg-amber-50 rounded-lg p-4">
+                              <h5 className="text-sm font-semibold text-amber-700 mb-3 flex items-center gap-2">
+                                <AlertCircle className="w-4 h-4" />
+                                Not Logged In ({notLoggedInParas.length})
+                              </h5>
+                              <div className="space-y-2 max-h-48 overflow-y-auto">
+                                {notLoggedInParas.map((para, i) => (
+                                  <div key={i} className="flex items-center justify-between text-sm">
+                                    <span className="text-gray-700">{para.name}</span>
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        const subject = encodeURIComponent(`Quick help getting into the TDI Learning Hub`);
+                                        const body = encodeURIComponent(
+                                          `Hi ${para.name.split(',')[0] || para.name.split(' ')[0]},\n\n` +
+                                          `I noticed you haven't had a chance to log into the TDI Learning Hub yet, and I wanted to reach out in case you need any help getting started.\n\n` +
+                                          `Here's how to access it:\n` +
+                                          `1. Go to tdi.thinkific.com\n` +
+                                          `2. Log in with your school email (${para.email})\n` +
+                                          `3. If you need to reset your password, click "Forgot Password"\n\n` +
+                                          `The Hub has some really practical, quick resources — nothing overwhelming. Most paras start with the "Getting Started" section.\n\n` +
+                                          `Let me know if you run into any issues!\n\n` +
+                                          `Thanks,\n` +
+                                          `Leslie`
+                                        );
+                                        window.open(`mailto:${para.email}?subject=${subject}&body=${body}`);
+                                      }}
+                                      className="text-xs text-amber-600 hover:text-amber-800 font-medium underline"
+                                    >
+                                      Nudge
+                                    </button>
+                                  </div>
+                                ))}
+                                {notLoggedInParas.length === 0 && (
+                                  <p className="text-sm text-emerald-600 italic">🎉 Everyone&apos;s logged in!</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+            </div>
           </div>
         )}
 
