@@ -1,6 +1,5 @@
 import Link from 'next/link';
 import { CoursesSection } from '@/components/CoursesSection';
-import { TabbedCalculator } from '@/components/calculators';
 import { BeforeAfterStats } from '@/components/BeforeAfterStats';
 
 export const metadata = {
@@ -11,7 +10,7 @@ export const metadata = {
 export default function ForSchoolsPage() {
   return (
     <main>
-      {/* Hero Section with Parallax */}
+      {/* 1. Hero Section with Parallax */}
       <section className="relative h-[400px] md:h-[450px] overflow-hidden">
         {/* Parallax Background Image */}
         <div
@@ -72,7 +71,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* 2. Stats Section */}
       <section className="py-16" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
@@ -92,7 +91,7 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      {/* Pain Points - Redesigned with Central Stat */}
+      {/* 3. Pain Points - Problem Agitation */}
       <section className="py-12 md:py-14" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
@@ -263,7 +262,141 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      {/* What Schools Get */}
+      {/* 4. Testimonials - MOVED UP */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-default">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
+            What School Leaders Are Saying
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="p-6 rounded-xl" style={{ backgroundColor: '#ffffff' }}>
+              <p className="mb-4 italic" style={{ color: '#1e2749' }}>
+                "This isn't sit-and-get. Our teachers are actually learning how to work smarter and feel better doing it."
+              </p>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Lisa M.</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>K-8 School Director</p>
+            </div>
+            <div className="p-6 rounded-xl" style={{ backgroundColor: '#ffffff' }}>
+              <p className="mb-4 italic" style={{ color: '#1e2749' }}>
+                "Before, we got eye rolls. Now, we hear: 'When's the team coming next?' That's when you know PD is finally working."
+              </p>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Daniel R.</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>High School Principal</p>
+            </div>
+            <div className="p-6 rounded-xl" style={{ backgroundColor: '#ffffff' }}>
+              <p className="mb-4 italic" style={{ color: '#1e2749' }}>
+                "TDI didn't just drop a slide deck and bounce. Every part of the experience felt personal. Our staff felt understood."
+              </p>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Julie H.</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Principal, MI</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Your Partner Dashboard - MOVED UP */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-default">
+          <div className="max-w-5xl mx-auto">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e2749' }}>
+                Your Partner Dashboard
+              </h2>
+              <p className="text-xl mb-4" style={{ color: '#38618C' }}>
+                Track progress, see real data, and stay connected — all in one place.
+              </p>
+              <p className="text-lg max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
+                Every TDI partner gets a personalized dashboard. No more wondering if PD is working — you'll see the data yourself.
+              </p>
+            </div>
+
+            {/* Three-column feature grid */}
+            <div className="grid md:grid-cols-3 gap-6 mb-10">
+              {/* Column 1: At-a-Glance Progress */}
+              <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                <a href="/Example-Dashboard" target="_blank" rel="noopener noreferrer" className="block group">
+                  <div className="relative overflow-hidden">
+                    <img
+                      src="/images/dashboard-overview.png"
+                      alt="Dashboard Overview"
+                      className="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-[#1e2749]/0 group-hover:bg-[#1e2749]/10 transition-colors" />
+                  </div>
+                </a>
+                <div className="p-5">
+                  <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>At-a-Glance Progress</h4>
+                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                    See staff enrollment, observations completed, and what needs attention — updated in real-time.
+                  </p>
+                </div>
+              </div>
+
+              {/* Column 2: Teacher Wellbeing Data */}
+              <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                <a href="/Example-Dashboard" target="_blank" rel="noopener noreferrer" className="block group">
+                  <div className="relative overflow-hidden">
+                    <img
+                      src="/images/dashboard-survey-results.png"
+                      alt="Survey Results Dashboard"
+                      className="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-[#1e2749]/0 group-hover:bg-[#1e2749]/10 transition-colors" />
+                  </div>
+                </a>
+                <div className="p-5">
+                  <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Teacher Wellbeing Data</h4>
+                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                    Track stress levels, retention intent, and what teachers say would help — straight from their surveys.
+                  </p>
+                </div>
+              </div>
+
+              {/* Column 3: Outcomes That Matter */}
+              <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
+                <a href="/Example-Dashboard" target="_blank" rel="noopener noreferrer" className="block group">
+                  <div className="relative overflow-hidden">
+                    <img
+                      src="/images/dashboard-leading-indicators.png"
+                      alt="Leading Indicators Dashboard"
+                      className="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-300"
+                    />
+                    <div className="absolute inset-0 bg-[#1e2749]/0 group-hover:bg-[#1e2749]/10 transition-colors" />
+                  </div>
+                </a>
+                <div className="p-5">
+                  <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Outcomes That Matter</h4>
+                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                    Compare your school to industry benchmarks on the metrics that predict lasting change.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="text-center">
+              <a
+                href="/Example-Dashboard"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-all hover:opacity-90"
+                style={{ backgroundColor: '#35A7FF' }}
+              >
+                See Full Example Dashboard
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </a>
+              <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.5 }}>
+                Fictional example shown — your dashboard reflects your school's real goals and data.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. What Schools Get - MOVED DOWN */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#ffffff' }}>
@@ -311,176 +444,28 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
-        <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
-            What School Leaders Are Saying
-          </h2>
+      {/* 7. What Educators Are Learning + Verified Outcomes - MOVED UP */}
+      <CoursesSection />
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-            <div className="p-6 rounded-xl" style={{ backgroundColor: '#E8F0FD' }}>
-              <p className="mb-4 italic" style={{ color: '#1e2749' }}>
-                "This isn't sit-and-get. Our teachers are actually learning how to work smarter and feel better doing it."
-              </p>
-              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Lisa M.</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>K-8 School Director</p>
-            </div>
-            <div className="p-6 rounded-xl" style={{ backgroundColor: '#E8F0FD' }}>
-              <p className="mb-4 italic" style={{ color: '#1e2749' }}>
-                "Before, we got eye rolls. Now, we hear: 'When's the team coming next?' That's when you know PD is finally working."
-              </p>
-              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Daniel R.</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>High School Principal</p>
-            </div>
-            <div className="p-6 rounded-xl" style={{ backgroundColor: '#E8F0FD' }}>
-              <p className="mb-4 italic" style={{ color: '#1e2749' }}>
-                "TDI didn't just drop a slide deck and bounce. Every part of the experience felt personal. Our staff felt understood."
-              </p>
-              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Julie H.</p>
-              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Principal, MI</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <BeforeAfterStats
+        title="Verified Outcomes from TDI Partner Schools"
+        stats={[
+          {
+            label: 'Likelihood to stay in teaching (10-point scale)',
+            beforeValue: '2-4',
+            afterValue: '5-7',
+            beforeNum: 3,
+          },
+          {
+            label: 'Reported stress reduction (10-point scale)',
+            beforeValue: '9',
+            afterValue: '5-7',
+            beforeNum: 9,
+          },
+        ]}
+      />
 
-      {/* Built for Every Leader */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
-        <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#ffffff' }}>
-            Built for Every Leader in the Building
-          </h2>
-          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
-            No matter your role, TDI meets you where you are.
-          </p>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
-
-            {/* Principals */}
-            <a
-              href="/free-pd-plan"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col"
-              style={{ textDecoration: 'none' }}
-            >
-              <div className="h-[140px] overflow-hidden">
-                <img
-                  src="/images/leader-principal.webp"
-                  alt="Principal"
-                  className="w-full h-full object-cover object-top transition-transform group-hover:scale-105"
-                  style={{ filter: 'grayscale(100%)' }}
-                />
-              </div>
-              <div className="bg-white p-4 flex-1 flex flex-col">
-                <p
-                  className="font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749', fontSize: '11px', letterSpacing: '0.05em' }}
-                >
-                  Principals
-                </p>
-                <p className="text-xs mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, lineHeight: '1.4' }}>
-                  PD your teachers won't dread. Results you can see in classrooms.
-                </p>
-                <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
-                  Take the PD Quiz →
-                </span>
-              </div>
-            </a>
-
-            {/* Superintendents */}
-            <a
-              href="/contact"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col"
-              style={{ textDecoration: 'none' }}
-            >
-              <div className="h-[140px] overflow-hidden">
-                <img
-                  src="/images/leader-superintendent.webp"
-                  alt="Superintendent"
-                  className="w-full h-full object-cover object-top transition-transform group-hover:scale-105"
-                  style={{ filter: 'grayscale(100%)' }}
-                />
-              </div>
-              <div className="bg-white p-4 flex-1 flex flex-col">
-                <p
-                  className="font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749', fontSize: '11px', letterSpacing: '0.05em' }}
-                >
-                  Superintendents
-                </p>
-                <p className="text-xs mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, lineHeight: '1.4' }}>
-                  District-wide scale, board-ready outcomes, budget flexibility.
-                </p>
-                <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
-                  Let's talk →
-                </span>
-              </div>
-            </a>
-
-            {/* Curriculum Directors */}
-            <a
-              href="/free-pd-plan"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col"
-              style={{ textDecoration: 'none' }}
-            >
-              <div className="h-[140px] overflow-hidden">
-                <img
-                  src="/images/leader-curriculum.webp"
-                  alt="Curriculum Director"
-                  className="w-full h-full object-cover object-center transition-transform group-hover:scale-105"
-                  style={{ filter: 'grayscale(100%)' }}
-                />
-              </div>
-              <div className="bg-white p-4 flex-1 flex flex-col">
-                <p
-                  className="font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749', fontSize: '11px', letterSpacing: '0.05em' }}
-                >
-                  Curriculum
-                </p>
-                <p className="text-xs mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, lineHeight: '1.4' }}>
-                  PD that works with what you're already doing, and actually gets used.
-                </p>
-                <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
-                  Take the PD Quiz →
-                </span>
-              </div>
-            </a>
-
-            {/* HR Directors */}
-            <a
-              href="/contact"
-              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col"
-              style={{ textDecoration: 'none' }}
-            >
-              <div className="h-[140px] overflow-hidden">
-                <img
-                  src="/images/leader-hr.webp"
-                  alt="HR Director"
-                  className="w-full h-full object-cover object-top transition-transform group-hover:scale-105"
-                  style={{ filter: 'grayscale(100%)' }}
-                />
-              </div>
-              <div className="bg-white p-4 flex-1 flex flex-col">
-                <p
-                  className="font-bold mb-2 uppercase tracking-wide"
-                  style={{ color: '#1e2749', fontSize: '11px', letterSpacing: '0.05em' }}
-                >
-                  HR Directors
-                </p>
-                <p className="text-xs mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, lineHeight: '1.4' }}>
-                  Data that ties teacher support to retention and turnover.
-                </p>
-                <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
-                  Let's talk →
-                </span>
-              </div>
-            </a>
-
-          </div>
-        </div>
-      </section>
-
-      {/* Partnership Journey */}
+      {/* 8. Partnership Journey (Pricing) */}
       <section id="blueprint" className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
@@ -619,129 +604,8 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      {/* Not Sure Where to Start */}
-      <section className="py-12 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h3 className="text-2xl font-bold mb-4" style={{ color: '#1e2749' }}>
-            Not Sure Where to Start?
-          </h3>
-          <p className="text-lg mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
-            Most school leaders can identify their current PD type in under 2 minutes.
-            Take our free diagnostic to see where you are today and which phase fits your goals.
-          </p>
-          <a
-            href="/pd-diagnostic"
-            className="inline-block px-8 py-3 rounded-full font-semibold transition-all hover:shadow-lg"
-            style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-          >
-            Take the PD Diagnostic
-          </a>
-        </div>
-      </section>
-
-      {/* Your Partner Dashboard */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
-        <div className="container-default">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e2749' }}>
-                Your Partner Dashboard
-              </h2>
-              <p className="text-xl mb-4" style={{ color: '#38618C' }}>
-                Track progress, see real data, and stay connected — all in one place.
-              </p>
-              <p className="text-lg max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Every TDI partner gets a personalized dashboard. No more wondering if PD is working — you'll see the data yourself.
-              </p>
-            </div>
-
-            {/* Three-column feature grid */}
-            <div className="grid md:grid-cols-3 gap-6 mb-10">
-              {/* Column 1: At-a-Glance Progress */}
-              <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-                <a href="/Example-Dashboard" target="_blank" rel="noopener noreferrer" className="block group">
-                  <div className="relative overflow-hidden">
-                    <img
-                      src="/images/dashboard-overview.png"
-                      alt="Dashboard Overview"
-                      className="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-[#1e2749]/0 group-hover:bg-[#1e2749]/10 transition-colors" />
-                  </div>
-                </a>
-                <div className="p-5">
-                  <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>At-a-Glance Progress</h4>
-                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                    See staff enrollment, observations completed, and what needs attention — updated in real-time.
-                  </p>
-                </div>
-              </div>
-
-              {/* Column 2: Teacher Wellbeing Data */}
-              <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-                <a href="/Example-Dashboard" target="_blank" rel="noopener noreferrer" className="block group">
-                  <div className="relative overflow-hidden">
-                    <img
-                      src="/images/dashboard-survey-results.png"
-                      alt="Survey Results Dashboard"
-                      className="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-[#1e2749]/0 group-hover:bg-[#1e2749]/10 transition-colors" />
-                  </div>
-                </a>
-                <div className="p-5">
-                  <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Teacher Wellbeing Data</h4>
-                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                    Track stress levels, retention intent, and what teachers say would help — straight from their surveys.
-                  </p>
-                </div>
-              </div>
-
-              {/* Column 3: Outcomes That Matter */}
-              <div className="bg-gray-50 rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
-                <a href="/Example-Dashboard" target="_blank" rel="noopener noreferrer" className="block group">
-                  <div className="relative overflow-hidden">
-                    <img
-                      src="/images/dashboard-leading-indicators.png"
-                      alt="Leading Indicators Dashboard"
-                      className="w-full h-48 object-cover object-top group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute inset-0 bg-[#1e2749]/0 group-hover:bg-[#1e2749]/10 transition-colors" />
-                  </div>
-                </a>
-                <div className="p-5">
-                  <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Outcomes That Matter</h4>
-                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                    Compare your school to industry benchmarks on the metrics that predict lasting change.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* CTA */}
-            <div className="text-center">
-              <a
-                href="/Example-Dashboard"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold text-white transition-all hover:opacity-90"
-                style={{ backgroundColor: '#35A7FF' }}
-              >
-                See Full Example Dashboard
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </a>
-              <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.5 }}>
-                Fictional example shown — your dashboard reflects your school's real goals and data.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Funding & Pricing Support */}
-      <section className="py-12 md:py-16" style={{ backgroundColor: '#f9fafb' }}>
+      {/* 9. Funding & Pricing Support - MOVED UP (after pricing) */}
+      <section className="py-12 md:py-16" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <div
             className="rounded-xl p-6 md:p-8 max-w-4xl mx-auto"
@@ -795,49 +659,163 @@ export default function ForSchoolsPage() {
         </div>
       </section>
 
-      {/* FAQ Callout for Admins */}
-      <div className="text-center py-8" style={{ backgroundColor: '#ffffff' }}>
-        <p style={{ color: '#1e2749', opacity: 0.8 }}>
-          Have questions about implementation, pricing, or funding?{' '}
+      {/* 10. Not Sure Where to Start - MOVED DOWN */}
+      <section className="py-12 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h3 className="text-2xl font-bold mb-4" style={{ color: '#1e2749' }}>
+            Not Sure Where to Start?
+          </h3>
+          <p className="text-lg mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
+            Most school leaders can identify their current PD type in under 2 minutes.
+            Take our free diagnostic to see where you are today and which phase fits your goals.
+          </p>
           <a
-            href="/faq"
-            className="font-semibold underline hover:opacity-80 transition-opacity"
-            style={{ color: '#ffba06' }}
+            href="/pd-diagnostic"
+            className="inline-block px-8 py-3 rounded-full font-semibold transition-all hover:shadow-lg"
+            style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
           >
-            Check our FAQ
+            Take the PD Diagnostic
           </a>
-        </p>
-      </div>
-
-      <CoursesSection />
-
-      {/* Verified Outcomes Stats */}
-      <BeforeAfterStats
-        title="Verified Outcomes from TDI Partner Schools"
-        stats={[
-          {
-            label: 'Likelihood to stay in teaching (10-point scale)',
-            beforeValue: '2-4',
-            afterValue: '5-7',
-            beforeNum: 3,
-          },
-          {
-            label: 'Reported stress reduction (10-point scale)',
-            beforeValue: '9',
-            afterValue: '5-7',
-            beforeNum: 9,
-          },
-        ]}
-      />
-
-      {/* ROI Calculator Section */}
-      <section id="calculator" className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="container-default">
-          <TabbedCalculator defaultTab="schools" />
         </div>
       </section>
 
-      {/* Final CTA */}
+      {/* 11. Built for Every Leader - MOVED DOWN */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
+        <div className="container-default">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#ffffff' }}>
+            Built for Every Leader in the Building
+          </h2>
+          <p className="text-center mb-12 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.8 }}>
+            No matter your role, TDI meets you where you are.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+
+            {/* Principals */}
+            <a
+              href="/free-pd-plan"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col"
+              style={{ textDecoration: 'none' }}
+            >
+              <div className="h-[140px] overflow-hidden">
+                <img
+                  src="/images/leader-principal.webp"
+                  alt="Principal"
+                  className="w-full h-full object-cover object-top transition-transform group-hover:scale-105"
+                  style={{ filter: 'grayscale(100%)' }}
+                />
+              </div>
+              <div className="bg-white p-4 flex-1 flex flex-col">
+                <p
+                  className="font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749', fontSize: '11px', letterSpacing: '0.05em' }}
+                >
+                  Principals
+                </p>
+                <p className="text-xs mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, lineHeight: '1.4' }}>
+                  PD your teachers won't dread. Results you can see in classrooms.
+                </p>
+                <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
+                  Take the PD Quiz →
+                </span>
+              </div>
+            </a>
+
+            {/* Superintendents */}
+            <a
+              href="/contact"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col"
+              style={{ textDecoration: 'none' }}
+            >
+              <div className="h-[140px] overflow-hidden">
+                <img
+                  src="/images/leader-superintendent.webp"
+                  alt="Superintendent"
+                  className="w-full h-full object-cover object-top transition-transform group-hover:scale-105"
+                  style={{ filter: 'grayscale(100%)' }}
+                />
+              </div>
+              <div className="bg-white p-4 flex-1 flex flex-col">
+                <p
+                  className="font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749', fontSize: '11px', letterSpacing: '0.05em' }}
+                >
+                  Superintendents
+                </p>
+                <p className="text-xs mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, lineHeight: '1.4' }}>
+                  District-wide scale, board-ready outcomes, budget flexibility.
+                </p>
+                <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
+                  Let's talk →
+                </span>
+              </div>
+            </a>
+
+            {/* Curriculum Directors */}
+            <a
+              href="/free-pd-plan"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col"
+              style={{ textDecoration: 'none' }}
+            >
+              <div className="h-[140px] overflow-hidden">
+                <img
+                  src="/images/leader-curriculum.webp"
+                  alt="Curriculum Director"
+                  className="w-full h-full object-cover object-center transition-transform group-hover:scale-105"
+                  style={{ filter: 'grayscale(100%)' }}
+                />
+              </div>
+              <div className="bg-white p-4 flex-1 flex flex-col">
+                <p
+                  className="font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749', fontSize: '11px', letterSpacing: '0.05em' }}
+                >
+                  Curriculum
+                </p>
+                <p className="text-xs mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, lineHeight: '1.4' }}>
+                  PD that works with what you're already doing, and actually gets used.
+                </p>
+                <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
+                  Take the PD Quiz →
+                </span>
+              </div>
+            </a>
+
+            {/* HR Directors */}
+            <a
+              href="/contact"
+              className="group rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all flex flex-col"
+              style={{ textDecoration: 'none' }}
+            >
+              <div className="h-[140px] overflow-hidden">
+                <img
+                  src="/images/leader-hr.webp"
+                  alt="HR Director"
+                  className="w-full h-full object-cover object-top transition-transform group-hover:scale-105"
+                  style={{ filter: 'grayscale(100%)' }}
+                />
+              </div>
+              <div className="bg-white p-4 flex-1 flex flex-col">
+                <p
+                  className="font-bold mb-2 uppercase tracking-wide"
+                  style={{ color: '#1e2749', fontSize: '11px', letterSpacing: '0.05em' }}
+                >
+                  HR Directors
+                </p>
+                <p className="text-xs mb-3 flex-1" style={{ color: '#1e2749', opacity: 0.7, lineHeight: '1.4' }}>
+                  Data that ties teacher support to retention and turnover.
+                </p>
+                <span className="font-semibold text-xs" style={{ color: '#80a4ed' }}>
+                  Let's talk →
+                </span>
+              </div>
+            </a>
+
+          </div>
+        </div>
+      </section>
+
+      {/* 12. Final CTA */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#ffffff' }}>
@@ -862,6 +840,9 @@ export default function ForSchoolsPage() {
               Start the Conversation
             </a>
           </div>
+          <p className="text-sm mt-6" style={{ color: '#ffffff', opacity: 0.6 }}>
+            Want to see projected outcomes? <a href="/calculator" className="underline hover:opacity-100">Try our Impact Calculator</a>
+          </p>
         </div>
       </section>
     </main>
