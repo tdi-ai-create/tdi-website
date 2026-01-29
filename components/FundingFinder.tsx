@@ -18,6 +18,7 @@ interface FormData {
   commitment1: boolean;
   commitment2: boolean;
   commitment3: boolean;
+  commitment4: boolean;
   // School Info
   schoolName: string;
   district: string;
@@ -46,6 +47,7 @@ const initialFormData: FormData = {
   commitment1: false,
   commitment2: false,
   commitment3: false,
+  commitment4: false,
   schoolName: '',
   district: '',
   state: '',
@@ -87,7 +89,7 @@ export default function FundingFinder() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const allCommitmentsChecked = formData.commitment1 && formData.commitment2 && formData.commitment3;
+  const allCommitmentsChecked = formData.commitment1 && formData.commitment2 && formData.commitment3 && formData.commitment4;
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
@@ -189,8 +191,8 @@ Best Time to Call: ${formData.bestTimeToCall || 'Not specified'}
       {step === 'commitments' && (
         <div className="space-y-6">
           <div className="text-center mb-8">
-            <h3 className="text-2xl font-bold text-[#1e2749] mb-2">Before We Begin</h3>
-            <p className="text-gray-600">Please confirm you're ready to explore funding options</p>
+            <h3 className="text-2xl font-bold text-[#1e2749] mb-2">Before We Find Your Funding...</h3>
+            <p className="text-gray-600">Just confirm you're ready to let us do the heavy lifting.</p>
           </div>
 
           <div className="space-y-4">
@@ -202,8 +204,8 @@ Best Time to Call: ${formData.bestTimeToCall || 'Not specified'}
                 className="mt-1 w-5 h-5 rounded border-gray-300 text-[#ffba06] focus:ring-[#ffba06]"
               />
               <div>
-                <p className="font-medium text-[#1e2749]">I'm exploring professional development for my school</p>
-                <p className="text-sm text-gray-500">You're actively looking for PD solutions, not just browsing</p>
+                <p className="font-medium text-[#1e2749]">Yes, research my funding options for me</p>
+                <p className="text-sm text-gray-500">You don't have to research anything</p>
               </div>
             </label>
 
@@ -215,8 +217,8 @@ Best Time to Call: ${formData.bestTimeToCall || 'Not specified'}
                 className="mt-1 w-5 h-5 rounded border-gray-300 text-[#ffba06] focus:ring-[#ffba06]"
               />
               <div>
-                <p className="font-medium text-[#1e2749]">I have input on professional development decisions</p>
-                <p className="text-sm text-gray-500">You can influence or make PD budget decisions at your school</p>
+                <p className="font-medium text-[#1e2749]">Yes, write my grant language for me</p>
+                <p className="text-sm text-gray-500">You don't have to write a single word</p>
               </div>
             </label>
 
@@ -228,8 +230,21 @@ Best Time to Call: ${formData.bestTimeToCall || 'Not specified'}
                 className="mt-1 w-5 h-5 rounded border-gray-300 text-[#ffba06] focus:ring-[#ffba06]"
               />
               <div>
-                <p className="font-medium text-[#1e2749]">I'm open to a brief conversation about funding options</p>
-                <p className="text-sm text-gray-500">You're willing to spend 15 minutes discussing possibilities</p>
+                <p className="font-medium text-[#1e2749]">Yes, prepare my board proposal for me</p>
+                <p className="text-sm text-gray-500">You just review and submit</p>
+              </div>
+            </label>
+
+            <label className="flex items-start gap-4 p-4 rounded-xl border-2 border-gray-200 hover:border-[#ffba06] cursor-pointer transition-all">
+              <input
+                type="checkbox"
+                checked={formData.commitment4}
+                onChange={(e) => updateFormData('commitment4', e.target.checked)}
+                className="mt-1 w-5 h-5 rounded border-gray-300 text-[#ffba06] focus:ring-[#ffba06]"
+              />
+              <div>
+                <p className="font-medium text-[#1e2749]">Yes, I want this free service</p>
+                <p className="text-sm text-gray-500">No obligation, no pressure</p>
               </div>
             </label>
           </div>
