@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import FundingFinder from '@/components/FundingFinder';
 
 export const metadata: Metadata = {
   title: 'Funding Options | Teachers Deserve It',
@@ -248,6 +249,24 @@ export default function FundingPage() {
           >
             Take the Diagnostic
           </a>
+        </div>
+      </section>
+
+      {/* Funding Finder Questionnaire */}
+      <section className="py-16" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-default">
+          <div className="text-center mb-8">
+            <p className="text-sm font-semibold uppercase tracking-wide mb-2" style={{ color: '#ffba06' }}>
+              Let's Find Your Funding
+            </p>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#1e2749' }}>
+              Tell Us About Your School
+            </h2>
+            <p className="max-w-xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
+              Answer a few quick questions and we'll identify the best funding options for your school.
+            </p>
+          </div>
+          <FundingFinder />
         </div>
       </section>
 
