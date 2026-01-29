@@ -11,19 +11,45 @@ export default function ContactPage() {
     message: ''
   });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Connect to form handling service
-    console.log('Form submitted:', formData);
-    setSubmitted(true);
+    setIsSubmitting(true);
 
-    // GA4 tracking
-    if (typeof window !== 'undefined' && window.gtag) {
-      window.gtag('event', 'form_submission', {
-        form_name: 'contact_form',
-        form_location: window.location.pathname
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: '0223db31-ba3a-42ae-a413-17dbe3a6ee9e',
+          subject: 'New Contact Form Submission - TDI Website',
+          name: formData.name,
+          email: formData.email,
+          role: formData.role,
+          message: formData.message,
+        }),
       });
+
+      if (response.ok) {
+        setSubmitted(true);
+
+        // GA4 tracking
+        if (typeof window !== 'undefined' && window.gtag) {
+          window.gtag('event', 'form_submission', {
+            form_name: 'contact_form',
+            form_location: window.location.pathname
+          });
+        }
+      } else {
+        console.error('Form submission failed');
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -234,8 +260,8 @@ export default function ContactPage() {
                     />
                   </div>
 
-                  <button type="submit" className="btn-primary w-full">
-                    Send Message
+                  <button type="submit" className="btn-primary w-full" disabled={isSubmitting}>
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
                   </button>
 
                   <p className="text-xs text-center" style={{ color: '#1e2749', opacity: 0.6 }}>
