@@ -64,6 +64,14 @@ export default function LeadCapture({ onSubmit }: LeadCaptureProps) {
     onSubmit?.(email, selectedQuadrant);
     setSubmitted(true);
     setIsSubmitting(false);
+
+    // GA4 tracking
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'form_submission', {
+        form_name: 'pd_framework_lead_capture',
+        form_location: window.location.pathname
+      });
+    }
   };
 
   if (submitted) {

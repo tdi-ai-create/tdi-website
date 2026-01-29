@@ -65,6 +65,15 @@ export function EmailPopup({ delay = 30000 }: EmailPopupProps) {
     // TODO: Connect to email service (Substack, ConvertKit, etc.)
     console.log('Email submitted:', email);
     setSubmitted(true);
+
+    // GA4 tracking
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'form_submission', {
+        form_name: 'email_popup',
+        form_location: window.location.pathname
+      });
+    }
+
     setTimeout(() => {
       setIsOpen(false);
       sessionStorage.setItem('tdi-popup-dismissed', 'true');

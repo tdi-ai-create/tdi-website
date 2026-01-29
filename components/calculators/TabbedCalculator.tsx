@@ -45,6 +45,15 @@ export function TabbedCalculator({ defaultTab = 'schools' }: TabbedCalculatorPro
     e.preventDefault();
     console.log('Calculator email submitted:', email);
     setSubmitted(true);
+
+    // GA4 tracking
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'form_submission', {
+        form_name: 'calculator_email_popup',
+        form_location: window.location.pathname
+      });
+    }
+
     setTimeout(() => {
       setShowPopup(false);
       sessionStorage.setItem('tdi-calc-popup-dismissed', 'true');

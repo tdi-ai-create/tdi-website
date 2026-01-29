@@ -18,6 +18,14 @@ export default function RequestForSchoolPage() {
     // TODO: Connect to form handling service
     console.log('Request submitted:', formData);
     setSubmitted(true);
+
+    // GA4 tracking
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'form_submission', {
+        form_name: 'school_inquiry_form',
+        form_location: window.location.pathname
+      });
+    }
   };
 
   return (
