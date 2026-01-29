@@ -4,15 +4,11 @@ import { useState } from 'react';
 import {
   CheckCircle,
   School,
-  MapPin,
-  Users,
   DollarSign,
   Target,
-  Calendar,
   User,
   Mail,
   Phone,
-  MessageSquare,
 } from 'lucide-react';
 
 type Step = 'commitments' | 'school-info' | 'funding-context' | 'goals' | 'contact' | 'success';
