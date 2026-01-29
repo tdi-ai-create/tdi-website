@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { MicrosoftClarity } from "@/components/MicrosoftClarity";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 import { Header } from "@/components/layout/Header";
@@ -63,6 +64,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="antialiased">
         <GoogleAnalytics />
+        <MicrosoftClarity />
         <ScrollToTop />
         <AnnouncementBar />
         <Header />
