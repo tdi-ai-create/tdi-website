@@ -69,6 +69,7 @@ export default function ASD4Dashboard() {
   const [showPolicy, setShowPolicy] = useState(false);
   const tabContentRef = useRef<HTMLDivElement>(null);
   const [expandedSchool, setExpandedSchool] = useState<string | null>(null);
+  const [showRoster, setShowRoster] = useState<string | null>(null);
 
   // Needs Attention completion state with localStorage persistence
   const [completedItems, setCompletedItems] = useState<string[]>(() => {
@@ -235,11 +236,20 @@ export default function ASD4Dashboard() {
     { name: "Effective Communication Strategies for Leaders", started: 1, completed70: 0, completionRate: 0 }
   ];
 
-  // School-level engagement data
+  // School-level engagement data (with real course metrics)
   const schoolData = [
     {
       id: 'wesley',
       name: 'Wesley',
+      engagement: {
+        engagedParas: 11,
+        totalActivities: 26,
+        topCourses: [
+          { name: 'Understanding Student Needs & Modifications', count: 5, avgProgress: 66 },
+          { name: 'Paraprofessional Foundations', count: 4, avgProgress: 100 },
+          { name: 'Streamline Your Inbox: Email Management', count: 4, avgProgress: 65 },
+        ],
+      },
       paras: [
         { name: 'Delgado, Beatriz', email: 'bdelgado@asd4.org', loggedIn: true },
         { name: 'Garcia, Claudia', email: 'cgarcia@asd4.org', loggedIn: true },
@@ -256,11 +266,98 @@ export default function ASD4Dashboard() {
         { name: 'Figueroa, Iliana', email: 'ifsanchez@asd4.org', loggedIn: true },
         { name: 'Padilla, Jackie', email: 'jpadilla@asd4.org', loggedIn: true },
       ],
-      themes: ['Classroom Management', 'Student Relationships', 'Communication'],
+    },
+    {
+      id: 'indian-trail',
+      name: 'Indian Trail',
+      engagement: {
+        engagedParas: 9,
+        totalActivities: 16,
+        topCourses: [
+          { name: 'Effective Small-Group & One-on-One Instruction', count: 4, avgProgress: 54 },
+          { name: 'Paraprofessional Foundations', count: 4, avgProgress: 52 },
+          { name: 'Classroom Management Toolkit', count: 2, avgProgress: 28 },
+        ],
+      },
+      paras: [
+        { name: 'Gorostieta, Michele', email: 'mgorostieta@asd4.org', loggedIn: true },
+        { name: 'Beahan, Linda', email: 'lbeahan@asd4.org', loggedIn: true },
+        { name: 'Magnuson, Karen', email: 'kmagnuson@asd4.org', loggedIn: true },
+        { name: 'Pajova, Albana', email: 'apajova@asd4.org', loggedIn: true },
+        { name: 'Hodo, Mirela', email: 'mhodo@asd4.org', loggedIn: false },
+        { name: 'Miller, Paula', email: 'pmiller@asd4.org', loggedIn: true },
+        { name: 'Judd, Marisa', email: 'mjudd@asd4.org', loggedIn: true },
+        { name: 'Juarez, Alexia', email: 'ajuarez@asd4.org', loggedIn: false },
+        { name: 'Salerno, Cori', email: 'csalerno@asd4.org', loggedIn: true },
+        { name: 'Zarate, Claudia', email: 'czarate@asd4.org', loggedIn: true },
+        { name: 'Sanchez, Maria', email: 'msanchez@asd4.org', loggedIn: true },
+        { name: 'Zaborowski, Samantha', email: 'szaborowski@asd4.org', loggedIn: true },
+      ],
+    },
+    {
+      id: 'lincoln',
+      name: 'Lincoln',
+      engagement: {
+        engagedParas: 9,
+        totalActivities: 13,
+        topCourses: [
+          { name: 'Paraprofessional Foundations', count: 3, avgProgress: 51 },
+          { name: 'Connected Educators: Building Networks', count: 2, avgProgress: 25 },
+          { name: 'Maximize Impact: One-on-One Conferences', count: 2, avgProgress: 55 },
+        ],
+      },
+      paras: [
+        { name: 'Hawkins, Michelina', email: 'mhawkins@asd4.org', loggedIn: true },
+        { name: 'Aguilar, Denys', email: 'daguilar@asd4.org', loggedIn: true },
+        { name: 'Chavez, Carlos', email: 'cchavez@asd4.org', loggedIn: true },
+        { name: 'Lopez-Castaneda, Victoria', email: 'vcastaneda@asd4.org', loggedIn: true },
+        { name: 'Montalvo, Jazzleen', email: 'jmontalvo@asd4.org', loggedIn: true },
+        { name: 'Ortiz, Maria', email: 'mortiz@asd4.org', loggedIn: false },
+        { name: 'Torres, Manuela', email: 'matorres@asd4.org', loggedIn: true },
+        { name: 'Bezdicek, Michelle', email: 'mbezdicek@asd4.org', loggedIn: false },
+        { name: 'Arredondo, Gregoria', email: 'garredondo@asd4.org', loggedIn: true },
+        { name: 'Marinelli, Rosemarie', email: 'rmarinelli@asd4.org', loggedIn: true },
+        { name: 'Iturbe Vaszquez, Xochitl', email: 'xiturbevazquez@asd4.org', loggedIn: true },
+      ],
+    },
+    {
+      id: 'stone',
+      name: 'Stone',
+      engagement: {
+        engagedParas: 7,
+        totalActivities: 10,
+        topCourses: [
+          { name: 'Paraprofessional Foundations', count: 5, avgProgress: 67 },
+          { name: 'Building Strong Teacher-Para Partnerships', count: 1, avgProgress: 100 },
+          { name: 'Differentiated Choice Boards', count: 1, avgProgress: 100 },
+        ],
+      },
+      paras: [
+        { name: 'Castro, Caprice', email: 'ccastro@asd4.org', loggedIn: true },
+        { name: 'Gorostieta, Jessica', email: 'jgorostieta@asd4.org', loggedIn: true },
+        { name: 'Vairo, Danielle', email: 'dvairo@asd4.org', loggedIn: true },
+        { name: 'Wojnicki, Tracy', email: 'twojnicki@asd4.org', loggedIn: true },
+        { name: 'Camaci, Franchesca', email: 'fcamaci@asd4.org', loggedIn: true },
+        { name: 'Dourlain, Karen', email: 'kdourlain@asd4.org', loggedIn: true },
+        { name: 'Lanzo, Brittany', email: 'blanzo@asd4.org', loggedIn: false },
+        { name: 'Navarrete, Ericka', email: 'enavarrete@asd4.org', loggedIn: true },
+        { name: 'Umana, Melvi', email: 'mumana@asd4.org', loggedIn: true },
+        { name: 'Wheeler, Michelle', email: 'mwheeler@asd4.org', loggedIn: true },
+        { name: 'Schlesser, Patricia', email: 'pschlesser@asd4.org', loggedIn: false },
+      ],
     },
     {
       id: 'fullerton',
       name: 'Fullerton',
+      engagement: {
+        engagedParas: 5,
+        totalActivities: 10,
+        topCourses: [
+          { name: 'Building Strong Teacher-Para Partnerships', count: 2, avgProgress: 76 },
+          { name: 'Paraprofessional Foundations', count: 2, avgProgress: 86 },
+          { name: 'Differentiated Choice Boards', count: 1, avgProgress: 5 },
+        ],
+      },
       paras: [
         { name: 'Bekhrani, Fatema', email: 'fbakhrani@asd4.org', loggedIn: true },
         { name: 'Guzman, Norma', email: 'nguzman@asd4.org', loggedIn: true },
@@ -276,66 +373,46 @@ export default function ASD4Dashboard() {
         { name: 'Garica, Jacquelynn', email: 'jagarcia@asd4.org', loggedIn: true },
         { name: 'Orellana, Kristina', email: 'korellana@asd4.org', loggedIn: true },
       ],
-      themes: ['Student Support', 'Time Management', 'Para-Teacher Collaboration'],
     },
     {
-      id: 'indian-trail',
-      name: 'Indian Trail',
+      id: 'lake-park',
+      name: 'Lake Park',
+      engagement: {
+        engagedParas: 4,
+        totalActivities: 10,
+        topCourses: [
+          { name: 'Maximize Impact: One-on-One Conferences', count: 3, avgProgress: 76 },
+          { name: 'Classroom Management Toolkit', count: 2, avgProgress: 100 },
+          { name: 'Differentiated Choice Boards', count: 2, avgProgress: 100 },
+        ],
+      },
       paras: [
-        { name: 'Gorostieta, Michele', email: 'mgorostieta@asd4.org', loggedIn: true },
-        { name: 'Beahan, Linda', email: 'lbeahan@asd4.org', loggedIn: true },
-        { name: 'Magnuson, Karen', email: 'kmagnuson@asd4.org', loggedIn: true },
-        { name: 'Pajova, Albana', email: 'apajova@asd4.org', loggedIn: true },
-        { name: 'Hodo, Mirela', email: 'mhodo@asd4.org', loggedIn: false },
-        { name: 'Miller, Paula', email: 'pmiller@asd4.org', loggedIn: true },
-        { name: 'Judd, Marisa', email: 'mjudd@asd4.org', loggedIn: true },
-        { name: 'Juarez, Alexia', email: 'ajuarez@asd4.org', loggedIn: false },
-        { name: 'Salerno, Cori', email: 'csalerno@asd4.org', loggedIn: true },
-        { name: 'Zarate, Claudia', email: 'czarate@asd4.org', loggedIn: true },
-        { name: 'Sanchez, Maria', email: 'msanchez@asd4.org', loggedIn: true },
-        { name: 'Zaborowski, Samantha', email: 'szaborowski@asd4.org', loggedIn: true },
+        { name: 'Alvarado, Patricia', email: 'palvarado@asd4.org', loggedIn: true },
+        { name: 'Marquez, Claudia', email: 'cmarquez@asd4.org', loggedIn: true },
+        { name: 'Ontiveros, Maribel', email: 'montiveros@asd4.org', loggedIn: false },
+        { name: 'Villalobos, Natalia', email: 'nvillalobos@asd4.org', loggedIn: false },
+        { name: 'Chairez Rodriguez, Sabina', email: 'schairez@asd4.org', loggedIn: true },
+        { name: 'DeLaGarza, Sandra', email: 'sdelagarza@asd4.org', loggedIn: true },
+        { name: 'Chaudary, Aysha', email: 'achaudary@asd4.org', loggedIn: false },
+        { name: 'Falco, Mary', email: 'mfalco@asd4.org', loggedIn: false },
+        { name: 'Martinez, Eriana', email: 'ermartinez@asd4.org', loggedIn: true },
+        { name: 'Mayer, Shelly', email: 'smayer@asd4.org', loggedIn: true },
+        { name: 'Medina, Ruby', email: 'rmedina@asd4.org', loggedIn: true },
+        { name: 'Trujillo, Fabiola', email: 'ftrujillo@asd4.org', loggedIn: true },
       ],
-      themes: ['Behavior Support', 'Small Group Instruction', 'Student Engagement'],
-    },
-    {
-      id: 'lincoln',
-      name: 'Lincoln',
-      paras: [
-        { name: 'Hawkins, Michelina', email: 'mhawkins@asd4.org', loggedIn: true },
-        { name: 'Aguilar, Denys', email: 'daguilar@asd4.org', loggedIn: true },
-        { name: 'Chavez, Carlos', email: 'cchavez@asd4.org', loggedIn: true },
-        { name: 'Lopez-Castaneda, Victoria', email: 'vcastaneda@asd4.org', loggedIn: true },
-        { name: 'Montalvo, Jazzleen', email: 'jmontalvo@asd4.org', loggedIn: true },
-        { name: 'Ortiz, Maria', email: 'mortiz@asd4.org', loggedIn: false },
-        { name: 'Torres, Manuela', email: 'matorres@asd4.org', loggedIn: true },
-        { name: 'Bezdicek, Michelle', email: 'mbezdicek@asd4.org', loggedIn: false },
-        { name: 'Arredondo, Gregoria', email: 'garredondo@asd4.org', loggedIn: true },
-        { name: 'Marinelli, Rosemarie', email: 'rmarinelli@asd4.org', loggedIn: true },
-        { name: 'Iturbe Vaszquez, Xochitl', email: 'xiturbevazquez@asd4.org', loggedIn: true },
-      ],
-      themes: ['Reading Support', 'Math Intervention', 'Classroom Routines'],
-    },
-    {
-      id: 'stone',
-      name: 'Stone',
-      paras: [
-        { name: 'Castro, Caprice', email: 'ccastro@asd4.org', loggedIn: true },
-        { name: 'Gorostieta, Jessica', email: 'jgorostieta@asd4.org', loggedIn: true },
-        { name: 'Vairo, Danielle', email: 'dvairo@asd4.org', loggedIn: true },
-        { name: 'Wojnicki, Tracy', email: 'twojnicki@asd4.org', loggedIn: true },
-        { name: 'Camaci, Franchesca', email: 'fcamaci@asd4.org', loggedIn: true },
-        { name: 'Dourlain, Karen', email: 'kdourlain@asd4.org', loggedIn: true },
-        { name: 'Lanzo, Brittany', email: 'blanzo@asd4.org', loggedIn: false },
-        { name: 'Navarrete, Ericka', email: 'enavarrete@asd4.org', loggedIn: true },
-        { name: 'Umana, Melvi', email: 'mumana@asd4.org', loggedIn: true },
-        { name: 'Wheeler, Michelle', email: 'mwheeler@asd4.org', loggedIn: true },
-        { name: 'Schlesser, Patricia', email: 'pschlesser@asd4.org', loggedIn: false },
-      ],
-      themes: ['Special Education Support', 'Behavior Strategies', 'Documentation'],
     },
     {
       id: 'army-trail',
       name: 'Army Trail',
+      engagement: {
+        engagedParas: 4,
+        totalActivities: 4,
+        topCourses: [
+          { name: 'Classroom Management Toolkit', count: 1, avgProgress: 36 },
+          { name: 'Connected Educators: Building Networks', count: 1, avgProgress: 38 },
+          { name: 'Effective Communication Strategies', count: 1, avgProgress: 28 },
+        ],
+      },
       paras: [
         { name: 'Zaragoza Aguilar, Ana', email: 'azaragoza@asd4.org', loggedIn: true },
         { name: 'Cantu, Imelda', email: 'icantu@asd4.org', loggedIn: true },
@@ -351,40 +428,29 @@ export default function ASD4Dashboard() {
         { name: 'Villegas, Giovanni', email: 'gvillegas@asd4.org', loggedIn: true },
         { name: 'Lugo Saldivar, Selene', email: 'slugo@asd4.org', loggedIn: true },
       ],
-      themes: ['ELL Support', 'Cultural Responsiveness', 'Family Communication'],
     },
     {
       id: 'ardmore',
       name: 'Ardmore',
+      engagement: {
+        engagedParas: 0,
+        totalActivities: 0,
+        topCourses: [],
+      },
       paras: [
         { name: 'Mondragon, Sugey', email: 'smondragon@asd4.org', loggedIn: false },
         { name: 'Peters, Maddalena', email: 'mpeters@asd4.org', loggedIn: true },
         { name: 'Weissgerber, Sara', email: 'sweissgerber@asd4.org', loggedIn: true },
       ],
-      themes: ['Intervention Support', 'Data Collection', 'Student Progress'],
-    },
-    {
-      id: 'lake-park',
-      name: 'Lake Park',
-      paras: [
-        { name: 'Alvarado, Patricia', email: 'palvarado@asd4.org', loggedIn: true },
-        { name: 'Marquez, Claudia', email: 'cmarquez@asd4.org', loggedIn: true },
-        { name: 'Ontiveros, Maribel', email: 'montiveros@asd4.org', loggedIn: false },
-        { name: 'Villalobos, Natalia', email: 'nvillalobos@asd4.org', loggedIn: false },
-        { name: 'Chairez Rodriguez, Sabina', email: 'schairez@asd4.org', loggedIn: true },
-        { name: 'DeLaGarza, Sandra', email: 'sdelagarza@asd4.org', loggedIn: true },
-        { name: 'Chaudary, Aysha', email: 'achaudary@asd4.org', loggedIn: false },
-        { name: 'Falco, Mary', email: 'mfalco@asd4.org', loggedIn: false },
-        { name: 'Martinez, Eriana', email: 'ermartinez@asd4.org', loggedIn: true },
-        { name: 'Mayer, Shelly', email: 'smayer@asd4.org', loggedIn: true },
-        { name: 'Medina, Ruby', email: 'rmedina@asd4.org', loggedIn: true },
-        { name: 'Trujillo, Fabiola', email: 'ftrujillo@asd4.org', loggedIn: true },
-      ],
-      themes: ['Reading Intervention', 'Student Motivation', 'Progress Monitoring'],
     },
     {
       id: 'elc',
       name: 'ELC (Early Learning Center)',
+      engagement: {
+        engagedParas: 0,
+        totalActivities: 0,
+        topCourses: [],
+      },
       paras: [
         { name: 'Tinajero Monroy, Melany', email: 'mtinajero@asd4.org', loggedIn: false },
         { name: 'Katherine De La Cruz', email: 'kdelacruz@asd4.org', loggedIn: true },
@@ -411,7 +477,6 @@ export default function ASD4Dashboard() {
         { name: 'Kimberly Martinez', email: 'kmartinez@asd4.org', loggedIn: true },
         { name: 'Kayla Carrillo', email: 'kcarrillo@asd4.org', loggedIn: false },
       ],
-      themes: ['Early Childhood Development', 'Play-Based Learning', 'Social-Emotional Skills'],
     },
   ];
 
@@ -1395,48 +1460,49 @@ Thanks for everything you do.`
                 <div className="text-sm text-gray-500">Schools</div>
               </div>
               <div className="bg-white rounded-xl p-4 border border-gray-200">
-                <div className="text-2xl font-bold text-emerald-600">5</div>
-                <div className="text-sm text-gray-500">Above 80%</div>
+                <div className="text-2xl font-bold text-blue-600">49</div>
+                <div className="text-sm text-gray-500">Paras Engaged</div>
               </div>
               <div className="bg-white rounded-xl p-4 border border-gray-200">
-                <div className="text-2xl font-bold text-amber-600">3</div>
-                <div className="text-sm text-gray-500">60-79%</div>
+                <div className="text-2xl font-bold text-emerald-600">89</div>
+                <div className="text-sm text-gray-500">Course Activities</div>
               </div>
               <div className="bg-white rounded-xl p-4 border border-gray-200">
-                <div className="text-2xl font-bold text-red-600">1</div>
-                <div className="text-sm text-gray-500">Below 60%</div>
+                <div className="text-2xl font-bold text-red-600">2</div>
+                <div className="text-sm text-gray-500">Need Attention</div>
               </div>
             </div>
 
-            {/* ELC Alert Banner */}
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-              <div>
-                <span className="font-medium text-red-800">ELC needs attention:</span>
-                <span className="text-red-700 ml-1">11 paras haven&apos;t logged in yet (54% login rate)</span>
+            {/* Alert for schools with no engagement */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium text-amber-800">ELC and Ardmore have zero course engagement</p>
+                  <p className="text-sm text-amber-700 mt-1">
+                    These teams have logged in but haven&apos;t started any courses yet. Consider a Hub walkthrough
+                    or recommending a specific starting point.
+                  </p>
+                </div>
               </div>
-              <button
-                onClick={() => setExpandedSchool('elc')}
-                className="ml-auto text-sm text-red-600 hover:text-red-800 font-medium underline"
-              >
-                View ELC →
-              </button>
             </div>
 
             {/* Schools Accordion */}
             <div className="space-y-3">
               {schoolData
                 .map(school => {
-                  const total = school.paras.length;
                   const loggedIn = school.paras.filter(p => p.loggedIn).length;
-                  const rate = Math.round((loggedIn / total) * 100);
-                  return { ...school, total, loggedIn, notLoggedIn: total - loggedIn, rate };
+                  const total = school.paras.length;
+                  const loginRate = Math.round((loggedIn / total) * 100);
+                  return { ...school, loggedIn, total, notLoggedIn: total - loggedIn, loginRate };
                 })
-                .sort((a, b) => b.rate - a.rate)
+                .sort((a, b) => b.engagement.totalActivities - a.engagement.totalActivities)
                 .map(school => {
                   const isExpanded = expandedSchool === school.id;
+                  const isRosterOpen = showRoster === school.id;
                   const loggedInParas = school.paras.filter(p => p.loggedIn);
                   const notLoggedInParas = school.paras.filter(p => !p.loggedIn);
+                  const hasEngagement = school.engagement.totalActivities > 0;
 
                   return (
                     <div
@@ -1451,44 +1517,38 @@ Thanks for everything you do.`
                         className="w-full p-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
                       >
                         <div className="flex items-center gap-4">
-                          <div className={`w-3 h-3 rounded-full ${
-                            school.rate >= 80 ? 'bg-emerald-500' :
-                            school.rate >= 60 ? 'bg-amber-500' : 'bg-red-500'
-                          }`} />
+                          {/* Engagement Indicator */}
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                            hasEngagement ? 'bg-blue-100' : 'bg-gray-100'
+                          }`}>
+                            <BookOpen className={`w-5 h-5 ${hasEngagement ? 'text-blue-600' : 'text-gray-400'}`} />
+                          </div>
+
                           <div className="text-left">
                             <h4 className="font-semibold text-gray-900">{school.name}</h4>
                             <p className="text-sm text-gray-500">
-                              {school.total} paras · {school.loggedIn} logged in
-                              {school.notLoggedIn > 0 && (
-                                <span className="text-amber-600 ml-2">
-                                  · {school.notLoggedIn} need{school.notLoggedIn === 1 ? 's' : ''} support
-                                </span>
+                              {hasEngagement ? (
+                                <>
+                                  <span className="text-blue-600 font-medium">{school.engagement.engagedParas} paras</span>
+                                  {' · '}
+                                  <span className="text-emerald-600 font-medium">{school.engagement.totalActivities} course activities</span>
+                                </>
+                              ) : (
+                                <span className="text-amber-600">No course engagement yet</span>
                               )}
                             </p>
                           </div>
                         </div>
 
                         <div className="flex items-center gap-4">
-                          {/* Progress Bar */}
-                          <div className="hidden sm:block w-32">
-                            <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full rounded-full transition-all ${
-                                  school.rate >= 80 ? 'bg-emerald-500' :
-                                  school.rate >= 60 ? 'bg-amber-500' : 'bg-red-500'
-                                }`}
-                                style={{ width: `${school.rate}%` }}
-                              />
-                            </div>
-                          </div>
-
-                          {/* Percentage */}
-                          <span className={`text-lg font-bold min-w-[3rem] text-right ${
-                            school.rate >= 80 ? 'text-emerald-600' :
-                            school.rate >= 60 ? 'text-amber-600' : 'text-red-600'
+                          {/* Login Rate Badge */}
+                          <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            school.loginRate >= 80 ? 'bg-emerald-100 text-emerald-700' :
+                            school.loginRate >= 60 ? 'bg-amber-100 text-amber-700' :
+                            'bg-red-100 text-red-700'
                           }`}>
-                            {school.rate}%
-                          </span>
+                            {school.loginRate}% logged in
+                          </div>
 
                           {/* Chevron */}
                           <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${
@@ -1497,11 +1557,51 @@ Thanks for everything you do.`
                         </div>
                       </button>
 
-                      {/* Accordion Content */}
+                      {/* Expanded Content */}
                       {isExpanded && (
                         <div className="px-4 pb-4 border-t border-gray-100">
-                          {/* Email Action Buttons */}
-                          <div className="flex flex-wrap gap-3 py-4">
+
+                          {/* HERO: What This School Is Learning */}
+                          <div className="py-4">
+                            <h5 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4 flex items-center gap-2">
+                              <TrendingUp className="w-4 h-4" />
+                              What {school.name.split(' ')[0].split('(')[0]} Is Exploring
+                            </h5>
+
+                            {hasEngagement ? (
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {school.engagement.topCourses.map((course, i) => (
+                                  <div
+                                    key={i}
+                                    className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-4 border border-blue-100"
+                                  >
+                                    <div className="text-2xl font-bold text-blue-600 mb-1">{course.count}</div>
+                                    <div className="text-sm font-medium text-gray-900 mb-2 line-clamp-2">{course.name}</div>
+                                    <div className="flex items-center gap-2">
+                                      <div className="flex-1 h-2 bg-blue-100 rounded-full overflow-hidden">
+                                        <div
+                                          className="h-full bg-blue-500 rounded-full"
+                                          style={{ width: `${course.avgProgress}%` }}
+                                        />
+                                      </div>
+                                      <span className="text-xs text-gray-500">{course.avgProgress}%</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="bg-gray-50 rounded-xl p-6 text-center">
+                                <BookOpen className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                                <p className="text-gray-500">No courses started yet</p>
+                                <p className="text-sm text-gray-400 mt-1">
+                                  {school.loggedIn} paras have logged in — they just need a nudge to get started
+                                </p>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Action Buttons Row */}
+                          <div className="flex flex-wrap items-center gap-3 py-3 border-t border-gray-100">
                             {notLoggedInParas.length > 0 && (
                               <button
                                 onClick={(e) => {
@@ -1509,23 +1609,22 @@ Thanks for everything you do.`
                                   const emails = notLoggedInParas.map(p => p.email).join(',');
                                   const subject = encodeURIComponent(`Getting Started with the TDI Learning Hub`);
                                   const body = encodeURIComponent(
-                                    `Hi ${school.name} Team,\n\n` +
+                                    `Hi ${school.name.split('(')[0].trim()} Team,\n\n` +
                                     `I wanted to reach out because I noticed you haven't had a chance to log into the TDI Learning Hub yet.\n\n` +
-                                    `No pressure — I know things get busy! But when you have 10-15 minutes, the Hub has some really practical resources that might help with your day-to-day work.\n\n` +
+                                    `No pressure — I know things get busy! But when you have 10-15 minutes, the Hub has some really practical resources.\n\n` +
                                     `Here's how to get started:\n` +
                                     `1. Go to tdi.thinkific.com\n` +
                                     `2. Log in with your school email\n` +
-                                    `3. Check out "Getting Started" or browse topics that interest you\n\n` +
-                                    `If you run into any issues logging in, just let me know and I'll help you get set up.\n\n` +
-                                    `Thanks!\n` +
+                                    `3. Start with "Paraprofessional Foundations" — it's quick and practical\n\n` +
+                                    `Let me know if you need help!\n\n` +
                                     `Leslie`
                                   );
                                   window.open(`mailto:${emails}?subject=${subject}&body=${body}`);
                                 }}
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-medium rounded-lg transition-colors"
+                                className="inline-flex items-center gap-2 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors"
                               >
                                 <Mail className="w-4 h-4" />
-                                Nudge Not Logged In ({notLoggedInParas.length})
+                                Nudge {notLoggedInParas.length} Not Logged In
                               </button>
                             )}
 
@@ -1536,19 +1635,18 @@ Thanks for everything you do.`
                                   const emails = loggedInParas.map(p => p.email).join(',');
                                   const subject = encodeURIComponent(`Keep up the great work! 🎉`);
                                   const body = encodeURIComponent(
-                                    `Hi ${school.name} Team,\n\n` +
-                                    `Just wanted to send a quick note to say thank you for diving into the TDI Learning Hub!\n\n` +
-                                    `Your engagement makes a difference — not just for your own growth, but for the students you support every day.\n\n` +
-                                    `If you've found any resources particularly helpful, I'd love to hear about it. And if there's something you wish the Hub had, let me know that too!\n\n` +
-                                    `Keep up the great work!\n` +
+                                    `Hi ${school.name.split('(')[0].trim()} Team,\n\n` +
+                                    `Just a quick note to say thank you for engaging with the TDI Learning Hub!\n\n` +
+                                    `Your growth mindset makes a difference for the students you support every day.\n\n` +
+                                    `Keep it up!\n` +
                                     `Leslie`
                                   );
                                   window.open(`mailto:?bcc=${emails}&subject=${subject}&body=${body}`);
                                 }}
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-lg transition-colors"
+                                className="inline-flex items-center gap-2 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium rounded-lg transition-colors"
                               >
                                 <Heart className="w-4 h-4" />
-                                High Five Logged In ({loggedInParas.length})
+                                High Five {loggedInParas.length}
                               </button>
                             )}
 
@@ -1556,100 +1654,94 @@ Thanks for everything you do.`
                               onClick={(e) => {
                                 e.stopPropagation();
                                 const emails = school.paras.map(p => p.email).join(',');
-                                const subject = encodeURIComponent(`A note for the ${school.name} team`);
-                                const body = encodeURIComponent(
-                                  `Hi ${school.name} Team,\n\n` +
-                                  `[Your message here]\n\n` +
-                                  `Thanks!\n` +
-                                  `Leslie`
-                                );
-                                window.open(`mailto:?bcc=${emails}&subject=${subject}&body=${body}`);
+                                window.open(`mailto:?bcc=${emails}&subject=${encodeURIComponent(`A note for the ${school.name.split('(')[0].trim()} team`)}`);
                               }}
-                              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors"
+                              className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors"
                             >
                               <Mail className="w-4 h-4" />
-                              Email All ({school.paras.length})
+                              Email All
+                            </button>
+
+                            {/* Spacer */}
+                            <div className="flex-1" />
+
+                            {/* View Roster Toggle */}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowRoster(isRosterOpen ? null : school.id);
+                              }}
+                              className="inline-flex items-center gap-2 px-3 py-2 text-gray-500 hover:text-gray-700 text-sm font-medium transition-colors"
+                            >
+                              <Users className="w-4 h-4" />
+                              {isRosterOpen ? 'Hide' : 'View'} Roster
+                              <ChevronRight className={`w-4 h-4 transition-transform ${isRosterOpen ? 'rotate-90' : ''}`} />
                             </button>
                           </div>
 
-                          {/* Themes Section */}
-                          <div className="mb-4">
-                            <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
-                              What {school.name} Is Exploring
-                            </h5>
-                            <div className="flex flex-wrap gap-2">
-                              {school.themes.map((theme, i) => (
-                                <span
-                                  key={i}
-                                  className="px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full"
-                                >
-                                  {theme}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-
-                          {/* Para Roster - Two Columns */}
-                          <div className="grid md:grid-cols-2 gap-4">
-                            {/* Logged In Column */}
-                            <div className="bg-emerald-50 rounded-lg p-4">
-                              <h5 className="text-sm font-semibold text-emerald-700 mb-3 flex items-center gap-2">
-                                <Check className="w-4 h-4" />
-                                Logged In ({loggedInParas.length})
-                              </h5>
-                              <div className="space-y-2 max-h-48 overflow-y-auto">
-                                {loggedInParas.map((para, i) => (
-                                  <div key={i} className="flex items-center justify-between text-sm">
-                                    <span className="text-gray-700">{para.name}</span>
-                                    <span className="text-gray-400 text-xs">{para.email}</span>
+                          {/* Collapsible Roster (Secondary) */}
+                          {isRosterOpen && (
+                            <div className="pt-3 border-t border-gray-100">
+                              <div className="grid md:grid-cols-2 gap-4">
+                                {/* Logged In */}
+                                <div className="bg-emerald-50 rounded-lg p-4">
+                                  <h6 className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-3 flex items-center gap-2">
+                                    <Check className="w-3 h-3" />
+                                    Logged In ({loggedInParas.length})
+                                  </h6>
+                                  <div className="space-y-1 max-h-40 overflow-y-auto">
+                                    {loggedInParas.map((para, i) => (
+                                      <div key={i} className="text-sm text-gray-700 flex justify-between">
+                                        <span>{para.name}</span>
+                                        <span className="text-gray-400 text-xs">{para.email}</span>
+                                      </div>
+                                    ))}
                                   </div>
-                                ))}
-                                {loggedInParas.length === 0 && (
-                                  <p className="text-sm text-gray-400 italic">No paras logged in yet</p>
+                                </div>
+
+                                {/* Not Logged In */}
+                                {notLoggedInParas.length > 0 ? (
+                                  <div className="bg-amber-50 rounded-lg p-4">
+                                    <h6 className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-3 flex items-center gap-2">
+                                      <AlertCircle className="w-3 h-3" />
+                                      Not Logged In ({notLoggedInParas.length})
+                                    </h6>
+                                    <div className="space-y-1 max-h-40 overflow-y-auto">
+                                      {notLoggedInParas.map((para, i) => (
+                                        <div key={i} className="text-sm text-gray-700 flex justify-between items-center">
+                                          <span>{para.name}</span>
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              const subject = encodeURIComponent(`Quick help getting into the TDI Learning Hub`);
+                                              const body = encodeURIComponent(
+                                                `Hi ${para.name.split(',')[0].split(' ')[0]},\n\n` +
+                                                `I noticed you haven't had a chance to log into the TDI Learning Hub yet.\n\n` +
+                                                `Here's how:\n` +
+                                                `1. Go to tdi.thinkific.com\n` +
+                                                `2. Log in with ${para.email}\n` +
+                                                `3. Start with "Paraprofessional Foundations"\n\n` +
+                                                `Let me know if you need help!\n\n` +
+                                                `Leslie`
+                                              );
+                                              window.open(`mailto:${para.email}?subject=${subject}&body=${body}`);
+                                            }}
+                                            className="text-xs text-amber-600 hover:text-amber-800 font-medium underline"
+                                          >
+                                            Nudge
+                                          </button>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <div className="bg-emerald-50 rounded-lg p-4 flex items-center justify-center">
+                                    <p className="text-emerald-600 font-medium">🎉 Everyone&apos;s logged in!</p>
+                                  </div>
                                 )}
                               </div>
                             </div>
-
-                            {/* Not Logged In Column */}
-                            <div className="bg-amber-50 rounded-lg p-4">
-                              <h5 className="text-sm font-semibold text-amber-700 mb-3 flex items-center gap-2">
-                                <AlertCircle className="w-4 h-4" />
-                                Not Logged In ({notLoggedInParas.length})
-                              </h5>
-                              <div className="space-y-2 max-h-48 overflow-y-auto">
-                                {notLoggedInParas.map((para, i) => (
-                                  <div key={i} className="flex items-center justify-between text-sm">
-                                    <span className="text-gray-700">{para.name}</span>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        const subject = encodeURIComponent(`Quick help getting into the TDI Learning Hub`);
-                                        const body = encodeURIComponent(
-                                          `Hi ${para.name.split(',')[0] || para.name.split(' ')[0]},\n\n` +
-                                          `I noticed you haven't had a chance to log into the TDI Learning Hub yet, and I wanted to reach out in case you need any help getting started.\n\n` +
-                                          `Here's how to access it:\n` +
-                                          `1. Go to tdi.thinkific.com\n` +
-                                          `2. Log in with your school email (${para.email})\n` +
-                                          `3. If you need to reset your password, click "Forgot Password"\n\n` +
-                                          `The Hub has some really practical, quick resources — nothing overwhelming. Most paras start with the "Getting Started" section.\n\n` +
-                                          `Let me know if you run into any issues!\n\n` +
-                                          `Thanks,\n` +
-                                          `Leslie`
-                                        );
-                                        window.open(`mailto:${para.email}?subject=${subject}&body=${body}`);
-                                      }}
-                                      className="text-xs text-amber-600 hover:text-amber-800 font-medium underline"
-                                    >
-                                      Nudge
-                                    </button>
-                                  </div>
-                                ))}
-                                {notLoggedInParas.length === 0 && (
-                                  <p className="text-sm text-emerald-600 italic">🎉 Everyone&apos;s logged in!</p>
-                                )}
-                              </div>
-                            </div>
-                          </div>
+                          )}
                         </div>
                       )}
                     </div>
