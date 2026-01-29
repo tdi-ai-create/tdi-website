@@ -100,7 +100,7 @@ export default function FundingFinder() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          access_key: process.env.NEXT_PUBLIC_WEB3FORMS_KEY,
+          access_key: '340a4593-a336-405f-a644-2b2867f96047',
           subject: `Funding Finder Request: ${formData.schoolName}`,
           from_name: formData.name,
           replyto: formData.email,
