@@ -627,7 +627,7 @@ export default function NominatePage() {
                 >
                   <div className="px-5 pb-5">
                     <p style={{ color: '#1e2749', opacity: 0.8 }}>
-                      We reach out to the school's admin team within 48 hours. They'll know you started the conversation. You don't have to do anything else — we take it from here.
+                      We reach out to the school's admin team within 48 hours. They'll know you started the conversation. You don't have to do anything else. We take it from here.
                     </p>
                   </div>
                 </div>
@@ -657,7 +657,7 @@ export default function NominatePage() {
                 >
                   <div className="px-5 pb-5 space-y-4">
                     <p style={{ color: '#1e2749', opacity: 0.8 }}>
-                      If you're a teacher or community member who nominates a school, you earn a personal celebration reward — up to $500. That could be a gift card, classroom supplies, or whatever feels right for you.
+                      If you're a teacher or community member who nominates a school, you earn a personal celebration reward: up to $500. That could be a gift card, classroom supplies, or whatever feels right for you.
                     </p>
                     <p style={{ color: '#1e2749', opacity: 0.8 }}>
                       If you're a school leader who refers another school, your entire staff gets celebrated. We're talking TDI swag for every teacher, plus you choose how to use the rest of the budget.
@@ -723,7 +723,7 @@ export default function NominatePage() {
                         </div>
                         <div>
                           <p className="font-semibold" style={{ color: '#1e2749' }}>Individual Gift Cards</p>
-                          <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Every teacher gets a gift card — Target, Amazon, Visa, your choice</p>
+                          <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Every teacher gets a gift card: Target, Amazon, Visa, your choice</p>
                         </div>
                       </div>
 
@@ -761,7 +761,7 @@ export default function NominatePage() {
                     </div>
 
                     <p className="text-sm font-medium" style={{ color: '#35A7FF' }}>
-                      Plus TDI swag — hats, tees, the works — is included no matter what you choose.
+                      Plus TDI swag (hats, tees, the works) is included no matter what you choose.
                     </p>
                   </div>
                 </div>
@@ -856,7 +856,7 @@ export default function NominatePage() {
                 >
                   <div className="px-5 pb-5">
                     <p style={{ color: '#1e2749', opacity: 0.8 }}>
-                      No. You nominate a school. We reach out. If it becomes a partnership, we celebrate you. If it doesn't, no harm done — you advocated for a school that needed it, and that matters.
+                      No. You nominate a school. We reach out. If it becomes a partnership, we celebrate you. If it doesn't, no harm done. You advocated for a school that needed it, and that matters.
                     </p>
                   </div>
                 </div>
