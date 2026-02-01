@@ -332,7 +332,7 @@ export default function NominatePage() {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: 'url("/images/hero-nominate.png")',
+            backgroundImage: 'url("/images/hero-for-schools.webp")',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
