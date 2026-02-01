@@ -2,6 +2,21 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import {
+  MapPin,
+  Users,
+  TrendingUp,
+  Facebook,
+  Twitter,
+  Mail,
+  Copy,
+  Check,
+  FileText,
+  BarChart3,
+  Headphones,
+  MessageSquare,
+  Heart,
+} from 'lucide-react';
 
 // Update this number as spots fill
 const VIP_SPOTS_REMAINING = 5;
@@ -44,6 +59,9 @@ export default function NominatePage() {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(false);
 
+  // Copy button state
+  const [copied, setCopied] = useState(false);
+
   // Determine track based on selections
   const getTrack = (): Track => {
     if (isPartner === false) return 'non-partner-nomination';
@@ -65,6 +83,20 @@ export default function NominatePage() {
         return `New Nomination (Track 3: Non-Partner) - ${formData.nominatedSchool}`;
       default:
         return 'New Nomination - TDI Website';
+    }
+  };
+
+  // Get encouragement line based on track
+  const getEncouragementLine = (): string => {
+    switch (currentTrack) {
+      case 'partner-leader-referral':
+        return 'A recommendation from a current partner carries real weight. Thank you for thinking of someone.';
+      case 'partner-teacher-nomination':
+        return 'The people doing the work every day are usually the first to know which schools need this.';
+      case 'non-partner-nomination':
+        return "You don't have to be connected to TDI to start this conversation. We're glad you're here.";
+      default:
+        return '';
     }
   };
 
@@ -136,6 +168,7 @@ export default function NominatePage() {
     });
     setSubmitted(false);
     setError(false);
+    setCopied(false);
   };
 
   // Get confirmation content based on track
@@ -160,6 +193,51 @@ export default function NominatePage() {
           body: `Thanks for nominating ${schoolName}. We'll reach out to their admin within 48 hours to start the conversation.`,
         };
     }
+  };
+
+  // Share functionality
+  const shareableText =
+    "I just nominated a school for a TDI partnership. If your school needs better PD, you can nominate yours too: teachersdeserveit.com/nominate";
+  const shareUrl = 'https://teachersdeserveit.com/nominate';
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(shareableText);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = shareableText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  const handleFacebookShare = () => {
+    window.open(
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
+      '_blank',
+      'width=600,height=400'
+    );
+  };
+
+  const handleTwitterShare = () => {
+    window.open(
+      `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareableText)}`,
+      '_blank',
+      'width=600,height=400'
+    );
+  };
+
+  const handleEmailShare = () => {
+    const subject = encodeURIComponent('Nominate Your School for Better PD');
+    const body = encodeURIComponent(shareableText);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
   };
 
   return (
@@ -248,6 +326,63 @@ export default function NominatePage() {
         </div>
       </section>
 
+      {/* 2.5 Social Proof Section */}
+      <section className="py-12 md:py-16" style={{ backgroundColor: '#1e2749' }}>
+        <div className="container-default">
+          {/* Stat Bar */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mb-12">
+            <div className="flex flex-col items-center">
+              <div className="flex items-center gap-2 mb-2">
+                <MapPin className="w-6 h-6" style={{ color: '#ffba06' }} />
+                <p className="text-4xl md:text-5xl font-bold" style={{ color: '#ffffff' }}>21</p>
+              </div>
+              <p style={{ color: '#ffffff', opacity: 0.8 }}>States</p>
+              <p className="text-sm" style={{ color: '#ffffff', opacity: 0.6 }}>Active TDI partnerships</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="flex items-center gap-2 mb-2">
+                <Users className="w-6 h-6" style={{ color: '#ffba06' }} />
+                <p className="text-4xl md:text-5xl font-bold" style={{ color: '#ffffff' }}>87,000+</p>
+              </div>
+              <p style={{ color: '#ffffff', opacity: 0.8 }}>Educators</p>
+              <p className="text-sm" style={{ color: '#ffffff', opacity: 0.6 }}>In the TDI community</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingUp className="w-6 h-6" style={{ color: '#ffba06' }} />
+                <p className="text-4xl md:text-5xl font-bold" style={{ color: '#ffffff' }}>65%</p>
+              </div>
+              <p style={{ color: '#ffffff', opacity: 0.8 }}>Implementation Rate</p>
+              <p className="text-sm" style={{ color: '#ffffff', opacity: 0.6 }}>Industry average: 10%</p>
+            </div>
+          </div>
+
+          {/* Testimonial */}
+          <div className="max-w-2xl mx-auto text-center">
+            <div
+              className="relative px-6 py-8 rounded-xl"
+              style={{ backgroundColor: 'rgba(53, 167, 255, 0.1)' }}
+            >
+              <div
+                className="absolute left-4 top-4 text-6xl font-serif leading-none"
+                style={{ color: '#35A7FF', opacity: 0.3 }}
+              >
+                "
+              </div>
+              <p
+                className="text-xl md:text-2xl italic mb-4 relative z-10"
+                style={{ color: '#ffffff' }}
+              >
+                I went from spending 12 hours a week planning to 6. I want that for every teacher I know.
+              </p>
+              <p className="text-sm font-semibold" style={{ color: '#35A7FF' }}>
+                — TDI Partner Teacher
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* 3. The Form */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
@@ -261,34 +396,212 @@ export default function NominatePage() {
 
             {/* Confirmation Message */}
             {submitted ? (
-              <div
-                className="bg-white rounded-xl p-8 text-center shadow-md"
-                style={{ border: '2px solid #22c55e' }}
-              >
+              <div className="space-y-8">
+                {/* Main Confirmation */}
                 <div
-                  className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
-                  style={{ backgroundColor: '#22c55e' }}
+                  className="bg-white rounded-xl p-8 text-center shadow-md animate-fade-in"
+                  style={{ border: '2px solid #22c55e' }}
                 >
-                  <svg className="w-8 h-8" fill="#ffffff" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
-                  </svg>
+                  <div
+                    className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
+                    style={{ backgroundColor: '#22c55e' }}
+                  >
+                    <Check className="w-8 h-8 text-white" />
+                  </div>
+                  <h3 className="text-2xl font-bold mb-3" style={{ color: '#1e2749' }}>
+                    {getConfirmationContent().heading}
+                  </h3>
+                  <p className="text-lg mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    {getConfirmationContent().body}
+                  </p>
+                  <p className="text-sm mb-6" style={{ color: '#1e2749', opacity: 0.7 }}>
+                    When a nomination leads to a partnership, we celebrate the person who started the conversation.
+                  </p>
+                  <button
+                    onClick={resetForm}
+                    className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+                    style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                  >
+                    Nominate Another School
+                  </button>
                 </div>
-                <h3 className="text-2xl font-bold mb-3" style={{ color: '#1e2749' }}>
-                  {getConfirmationContent().heading}
-                </h3>
-                <p className="text-lg mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
-                  {getConfirmationContent().body}
-                </p>
-                <p className="text-sm mb-6" style={{ color: '#1e2749', opacity: 0.7 }}>
-                  When a nomination leads to a partnership, we celebrate the person who started the conversation.
-                </p>
-                <button
-                  onClick={resetForm}
-                  className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
-                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                >
-                  Nominate Another School
-                </button>
+
+                {/* A. Share This Nomination */}
+                <div className="bg-white rounded-xl p-6 shadow-md animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                  <h4 className="text-lg font-bold mb-4 text-center" style={{ color: '#1e2749' }}>
+                    Spread the word
+                  </h4>
+
+                  {/* Shareable text box */}
+                  <div
+                    className="p-4 rounded-lg mb-4"
+                    style={{ backgroundColor: '#f5f5f5', border: '1px solid #e5e5e5' }}
+                  >
+                    <p className="text-sm mb-3" style={{ color: '#1e2749' }}>
+                      {shareableText}
+                    </p>
+                    <button
+                      onClick={handleCopy}
+                      className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all hover:scale-105"
+                      style={{ backgroundColor: copied ? '#22c55e' : '#1e2749', color: '#ffffff' }}
+                    >
+                      {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                      {copied ? 'Copied!' : 'Copy'}
+                    </button>
+                  </div>
+
+                  {/* Share buttons */}
+                  <div className="flex justify-center gap-3">
+                    <button
+                      onClick={handleFacebookShare}
+                      className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                      style={{ backgroundColor: '#1877F2' }}
+                      aria-label="Share on Facebook"
+                    >
+                      <Facebook className="w-5 h-5 text-white" />
+                    </button>
+                    <button
+                      onClick={handleTwitterShare}
+                      className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                      style={{ backgroundColor: '#000000' }}
+                      aria-label="Share on X"
+                    >
+                      <Twitter className="w-5 h-5 text-white" />
+                    </button>
+                    <button
+                      onClick={handleEmailShare}
+                      className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+                      style={{ backgroundColor: '#35A7FF' }}
+                      aria-label="Share via Email"
+                    >
+                      <Mail className="w-5 h-5 text-white" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* B. Something For You */}
+                <div className="bg-white rounded-xl p-6 shadow-md animate-fade-in" style={{ animationDelay: '0.2s' }}>
+                  <h4 className="text-lg font-bold mb-4 text-center" style={{ color: '#1e2749' }}>
+                    While we get to work on your nomination, here's something for you.
+                  </h4>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    {/* Card 1: Free PD Plan */}
+                    <Link
+                      href="/free-pd-plan"
+                      className="p-4 rounded-lg text-center transition-all hover:shadow-md"
+                      style={{ backgroundColor: '#f5f5f5' }}
+                    >
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3"
+                        style={{ backgroundColor: '#ffba06' }}
+                      >
+                        <FileText className="w-5 h-5" style={{ color: '#1e2749' }} />
+                      </div>
+                      <p className="font-semibold text-sm mb-1" style={{ color: '#1e2749' }}>Free PD Plan</p>
+                      <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>Get a custom plan in 24 hours</p>
+                    </Link>
+
+                    {/* Card 2: PD Diagnostic */}
+                    <Link
+                      href="/pd-diagnostic"
+                      className="p-4 rounded-lg text-center transition-all hover:shadow-md"
+                      style={{ backgroundColor: '#f5f5f5' }}
+                    >
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3"
+                        style={{ backgroundColor: '#ffba06' }}
+                      >
+                        <BarChart3 className="w-5 h-5" style={{ color: '#1e2749' }} />
+                      </div>
+                      <p className="font-semibold text-sm mb-1" style={{ color: '#1e2749' }}>PD Diagnostic</p>
+                      <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>Find out where your PD stands</p>
+                    </Link>
+
+                    {/* Card 3: TDI Podcast */}
+                    <a
+                      href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-4 rounded-lg text-center transition-all hover:shadow-md"
+                      style={{ backgroundColor: '#f5f5f5' }}
+                    >
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center mx-auto mb-3"
+                        style={{ backgroundColor: '#ffba06' }}
+                      >
+                        <Headphones className="w-5 h-5" style={{ color: '#1e2749' }} />
+                      </div>
+                      <p className="font-semibold text-sm mb-1" style={{ color: '#1e2749' }}>TDI Podcast</p>
+                      <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>Listen to Sustainable Teaching</p>
+                    </a>
+                  </div>
+                </div>
+
+                {/* C. What Happens Next Timeline */}
+                <div className="bg-white rounded-xl p-6 shadow-md animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                  <h4 className="text-lg font-bold mb-6 text-center" style={{ color: '#1e2749' }}>
+                    What happens from here
+                  </h4>
+
+                  <div className="max-w-md mx-auto">
+                    {/* Step 1 - Active */}
+                    <div className="flex gap-4 pb-6 relative">
+                      <div className="flex flex-col items-center">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#35A7FF' }}
+                        >
+                          <Check className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="w-0.5 flex-1 mt-2" style={{ backgroundColor: '#e5e5e5' }} />
+                      </div>
+                      <div className="pb-2">
+                        <p className="font-semibold" style={{ color: '#35A7FF' }}>Within 48 hours</p>
+                        <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                          We reach out to their admin team to start the conversation.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Step 2 */}
+                    <div className="flex gap-4 pb-6 relative">
+                      <div className="flex flex-col items-center">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 border-2"
+                          style={{ borderColor: '#35A7FF', backgroundColor: 'transparent' }}
+                        >
+                          <MessageSquare className="w-5 h-5" style={{ color: '#35A7FF' }} />
+                        </div>
+                        <div className="w-0.5 flex-1 mt-2" style={{ backgroundColor: '#e5e5e5' }} />
+                      </div>
+                      <div className="pb-2">
+                        <p className="font-semibold" style={{ color: '#1e2749' }}>If there's a fit</p>
+                        <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                          We walk them through what a TDI partnership looks like.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Step 3 */}
+                    <div className="flex gap-4">
+                      <div className="flex flex-col items-center">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 border-2"
+                          style={{ borderColor: '#35A7FF', backgroundColor: 'transparent' }}
+                        >
+                          <Heart className="w-5 h-5" style={{ color: '#35A7FF' }} />
+                        </div>
+                      </div>
+                      <div>
+                        <p className="font-semibold" style={{ color: '#1e2749' }}>When a deal closes</p>
+                        <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                          We celebrate you for starting it.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="bg-white rounded-xl p-6 md:p-8 shadow-md">
@@ -367,7 +680,15 @@ export default function NominatePage() {
 
                 {/* Track-specific fields */}
                 {currentTrack && (
-                  <div className="space-y-5 transition-all duration-300">
+                  <div className="space-y-5 transition-all duration-300 animate-fade-in">
+                    {/* Encouragement line */}
+                    <p
+                      className="text-sm italic mb-4"
+                      style={{ color: '#35A7FF' }}
+                    >
+                      {getEncouragementLine()}
+                    </p>
+
                     {/* Common fields: Name and Email */}
                     <div>
                       <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
