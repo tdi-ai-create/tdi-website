@@ -1,17 +1,28 @@
 'use client';
 
-import { GAME_COLORS } from './gameData';
+import { ArrowLeft, Target, Zap, TrendingUp, Wrench, Award, Check, X } from 'lucide-react';
+import { COLORS, type GameId } from '../data/gameConfig';
+import { ConfettiBurst } from './ConfettiBurst';
+
+// Icon map for games
+export const GAME_ICONS = {
+  knockout: Target,
+  tellorask: Zap,
+  levelup: TrendingUp,
+  makeover: Wrench,
+} as const;
 
 interface GameWrapperProps {
+  gameId: GameId;
   title: string;
-  icon: string;
-  color: keyof typeof GAME_COLORS;
+  color: keyof typeof COLORS;
   onBack: () => void;
   children: React.ReactNode;
 }
 
-export function GameWrapper({ title, icon, color, onBack, children }: GameWrapperProps) {
-  const colorConfig = GAME_COLORS[color];
+export function GameWrapper({ gameId, title, color, onBack, children }: GameWrapperProps) {
+  const colorConfig = COLORS[color];
+  const IconComponent = GAME_ICONS[gameId];
 
   return (
     <div
@@ -23,31 +34,19 @@ export function GameWrapper({ title, icon, color, onBack, children }: GameWrappe
       {/* Top bar */}
       <header
         className="flex items-center justify-between px-4 py-3 md:px-6 md:py-4"
-        style={{ borderBottom: `2px solid ${colorConfig.border}` }}
+        style={{ borderBottom: `1px solid ${colorConfig.border}` }}
       >
         <button
           onClick={onBack}
           className="flex items-center gap-2 text-sm md:text-base font-medium transition-colors hover:opacity-80"
           style={{ color: '#8899aa' }}
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
+          <ArrowLeft size={20} />
           Games
         </button>
 
         <div className="flex items-center gap-2">
-          <span className="text-2xl">{icon}</span>
+          <IconComponent size={24} style={{ color: colorConfig.accent }} />
           <h1
             className="text-lg md:text-xl font-bold"
             style={{ color: colorConfig.accent }}
@@ -72,20 +71,26 @@ export function GameWrapper({ title, icon, color, onBack, children }: GameWrappe
 
 // Intro screen component
 interface IntroScreenProps {
-  icon: string;
+  gameId: GameId;
   title: string;
-  color: keyof typeof GAME_COLORS;
+  color: keyof typeof COLORS;
   rules: string[];
   onStart: () => void;
   extraContent?: React.ReactNode;
 }
 
-export function IntroScreen({ icon, title, color, rules, onStart, extraContent }: IntroScreenProps) {
-  const colorConfig = GAME_COLORS[color];
+export function IntroScreen({ gameId, title, color, rules, onStart, extraContent }: IntroScreenProps) {
+  const colorConfig = COLORS[color];
+  const IconComponent = GAME_ICONS[gameId];
 
   return (
-    <div className="flex flex-col items-center text-center">
-      <div className="text-7xl md:text-8xl mb-4">{icon}</div>
+    <div className="flex flex-col items-center text-center animate-fade-in">
+      <div
+        className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4"
+        style={{ backgroundColor: colorConfig.bg, border: `2px solid ${colorConfig.accent}` }}
+      >
+        <IconComponent size={48} style={{ color: colorConfig.accent }} />
+      </div>
       <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">{title}</h2>
 
       {/* Rules box */}
@@ -107,10 +112,11 @@ export function IntroScreen({ icon, title, color, rules, onStart, extraContent }
 
       <button
         onClick={onStart}
-        className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
+        className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95 animate-glow-pulse"
         style={{
           backgroundColor: colorConfig.accent,
           color: color === 'yellow' ? '#0a1628' : '#ffffff',
+          ['--glow-color' as string]: colorConfig.accent + '40',
         }}
       >
         Let's Go →
@@ -121,18 +127,16 @@ export function IntroScreen({ icon, title, color, rules, onStart, extraContent }
 
 // Done screen component
 interface DoneScreenProps {
-  icon: string;
   title: string;
   message: string;
   subMessage?: string;
   tableTalk: string;
-  color: keyof typeof GAME_COLORS;
+  color: keyof typeof COLORS;
   onBack: () => void;
   extraContent?: React.ReactNode;
 }
 
 export function DoneScreen({
-  icon,
   title,
   message,
   subMessage,
@@ -141,11 +145,19 @@ export function DoneScreen({
   onBack,
   extraContent,
 }: DoneScreenProps) {
-  const colorConfig = GAME_COLORS[color];
+  const colorConfig = COLORS[color];
+  const confettiColors = [colorConfig.accent, '#FFD700', '#FFFFFF'];
 
   return (
     <div className="flex flex-col items-center text-center">
-      <div className="text-7xl md:text-8xl mb-4">{icon}</div>
+      <ConfettiBurst colors={confettiColors} particleCount={60} />
+
+      <div
+        className="w-20 h-20 md:w-24 md:h-24 rounded-full flex items-center justify-center mb-4 animate-scale-in"
+        style={{ backgroundColor: colorConfig.bg, border: `2px solid ${colorConfig.accent}` }}
+      >
+        <Award size={48} style={{ color: colorConfig.accent }} />
+      </div>
       <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">{title}</h2>
 
       <p className="text-lg md:text-xl text-white mb-2 max-w-lg">{message}</p>
@@ -168,11 +180,41 @@ export function DoneScreen({
 
       <button
         onClick={onBack}
-        className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
+        className="flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
         style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#ffffff' }}
       >
-        ← Back to Games
+        <ArrowLeft size={20} />
+        Back to Games
       </button>
+    </div>
+  );
+}
+
+// Result card for reveal animations
+interface ResultCardProps {
+  isCorrect: boolean;
+  title: string;
+  explanation: string;
+  shake?: boolean;
+}
+
+export function ResultCard({ isCorrect, title, explanation, shake }: ResultCardProps) {
+  const bgColor = isCorrect ? 'rgba(39, 174, 96, 0.15)' : 'rgba(231, 76, 60, 0.15)';
+  const borderColor = isCorrect ? '#27AE60' : '#E74C3C';
+  const IconComponent = isCorrect ? Check : X;
+
+  return (
+    <div
+      className={`w-full rounded-xl p-6 text-center animate-reveal-bounce ${shake ? 'animate-shake' : ''}`}
+      style={{ backgroundColor: bgColor, border: `2px solid ${borderColor}` }}
+    >
+      <div className="flex items-center justify-center gap-2 mb-2">
+        <IconComponent size={28} style={{ color: borderColor }} />
+        <p className="text-2xl md:text-3xl font-bold" style={{ color: borderColor }}>
+          {title}
+        </p>
+      </div>
+      <p className="text-white">{explanation}</p>
     </div>
   );
 }

@@ -398,3 +398,163 @@ label {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* ============================================
+   Para Game Tools - Custom Animations
+   ============================================ */
+
+/* Slide up animation for cards and content */
+@keyframes slideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+/* Scale in animation */
+@keyframes scaleIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s ease-out forwards;
+}
+
+/* Reveal bounce for results */
+@keyframes revealBounce {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-reveal-bounce {
+  animation: revealBounce 0.4s ease-out forwards;
+}
+
+/* Shake animation for wrong answers */
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+/* Timer pulse animation when running low */
+@keyframes timerPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.8;
+  }
+}
+
+.animate-timer-pulse {
+  animation: timerPulse 1s ease-in-out infinite;
+}
+
+/* Timer flash when expired */
+@keyframes timerFlash {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.animate-timer-flash {
+  animation: timerFlash 0.5s ease-in-out infinite;
+}
+
+/* Streak counter pop */
+@keyframes streakPop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-streak-pop {
+  animation: streakPop 0.3s ease-out;
+}
+
+/* Glow pulse for buttons */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--glow-color, rgba(255, 120, 71, 0.4));
+  }
+  50% {
+    box-shadow: 0 0 20px 4px var(--glow-color, rgba(255, 120, 71, 0.4));
+  }
+}
+
+.animate-glow-pulse {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* Confetti fall animation */
+@keyframes confettiFall {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(100vh) translateX(var(--drift, 0px)) rotate(var(--rotate-end, 720deg));
+    opacity: 0;
+  }
+}
+
+/* Fade in animation (enhanced for games) */
+@keyframes gameFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: gameFadeIn 0.5s ease-out forwards;
+}

@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import { Lightbulb, ChevronRight, Eye, EyeOff } from 'lucide-react';
 import { GameWrapper, IntroScreen, DoneScreen } from './GameWrapper';
 import { Timer, TimerControls } from './Timer';
-import { FEEDBACK_MAKEOVERS, shuffleAndPick, GAME_COLORS } from './gameData';
+import { FEEDBACK_MAKEOVERS, MAKEOVER_TIMER_SECONDS } from '../data/makeovers';
+import { COLORS, shuffle } from '../data/gameConfig';
 
 type Screen = 'intro' | 'play' | 'done';
 
@@ -11,18 +13,17 @@ interface FeedbackMakeoverProps {
   onBack: () => void;
 }
 
-const TIMER_SECONDS = 120;
-
 export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
   const [screen, setScreen] = useState<Screen>('intro');
   const [currentRound, setCurrentRound] = useState(0);
   const [timerRunning, setTimerRunning] = useState(false);
   const [timerKey, setTimerKey] = useState(0);
   const [showHint, setShowHint] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
 
   // Shuffle makeovers on mount
   const makeovers = useMemo(
-    () => shuffleAndPick(FEEDBACK_MAKEOVERS, FEEDBACK_MAKEOVERS.length),
+    () => shuffle(FEEDBACK_MAKEOVERS),
     []
   );
 
@@ -36,10 +37,14 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
 
   const handleNext = () => {
     if (currentRound < makeovers.length - 1) {
-      setCurrentRound((prev) => prev + 1);
-      setTimerRunning(false);
-      setTimerKey((prev) => prev + 1);
-      setShowHint(false);
+      setIsAnimating(true);
+      setTimeout(() => {
+        setCurrentRound((prev) => prev + 1);
+        setTimerRunning(false);
+        setTimerKey((prev) => prev + 1);
+        setShowHint(false);
+        setIsAnimating(false);
+      }, 200);
     } else {
       setScreen('done');
     }
@@ -50,14 +55,14 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
   const handleTimerComplete = () => setTimerRunning(false);
   const toggleHint = () => setShowHint((prev) => !prev);
 
-  const colorConfig = GAME_COLORS.red;
+  const colorConfig = COLORS.red;
   const current = makeovers[currentRound];
 
   return (
-    <GameWrapper title="Feedback Makeover" icon="🔧" color="red" onBack={onBack}>
+    <GameWrapper gameId="makeover" title="Feedback Makeover" color="red" onBack={onBack}>
       {screen === 'intro' && (
         <IntroScreen
-          icon="🔧"
+          gameId="makeover"
           title="Feedback Makeover"
           color="red"
           rules={[
@@ -66,9 +71,21 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
           ]}
           onStart={handleStart}
           extraContent={
-            <p className="text-lg mb-6" style={{ color: '#27AE60' }}>
-              NOTICE → NAME → NEXT STEP
-            </p>
+            <div className="flex flex-col items-center gap-4 mb-6">
+              <div className="flex gap-3">
+                {['NOTICE', 'NAME', 'NEXT STEP'].map((step, i) => (
+                  <div
+                    key={step}
+                    className="px-3 py-2 rounded-lg text-center"
+                    style={{ backgroundColor: 'rgba(39, 174, 96, 0.15)', border: '1px solid rgba(39, 174, 96, 0.4)' }}
+                  >
+                    <p className="text-sm font-bold" style={{ color: '#27AE60' }}>
+                      {i + 1}. {step}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
           }
         />
       )}
@@ -85,7 +102,9 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
 
           {/* Bad feedback card */}
           <div
-            className="w-full rounded-xl p-5 md:p-6 mb-4"
+            className={`w-full rounded-xl p-5 md:p-6 mb-4 transition-all duration-200 ${
+              isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0 animate-slide-up'
+            }`}
             style={{ backgroundColor: colorConfig.bg, border: `1px solid ${colorConfig.border}` }}
           >
             <p className="text-xs uppercase tracking-wide mb-2" style={{ color: colorConfig.accent }}>
@@ -98,8 +117,14 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
 
           {/* Context card */}
           <div
-            className="w-full rounded-xl p-5 md:p-6 mb-6"
-            style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.1)' }}
+            className={`w-full rounded-xl p-5 md:p-6 mb-6 transition-all duration-200 ${
+              isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'
+            }`}
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.04)',
+              border: '1px solid rgba(255, 255, 255, 0.1)',
+              animationDelay: '0.1s'
+            }}
           >
             <p className="text-xs uppercase tracking-wide mb-2" style={{ color: '#8899aa' }}>
               What the student actually did:
@@ -113,7 +138,7 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
           <div className="mb-6">
             <Timer
               key={timerKey}
-              totalSeconds={TIMER_SECONDS}
+              totalSeconds={MAKEOVER_TIMER_SECONDS}
               isRunning={timerRunning}
               onComplete={handleTimerComplete}
             />
@@ -128,29 +153,34 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
             />
             <button
               onClick={toggleHint}
-              className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 active:scale-95"
+              className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 active:scale-95"
               style={{ backgroundColor: '#F1C40F', color: '#0a1628' }}
             >
+              {showHint ? <EyeOff size={20} /> : <Eye size={20} />}
               {showHint ? 'Hide Hint' : 'Show Hint'}
             </button>
             <button
               onClick={handleNext}
-              className="px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 active:scale-95"
+              className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 active:scale-95"
               style={{ backgroundColor: colorConfig.accent, color: '#ffffff' }}
             >
-              {currentRound < makeovers.length - 1 ? 'Next →' : 'Finish →'}
+              {currentRound < makeovers.length - 1 ? 'Next' : 'Finish'}
+              <ChevronRight size={20} />
             </button>
           </div>
 
           {/* Hint box */}
           {showHint && (
             <div
-              className="w-full rounded-xl p-4 mb-4"
+              className="w-full rounded-xl p-4 mb-4 animate-reveal-bounce"
               style={{ backgroundColor: 'rgba(241, 196, 15, 0.1)', border: '1px solid rgba(241, 196, 15, 0.3)' }}
             >
-              <p className="text-xs uppercase tracking-wide mb-2" style={{ color: '#F1C40F' }}>
-                💡 Hint
-              </p>
+              <div className="flex items-center gap-2 mb-2">
+                <Lightbulb size={18} style={{ color: '#F1C40F' }} />
+                <p className="text-xs uppercase tracking-wide font-semibold" style={{ color: '#F1C40F' }}>
+                  Hint
+                </p>
+              </div>
               <p className="text-white">{current.hint}</p>
             </div>
           )}
@@ -164,7 +194,6 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
 
       {screen === 'done' && (
         <DoneScreen
-          icon="💪"
           title="Makeover Complete!"
           message="You can turn ANY vague feedback into something powerful. The formula works every time."
           tableTalk="Which makeover was the hardest to improve?"

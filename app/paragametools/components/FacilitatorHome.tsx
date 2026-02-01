@@ -1,6 +1,6 @@
 'use client';
 
-import { Target, Zap, TrendingUp, Wrench, Monitor } from 'lucide-react';
+import { Target, Zap, TrendingUp, Wrench, ArrowLeft, Monitor, Coffee } from 'lucide-react';
 import { GAMES, COLORS, type GameId } from '../data/gameConfig';
 
 // Icon map for home screen
@@ -11,12 +11,13 @@ const GAME_ICONS = {
   makeover: Wrench,
 } as const;
 
-interface HomeScreenProps {
+interface FacilitatorHomeProps {
   onSelectGame: (gameId: GameId) => void;
-  onFacilitatorMode?: () => void;
+  onPlayerMode: () => void;
+  onSlangBreak: () => void;
 }
 
-export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps) {
+export function FacilitatorHome({ onSelectGame, onPlayerMode, onSlangBreak }: FacilitatorHomeProps) {
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4 py-8"
@@ -26,12 +27,15 @@ export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps)
     >
       {/* Header */}
       <div className="text-center mb-8 md:mb-12 animate-fade-in">
-        <p
-          className="text-xs md:text-sm uppercase tracking-widest mb-2"
-          style={{ color: 'rgba(255, 120, 71, 0.5)' }}
-        >
-          The Moves That Matter
-        </p>
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <Monitor size={24} style={{ color: '#3498DB' }} />
+          <p
+            className="text-xs md:text-sm uppercase tracking-widest"
+            style={{ color: '#3498DB' }}
+          >
+            Facilitator Mode
+          </p>
+        </div>
         <h1
           className="text-5xl md:text-7xl font-black mb-3"
           style={{ color: '#ffffff', fontFamily: "'Outfit', sans-serif" }}
@@ -39,7 +43,7 @@ export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps)
           GAME TIME
         </h1>
         <p className="text-base md:text-lg font-light" style={{ color: '#8899aa' }}>
-          Pick a game to play with your tables
+          Select a game to manage from your projected screen
         </p>
       </div>
 
@@ -78,7 +82,7 @@ export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps)
                   className="text-xs font-medium px-2 py-1 rounded-full"
                   style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#8899aa' }}
                 >
-                  {game.time}
+                  {game.duration} min
                 </span>
               </div>
               <h2
@@ -88,34 +92,42 @@ export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps)
                 {game.title}
               </h2>
               <p
-                className="text-sm md:text-base mb-2"
+                className="text-sm md:text-base"
                 style={{ color: '#8899aa' }}
               >
                 {game.description}
-              </p>
-              <p className="text-xs" style={{ color: colorConfig.accent }}>
-                {game.rounds}
               </p>
             </button>
           );
         })}
       </div>
 
-      {/* Facilitator mode button */}
-      {onFacilitatorMode && (
+      {/* Bottom actions */}
+      <div className="flex gap-4 mt-8">
         <button
-          onClick={onFacilitatorMode}
-          className="mt-8 flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all hover:scale-105 active:scale-95"
+          onClick={onSlangBreak}
+          className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all hover:scale-105"
           style={{
-            backgroundColor: 'rgba(52, 152, 219, 0.15)',
-            border: '1px solid rgba(52, 152, 219, 0.4)',
-            color: '#3498DB',
+            backgroundColor: 'rgba(155, 89, 182, 0.15)',
+            border: '1px solid rgba(155, 89, 182, 0.4)',
+            color: '#9B59B6',
           }}
         >
-          <Monitor size={20} />
-          Facilitator Mode
+          <Coffee size={20} />
+          Slang Break
         </button>
-      )}
+        <button
+          onClick={onPlayerMode}
+          className="flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all hover:scale-105"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            color: '#8899aa',
+          }}
+        >
+          <ArrowLeft size={20} />
+          Player Mode
+        </button>
+      </div>
 
       {/* Footer */}
       <p className="mt-8 text-xs" style={{ color: '#8899aa', opacity: 0.5 }}>
