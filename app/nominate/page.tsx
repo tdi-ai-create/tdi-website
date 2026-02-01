@@ -410,13 +410,13 @@ export default function NominatePage() {
               >
                 <button
                   onClick={() => toggleAccordion(0)}
-                  className="w-full flex items-center justify-between p-5 text-left"
+                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-100"
                 >
                   <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
                     What happens after I nominate?
                   </span>
                   <ChevronDown
-                    className={`w-5 h-5 transition-transform duration-300 ${openAccordion === 0 ? 'rotate-180' : ''}`}
+                    className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 0 ? 'rotate-180' : ''}`}
                     style={{ color: '#35A7FF' }}
                   />
                 </button>
@@ -440,13 +440,13 @@ export default function NominatePage() {
               >
                 <button
                   onClick={() => toggleAccordion(1)}
-                  className="w-full flex items-center justify-between p-5 text-left"
+                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-100"
                 >
                   <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
                     What do I earn if it becomes a partnership?
                   </span>
                   <ChevronDown
-                    className={`w-5 h-5 transition-transform duration-300 ${openAccordion === 1 ? 'rotate-180' : ''}`}
+                    className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 1 ? 'rotate-180' : ''}`}
                     style={{ color: '#35A7FF' }}
                   />
                 </button>
@@ -473,13 +473,13 @@ export default function NominatePage() {
               >
                 <button
                   onClick={() => toggleAccordion(2)}
-                  className="w-full flex items-center justify-between p-5 text-left"
+                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-100"
                 >
                   <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
                     Wait — my whole staff gets celebrated?
                   </span>
                   <ChevronDown
-                    className={`w-5 h-5 transition-transform duration-300 ${openAccordion === 2 ? 'rotate-180' : ''}`}
+                    className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 2 ? 'rotate-180' : ''}`}
                     style={{ color: '#35A7FF' }}
                   />
                 </button>
@@ -574,13 +574,13 @@ export default function NominatePage() {
               >
                 <button
                   onClick={() => toggleAccordion(3)}
-                  className="w-full flex items-center justify-between p-5 text-left"
+                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-100"
                 >
                   <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
                     What's Blueprint Founders Circle?
                   </span>
                   <ChevronDown
-                    className={`w-5 h-5 transition-transform duration-300 ${openAccordion === 3 ? 'rotate-180' : ''}`}
+                    className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 3 ? 'rotate-180' : ''}`}
                     style={{ color: '#35A7FF' }}
                   />
                 </button>
@@ -639,13 +639,13 @@ export default function NominatePage() {
               >
                 <button
                   onClick={() => toggleAccordion(4)}
-                  className="w-full flex items-center justify-between p-5 text-left"
+                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-100"
                 >
                   <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
                     Is there a catch?
                   </span>
                   <ChevronDown
-                    className={`w-5 h-5 transition-transform duration-300 ${openAccordion === 4 ? 'rotate-180' : ''}`}
+                    className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 4 ? 'rotate-180' : ''}`}
                     style={{ color: '#35A7FF' }}
                   />
                 </button>
@@ -726,7 +726,10 @@ export default function NominatePage() {
                 I went from spending 12 hours a week planning to 6. I want that for every teacher I know.
               </p>
               <p className="text-sm font-semibold" style={{ color: '#35A7FF' }}>
-                — TDI Partner Teacher
+                — TDI Partner Teacher, IL
+              </p>
+              <p className="text-xs font-medium mt-2" style={{ color: '#35A7FF' }}>
+                This is why people nominate.
               </p>
             </div>
           </div>
