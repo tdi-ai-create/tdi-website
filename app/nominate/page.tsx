@@ -533,7 +533,7 @@ export default function NominatePage() {
         {/* Content */}
         <div className="relative z-10 container-default text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4" style={{ color: '#ffffff' }}>
-            Know a School That Deserves Better PD?
+            Know a School That<br />Deserves Better PD?
           </h1>
           <p className="text-xl md:text-2xl mb-4 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
             Nominate them. If it leads to a partnership, we celebrate you.
