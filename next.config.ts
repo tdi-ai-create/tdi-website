@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
         destination: '/contact',
         permanent: true,
       },
+      {
+        source: '/gametools',
+        destination: '/paragametools',
+        permanent: true,
+      },
     ];
   },
 };
