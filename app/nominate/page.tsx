@@ -17,11 +17,15 @@ import {
   Headphones,
   MessageSquare,
   Heart,
-  Send,
   Loader2,
   Award,
   Bot,
   Star,
+  ChevronDown,
+  UtensilsCrossed,
+  Gift,
+  BookOpen,
+  Shuffle,
 } from 'lucide-react';
 
 // Update this number as spots fill
@@ -42,6 +46,9 @@ interface FormData {
 }
 
 export default function NominatePage() {
+  // Accordion state
+  const [openAccordion, setOpenAccordion] = useState<number | null>(null);
+
   // Form routing state
   const [isPartner, setIsPartner] = useState<boolean | null>(null);
   const [role, setRole] = useState<'leader' | 'teacher' | null>(null);
@@ -81,6 +88,11 @@ export default function NominatePage() {
     }
   }, [submitted]);
 
+  // Accordion toggle
+  const toggleAccordion = (index: number) => {
+    setOpenAccordion(openAccordion === index ? null : index);
+  };
+
   // Determine track based on selections
   const getTrack = (): Track => {
     if (isPartner === false) return 'non-partner-nomination';
@@ -93,8 +105,7 @@ export default function NominatePage() {
 
   // Determine progress step
   const getProgressStep = (): number => {
-    if (!currentTrack) return 1; // Still answering routing questions
-    // Check if required fields are filled
+    if (!currentTrack) return 1;
     const hasRequiredFields = formData.name && formData.email && formData.nominatedSchool;
     if (currentTrack === 'non-partner-nomination' && (!formData.relationship || !formData.schoolCityState)) {
       return 2;
@@ -155,7 +166,6 @@ export default function NominatePage() {
     setIsSubmitting(true);
     setError(false);
 
-    // Build form data with human-readable field names for Web3Forms
     const submitData: Record<string, string | undefined> = {
       access_key: '6533e850-3216-4ba6-bdd3-3d1273ce353b',
       subject: getSubjectLine(),
@@ -167,12 +177,10 @@ export default function NominatePage() {
       'Your Email': formData.email,
     };
 
-    // Add role if applicable
     if (isPartner && role) {
       submitData['Role'] = role === 'leader' ? 'School Leader' : 'Teacher or Staff';
     }
 
-    // Add track-specific fields
     if (currentTrack === 'partner-leader-referral' || currentTrack === 'partner-teacher-nomination') {
       submitData['Your School Name'] = formData.yourSchool;
     }
@@ -181,7 +189,6 @@ export default function NominatePage() {
       submitData['Relationship to School'] = formData.relationship;
     }
 
-    // School being nominated/referred
     const schoolFieldName = currentTrack === 'partner-leader-referral' ? 'School Being Referred' : 'School Being Nominated';
     submitData[schoolFieldName] = formData.nominatedSchool;
 
@@ -214,7 +221,6 @@ export default function NominatePage() {
         setSubmitted(true);
         setTrack(currentTrack);
 
-        // GA4 tracking
         if (typeof window !== 'undefined' && window.gtag) {
           window.gtag('event', 'form_submission', {
             form_name: 'nomination_form',
@@ -252,7 +258,6 @@ export default function NominatePage() {
     setCopied(false);
   };
 
-  // Get confirmation content based on track
   const getConfirmationContent = () => {
     const schoolName = formData.nominatedSchool || 'the school';
 
@@ -276,7 +281,6 @@ export default function NominatePage() {
     }
   };
 
-  // Share functionality
   const shareableText =
     "I just nominated a school for a TDI partnership. If your school needs better PD, you can nominate yours too: teachersdeserveit.com/nominate";
   const shareUrl = 'https://teachersdeserveit.com/nominate';
@@ -287,7 +291,6 @@ export default function NominatePage() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // Fallback for older browsers
       const textArea = document.createElement('textarea');
       textArea.value = shareableText;
       document.body.appendChild(textArea);
@@ -338,7 +341,7 @@ export default function NominatePage() {
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(135deg, rgba(30, 39, 73, 0.85) 0%, rgba(30, 39, 73, 0.75) 100%)',
+            background: 'linear-gradient(135deg, rgba(30, 39, 73, 0.80) 0%, rgba(30, 39, 73, 0.70) 100%)',
           }}
         />
 
@@ -363,86 +366,340 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 2. How It Works */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
+      {/* 2. The Mission Moment */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#fafafa' }}>
         <div className="container-default">
-          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
-            How It Works
-          </h2>
+          <div className="max-w-[700px] mx-auto text-center">
+            <h2 className="text-3xl md:text-4xl font-bold mb-10" style={{ color: '#1e2749' }}>
+              One Conversation Can Change Everything for a School
+            </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {/* Step 1 */}
-            <div className="text-center">
-              <div
-                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                style={{ backgroundColor: '#ffba06' }}
-              >
-                <Send className="w-7 h-7" style={{ color: '#1e2749' }} />
-              </div>
-              <h3 className="text-xl font-bold mb-2" style={{ color: '#1e2749' }}>You Nominate</h3>
-              <p style={{ color: '#1e2749', opacity: 0.7 }}>
-                Tell us about a school that needs better PD. Takes 2 minutes.
+            <div className="space-y-6 text-lg md:text-xl" style={{ color: '#1e2749', lineHeight: 1.7 }}>
+              <p>
+                Every TDI partnership started because someone said something. A principal mentioned us to a friend. A teacher told us about a school down the road that was struggling.
               </p>
-            </div>
-
-            {/* Step 2 */}
-            <div className="text-center">
-              <div
-                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                style={{ backgroundColor: '#ffba06' }}
-              >
-                <MessageSquare className="w-7 h-7" style={{ color: '#1e2749' }} />
-              </div>
-              <h3 className="text-xl font-bold mb-2" style={{ color: '#1e2749' }}>We Reach Out</h3>
-              <p style={{ color: '#1e2749', opacity: 0.7 }}>
-                We contact their admin team within 48 hours to start the conversation.
+              <p>
+                You probably know a school right now where teachers are burning out, PD feels like a waste of time, and nobody's doing anything about it.
               </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="text-center">
-              <div
-                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
-                style={{ backgroundColor: '#ffba06' }}
-              >
-                <Heart className="w-7 h-7" style={{ color: '#1e2749' }} />
-              </div>
-              <h3 className="text-xl font-bold mb-2" style={{ color: '#1e2749' }}>You Get Celebrated</h3>
-              <p style={{ color: '#1e2749', opacity: 0.7 }}>
-                When a nomination leads to a partnership, we make sure you're celebrated for starting it.
+              <p className="font-semibold" style={{ color: '#1e2749' }}>
+                This is how it changes.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 3. Social Proof Section */}
+      {/* 3. Accordion — What Happens When You Nominate */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-default">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-3" style={{ color: '#1e2749' }}>
+              What Happens When You Nominate
+            </h2>
+            <p className="text-center mb-10" style={{ color: '#1e2749', opacity: 0.7 }}>
+              Everything you'd want to know before you start.
+            </p>
+
+            <div className="space-y-4">
+              {/* Accordion Item 1 */}
+              <div
+                className="rounded-xl overflow-hidden"
+                style={{ backgroundColor: '#fafafa', border: '1px solid #e5e5e5' }}
+              >
+                <button
+                  onClick={() => toggleAccordion(0)}
+                  className="w-full flex items-center justify-between p-5 text-left"
+                >
+                  <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
+                    What happens after I nominate?
+                  </span>
+                  <ChevronDown
+                    className={`w-5 h-5 transition-transform duration-300 ${openAccordion === 0 ? 'rotate-180' : ''}`}
+                    style={{ color: '#35A7FF' }}
+                  />
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openAccordion === 0 ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="px-5 pb-5">
+                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
+                      We reach out to the school's admin team within 48 hours. They'll know you started the conversation. You don't have to do anything else — we take it from here.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Accordion Item 2 */}
+              <div
+                className="rounded-xl overflow-hidden"
+                style={{ backgroundColor: '#fafafa', border: '1px solid #e5e5e5' }}
+              >
+                <button
+                  onClick={() => toggleAccordion(1)}
+                  className="w-full flex items-center justify-between p-5 text-left"
+                >
+                  <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
+                    What do I earn if it becomes a partnership?
+                  </span>
+                  <ChevronDown
+                    className={`w-5 h-5 transition-transform duration-300 ${openAccordion === 1 ? 'rotate-180' : ''}`}
+                    style={{ color: '#35A7FF' }}
+                  />
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openAccordion === 1 ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="px-5 pb-5 space-y-4">
+                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
+                      If you're a teacher or community member who nominates a school, you earn a personal celebration reward — up to $500. That could be a gift card, classroom supplies, or whatever feels right for you.
+                    </p>
+                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
+                      If you're a school leader who refers another school, your entire staff gets celebrated. We're talking TDI swag for every teacher, plus you choose how to use the rest of the budget.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Accordion Item 3 */}
+              <div
+                className="rounded-xl overflow-hidden"
+                style={{ backgroundColor: '#fafafa', border: '1px solid #e5e5e5' }}
+              >
+                <button
+                  onClick={() => toggleAccordion(2)}
+                  className="w-full flex items-center justify-between p-5 text-left"
+                >
+                  <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
+                    Wait — my whole staff gets celebrated?
+                  </span>
+                  <ChevronDown
+                    className={`w-5 h-5 transition-transform duration-300 ${openAccordion === 2 ? 'rotate-180' : ''}`}
+                    style={{ color: '#35A7FF' }}
+                  />
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openAccordion === 2 ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="px-5 pb-5 space-y-4">
+                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
+                      Yes. When a school leader refers another school and it becomes a partnership, TDI funds a celebration for the referring school's teachers. You pick from the menu:
+                    </p>
+
+                    {/* Reward menu cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                      <div
+                        className="p-4 rounded-lg flex items-start gap-3"
+                        style={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5' }}
+                      >
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#ffba06' }}
+                        >
+                          <UtensilsCrossed className="w-5 h-5" style={{ color: '#1e2749' }} />
+                        </div>
+                        <div>
+                          <p className="font-semibold" style={{ color: '#1e2749' }}>Catered Celebration</p>
+                          <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>A team lunch or breakfast for your whole staff</p>
+                        </div>
+                      </div>
+
+                      <div
+                        className="p-4 rounded-lg flex items-start gap-3"
+                        style={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5' }}
+                      >
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#ffba06' }}
+                        >
+                          <Gift className="w-5 h-5" style={{ color: '#1e2749' }} />
+                        </div>
+                        <div>
+                          <p className="font-semibold" style={{ color: '#1e2749' }}>Individual Gift Cards</p>
+                          <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Every teacher gets a gift card — Target, Amazon, Visa, your choice</p>
+                        </div>
+                      </div>
+
+                      <div
+                        className="p-4 rounded-lg flex items-start gap-3"
+                        style={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5' }}
+                      >
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#ffba06' }}
+                        >
+                          <BookOpen className="w-5 h-5" style={{ color: '#1e2749' }} />
+                        </div>
+                        <div>
+                          <p className="font-semibold" style={{ color: '#1e2749' }}>Classroom Supply Grants</p>
+                          <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Teachers submit wish lists, TDI fulfills them</p>
+                        </div>
+                      </div>
+
+                      <div
+                        className="p-4 rounded-lg flex items-start gap-3"
+                        style={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5' }}
+                      >
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#ffba06' }}
+                        >
+                          <Shuffle className="w-5 h-5" style={{ color: '#1e2749' }} />
+                        </div>
+                        <div>
+                          <p className="font-semibold" style={{ color: '#1e2749' }}>Hybrid</p>
+                          <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Mix and match from the options above</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="text-sm font-medium" style={{ color: '#35A7FF' }}>
+                      Plus TDI swag — hats, tees, the works — is included no matter what you choose.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Accordion Item 4 */}
+              <div
+                className="rounded-xl overflow-hidden"
+                style={{ backgroundColor: '#fafafa', border: '1px solid #e5e5e5' }}
+              >
+                <button
+                  onClick={() => toggleAccordion(3)}
+                  className="w-full flex items-center justify-between p-5 text-left"
+                >
+                  <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
+                    What's Blueprint Founders Circle?
+                  </span>
+                  <ChevronDown
+                    className={`w-5 h-5 transition-transform duration-300 ${openAccordion === 3 ? 'rotate-180' : ''}`}
+                    style={{ color: '#35A7FF' }}
+                  />
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openAccordion === 3 ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="px-5 pb-5 space-y-4">
+                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
+                      The first 5 schools each semester that come in through a referral or nomination receive Blueprint Founders Circle status.
+                    </p>
+
+                    {/* Benefits */}
+                    <div className="space-y-3 mt-4">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#35A7FF' }}
+                        >
+                          <Award className="w-5 h-5 text-white" />
+                        </div>
+                        <p style={{ color: '#1e2749' }}>A bonus executive coaching session</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#35A7FF' }}
+                        >
+                          <Bot className="w-5 h-5 text-white" />
+                        </div>
+                        <p style={{ color: '#1e2749' }}>Early access to Desi, our AI-powered teacher support tool</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#35A7FF' }}
+                        >
+                          <Star className="w-5 h-5 text-white" />
+                        </div>
+                        <p style={{ color: '#1e2749' }}>A spotlight feature on the TDI website</p>
+                      </div>
+                    </div>
+
+                    <p className="text-sm font-medium mt-4" style={{ color: '#35A7FF' }}>
+                      Only {VIP_SPOTS_REMAINING} spots remain for Fall 2026. Once they're gone, they're gone until next semester.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Accordion Item 5 */}
+              <div
+                className="rounded-xl overflow-hidden"
+                style={{ backgroundColor: '#fafafa', border: '1px solid #e5e5e5' }}
+              >
+                <button
+                  onClick={() => toggleAccordion(4)}
+                  className="w-full flex items-center justify-between p-5 text-left"
+                >
+                  <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
+                    Is there a catch?
+                  </span>
+                  <ChevronDown
+                    className={`w-5 h-5 transition-transform duration-300 ${openAccordion === 4 ? 'rotate-180' : ''}`}
+                    style={{ color: '#35A7FF' }}
+                  />
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openAccordion === 4 ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="px-5 pb-5">
+                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
+                      No. You nominate a school. We reach out. If it becomes a partnership, we celebrate you. If it doesn't, no harm done — you advocated for a school that needed it, and that matters.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Social Proof Section */}
       <section className="py-12 md:py-16" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
           {/* Stat Bar */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mb-12">
-            <div className="flex flex-col items-center">
-              <div className="flex items-center gap-2 mb-2">
+            <div
+              className="p-6 rounded-xl"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
+            >
+              <div className="flex items-center justify-center gap-2 mb-2">
                 <MapPin className="w-6 h-6" style={{ color: '#ffba06' }} />
                 <p className="text-4xl md:text-5xl font-bold" style={{ color: '#ffffff' }}>21</p>
               </div>
-              <p style={{ color: '#ffffff', opacity: 0.8 }}>States</p>
+              <p className="font-medium" style={{ color: '#ffffff' }}>States</p>
               <p className="text-sm" style={{ color: '#ffffff', opacity: 0.6 }}>Active TDI partnerships</p>
             </div>
-            <div className="flex flex-col items-center">
-              <div className="flex items-center gap-2 mb-2">
+            <div
+              className="p-6 rounded-xl"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
+            >
+              <div className="flex items-center justify-center gap-2 mb-2">
                 <Users className="w-6 h-6" style={{ color: '#ffba06' }} />
                 <p className="text-4xl md:text-5xl font-bold" style={{ color: '#ffffff' }}>87,000+</p>
               </div>
-              <p style={{ color: '#ffffff', opacity: 0.8 }}>Educators</p>
+              <p className="font-medium" style={{ color: '#ffffff' }}>Educators</p>
               <p className="text-sm" style={{ color: '#ffffff', opacity: 0.6 }}>In the TDI community</p>
             </div>
-            <div className="flex flex-col items-center">
-              <div className="flex items-center gap-2 mb-2">
+            <div
+              className="p-6 rounded-xl"
+              style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
+            >
+              <div className="flex items-center justify-center gap-2 mb-2">
                 <TrendingUp className="w-6 h-6" style={{ color: '#ffba06' }} />
                 <p className="text-4xl md:text-5xl font-bold" style={{ color: '#ffffff' }}>65%</p>
               </div>
-              <p style={{ color: '#ffffff', opacity: 0.8 }}>Implementation Rate</p>
+              <p className="font-medium" style={{ color: '#ffffff' }}>Implementation Rate</p>
               <p className="text-sm" style={{ color: '#ffffff', opacity: 0.6 }}>Industry average: 10%</p>
             </div>
           </div>
@@ -453,14 +710,15 @@ export default function NominatePage() {
               className="relative px-6 py-8 rounded-xl"
               style={{ backgroundColor: 'rgba(53, 167, 255, 0.1)' }}
             >
+              {/* Decorative quote mark */}
               <div
-                className="absolute left-4 top-4 text-6xl font-serif leading-none"
-                style={{ color: '#35A7FF', opacity: 0.3 }}
+                className="absolute left-6 top-4 text-7xl font-serif leading-none select-none"
+                style={{ color: '#35A7FF', opacity: 0.4, fontFamily: 'Georgia, serif' }}
               >
                 "
               </div>
               <p
-                className="text-xl md:text-2xl italic mb-4 relative z-10"
+                className="text-xl md:text-2xl italic mb-4 relative z-10 pt-6"
                 style={{ color: '#ffffff' }}
               >
                 I went from spending 12 hours a week planning to 6. I want that for every teacher I know.
@@ -473,7 +731,7 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 4. The Form */}
+      {/* 5. The Form */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <div className="max-w-2xl mx-auto" ref={confirmationRef}>
@@ -509,13 +767,12 @@ export default function NominatePage() {
                   </button>
                 </div>
 
-                {/* A. Share This Nomination */}
+                {/* Share This Nomination */}
                 <div className="bg-white rounded-xl p-6 shadow-md animate-fade-in" style={{ animationDelay: '0.1s' }}>
                   <h4 className="text-lg font-bold mb-4 text-center" style={{ color: '#1e2749' }}>
                     Spread the word
                   </h4>
 
-                  {/* Shareable text box */}
                   <div
                     className="p-4 rounded-lg mb-4"
                     style={{ backgroundColor: '#f5f5f5', border: '1px solid #e5e5e5' }}
@@ -533,7 +790,6 @@ export default function NominatePage() {
                     </button>
                   </div>
 
-                  {/* Share buttons */}
                   <div className="flex justify-center gap-3">
                     <button
                       onClick={handleFacebookShare}
@@ -562,14 +818,13 @@ export default function NominatePage() {
                   </div>
                 </div>
 
-                {/* B. Something For You */}
+                {/* Something For You */}
                 <div className="bg-white rounded-xl p-6 shadow-md animate-fade-in" style={{ animationDelay: '0.2s' }}>
                   <h4 className="text-lg font-bold mb-4 text-center" style={{ color: '#1e2749' }}>
                     While we get to work on your nomination, here's something for you.
                   </h4>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {/* Card 1: Free PD Plan */}
                     <Link
                       href="/free-pd-plan"
                       className="p-4 rounded-lg text-center transition-all hover:shadow-md"
@@ -585,7 +840,6 @@ export default function NominatePage() {
                       <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>Get a custom plan in 24 hours</p>
                     </Link>
 
-                    {/* Card 2: PD Diagnostic */}
                     <Link
                       href="/pd-diagnostic"
                       className="p-4 rounded-lg text-center transition-all hover:shadow-md"
@@ -601,7 +855,6 @@ export default function NominatePage() {
                       <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>Find out where your PD stands</p>
                     </Link>
 
-                    {/* Card 3: TDI Podcast */}
                     <a
                       href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274"
                       target="_blank"
@@ -621,7 +874,7 @@ export default function NominatePage() {
                   </div>
                 </div>
 
-                {/* C. What Happens Next Timeline */}
+                {/* What Happens Next Timeline */}
                 <div className="bg-white rounded-xl p-6 shadow-md animate-fade-in" style={{ animationDelay: '0.3s' }}>
                   <h4 className="text-lg font-bold mb-6 text-center" style={{ color: '#1e2749' }}>
                     What happens from here
@@ -1011,62 +1264,6 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 5. What Is Blueprint Founders Circle? */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
-        <div className="container-default">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
-              What's Blueprint Founders Circle?
-            </h2>
-            <p className="text-center mb-8" style={{ color: '#1e2749', opacity: 0.8 }}>
-              Schools that join TDI through a referral or nomination are eligible for Blueprint Founders Circle status.
-              Only 5 schools per semester. Founders Circle schools receive:
-            </p>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Benefit 1 */}
-              <div className="text-center p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
-                  style={{ backgroundColor: '#35A7FF' }}
-                >
-                  <Award className="w-6 h-6 text-white" />
-                </div>
-                <p className="font-semibold" style={{ color: '#1e2749' }}>
-                  A bonus executive coaching session
-                </p>
-              </div>
-
-              {/* Benefit 2 */}
-              <div className="text-center p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
-                  style={{ backgroundColor: '#35A7FF' }}
-                >
-                  <Bot className="w-6 h-6 text-white" />
-                </div>
-                <p className="font-semibold" style={{ color: '#1e2749' }}>
-                  Early access to Desi, our AI-powered teacher support tool
-                </p>
-              </div>
-
-              {/* Benefit 3 */}
-              <div className="text-center p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
-                  style={{ backgroundColor: '#35A7FF' }}
-                >
-                  <Star className="w-6 h-6 text-white" />
-                </div>
-                <p className="font-semibold" style={{ color: '#1e2749' }}>
-                  A spotlight feature on the TDI website
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* 6. Final CTA */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default text-center">
@@ -1089,6 +1286,7 @@ export default function NominatePage() {
             >
               <Facebook className="w-6 h-6" style={{ color: '#1e2749' }} />
             </a>
+            {/* TODO: Add TDI Instagram URL */}
             <a
               href="https://www.instagram.com/teachersdeserveit"
               target="_blank"
@@ -1099,18 +1297,6 @@ export default function NominatePage() {
             >
               <svg className="w-6 h-6" fill="#1e2749" viewBox="0 0 24 24">
                 <path d="M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153.509.5.902 1.105 1.153 1.772.247.637.415 1.363.465 2.428.047 1.066.06 1.405.06 4.122 0 2.717-.01 3.056-.06 4.122-.05 1.065-.218 1.79-.465 2.428a4.883 4.883 0 01-1.153 1.772c-.5.508-1.105.902-1.772 1.153-.637.247-1.363.415-2.428.465-1.066.047-1.405.06-4.122.06-2.717 0-3.056-.01-4.122-.06-1.065-.05-1.79-.218-2.428-.465a4.89 4.89 0 01-1.772-1.153 4.904 4.904 0 01-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.013 15.056 2 14.717 2 12c0-2.717.01-3.056.06-4.122.05-1.066.217-1.79.465-2.428a4.88 4.88 0 011.153-1.772A4.897 4.897 0 015.45 2.525c.638-.248 1.362-.415 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5a5 5 0 100 10 5 5 0 000-10zm6.5-.25a1.25 1.25 0 10-2.5 0 1.25 1.25 0 002.5 0zM12 9a3 3 0 110 6 3 3 0 010-6z" />
-              </svg>
-            </a>
-            <a
-              href="https://www.linkedin.com/company/teachersdeserveit"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-12 h-12 rounded-full flex items-center justify-center transition-all hover:scale-110"
-              style={{ backgroundColor: '#ffba06' }}
-              aria-label="LinkedIn"
-            >
-              <svg className="w-6 h-6" fill="#1e2749" viewBox="0 0 24 24">
-                <path d="M19 3a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h14m-.5 15.5v-5.3a3.26 3.26 0 00-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 011.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 001.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 00-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z" />
               </svg>
             </a>
           </div>
