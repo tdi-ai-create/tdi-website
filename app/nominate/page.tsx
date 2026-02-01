@@ -22,10 +22,12 @@ import {
   Bot,
   Star,
   ChevronDown,
+  ChevronUp,
   UtensilsCrossed,
   Gift,
   BookOpen,
   Shuffle,
+  ArrowDown,
 } from 'lucide-react';
 
 // Update this number as spots fill
@@ -43,6 +45,15 @@ interface FormData {
   pdChallenge: string;
   relationship: string;
   notes: string;
+}
+
+interface FormErrors {
+  name?: string;
+  email?: string;
+  yourSchool?: string;
+  nominatedSchool?: string;
+  schoolCityState?: string;
+  relationship?: string;
 }
 
 export default function NominatePage() {
@@ -67,6 +78,16 @@ export default function NominatePage() {
     notes: '',
   });
 
+  // Form validation state
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+
+  // Track 3 optional fields toggle
+  const [showOptionalFields, setShowOptionalFields] = useState(false);
+
+  // Form start tracking (to only fire once)
+  const [hasTrackedFormStart, setHasTrackedFormStart] = useState(false);
+
   // Submission state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -77,6 +98,21 @@ export default function NominatePage() {
 
   // Ref for smooth scroll
   const confirmationRef = useRef<HTMLDivElement>(null);
+
+  // Refs for form fields (for scrolling to errors)
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const yourSchoolRef = useRef<HTMLInputElement>(null);
+  const nominatedSchoolRef = useRef<HTMLInputElement>(null);
+  const schoolCityStateRef = useRef<HTMLInputElement>(null);
+  const relationshipRef = useRef<HTMLSelectElement>(null);
+
+  // GA4 page view tracking
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'nominate_page_view', { page: '/nominate' });
+    }
+  }, []);
 
   // Scroll to confirmation after submission
   useEffect(() => {
@@ -91,6 +127,11 @@ export default function NominatePage() {
   // Accordion toggle
   const toggleAccordion = (index: number) => {
     setOpenAccordion(openAccordion === index ? null : index);
+  };
+
+  // Scroll to form
+  const scrollToForm = () => {
+    document.getElementById('nomination-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   // Determine track based on selections
@@ -161,8 +202,103 @@ export default function NominatePage() {
     }
   };
 
+  // Email validation
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Validate form
+  const validateForm = (): FormErrors => {
+    const errors: FormErrors = {};
+
+    if (!formData.name.trim()) {
+      errors.name = 'Please enter your name';
+    }
+
+    if (!formData.email.trim()) {
+      errors.email = 'Please enter your email address';
+    } else if (!isValidEmail(formData.email)) {
+      errors.email = 'Please enter a valid email address';
+    }
+
+    if ((currentTrack === 'partner-leader-referral' || currentTrack === 'partner-teacher-nomination') && !formData.yourSchool.trim()) {
+      errors.yourSchool = 'Please enter your school name';
+    }
+
+    if (!formData.nominatedSchool.trim()) {
+      errors.nominatedSchool = 'Please enter the school name';
+    }
+
+    if (currentTrack === 'non-partner-nomination') {
+      if (!formData.relationship) {
+        errors.relationship = 'Please select your relationship';
+      }
+      if (!formData.schoolCityState.trim()) {
+        errors.schoolCityState = 'Please enter the city and state';
+      }
+    }
+
+    return errors;
+  };
+
+  // Scroll to first error
+  const scrollToFirstError = (errors: FormErrors) => {
+    if (errors.name && nameRef.current) {
+      nameRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      nameRef.current.focus();
+    } else if (errors.email && emailRef.current) {
+      emailRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      emailRef.current.focus();
+    } else if (errors.yourSchool && yourSchoolRef.current) {
+      yourSchoolRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      yourSchoolRef.current.focus();
+    } else if (errors.relationship && relationshipRef.current) {
+      relationshipRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      relationshipRef.current.focus();
+    } else if (errors.nominatedSchool && nominatedSchoolRef.current) {
+      nominatedSchoolRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      nominatedSchoolRef.current.focus();
+    } else if (errors.schoolCityState && schoolCityStateRef.current) {
+      schoolCityStateRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      schoolCityStateRef.current.focus();
+    }
+  };
+
+  // Clear individual error when user types
+  const clearFieldError = (field: keyof FormErrors) => {
+    if (formErrors[field]) {
+      setFormErrors((prev) => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
+
+  // Track form start (first field interaction)
+  const trackFormStart = () => {
+    if (!hasTrackedFormStart && currentTrack) {
+      setHasTrackedFormStart(true);
+      if (typeof window !== 'undefined' && window.gtag) {
+        window.gtag('event', 'nominate_form_start', { track: currentTrack });
+      }
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setHasAttemptedSubmit(true);
+
+    // Validate form
+    const errors = validateForm();
+    setFormErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      scrollToFirstError(errors);
+      return;
+    }
+
     setIsSubmitting(true);
     setError(false);
 
@@ -221,12 +357,9 @@ export default function NominatePage() {
         setSubmitted(true);
         setTrack(currentTrack);
 
+        // GA4 form submit tracking
         if (typeof window !== 'undefined' && window.gtag) {
-          window.gtag('event', 'form_submission', {
-            form_name: 'nomination_form',
-            form_track: currentTrack,
-            form_location: window.location.pathname,
-          });
+          window.gtag('event', 'nominate_form_submit', { track: currentTrack });
         }
       } else {
         setError(true);
@@ -239,6 +372,11 @@ export default function NominatePage() {
   };
 
   const resetForm = () => {
+    // GA4 tracking for nominate another click
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'nominate_another_click');
+    }
+
     setIsPartner(null);
     setRole(null);
     setTrack(null);
@@ -253,6 +391,10 @@ export default function NominatePage() {
       relationship: '',
       notes: '',
     });
+    setFormErrors({});
+    setHasAttemptedSubmit(false);
+    setHasTrackedFormStart(false);
+    setShowOptionalFields(false);
     setSubmitted(false);
     setError(false);
     setCopied(false);
@@ -286,6 +428,11 @@ export default function NominatePage() {
   const shareUrl = 'https://teachersdeserveit.com/nominate';
 
   const handleCopy = async () => {
+    // GA4 tracking
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'nominate_share_click', { method: 'copy' });
+    }
+
     try {
       await navigator.clipboard.writeText(shareableText);
       setCopied(true);
@@ -303,6 +450,11 @@ export default function NominatePage() {
   };
 
   const handleFacebookShare = () => {
+    // GA4 tracking
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'nominate_share_click', { method: 'facebook' });
+    }
+
     window.open(
       `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
       '_blank',
@@ -311,6 +463,11 @@ export default function NominatePage() {
   };
 
   const handleTwitterShare = () => {
+    // GA4 tracking
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'nominate_share_click', { method: 'twitter' });
+    }
+
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareableText)}`,
       '_blank',
@@ -319,9 +476,35 @@ export default function NominatePage() {
   };
 
   const handleEmailShare = () => {
+    // GA4 tracking
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'nominate_share_click', { method: 'email' });
+    }
+
     const subject = encodeURIComponent('Nominate Your School for Better PD');
     const body = encodeURIComponent(shareableText);
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
+  };
+
+  // Handle partner status change with GA4 tracking
+  const handlePartnerChange = (value: boolean) => {
+    setIsPartner(value);
+    setRole(null);
+
+    // GA4 tracking
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'nominate_partner_status', { is_partner: value ? 'yes' : 'no' });
+    }
+  };
+
+  // Handle role change with GA4 tracking
+  const handleRoleChange = (value: 'leader' | 'teacher') => {
+    setRole(value);
+
+    // GA4 tracking
+    if (typeof window !== 'undefined' && window.gtag) {
+      window.gtag('event', 'nominate_role_selected', { role: value === 'leader' ? 'school-leader' : 'teacher-staff' });
+    }
   };
 
   return (
@@ -352,18 +535,35 @@ export default function NominatePage() {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4" style={{ color: '#ffffff' }}>
             Know a School That Deserves Better PD?
           </h1>
-          <p className="text-xl md:text-2xl mb-6 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
+          <p className="text-xl md:text-2xl mb-4 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
             Nominate them. If it leads to a partnership, we celebrate you.
+          </p>
+
+          {/* Trust Line */}
+          <p className="text-base mb-6" style={{ color: '#ffffff', opacity: 0.8 }}>
+            Trusted by 87,000+ educators in 21 states
           </p>
 
           {/* VIP Spots Counter */}
           <div
-            className="inline-block px-6 py-3 rounded-lg"
+            className="inline-block px-6 py-3 rounded-lg mb-6"
             style={{ backgroundColor: 'rgba(53, 167, 255, 0.2)', border: '1px solid #35A7FF' }}
           >
             <p className="font-semibold" style={{ color: '#35A7FF' }}>
               Only <span className="text-2xl font-bold">{VIP_SPOTS_REMAINING}</span> Blueprint Founders Circle spots available for Fall 2026
             </p>
+          </div>
+
+          {/* Start Your Nomination CTA Button */}
+          <div>
+            <button
+              onClick={scrollToForm}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
+              style={{ backgroundColor: '#ffffff', color: '#1e2749' }}
+            >
+              Start Your Nomination
+              <ArrowDown className="w-5 h-5" />
+            </button>
           </div>
         </div>
       </section>
@@ -945,7 +1145,7 @@ export default function NominatePage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-white rounded-xl p-6 md:p-8 shadow-md">
+              <div id="nomination-form" className="bg-white rounded-xl p-6 md:p-8 shadow-md">
                 {/* Progress Indicator */}
                 <div className="mb-8">
                   <div className="flex items-center justify-between max-w-xs mx-auto">
@@ -1009,10 +1209,7 @@ export default function NominatePage() {
                           type="radio"
                           name="isPartner"
                           checked={isPartner === true}
-                          onChange={() => {
-                            setIsPartner(true);
-                            setRole(null);
-                          }}
+                          onChange={() => handlePartnerChange(true)}
                           className="w-5 h-5"
                           style={{ accentColor: '#1e2749' }}
                         />
@@ -1023,10 +1220,7 @@ export default function NominatePage() {
                           type="radio"
                           name="isPartner"
                           checked={isPartner === false}
-                          onChange={() => {
-                            setIsPartner(false);
-                            setRole(null);
-                          }}
+                          onChange={() => handlePartnerChange(false)}
                           className="w-5 h-5"
                           style={{ accentColor: '#1e2749' }}
                         />
@@ -1050,7 +1244,7 @@ export default function NominatePage() {
                             type="radio"
                             name="role"
                             checked={role === 'leader'}
-                            onChange={() => setRole('leader')}
+                            onChange={() => handleRoleChange('leader')}
                             className="w-5 h-5"
                             style={{ accentColor: '#1e2749' }}
                           />
@@ -1061,7 +1255,7 @@ export default function NominatePage() {
                             type="radio"
                             name="role"
                             checked={role === 'teacher'}
-                            onChange={() => setRole('teacher')}
+                            onChange={() => handleRoleChange('teacher')}
                             className="w-5 h-5"
                             style={{ accentColor: '#1e2749' }}
                           />
@@ -1088,12 +1282,22 @@ export default function NominatePage() {
                           Your Name <span className="text-red-500">*</span>
                         </label>
                         <input
+                          ref={nameRef}
                           type="text"
-                          required
+                          placeholder="Your full name"
                           value={formData.name}
-                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                          onChange={(e) => {
+                            setFormData({ ...formData, name: e.target.value });
+                            clearFieldError('name');
+                            trackFormStart();
+                          }}
+                          className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:border-gray-500 ${
+                            formErrors.name ? 'border-red-500' : 'border-gray-300'
+                          }`}
                         />
+                        {formErrors.name && (
+                          <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>
+                        )}
                       </div>
 
                       <div>
@@ -1101,12 +1305,21 @@ export default function NominatePage() {
                           Your Email <span className="text-red-500">*</span>
                         </label>
                         <input
+                          ref={emailRef}
                           type="email"
-                          required
+                          placeholder="you@school.edu"
                           value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                          onChange={(e) => {
+                            setFormData({ ...formData, email: e.target.value });
+                            clearFieldError('email');
+                          }}
+                          className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:border-gray-500 ${
+                            formErrors.email ? 'border-red-500' : 'border-gray-300'
+                          }`}
                         />
+                        {formErrors.email && (
+                          <p className="text-red-500 text-sm mt-1">{formErrors.email}</p>
+                        )}
                       </div>
 
                       {/* Track 1 & 2: Your school name */}
@@ -1116,12 +1329,21 @@ export default function NominatePage() {
                             Your School Name <span className="text-red-500">*</span>
                           </label>
                           <input
+                            ref={yourSchoolRef}
                             type="text"
-                            required
+                            placeholder="Your school or district name"
                             value={formData.yourSchool}
-                            onChange={(e) => setFormData({ ...formData, yourSchool: e.target.value })}
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                            onChange={(e) => {
+                              setFormData({ ...formData, yourSchool: e.target.value });
+                              clearFieldError('yourSchool');
+                            }}
+                            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:border-gray-500 ${
+                              formErrors.yourSchool ? 'border-red-500' : 'border-gray-300'
+                            }`}
                           />
+                          {formErrors.yourSchool && (
+                            <p className="text-red-500 text-sm mt-1">{formErrors.yourSchool}</p>
+                          )}
                         </div>
                       )}
 
@@ -1132,10 +1354,15 @@ export default function NominatePage() {
                             Your Relationship to This School <span className="text-red-500">*</span>
                           </label>
                           <select
-                            required
+                            ref={relationshipRef}
                             value={formData.relationship}
-                            onChange={(e) => setFormData({ ...formData, relationship: e.target.value })}
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                            onChange={(e) => {
+                              setFormData({ ...formData, relationship: e.target.value });
+                              clearFieldError('relationship');
+                            }}
+                            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:border-gray-500 ${
+                              formErrors.relationship ? 'border-red-500' : 'border-gray-300'
+                            }`}
                           >
                             <option value="">Select one</option>
                             <option value="I teach there">I teach there</option>
@@ -1144,6 +1371,9 @@ export default function NominatePage() {
                             <option value="I'm a parent">I'm a parent</option>
                             <option value="Other">Other</option>
                           </select>
+                          {formErrors.relationship && (
+                            <p className="text-red-500 text-sm mt-1">{formErrors.relationship}</p>
+                          )}
                         </div>
                       )}
 
@@ -1154,12 +1384,21 @@ export default function NominatePage() {
                           <span className="text-red-500">*</span>
                         </label>
                         <input
+                          ref={nominatedSchoolRef}
                           type="text"
-                          required
+                          placeholder="Full school name (e.g., Lincoln Elementary)"
                           value={formData.nominatedSchool}
-                          onChange={(e) => setFormData({ ...formData, nominatedSchool: e.target.value })}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                          onChange={(e) => {
+                            setFormData({ ...formData, nominatedSchool: e.target.value });
+                            clearFieldError('nominatedSchool');
+                          }}
+                          className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:border-gray-500 ${
+                            formErrors.nominatedSchool ? 'border-red-500' : 'border-gray-300'
+                          }`}
                         />
+                        {formErrors.nominatedSchool && (
+                          <p className="text-red-500 text-sm mt-1">{formErrors.nominatedSchool}</p>
+                        )}
                       </div>
 
                       {/* Track 3: City and State */}
@@ -1169,45 +1408,107 @@ export default function NominatePage() {
                             School City and State <span className="text-red-500">*</span>
                           </label>
                           <input
+                            ref={schoolCityStateRef}
                             type="text"
-                            required
-                            placeholder="e.g., Chicago, IL"
+                            placeholder="Springfield, IL"
                             value={formData.schoolCityState}
-                            onChange={(e) => setFormData({ ...formData, schoolCityState: e.target.value })}
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                            onChange={(e) => {
+                              setFormData({ ...formData, schoolCityState: e.target.value });
+                              clearFieldError('schoolCityState');
+                            }}
+                            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:border-gray-500 ${
+                              formErrors.schoolCityState ? 'border-red-500' : 'border-gray-300'
+                            }`}
                           />
+                          {formErrors.schoolCityState && (
+                            <p className="text-red-500 text-sm mt-1">{formErrors.schoolCityState}</p>
+                          )}
                         </div>
                       )}
 
-                      {/* Principal name (Track 2 & 3) */}
-                      {(currentTrack === 'partner-teacher-nomination' || currentTrack === 'non-partner-nomination') && (
-                        <div>
-                          <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                            Principal Name (If Known)
-                          </label>
-                          <input
-                            type="text"
-                            value={formData.principalName}
-                            onChange={(e) => setFormData({ ...formData, principalName: e.target.value })}
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
-                          />
-                        </div>
+                      {/* Track 2: Principal name and PD Challenge (always visible) */}
+                      {currentTrack === 'partner-teacher-nomination' && (
+                        <>
+                          <div>
+                            <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                              Principal Name (If Known)
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="First and last name"
+                              value={formData.principalName}
+                              onChange={(e) => setFormData({ ...formData, principalName: e.target.value })}
+                              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                              Biggest PD Challenge at That School
+                            </label>
+                            <textarea
+                              rows={3}
+                              placeholder="This helps us start a better conversation with their admin."
+                              value={formData.pdChallenge}
+                              onChange={(e) => setFormData({ ...formData, pdChallenge: e.target.value })}
+                              className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                            />
+                          </div>
+                        </>
                       )}
 
-                      {/* PD Challenge (Track 2 & 3) */}
-                      {(currentTrack === 'partner-teacher-nomination' || currentTrack === 'non-partner-nomination') && (
-                        <div>
-                          <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                            Biggest PD Challenge at That School
-                          </label>
-                          <textarea
-                            rows={3}
-                            placeholder="This helps us start a better conversation with their admin."
-                            value={formData.pdChallenge}
-                            onChange={(e) => setFormData({ ...formData, pdChallenge: e.target.value })}
-                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
-                          />
-                        </div>
+                      {/* Track 3: Optional fields toggle */}
+                      {currentTrack === 'non-partner-nomination' && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => setShowOptionalFields(!showOptionalFields)}
+                            className="flex items-center gap-2 text-sm font-medium transition-colors"
+                            style={{ color: '#35A7FF' }}
+                          >
+                            {showOptionalFields ? (
+                              <>
+                                Optional details
+                                <ChevronUp className="w-4 h-4" />
+                              </>
+                            ) : (
+                              <>
+                                Want to tell us more? (optional)
+                                <ChevronDown className="w-4 h-4" />
+                              </>
+                            )}
+                          </button>
+
+                          {showOptionalFields && (
+                            <div className="space-y-5 transition-all duration-300 ease-in-out animate-fade-in">
+                              <div>
+                                <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                                  Principal Name (If Known)
+                                </label>
+                                <input
+                                  type="text"
+                                  placeholder="First and last name"
+                                  value={formData.principalName}
+                                  onChange={(e) => setFormData({ ...formData, principalName: e.target.value })}
+                                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                                />
+                              </div>
+
+                              <div>
+                                <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                                  Biggest PD Challenge at That School
+                                </label>
+                                <textarea
+                                  rows={3}
+                                  placeholder="This helps us start a better conversation with their admin."
+                                  value={formData.pdChallenge}
+                                  onChange={(e) => setFormData({ ...formData, pdChallenge: e.target.value })}
+                                  className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                                />
+                              </div>
+                            </div>
+                          )}
+                        </>
                       )}
 
                       {/* Additional notes (Track 1 only) */}
@@ -1218,6 +1519,7 @@ export default function NominatePage() {
                           </label>
                           <textarea
                             rows={3}
+                            placeholder="Any context that would help us reach out"
                             value={formData.notes}
                             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                             className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
