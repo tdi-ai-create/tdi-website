@@ -28,10 +28,51 @@ import {
   BookOpen,
   Shuffle,
   ArrowDown,
+  Sparkles,
 } from 'lucide-react';
 
 // Update this number as spots fill
-const VIP_SPOTS_REMAINING = 5;
+const VIP_SPOTS_REMAINING = 4;
+
+// Testimonials for rotating carousel
+const TESTIMONIALS = [
+  {
+    quote: "I went from spending 12 hours a week planning to 6. I want that for every teacher I know.",
+    attribution: "TDI Partner Teacher, IL"
+  },
+  {
+    quote: "Our teachers finally feel like PD is worth their time. That shift happened because of TDI.",
+    attribution: "Principal, TX"
+  },
+  {
+    quote: "The implementation support is what sets TDI apart. They don't just train and leave.",
+    attribution: "Assistant Principal, GA"
+  },
+  {
+    quote: "I nominated my friend's school last year. Now their whole team thanks me for it.",
+    attribution: "TDI Partner Teacher, OH"
+  },
+  {
+    quote: "For the first time in 15 years, I'm excited about professional development.",
+    attribution: "Teacher, FL"
+  },
+  {
+    quote: "TDI helped us cut teacher turnover by 23% in one year. The data speaks for itself.",
+    attribution: "Superintendent, NC"
+  },
+  {
+    quote: "I wish someone had nominated us sooner. Don't wait.",
+    attribution: "Principal, AZ"
+  },
+  {
+    quote: "The strategies actually work in my classroom. That's rare for PD.",
+    attribution: "5th Grade Teacher, CA"
+  },
+  {
+    quote: "Our staff morale transformed. Teachers are collaborating again.",
+    attribution: "Instructional Coach, MI"
+  }
+];
 
 type Track = 'partner-leader-referral' | 'partner-teacher-nomination' | 'non-partner-nomination' | null;
 
@@ -96,6 +137,9 @@ export default function NominatePage() {
   // Copy button state
   const [copied, setCopied] = useState(false);
 
+  // Testimonial carousel state
+  const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0);
+
   // Ref for smooth scroll
   const confirmationRef = useRef<HTMLDivElement>(null);
 
@@ -112,6 +156,14 @@ export default function NominatePage() {
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'nominate_page_view', { page: '/nominate' });
     }
+  }, []);
+
+  // Auto-rotate testimonials every 6 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveTestimonialIndex((prev) => (prev + 1) % TESTIMONIALS.length);
+    }, 6000);
+    return () => clearInterval(interval);
   }, []);
 
   // Scroll to confirmation after submission
@@ -235,7 +287,7 @@ export default function NominatePage() {
         errors.relationship = 'Please select your relationship';
       }
       if (!formData.schoolCityState.trim()) {
-        errors.schoolCityState = 'Please enter the city and state';
+        errors.schoolCityState = 'Please enter the school location';
       }
     }
 
@@ -767,16 +819,17 @@ export default function NominatePage() {
                 </div>
               </div>
 
-              {/* Accordion Item 4 */}
+              {/* Accordion Item 4 - Founders Circle (Featured) */}
               <div
-                className="rounded-xl overflow-hidden"
-                style={{ backgroundColor: '#fafafa', border: '1px solid #e5e5e5' }}
+                className="rounded-xl overflow-hidden border-l-4"
+                style={{ backgroundColor: 'rgba(20, 184, 166, 0.08)', border: '1px solid #e5e5e5', borderLeftColor: '#14b8a6', borderLeftWidth: '4px' }}
               >
                 <button
                   onClick={() => toggleAccordion(3)}
-                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-100"
+                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-teal-50/50"
                 >
-                  <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
+                  <span className="font-semibold text-lg flex items-center gap-2" style={{ color: '#1e2749' }}>
+                    <Sparkles className="w-5 h-5" style={{ color: '#14b8a6' }} />
                     What's Blueprint Founders Circle?
                   </span>
                   <ChevronDown
@@ -866,47 +919,9 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 4. Social Proof Section */}
+      {/* 4. Rotating Testimonial Carousel */}
       <section className="py-12 md:py-16" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
-          {/* Stat Bar */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mb-12">
-            <div
-              className="p-6 rounded-xl"
-              style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
-            >
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <MapPin className="w-6 h-6" style={{ color: '#ffba06' }} />
-                <p className="text-4xl md:text-5xl font-bold" style={{ color: '#ffffff' }}>21</p>
-              </div>
-              <p className="font-medium" style={{ color: '#ffffff' }}>States</p>
-              <p className="text-sm" style={{ color: '#ffffff', opacity: 0.6 }}>Active TDI partnerships</p>
-            </div>
-            <div
-              className="p-6 rounded-xl"
-              style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
-            >
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <Users className="w-6 h-6" style={{ color: '#ffba06' }} />
-                <p className="text-4xl md:text-5xl font-bold" style={{ color: '#ffffff' }}>87,000+</p>
-              </div>
-              <p className="font-medium" style={{ color: '#ffffff' }}>Educators</p>
-              <p className="text-sm" style={{ color: '#ffffff', opacity: 0.6 }}>In the TDI community</p>
-            </div>
-            <div
-              className="p-6 rounded-xl"
-              style={{ backgroundColor: 'rgba(255, 255, 255, 0.05)' }}
-            >
-              <div className="flex items-center justify-center gap-2 mb-2">
-                <TrendingUp className="w-6 h-6" style={{ color: '#ffba06' }} />
-                <p className="text-4xl md:text-5xl font-bold" style={{ color: '#ffffff' }}>65%</p>
-              </div>
-              <p className="font-medium" style={{ color: '#ffffff' }}>Implementation Rate</p>
-              <p className="text-sm" style={{ color: '#ffffff', opacity: 0.6 }}>Industry average: 10%</p>
-            </div>
-          </div>
-
-          {/* Testimonial */}
           <div className="max-w-2xl mx-auto text-center">
             <div
               className="relative px-6 py-8 rounded-xl"
@@ -919,16 +934,46 @@ export default function NominatePage() {
               >
                 "
               </div>
-              <p
-                className="text-xl md:text-2xl italic mb-4 relative z-10 pt-6"
-                style={{ color: '#ffffff' }}
-              >
-                I went from spending 12 hours a week planning to 6. I want that for every teacher I know.
-              </p>
-              <p className="text-sm font-semibold" style={{ color: '#35A7FF' }}>
-                — TDI Partner Teacher, IL
-              </p>
-              <p className="text-xs font-medium mt-2" style={{ color: '#35A7FF' }}>
+
+              {/* Testimonial content with fade transition */}
+              <div className="relative min-h-[120px] flex items-center justify-center">
+                {TESTIMONIALS.map((testimonial, index) => (
+                  <div
+                    key={index}
+                    className={`absolute inset-0 flex flex-col items-center justify-center transition-opacity duration-500 ${
+                      index === activeTestimonialIndex ? 'opacity-100' : 'opacity-0'
+                    }`}
+                  >
+                    <p
+                      className="text-xl md:text-2xl italic mb-4 relative z-10 pt-6"
+                      style={{ color: '#ffffff' }}
+                    >
+                      {testimonial.quote}
+                    </p>
+                    <p className="text-sm font-semibold" style={{ color: '#35A7FF' }}>
+                      — {testimonial.attribution}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Dot indicators */}
+              <div className="flex justify-center gap-2 mt-6">
+                {TESTIMONIALS.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setActiveTestimonialIndex(index)}
+                    className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                      index === activeTestimonialIndex
+                        ? 'w-6 bg-[#35A7FF]'
+                        : 'bg-white/30 hover:bg-white/50'
+                    }`}
+                    aria-label={`View testimonial ${index + 1}`}
+                  />
+                ))}
+              </div>
+
+              <p className="text-xs font-medium mt-4" style={{ color: '#35A7FF' }}>
                 This is why people nominate.
               </p>
             </div>
@@ -936,9 +981,52 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 5. The Form */}
+      {/* 5. Stats + Form Section */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
+          {/* Stats Bar */}
+          <div className="grid grid-cols-3 gap-4 md:gap-8 text-center mb-8 max-w-2xl mx-auto">
+            <div className="p-4 md:p-6 rounded-xl bg-white shadow-sm">
+              <div className="flex items-center justify-center gap-1 md:gap-2 mb-1">
+                <MapPin className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#35A7FF' }} />
+                <p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>21</p>
+              </div>
+              <p className="text-xs md:text-sm font-medium" style={{ color: '#1e2749' }}>States</p>
+            </div>
+            <div className="p-4 md:p-6 rounded-xl bg-white shadow-sm">
+              <div className="flex items-center justify-center gap-1 md:gap-2 mb-1">
+                <Users className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#35A7FF' }} />
+                <p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>87K+</p>
+              </div>
+              <p className="text-xs md:text-sm font-medium" style={{ color: '#1e2749' }}>Educators</p>
+            </div>
+            <div className="p-4 md:p-6 rounded-xl bg-white shadow-sm">
+              <div className="flex items-center justify-center gap-1 md:gap-2 mb-1">
+                <TrendingUp className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#35A7FF' }} />
+                <p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>65%</p>
+              </div>
+              <p className="text-xs md:text-sm font-medium" style={{ color: '#1e2749' }}>Implementation</p>
+            </div>
+          </div>
+
+          {/* Compact Testimonial Strip */}
+          <div className="max-w-2xl mx-auto mb-8">
+            <div
+              className="flex items-center justify-center gap-3 px-4 py-3 rounded-lg text-center"
+              style={{ backgroundColor: 'rgba(53, 167, 255, 0.1)', border: '1px solid rgba(53, 167, 255, 0.2)' }}
+            >
+              <span className="text-lg" style={{ color: '#35A7FF' }}>"</span>
+              <p className="text-sm italic" style={{ color: '#1e2749' }}>
+                {TESTIMONIALS[activeTestimonialIndex].quote.length > 80
+                  ? TESTIMONIALS[activeTestimonialIndex].quote.substring(0, 77) + '...'
+                  : TESTIMONIALS[activeTestimonialIndex].quote}
+              </p>
+              <span className="text-xs font-medium whitespace-nowrap" style={{ color: '#35A7FF' }}>
+                — {TESTIMONIALS[activeTestimonialIndex].attribution}
+              </span>
+            </div>
+          </div>
+
           <div className="max-w-2xl mx-auto" ref={confirmationRef}>
             {/* Confirmation Message */}
             {submitted ? (
@@ -1401,16 +1489,16 @@ export default function NominatePage() {
                         )}
                       </div>
 
-                      {/* Track 3: City and State */}
+                      {/* Track 3: School Location */}
                       {currentTrack === 'non-partner-nomination' && (
                         <div>
                           <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                            School City and State <span className="text-red-500">*</span>
+                            School Location <span className="text-red-500">*</span>
                           </label>
                           <input
                             ref={schoolCityStateRef}
                             type="text"
-                            placeholder="Springfield, IL"
+                            placeholder="City, State (e.g., Springfield, IL)"
                             value={formData.schoolCityState}
                             onChange={(e) => {
                               setFormData({ ...formData, schoolCityState: e.target.value });
