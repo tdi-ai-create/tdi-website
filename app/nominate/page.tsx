@@ -329,11 +329,10 @@ export default function NominatePage() {
       {/* 1. Hero Section */}
       <section className="relative py-16 md:py-24 overflow-hidden">
         {/* Background Image */}
-        {/* TODO: Add hero background image - consider using hero-schools.webp or similar */}
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: 'url("/images/hero-schools.webp")',
+            backgroundImage: 'url("/images/hero-nominate.png")',
           }}
         />
 
