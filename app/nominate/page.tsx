@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import {
   MapPin,
@@ -11,11 +11,17 @@ import {
   Mail,
   Copy,
   Check,
+  CheckCircle,
   FileText,
   BarChart3,
   Headphones,
   MessageSquare,
   Heart,
+  Send,
+  Loader2,
+  Award,
+  Bot,
+  Star,
 } from 'lucide-react';
 
 // Update this number as spots fill
@@ -62,6 +68,19 @@ export default function NominatePage() {
   // Copy button state
   const [copied, setCopied] = useState(false);
 
+  // Ref for smooth scroll
+  const confirmationRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to confirmation after submission
+  useEffect(() => {
+    if (submitted && confirmationRef.current) {
+      const timer = setTimeout(() => {
+        confirmationRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [submitted]);
+
   // Determine track based on selections
   const getTrack = (): Track => {
     if (isPartner === false) return 'non-partner-nomination';
@@ -71,6 +90,37 @@ export default function NominatePage() {
   };
 
   const currentTrack = getTrack();
+
+  // Determine progress step
+  const getProgressStep = (): number => {
+    if (!currentTrack) return 1; // Still answering routing questions
+    // Check if required fields are filled
+    const hasRequiredFields = formData.name && formData.email && formData.nominatedSchool;
+    if (currentTrack === 'non-partner-nomination' && (!formData.relationship || !formData.schoolCityState)) {
+      return 2;
+    }
+    if ((currentTrack === 'partner-leader-referral' || currentTrack === 'partner-teacher-nomination') && !formData.yourSchool) {
+      return 2;
+    }
+    if (hasRequiredFields) return 3;
+    return 2;
+  };
+
+  const progressStep = getProgressStep();
+
+  // Get track type label for Web3Forms
+  const getTrackTypeLabel = (): string => {
+    switch (currentTrack) {
+      case 'partner-leader-referral':
+        return 'Partner Leader Referral';
+      case 'partner-teacher-nomination':
+        return 'Partner Teacher Nomination';
+      case 'non-partner-nomination':
+        return 'Non-Partner Nomination';
+      default:
+        return 'Unknown';
+    }
+  };
 
   // Get subject line based on track
   const getSubjectLine = (): string => {
@@ -105,28 +155,59 @@ export default function NominatePage() {
     setIsSubmitting(true);
     setError(false);
 
+    // Build form data with human-readable field names for Web3Forms
+    const submitData: Record<string, string | undefined> = {
+      access_key: '6533e850-3216-4ba6-bdd3-3d1273ce353b',
+      subject: getSubjectLine(),
+      from_name: 'TDI Nominate Page',
+      replyto: formData.email,
+      'Track Type': getTrackTypeLabel(),
+      'Is TDI Partner': isPartner ? 'Yes' : 'No',
+      'Your Name': formData.name,
+      'Your Email': formData.email,
+    };
+
+    // Add role if applicable
+    if (isPartner && role) {
+      submitData['Role'] = role === 'leader' ? 'School Leader' : 'Teacher or Staff';
+    }
+
+    // Add track-specific fields
+    if (currentTrack === 'partner-leader-referral' || currentTrack === 'partner-teacher-nomination') {
+      submitData['Your School Name'] = formData.yourSchool;
+    }
+
+    if (currentTrack === 'non-partner-nomination') {
+      submitData['Relationship to School'] = formData.relationship;
+    }
+
+    // School being nominated/referred
+    const schoolFieldName = currentTrack === 'partner-leader-referral' ? 'School Being Referred' : 'School Being Nominated';
+    submitData[schoolFieldName] = formData.nominatedSchool;
+
+    if (currentTrack === 'non-partner-nomination') {
+      submitData['School City and State'] = formData.schoolCityState;
+    }
+
+    if (formData.principalName) {
+      submitData['Principal Name (If Known)'] = formData.principalName;
+    }
+
+    if (formData.pdChallenge) {
+      submitData['Biggest PD Challenge'] = formData.pdChallenge;
+    }
+
+    if (formData.notes) {
+      submitData['Additional Notes'] = formData.notes;
+    }
+
     try {
       const response = await fetch('https://api.web3forms.com/submit', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          access_key: '6533e850-3216-4ba6-bdd3-3d1273ce353b',
-          subject: getSubjectLine(),
-          from_name: 'TDI Nomination Form',
-          to: 'Rae@TeachersDeserveIt.com',
-          track: currentTrack,
-          name: formData.name,
-          email: formData.email,
-          your_school: formData.yourSchool || undefined,
-          nominated_school: formData.nominatedSchool,
-          school_city_state: formData.schoolCityState || undefined,
-          principal_name: formData.principalName || undefined,
-          pd_challenge: formData.pdChallenge || undefined,
-          relationship: formData.relationship || undefined,
-          additional_notes: formData.notes || undefined,
-        }),
+        body: JSON.stringify(submitData),
       });
 
       if (response.ok) {
@@ -244,11 +325,20 @@ export default function NominatePage() {
     <main className="min-h-screen">
       {/* 1. Hero Section */}
       <section className="relative py-16 md:py-24 overflow-hidden">
-        {/* Navy Gradient Background */}
+        {/* Background Image */}
+        {/* TODO: Add hero background image - consider using hero-schools.webp or similar */}
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: 'url("/images/hero-schools.webp")',
+          }}
+        />
+
+        {/* Navy Gradient Overlay */}
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(135deg, #1e2749 0%, #2a3a5c 50%, #1e2749 100%)',
+            background: 'linear-gradient(135deg, rgba(30, 39, 73, 0.85) 0%, rgba(30, 39, 73, 0.75) 100%)',
           }}
         />
 
@@ -287,7 +377,7 @@ export default function NominatePage() {
                 className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
                 style={{ backgroundColor: '#ffba06' }}
               >
-                <span className="text-2xl font-bold" style={{ color: '#1e2749' }}>1</span>
+                <Send className="w-7 h-7" style={{ color: '#1e2749' }} />
               </div>
               <h3 className="text-xl font-bold mb-2" style={{ color: '#1e2749' }}>You Nominate</h3>
               <p style={{ color: '#1e2749', opacity: 0.7 }}>
@@ -301,7 +391,7 @@ export default function NominatePage() {
                 className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
                 style={{ backgroundColor: '#ffba06' }}
               >
-                <span className="text-2xl font-bold" style={{ color: '#1e2749' }}>2</span>
+                <MessageSquare className="w-7 h-7" style={{ color: '#1e2749' }} />
               </div>
               <h3 className="text-xl font-bold mb-2" style={{ color: '#1e2749' }}>We Reach Out</h3>
               <p style={{ color: '#1e2749', opacity: 0.7 }}>
@@ -315,7 +405,7 @@ export default function NominatePage() {
                 className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4"
                 style={{ backgroundColor: '#ffba06' }}
               >
-                <span className="text-2xl font-bold" style={{ color: '#1e2749' }}>3</span>
+                <Heart className="w-7 h-7" style={{ color: '#1e2749' }} />
               </div>
               <h3 className="text-xl font-bold mb-2" style={{ color: '#1e2749' }}>You Get Celebrated</h3>
               <p style={{ color: '#1e2749', opacity: 0.7 }}>
@@ -326,7 +416,7 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 2.5 Social Proof Section */}
+      {/* 3. Social Proof Section */}
       <section className="py-12 md:py-16" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
           {/* Stat Bar */}
@@ -383,17 +473,10 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 3. The Form */}
+      {/* 4. The Form */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
-          <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-2" style={{ color: '#1e2749' }}>
-              Nominate a School
-            </h2>
-            <p className="text-center mb-8" style={{ color: '#35A7FF' }}>
-              <span className="font-semibold">{VIP_SPOTS_REMAINING} of 5</span> Blueprint Founders Circle spots remaining for Fall 2026
-            </p>
-
+          <div className="max-w-2xl mx-auto" ref={confirmationRef}>
             {/* Confirmation Message */}
             {submitted ? (
               <div className="space-y-8">
@@ -552,9 +635,9 @@ export default function NominatePage() {
                           className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                           style={{ backgroundColor: '#35A7FF' }}
                         >
-                          <Check className="w-5 h-5 text-white" />
+                          <CheckCircle className="w-5 h-5 text-white" />
                         </div>
-                        <div className="w-0.5 flex-1 mt-2" style={{ backgroundColor: '#e5e5e5' }} />
+                        <div className="w-0.5 flex-1 mt-2" style={{ backgroundColor: '#35A7FF' }} />
                       </div>
                       <div className="pb-2">
                         <p className="font-semibold" style={{ color: '#35A7FF' }}>Within 48 hours</p>
@@ -569,7 +652,7 @@ export default function NominatePage() {
                       <div className="flex flex-col items-center">
                         <div
                           className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 border-2"
-                          style={{ borderColor: '#35A7FF', backgroundColor: 'transparent' }}
+                          style={{ borderColor: '#35A7FF', backgroundColor: 'rgba(53, 167, 255, 0.1)' }}
                         >
                           <MessageSquare className="w-5 h-5" style={{ color: '#35A7FF' }} />
                         </div>
@@ -588,7 +671,7 @@ export default function NominatePage() {
                       <div className="flex flex-col items-center">
                         <div
                           className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 border-2"
-                          style={{ borderColor: '#35A7FF', backgroundColor: 'transparent' }}
+                          style={{ borderColor: '#35A7FF', backgroundColor: 'rgba(53, 167, 255, 0.1)' }}
                         >
                           <Heart className="w-5 h-5" style={{ color: '#35A7FF' }} />
                         </div>
@@ -604,271 +687,331 @@ export default function NominatePage() {
                 </div>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="bg-white rounded-xl p-6 md:p-8 shadow-md">
-                {/* Question 1: Is your school a TDI partner? */}
-                <div className="mb-6">
-                  <label className="block text-sm font-semibold mb-3" style={{ color: '#1e2749' }}>
-                    Is your school currently a TDI partner? <span className="text-red-500">*</span>
-                  </label>
-                  <div className="flex gap-4">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="isPartner"
-                        checked={isPartner === true}
-                        onChange={() => {
-                          setIsPartner(true);
-                          setRole(null);
-                        }}
-                        className="w-5 h-5"
-                        style={{ accentColor: '#1e2749' }}
-                      />
-                      <span style={{ color: '#1e2749' }}>Yes</span>
-                    </label>
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="isPartner"
-                        checked={isPartner === false}
-                        onChange={() => {
-                          setIsPartner(false);
-                          setRole(null);
-                        }}
-                        className="w-5 h-5"
-                        style={{ accentColor: '#1e2749' }}
-                      />
-                      <span style={{ color: '#1e2749' }}>No</span>
-                    </label>
+              <div className="bg-white rounded-xl p-6 md:p-8 shadow-md">
+                {/* Progress Indicator */}
+                <div className="mb-8">
+                  <div className="flex items-center justify-between max-w-xs mx-auto">
+                    {/* Step 1 */}
+                    <div className="flex flex-col items-center">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                          progressStep > 1 ? 'bg-[#35A7FF] text-white' : progressStep === 1 ? 'bg-[#35A7FF] text-white' : 'bg-gray-200 text-gray-500'
+                        }`}
+                      >
+                        {progressStep > 1 ? <Check className="w-4 h-4" /> : '1'}
+                      </div>
+                      <span className={`text-xs mt-1 ${progressStep >= 1 ? 'text-[#35A7FF]' : 'text-gray-400'}`}>About You</span>
+                    </div>
+                    {/* Line */}
+                    <div className={`flex-1 h-0.5 mx-2 ${progressStep > 1 ? 'bg-[#35A7FF]' : 'bg-gray-200'}`} />
+                    {/* Step 2 */}
+                    <div className="flex flex-col items-center">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                          progressStep > 2 ? 'bg-[#35A7FF] text-white' : progressStep === 2 ? 'bg-[#35A7FF] text-white' : 'bg-gray-200 text-gray-500'
+                        }`}
+                      >
+                        {progressStep > 2 ? <Check className="w-4 h-4" /> : '2'}
+                      </div>
+                      <span className={`text-xs mt-1 ${progressStep >= 2 ? 'text-[#35A7FF]' : 'text-gray-400'}`}>The School</span>
+                    </div>
+                    {/* Line */}
+                    <div className={`flex-1 h-0.5 mx-2 ${progressStep > 2 ? 'bg-[#35A7FF]' : 'bg-gray-200'}`} />
+                    {/* Step 3 */}
+                    <div className="flex flex-col items-center">
+                      <div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
+                          progressStep === 3 ? 'bg-[#35A7FF] text-white' : 'bg-gray-200 text-gray-500'
+                        }`}
+                      >
+                        3
+                      </div>
+                      <span className={`text-xs mt-1 ${progressStep === 3 ? 'text-[#35A7FF]' : 'text-gray-400'}`}>Submit</span>
+                    </div>
                   </div>
                 </div>
 
-                {/* Question 2: Role (only if partner) */}
-                {isPartner === true && (
-                  <div
-                    className="mb-6 p-4 rounded-lg transition-all duration-300"
-                    style={{ backgroundColor: '#f5f5f5' }}
-                  >
+                {/* Form Title */}
+                <h2 className="text-2xl md:text-3xl font-bold text-center mb-2" style={{ color: '#1e2749' }}>
+                  Nominate a School
+                </h2>
+                <p className="text-center mb-8" style={{ color: '#35A7FF' }}>
+                  <span className="font-semibold">{VIP_SPOTS_REMAINING} of 5</span> Blueprint Founders Circle spots remaining for Fall 2026
+                </p>
+
+                <form onSubmit={handleSubmit}>
+                  {/* Question 1: Is your school a TDI partner? */}
+                  <div className="mb-6">
                     <label className="block text-sm font-semibold mb-3" style={{ color: '#1e2749' }}>
-                      What is your role? <span className="text-red-500">*</span>
+                      Is your school currently a TDI partner? <span className="text-red-500">*</span>
                     </label>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex gap-4">
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="radio"
-                          name="role"
-                          checked={role === 'leader'}
-                          onChange={() => setRole('leader')}
+                          name="isPartner"
+                          checked={isPartner === true}
+                          onChange={() => {
+                            setIsPartner(true);
+                            setRole(null);
+                          }}
                           className="w-5 h-5"
                           style={{ accentColor: '#1e2749' }}
                         />
-                        <span style={{ color: '#1e2749' }}>School Leader (principal, AP, admin)</span>
+                        <span style={{ color: '#1e2749' }}>Yes</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
                         <input
                           type="radio"
-                          name="role"
-                          checked={role === 'teacher'}
-                          onChange={() => setRole('teacher')}
+                          name="isPartner"
+                          checked={isPartner === false}
+                          onChange={() => {
+                            setIsPartner(false);
+                            setRole(null);
+                          }}
                           className="w-5 h-5"
                           style={{ accentColor: '#1e2749' }}
                         />
-                        <span style={{ color: '#1e2749' }}>Teacher or Staff</span>
+                        <span style={{ color: '#1e2749' }}>No</span>
                       </label>
                     </div>
                   </div>
-                )}
 
-                {/* Track-specific fields */}
-                {currentTrack && (
-                  <div className="space-y-5 transition-all duration-300 animate-fade-in">
-                    {/* Encouragement line */}
-                    <p
-                      className="text-sm italic mb-4"
-                      style={{ color: '#35A7FF' }}
+                  {/* Question 2: Role (only if partner) */}
+                  {isPartner === true && (
+                    <div
+                      className="mb-6 p-4 rounded-lg transition-all duration-300 ease-in-out animate-fade-in"
+                      style={{ backgroundColor: '#f5f5f5' }}
                     >
-                      {getEncouragementLine()}
-                    </p>
-
-                    {/* Common fields: Name and Email */}
-                    <div>
-                      <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                        Your name <span className="text-red-500">*</span>
+                      <label className="block text-sm font-semibold mb-3" style={{ color: '#1e2749' }}>
+                        What is your role? <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
-                      />
+                      <div className="flex flex-col gap-3">
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="role"
+                            checked={role === 'leader'}
+                            onChange={() => setRole('leader')}
+                            className="w-5 h-5"
+                            style={{ accentColor: '#1e2749' }}
+                          />
+                          <span style={{ color: '#1e2749' }}>School Leader (principal, AP, admin)</span>
+                        </label>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="radio"
+                            name="role"
+                            checked={role === 'teacher'}
+                            onChange={() => setRole('teacher')}
+                            className="w-5 h-5"
+                            style={{ accentColor: '#1e2749' }}
+                          />
+                          <span style={{ color: '#1e2749' }}>Teacher or Staff</span>
+                        </label>
+                      </div>
                     </div>
+                  )}
 
-                    <div>
-                      <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                        Your email <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
-                      />
-                    </div>
-
-                    {/* Track 1 & 2: Your school name */}
-                    {(currentTrack === 'partner-leader-referral' || currentTrack === 'partner-teacher-nomination') && (
-                      <div>
-                        <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                          Your school name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          value={formData.yourSchool}
-                          onChange={(e) => setFormData({ ...formData, yourSchool: e.target.value })}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
-                        />
-                      </div>
-                    )}
-
-                    {/* Track 3: Relationship to school */}
-                    {currentTrack === 'non-partner-nomination' && (
-                      <div>
-                        <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                          Your relationship to this school <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          required
-                          value={formData.relationship}
-                          onChange={(e) => setFormData({ ...formData, relationship: e.target.value })}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
-                        >
-                          <option value="">Select one</option>
-                          <option value="I teach there">I teach there</option>
-                          <option value="I used to teach there">I used to teach there</option>
-                          <option value="I know someone who teaches there">I know someone who teaches there</option>
-                          <option value="I'm a parent">I'm a parent</option>
-                          <option value="Other">Other</option>
-                        </select>
-                      </div>
-                    )}
-
-                    {/* Nominated school name */}
-                    <div>
-                      <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                        {currentTrack === 'partner-leader-referral' ? 'School you\'re referring' : 'School you\'re nominating'}{' '}
-                        <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.nominatedSchool}
-                        onChange={(e) => setFormData({ ...formData, nominatedSchool: e.target.value })}
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
-                      />
-                    </div>
-
-                    {/* Track 3: City and State */}
-                    {currentTrack === 'non-partner-nomination' && (
-                      <div>
-                        <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                          School city and state <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          required
-                          placeholder="e.g., Chicago, IL"
-                          value={formData.schoolCityState}
-                          onChange={(e) => setFormData({ ...formData, schoolCityState: e.target.value })}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
-                        />
-                      </div>
-                    )}
-
-                    {/* Principal name (Track 2 & 3) */}
-                    {(currentTrack === 'partner-teacher-nomination' || currentTrack === 'non-partner-nomination') && (
-                      <div>
-                        <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                          Do you know the principal's name?
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.principalName}
-                          onChange={(e) => setFormData({ ...formData, principalName: e.target.value })}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
-                        />
-                      </div>
-                    )}
-
-                    {/* PD Challenge (Track 2 & 3) */}
-                    {(currentTrack === 'partner-teacher-nomination' || currentTrack === 'non-partner-nomination') && (
-                      <div>
-                        <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                          What's the biggest PD challenge at that school?
-                        </label>
-                        <textarea
-                          rows={3}
-                          placeholder="This helps us start a better conversation with their admin."
-                          value={formData.pdChallenge}
-                          onChange={(e) => setFormData({ ...formData, pdChallenge: e.target.value })}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
-                        />
-                      </div>
-                    )}
-
-                    {/* Additional notes (Track 1 only) */}
-                    {currentTrack === 'partner-leader-referral' && (
-                      <div>
-                        <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                          Anything else we should know?
-                        </label>
-                        <textarea
-                          rows={3}
-                          value={formData.notes}
-                          onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
-                        />
-                      </div>
-                    )}
-
-                    {/* Error message */}
-                    {error && (
-                      <div
-                        className="p-4 rounded-lg"
-                        style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444' }}
+                  {/* Track-specific fields */}
+                  {currentTrack && (
+                    <div className="space-y-5 transition-all duration-300 ease-in-out animate-fade-in">
+                      {/* Encouragement line */}
+                      <p
+                        className="text-sm italic mb-4 transition-all duration-300 ease-in-out"
+                        style={{ color: '#35A7FF' }}
                       >
-                        <p style={{ color: '#ef4444' }}>
-                          Something went wrong. Please try again or email us at{' '}
-                          <a href="mailto:info@teachersdeserveit.com" className="underline">
-                            info@teachersdeserveit.com
-                          </a>
-                        </p>
+                        {getEncouragementLine()}
+                      </p>
+
+                      {/* Common fields: Name and Email */}
+                      <div>
+                        <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                          Your Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                        />
                       </div>
-                    )}
 
-                    {/* Submit button */}
-                    <button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="w-full py-4 rounded-lg font-bold text-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                    >
-                      {isSubmitting ? 'Submitting...' : 'Submit Nomination'}
-                    </button>
+                      <div>
+                        <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                          Your Email <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          required
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                        />
+                      </div>
 
-                    <p className="text-xs text-center" style={{ color: '#1e2749', opacity: 0.6 }}>
-                      Your data is encrypted and never sold. We respect your privacy.
-                    </p>
-                  </div>
-                )}
-              </form>
+                      {/* Track 1 & 2: Your school name */}
+                      {(currentTrack === 'partner-leader-referral' || currentTrack === 'partner-teacher-nomination') && (
+                        <div>
+                          <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                            Your School Name <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            value={formData.yourSchool}
+                            onChange={(e) => setFormData({ ...formData, yourSchool: e.target.value })}
+                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                          />
+                        </div>
+                      )}
+
+                      {/* Track 3: Relationship to school */}
+                      {currentTrack === 'non-partner-nomination' && (
+                        <div>
+                          <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                            Your Relationship to This School <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            required
+                            value={formData.relationship}
+                            onChange={(e) => setFormData({ ...formData, relationship: e.target.value })}
+                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                          >
+                            <option value="">Select one</option>
+                            <option value="I teach there">I teach there</option>
+                            <option value="I used to teach there">I used to teach there</option>
+                            <option value="I know someone who teaches there">I know someone who teaches there</option>
+                            <option value="I'm a parent">I'm a parent</option>
+                            <option value="Other">Other</option>
+                          </select>
+                        </div>
+                      )}
+
+                      {/* Nominated school name */}
+                      <div>
+                        <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                          {currentTrack === 'partner-leader-referral' ? 'School You\'re Referring' : 'School You\'re Nominating'}{' '}
+                          <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={formData.nominatedSchool}
+                          onChange={(e) => setFormData({ ...formData, nominatedSchool: e.target.value })}
+                          className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                        />
+                      </div>
+
+                      {/* Track 3: City and State */}
+                      {currentTrack === 'non-partner-nomination' && (
+                        <div>
+                          <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                            School City and State <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            required
+                            placeholder="e.g., Chicago, IL"
+                            value={formData.schoolCityState}
+                            onChange={(e) => setFormData({ ...formData, schoolCityState: e.target.value })}
+                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                          />
+                        </div>
+                      )}
+
+                      {/* Principal name (Track 2 & 3) */}
+                      {(currentTrack === 'partner-teacher-nomination' || currentTrack === 'non-partner-nomination') && (
+                        <div>
+                          <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                            Principal Name (If Known)
+                          </label>
+                          <input
+                            type="text"
+                            value={formData.principalName}
+                            onChange={(e) => setFormData({ ...formData, principalName: e.target.value })}
+                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                          />
+                        </div>
+                      )}
+
+                      {/* PD Challenge (Track 2 & 3) */}
+                      {(currentTrack === 'partner-teacher-nomination' || currentTrack === 'non-partner-nomination') && (
+                        <div>
+                          <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                            Biggest PD Challenge at That School
+                          </label>
+                          <textarea
+                            rows={3}
+                            placeholder="This helps us start a better conversation with their admin."
+                            value={formData.pdChallenge}
+                            onChange={(e) => setFormData({ ...formData, pdChallenge: e.target.value })}
+                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                          />
+                        </div>
+                      )}
+
+                      {/* Additional notes (Track 1 only) */}
+                      {currentTrack === 'partner-leader-referral' && (
+                        <div>
+                          <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                            Anything Else We Should Know?
+                          </label>
+                          <textarea
+                            rows={3}
+                            value={formData.notes}
+                            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                            className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:border-gray-500"
+                          />
+                        </div>
+                      )}
+
+                      {/* Error message */}
+                      {error && (
+                        <div
+                          className="p-4 rounded-lg"
+                          style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', border: '1px solid #ef4444' }}
+                        >
+                          <p style={{ color: '#ef4444' }}>
+                            Something went wrong. Please try again or email us at{' '}
+                            <a href="mailto:info@teachersdeserveit.com" className="underline">
+                              info@teachersdeserveit.com
+                            </a>
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Submit button */}
+                      <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="w-full py-4 rounded-lg font-bold text-lg transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Submitting...
+                          </>
+                        ) : (
+                          'Submit Nomination'
+                        )}
+                      </button>
+
+                      <p className="text-xs text-center" style={{ color: '#1e2749', opacity: 0.6 }}>
+                        Your data is encrypted and never sold. We respect your privacy.
+                      </p>
+                    </div>
+                  )}
+                </form>
+              </div>
             )}
           </div>
         </div>
       </section>
 
-      {/* 4. What Is Blueprint Founders Circle? */}
+      {/* 5. What Is Blueprint Founders Circle? */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto">
@@ -887,9 +1030,7 @@ export default function NominatePage() {
                   className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
                   style={{ backgroundColor: '#35A7FF' }}
                 >
-                  <svg className="w-6 h-6" fill="#ffffff" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                  </svg>
+                  <Award className="w-6 h-6 text-white" />
                 </div>
                 <p className="font-semibold" style={{ color: '#1e2749' }}>
                   A bonus executive coaching session
@@ -902,9 +1043,7 @@ export default function NominatePage() {
                   className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
                   style={{ backgroundColor: '#35A7FF' }}
                 >
-                  <svg className="w-6 h-6" fill="#ffffff" viewBox="0 0 24 24">
-                    <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z" />
-                  </svg>
+                  <Bot className="w-6 h-6 text-white" />
                 </div>
                 <p className="font-semibold" style={{ color: '#1e2749' }}>
                   Early access to Desi, our AI-powered teacher support tool
@@ -917,9 +1056,7 @@ export default function NominatePage() {
                   className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
                   style={{ backgroundColor: '#35A7FF' }}
                 >
-                  <svg className="w-6 h-6" fill="#ffffff" viewBox="0 0 24 24">
-                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-                  </svg>
+                  <Star className="w-6 h-6 text-white" />
                 </div>
                 <p className="font-semibold" style={{ color: '#1e2749' }}>
                   A spotlight feature on the TDI website
@@ -930,7 +1067,7 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 5. Final CTA */}
+      {/* 6. Final CTA */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#ffffff' }}>
@@ -950,9 +1087,7 @@ export default function NominatePage() {
               style={{ backgroundColor: '#ffba06' }}
               aria-label="Facebook"
             >
-              <svg className="w-6 h-6" fill="#1e2749" viewBox="0 0 24 24">
-                <path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3v3h-3v6.95c5.05-.5 9-4.76 9-9.95z" />
-              </svg>
+              <Facebook className="w-6 h-6" style={{ color: '#1e2749' }} />
             </a>
             <a
               href="https://www.instagram.com/teachersdeserveit"
