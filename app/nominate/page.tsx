@@ -330,9 +330,12 @@ export default function NominatePage() {
       <section className="relative py-16 md:py-24 overflow-hidden">
         {/* Background Image */}
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0"
           style={{
             backgroundImage: 'url("/images/hero-nominate.png")',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
           }}
         />
 
@@ -340,7 +343,7 @@ export default function NominatePage() {
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(135deg, rgba(30, 39, 73, 0.80) 0%, rgba(30, 39, 73, 0.70) 100%)',
+            background: 'linear-gradient(180deg, rgba(30, 39, 73, 0.5) 0%, rgba(30, 39, 73, 0.65) 100%)',
           }}
         />
 
