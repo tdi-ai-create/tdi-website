@@ -1,0 +1,15 @@
+# Robots.txt for teachersdeserveit.com
+
+User-agent: *
+Allow: /
+
+# Hidden pages - do not index
+Disallow: /paragametools
+Disallow: /api/
+Disallow: /admin/
+Disallow: /creator-portal/
+Disallow: /*-dashboard
+Disallow: /dashboard-creation-team-use
+
+# Sitemap
+Sitemap: https://teachersdeserveit.com/sitemap.xml
