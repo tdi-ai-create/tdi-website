@@ -14,6 +14,13 @@ import {
   Loader2,
   ChevronRight,
   CheckCircle,
+  PenLine,
+  Package,
+  GraduationCap,
+  Clock,
+  AlertCircle,
+  Calendar,
+  Filter,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { isAdmin, getAllCreators, createCreator } from '@/lib/creator-portal-data';
@@ -37,6 +44,11 @@ export default function AdminCreatorsPage() {
     course_audience: '',
     target_launch_month: '',
   });
+
+  // Filter state
+  const [filterPath, setFilterPath] = useState<string>('all');
+  const [filterPhase, setFilterPhase] = useState<string>('all');
+  const [showFilters, setShowFilters] = useState(false);
 
   const loadCreators = useCallback(async () => {
     const data = await getAllCreators();
@@ -112,20 +124,31 @@ export default function AdminCreatorsPage() {
   }, [router, loadCreators, loadNotifications]);
 
   useEffect(() => {
-    if (!searchQuery) {
-      setFilteredCreators(creators);
-      return;
+    let filtered = creators;
+
+    // Apply search filter
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (c) =>
+          c.name.toLowerCase().includes(query) ||
+          c.email.toLowerCase().includes(query) ||
+          (c.course_title?.toLowerCase().includes(query) ?? false)
+      );
     }
 
-    const query = searchQuery.toLowerCase();
-    const filtered = creators.filter(
-      (c) =>
-        c.name.toLowerCase().includes(query) ||
-        c.email.toLowerCase().includes(query) ||
-        (c.course_title?.toLowerCase().includes(query) ?? false)
-    );
+    // Apply content path filter
+    if (filterPath !== 'all') {
+      filtered = filtered.filter((c) => c.content_path === filterPath);
+    }
+
+    // Apply phase filter
+    if (filterPhase !== 'all') {
+      filtered = filtered.filter((c) => c.current_phase === filterPhase);
+    }
+
     setFilteredCreators(filtered);
-  }, [searchQuery, creators]);
+  }, [searchQuery, creators, filterPath, filterPhase]);
 
   const handleAddCreator = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -159,6 +182,89 @@ export default function AdminCreatorsPage() {
   const launchedCreators = creators.filter(
     (c) => c.progressPercentage === 100
   ).length;
+  const needsAttentionCreators = creators.filter((c) => {
+    // Needs attention if they have notifications
+    return notifications.some((n) => n.creator_id === c.id);
+  }).length;
+
+  // Helper functions for content path display
+  const getPathIcon = (path: string | null) => {
+    switch (path) {
+      case 'blog':
+        return <PenLine className="w-4 h-4" />;
+      case 'download':
+        return <Package className="w-4 h-4" />;
+      case 'course':
+        return <GraduationCap className="w-4 h-4" />;
+      default:
+        return null;
+    }
+  };
+
+  const getPathLabel = (path: string | null) => {
+    switch (path) {
+      case 'blog':
+        return 'Blog Post';
+      case 'download':
+        return 'Download';
+      case 'course':
+        return 'Course';
+      default:
+        return 'Not selected';
+    }
+  };
+
+  const getPathBadgeColor = (path: string | null) => {
+    switch (path) {
+      case 'blog':
+        return 'bg-purple-100 text-purple-700';
+      case 'download':
+        return 'bg-blue-100 text-blue-700';
+      case 'course':
+        return 'bg-green-100 text-green-700';
+      default:
+        return 'bg-gray-100 text-gray-500';
+    }
+  };
+
+  const getPhaseBadgeColor = (phase: string) => {
+    switch (phase) {
+      case 'onboarding':
+        return 'bg-yellow-100 text-yellow-700';
+      case 'agreement':
+        return 'bg-orange-100 text-orange-700';
+      case 'course_design':
+        return 'bg-blue-100 text-blue-700';
+      case 'production':
+        return 'bg-purple-100 text-purple-700';
+      case 'launch':
+        return 'bg-green-100 text-green-700';
+      default:
+        return 'bg-gray-100 text-gray-600';
+    }
+  };
+
+  const formatPhase = (phase: string) => {
+    return phase.split('_').map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
+  const getLastActivity = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffInDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffInDays === 0) return 'Today';
+    if (diffInDays === 1) return 'Yesterday';
+    if (diffInDays < 7) return `${diffInDays} days ago`;
+    if (diffInDays < 30) return `${Math.floor(diffInDays / 7)} weeks ago`;
+    return `${Math.floor(diffInDays / 30)} months ago`;
+  };
+
+  const hasNotification = (creatorId: string) => {
+    return notifications.some((n) => n.creator_id === creatorId);
+  };
+
+  const activeFiltersCount = (filterPath !== 'all' ? 1 : 0) + (filterPhase !== 'all' ? 1 : 0);
 
   if (isLoading) {
     return (
@@ -231,48 +337,60 @@ export default function AdminCreatorsPage() {
         )}
 
         {/* Stats cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          <div className="bg-white rounded-xl p-6 border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#80a4ed]/20 flex items-center justify-center">
-                <Users className="w-6 h-6 text-[#80a4ed]" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white rounded-xl p-4 md:p-6 border border-gray-200">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#80a4ed]/20 flex items-center justify-center flex-shrink-0">
+                <Users className="w-5 h-5 md:w-6 md:h-6 text-[#80a4ed]" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#1e2749]">{totalCreators}</p>
-                <p className="text-sm text-gray-600">Total Creators</p>
+                <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{totalCreators}</p>
+                <p className="text-xs md:text-sm text-gray-600">Total</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-6 border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#ffba06]/20 flex items-center justify-center">
-                <PlayCircle className="w-6 h-6 text-[#ffba06]" />
+          <div className="bg-white rounded-xl p-4 md:p-6 border border-gray-200">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-orange-100 flex items-center justify-center flex-shrink-0">
+                <AlertCircle className="w-5 h-5 md:w-6 md:h-6 text-orange-500" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#1e2749]">{inProgressCreators}</p>
-                <p className="text-sm text-gray-600">In Progress</p>
+                <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{needsAttentionCreators}</p>
+                <p className="text-xs md:text-sm text-gray-600">Needs Attention</p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-6 border border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
-                <Rocket className="w-6 h-6 text-green-600" />
+          <div className="bg-white rounded-xl p-4 md:p-6 border border-gray-200">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-[#ffba06]/20 flex items-center justify-center flex-shrink-0">
+                <PlayCircle className="w-5 h-5 md:w-6 md:h-6 text-[#ffba06]" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-[#1e2749]">{launchedCreators}</p>
-                <p className="text-sm text-gray-600">Launched</p>
+                <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{inProgressCreators}</p>
+                <p className="text-xs md:text-sm text-gray-600">In Progress</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-xl p-4 md:p-6 border border-gray-200">
+            <div className="flex items-center gap-3 md:gap-4">
+              <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                <Rocket className="w-5 h-5 md:w-6 md:h-6 text-green-600" />
+              </div>
+              <div>
+                <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{launchedCreators}</p>
+                <p className="text-xs md:text-sm text-gray-600">Launched</p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Search */}
+        {/* Search and Filters */}
         <div className="bg-white rounded-xl border border-gray-200 mb-6">
-          <div className="p-4 border-b border-gray-100">
-            <div className="relative">
+          <div className="p-4 flex flex-col md:flex-row gap-3">
+            <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input
                 type="text"
@@ -282,67 +400,177 @@ export default function AdminCreatorsPage() {
                 className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
               />
             </div>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className={`inline-flex items-center gap-2 px-4 py-3 border rounded-lg transition-colors ${
+                showFilters || activeFiltersCount > 0
+                  ? 'border-[#80a4ed] bg-[#80a4ed]/10 text-[#1e2749]'
+                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              <Filter className="w-4 h-4" />
+              Filters
+              {activeFiltersCount > 0 && (
+                <span className="bg-[#80a4ed] text-white text-xs px-2 py-0.5 rounded-full">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </button>
           </div>
 
-          {/* Creator list */}
-          <div className="divide-y divide-gray-100">
-            {filteredCreators.length === 0 ? (
-              <div className="p-8 text-center text-gray-500">
-                {searchQuery
-                  ? 'No creators found matching your search.'
-                  : 'No creators yet. Add your first creator to get started.'}
-              </div>
-            ) : (
-              filteredCreators.map((creator) => (
-                <Link
-                  key={creator.id}
-                  href={`/admin/creators/${creator.id}`}
-                  className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+          {/* Filter options */}
+          {showFilters && (
+            <div className="px-4 pb-4 flex flex-wrap gap-3 border-t border-gray-100 pt-3">
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Content Path</label>
+                <select
+                  value={filterPath}
+                  onChange={(e) => setFilterPath(e.target.value)}
+                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-full bg-[#1e2749] text-white flex items-center justify-center font-medium">
+                  <option value="all">All Paths</option>
+                  <option value="blog">Blog Post</option>
+                  <option value="download">Download</option>
+                  <option value="course">Course</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs text-gray-500 mb-1">Phase</label>
+                <select
+                  value={filterPhase}
+                  onChange={(e) => setFilterPhase(e.target.value)}
+                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
+                >
+                  <option value="all">All Phases</option>
+                  <option value="onboarding">Onboarding</option>
+                  <option value="agreement">Agreement</option>
+                  <option value="course_design">Course Design</option>
+                  <option value="production">Production</option>
+                  <option value="launch">Launch</option>
+                </select>
+              </div>
+              {activeFiltersCount > 0 && (
+                <button
+                  onClick={() => {
+                    setFilterPath('all');
+                    setFilterPhase('all');
+                  }}
+                  className="self-end px-3 py-2 text-sm text-gray-500 hover:text-gray-700"
+                >
+                  Clear filters
+                </button>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Creator Cards Grid */}
+        {filteredCreators.length === 0 ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-500">
+            {searchQuery || activeFiltersCount > 0
+              ? 'No creators found matching your criteria.'
+              : 'No creators yet. Add your first creator to get started.'}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {filteredCreators.map((creator) => (
+              <Link
+                key={creator.id}
+                href={`/admin/creators/${creator.id}`}
+                className={`bg-white rounded-xl border p-5 hover:shadow-md transition-all group ${
+                  hasNotification(creator.id)
+                    ? 'border-orange-300 shadow-sm'
+                    : 'border-gray-200'
+                }`}
+              >
+                {/* Card Header */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center font-semibold text-lg ${
+                      creator.progressPercentage === 100
+                        ? 'bg-green-500 text-white'
+                        : 'bg-[#1e2749] text-white'
+                    }`}>
                       {creator.name.charAt(0).toUpperCase()}
                     </div>
                     <div>
-                      <p className="font-medium text-[#1e2749]">{creator.name}</p>
+                      <p className="font-semibold text-[#1e2749] group-hover:text-[#80a4ed] transition-colors">
+                        {creator.name}
+                      </p>
                       <p className="text-sm text-gray-500">{creator.email}</p>
                     </div>
                   </div>
+                  {hasNotification(creator.id) && (
+                    <span className="flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                      <AlertCircle className="w-3 h-3" />
+                      Action needed
+                    </span>
+                  )}
+                </div>
 
-                  <div className="flex items-center gap-6">
-                    <div className="text-right hidden sm:block">
-                      <p className="text-sm font-medium text-[#1e2749]">
-                        {creator.course_title || 'No course yet'}
-                      </p>
-                      <p className="text-xs text-gray-500 capitalize">
-                        {creator.current_phase.replace('_', ' ')}
-                      </p>
-                    </div>
+                {/* Course Title */}
+                {creator.course_title && (
+                  <p className="text-sm font-medium text-[#1e2749] mb-3 line-clamp-1">
+                    {creator.course_title}
+                  </p>
+                )}
 
-                    <div className="flex items-center gap-3">
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-[#1e2749]">
-                          {creator.progressPercentage}%
-                        </p>
-                        <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full ${
-                              creator.progressPercentage === 100
-                                ? 'bg-green-500'
-                                : 'bg-[#80a4ed]'
-                            }`}
-                            style={{ width: `${creator.progressPercentage}%` }}
-                          />
-                        </div>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
-                    </div>
+                {/* Badges Row */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {/* Content Path Badge */}
+                  <span className={`inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full ${getPathBadgeColor(creator.content_path)}`}>
+                    {getPathIcon(creator.content_path)}
+                    {getPathLabel(creator.content_path)}
+                  </span>
+
+                  {/* Phase Badge */}
+                  <span className={`text-xs px-2.5 py-1 rounded-full ${getPhaseBadgeColor(creator.current_phase)}`}>
+                    {formatPhase(creator.current_phase)}
+                  </span>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mb-3">
+                  <div className="flex items-center justify-between text-xs mb-1">
+                    <span className="text-gray-500">Progress</span>
+                    <span className="font-medium text-[#1e2749]">
+                      {creator.completedMilestones}/{creator.totalMilestones} milestones ({creator.progressPercentage}%)
+                    </span>
                   </div>
-                </Link>
-              ))
-            )}
+                  <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all ${
+                        creator.progressPercentage === 100
+                          ? 'bg-green-500'
+                          : 'bg-[#80a4ed]'
+                      }`}
+                      style={{ width: `${creator.progressPercentage}%` }}
+                    />
+                  </div>
+                </div>
+
+                {/* Footer Info */}
+                <div className="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-100">
+                  <span className="flex items-center gap-1">
+                    <Clock className="w-3.5 h-3.5" />
+                    {getLastActivity(creator.updated_at)}
+                  </span>
+                  {creator.target_launch_month && (
+                    <span className="flex items-center gap-1">
+                      <Calendar className="w-3.5 h-3.5" />
+                      {creator.target_launch_month}
+                    </span>
+                  )}
+                </div>
+
+                {/* Hover Arrow */}
+                <div className="mt-3 flex justify-end">
+                  <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-[#80a4ed] group-hover:translate-x-1 transition-all" />
+                </div>
+              </Link>
+            ))}
           </div>
-        </div>
+        )}
       </main>
 
       {/* Add Creator Modal */}
