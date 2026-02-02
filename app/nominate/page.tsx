@@ -1709,7 +1709,7 @@ export default function NominatePage() {
 
               {/* Moment Cards - Right */}
               <div className="space-y-4">
-                {/* Moment 1 - Private Dinner */}
+                {/* Moment 1 - A Night They'll Never Forget */}
                 <div
                   className={`rounded-xl p-5 transition-all duration-700 delay-300 ease-out ${
                     celebrationVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
@@ -1726,13 +1726,16 @@ export default function NominatePage() {
                     >
                       <UtensilsCrossed className="w-5 h-5" style={{ color: '#E8734A' }} />
                     </div>
-                    <p className="text-sm leading-relaxed" style={{ color: '#e2e8f0' }}>
-                      A private dinner at a local restaurant — fully paid, spouses included
-                    </p>
+                    <div>
+                      <h4 className="font-semibold text-white mb-1">A Night They'll Never Forget</h4>
+                      <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
+                        A private dinner at their favorite restaurant. Spouses invited. Everything covered. The kind of night that makes someone say "I love working here."
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Moment 2 - Swag Bags */}
+                {/* Moment 2 - Swag Bags That Actually Mean Something */}
                 <div
                   className={`rounded-xl p-5 transition-all duration-700 delay-400 ease-out ${
                     celebrationVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
@@ -1749,13 +1752,16 @@ export default function NominatePage() {
                     >
                       <Gift className="w-5 h-5" style={{ color: '#2B8C96' }} />
                     </div>
-                    <p className="text-sm leading-relaxed" style={{ color: '#e2e8f0' }}>
-                      TDI swag bags with personal gift cards and handwritten notes from admin
-                    </p>
+                    <div>
+                      <h4 className="font-semibold text-white mb-1">Swag Bags That Actually Mean Something</h4>
+                      <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
+                        TDI hats and tees at every seat. A personal gift card inside. A handwritten note from you. Not a branded pen — a moment they take home.
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                {/* Moment 3 - The Night */}
+                {/* Moment 3 - The Story They Tell Everyone */}
                 <div
                   className={`rounded-xl p-5 transition-all duration-700 delay-500 ease-out ${
                     celebrationVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
@@ -1770,11 +1776,14 @@ export default function NominatePage() {
                       className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ backgroundColor: 'rgba(246, 173, 85, 0.2)' }}
                     >
-                      <Camera className="w-5 h-5" style={{ color: '#F6AD55' }} />
+                      <Sparkles className="w-5 h-5" style={{ color: '#F6AD55' }} />
                     </div>
-                    <p className="text-sm leading-relaxed" style={{ color: '#e2e8f0' }}>
-                      The kind of night your teachers post about — and talk about for years
-                    </p>
+                    <div>
+                      <h4 className="font-semibold text-white mb-1">The Story They Tell Everyone</h4>
+                      <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
+                        The group photo that hits Instagram. The text to their spouse that says "you won't believe what my school just did." The Monday morning where everything feels different.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1793,7 +1802,7 @@ export default function NominatePage() {
               <div className="flex items-center gap-3">
                 <Heart className="w-5 h-5" style={{ color: '#E8734A' }} />
                 <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                  Teachers talk about it for weeks
+                  The teacher who almost quit? She's staying.
                 </span>
               </div>
 
@@ -1804,7 +1813,7 @@ export default function NominatePage() {
               <div className="flex items-center gap-3">
                 <TrendingUp className="w-5 h-5" style={{ color: '#2B8C96' }} />
                 <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                  15-25% higher retention
+                  15-25% higher retention when staff feel valued
                 </span>
               </div>
 
@@ -1813,9 +1822,9 @@ export default function NominatePage() {
 
               {/* Proof 3 */}
               <div className="flex items-center gap-3">
-                <Unlock className="w-5 h-5" style={{ color: '#F6AD55' }} />
+                <KeyRound className="w-5 h-5" style={{ color: '#F6AD55' }} />
                 <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                  Your budget, your rules
+                  You design every detail — no approvals, no committee
                 </span>
               </div>
             </div>
