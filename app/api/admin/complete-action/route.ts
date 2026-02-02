@@ -112,12 +112,15 @@ export async function POST(request: Request) {
       metadata.admin_note = adminNote;
     }
 
-    // Update milestone status to completed
+    // Update milestone status to completed with audit trail
     const { error: updateError } = await supabase
       .from('creator_milestones')
       .update({
         status: 'completed',
         metadata,
+        completed_by: `admin:${adminEmail}`,
+        completed_at: new Date().toISOString(),
+        notes: adminNote || null,
         updated_at: new Date().toISOString()
       })
       .eq('creator_id', creatorId)

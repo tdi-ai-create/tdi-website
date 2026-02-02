@@ -153,6 +153,7 @@ export default function AdminCreatorDetailPage() {
   const [adminActionNote, setAdminActionNote] = useState('');
   const [isCompletingAction, setIsCompletingAction] = useState(false);
   const [selectedPathForAction, setSelectedPathForAction] = useState<string | null>(null);
+  const [adminLinkInput, setAdminLinkInput] = useState('');
 
   const loadData = useCallback(async () => {
     const data = await getCreatorDashboardData(creatorId);
@@ -436,15 +437,24 @@ export default function AdminCreatorDetailPage() {
     });
     setAdminActionNote('');
     setSelectedPathForAction(null);
+    setAdminLinkInput('');
     setShowActionModal(true);
   };
 
   const handleCompleteAction = async () => {
     if (!selectedMilestoneForAction) return;
 
+    const actionType = selectedMilestoneForAction.actionType;
+
     // For select action type, require a selection
-    if (selectedMilestoneForAction.actionType === 'select' && !selectedPathForAction) {
+    if (actionType === 'select' && !selectedPathForAction) {
       alert('Please select an option first');
+      return;
+    }
+
+    // For link submission types, require a link
+    if ((actionType === 'submit_link' || actionType === 'link_submit') && !adminLinkInput.trim()) {
+      alert('Please enter a link');
       return;
     }
 
@@ -455,10 +465,15 @@ export default function AdminCreatorDetailPage() {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       let content: any = {};
 
-      if (selectedMilestoneForAction.actionType === 'select') {
+      if (actionType === 'select') {
         content = { selected_path: selectedPathForAction };
-      } else if (selectedMilestoneForAction.actionType === 'confirm' ||
-                 selectedMilestoneForAction.actionType === 'review') {
+      } else if (actionType === 'submit_link' || actionType === 'link_submit') {
+        content = { link: adminLinkInput.trim() };
+      } else if (actionType === 'calendly') {
+        content = { booked_externally: true };
+      } else if (actionType === 'sign_agreement') {
+        content = { signed_externally: true };
+      } else {
         content = { confirmed: true };
       }
 
@@ -482,6 +497,7 @@ export default function AdminCreatorDetailPage() {
         setSelectedMilestoneForAction(null);
         setAdminActionNote('');
         setSelectedPathForAction(null);
+        setAdminLinkInput('');
         await loadData();
         setSuccessMessage(`Completed on behalf of creator: ${selectedMilestoneForAction.title}`);
         setTimeout(() => setSuccessMessage(null), 3000);
@@ -1039,9 +1055,51 @@ export default function AdminCreatorDetailPage() {
               </div>
             )}
 
+            {/* Link submission action types */}
+            {(selectedMilestoneForAction.actionType === 'submit_link' ||
+              selectedMilestoneForAction.actionType === 'link_submit') && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Link URL <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="url"
+                  value={adminLinkInput}
+                  onChange={(e) => setAdminLinkInput(e.target.value)}
+                  placeholder="https://..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Enter the link on behalf of the creator (e.g., they shared it via email or on a call)
+                </p>
+              </div>
+            )}
+
+            {/* Calendly booking action */}
+            {selectedMilestoneForAction.actionType === 'calendly' && (
+              <div className="bg-blue-50 rounded-lg p-4 mb-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Mark as Booked:</strong> Use this when the creator has scheduled their meeting outside the portal (e.g., via direct email or phone).
+                </p>
+              </div>
+            )}
+
+            {/* Agreement signing action */}
+            {selectedMilestoneForAction.actionType === 'sign_agreement' && (
+              <div className="bg-blue-50 rounded-lg p-4 mb-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Mark as Signed:</strong> Use this when the creator has signed the agreement outside the portal (e.g., physical signature or DocuSign).
+                </p>
+              </div>
+            )}
+
             {/* Confirmation action types */}
             {(selectedMilestoneForAction.actionType === 'confirm' ||
-              selectedMilestoneForAction.actionType === 'review') && (
+              selectedMilestoneForAction.actionType === 'review' ||
+              selectedMilestoneForAction.actionType === 'review_notes' ||
+              selectedMilestoneForAction.actionType === 'preferences_form' ||
+              selectedMilestoneForAction.actionType === 'review_with_changes' ||
+              selectedMilestoneForAction.actionType === 'form') && (
               <div className="bg-gray-50 rounded-lg p-4 mb-4">
                 <p className="text-sm text-gray-700">
                   This will mark the step as completed. The creator will see this as done in their dashboard.
@@ -1069,6 +1127,7 @@ export default function AdminCreatorDetailPage() {
                   setSelectedMilestoneForAction(null);
                   setAdminActionNote('');
                   setSelectedPathForAction(null);
+                  setAdminLinkInput('');
                 }}
                 className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
@@ -1076,7 +1135,11 @@ export default function AdminCreatorDetailPage() {
               </button>
               <button
                 onClick={handleCompleteAction}
-                disabled={isCompletingAction || (selectedMilestoneForAction.actionType === 'select' && !selectedPathForAction)}
+                disabled={
+                  isCompletingAction ||
+                  (selectedMilestoneForAction.actionType === 'select' && !selectedPathForAction) ||
+                  ((selectedMilestoneForAction.actionType === 'submit_link' || selectedMilestoneForAction.actionType === 'link_submit') && !adminLinkInput.trim())
+                }
                 className="flex-1 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3459] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
               >
                 {isCompletingAction ? (
@@ -1237,12 +1300,29 @@ function MilestoneRow({
 
   // Check if this milestone has a creator action that admin can complete on their behalf
   const actionType = m.action_type || 'confirm';
-  const creatorActionTypes = ['confirm', 'review', 'select', 'preferences_form', 'review_notes'];
+  // All action types that admin can complete on behalf of creator
+  const creatorActionTypes = [
+    'confirm',
+    'review',
+    'select',
+    'preferences_form',
+    'review_notes',
+    'calendly',
+    'submit_link',
+    'sign_agreement',
+    'form',
+    'link_submit',
+    'review_with_changes'
+  ];
   const canCompleteForCreator =
     !milestone.requires_team_action &&
     creatorActionTypes.includes(actionType) &&
     (milestone.status === 'available' || milestone.status === 'in_progress') &&
     !isLocked;
+
+  // Check if milestone was completed by admin
+  const completedByAdmin = m.metadata?.completed_by_admin || (m.completed_by && m.completed_by.startsWith('admin:'));
+  const adminWhoCompleted = m.completed_by?.replace('admin:', '') || m.metadata?.admin_email;
 
   return (
     <div className="px-6 py-4">
@@ -1291,6 +1371,14 @@ function MilestoneRow({
                 <Tooltip content="This milestone requires TDI team review or action before the creator can proceed." position="right">
                   <Info className="w-3.5 h-3.5 text-amber-400 cursor-help" />
                 </Tooltip>
+              </div>
+            )}
+            {/* Show admin completion indicator */}
+            {isCompleted && completedByAdmin && adminWhoCompleted && (
+              <div className="flex items-center gap-1.5 mt-2">
+                <span className="text-xs text-gray-500 italic">
+                  Completed by {adminWhoCompleted.split('@')[0]} on behalf of creator
+                </span>
               </div>
             )}
             {/* Show scheduled meeting date if exists */}
