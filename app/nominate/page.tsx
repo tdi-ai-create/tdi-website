@@ -917,7 +917,30 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 3. Rotating Testimonial Carousel */}
+      {/* 3. Stats Bar */}
+      <section className="py-12" style={{ backgroundColor: '#fafafa' }}>
+        <div className="container-default">
+          <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-8 max-w-2xl mx-auto">
+            <div className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white shadow-sm">
+              <MapPin className="w-5 h-5" style={{ color: '#35A7FF' }} />
+              <p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>21</p>
+              <p className="text-sm font-medium" style={{ color: '#1e2749' }}>States</p>
+            </div>
+            <div className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white shadow-sm">
+              <Users className="w-5 h-5" style={{ color: '#35A7FF' }} />
+              <p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>87K+</p>
+              <p className="text-sm font-medium" style={{ color: '#1e2749' }}>Educators</p>
+            </div>
+            <div className="flex items-center justify-center gap-2 p-4 rounded-xl bg-white shadow-sm">
+              <TrendingUp className="w-5 h-5" style={{ color: '#35A7FF' }} />
+              <p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>65%</p>
+              <p className="text-sm font-medium" style={{ color: '#1e2749' }}>Implementation</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Rotating Testimonial Carousel */}
       <section className="py-12 md:py-16" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
           <div className="max-w-2xl mx-auto text-center relative">
@@ -999,7 +1022,7 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 4. Celebration Section - Picture This */}
+      {/* 5. Celebration Section - Picture This */}
       <section className="py-16 lg:py-24" style={{ backgroundColor: '#1e2749' }} ref={celebrationRef}>
         <div className="container-default">
 
@@ -1180,7 +1203,7 @@ export default function NominatePage() {
                     window.gtag('event', 'celebration_guide_download', { source: 'nominate_page' });
                   }
                 }}
-                className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold transition-all hover:scale-105"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3 rounded-full font-semibold transition-all hover:scale-105"
                 style={{ backgroundColor: '#2B8C96', color: '#ffffff' }}
               >
                 <Download className="w-5 h-5" />
@@ -1194,34 +1217,9 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 5. Stats + Form Section */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
+      {/* 6. Nomination Form Section */}
+      <section className="pt-16 lg:pt-20 pb-16 md:pb-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
-          {/* Stats Bar */}
-          <div className="grid grid-cols-3 gap-4 md:gap-8 text-center mb-8 max-w-2xl mx-auto">
-            <div className="p-4 md:p-6 rounded-xl bg-white shadow-sm">
-              <div className="flex items-center justify-center gap-1 md:gap-2 mb-1">
-                <MapPin className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#35A7FF' }} />
-                <p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>21</p>
-              </div>
-              <p className="text-xs md:text-sm font-medium" style={{ color: '#1e2749' }}>States</p>
-            </div>
-            <div className="p-4 md:p-6 rounded-xl bg-white shadow-sm">
-              <div className="flex items-center justify-center gap-1 md:gap-2 mb-1">
-                <Users className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#35A7FF' }} />
-                <p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>87K+</p>
-              </div>
-              <p className="text-xs md:text-sm font-medium" style={{ color: '#1e2749' }}>Educators</p>
-            </div>
-            <div className="p-4 md:p-6 rounded-xl bg-white shadow-sm">
-              <div className="flex items-center justify-center gap-1 md:gap-2 mb-1">
-                <TrendingUp className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#35A7FF' }} />
-                <p className="text-2xl md:text-3xl font-bold" style={{ color: '#1e2749' }}>65%</p>
-              </div>
-              <p className="text-xs md:text-sm font-medium" style={{ color: '#1e2749' }}>Implementation</p>
-            </div>
-          </div>
-
           {/* Compact Testimonial Strip */}
           <div className="max-w-2xl mx-auto mb-8">
             <div
@@ -1492,7 +1490,7 @@ export default function NominatePage() {
                   Nominate a School
                 </h2>
                 <p className="text-center mb-8" style={{ color: '#35A7FF' }}>
-                  <span className="font-bold">{VIP_SPOTS_REMAINING} of 5 Blueprint Founders Circle</span> spots remaining for Fall 2026
+                  <span className="font-bold" style={{ color: '#35A7FF' }}>{VIP_SPOTS_REMAINING}</span> of 5 Blueprint Founders Circle spots remaining for Fall 2026
                 </p>
 
                 <form onSubmit={handleSubmit}>
@@ -1895,7 +1893,7 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 6. Accordion - What Happens When You Nominate */}
+      {/* 7. FAQ Accordion - What Happens When You Nominate */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto">
@@ -2171,8 +2169,8 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 7. Final CTA */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
+      {/* 8. Soft CTA */}
+      <section className="pt-16 pb-20 md:py-20" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-8" style={{ color: '#ffffff' }}>
             Not ready to nominate? That's okay.
@@ -2193,10 +2191,9 @@ export default function NominatePage() {
 
       {/* Sticky Mobile CTA - appears when hero is not visible */}
       <div
-        className={`lg:hidden fixed bottom-0 left-0 right-0 z-50 p-4 pb-6 transition-all duration-300 ${
+        className={`lg:hidden fixed bottom-0 left-0 right-0 z-50 mx-4 mb-4 transition-all duration-300 ${
           heroVisible ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
         }`}
-        style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(8px)' }}
       >
         <button
           onClick={scrollToForm}
