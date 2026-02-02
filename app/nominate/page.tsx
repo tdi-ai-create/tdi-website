@@ -29,6 +29,7 @@ import {
   Shuffle,
   ArrowDown,
   Sparkles,
+  ArrowRight,
 } from 'lucide-react';
 
 // Update this number as spots fill
@@ -73,6 +74,23 @@ const TESTIMONIALS = [
     attribution: "Instructional Coach, MI"
   }
 ];
+
+// Animated counter hook for impact metrics
+function useCounter(end: number, duration: number = 1000, start: boolean = false) {
+  const [value, setValue] = useState(0);
+  useEffect(() => {
+    if (!start) return;
+    let startTime: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      setValue(Math.floor(progress * end));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [start, end, duration]);
+  return value;
+}
 
 type Track = 'partner-leader-referral' | 'partner-teacher-nomination' | 'non-partner-nomination' | null;
 
@@ -140,6 +158,15 @@ export default function NominatePage() {
   // Testimonial carousel state
   const [activeTestimonialIndex, setActiveTestimonialIndex] = useState(0);
 
+  // Impact visual animation state
+  const [impactVisible, setImpactVisible] = useState(false);
+  const impactRef = useRef<HTMLDivElement>(null);
+
+  // Animated counter values for impact metrics
+  const planningHours = useCounter(6, 1000, impactVisible);
+  const stressLevel = useCounter(5, 1000, impactVisible);
+  const implRate = useCounter(65, 1200, impactVisible);
+
   // Ref for smooth scroll
   const confirmationRef = useRef<HTMLDivElement>(null);
 
@@ -164,6 +191,20 @@ export default function NominatePage() {
       setActiveTestimonialIndex((prev) => (prev + 1) % TESTIMONIALS.length);
     }, 6000);
     return () => clearInterval(interval);
+  }, []);
+
+  // Trigger impact visual animation on scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setImpactVisible(true);
+        }
+      },
+      { threshold: 0.3 }
+    );
+    if (impactRef.current) observer.observe(impactRef.current);
+    return () => observer.disconnect();
   }, []);
 
   // Scroll to confirmation after submission
@@ -621,23 +662,147 @@ export default function NominatePage() {
       </section>
 
       {/* 2. The Mission Moment */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#fafafa' }}>
-        <div className="container-default">
-          <div className="max-w-[700px] mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-10" style={{ color: '#1e2749' }}>
-              One Conversation Can Change Everything for a School
-            </h2>
+      <section className="py-12 md:py-24" style={{ backgroundColor: '#fafafa' }}>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
+            {/* Left Side: Text Content */}
+            <div className="md:w-1/2">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6" style={{ color: '#1e2749' }}>
+                One Conversation Can Change Everything for a School
+              </h2>
 
-            <div className="space-y-6 text-lg md:text-xl" style={{ color: '#1e2749', lineHeight: 1.7 }}>
-              <p>
+              <p className="text-lg mb-4 leading-relaxed" style={{ color: '#4b5563' }}>
                 Every TDI partnership started because someone said something. A principal mentioned us to a friend. A teacher told us about a school down the road that was struggling.
               </p>
-              <p>
+
+              <p className="text-lg mb-6 leading-relaxed" style={{ color: '#4b5563' }}>
                 You probably know a school right now where teachers are burning out, PD feels like a waste of time, and nobody's doing anything about it.
               </p>
-              <p className="font-semibold" style={{ color: '#1e2749' }}>
+
+              <p className="text-xl font-bold" style={{ color: '#1e2749' }}>
                 This is how it changes.
               </p>
+            </div>
+
+            {/* Right Side: Animated Impact Visual */}
+            <div className="md:w-1/2 relative w-full">
+              {/* Subtle background pattern - teal dots */}
+              <div
+                className="absolute inset-0 opacity-[0.03]"
+                style={{
+                  backgroundImage: 'radial-gradient(circle, #319795 1px, transparent 1px)',
+                  backgroundSize: '24px 24px'
+                }}
+              />
+
+              {/* The Impact Card */}
+              <div
+                ref={impactRef}
+                className={`relative bg-white rounded-2xl shadow-xl border border-gray-100 p-6 md:p-8 max-w-md mx-auto transition-all duration-700 ease-out ${
+                  impactVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-5'
+                }`}
+              >
+                {/* Card Header */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center">
+                      <TrendingUp className="w-5 h-5 text-teal-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm">Partner School Impact</p>
+                      <p className="text-xs text-gray-400">After 3-4 months with TDI</p>
+                    </div>
+                  </div>
+                  <span className="text-xs bg-green-100 text-green-700 px-2.5 py-1 rounded-full font-medium">
+                    Verified Data
+                  </span>
+                </div>
+
+                {/* Metric 1: Weekly Planning Hours */}
+                <div className="flex items-center justify-between py-4 border-b border-gray-100">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-700">Weekly Planning</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-red-400 text-sm line-through">12 hrs</span>
+                      <ArrowRight className="w-3 h-3 text-gray-300" />
+                      <span className="text-teal-600 text-lg font-bold">
+                        {planningHours} hrs
+                      </span>
+                    </div>
+                  </div>
+                  <div className="w-24">
+                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full bg-teal-500 rounded-full transition-all duration-1000 ease-out ${
+                          impactVisible ? 'w-[50%]' : 'w-0'
+                        }`}
+                      />
+                    </div>
+                    <p className="text-xs text-teal-600 mt-1 text-right">50% reduction</p>
+                  </div>
+                </div>
+
+                {/* Metric 2: Staff Stress Level */}
+                <div className="flex items-center justify-between py-4 border-b border-gray-100">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-700">Staff Stress Level</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-red-400 text-sm line-through">9/10</span>
+                      <ArrowRight className="w-3 h-3 text-gray-300" />
+                      <span className="text-teal-600 text-lg font-bold">
+                        {stressLevel}/10
+                      </span>
+                    </div>
+                  </div>
+                  <div className="w-24">
+                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full bg-teal-500 rounded-full transition-all duration-1000 delay-200 ease-out ${
+                          impactVisible ? 'w-[44%]' : 'w-0'
+                        }`}
+                      />
+                    </div>
+                    <p className="text-xs text-teal-600 mt-1 text-right">4-point drop</p>
+                  </div>
+                </div>
+
+                {/* Metric 3: Implementation Rate */}
+                <div className="flex items-center justify-between py-4">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-gray-700">Strategy Implementation</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-red-400 text-sm line-through">10% industry avg</span>
+                      <ArrowRight className="w-3 h-3 text-gray-300" />
+                      <span className="text-teal-600 text-lg font-bold">
+                        {implRate}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="w-24">
+                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full bg-teal-500 rounded-full transition-all duration-1000 delay-[400ms] ease-out ${
+                          impactVisible ? 'w-[65%]' : 'w-0'
+                        }`}
+                      />
+                    </div>
+                    <p className="text-xs text-teal-600 mt-1 text-right">6.5x industry</p>
+                  </div>
+                </div>
+
+                {/* Card Footer */}
+                <div className="mt-6 pt-4 border-t border-gray-100 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="flex -space-x-2">
+                      <div className="w-6 h-6 rounded-full bg-teal-200 border-2 border-white" />
+                      <div className="w-6 h-6 rounded-full bg-blue-200 border-2 border-white" />
+                      <div className="w-6 h-6 rounded-full bg-amber-200 border-2 border-white" />
+                    </div>
+                    <span className="text-xs text-gray-500">87,000+ educators</span>
+                  </div>
+                  <span className="text-xs text-gray-400">21 states</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
