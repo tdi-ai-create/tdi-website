@@ -32,6 +32,11 @@ import {
   ArrowDown,
   Sparkles,
   ArrowRight,
+  Send,
+  Handshake,
+  PartyPopper,
+  KeyRound,
+  Download,
 } from 'lucide-react';
 
 // Update this number as spots fill
@@ -164,6 +169,10 @@ export default function NominatePage() {
   const [impactVisible, setImpactVisible] = useState(false);
   const impactRef = useRef<HTMLDivElement>(null);
 
+  // Celebration section animation state
+  const [celebrationVisible, setCelebrationVisible] = useState(false);
+  const celebrationRef = useRef<HTMLDivElement>(null);
+
   // Animated counter values for impact metrics
   const planningHours = useCounter(6, 1000, impactVisible);
   const stressLevel = useCounter(5, 1000, impactVisible);
@@ -206,6 +215,20 @@ export default function NominatePage() {
       { threshold: 0.3 }
     );
     if (impactRef.current) observer.observe(impactRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // Trigger celebration section animation on scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setCelebrationVisible(true);
+        }
+      },
+      { threshold: 0.2 }
+    );
+    if (celebrationRef.current) observer.observe(celebrationRef.current);
     return () => observer.disconnect();
   }, []);
 
@@ -1567,7 +1590,188 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 5. Accordion — What Happens When You Nominate */}
+      {/* 5. Refer a School, Celebrate Your Staff */}
+      <section className="py-16 lg:py-24" style={{ backgroundColor: '#f9fafb' }} ref={celebrationRef}>
+        <div className="container-default">
+          {/* Section Header */}
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ color: '#1e2749' }}>
+              Refer a School, Celebrate Your Staff
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#6b7280' }}>
+              Here's how one referral turns into a celebration your teachers won't forget.
+            </p>
+          </div>
+
+          {/* Three-Step Process Flow */}
+          <div className="max-w-5xl mx-auto mb-16">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-4">
+              {/* Step 1 */}
+              <div
+                className={`bg-white rounded-xl shadow-md p-6 md:p-8 w-full md:w-72 text-center transition-all duration-700 ease-out ${
+                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+              >
+                <div
+                  className="w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                  style={{ backgroundColor: 'rgba(20, 184, 166, 0.15)' }}
+                >
+                  <Send className="w-7 h-7 md:w-8 md:h-8" style={{ color: '#14b8a6' }} />
+                </div>
+                <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>
+                  1. You Refer a School
+                </h3>
+                <p className="text-sm" style={{ color: '#6b7280' }}>
+                  Tell us about a school that deserves better professional development.
+                </p>
+              </div>
+
+              {/* Arrow 1 */}
+              <div className="hidden md:flex items-center justify-center text-gray-300">
+                <ChevronRight className="w-8 h-8" />
+              </div>
+              <div className="flex md:hidden items-center justify-center text-gray-300">
+                <ChevronDown className="w-8 h-8" />
+              </div>
+
+              {/* Step 2 */}
+              <div
+                className={`bg-white rounded-xl shadow-md p-6 md:p-8 w-full md:w-72 text-center transition-all duration-700 delay-150 ease-out ${
+                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+              >
+                <div
+                  className="w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                  style={{ backgroundColor: 'rgba(251, 146, 134, 0.2)' }}
+                >
+                  <Handshake className="w-7 h-7 md:w-8 md:h-8" style={{ color: '#f87171' }} />
+                </div>
+                <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>
+                  2. They Partner with TDI
+                </h3>
+                <p className="text-sm" style={{ color: '#6b7280' }}>
+                  We begin a conversation, and they agree to our PD services.
+                </p>
+              </div>
+
+              {/* Arrow 2 */}
+              <div className="hidden md:flex items-center justify-center text-gray-300">
+                <ChevronRight className="w-8 h-8" />
+              </div>
+              <div className="flex md:hidden items-center justify-center text-gray-300">
+                <ChevronDown className="w-8 h-8" />
+              </div>
+
+              {/* Step 3 */}
+              <div
+                className={`bg-white rounded-xl shadow-md p-6 md:p-8 w-full md:w-72 text-center transition-all duration-700 delay-300 ease-out ${
+                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+              >
+                <div
+                  className="w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center mx-auto mb-4"
+                  style={{ backgroundColor: 'rgba(251, 191, 36, 0.2)' }}
+                >
+                  <PartyPopper className="w-7 h-7 md:w-8 md:h-8" style={{ color: '#f59e0b' }} />
+                </div>
+                <h3 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>
+                  3. Your Staff Gets Celebrated
+                </h3>
+                <p className="text-sm" style={{ color: '#6b7280' }}>
+                  You receive a budget to design the perfect appreciation moment for your team.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Three Impact Cards */}
+          <div className="max-w-5xl mx-auto mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Impact Card A */}
+              <div
+                className={`rounded-lg p-6 transition-all duration-700 delay-100 ease-out ${
+                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+                style={{ backgroundColor: 'rgba(20, 184, 166, 0.08)' }}
+              >
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
+                  style={{ backgroundColor: 'rgba(20, 184, 166, 0.15)' }}
+                >
+                  <Gift className="w-6 h-6" style={{ color: '#14b8a6' }} />
+                </div>
+                <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>
+                  Design the Moment Your Team Deserves
+                </h4>
+                <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
+                  Use your budget for surprise lunches, personal gift cards, or fulfilling classroom wish lists.
+                </p>
+              </div>
+
+              {/* Impact Card B */}
+              <div
+                className={`rounded-lg p-6 transition-all duration-700 delay-200 ease-out ${
+                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+                style={{ backgroundColor: 'rgba(20, 184, 166, 0.08)' }}
+              >
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
+                  style={{ backgroundColor: 'rgba(20, 184, 166, 0.15)' }}
+                >
+                  <TrendingUp className="w-6 h-6" style={{ color: '#14b8a6' }} />
+                </div>
+                <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>
+                  Achieve 15-25% Higher Teacher Retention
+                </h4>
+                <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
+                  Schools with consistent recognition see their best people stay.
+                </p>
+              </div>
+
+              {/* Impact Card C */}
+              <div
+                className={`rounded-lg p-6 transition-all duration-700 delay-300 ease-out ${
+                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+                style={{ backgroundColor: 'rgba(20, 184, 166, 0.08)' }}
+              >
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
+                  style={{ backgroundColor: 'rgba(20, 184, 166, 0.15)' }}
+                >
+                  <KeyRound className="w-6 h-6" style={{ color: '#14b8a6' }} />
+                </div>
+                <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>
+                  Your Budget, Your Rules — No Red Tape
+                </h4>
+                <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
+                  You have complete freedom to decide how to celebrate your own people.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* PDF Download Link */}
+          <div className="text-center">
+            <a
+              href="/celebration-guide.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 shadow-md w-full sm:w-auto justify-center"
+              style={{ backgroundColor: '#14b8a6', color: '#ffffff' }}
+            >
+              <Download className="w-5 h-5" />
+              See the Full Celebration Guide
+            </a>
+            <p className="text-sm mt-3" style={{ color: '#9ca3af' }}>
+              A printable overview of celebration options, impact, and how the budget works.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Accordion — What Happens When You Nominate */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto">
@@ -1843,7 +2047,7 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 6. Final CTA */}
+      {/* 7. Final CTA */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-8" style={{ color: '#ffffff' }}>
