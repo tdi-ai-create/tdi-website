@@ -23,6 +23,8 @@ import {
   Star,
   ChevronDown,
   ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   UtensilsCrossed,
   Gift,
   BookOpen,
@@ -808,286 +810,30 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 3. Accordion — What Happens When You Nominate */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
-        <div className="container-default">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-3" style={{ color: '#1e2749' }}>
-              What Happens When You Nominate
-            </h2>
-            <p className="text-center mb-10" style={{ color: '#1e2749', opacity: 0.7 }}>
-              Everything you'd want to know before you start.
-            </p>
-
-            <div className="space-y-4">
-              {/* Accordion Item 1 */}
-              <div
-                className="rounded-xl overflow-hidden"
-                style={{ backgroundColor: '#fafafa', border: '1px solid #e5e5e5' }}
-              >
-                <button
-                  onClick={() => toggleAccordion(0)}
-                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-100"
-                >
-                  <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
-                    What happens after I nominate?
-                  </span>
-                  <ChevronDown
-                    className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 0 ? 'rotate-180' : ''}`}
-                    style={{ color: '#35A7FF' }}
-                  />
-                </button>
-                <div
-                  className={`overflow-hidden transition-all duration-300 ${
-                    openAccordion === 0 ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                  }`}
-                >
-                  <div className="px-5 pb-5">
-                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
-                      We reach out to the school's admin team within 48 hours. They'll know you started the conversation. You don't have to do anything else. We take it from here.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Accordion Item 2 */}
-              <div
-                className="rounded-xl overflow-hidden"
-                style={{ backgroundColor: '#fafafa', border: '1px solid #e5e5e5' }}
-              >
-                <button
-                  onClick={() => toggleAccordion(1)}
-                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-100"
-                >
-                  <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
-                    What do I earn if it becomes a partnership?
-                  </span>
-                  <ChevronDown
-                    className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 1 ? 'rotate-180' : ''}`}
-                    style={{ color: '#35A7FF' }}
-                  />
-                </button>
-                <div
-                  className={`overflow-hidden transition-all duration-300 ${
-                    openAccordion === 1 ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-                  }`}
-                >
-                  <div className="px-5 pb-5 space-y-4">
-                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
-                      If you're a teacher or community member who nominates a school, you earn a personal celebration reward: up to $500. That could be a gift card, classroom supplies, or whatever feels right for you.
-                    </p>
-                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
-                      If you're a school leader who refers another school, your entire staff gets celebrated. We're talking TDI swag for every teacher, plus you choose how to use the rest of the budget.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Accordion Item 3 */}
-              <div
-                className="rounded-xl overflow-hidden"
-                style={{ backgroundColor: '#fafafa', border: '1px solid #e5e5e5' }}
-              >
-                <button
-                  onClick={() => toggleAccordion(2)}
-                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-100"
-                >
-                  <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
-                    Wait — my whole staff gets celebrated?
-                  </span>
-                  <ChevronDown
-                    className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 2 ? 'rotate-180' : ''}`}
-                    style={{ color: '#35A7FF' }}
-                  />
-                </button>
-                <div
-                  className={`overflow-hidden transition-all duration-300 ${
-                    openAccordion === 2 ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
-                  }`}
-                >
-                  <div className="px-5 pb-5 space-y-4">
-                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
-                      Yes. When a school leader refers another school and it becomes a partnership, TDI funds a celebration for the referring school's teachers. You pick from the menu:
-                    </p>
-
-                    {/* Reward menu cards */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-                      <div
-                        className="p-4 rounded-lg flex items-start gap-3"
-                        style={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5' }}
-                      >
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: '#ffba06' }}
-                        >
-                          <UtensilsCrossed className="w-5 h-5" style={{ color: '#1e2749' }} />
-                        </div>
-                        <div>
-                          <p className="font-semibold" style={{ color: '#1e2749' }}>Catered Celebration</p>
-                          <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>A team lunch or breakfast for your whole staff</p>
-                        </div>
-                      </div>
-
-                      <div
-                        className="p-4 rounded-lg flex items-start gap-3"
-                        style={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5' }}
-                      >
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: '#ffba06' }}
-                        >
-                          <Gift className="w-5 h-5" style={{ color: '#1e2749' }} />
-                        </div>
-                        <div>
-                          <p className="font-semibold" style={{ color: '#1e2749' }}>Individual Gift Cards</p>
-                          <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Every teacher gets a gift card: Target, Amazon, Visa, your choice</p>
-                        </div>
-                      </div>
-
-                      <div
-                        className="p-4 rounded-lg flex items-start gap-3"
-                        style={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5' }}
-                      >
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: '#ffba06' }}
-                        >
-                          <BookOpen className="w-5 h-5" style={{ color: '#1e2749' }} />
-                        </div>
-                        <div>
-                          <p className="font-semibold" style={{ color: '#1e2749' }}>Classroom Supply Grants</p>
-                          <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Teachers submit wish lists, TDI fulfills them</p>
-                        </div>
-                      </div>
-
-                      <div
-                        className="p-4 rounded-lg flex items-start gap-3"
-                        style={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5' }}
-                      >
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: '#ffba06' }}
-                        >
-                          <Shuffle className="w-5 h-5" style={{ color: '#1e2749' }} />
-                        </div>
-                        <div>
-                          <p className="font-semibold" style={{ color: '#1e2749' }}>Hybrid</p>
-                          <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Mix and match from the options above</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    <p className="text-sm font-medium" style={{ color: '#35A7FF' }}>
-                      Plus TDI swag (hats, tees, the works) is included no matter what you choose.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Accordion Item 4 - Founders Circle (Featured) */}
-              <div
-                className="rounded-xl overflow-hidden border-l-4"
-                style={{ backgroundColor: 'rgba(20, 184, 166, 0.08)', border: '1px solid #e5e5e5', borderLeftColor: '#14b8a6', borderLeftWidth: '4px' }}
-              >
-                <button
-                  onClick={() => toggleAccordion(3)}
-                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-teal-50/50"
-                >
-                  <span className="font-semibold text-lg flex items-center gap-2" style={{ color: '#1e2749' }}>
-                    <Sparkles className="w-5 h-5" style={{ color: '#14b8a6' }} />
-                    What's Blueprint Founders Circle?
-                  </span>
-                  <ChevronDown
-                    className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 3 ? 'rotate-180' : ''}`}
-                    style={{ color: '#35A7FF' }}
-                  />
-                </button>
-                <div
-                  className={`overflow-hidden transition-all duration-300 ${
-                    openAccordion === 3 ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-                  }`}
-                >
-                  <div className="px-5 pb-5 space-y-4">
-                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
-                      The first 5 schools each semester that come in through a referral or nomination receive Blueprint Founders Circle status.
-                    </p>
-
-                    {/* Benefits */}
-                    <div className="space-y-3 mt-4">
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: '#35A7FF' }}
-                        >
-                          <Award className="w-5 h-5 text-white" />
-                        </div>
-                        <p style={{ color: '#1e2749' }}>A bonus executive coaching session</p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: '#35A7FF' }}
-                        >
-                          <Bot className="w-5 h-5 text-white" />
-                        </div>
-                        <p style={{ color: '#1e2749' }}>Early access to Desi, our AI-powered teacher support tool</p>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                          style={{ backgroundColor: '#35A7FF' }}
-                        >
-                          <Star className="w-5 h-5 text-white" />
-                        </div>
-                        <p style={{ color: '#1e2749' }}>A spotlight feature on the TDI website</p>
-                      </div>
-                    </div>
-
-                    <p className="text-sm font-medium mt-4" style={{ color: '#35A7FF' }}>
-                      Only {VIP_SPOTS_REMAINING} spots remain for Fall 2026. Once they're gone, they're gone until next semester.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Accordion Item 5 */}
-              <div
-                className="rounded-xl overflow-hidden"
-                style={{ backgroundColor: '#fafafa', border: '1px solid #e5e5e5' }}
-              >
-                <button
-                  onClick={() => toggleAccordion(4)}
-                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-100"
-                >
-                  <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
-                    Is there a catch?
-                  </span>
-                  <ChevronDown
-                    className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 4 ? 'rotate-180' : ''}`}
-                    style={{ color: '#35A7FF' }}
-                  />
-                </button>
-                <div
-                  className={`overflow-hidden transition-all duration-300 ${
-                    openAccordion === 4 ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                  }`}
-                >
-                  <div className="px-5 pb-5">
-                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
-                      No. You nominate a school. We reach out. If it becomes a partnership, we celebrate you. If it doesn't, no harm done. You advocated for a school that needed it, and that matters.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. Rotating Testimonial Carousel */}
+      {/* 3. Rotating Testimonial Carousel */}
       <section className="py-12 md:py-16" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
-          <div className="max-w-2xl mx-auto text-center">
+          <div className="max-w-2xl mx-auto text-center relative">
+            {/* Left Arrow */}
+            <button
+              onClick={() => setActiveTestimonialIndex((prev) => (prev - 1 + TESTIMONIALS.length) % TESTIMONIALS.length)}
+              className="absolute left-0 md:-left-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+              style={{ backgroundColor: 'rgba(53, 167, 255, 0.2)' }}
+              aria-label="Previous testimonial"
+            >
+              <ChevronLeft className="w-6 h-6 text-white" />
+            </button>
+
+            {/* Right Arrow */}
+            <button
+              onClick={() => setActiveTestimonialIndex((prev) => (prev + 1) % TESTIMONIALS.length)}
+              className="absolute right-0 md:-right-12 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110"
+              style={{ backgroundColor: 'rgba(53, 167, 255, 0.2)' }}
+              aria-label="Next testimonial"
+            >
+              <ChevronRight className="w-6 h-6 text-white" />
+            </button>
+
             <div
               className="relative px-6 py-8 rounded-xl"
               style={{ backgroundColor: 'rgba(53, 167, 255, 0.1)' }}
@@ -1146,7 +892,7 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 5. Stats + Form Section */}
+      {/* 4. Stats + Form Section */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           {/* Stats Bar */}
@@ -1817,6 +1563,282 @@ export default function NominatePage() {
                 </form>
               </div>
             )}
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Accordion — What Happens When You Nominate */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container-default">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-3" style={{ color: '#1e2749' }}>
+              What Happens When You Nominate
+            </h2>
+            <p className="text-center mb-10" style={{ color: '#1e2749', opacity: 0.7 }}>
+              Everything you'd want to know before you start.
+            </p>
+
+            <div className="space-y-4">
+              {/* Accordion Item 1 */}
+              <div
+                className="rounded-xl overflow-hidden"
+                style={{ backgroundColor: '#fafafa', border: '1px solid #e5e5e5' }}
+              >
+                <button
+                  onClick={() => toggleAccordion(0)}
+                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-100"
+                >
+                  <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
+                    What happens after I nominate?
+                  </span>
+                  <ChevronDown
+                    className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 0 ? 'rotate-180' : ''}`}
+                    style={{ color: '#35A7FF' }}
+                  />
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openAccordion === 0 ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="px-5 pb-5">
+                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
+                      We reach out to the school's admin team within 48 hours. They'll know you started the conversation. You don't have to do anything else. We take it from here.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Accordion Item 2 */}
+              <div
+                className="rounded-xl overflow-hidden"
+                style={{ backgroundColor: '#fafafa', border: '1px solid #e5e5e5' }}
+              >
+                <button
+                  onClick={() => toggleAccordion(1)}
+                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-100"
+                >
+                  <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
+                    What do I earn if it becomes a partnership?
+                  </span>
+                  <ChevronDown
+                    className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 1 ? 'rotate-180' : ''}`}
+                    style={{ color: '#35A7FF' }}
+                  />
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openAccordion === 1 ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="px-5 pb-5 space-y-4">
+                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
+                      If you're a teacher or community member who nominates a school, you earn a personal celebration reward: up to $500. That could be a gift card, classroom supplies, or whatever feels right for you.
+                    </p>
+                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
+                      If you're a school leader who refers another school, your entire staff gets celebrated. We're talking TDI swag for every teacher, plus you choose how to use the rest of the budget.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Accordion Item 3 */}
+              <div
+                className="rounded-xl overflow-hidden"
+                style={{ backgroundColor: '#fafafa', border: '1px solid #e5e5e5' }}
+              >
+                <button
+                  onClick={() => toggleAccordion(2)}
+                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-100"
+                >
+                  <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
+                    Wait — my whole staff gets celebrated?
+                  </span>
+                  <ChevronDown
+                    className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 2 ? 'rotate-180' : ''}`}
+                    style={{ color: '#35A7FF' }}
+                  />
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openAccordion === 2 ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="px-5 pb-5 space-y-4">
+                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
+                      Yes. When a school leader refers another school and it becomes a partnership, TDI funds a celebration for the referring school's teachers. You pick from the menu:
+                    </p>
+
+                    {/* Reward menu cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                      <div
+                        className="p-4 rounded-lg flex items-start gap-3"
+                        style={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5' }}
+                      >
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#ffba06' }}
+                        >
+                          <UtensilsCrossed className="w-5 h-5" style={{ color: '#1e2749' }} />
+                        </div>
+                        <div>
+                          <p className="font-semibold" style={{ color: '#1e2749' }}>Catered Celebration</p>
+                          <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>A team lunch or breakfast for your whole staff</p>
+                        </div>
+                      </div>
+
+                      <div
+                        className="p-4 rounded-lg flex items-start gap-3"
+                        style={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5' }}
+                      >
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#ffba06' }}
+                        >
+                          <Gift className="w-5 h-5" style={{ color: '#1e2749' }} />
+                        </div>
+                        <div>
+                          <p className="font-semibold" style={{ color: '#1e2749' }}>Individual Gift Cards</p>
+                          <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Every teacher gets a gift card: Target, Amazon, Visa, your choice</p>
+                        </div>
+                      </div>
+
+                      <div
+                        className="p-4 rounded-lg flex items-start gap-3"
+                        style={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5' }}
+                      >
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#ffba06' }}
+                        >
+                          <BookOpen className="w-5 h-5" style={{ color: '#1e2749' }} />
+                        </div>
+                        <div>
+                          <p className="font-semibold" style={{ color: '#1e2749' }}>Classroom Supply Grants</p>
+                          <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Teachers submit wish lists, TDI fulfills them</p>
+                        </div>
+                      </div>
+
+                      <div
+                        className="p-4 rounded-lg flex items-start gap-3"
+                        style={{ backgroundColor: '#ffffff', border: '1px solid #e5e5e5' }}
+                      >
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#ffba06' }}
+                        >
+                          <Shuffle className="w-5 h-5" style={{ color: '#1e2749' }} />
+                        </div>
+                        <div>
+                          <p className="font-semibold" style={{ color: '#1e2749' }}>Hybrid</p>
+                          <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Mix and match from the options above</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <p className="text-sm font-medium" style={{ color: '#35A7FF' }}>
+                      Plus TDI swag (hats, tees, the works) is included no matter what you choose.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Accordion Item 4 - Founders Circle (Featured) */}
+              <div
+                className="rounded-xl overflow-hidden border-l-4"
+                style={{ backgroundColor: 'rgba(20, 184, 166, 0.08)', border: '1px solid #e5e5e5', borderLeftColor: '#14b8a6', borderLeftWidth: '4px' }}
+              >
+                <button
+                  onClick={() => toggleAccordion(3)}
+                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-teal-50/50"
+                >
+                  <span className="font-semibold text-lg flex items-center gap-2" style={{ color: '#1e2749' }}>
+                    <Sparkles className="w-5 h-5" style={{ color: '#14b8a6' }} />
+                    What's Blueprint Founders Circle?
+                  </span>
+                  <ChevronDown
+                    className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 3 ? 'rotate-180' : ''}`}
+                    style={{ color: '#35A7FF' }}
+                  />
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openAccordion === 3 ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="px-5 pb-5 space-y-4">
+                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
+                      The first 5 schools each semester that come in through a referral or nomination receive Blueprint Founders Circle status.
+                    </p>
+
+                    {/* Benefits */}
+                    <div className="space-y-3 mt-4">
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#35A7FF' }}
+                        >
+                          <Award className="w-5 h-5 text-white" />
+                        </div>
+                        <p style={{ color: '#1e2749' }}>A bonus executive coaching session</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#35A7FF' }}
+                        >
+                          <Bot className="w-5 h-5 text-white" />
+                        </div>
+                        <p style={{ color: '#1e2749' }}>Early access to Desi, our AI-powered teacher support tool</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                          style={{ backgroundColor: '#35A7FF' }}
+                        >
+                          <Star className="w-5 h-5 text-white" />
+                        </div>
+                        <p style={{ color: '#1e2749' }}>A spotlight feature on the TDI website</p>
+                      </div>
+                    </div>
+
+                    <p className="text-sm font-medium mt-4" style={{ color: '#35A7FF' }}>
+                      Only {VIP_SPOTS_REMAINING} spots remain for Fall 2026. Once they're gone, they're gone until next semester.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Accordion Item 5 */}
+              <div
+                className="rounded-xl overflow-hidden"
+                style={{ backgroundColor: '#fafafa', border: '1px solid #e5e5e5' }}
+              >
+                <button
+                  onClick={() => toggleAccordion(4)}
+                  className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-100"
+                >
+                  <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
+                    Is there a catch?
+                  </span>
+                  <ChevronDown
+                    className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 4 ? 'rotate-180' : ''}`}
+                    style={{ color: '#35A7FF' }}
+                  />
+                </button>
+                <div
+                  className={`overflow-hidden transition-all duration-300 ${
+                    openAccordion === 4 ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                  }`}
+                >
+                  <div className="px-5 pb-5">
+                    <p style={{ color: '#1e2749', opacity: 0.8 }}>
+                      No. You nominate a school. We reach out. If it becomes a partnership, we celebrate you. If it doesn't, no harm done. You advocated for a school that needed it, and that matters.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
