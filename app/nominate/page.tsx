@@ -712,7 +712,7 @@ export default function NominatePage() {
   return (
     <main className="min-h-screen">
       {/* 1. Hero Section */}
-      <section ref={heroRef} className="relative py-16 md:py-24 overflow-hidden">
+      <section ref={heroRef} className="relative py-10 md:py-14 overflow-hidden">
         {/* Background Image */}
         <div
           className="absolute inset-0"
@@ -734,25 +734,25 @@ export default function NominatePage() {
 
         {/* Content */}
         <div className="relative z-10 container-default text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4" style={{ color: '#ffffff' }}>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3" style={{ color: '#ffffff' }}>
             Know a School That<br />Deserves Better PD?
           </h1>
-          <p className="text-xl md:text-2xl mb-4 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
+          <p className="text-lg md:text-xl mb-3 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
             Nominate them. <span className="font-bold">If it leads to a partnership, we celebrate you.</span>
           </p>
 
           {/* Trust Line */}
-          <p className="text-base mb-6" style={{ color: '#ffffff', opacity: 0.8 }}>
+          <p className="text-sm mb-4" style={{ color: '#ffffff', opacity: 0.8 }}>
             Trusted by 87,000+ educators in 21 states
           </p>
 
           {/* VIP Spots Counter */}
           <div
-            className="inline-block px-6 py-3 rounded-lg mb-6"
+            className="inline-block px-5 py-2 rounded-lg mb-4"
             style={{ backgroundColor: 'rgba(53, 167, 255, 0.2)', border: '1px solid #35A7FF' }}
           >
-            <p className="font-semibold" style={{ color: '#35A7FF' }}>
-              Only <span className="text-2xl font-bold">{VIP_SPOTS_REMAINING}</span> Blueprint Founders Circle spots available for Fall 2026
+            <p className="text-sm font-semibold" style={{ color: '#35A7FF' }}>
+              Only <span className="text-xl font-bold">{VIP_SPOTS_REMAINING}</span> Blueprint Founders Circle spots available for Fall 2026
             </p>
           </div>
 
