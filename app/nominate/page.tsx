@@ -610,7 +610,7 @@ export default function NominatePage() {
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage: 'url("/images/hero-for-schools.webp")',
+            backgroundImage: 'url("/images/hero-nominate.png")',
             backgroundSize: 'cover',
             backgroundPosition: 'center',
             backgroundRepeat: 'no-repeat',
@@ -631,7 +631,7 @@ export default function NominatePage() {
             Know a School That<br />Deserves Better PD?
           </h1>
           <p className="text-xl md:text-2xl mb-4 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
-            Nominate them. If it leads to a partnership, <span className="font-bold">we celebrate you.</span>
+            Nominate them. <span className="font-bold">If it leads to a partnership, we celebrate you.</span>
           </p>
 
           {/* Trust Line */}
