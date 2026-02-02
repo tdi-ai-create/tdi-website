@@ -385,7 +385,7 @@ export default function CreateWithUsPage() {
         <div className="max-w-3xl mx-auto px-6">
           {/* Form Card with negative margin overlap */}
           <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 -mt-24 relative z-20">
-            <div className="text-center mb-10">
+            <div className="text-center mb-8">
               <h2
                 className="text-3xl md:text-4xl font-bold text-[#1e2749] mb-4 opacity-0 translate-y-8 transition-all duration-700"
                 data-animate="true"
@@ -398,6 +398,23 @@ export default function CreateWithUsPage() {
               >
                 Tell us about yourself and the strategies you'd love to share.
                 Rachel from our team will be in touch within a few days to discuss next steps and get your headshot.
+              </p>
+            </div>
+
+            {/* Creator Opportunity Context */}
+            <div
+              className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-6 mb-8 border border-gray-200 opacity-0 translate-y-8 transition-all duration-700 delay-200"
+              data-animate="true"
+            >
+              <h3 className="font-semibold text-[#1e2749] mb-3 flex items-center gap-2">
+                <span className="text-xl">✨</span>
+                Share Your Expertise. Impact Educators Everywhere.
+              </h3>
+              <p className="text-gray-600 text-sm leading-relaxed mb-4">
+                Whether you want to write a blog post, create a downloadable resource, or build a full online course, TDI gives you the platform, support, and audience to reach educators who need what you know. Course creators earn ongoing revenue every time an educator enrolls - we handle production, marketing, and distribution so you can focus on what you do best: teaching.
+              </p>
+              <p className="text-xs text-gray-500">
+                All creators receive hands-on support. Course creators also receive a personal discount code and earn revenue with every enrollment.
               </p>
             </div>
 
