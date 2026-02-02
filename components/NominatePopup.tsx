@@ -117,7 +117,10 @@ export function NominatePopup() {
         {/* Content */}
         <div className="text-center">
           {/* NEW badge */}
-          <span className="inline-block bg-teal-50 text-teal-700 text-xs font-semibold uppercase px-3 py-1 rounded-full mb-4">
+          <span
+            className="inline-block text-xs font-semibold uppercase px-3 py-1 rounded-full mb-4"
+            style={{ backgroundColor: 'rgba(255, 186, 6, 0.15)', color: '#b8860b' }}
+          >
             NEW
           </span>
 
@@ -139,7 +142,7 @@ export function NominatePopup() {
             href="/nominate"
             onClick={handleButtonClick}
             className="block w-full py-3 rounded-full font-semibold text-white transition-colors hover:opacity-90"
-            style={{ backgroundColor: '#2B8C96' }}
+            style={{ backgroundColor: '#ffba06' }}
           >
             Nominate a School
           </Link>
