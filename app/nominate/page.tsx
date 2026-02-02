@@ -40,6 +40,7 @@ import {
   CreditCard,
   Unlock,
   Camera,
+  Wand2,
 } from 'lucide-react';
 
 // Update this number as spots fill
@@ -1599,8 +1600,13 @@ export default function NominatePage() {
 
           {/* ===== The Vision - "Picture This" ===== */}
           <div className="max-w-5xl mx-auto mb-20">
+            {/* Connector Line */}
+            <p className="text-center text-lg md:text-xl font-medium text-white mb-8">
+              This is what your nomination leads to.
+            </p>
+
             {/* Label */}
-            <div className="text-center mb-6">
+            <div className="text-center mb-8">
               <span
                 className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
                 style={{ backgroundColor: 'rgba(43, 140, 150, 0.2)', color: '#2B8C96' }}
@@ -1622,26 +1628,23 @@ export default function NominatePage() {
                 </h3>
                 <div className="space-y-4" style={{ color: '#cbd5e1', lineHeight: '1.8' }}>
                   <p>
-                    Not the lounge. Not the cafeteria. A restaurant. Their favorite one.
+                    Not the lounge. Not the cafeteria. A restaurant — their favorite one. Private room. Spouses invited. Everything paid for.
                   </p>
                   <p>
-                    There's a private room reserved in their honor. Spouses are there. The table is set. There's a TDI swag bag at every chair — hats, t-shirts, something that says "we see you." Inside each bag: a personal gift card and a handwritten note from you.
+                    There's a TDI swag bag at every chair. Inside: a gift card, a handwritten note from you, and gear that says "we see you."
                   </p>
                   <p>
-                    The food is paid for. The drinks are paid for. The night is theirs.
-                  </p>
-                  <p>
-                    Someone pulls out their phone to take a photo. Then everyone does. A teacher who almost quit last semester leans over and says, "I didn't know admin cared like this." But you did. You always did. You just never had the budget.
+                    A teacher who almost quit last semester leans over and whispers, "I didn't know admin cared like this."
                   </p>
                   <p className="text-xl font-semibold" style={{ color: '#F6AD55' }}>
-                    Now you do.
+                    You always did. You just never had the budget. Now you do.
                   </p>
                 </div>
               </div>
 
               {/* Moment Cards - Right */}
               <div className="space-y-4">
-                {/* Moment 1 - A Night They'll Never Forget */}
+                {/* Moment 1 - Dinner, Lunch, or Happy Hour */}
                 <div
                   className={`rounded-xl p-5 transition-all duration-700 delay-300 ease-out ${
                     celebrationVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
@@ -1659,15 +1662,15 @@ export default function NominatePage() {
                       <UtensilsCrossed className="w-5 h-5" style={{ color: '#E8734A' }} />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-white mb-1">A Night They'll Never Forget</h4>
+                      <h4 className="font-semibold text-white mb-1">Dinner, Lunch, or Happy Hour</h4>
                       <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
-                        A private dinner at their favorite restaurant. Spouses invited. Everything covered. The kind of night that makes someone say "I love working here."
+                        You pick the venue and the vibe. It's your staff — you know what they'd love.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Moment 2 - Swag Bags That Actually Mean Something */}
+                {/* Moment 2 - Gift Cards, Swag & Handwritten Notes */}
                 <div
                   className={`rounded-xl p-5 transition-all duration-700 delay-400 ease-out ${
                     celebrationVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
@@ -1685,15 +1688,15 @@ export default function NominatePage() {
                       <Gift className="w-5 h-5" style={{ color: '#2B8C96' }} />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-white mb-1">Swag Bags That Actually Mean Something</h4>
+                      <h4 className="font-semibold text-white mb-1">Gift Cards, Swag & Handwritten Notes</h4>
                       <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
-                        TDI hats and tees at every seat. A personal gift card inside. A handwritten note from you. Not a branded pen — a moment they take home.
+                        Every teacher walks away with something personal. Not generic — chosen by you.
                       </p>
                     </div>
                   </div>
                 </div>
 
-                {/* Moment 3 - The Story They Tell Everyone */}
+                {/* Moment 3 - Or Something Entirely Your Own */}
                 <div
                   className={`rounded-xl p-5 transition-all duration-700 delay-500 ease-out ${
                     celebrationVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
@@ -1708,12 +1711,12 @@ export default function NominatePage() {
                       className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ backgroundColor: 'rgba(246, 173, 85, 0.2)' }}
                     >
-                      <Sparkles className="w-5 h-5" style={{ color: '#F6AD55' }} />
+                      <Wand2 className="w-5 h-5" style={{ color: '#F6AD55' }} />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-white mb-1">The Story They Tell Everyone</h4>
+                      <h4 className="font-semibold text-white mb-1">Or Something Entirely Your Own</h4>
                       <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
-                        The group photo that hits Instagram. The text to their spouse that says "you won't believe what my school just did." The Monday morning where everything feels different.
+                        Classroom wish lists. A spa day. A surprise assembly. You design it from scratch.
                       </p>
                     </div>
                   </div>
@@ -1743,9 +1746,9 @@ export default function NominatePage() {
 
               {/* Proof 2 */}
               <div className="flex items-center gap-3">
-                <TrendingUp className="w-5 h-5" style={{ color: '#2B8C96' }} />
+                <Users className="w-5 h-5" style={{ color: '#2B8C96' }} />
                 <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                  15-25% higher retention when staff feel valued
+                  One referral celebrates your staff and lifts another building
                 </span>
               </div>
 
@@ -1754,9 +1757,9 @@ export default function NominatePage() {
 
               {/* Proof 3 */}
               <div className="flex items-center gap-3">
-                <KeyRound className="w-5 h-5" style={{ color: '#F6AD55' }} />
+                <Download className="w-5 h-5" style={{ color: '#F6AD55' }} />
                 <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                  You design every detail — no approvals, no committee
+                  Get the full guide below — it's yours to keep and share
                 </span>
               </div>
             </div>
@@ -1773,8 +1776,8 @@ export default function NominatePage() {
                 <Download className="w-5 h-5" />
                 See the Full Celebration Guide
               </a>
-              <p className="text-sm mt-4" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                A printable overview of celebration ideas and how the budget works.
+              <p className="text-sm mt-4 max-w-md mx-auto" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                See exactly what's possible — celebration options, how the budget works, and the impact it has on your building. Everything you just read, in a guide you can share with your team.
               </p>
             </div>
           </div>
