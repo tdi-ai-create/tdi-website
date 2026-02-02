@@ -46,6 +46,61 @@ import {
 // Update this number as spots fill
 const VIP_SPOTS_REMAINING = 4;
 
+// US States for dropdown
+const US_STATES = [
+  { value: 'AL', label: 'Alabama' },
+  { value: 'AK', label: 'Alaska' },
+  { value: 'AZ', label: 'Arizona' },
+  { value: 'AR', label: 'Arkansas' },
+  { value: 'CA', label: 'California' },
+  { value: 'CO', label: 'Colorado' },
+  { value: 'CT', label: 'Connecticut' },
+  { value: 'DE', label: 'Delaware' },
+  { value: 'DC', label: 'District of Columbia' },
+  { value: 'FL', label: 'Florida' },
+  { value: 'GA', label: 'Georgia' },
+  { value: 'HI', label: 'Hawaii' },
+  { value: 'ID', label: 'Idaho' },
+  { value: 'IL', label: 'Illinois' },
+  { value: 'IN', label: 'Indiana' },
+  { value: 'IA', label: 'Iowa' },
+  { value: 'KS', label: 'Kansas' },
+  { value: 'KY', label: 'Kentucky' },
+  { value: 'LA', label: 'Louisiana' },
+  { value: 'ME', label: 'Maine' },
+  { value: 'MD', label: 'Maryland' },
+  { value: 'MA', label: 'Massachusetts' },
+  { value: 'MI', label: 'Michigan' },
+  { value: 'MN', label: 'Minnesota' },
+  { value: 'MS', label: 'Mississippi' },
+  { value: 'MO', label: 'Missouri' },
+  { value: 'MT', label: 'Montana' },
+  { value: 'NE', label: 'Nebraska' },
+  { value: 'NV', label: 'Nevada' },
+  { value: 'NH', label: 'New Hampshire' },
+  { value: 'NJ', label: 'New Jersey' },
+  { value: 'NM', label: 'New Mexico' },
+  { value: 'NY', label: 'New York' },
+  { value: 'NC', label: 'North Carolina' },
+  { value: 'ND', label: 'North Dakota' },
+  { value: 'OH', label: 'Ohio' },
+  { value: 'OK', label: 'Oklahoma' },
+  { value: 'OR', label: 'Oregon' },
+  { value: 'PA', label: 'Pennsylvania' },
+  { value: 'RI', label: 'Rhode Island' },
+  { value: 'SC', label: 'South Carolina' },
+  { value: 'SD', label: 'South Dakota' },
+  { value: 'TN', label: 'Tennessee' },
+  { value: 'TX', label: 'Texas' },
+  { value: 'UT', label: 'Utah' },
+  { value: 'VT', label: 'Vermont' },
+  { value: 'VA', label: 'Virginia' },
+  { value: 'WA', label: 'Washington' },
+  { value: 'WV', label: 'West Virginia' },
+  { value: 'WI', label: 'Wisconsin' },
+  { value: 'WY', label: 'Wyoming' },
+];
+
 // Testimonials for rotating carousel
 const TESTIMONIALS = [
   {
@@ -110,7 +165,8 @@ interface FormData {
   email: string;
   yourSchool: string;
   nominatedSchool: string;
-  schoolCityState: string;
+  schoolCity: string;
+  schoolState: string;
   principalName: string;
   pdChallenge: string;
   relationship: string;
@@ -122,7 +178,8 @@ interface FormErrors {
   email?: string;
   yourSchool?: string;
   nominatedSchool?: string;
-  schoolCityState?: string;
+  schoolCity?: string;
+  schoolState?: string;
   relationship?: string;
 }
 
@@ -141,7 +198,8 @@ export default function NominatePage() {
     email: '',
     yourSchool: '',
     nominatedSchool: '',
-    schoolCityState: '',
+    schoolCity: '',
+    schoolState: '',
     principalName: '',
     pdChallenge: '',
     relationship: '',
@@ -194,7 +252,8 @@ export default function NominatePage() {
   const emailRef = useRef<HTMLInputElement>(null);
   const yourSchoolRef = useRef<HTMLInputElement>(null);
   const nominatedSchoolRef = useRef<HTMLInputElement>(null);
-  const schoolCityStateRef = useRef<HTMLInputElement>(null);
+  const schoolCityRef = useRef<HTMLInputElement>(null);
+  const schoolStateRef = useRef<HTMLSelectElement>(null);
   const relationshipRef = useRef<HTMLSelectElement>(null);
 
   // GA4 page view tracking
@@ -285,8 +344,8 @@ export default function NominatePage() {
   // Determine progress step
   const getProgressStep = (): number => {
     if (!currentTrack) return 1;
-    const hasRequiredFields = formData.name && formData.email && formData.nominatedSchool;
-    if (currentTrack === 'non-partner-nomination' && (!formData.relationship || !formData.schoolCityState)) {
+    const hasRequiredFields = formData.name && formData.email && formData.nominatedSchool && formData.schoolCity && formData.schoolState;
+    if (currentTrack === 'non-partner-nomination' && !formData.relationship) {
       return 2;
     }
     if ((currentTrack === 'partner-leader-referral' || currentTrack === 'partner-teacher-nomination') && !formData.yourSchool) {
@@ -368,12 +427,17 @@ export default function NominatePage() {
       errors.nominatedSchool = 'Please enter the school name';
     }
 
+    if (!formData.schoolCity.trim()) {
+      errors.schoolCity = 'Please enter the city';
+    }
+
+    if (!formData.schoolState) {
+      errors.schoolState = 'Please select a state';
+    }
+
     if (currentTrack === 'non-partner-nomination') {
       if (!formData.relationship) {
         errors.relationship = 'Please select your relationship';
-      }
-      if (!formData.schoolCityState.trim()) {
-        errors.schoolCityState = 'Please enter the school location';
       }
     }
 
@@ -397,9 +461,12 @@ export default function NominatePage() {
     } else if (errors.nominatedSchool && nominatedSchoolRef.current) {
       nominatedSchoolRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
       nominatedSchoolRef.current.focus();
-    } else if (errors.schoolCityState && schoolCityStateRef.current) {
-      schoolCityStateRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      schoolCityStateRef.current.focus();
+    } else if (errors.schoolCity && schoolCityRef.current) {
+      schoolCityRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      schoolCityRef.current.focus();
+    } else if (errors.schoolState && schoolStateRef.current) {
+      schoolStateRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      schoolStateRef.current.focus();
     }
   };
 
@@ -463,12 +530,8 @@ export default function NominatePage() {
       submitData['Relationship to School'] = formData.relationship;
     }
 
-    const schoolFieldName = currentTrack === 'partner-leader-referral' ? 'School Being Referred' : 'School Being Nominated';
-    submitData[schoolFieldName] = formData.nominatedSchool;
-
-    if (currentTrack === 'non-partner-nomination') {
-      submitData['School City and State'] = formData.schoolCityState;
-    }
+    const schoolFieldName = currentTrack === 'partner-leader-referral' ? 'School Referred' : 'School Nominated';
+    submitData[schoolFieldName] = `${formData.nominatedSchool}, ${formData.schoolCity}, ${formData.schoolState}`;
 
     if (formData.principalName) {
       submitData['Principal Name (If Known)'] = formData.principalName;
@@ -523,7 +586,8 @@ export default function NominatePage() {
       email: '',
       yourSchool: '',
       nominatedSchool: '',
-      schoolCityState: '',
+      schoolCity: '',
+      schoolState: '',
       principalName: '',
       pdChallenge: '',
       relationship: '',
@@ -1635,30 +1699,56 @@ export default function NominatePage() {
                         )}
                       </div>
 
-                      {/* Track 3: School Location */}
-                      {currentTrack === 'non-partner-nomination' && (
+                      {/* City and State fields - all tracks */}
+                      <div className="grid grid-cols-1 md:grid-cols-[65%_35%] gap-4">
                         <div>
                           <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
-                            School Location <span className="text-red-500">*</span>
+                            City <span className="text-red-500">*</span>
                           </label>
                           <input
-                            ref={schoolCityStateRef}
+                            ref={schoolCityRef}
                             type="text"
-                            placeholder="City, State (e.g., Springfield, IL)"
-                            value={formData.schoolCityState}
+                            placeholder="City"
+                            value={formData.schoolCity}
                             onChange={(e) => {
-                              setFormData({ ...formData, schoolCityState: e.target.value });
-                              clearFieldError('schoolCityState');
+                              setFormData({ ...formData, schoolCity: e.target.value });
+                              clearFieldError('schoolCity');
                             }}
                             className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:border-gray-500 ${
-                              formErrors.schoolCityState ? 'border-red-500' : 'border-gray-300'
+                              formErrors.schoolCity ? 'border-red-500' : 'border-gray-300'
                             }`}
                           />
-                          {formErrors.schoolCityState && (
-                            <p className="text-red-500 text-sm mt-1">{formErrors.schoolCityState}</p>
+                          {formErrors.schoolCity && (
+                            <p className="text-red-500 text-sm mt-1">{formErrors.schoolCity}</p>
                           )}
                         </div>
-                      )}
+                        <div>
+                          <label className="block text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                            State <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            ref={schoolStateRef}
+                            value={formData.schoolState}
+                            onChange={(e) => {
+                              setFormData({ ...formData, schoolState: e.target.value });
+                              clearFieldError('schoolState');
+                            }}
+                            className={`w-full px-4 py-3 rounded-lg border focus:outline-none focus:border-gray-500 bg-white ${
+                              formErrors.schoolState ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                          >
+                            <option value="">Select state</option>
+                            {US_STATES.map((state) => (
+                              <option key={state.value} value={state.value}>
+                                {state.label}
+                              </option>
+                            ))}
+                          </select>
+                          {formErrors.schoolState && (
+                            <p className="text-red-500 text-sm mt-1">{formErrors.schoolState}</p>
+                          )}
+                        </div>
+                      </div>
 
                       {/* Track 2: Principal name and PD Challenge (always visible) */}
                       {currentTrack === 'partner-teacher-nomination' && (
