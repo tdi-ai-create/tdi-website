@@ -25,6 +25,10 @@ import {
   Calendar,
   Users,
   UserCircle,
+  PlayCircle,
+  PenLine,
+  Package,
+  GraduationCap,
 } from 'lucide-react';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { supabase } from '@/lib/supabase';
@@ -137,6 +141,18 @@ export default function AdminCreatorDetailPage() {
 
   // View mode toggle (admin vs creator preview)
   const [viewMode, setViewMode] = useState<'admin' | 'creator'>('admin');
+
+  // Admin complete action modal state
+  const [showActionModal, setShowActionModal] = useState(false);
+  const [selectedMilestoneForAction, setSelectedMilestoneForAction] = useState<{
+    id: string;
+    title: string;
+    actionType: string;
+    actionConfig: Record<string, unknown>;
+  } | null>(null);
+  const [adminActionNote, setAdminActionNote] = useState('');
+  const [isCompletingAction, setIsCompletingAction] = useState(false);
+  const [selectedPathForAction, setSelectedPathForAction] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     const data = await getCreatorDashboardData(creatorId);
@@ -406,6 +422,80 @@ export default function AdminCreatorDetailPage() {
     }
   };
 
+  const handleOpenActionModal = (
+    milestoneId: string,
+    milestoneTitle: string,
+    actionType: string,
+    actionConfig: Record<string, unknown>
+  ) => {
+    setSelectedMilestoneForAction({
+      id: milestoneId,
+      title: milestoneTitle,
+      actionType,
+      actionConfig
+    });
+    setAdminActionNote('');
+    setSelectedPathForAction(null);
+    setShowActionModal(true);
+  };
+
+  const handleCompleteAction = async () => {
+    if (!selectedMilestoneForAction) return;
+
+    // For select action type, require a selection
+    if (selectedMilestoneForAction.actionType === 'select' && !selectedPathForAction) {
+      alert('Please select an option first');
+      return;
+    }
+
+    setIsCompletingAction(true);
+
+    try {
+      // Build content based on action type
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let content: any = {};
+
+      if (selectedMilestoneForAction.actionType === 'select') {
+        content = { selected_path: selectedPathForAction };
+      } else if (selectedMilestoneForAction.actionType === 'confirm' ||
+                 selectedMilestoneForAction.actionType === 'review') {
+        content = { confirmed: true };
+      }
+
+      const response = await fetch('/api/admin/complete-action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          milestoneId: selectedMilestoneForAction.id,
+          actionType: selectedMilestoneForAction.actionType === 'select' ? 'path_selection' : selectedMilestoneForAction.actionType,
+          content,
+          adminEmail,
+          adminNote: adminActionNote.trim() || null
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setShowActionModal(false);
+        setSelectedMilestoneForAction(null);
+        setAdminActionNote('');
+        setSelectedPathForAction(null);
+        await loadData();
+        setSuccessMessage(`Completed on behalf of creator: ${selectedMilestoneForAction.title}`);
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        alert(`Failed to complete action: ${data.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error completing action:', error);
+      alert('Error completing action. Please try again.');
+    } finally {
+      setIsCompletingAction(false);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
@@ -579,6 +669,7 @@ export default function AdminCreatorDetailPage() {
                   onRequestRevision={handleRequestRevision}
                   onReopen={handleReopen}
                   onToggleMilestone={handleToggleMilestone}
+                  onCompleteAction={handleOpenActionModal}
                   approvingMilestoneId={approvingMilestoneId}
                   reopeningMilestone={reopeningMilestone}
                   togglingMilestone={togglingMilestone}
@@ -885,6 +976,125 @@ export default function AdminCreatorDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Admin Complete Action Modal */}
+      {showActionModal && selectedMilestoneForAction && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between mb-4">
+              <div>
+                <h3 className="text-lg font-semibold text-[#1e2749]">Complete Action for Creator</h3>
+                <p className="text-sm text-gray-500 mt-1">
+                  {selectedMilestoneForAction.title}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setShowActionModal(false);
+                  setSelectedMilestoneForAction(null);
+                  setAdminActionNote('');
+                  setSelectedPathForAction(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+              <p className="text-sm text-amber-800">
+                <strong>Admin Action:</strong> You are completing this step on behalf of {creator.name}. This will be recorded in the audit trail.
+              </p>
+            </div>
+
+            {/* Content Path Selection UI */}
+            {selectedMilestoneForAction.actionType === 'select' && (
+              <div className="space-y-3 mb-4">
+                <p className="text-sm font-medium text-gray-700">Select content path:</p>
+                {[
+                  { value: 'blog', label: 'Blog Post', icon: PenLine, description: 'Write a featured article' },
+                  { value: 'download', label: 'Digital Download', icon: Package, description: 'Create downloadable resources' },
+                  { value: 'course', label: 'Learning Hub Course', icon: GraduationCap, description: 'Build a full online course' },
+                ].map((option) => (
+                  <button
+                    key={option.value}
+                    onClick={() => setSelectedPathForAction(option.value)}
+                    className={`w-full flex items-center gap-3 p-3 rounded-lg border-2 transition-all text-left ${
+                      selectedPathForAction === option.value
+                        ? 'border-[#ffba06] bg-[#fff9eb]'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                      selectedPathForAction === option.value ? 'bg-[#ffba06] text-white' : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      <option.icon className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-[#1e2749]">{option.label}</p>
+                      <p className="text-xs text-gray-500">{option.description}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Confirmation action types */}
+            {(selectedMilestoneForAction.actionType === 'confirm' ||
+              selectedMilestoneForAction.actionType === 'review') && (
+              <div className="bg-gray-50 rounded-lg p-4 mb-4">
+                <p className="text-sm text-gray-700">
+                  This will mark the step as completed. The creator will see this as done in their dashboard.
+                </p>
+              </div>
+            )}
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Internal note (optional)
+              </label>
+              <textarea
+                value={adminActionNote}
+                onChange={(e) => setAdminActionNote(e.target.value)}
+                placeholder="Why are you completing this on their behalf? (e.g., Discussed on call, creator requested)"
+                rows={2}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent resize-none"
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowActionModal(false);
+                  setSelectedMilestoneForAction(null);
+                  setAdminActionNote('');
+                  setSelectedPathForAction(null);
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCompleteAction}
+                disabled={isCompletingAction || (selectedMilestoneForAction.actionType === 'select' && !selectedPathForAction)}
+                className="flex-1 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3459] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+              >
+                {isCompletingAction ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Completing...
+                  </>
+                ) : (
+                  <>
+                    <PlayCircle className="w-4 h-4" />
+                    Complete for Creator
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -897,6 +1107,7 @@ function PhaseSection({
   onRequestRevision,
   onReopen,
   onToggleMilestone,
+  onCompleteAction,
   approvingMilestoneId,
   reopeningMilestone,
   togglingMilestone,
@@ -908,6 +1119,7 @@ function PhaseSection({
   onRequestRevision: (milestoneId: string, milestoneTitle: string) => void;
   onReopen: (milestoneId: string, milestoneTitle: string) => void;
   onToggleMilestone: (milestoneId: string, milestoneTitle: string, currentStatus: string) => void;
+  onCompleteAction: (milestoneId: string, milestoneTitle: string, actionType: string, actionConfig: Record<string, unknown>) => void;
   approvingMilestoneId: string | null;
   reopeningMilestone: string | null;
   togglingMilestone: string | null;
@@ -970,6 +1182,7 @@ function PhaseSection({
                   onRequestRevision={() => onRequestRevision(milestone.id, milestoneTitle)}
                   onReopen={() => onReopen(milestone.id, milestoneTitle)}
                   onToggle={() => onToggleMilestone(milestone.id, milestoneTitle, milestone.status)}
+                  onCompleteAction={() => onCompleteAction(milestone.id, milestoneTitle, m.action_type || 'confirm', m.action_config || {})}
                   isApproving={approvingMilestoneId === milestone.id}
                   isReopening={reopeningMilestone === milestone.id}
                   isToggling={togglingMilestone === milestone.id}
@@ -989,6 +1202,7 @@ function MilestoneRow({
   onRequestRevision,
   onReopen,
   onToggle,
+  onCompleteAction,
   isApproving,
   isReopening,
   isToggling,
@@ -996,6 +1210,7 @@ function MilestoneRow({
   milestone: MilestoneWithStatus;
   onApprove: () => void;
   onRequestRevision: () => void;
+  onCompleteAction: () => void;
   onReopen: () => void;
   onToggle: () => void;
   isApproving: boolean;
@@ -1019,6 +1234,15 @@ function MilestoneRow({
   const isLocked = milestone.status === 'locked';
   const isCompleted = milestone.status === 'completed';
   const isClickable = !isLocked && !isToggling;
+
+  // Check if this milestone has a creator action that admin can complete on their behalf
+  const actionType = m.action_type || 'confirm';
+  const creatorActionTypes = ['confirm', 'review', 'select', 'preferences_form', 'review_notes'];
+  const canCompleteForCreator =
+    !milestone.requires_team_action &&
+    creatorActionTypes.includes(actionType) &&
+    (milestone.status === 'available' || milestone.status === 'in_progress') &&
+    !isLocked;
 
   return (
     <div className="px-6 py-4">
@@ -1141,6 +1365,17 @@ function MilestoneRow({
                 </button>
               </Tooltip>
             </>
+          )}
+          {canCompleteForCreator && (
+            <Tooltip content="Complete this action on behalf of the creator (with audit trail)" position="left">
+              <button
+                onClick={onCompleteAction}
+                className="inline-flex items-center gap-1 bg-[#1e2749] text-white px-3 py-1.5 rounded-lg text-sm hover:bg-[#2a3459] transition-colors"
+              >
+                <PlayCircle className="w-4 h-4" />
+                Complete for Creator
+              </button>
+            </Tooltip>
           )}
           {milestone.status === 'completed' && (
             <div className="flex items-center gap-2">
