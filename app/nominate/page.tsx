@@ -889,7 +889,7 @@ export default function NominatePage() {
                       {testimonial.quote}
                     </p>
                     <p className="text-sm font-semibold" style={{ color: '#35A7FF' }}>
-                      — {testimonial.attribution}
+                      - {testimonial.attribution}
                     </p>
                   </div>
                 ))}
@@ -957,7 +957,7 @@ export default function NominatePage() {
                 "{TESTIMONIALS[activeTestimonialIndex].quote}"
               </p>
               <span className="text-xs font-medium whitespace-nowrap" style={{ color: '#35A7FF' }}>
-                — {TESTIMONIALS[activeTestimonialIndex].attribution}
+                - {TESTIMONIALS[activeTestimonialIndex].attribution}
               </span>
             </div>
           </div>
@@ -1628,7 +1628,7 @@ export default function NominatePage() {
                 </h3>
                 <div className="space-y-4" style={{ color: '#cbd5e1', lineHeight: '1.8' }}>
                   <p>
-                    Not the lounge. Not the cafeteria. A restaurant — their favorite one. Private room. Spouses invited. Everything paid for.
+                    Not the lounge. Not the cafeteria. A restaurant - their favorite one. Private room. Spouses invited. Everything paid for.
                   </p>
                   <p>
                     There's a TDI swag bag at every chair. Inside: a gift card, a handwritten note from you, and gear that says "we see you."
@@ -1664,7 +1664,7 @@ export default function NominatePage() {
                     <div>
                       <h4 className="font-semibold text-white mb-1">Dinner, Lunch, or Happy Hour</h4>
                       <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
-                        You pick the venue and the vibe. It's your staff — you know what they'd love.
+                        You pick the venue and the vibe. It's your staff - you know what they'd love.
                       </p>
                     </div>
                   </div>
@@ -1690,7 +1690,7 @@ export default function NominatePage() {
                     <div>
                       <h4 className="font-semibold text-white mb-1">Gift Cards, Swag & Handwritten Notes</h4>
                       <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
-                        Every teacher walks away with something personal. Not generic — chosen by you.
+                        Every teacher walks away with something personal. Not generic - chosen by you.
                       </p>
                     </div>
                   </div>
@@ -1759,7 +1759,7 @@ export default function NominatePage() {
               <div className="flex items-center gap-3">
                 <Download className="w-5 h-5" style={{ color: '#F6AD55' }} />
                 <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                  Get the full guide below — it's yours to keep and share
+                  Get the full guide below - it's yours to keep and share
                 </span>
               </div>
             </div>
@@ -1777,14 +1777,14 @@ export default function NominatePage() {
                 See the Full Celebration Guide
               </a>
               <p className="text-sm mt-4 max-w-md mx-auto" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                See exactly what's possible — celebration options, how the budget works, and the impact it has on your building. Everything you just read, in a guide you can share with your team.
+                See exactly what's possible - celebration options, how the budget works, and the impact it has on your building. Everything you just read, in a guide you can share with your team.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* 6. Accordion — What Happens When You Nominate */}
+      {/* 6. Accordion - What Happens When You Nominate */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto">
@@ -1869,7 +1869,7 @@ export default function NominatePage() {
                   className="w-full flex items-center justify-between p-5 text-left cursor-pointer transition-colors duration-200 hover:bg-gray-100"
                 >
                   <span className="font-semibold text-lg" style={{ color: '#1e2749' }}>
-                    Wait — my whole staff gets celebrated?
+                    Wait - my whole staff gets celebrated?
                   </span>
                   <ChevronDown
                     className={`w-5 h-5 transition-transform duration-200 ${openAccordion === 2 ? 'rotate-180' : ''}`}

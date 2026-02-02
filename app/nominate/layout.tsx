@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Nominate a School | Teachers Deserve It',
+  title: 'Nominate a School',
   description: 'Know a school that deserves better professional development? Nominate them for a TDI partnership. Only 4 Blueprint Founders Circle spots available for Fall 2026.',
   openGraph: {
     title: 'Nominate a School for Better PD | Teachers Deserve It',
