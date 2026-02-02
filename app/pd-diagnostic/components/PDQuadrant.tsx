@@ -42,7 +42,7 @@ const quadrants = [
     icon: Target,
     name: 'Embedded Practice',
     tagline: 'Consistent support, sustained outcomes',
-    description: 'PD isn\'t an event — it\'s how your school operates. Everyone grows, all year.',
+    description: 'PD isn\'t an event -  it\'s how your school operates. Everyone grows, all year.',
     gradient: 'from-emerald-50 to-teal-100',
     borderColor: 'border-emerald-300',
     selectedGradient: 'from-emerald-100 to-teal-200',

@@ -30,7 +30,7 @@ Use this document to maintain continuity across Claude threads. Read this ENTIRE
 
 ### Formatting Rules (STRICT - NO EXCEPTIONS)
 - NO emojis anywhere on the site
-- NO em-dashes (—) - use commas or regular dashes
+- NO em-dashes ( - ) - use commas or regular dashes
 - NO underlines on text (except actual links on hover)
 - NO bullet points in prose - write naturally
 - Minimal formatting - clean and modern

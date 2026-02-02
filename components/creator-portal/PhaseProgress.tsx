@@ -170,7 +170,7 @@ function MilestoneItem({
               <p className="text-sm text-gray-600 mt-1">{milestone.description}</p>
             )}
             <p className="text-sm text-amber-700 mt-2">
-              Our team is working on this — we&apos;ll update your portal once complete.
+              Our team is working on this -  we&apos;ll update your portal once complete.
             </p>
             <a
               href={`mailto:rachel@teachersdeserveit.com?subject=${emailSubject}&body=${emailBody}`}

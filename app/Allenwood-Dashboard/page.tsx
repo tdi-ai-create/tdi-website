@@ -354,7 +354,7 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Virtual Sessions — Ideas & Scheduling */}
+            {/* Virtual Sessions -  Ideas & Scheduling */}
             <div className="bg-gradient-to-r from-[#38618C]/10 to-[#35A7FF]/10 rounded-xl p-5 border border-[#38618C]/20">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-[#38618C] rounded-lg flex items-center justify-center flex-shrink-0">
@@ -644,7 +644,7 @@ export default function AllenwoodDashboard() {
                   <h3 className="text-xl font-semibold text-gray-800 mb-2">2026-27 Partnership Plan</h3>
                   <p className="text-sm text-gray-600">
                     Your pilot team is building strong foundations. Year 2 could expand
-                    this support schoolwide — bringing shared strategies to every classroom.
+                    this support schoolwide -  bringing shared strategies to every classroom.
                   </p>
                 </div>
                 <button
@@ -748,7 +748,7 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* 2b. Success Metrics — Card Grid with Clear Goals */}
+            {/* 2b. Success Metrics -  Card Grid with Clear Goals */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <div className="flex justify-between items-center mb-6">
                 <div>
@@ -884,7 +884,7 @@ export default function AllenwoodDashboard() {
               <Lightbulb className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
               <p className="text-xs text-amber-800">
                 <span className="font-semibold">Timeline tip:</span> Green checkmarks = completed milestones. The blue &quot;NOW&quot; marker shows where you are.
-                Gray items are upcoming — click the schedule buttons to book them!
+                Gray items are upcoming -  click the schedule buttons to book them!
               </p>
             </div>
 
@@ -904,7 +904,7 @@ export default function AllenwoodDashboard() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-800">Partnership Launched</p>
-                      <p className="text-sm text-gray-500">July 2025 — Contract signed, goals aligned</p>
+                      <p className="text-sm text-gray-500">July 2025 -  Contract signed, goals aligned</p>
                     </div>
                   </div>
 
@@ -915,7 +915,7 @@ export default function AllenwoodDashboard() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-800">Summer Leadership Meeting</p>
-                      <p className="text-sm text-gray-500">July 25, 2025 — Planning and preparation</p>
+                      <p className="text-sm text-gray-500">July 25, 2025 -  Planning and preparation</p>
                     </div>
                   </div>
 
@@ -926,7 +926,7 @@ export default function AllenwoodDashboard() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-800">Virtual Session #1</p>
-                      <p className="text-sm text-gray-500">September 17, 2025 — Team kickoff</p>
+                      <p className="text-sm text-gray-500">September 17, 2025 -  Team kickoff</p>
                     </div>
                   </div>
 
@@ -937,7 +937,7 @@ export default function AllenwoodDashboard() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-800">Observation Day #1</p>
-                      <p className="text-sm text-gray-500">October 15, 2025 — 10 teachers observed, 10 Love Notes delivered</p>
+                      <p className="text-sm text-gray-500">October 15, 2025 -  10 teachers observed, 10 Love Notes delivered</p>
                     </div>
                   </div>
 
@@ -959,7 +959,7 @@ export default function AllenwoodDashboard() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-800">Observation Day #2</p>
-                      <p className="text-sm text-gray-500">February 18, 2026 — Scheduled</p>
+                      <p className="text-sm text-gray-500">February 18, 2026 -  Scheduled</p>
                     </div>
                   </div>
 
@@ -970,7 +970,7 @@ export default function AllenwoodDashboard() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-800">Spring Leadership Celebration</p>
-                      <p className="text-sm text-gray-500">Spring 2026 — Celebrate wins + Year 2 planning</p>
+                      <p className="text-sm text-gray-500">Spring 2026 -  Celebrate wins + Year 2 planning</p>
                     </div>
                   </div>
                 </div>
@@ -1363,7 +1363,7 @@ export default function AllenwoodDashboard() {
                 <div className="flex items-center gap-3">
                   <CheckCircle className="w-6 h-6 text-green-500" />
                   <div className="text-left">
-                    <h3 className="font-semibold text-gray-800">Observation Day #1 — October 15, 2025</h3>
+                    <h3 className="font-semibold text-gray-800">Observation Day #1 -  October 15, 2025</h3>
                     <p className="text-sm text-gray-500">10 teachers observed · 10 personalized Love Notes delivered</p>
                   </div>
                 </div>
@@ -1639,7 +1639,7 @@ export default function AllenwoodDashboard() {
                   <div className="flex items-center gap-3">
                     <Calendar className="w-6 h-6 text-blue-500" />
                     <div>
-                      <h3 className="font-semibold text-gray-800">Observation Day #2 — February 18, 2026</h3>
+                      <h3 className="font-semibold text-gray-800">Observation Day #2 -  February 18, 2026</h3>
                       <p className="text-sm text-gray-500">Follow-up observations + continued coaching</p>
                     </div>
                   </div>
@@ -1731,7 +1731,7 @@ export default function AllenwoodDashboard() {
               {/* Hub Engagement Tip */}
               <p className="text-xs text-gray-500 mb-4 flex items-start gap-2">
                 <Lightbulb className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
-                <span><strong>What we&apos;re watching:</strong> 3+ logins = building habits. The goal isn&apos;t just access — it&apos;s regular use. We&apos;ll re-engage the &quot;Getting Started&quot; group at the Feb observation.</span>
+                <span><strong>What we&apos;re watching:</strong> 3+ logins = building habits. The goal isn&apos;t just access -  it&apos;s regular use. We&apos;ll re-engage the &quot;Getting Started&quot; group at the Feb observation.</span>
               </p>
 
               {/* Stats Row */}
@@ -1815,7 +1815,7 @@ export default function AllenwoodDashboard() {
                   <div className="w-3 h-3 bg-gray-400 rounded-full mt-1.5"></div>
                   <div>
                     <span className="font-semibold text-gray-700">Getting Started: 2 Teachers</span>
-                    <p className="text-sm text-gray-600">Haven&apos;t logged in yet — we&apos;ll reconnect at Feb observation</p>
+                    <p className="text-sm text-gray-600">Haven&apos;t logged in yet -  we&apos;ll reconnect at Feb observation</p>
                   </div>
                 </div>
               </div>
@@ -2041,19 +2041,19 @@ export default function AllenwoodDashboard() {
                 <ul className="space-y-3">
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <Rocket className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
-                    <span><strong>Expand team</strong> — add more teachers schoolwide</span>
+                    <span><strong>Expand team</strong> -  add more teachers schoolwide</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <Repeat className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
-                    <span><strong>Full-year support</strong> — August to July</span>
+                    <span><strong>Full-year support</strong> -  August to July</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <Award className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
-                    <span><strong>Teacher leaders emerge</strong> — pilot teachers mentor new members</span>
+                    <span><strong>Teacher leaders emerge</strong> -  pilot teachers mentor new members</span>
                   </li>
                   <li className="flex items-start gap-2 text-sm text-gray-700">
                     <TrendingUp className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
-                    <span><strong>Deeper implementation</strong> — strategies become habits</span>
+                    <span><strong>Deeper implementation</strong> -  strategies become habits</span>
                   </li>
                 </ul>
                 <div className="mt-4 pt-4 border-t border-[#38618C]/20">
@@ -2108,7 +2108,7 @@ export default function AllenwoodDashboard() {
                   </div>
                   <p className="text-gray-600 text-sm italic mb-4 pl-4">
                     &quot;Year 2 was when everything clicked. Our pilot teachers became mentors,
-                    and the strategies became part of our school culture — not just something
+                    and the strategies became part of our school culture -  not just something
                     a few teachers were trying.&quot;
                   </p>
                   <div className="flex items-center gap-3 pl-4">
@@ -2151,7 +2151,7 @@ export default function AllenwoodDashboard() {
               <div>
                 <p className="text-sm text-[#1e2749] font-medium mb-1">How to use this preview</p>
                 <p className="text-xs text-gray-600">
-                  This isn&apos;t a commitment — it&apos;s a conversation starter. Use these options to think about what
+                  This isn&apos;t a commitment -  it&apos;s a conversation starter. Use these options to think about what
                   makes sense for YOUR school. We&apos;ll customize any Year 2 plan based on your goals, budget, and capacity.
                 </p>
               </div>
@@ -2177,7 +2177,7 @@ export default function AllenwoodDashboard() {
                         <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full font-medium">Year 2 Feature</span>
                       </div>
                       <p className="text-gray-600 text-sm">
-                        Bring additional teachers into the TDI community — gen ed, specialists, or department teams ready for sustainable PD.
+                        Bring additional teachers into the TDI community -  gen ed, specialists, or department teams ready for sustainable PD.
                       </p>
                     </div>
                   </div>
@@ -2213,7 +2213,7 @@ export default function AllenwoodDashboard() {
                         <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full font-medium">Year 2 Feature</span>
                       </div>
                       <p className="text-gray-600 text-sm">
-                        Your pilot teachers become in-house mentors — modeling strategies and supporting new team members as they onboard.
+                        Your pilot teachers become in-house mentors -  modeling strategies and supporting new team members as they onboard.
                       </p>
                     </div>
                   </div>
@@ -2231,7 +2231,7 @@ export default function AllenwoodDashboard() {
                         <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full font-medium">Year 2 Feature</span>
                       </div>
                       <p className="text-gray-600 text-sm">
-                        Start in August with a full school year of support — not just spring semester.
+                        Start in August with a full school year of support -  not just spring semester.
                       </p>
                     </div>
                   </div>
@@ -2294,7 +2294,7 @@ export default function AllenwoodDashboard() {
               {/* Right Column: Timeline (3 cols) */}
               <div className="md:col-span-3 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                 <h3 className="font-semibold text-gray-800 mb-2">Proposed 2026-27 Timeline</h3>
-                <p className="text-sm text-gray-500 mb-4">Phase 2 (ACCELERATE) — Expanding Schoolwide</p>
+                <p className="text-sm text-gray-500 mb-4">Phase 2 (ACCELERATE) -  Expanding Schoolwide</p>
 
                 <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
                   {/* 1. July/August - Leadership Planning */}
@@ -2491,7 +2491,7 @@ export default function AllenwoodDashboard() {
               </div>
               <h3 className="text-2xl font-bold text-white mb-2">Ready to Talk About Year 2?</h3>
               <p className="text-white/90 mb-6 max-w-xl mx-auto">
-                We&apos;ll customize the plan to fit YOUR goals — whether that&apos;s expanding to more teachers, deepening with your current team, or something in between.
+                We&apos;ll customize the plan to fit YOUR goals -  whether that&apos;s expanding to more teachers, deepening with your current team, or something in between.
               </p>
               <a
                 href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
@@ -2504,7 +2504,7 @@ export default function AllenwoodDashboard() {
                 <ArrowRight className="w-4 h-4" />
               </a>
               <p className="text-white/70 text-xs mt-4">
-                No commitment required — just a conversation about what&apos;s possible
+                No commitment required -  just a conversation about what&apos;s possible
               </p>
             </div>
           </div>
@@ -2671,7 +2671,7 @@ export default function AllenwoodDashboard() {
 
               <div className="mt-4 pt-4 border-t border-gray-200 text-center">
                 <p className="text-sm text-gray-600">
-                  Partnership Period: <span className="font-medium text-[#1e2749]">July 2025 – June 2026</span>
+                  Partnership Period: <span className="font-medium text-[#1e2749]">July 2025 -  June 2026</span>
                 </p>
                 <p className="text-sm text-gray-500 mt-1">Hub Access Until July 2026</p>
               </div>
@@ -2825,7 +2825,7 @@ export default function AllenwoodDashboard() {
                 <p className="text-gray-600 italic">
                   &quot;The implementation support makes all the difference.&quot;
                 </p>
-                <p className="text-sm text-gray-400 mt-1">— Partner School Administrator</p>
+                <p className="text-sm text-gray-400 mt-1"> -  Partner School Administrator</p>
               </div>
             </div>
 

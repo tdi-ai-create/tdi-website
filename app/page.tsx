@@ -521,7 +521,7 @@ export default function Home() {
             </div>
 
             <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.5 }}>
-              This is a fictional example — your dashboard is customized to your school's goals.
+              This is a fictional example -  your dashboard is customized to your school's goals.
             </p>
           </div>
         </div>

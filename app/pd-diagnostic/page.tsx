@@ -535,7 +535,7 @@ export default function PDDiagnosticPage() {
                       &quot;This diagnostic helped us see exactly where our PD was falling short. Within 10 minutes,<br />we had a clear picture of what needed to change.&quot;
                     </p>
                     <p className="text-xs font-medium text-white/60">
-                      - K-8 Principal, Illinois
+                   - K-8 Principal, Illinois
                     </p>
                   </div>
                 </div>

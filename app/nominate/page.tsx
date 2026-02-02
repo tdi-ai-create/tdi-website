@@ -992,7 +992,7 @@ export default function NominatePage() {
                       {testimonial.quote}
                     </p>
                     <p className="text-sm font-semibold" style={{ color: '#35A7FF' }}>
-                      - {testimonial.attribution}
+                   - {testimonial.attribution}
                     </p>
                   </div>
                 ))}
@@ -1230,7 +1230,7 @@ export default function NominatePage() {
                 "{TESTIMONIALS[activeTestimonialIndex].quote}"
               </p>
               <span className="text-xs font-medium whitespace-nowrap" style={{ color: '#35A7FF' }}>
-                - {TESTIMONIALS[activeTestimonialIndex].attribution}
+             - {TESTIMONIALS[activeTestimonialIndex].attribution}
               </span>
             </div>
           </div>

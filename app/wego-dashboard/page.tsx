@@ -287,7 +287,7 @@ export default function WegoDashboard() {
               </div>
 
               <p className="text-sm text-gray-600 text-center">
-                Your team receives dedicated, personalized support — not one-size-fits-all PD.
+                Your team receives dedicated, personalized support -  not one-size-fits-all PD.
               </p>
             </div>
 
@@ -353,7 +353,7 @@ export default function WegoDashboard() {
 
               <div className="mt-4 flex items-center gap-2 text-sm text-green-600">
                 <CheckCircle className="w-4 h-4" />
-                <span>Only 1 item left to schedule — you&apos;re almost there!</span>
+                <span>Only 1 item left to schedule -  you&apos;re almost there!</span>
               </div>
             </div>
 
@@ -367,15 +367,15 @@ export default function WegoDashboard() {
               <div className="space-y-4">
                 <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#ffba06]">
                   <p className="text-gray-700 italic mb-2">&quot;Trust and shared goals to best serve students.&quot;</p>
-                  <p className="text-sm text-[#38618C] font-medium">— Bob Talbot</p>
+                  <p className="text-sm text-[#38618C] font-medium"> -  Bob Talbot</p>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#ffba06]">
                   <p className="text-gray-700 italic mb-2">&quot;The feedback step has been effective for me and enables me to provide better support to both teachers and students.&quot;</p>
-                  <p className="text-sm text-[#38618C] font-medium">— Claudia Castellanos</p>
+                  <p className="text-sm text-[#38618C] font-medium"> -  Claudia Castellanos</p>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#ffba06]">
                   <p className="text-gray-700 italic mb-2">&quot;We all agreed this course was useful.&quot;</p>
-                  <p className="text-sm text-[#38618C] font-medium">— Curt Treu&apos;s Subgroup</p>
+                  <p className="text-sm text-[#38618C] font-medium"> -  Curt Treu&apos;s Subgroup</p>
                 </div>
               </div>
             </div>
@@ -407,21 +407,21 @@ export default function WegoDashboard() {
                   <div className="w-3 h-3 bg-green-500 rounded-full mt-1 flex-shrink-0"></div>
                   <div>
                     <div className="font-medium text-green-800 text-sm">High Engagement (5+ logins)</div>
-                    <div className="text-xs text-green-700">9 PAs — logging in regularly</div>
+                    <div className="text-xs text-green-700">9 PAs -  logging in regularly</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
                   <div className="w-3 h-3 bg-amber-500 rounded-full mt-1 flex-shrink-0"></div>
                   <div>
                     <div className="font-medium text-amber-800 text-sm">Building Habits (2-4 logins)</div>
-                    <div className="text-xs text-amber-700">9 PAs — exploring at their pace</div>
+                    <div className="text-xs text-amber-700">9 PAs -  exploring at their pace</div>
                   </div>
                 </div>
                 <div className="flex items-start gap-3 p-3 bg-red-50 rounded-lg border border-red-200">
                   <div className="w-3 h-3 bg-red-500 rounded-full mt-1 flex-shrink-0"></div>
                   <div>
                     <div className="font-medium text-red-800 text-sm">Needs Support (0 logins)</div>
-                    <div className="text-xs text-red-700">1 PA — hasn&apos;t logged in yet</div>
+                    <div className="text-xs text-red-700">1 PA -  hasn&apos;t logged in yet</div>
                   </div>
                 </div>
               </div>
@@ -431,13 +431,13 @@ export default function WegoDashboard() {
                   <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
                   <div>
                     <div className="text-sm font-semibold text-[#38618C]">Recommendation</div>
-                    <p className="text-sm text-gray-700">Consider a quick Hub walkthrough for the 1 PA who hasn&apos;t logged in — a 5-minute demo at your next team meeting can make the difference.</p>
+                    <p className="text-sm text-gray-700">Consider a quick Hub walkthrough for the 1 PA who hasn&apos;t logged in -  a 5-minute demo at your next team meeting can make the difference.</p>
                   </div>
                 </div>
               </div>
 
               <p className="text-sm text-gray-600 text-center mt-4">
-                7 PAs logged in this month (January 2026) — momentum is building!
+                7 PAs logged in this month (January 2026) -  momentum is building!
               </p>
             </div>
 
@@ -540,7 +540,7 @@ export default function WegoDashboard() {
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <div>
                       <span className="font-medium text-[#1e2749]">Observation Day 3</span>
-                      <span className="text-gray-500 mx-2">—</span>
+                      <span className="text-gray-500 mx-2"> - </span>
                       <span className="text-green-600 font-medium">February 25, 2026</span>
                     </div>
                   </div>
@@ -548,7 +548,7 @@ export default function WegoDashboard() {
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <div>
                       <span className="font-medium text-[#1e2749]">Virtual Session 4</span>
-                      <span className="text-gray-500 mx-2">—</span>
+                      <span className="text-gray-500 mx-2"> - </span>
                       <span className="text-green-600 font-medium">March 16, 2026</span>
                     </div>
                   </div>
@@ -556,7 +556,7 @@ export default function WegoDashboard() {
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <div>
                       <span className="font-medium text-[#1e2749]">Virtual Session 5</span>
-                      <span className="text-gray-500 mx-2">—</span>
+                      <span className="text-gray-500 mx-2"> - </span>
                       <span className="text-green-600 font-medium">April 13, 2026</span>
                     </div>
                   </div>
@@ -564,7 +564,7 @@ export default function WegoDashboard() {
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <div>
                       <span className="font-medium text-[#1e2749]">Virtual Session 6</span>
-                      <span className="text-gray-500 mx-2">—</span>
+                      <span className="text-gray-500 mx-2"> - </span>
                       <span className="text-green-600 font-medium">May 11, 2026</span>
                     </div>
                   </div>
@@ -580,11 +580,11 @@ export default function WegoDashboard() {
               </div>
               <div className="grid sm:grid-cols-2 gap-3">
                 {[
-                  'Hub Access Activated — 19 paras enrolled',
-                  'Hub Logins — 95% (18/19)',
-                  'Observation Day 1 — November 12, 2025',
-                  'Observation Day 2 — Complete',
-                  'Virtual Sessions 1-3 — Complete',
+                  'Hub Access Activated -  19 paras enrolled',
+                  'Hub Logins -  95% (18/19)',
+                  'Observation Day 1 -  November 12, 2025',
+                  'Observation Day 2 -  Complete',
+                  'Virtual Sessions 1-3 -  Complete',
                 ].map((item, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-green-700">
                     <Check className="w-4 h-4 flex-shrink-0" />
@@ -597,7 +597,7 @@ export default function WegoDashboard() {
             {/* Partnership Footer */}
             <div className="bg-[#1e2749] rounded-xl p-4 text-center">
               <p className="text-white/80 text-sm">
-                Partnership Period: <span className="text-white font-semibold">September 2025 – June 2026</span>
+                Partnership Period: <span className="text-white font-semibold">September 2025 -  June 2026</span>
                 <span className="mx-2 text-white/40">|</span>
                 Hub Access Until: <span className="text-white font-semibold">June 2027</span>
               </p>
@@ -721,7 +721,7 @@ export default function WegoDashboard() {
                   <ul className="text-sm text-green-700 space-y-1">
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      100% hub login rate — exceptional engagement
+                      100% hub login rate -  exceptional engagement
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -829,23 +829,23 @@ export default function WegoDashboard() {
                   <ul className="text-sm text-gray-700 space-y-2">
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span><strong>Sep 2025</strong> — Partnership launched, 19 PAs enrolled</span>
+                      <span><strong>Sep 2025</strong> -  Partnership launched, 19 PAs enrolled</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span><strong>Oct 2025</strong> — 95% Hub access, subgroups established</span>
+                      <span><strong>Oct 2025</strong> -  95% Hub access, subgroups established</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span><strong>Nov 2025</strong> — Obs Day 1: 62.5% high Hub engagement</span>
+                      <span><strong>Nov 2025</strong> -  Obs Day 1: 62.5% high Hub engagement</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span><strong>Dec 2025</strong> — Subgroups thriving, course feedback flowing</span>
+                      <span><strong>Dec 2025</strong> -  Subgroups thriving, course feedback flowing</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span><strong>Jan 2026</strong> — 7 PAs active this month</span>
+                      <span><strong>Jan 2026</strong> -  7 PAs active this month</span>
                     </li>
                   </ul>
                 </div>
@@ -858,23 +858,23 @@ export default function WegoDashboard() {
                   <ul className="text-sm text-gray-700 space-y-2">
                     <li className="flex items-start gap-2">
                       <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                      <span><strong>Feb 25</strong> — Observation Day 3</span>
+                      <span><strong>Feb 25</strong> -  Observation Day 3</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                      <span><strong>Mar 16</strong> — Virtual Session 4</span>
+                      <span><strong>Mar 16</strong> -  Virtual Session 4</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                      <span><strong>Apr 13</strong> — Virtual Session 5</span>
+                      <span><strong>Apr 13</strong> -  Virtual Session 5</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                      <span><strong>Apr (TBD)</strong> — Year 1 Celebration + Year 2 Planning</span>
+                      <span><strong>Apr (TBD)</strong> -  Year 1 Celebration + Year 2 Planning</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                      <span><strong>May 11</strong> — Virtual Session 6 (Final)</span>
+                      <span><strong>May 11</strong> -  Virtual Session 6 (Final)</span>
                     </li>
                   </ul>
                 </div>
@@ -892,7 +892,7 @@ export default function WegoDashboard() {
               <div className="flex items-start gap-4 mb-4">
                 <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="font-medium text-[#1e2749]">Observation Day 1 — November 12, 2025</p>
+                  <p className="font-medium text-[#1e2749]">Observation Day 1 -  November 12, 2025</p>
                   <p className="text-sm text-gray-500">8 of 19 PAs observed</p>
                 </div>
                 <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">COMPLETE</span>
@@ -902,7 +902,7 @@ export default function WegoDashboard() {
               <div className="flex items-start gap-4 mb-4">
                 <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="font-medium text-[#1e2749]">Observation Day 2 — December 3, 2025</p>
+                  <p className="font-medium text-[#1e2749]">Observation Day 2 -  December 3, 2025</p>
                   <p className="text-sm text-gray-500">11 of 19 PAs observed</p>
                 </div>
                 <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">COMPLETE</span>
@@ -912,7 +912,7 @@ export default function WegoDashboard() {
               <div className="flex items-start gap-4">
                 <Calendar className="w-6 h-6 text-blue-500 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
-                  <p className="font-medium text-[#1e2749]">Observation Day 3 — February 25, 2026</p>
+                  <p className="font-medium text-[#1e2749]">Observation Day 3 -  February 25, 2026</p>
                   <p className="text-sm text-gray-500">Follow-up observations</p>
                 </div>
                 <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">SCHEDULED</span>
@@ -940,7 +940,7 @@ export default function WegoDashboard() {
                         <span className="font-bold text-[#1e2749]">Isaac Spear</span>
                         <span className="text-xs text-gray-500">Nov 12, 2025</span>
                       </div>
-                      <p className="text-sm text-gray-700 italic">&quot;Textbook scaffolding! Goal review was outstanding — reviewed when work would be done, asked &apos;Do you have any questions?&apos;, gave reminders of next steps. Multi-modal support shows deep understanding.&quot;</p>
+                      <p className="text-sm text-gray-700 italic">&quot;Textbook scaffolding! Goal review was outstanding -  reviewed when work would be done, asked &apos;Do you have any questions?&apos;, gave reminders of next steps. Multi-modal support shows deep understanding.&quot;</p>
                       <div className="mt-2 text-xs text-[#35A7FF] font-medium">Recommended: Sentence Starter Guide</div>
                     </div>
                   </div>
@@ -957,7 +957,7 @@ export default function WegoDashboard() {
                         <span className="font-bold text-[#1e2749]">Quinn Ricci</span>
                         <span className="text-xs text-gray-500">Dec 3, 2025</span>
                       </div>
-                      <p className="text-sm text-gray-700 italic">&quot;Leadership was seamless — even with a sub, you kept everything running smoothly. 15/10 for handling that student moment with warmth. &apos;Thank you for apologizing&apos; models exactly the kind of respect that builds trust.&quot;</p>
+                      <p className="text-sm text-gray-700 italic">&quot;Leadership was seamless -  even with a sub, you kept everything running smoothly. 15/10 for handling that student moment with warmth. &apos;Thank you for apologizing&apos; models exactly the kind of respect that builds trust.&quot;</p>
                     </div>
                   </div>
                 </div>
@@ -973,7 +973,7 @@ export default function WegoDashboard() {
                         <span className="font-bold text-[#1e2749]">Lizz Nieto</span>
                         <span className="text-xs text-gray-500">Dec 3, 2025</span>
                       </div>
-                      <p className="text-sm text-gray-700 italic">&quot;All Star Status! Natural relationship-building in action — you leaned into conversation and bonded over TJ Maxx. Uses downtime with intention, not just filler. Keep exploring the Hub!&quot;</p>
+                      <p className="text-sm text-gray-700 italic">&quot;All Star Status! Natural relationship-building in action -  you leaned into conversation and bonded over TJ Maxx. Uses downtime with intention, not just filler. Keep exploring the Hub!&quot;</p>
                     </div>
                   </div>
                 </div>
@@ -1020,23 +1020,23 @@ export default function WegoDashboard() {
                         <ul className="text-sm text-gray-700 space-y-2">
                           <li className="flex items-start gap-2">
                             <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span><strong>Calm, structured environment</strong> — students clearly knew expectations and felt safe</span>
+                            <span><strong>Calm, structured environment</strong> -  students clearly knew expectations and felt safe</span>
                           </li>
                           <li className="flex items-start gap-2">
                             <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span><strong>AAC tools integration</strong> — using devices to support communication for non-verbal learners</span>
+                            <span><strong>AAC tools integration</strong> -  using devices to support communication for non-verbal learners</span>
                           </li>
                           <li className="flex items-start gap-2">
                             <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span><strong>Goal review scaffolding</strong> — helping students track their own progress toward IEP goals</span>
+                            <span><strong>Goal review scaffolding</strong> -  helping students track their own progress toward IEP goals</span>
                           </li>
                           <li className="flex items-start gap-2">
                             <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span><strong>Multi-modal support</strong> — using visuals, verbal cues, and physical prompts appropriately</span>
+                            <span><strong>Multi-modal support</strong> -  using visuals, verbal cues, and physical prompts appropriately</span>
                           </li>
                           <li className="flex items-start gap-2">
                             <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span><strong>Leadership presence</strong> — confident, proactive, and clearly invested in student success</span>
+                            <span><strong>Leadership presence</strong> -  confident, proactive, and clearly invested in student success</span>
                           </li>
                         </ul>
                       </div>
@@ -1045,7 +1045,7 @@ export default function WegoDashboard() {
                           <Lightbulb className="w-4 h-4 text-[#35A7FF]" />
                           <span className="text-sm font-semibold text-[#35A7FF]">Hub Resource Recommended</span>
                         </div>
-                        <p className="text-sm text-gray-700">&quot;Sentence Starter Guide&quot; — to expand student responses during goal review conversations</p>
+                        <p className="text-sm text-gray-700">&quot;Sentence Starter Guide&quot; -  to expand student responses during goal review conversations</p>
                       </div>
                     </div>
                   </div>
@@ -1070,15 +1070,15 @@ export default function WegoDashboard() {
                         <ul className="text-sm text-gray-700 space-y-2">
                           <li className="flex items-start gap-2">
                             <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span><strong>Leadership with substitute</strong> — stepped up seamlessly when regular teacher was out</span>
+                            <span><strong>Leadership with substitute</strong> -  stepped up seamlessly when regular teacher was out</span>
                           </li>
                           <li className="flex items-start gap-2">
                             <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span><strong>Device communication</strong> — effectively supported students using AAC devices throughout class</span>
+                            <span><strong>Device communication</strong> -  effectively supported students using AAC devices throughout class</span>
                           </li>
                           <li className="flex items-start gap-2">
                             <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span><strong>Warm student relationships</strong> — students clearly trust and respond positively to Quinn</span>
+                            <span><strong>Warm student relationships</strong> -  students clearly trust and respond positively to Quinn</span>
                           </li>
                         </ul>
                       </div>
@@ -1112,19 +1112,19 @@ export default function WegoDashboard() {
                         <ul className="text-sm text-gray-700 space-y-2">
                           <li className="flex items-start gap-2">
                             <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span><strong>Natural relationship-building</strong> — with a talkative student, you didn&apos;t shut down the conversation, you leaned into it and bonded over TJ Maxx!</span>
+                            <span><strong>Natural relationship-building</strong> -  with a talkative student, you didn&apos;t shut down the conversation, you leaned into it and bonded over TJ Maxx!</span>
                           </li>
                           <li className="flex items-start gap-2">
                             <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span><strong>Intentional use of downtime</strong> — the puzzle wasn&apos;t just filler, it was an opportunity to keep students engaged and have real conversation</span>
+                            <span><strong>Intentional use of downtime</strong> -  the puzzle wasn&apos;t just filler, it was an opportunity to keep students engaged and have real conversation</span>
                           </li>
                           <li className="flex items-start gap-2">
                             <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span><strong>Warm communication style</strong> — clearly makes students feel comfortable around you</span>
+                            <span><strong>Warm communication style</strong> -  clearly makes students feel comfortable around you</span>
                           </li>
                           <li className="flex items-start gap-2">
                             <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                            <span><strong>All Star Status!</strong> — knew how to engage students, use all forms of communication, and gave great reminders about charging tools at home</span>
+                            <span><strong>All Star Status!</strong> -  knew how to engage students, use all forms of communication, and gave great reminders about charging tools at home</span>
                           </li>
                         </ul>
                       </div>
@@ -1133,7 +1133,7 @@ export default function WegoDashboard() {
                           <CheckCircle className="w-4 h-4 text-green-600" />
                           <span className="text-sm font-semibold text-green-700">Hub Status</span>
                         </div>
-                        <p className="text-sm text-gray-700">Logged in twice (last: Dec 18) — keep exploring! We&apos;d love your feedback on what resources are most useful.</p>
+                        <p className="text-sm text-gray-700">Logged in twice (last: Dec 18) -  keep exploring! We&apos;d love your feedback on what resources are most useful.</p>
                       </div>
                     </div>
                   </div>
@@ -1309,7 +1309,7 @@ export default function WegoDashboard() {
               <div className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
                   <MessageSquare className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-sm font-semibold text-[#1e2749]">Sample Weekly Update — December 15, 2025</span>
+                  <span className="text-sm font-semibold text-[#1e2749]">Sample Weekly Update -  December 15, 2025</span>
                 </div>
                 <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
                   <div className="text-xs text-gray-500 mb-3">From: Denise, Eileen, Becky, Maricarmen</div>
@@ -1319,15 +1319,15 @@ export default function WegoDashboard() {
                     <ul className="text-sm text-gray-700 space-y-2">
                       <li className="flex items-start gap-2">
                         <span className="bg-[#38618C] text-white text-xs font-bold px-2 py-0.5 rounded mt-0.5">1</span>
-                        <span><strong>Early warning signs matter</strong> — recognizing dysregulation early helps prevent escalation in unstructured settings</span>
+                        <span><strong>Early warning signs matter</strong> -  recognizing dysregulation early helps prevent escalation in unstructured settings</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="bg-[#38618C] text-white text-xs font-bold px-2 py-0.5 rounded mt-0.5">2</span>
-                        <span><strong>Structure reduces stress</strong> — clear expectations, visuals, and adult presence help students navigate transitions</span>
+                        <span><strong>Structure reduces stress</strong> -  clear expectations, visuals, and adult presence help students navigate transitions</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <span className="bg-[#38618C] text-white text-xs font-bold px-2 py-0.5 rounded mt-0.5">3</span>
-                        <span><strong>Adult responses shape student regulation</strong> — calm, validating language supports self-regulation and builds trust</span>
+                        <span><strong>Adult responses shape student regulation</strong> -  calm, validating language supports self-regulation and builds trust</span>
                       </li>
                     </ul>
                   </div>
@@ -1337,11 +1337,11 @@ export default function WegoDashboard() {
                     <ul className="text-sm text-gray-700 space-y-2">
                       <li className="flex items-start gap-2">
                         <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span>Plan proactively for transitions — use visual supports, routines, and peer supports before triggers arise</span>
+                        <span>Plan proactively for transitions -  use visual supports, routines, and peer supports before triggers arise</span>
                       </li>
                       <li className="flex items-start gap-2">
                         <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                        <span>Use consistent de-escalation language — training staff to respond calmly helps students reset and re-engage</span>
+                        <span>Use consistent de-escalation language -  training staff to respond calmly helps students reset and re-engage</span>
                       </li>
                     </ul>
                   </div>
@@ -1352,7 +1352,7 @@ export default function WegoDashboard() {
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <BookOpen className="w-4 h-4 text-[#35A7FF]" />
-                  <span className="text-sm font-semibold text-[#1e2749]">Hub Course Feedback — &quot;Building Strong Teacher-Para Partnerships&quot;</span>
+                  <span className="text-sm font-semibold text-[#1e2749]">Hub Course Feedback -  &quot;Building Strong Teacher-Para Partnerships&quot;</span>
                 </div>
                 <div className="bg-[#35A7FF]/5 rounded-xl p-5 border border-[#35A7FF]/20">
                   <div className="text-xs text-gray-500 mb-3">From: Curt&apos;s Subgroup</div>
@@ -1366,7 +1366,7 @@ export default function WegoDashboard() {
                     </div>
                     <div className="bg-white rounded-lg p-3">
                       <span className="font-semibold text-[#1e2749]">Claudia:</span>
-                      <span className="text-gray-700 ml-2">&quot;Reinforces what we&apos;re practicing. I like how feedback is explained — it&apos;s been effective for me.&quot;</span>
+                      <span className="text-gray-700 ml-2">&quot;Reinforces what we&apos;re practicing. I like how feedback is explained -  it&apos;s been effective for me.&quot;</span>
                     </div>
                     <div className="bg-white rounded-lg p-3">
                       <span className="font-semibold text-[#1e2749]">Cristina:</span>
@@ -1411,7 +1411,7 @@ export default function WegoDashboard() {
               </span>
               <h2 className="text-2xl font-bold text-[#1e2749] mb-3">Year 2: Teacher-Para Partnerships</h2>
               <p className="text-gray-600 max-w-2xl mx-auto text-lg">
-                Your para team is thriving. Year 2 brings their teachers into the conversation — building the co-teaching partnerships that benefit everyone.
+                Your para team is thriving. Year 2 brings their teachers into the conversation -  building the co-teaching partnerships that benefit everyone.
               </p>
             </div>
 
@@ -1427,7 +1427,7 @@ export default function WegoDashboard() {
                 <p className="text-[#1e2749] font-medium italic mb-2">Your team said it best:</p>
                 <p className="text-xl text-[#1e2749] font-semibold">&quot;Trust and shared goals to best serve students.&quot;</p>
                 <p className="text-gray-600 text-sm mt-3">
-                  Your PAs are already practicing this. Year 2 brings their teachers into the same conversation — so everyone is aligned.
+                  Your PAs are already practicing this. Year 2 brings their teachers into the same conversation -  so everyone is aligned.
                 </p>
               </div>
 
@@ -1644,7 +1644,7 @@ export default function WegoDashboard() {
                     Are there other paras at WEGO who aren&apos;t part of this work yet?
                   </p>
                   <p className="text-sm text-gray-600 mb-4">
-                    Year 2 could be an opportunity to bring everyone onto the same page —
+                    Year 2 could be an opportunity to bring everyone onto the same page - 
                     same language, same strategies, same community.
                   </p>
                   <a
@@ -1688,7 +1688,7 @@ export default function WegoDashboard() {
                 <Calendar className="w-5 h-5 text-[#35A7FF]" />
                 Proposed 2026-27 Timeline
               </h3>
-              <p className="text-sm text-gray-600 mb-6">Phase 2 (ACCELERATE) — Building Teacher-Para Partnerships</p>
+              <p className="text-sm text-gray-600 mb-6">Phase 2 (ACCELERATE) -  Building Teacher-Para Partnerships</p>
 
               {/* Timeline */}
               <div className="relative">
@@ -1744,7 +1744,7 @@ export default function WegoDashboard() {
                         <span className="text-xs font-medium text-[#38618C]">OCTOBER 2026</span>
                       </div>
                       <h4 className="font-semibold text-[#1e2749] text-sm">Virtual Session #1</h4>
-                      <p className="text-xs text-gray-600 mt-1">Co-planning strategies — helping teachers and paras find time and systems for shared planning</p>
+                      <p className="text-xs text-gray-600 mt-1">Co-planning strategies -  helping teachers and paras find time and systems for shared planning</p>
                     </div>
                   </div>
 
@@ -1759,7 +1759,7 @@ export default function WegoDashboard() {
                         <span className="text-xs font-medium text-[#38618C]">NOVEMBER 2026</span>
                       </div>
                       <h4 className="font-semibold text-[#1e2749] text-sm">On-Site Observation Day #2</h4>
-                      <p className="text-xs text-gray-600 mt-1">Co-teaching observations — watch teacher-para teams in action, joint Love Notes celebrating partnerships</p>
+                      <p className="text-xs text-gray-600 mt-1">Co-teaching observations -  watch teacher-para teams in action, joint Love Notes celebrating partnerships</p>
                     </div>
                   </div>
 
@@ -1789,7 +1789,7 @@ export default function WegoDashboard() {
                         <span className="text-xs font-medium text-[#38618C]">JANUARY 2027</span>
                       </div>
                       <h4 className="font-semibold text-[#1e2749] text-sm">Virtual Session #2</h4>
-                      <p className="text-xs text-gray-600 mt-1">Role clarity conversations — clear expectations for teachers and paras working together</p>
+                      <p className="text-xs text-gray-600 mt-1">Role clarity conversations -  clear expectations for teachers and paras working together</p>
                     </div>
                   </div>
 
@@ -1804,7 +1804,7 @@ export default function WegoDashboard() {
                         <span className="text-xs font-medium text-[#1e2749]">FEBRUARY 2027</span>
                       </div>
                       <h4 className="font-semibold text-[#1e2749] text-sm">Virtual Session #3</h4>
-                      <p className="text-xs text-gray-600 mt-1">Communication frameworks — tools for busy days when face-to-face planning isn&apos;t possible</p>
+                      <p className="text-xs text-gray-600 mt-1">Communication frameworks -  tools for busy days when face-to-face planning isn&apos;t possible</p>
                     </div>
                   </div>
 
@@ -1819,7 +1819,7 @@ export default function WegoDashboard() {
                         <span className="text-xs font-medium text-[#1e2749]">MARCH 2027</span>
                       </div>
                       <h4 className="font-semibold text-[#1e2749] text-sm">Virtual Session #4</h4>
-                      <p className="text-xs text-gray-600 mt-1">Para leadership development — growing your strongest PAs into mentors and leaders</p>
+                      <p className="text-xs text-gray-600 mt-1">Para leadership development -  growing your strongest PAs into mentors and leaders</p>
                     </div>
                   </div>
 
@@ -1894,7 +1894,7 @@ export default function WegoDashboard() {
             <div className="bg-[#1e2749] rounded-xl p-6 text-center">
               <h3 className="text-xl font-bold text-white mb-2">Ready to Talk About Year 2?</h3>
               <p className="text-white/80 mb-4 max-w-xl mx-auto">
-                Your paras are building something special. Year 2 brings their teachers into the fold — so everyone speaks the same language.
+                Your paras are building something special. Year 2 brings their teachers into the fold -  so everyone speaks the same language.
               </p>
               <p className="text-white/70 text-sm mb-5">
                 We&apos;ll customize the plan to fit YOUR goals. Options include:
@@ -2057,7 +2057,7 @@ export default function WegoDashboard() {
                 </div>
               </div>
               <div className="mt-4 pt-4 border-t border-gray-100 text-center text-sm text-gray-600">
-                <span className="font-medium">Partnership Period:</span> September 2025 – June 2026
+                <span className="font-medium">Partnership Period:</span> September 2025 -  June 2026
                 <span className="mx-2">|</span>
                 <span className="font-medium">Hub Access Until:</span> June 2027
               </div>
@@ -2235,7 +2235,7 @@ export default function WegoDashboard() {
                 <p className="text-gray-600 italic">
                   &quot;TDI changed the way our teachers approach their day. The strategies actually stick.&quot;
                 </p>
-                <p className="text-sm text-gray-400 mt-1">— Partner School Administrator</p>
+                <p className="text-sm text-gray-400 mt-1"> -  Partner School Administrator</p>
               </div>
             </div>
 

@@ -572,7 +572,7 @@ export default function SauneminDashboard() {
               </div>
 
               <p className="text-sm text-gray-600 mb-4">
-                Here&apos;s what we celebrated during our November 19th visit — your team is doing incredible work!
+                Here&apos;s what we celebrated during our November 19th visit -  your team is doing incredible work!
               </p>
 
               <div className="grid md:grid-cols-2 gap-3">
@@ -581,7 +581,7 @@ export default function SauneminDashboard() {
                     <Heart className="w-4 h-4 text-[#E07A5F]" />
                     <span className="font-medium text-[#1e2749] text-sm">Sam Woodcock</span>
                   </div>
-                  <p className="text-xs text-gray-600">Incredible rapport with students — lots of jokes, trust, and genuine connection. This is the foundation everything else is built on.</p>
+                  <p className="text-xs text-gray-600">Incredible rapport with students -  lots of jokes, trust, and genuine connection. This is the foundation everything else is built on.</p>
                 </div>
 
                 <div className="bg-white rounded-lg p-3 border border-green-100">
@@ -612,7 +612,7 @@ export default function SauneminDashboard() {
               <div className="mt-4 pt-3 border-t border-green-200">
                 <div className="flex items-center gap-2 text-sm text-green-700">
                   <Users className="w-4 h-4" />
-                  <span><strong>Team Win:</strong> Seamless para-teacher collaboration observed across classrooms — especially Haylie with her teacher, and Grace with Sam.</span>
+                  <span><strong>Team Win:</strong> Seamless para-teacher collaboration observed across classrooms -  especially Haylie with her teacher, and Grace with Sam.</span>
                 </div>
               </div>
             </div>
@@ -805,14 +805,14 @@ export default function SauneminDashboard() {
                   <p className="text-sm text-gray-700 italic mb-2">
                     &quot;Professional development that finally meets the moment. Between burnout and new initiatives, our team needed clarity and care. TDI delivered both.&quot;
                   </p>
-                  <p className="text-xs text-gray-500">— Assistant Superintendent, Illinois</p>
+                  <p className="text-xs text-gray-500"> -  Assistant Superintendent, Illinois</p>
                 </div>
 
                 <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#35A7FF]">
                   <p className="text-sm text-gray-700 italic mb-2">
-                    &quot;Our staff actually looked forward to PD. The personalized feedback made a huge difference — teachers felt seen and celebrated for their specific strengths.&quot;
+                    &quot;Our staff actually looked forward to PD. The personalized feedback made a huge difference -  teachers felt seen and celebrated for their specific strengths.&quot;
                   </p>
-                  <p className="text-xs text-gray-500">— Principal, K-8 School</p>
+                  <p className="text-xs text-gray-500"> -  Principal, K-8 School</p>
                 </div>
               </div>
 
@@ -918,7 +918,7 @@ export default function SauneminDashboard() {
               {/* Indicator Grid */}
               <div className="space-y-8">
 
-                {/* Educator Stress (lower is better — bars INVERTED) */}
+                {/* Educator Stress (lower is better -  bars INVERTED) */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-[#1e2749]">Educator Stress</span>
@@ -1020,7 +1020,7 @@ export default function SauneminDashboard() {
                       <span className="text-xs font-bold text-green-600 w-20 text-right">Strong ✓</span>
                     </div>
                   </div>
-                  <p className="text-xs text-green-700 mt-2 ml-31">Excellent collaboration observed Nov 2025 — seamless teamwork across classrooms</p>
+                  <p className="text-xs text-green-700 mt-2 ml-31">Excellent collaboration observed Nov 2025 -  seamless teamwork across classrooms</p>
                 </div>
 
                 {/* Retention Intent (higher is better) */}
@@ -1082,7 +1082,7 @@ export default function SauneminDashboard() {
                 <div>
                   <h4 className="font-bold text-[#1e2749] text-lg">Recommendation: Bridge the Implementation Gap</h4>
                   <p className="text-sm text-gray-600 mt-1">
-                    Research shows only 30% of professional development translates to classroom practice. Saunemin&apos;s November observations showed <strong>100% of observed staff</strong> implementing at least one strategy — that&apos;s exceptional! Day 2 will help sustain this momentum and deepen implementation.
+                    Research shows only 30% of professional development translates to classroom practice. Saunemin&apos;s November observations showed <strong>100% of observed staff</strong> implementing at least one strategy -  that&apos;s exceptional! Day 2 will help sustain this momentum and deepen implementation.
                   </p>
                 </div>
               </div>
@@ -1109,7 +1109,7 @@ export default function SauneminDashboard() {
                     </div>
                     <div>
                       <p className="text-sm font-medium text-[#1e2749]">Observe Strategy Implementation</p>
-                      <p className="text-xs text-gray-500">Look for specific Hub strategies showing up in daily practice — not just logins, but real change</p>
+                      <p className="text-xs text-gray-500">Look for specific Hub strategies showing up in daily practice -  not just logins, but real change</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
@@ -1483,7 +1483,7 @@ export default function SauneminDashboard() {
                 <div>
                   <p className="text-sm font-medium text-blue-800">About Learning Hub Data</p>
                   <p className="text-sm text-blue-700 mt-1">
-                    Hub logins are one indicator we track to understand tool engagement, but they don&apos;t tell the whole story. What matters most is whether strategies from the Hub are showing up in classroom practice — that&apos;s what we look for during observation days.
+                    Hub logins are one indicator we track to understand tool engagement, but they don&apos;t tell the whole story. What matters most is whether strategies from the Hub are showing up in classroom practice -  that&apos;s what we look for during observation days.
                   </p>
                 </div>
               </div>
@@ -1679,9 +1679,9 @@ export default function SauneminDashboard() {
               <div className="pt-4">
                 <div className="border-l-4 border-[#E07A5F] bg-[#E07A5F]/5 rounded-r-lg p-4">
                   <p className="text-gray-700 italic">
-                    &quot;Your classroom had such a great vibe today — [Sam&apos;s] rapport with students is incredible. The jokes, the trust, the genuine connection you&apos;ve built... that&apos;s the foundation everything else is built on.&quot;
+                    &quot;Your classroom had such a great vibe today -  [Sam&apos;s] rapport with students is incredible. The jokes, the trust, the genuine connection you&apos;ve built... that&apos;s the foundation everything else is built on.&quot;
                   </p>
-                  <p className="text-sm text-gray-500 mt-3">— From November 19 observations</p>
+                  <p className="text-sm text-gray-500 mt-3"> -  From November 19 observations</p>
                 </div>
               </div>
             </Accordion>
@@ -1806,7 +1806,7 @@ export default function SauneminDashboard() {
                     </li>
                   </ul>
                   <p className="text-sm text-amber-800 font-medium mt-3">
-                    Most partner schools see breakthrough results in Year 2. You&apos;ve built the foundation — now let&apos;s build on it.
+                    Most partner schools see breakthrough results in Year 2. You&apos;ve built the foundation -  now let&apos;s build on it.
                   </p>
                 </div>
               </div>
@@ -1845,7 +1845,7 @@ export default function SauneminDashboard() {
                   </div>
                   <div>
                     <p className="font-medium text-[#1e2749]">Full Staff Access</p>
-                    <p className="text-sm text-gray-600">Expand Learning Hub access from paras only to include all educators. Your paras work across every classroom — now their teachers will have the same tools and language.</p>
+                    <p className="text-sm text-gray-600">Expand Learning Hub access from paras only to include all educators. Your paras work across every classroom -  now their teachers will have the same tools and language.</p>
                   </div>
                 </div>
 
@@ -1865,7 +1865,7 @@ export default function SauneminDashboard() {
                   </div>
                   <div>
                     <p className="font-medium text-[#1e2749]">Intentional Kickoff System</p>
-                    <p className="text-sm text-gray-600">Next year, we&apos;ll launch with our new engagement system — designed to re-engage educators with what matters to them faster and easier than ever before.</p>
+                    <p className="text-sm text-gray-600">Next year, we&apos;ll launch with our new engagement system -  designed to re-engage educators with what matters to them faster and easier than ever before.</p>
                   </div>
                 </div>
 
@@ -1884,7 +1884,7 @@ export default function SauneminDashboard() {
             {/* Proposed Timeline */}
             <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
               <h4 className="font-semibold text-[#1e2749] mb-4">Proposed 2026-27 Timeline</h4>
-              <p className="text-sm text-gray-500 mb-4">Phase 2 (ACCELERATE) — 10 touchpoints throughout the year</p>
+              <p className="text-sm text-gray-500 mb-4">Phase 2 (ACCELERATE) -  10 touchpoints throughout the year</p>
 
               <div className="space-y-3">
                 {[
@@ -1980,7 +1980,7 @@ export default function SauneminDashboard() {
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                   <p className="text-sm font-medium text-green-700 mb-2">TDI Commitment:</p>
                   <p className="text-sm text-gray-600">
-                    Full staff support with measurable outcomes. We&apos;ll track educator stress levels, implementation rates, and retention intent — providing data Gary can use to demonstrate impact.
+                    Full staff support with measurable outcomes. We&apos;ll track educator stress levels, implementation rates, and retention intent -  providing data Gary can use to demonstrate impact.
                   </p>
                 </div>
               </div>
@@ -1993,7 +1993,7 @@ export default function SauneminDashboard() {
                 <div>
                   <p className="font-medium mb-1">Research Foundation</p>
                   <p className="text-sm text-white/70">
-                    &quot;Teacher well-being and job satisfaction are among the strongest predictors of student achievement and school-wide success.&quot; — Hattie, J. (2023). Visible Learning: The Sequel.
+                    &quot;Teacher well-being and job satisfaction are among the strongest predictors of student achievement and school-wide success.&quot; -  Hattie, J. (2023). Visible Learning: The Sequel.
                   </p>
                 </div>
               </div>
@@ -2290,7 +2290,7 @@ export default function SauneminDashboard() {
                 <p className="text-gray-600 italic">
                   &quot;Finally, PD that doesn&apos;t add to our plate. It actually helps.&quot;
                 </p>
-                <p className="text-sm text-gray-400 mt-1">— Illinois Principal</p>
+                <p className="text-sm text-gray-400 mt-1"> -  Illinois Principal</p>
               </div>
             </div>
 

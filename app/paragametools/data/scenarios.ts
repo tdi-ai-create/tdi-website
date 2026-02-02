@@ -5,7 +5,7 @@ export const KNOCKOUT_SCENARIOS = [
   "David just got 3 out of 10 on his math worksheet. He puts his head down on his desk.",
   "A student says 'I don't get it' for the third time today.",
   "You notice a student copied the answer directly from their neighbor's paper.",
-  "A student raises their hand and asks 'Is this right?' — for the 6th time today.",
+  "A student raises their hand and asks 'Is this right?' -  for the 6th time today.",
   "A student rushes through their work and says 'I'm done!' but it's messy and half the answers are blank.",
   "A student is reading aloud and skips every word they don't know.",
   "Two students are arguing about what the answer is. Both are getting frustrated.",

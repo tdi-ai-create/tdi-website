@@ -135,7 +135,7 @@ export function TDICalculatorMedium() {
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-3 italic">
-            Most districts spend $2,000–$5,000 per teacher on PD that doesn't stick.
+            Most districts spend $2,000 - $5,000 per teacher on PD that doesn't stick.
           </p>
         </div>
 

@@ -43,7 +43,7 @@ export const KNOCKOUT_SCENARIOS = [
   "David just got 3 out of 10 on his math worksheet. He puts his head down on his desk.",
   "A student says 'I don't get it' for the third time today.",
   "You notice a student copied the answer directly from their neighbor's paper.",
-  "A student raises their hand and asks 'Is this right?' — for the 6th time today.",
+  "A student raises their hand and asks 'Is this right?' -  for the 6th time today.",
   "A student rushes through their work and says 'I'm done!' but it's messy and half the answers are blank.",
   "A student is reading aloud and skips every word they don't know.",
   "Two students are arguing about what the answer is. Both are getting frustrated.",
@@ -58,10 +58,10 @@ export const KNOCKOUT_SCENARIOS = [
 
 // Tell or Ask statements (18 total, pick 12)
 export const TELL_OR_ASK_STATEMENTS = [
-  { statement: "The answer is 7.", type: "TELL" as const, why: "Gives the answer — no thinking required." },
+  { statement: "The answer is 7.", type: "TELL" as const, why: "Gives the answer -  no thinking required." },
   { statement: "You need to add a period here.", type: "TELL" as const, why: "Tells them exactly what to do." },
   { statement: "Sound it out.", type: "TELL" as const, why: "Sounds like help, but it's a command. Try: 'What strategy could you use?'" },
-  { statement: "What do you notice about your answer?", type: "ASK" as const, why: "Opens thinking — student has to look and analyze." },
+  { statement: "What do you notice about your answer?", type: "ASK" as const, why: "Opens thinking -  student has to look and analyze." },
   { statement: "Don't you think you should check your work?", type: "TELL" as const, why: "Disguised as a question, but it's really a command with a question mark." },
   { statement: "Where are you getting stuck?", type: "ASK" as const, why: "Reveals the student's thinking so you can help strategically." },
   { statement: "Write neater.", type: "TELL" as const, why: "Vague command. Try: 'Which letters could you form more clearly?'" },
@@ -72,9 +72,9 @@ export const TELL_OR_ASK_STATEMENTS = [
   { statement: "Shouldn't you be showing your work?", type: "TELL" as const, why: "Another command disguised as a question." },
   { statement: "What would happen if you tried it a different way?", type: "ASK" as const, why: "Encourages risk-taking and flexible thinking." },
   { statement: "Use your finger to track the words.", type: "TELL" as const, why: "Gives the strategy instead of letting them choose one." },
-  { statement: "What do you think the next step is?", type: "ASK" as const, why: "Student has to plan ahead — real thinking!" },
+  { statement: "What do you think the next step is?", type: "ASK" as const, why: "Student has to plan ahead -  real thinking!" },
   { statement: "Can you please sit down and focus?", type: "TELL" as const, why: "Looks like a question but it's a directive." },
-  { statement: "Walk me through your thinking.", type: "ASK" as const, why: "The gold standard — makes thinking visible." },
+  { statement: "Walk me through your thinking.", type: "ASK" as const, why: "The gold standard -  makes thinking visible." },
   { statement: "You're not following directions.", type: "TELL" as const, why: "Labels the problem without helping. Try: 'What step are you on?'" },
 ];
 

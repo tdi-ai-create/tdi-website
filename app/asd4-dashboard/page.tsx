@@ -134,7 +134,7 @@ export default function ASD4Dashboard() {
     {
       id: 'virtual-session-1',
       title: 'Virtual Session 1 · 45 min',
-      description: 'Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
+      description: 'Flexible session -  schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
       deadline: 'FEB 2026',
       actionLabel: 'Book Your Session',
       actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
@@ -158,7 +158,7 @@ export default function ASD4Dashboard() {
     {
       id: 'virtual-session-2',
       title: 'Virtual Session 2 · 45 min',
-      description: 'Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
+      description: 'Flexible session -  schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
       deadline: 'MAR 2026',
       actionLabel: 'Book Your Session',
       actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
@@ -170,7 +170,7 @@ export default function ASD4Dashboard() {
     {
       id: 'virtual-session-3',
       title: 'Virtual Session 3 · 45 min',
-      description: 'Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
+      description: 'Flexible session -  schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
       deadline: 'APR 2026',
       actionLabel: 'Book Your Session',
       actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
@@ -182,7 +182,7 @@ export default function ASD4Dashboard() {
     {
       id: 'virtual-session-4',
       title: 'Virtual Session 4 · 45 min',
-      description: 'Flexible session — schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
+      description: 'Flexible session -  schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
       deadline: 'APR 2026',
       actionLabel: 'Book Your Session',
       actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
@@ -515,14 +515,14 @@ export default function ASD4Dashboard() {
     const body = encodeURIComponent(
 `Hi ${firstName},
 
-I noticed you haven't had a chance to log into the TDI Learning Hub yet — no worries, just wanted to make sure you have what you need.
+I noticed you haven't had a chance to log into the TDI Learning Hub yet -  no worries, just wanted to make sure you have what you need.
 
-This isn't like typical PD — it's short, practical stuff you can actually use. No 3-hour sessions, no sitting and listening. Just strategies from real educators.
+This isn't like typical PD -  it's short, practical stuff you can actually use. No 3-hour sessions, no sitting and listening. Just strategies from real educators.
 
 Here's how to get in:
 1. Go to: tdi.thinkific.com
 2. Log in with your @asd4.org email
-3. Try "Paraprofessional Foundations" — it's a quick win
+3. Try "Paraprofessional Foundations" -  it's a quick win
 
 Let me know if you run into any issues and I'll help you out.`
     );
@@ -539,14 +539,14 @@ Let me know if you run into any issues and I'll help you out.`
     const body = encodeURIComponent(
 `Hi team,
 
-Quick check-in — some of you haven't had a chance to log into the TDI Learning Hub yet, and I wanted to make sure you have what you need to get started.
+Quick check-in -  some of you haven't had a chance to log into the TDI Learning Hub yet, and I wanted to make sure you have what you need to get started.
 
-I know "professional development" can feel like one more thing on your plate. But this one's different — short, practical strategies you can actually use. No sitting through hours of slides.
+I know "professional development" can feel like one more thing on your plate. But this one's different -  short, practical strategies you can actually use. No sitting through hours of slides.
 
 Here's how to get in:
 1. Go to: tdi.thinkific.com
 2. Log in with your @asd4.org email
-3. Start with "Paraprofessional Foundations" — it's a good first step
+3. Start with "Paraprofessional Foundations" -  it's a good first step
 
 If you'd like, we can do a quick 15-minute walkthrough at our next meeting. Just let me know.
 
@@ -568,7 +568,7 @@ Thanks for everything you do.`
       '',
       'I was looking at our TDI Learning Hub progress and wanted to reach out personally.',
       '',
-      `You've completed ${para.coursesStarted} courses with a ${para.avgCompletion}% average — that puts you at the top of our team. That kind of dedication doesn't go unnoticed.`,
+      `You've completed ${para.coursesStarted} courses with a ${para.avgCompletion}% average -  that puts you at the top of our team. That kind of dedication doesn't go unnoticed.`,
       '',
       'I know your time is limited and there\'s always more to do. The fact that you\'re investing in your own growth shows real commitment to our students and to yourself.',
       '',
@@ -922,7 +922,7 @@ Thanks for everything you do.`
                 <div>
                   <p className="font-semibold text-[#1e2749] text-sm mb-1">Virtual Sessions are Flexible</p>
                   <p className="text-sm text-gray-600">
-                    Schedule by dates indicate when sessions should be scheduled by. You have flexibility in how you use them — combine sessions back-to-back, spread them out, whatever works best for your team.
+                    Schedule by dates indicate when sessions should be scheduled by. You have flexibility in how you use them -  combine sessions back-to-back, spread them out, whatever works best for your team.
                   </p>
                 </div>
               </div>
@@ -987,7 +987,7 @@ Thanks for everything you do.`
 
             {/* Partnership Period Footer */}
             <div className="text-center text-xs text-gray-400 mt-8 pt-4 border-t border-gray-100">
-              Partnership Period: January 2026 – May 2026 · Hub Access: Through January 2027
+              Partnership Period: January 2026 -  May 2026 · Hub Access: Through January 2027
             </div>
           </div>
         )}
@@ -1159,7 +1159,7 @@ Thanks for everything you do.`
               </div>
               <div className="text-xl font-medium mb-1">Courses Completed</div>
               <div className="text-emerald-100 text-sm">
-                by your paraprofessionals — and counting!
+                by your paraprofessionals -  and counting!
               </div>
               <div className="text-emerald-100 text-sm mt-2">
                 That&apos;s 49 strategies ready to use in classrooms tomorrow.
@@ -1211,7 +1211,7 @@ Thanks for everything you do.`
                   <div className="relative group">
                     <Info className="w-4 h-4 text-gray-400 cursor-help" />
                     <div className="absolute z-10 w-48 p-2 text-xs text-white bg-gray-900 rounded-lg shadow-lg -top-2 left-6 hidden group-hover:block">
-                      Course completions at 70% or higher — our threshold for meaningful learning
+                      Course completions at 70% or higher -  our threshold for meaningful learning
                     </div>
                   </div>
                 </div>
@@ -1423,7 +1423,7 @@ Thanks for everything you do.`
                   <div className="w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 mt-0.5"></div>
                   <div>
                     <div className="font-medium text-gray-900">Try a 15-min Hub walkthrough</div>
-                    <div className="text-sm text-gray-500">For paras who haven&apos;t logged in — we can help facilitate</div>
+                    <div className="text-sm text-gray-500">For paras who haven&apos;t logged in -  we can help facilitate</div>
                   </div>
                 </div>
 
@@ -1594,7 +1594,7 @@ Thanks for everything you do.`
                                 <BookOpen className="w-8 h-8 text-gray-300 mx-auto mb-2" />
                                 <p className="text-gray-500">No courses started yet</p>
                                 <p className="text-sm text-gray-400 mt-1">
-                                  {school.loggedIn} paras have logged in — they just need a nudge to get started
+                                  {school.loggedIn} paras have logged in -  they just need a nudge to get started
                                 </p>
                               </div>
                             )}
@@ -1611,11 +1611,11 @@ Thanks for everything you do.`
                                   const body = encodeURIComponent(
                                     `Hi ${school.name.split('(')[0].trim()} Team,\n\n` +
                                     `I wanted to reach out because I noticed you haven't had a chance to log into the TDI Learning Hub yet.\n\n` +
-                                    `No pressure — I know things get busy! But when you have 10-15 minutes, the Hub has some really practical resources.\n\n` +
+                                    `No pressure -  I know things get busy! But when you have 10-15 minutes, the Hub has some really practical resources.\n\n` +
                                     `Here's how to get started:\n` +
                                     `1. Go to tdi.thinkific.com\n` +
                                     `2. Log in with your school email\n` +
-                                    `3. Start with "Paraprofessional Foundations" — it's quick and practical\n\n` +
+                                    `3. Start with "Paraprofessional Foundations" -  it's quick and practical\n\n` +
                                     `Let me know if you need help!\n\n` +
                                     `Leslie`
                                   );
@@ -2221,7 +2221,7 @@ Thanks for everything you do.`
               <div className="flex flex-col sm:flex-row gap-4 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-[#38618C]" />
-                  <span><strong>Partnership Period:</strong> January 2026 – May 2026</span>
+                  <span><strong>Partnership Period:</strong> January 2026 -  May 2026</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <BookOpen className="w-4 h-4 text-[#38618C]" />
@@ -2399,7 +2399,7 @@ Thanks for everything you do.`
                 <p className="text-gray-600 italic">
                   &quot;TDI changed the way our teachers approach their day. The strategies actually stick.&quot;
                 </p>
-                <p className="text-sm text-gray-400 mt-1">— Partner School Administrator</p>
+                <p className="text-sm text-gray-400 mt-1"> -  Partner School Administrator</p>
               </div>
             </div>
 

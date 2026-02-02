@@ -82,7 +82,7 @@ export default function PDFrameworkPage() {
         value={65}
         suffix="%"
         label="Implementation Rate"
-        subtext="vs 10% industry average — because our PD is built for Monday morning, not 'someday'"
+        subtext="vs 10% industry average -  because our PD is built for Monday morning, not 'someday'"
       />
 
       {/* Section 2: Movement Path (LEAD WITH THIS) */}

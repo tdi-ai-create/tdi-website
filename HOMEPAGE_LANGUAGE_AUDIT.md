@@ -214,8 +214,8 @@ These terms commonly resonate with school/district decision-makers but are **und
 1. **Hero subhead**: Change "Educator-Focused" to "Educator-Focused. Admin-Approved."
 
 2. **Stats bar**: Add an admin-focused stat like:
-   - "65% avg implementation rate" (vs industry 10%)
-   - "80% secure external funding"
+ - "65% avg implementation rate" (vs industry 10%)
+ - "80% secure external funding"
 
 3. **"How We Build" heading**: Consider "How We Build What Educators Need" (inclusive)
 

@@ -152,7 +152,7 @@ export default function D41Dashboard() {
 
   // Paraprofessional-specific courses
   const paraCourses = [
-    { title: 'Paraprofessional Foundations – Understanding Your Role & Impact', category: 'Core', recommended: true },
+    { title: 'Paraprofessional Foundations -  Understanding Your Role & Impact', category: 'Core', recommended: true },
     { title: 'Understanding Student Needs & Modifications', category: 'Core', recommended: true },
     { title: 'Building Strong Teacher-Para Partnerships', category: 'Collaboration', recommended: true },
     { title: 'Effective Small-Group & One-on-One Instruction', category: 'Instruction', recommended: true },
@@ -293,7 +293,7 @@ export default function D41Dashboard() {
               </div>
 
               <p className="text-sm text-gray-600 mb-4">
-                One team member has logged in — here&apos;s how to help the rest of your paraprofessionals get started with the Learning Hub.
+                One team member has logged in -  here&apos;s how to help the rest of your paraprofessionals get started with the Learning Hub.
               </p>
 
               <div className="grid sm:grid-cols-3 gap-3">
@@ -347,7 +347,7 @@ export default function D41Dashboard() {
               </div>
 
               <p className="text-sm text-gray-600 mb-4">
-                Research shows that on-demand professional development — without coaching support — typically sees about 10% of strategies implemented in classrooms. This is true across the industry, not unique to any district.
+                Research shows that on-demand professional development -  without coaching support -  typically sees about 10% of strategies implemented in classrooms. This is true across the industry, not unique to any district.
               </p>
 
               <div className="grid md:grid-cols-2 gap-4">
@@ -403,7 +403,7 @@ export default function D41Dashboard() {
 
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
                   <HandHelping className="w-5 h-5 mb-2 text-[#35A7FF]" />
-                  <h4 className="font-semibold text-[#1e2749] mb-1">Para–Teacher Collaboration</h4>
+                  <h4 className="font-semibold text-[#1e2749] mb-1">Para - Teacher Collaboration</h4>
                   <p className="text-sm text-gray-600">Strengthen communication and partnership between teachers and paras</p>
                 </div>
               </div>
@@ -415,7 +415,7 @@ export default function D41Dashboard() {
                 <div>
                   <h3 className="font-bold text-lg mb-1">When You&apos;re Ready to Go Deeper</h3>
                   <p className="text-sm text-white/80 max-w-lg">
-                    TDI&apos;s IGNITE phase adds on-site observations, personalized feedback, and measurable outcomes —
+                    TDI&apos;s IGNITE phase adds on-site observations, personalized feedback, and measurable outcomes - 
                     with no sub coverage required. Many districts explore this after building Hub familiarity.
                   </p>
                 </div>
@@ -555,7 +555,7 @@ export default function D41Dashboard() {
                   <h3 className="font-semibold text-[#1e2749] mb-1">Want Deeper Progress Tracking?</h3>
                   <p className="text-sm text-gray-600">
                     With Hub access, we can track logins. With TDI&apos;s coaching model, we&apos;d also measure
-                    strategy implementation, confidence growth, and classroom impact — giving you real data
+                    strategy implementation, confidence growth, and classroom impact -  giving you real data
                     to show progress over time.
                   </p>
                   <button
@@ -789,7 +789,7 @@ export default function D41Dashboard() {
                   <h3 className="font-semibold text-[#1e2749] mb-1">Getting More from These Resources</h3>
                   <p className="text-sm text-gray-600">
                     The Hub gives your team access to strategies. TDI&apos;s coaching model helps ensure those
-                    strategies make it into classrooms — through personalized observations and feedback
+                    strategies make it into classrooms -  through personalized observations and feedback
                     tailored to each para&apos;s students and setting.
                   </p>
                   <button
@@ -872,7 +872,7 @@ export default function D41Dashboard() {
                 {/* Future Phases */}
                 <div className="flex-1 bg-gray-50 border border-gray-200 rounded-xl p-4 opacity-60">
                   <h4 className="font-semibold text-[#1e2749]">Future Phases</h4>
-                  <p className="text-sm text-gray-600 mt-1">ACCELERATE & SUSTAIN — deeper coaching, Growth Groups, ongoing support</p>
+                  <p className="text-sm text-gray-600 mt-1">ACCELERATE & SUSTAIN -  deeper coaching, Growth Groups, ongoing support</p>
                   <p className="text-xs text-gray-400 mt-2">When you&apos;re ready</p>
                 </div>
               </div>
@@ -1048,7 +1048,7 @@ export default function D41Dashboard() {
                     <HandHelping className="w-5 h-5 text-[#35A7FF]" />
                     <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-0.5 rounded-full">Supporting Focus</span>
                   </div>
-                  <h5 className="font-semibold text-lg text-[#1e2749] mb-2">Para–Teacher Collaboration</h5>
+                  <h5 className="font-semibold text-lg text-[#1e2749] mb-2">Para - Teacher Collaboration</h5>
                   <p className="text-sm text-gray-600 mb-4">Strengthening communication and partnership</p>
                   <div className="border-t border-gray-200 pt-3 mt-3">
                     <p className="text-xs text-gray-500 mb-2">Success Metrics:</p>
@@ -1078,7 +1078,7 @@ export default function D41Dashboard() {
                   <div>
                     <p className="text-sm font-medium text-amber-800">Why These Metrics?</p>
                     <p className="text-sm text-amber-700 mt-1">
-                      These goals come directly from Dee&apos;s stated priorities: supporting the literacy curriculum rollout, building instructional consistency across paras, and strengthening para–teacher partnerships. We&apos;ll measure progress at each observation visit.
+                      These goals come directly from Dee&apos;s stated priorities: supporting the literacy curriculum rollout, building instructional consistency across paras, and strengthening para - teacher partnerships. We&apos;ll measure progress at each observation visit.
                     </p>
                   </div>
                 </div>
@@ -1257,7 +1257,7 @@ export default function D41Dashboard() {
                 <span className="font-semibold text-[#1e2749]">Measurable KPIs We&apos;ll Track Together</span>
               </div>
               <p className="text-sm text-gray-500 mb-6">
-                Unlike generic PD, IGNITE gives you concrete data to show progress — and justify continued investment.
+                Unlike generic PD, IGNITE gives you concrete data to show progress -  and justify continued investment.
               </p>
 
               <div className="grid md:grid-cols-4 gap-4">
@@ -1300,7 +1300,7 @@ export default function D41Dashboard() {
 
               <div className="mt-6 p-4 bg-[#35A7FF]/10 rounded-lg">
                 <p className="text-sm text-[#1e2749]">
-                  <strong>Why this matters:</strong> When budget conversations happen, you&apos;ll have real data showing ROI — not just &quot;teachers liked it.&quot;
+                  <strong>Why this matters:</strong> When budget conversations happen, you&apos;ll have real data showing ROI -  not just &quot;teachers liked it.&quot;
                 </p>
               </div>
             </div>
@@ -1314,11 +1314,11 @@ export default function D41Dashboard() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 rounded-lg p-4">
                   <p className="text-xs text-gray-500 mb-1">Dee&apos;s Priority:</p>
-                  <p className="text-sm text-[#1e2749] font-medium">&quot;Support the literacy curriculum rollout with effective small-group instruction and para–teacher collaboration&quot;</p>
+                  <p className="text-sm text-[#1e2749] font-medium">&quot;Support the literacy curriculum rollout with effective small-group instruction and para - teacher collaboration&quot;</p>
                 </div>
                 <div className="bg-[#35A7FF]/10 rounded-lg p-4">
                   <p className="text-xs text-[#35A7FF] mb-1">TDI Commitment:</p>
-                  <p className="text-sm text-[#1e2749] font-medium">Personalized observations and Love Notes that give each para specific, actionable feedback — not generic PD</p>
+                  <p className="text-sm text-[#1e2749] font-medium">Personalized observations and Love Notes that give each para specific, actionable feedback -  not generic PD</p>
                 </div>
               </div>
             </div>
@@ -1357,7 +1357,7 @@ export default function D41Dashboard() {
             <div className="bg-[#1e2749] rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-white">
                 <p className="font-semibold text-lg">Questions about coaching options?</p>
-                <p className="text-sm opacity-80">We&apos;re happy to talk through what might work for D41 — no commitment needed.</p>
+                <p className="text-sm opacity-80">We&apos;re happy to talk through what might work for D41 -  no commitment needed.</p>
               </div>
               <a
                 href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
@@ -1471,7 +1471,7 @@ export default function D41Dashboard() {
                       <p className="text-xs text-gray-500">30 minutes</p>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-600">Discuss goals, explore options, or just catch up — no agenda required.</p>
+                  <p className="text-sm text-gray-600">Discuss goals, explore options, or just catch up -  no agenda required.</p>
                 </a>
               </div>
             </div>
@@ -1682,7 +1682,7 @@ export default function D41Dashboard() {
                 <p className="text-gray-600 italic">
                   &quot;Our teachers went from burned out to bought in.&quot;
                 </p>
-                <p className="text-sm text-gray-400 mt-1">— Partner District Leader</p>
+                <p className="text-sm text-gray-400 mt-1"> -  Partner District Leader</p>
               </div>
             </div>
 

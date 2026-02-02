@@ -13,7 +13,7 @@ import { createClient } from '@supabase/supabase-js';
 
 const CREATOR_ID = '4342b0b4-ee6b-498d-9ba9-336ff71173ad';
 
-const INTAKE_NOTE = `Intake form submission — Heard Rae on Unleash Yes podcast. 12+ year veteran teacher, NYC public schools, inquiry-based life science. Strategy: sensory-based learning — engaging students through five senses plus imagination, empathy, embodiment, and intuition for magnetic engagement, deep understanding, and original insight. Has shared with a small group of educators who found it profoundly transformative. Interested in: blog posts, digital downloads, AND Learning Hub course. Website: sensethinking.com`;
+const INTAKE_NOTE = `Intake form submission -  Heard Rae on Unleash Yes podcast. 12+ year veteran teacher, NYC public schools, inquiry-based life science. Strategy: sensory-based learning -  engaging students through five senses plus imagination, empathy, embodiment, and intuition for magnetic engagement, deep understanding, and original insight. Has shared with a small group of educators who found it profoundly transformative. Interested in: blog posts, digital downloads, AND Learning Hub course. Website: sensethinking.com`;
 
 export async function GET() {
   const results: string[] = [];

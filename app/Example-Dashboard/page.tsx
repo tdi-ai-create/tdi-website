@@ -447,7 +447,7 @@ export default function ExampleDashboard() {
         { label: 'Hub Engagement', value: '100%', sublabel: 'All staff active' },
         { label: 'Sessions Remaining', value: '8', sublabel: 'This school year' }
       ],
-      blueprintPreview: 'This is the full implementation phase — building momentum through consistent touchpoints.'
+      blueprintPreview: 'This is the full implementation phase -  building momentum through consistent touchpoints.'
     },
     {
       id: 3,
@@ -1066,7 +1066,7 @@ export default function ExampleDashboard() {
               {/* Indicator Bars */}
               <div className="space-y-6">
 
-                {/* Teacher Stress (lower is better — bars INVERTED) */}
+                {/* Teacher Stress (lower is better -  bars INVERTED) */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-semibold text-[#1e2749]">Teacher Stress</span>
@@ -1392,7 +1392,7 @@ export default function ExampleDashboard() {
                       <ul className="text-sm text-gray-600 space-y-1">
                         <li className="flex items-center gap-2">
                           <Check className="w-4 h-4 text-[#35A7FF]" />
-                          Teacher Check-In Survey (19 responses — 100%)
+                          Teacher Check-In Survey (19 responses -  100%)
                         </li>
                         <li className="flex items-center gap-2">
                           <Check className="w-4 h-4 text-[#35A7FF]" />
@@ -1413,8 +1413,8 @@ export default function ExampleDashboard() {
                     <div className="bg-green-50 rounded-lg p-4">
                       <p className="text-sm font-medium text-green-800 mb-2">Session Wins:</p>
                       <ul className="text-sm text-green-700 space-y-1">
-                        <li>• <strong>Stress level 6.0/10</strong> — below industry average (8-9/10)</li>
-                        <li>• <strong>Retention intent 9.8/10</strong> — nearly everyone returning</li>
+                        <li>• <strong>Stress level 6.0/10</strong> -  below industry average (8-9/10)</li>
+                        <li>• <strong>Retention intent 9.8/10</strong> -  nearly everyone returning</li>
                         <li>• <strong>47% feel better</strong> than start of year</li>
                         <li>• <strong>100% Hub login</strong> achieved</li>
                         <li>• Strong &quot;family&quot; culture cited by teachers</li>
@@ -1448,7 +1448,7 @@ export default function ExampleDashboard() {
                     <div className="bg-[#35A7FF]/10 rounded-lg p-4">
                       <p className="text-sm font-medium text-[#1e2749] mb-2">Top Challenges Discussed:</p>
                       <ul className="text-sm text-gray-700 space-y-1">
-                        <li>• <strong>Time management</strong> — #1 challenge</li>
+                        <li>• <strong>Time management</strong> -  #1 challenge</li>
                         <li>• <strong>Work-life balance</strong></li>
                         <li>• <strong>Student behavior</strong></li>
                         <li>• <strong>Schedule disruptions</strong></li>
@@ -1459,8 +1459,8 @@ export default function ExampleDashboard() {
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                       <p className="text-sm font-medium text-red-800 mb-2">Areas to Watch:</p>
                       <ul className="text-sm text-red-700 space-y-1">
-                        <li>• <strong>Strategy implementation at 21%</strong> — needs support</li>
-                        <li>• <strong>Time constraints</strong> — top barrier</li>
+                        <li>• <strong>Strategy implementation at 21%</strong> -  needs support</li>
+                        <li>• <strong>Time constraints</strong> -  top barrier</li>
                       </ul>
                     </div>
 
@@ -1539,9 +1539,9 @@ export default function ExampleDashboard() {
                         <span className="font-semibold text-[#1e2749] text-sm">Sample Love Note</span>
                       </div>
                       <p className="text-sm text-gray-700 italic">
-                        &quot;Your classroom had such a great vibe today — clean, welcoming, a place I&apos;d want to stay all day! I loved your &apos;Odd Todd and Even Steven&apos; songs and phrases...&quot;
+                        &quot;Your classroom had such a great vibe today -  clean, welcoming, a place I&apos;d want to stay all day! I loved your &apos;Odd Todd and Even Steven&apos; songs and phrases...&quot;
                       </p>
-                      <p className="text-xs text-gray-400 mt-2">— From Cathy Dufresne&apos;s observation</p>
+                      <p className="text-xs text-gray-400 mt-2"> -  From Cathy Dufresne&apos;s observation</p>
                     </div>
                   </div>
                 </Accordion>
@@ -1700,15 +1700,15 @@ export default function ExampleDashboard() {
                     <p className="text-xs font-semibold text-[#1e2749] mb-2">Top Engagers:</p>
                     <div className="flex items-center gap-2 text-xs">
                       <Star className="w-4 h-4 text-yellow-500 inline" />
-                      <span className="text-gray-600">Sandi Waguespack — 5 logins</span>
+                      <span className="text-gray-600">Sandi Waguespack -  5 logins</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs">
                       <span className="text-[#38618C]">●</span>
-                      <span className="text-gray-600">Regan Kliebert — 3 logins</span>
+                      <span className="text-gray-600">Regan Kliebert -  3 logins</span>
                     </div>
                     <div className="flex items-center gap-2 text-xs">
                       <span className="text-[#38618C]">●</span>
-                      <span className="text-gray-600">Jessica Roper — 3 logins</span>
+                      <span className="text-gray-600">Jessica Roper -  3 logins</span>
                     </div>
                   </div>
 
@@ -1767,7 +1767,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-start gap-2">
                       <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
                       <p className="text-xs text-gray-600">
-                        <span className="font-semibold text-[#1e2749]">Recommendation:</span> Celebrate these wins at your next staff meeting — teachers need to hear what's working
+                        <span className="font-semibold text-[#1e2749]">Recommendation:</span> Celebrate these wins at your next staff meeting -  teachers need to hear what's working
                       </p>
                     </div>
                   </div>
@@ -2064,7 +2064,7 @@ export default function ExampleDashboard() {
                   <p className="text-sm font-medium">Why This Plan?</p>
                 </div>
                 <p className="text-sm opacity-90">
-                  Your TerraNova data shows grades 3-6 averaging <strong>30th-48th percentile</strong> in Reading while earning <strong>A&apos;s in class</strong>. Research shows this gap closes when teachers implement <strong>differentiated instruction</strong> — meeting students where they are. That&apos;s our focus.
+                  Your TerraNova data shows grades 3-6 averaging <strong>30th-48th percentile</strong> in Reading while earning <strong>A&apos;s in class</strong>. Research shows this gap closes when teachers implement <strong>differentiated instruction</strong> -  meeting students where they are. That&apos;s our focus.
                 </p>
               </div>
             </div>
@@ -2120,7 +2120,7 @@ export default function ExampleDashboard() {
                   <Heart className="w-6 h-6 text-[#1e2749]" />
                   <span className="font-semibold text-[#1e2749]">Sustained Support</span>
                 </div>
-                <p className="text-sm text-gray-600 mb-4">Everything teachers loved this year — plus more.</p>
+                <p className="text-sm text-gray-600 mb-4">Everything teachers loved this year -  plus more.</p>
                 <div className="text-xs text-gray-500 space-y-1">
                   <p>✓ Full Hub access continues</p>
                   <p>✓ Weekly Love Notes</p>
@@ -2149,7 +2149,7 @@ export default function ExampleDashboard() {
                     <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">Primary Focus</span>
                   </div>
                   <h5 className="font-semibold text-lg mb-2">Differentiation</h5>
-                  <p className="text-sm opacity-80 mb-4">Meeting students where they are — especially grades 3-6</p>
+                  <p className="text-sm opacity-80 mb-4">Meeting students where they are -  especially grades 3-6</p>
                   <div className="border-t border-white/20 pt-3 mt-3">
                     <p className="text-xs opacity-60 mb-2">Success Metrics:</p>
                     <ul className="text-sm space-y-1">
@@ -2274,7 +2274,7 @@ export default function ExampleDashboard() {
                   </button>
                 </div>
               </div>
-              <p className="text-sm text-gray-500 mb-6">Phase 2 (ACCELERATE) — Click each session for details</p>
+              <p className="text-sm text-gray-500 mb-6">Phase 2 (ACCELERATE) -  Click each session for details</p>
 
               <div className="space-y-3">
 
@@ -2292,7 +2292,7 @@ export default function ExampleDashboard() {
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3">
                       <p className="text-xs text-gray-500 mb-1">Differentiation Connection:</p>
-                      <p className="text-sm text-gray-700">Establish baseline expectations — what does differentiation look like at SPC? Define observable indicators.</p>
+                      <p className="text-sm text-gray-700">Establish baseline expectations -  what does differentiation look like at SPC? Define observable indicators.</p>
                     </div>
                   </div>
                 </TimelineAccordion>
@@ -2347,7 +2347,7 @@ export default function ExampleDashboard() {
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3">
                       <p className="text-xs text-gray-500 mb-1">Classroom Management Connection:</p>
-                      <p className="text-sm text-gray-700">Introduce routines for managing multiple groups — &quot;What are the other students doing?&quot;</p>
+                      <p className="text-sm text-gray-700">Introduce routines for managing multiple groups -  &quot;What are the other students doing?&quot;</p>
                     </div>
                   </div>
                 </TimelineAccordion>
@@ -2385,7 +2385,7 @@ export default function ExampleDashboard() {
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3">
                       <p className="text-xs text-gray-500 mb-1">Instructional Design Connection:</p>
-                      <p className="text-sm text-gray-700">Connect grouping to lesson design — how does this change planning?</p>
+                      <p className="text-sm text-gray-700">Connect grouping to lesson design -  how does this change planning?</p>
                     </div>
                   </div>
                 </TimelineAccordion>
@@ -2440,7 +2440,7 @@ export default function ExampleDashboard() {
                     </div>
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                       <p className="text-xs text-green-600 mb-1">Why Flipped?</p>
-                      <p className="text-sm text-green-700">Morning observations allow afternoon conversations to be immediately actionable — feedback is fresh.</p>
+                      <p className="text-sm text-green-700">Morning observations allow afternoon conversations to be immediately actionable -  feedback is fresh.</p>
                     </div>
                   </div>
                 </TimelineAccordion>

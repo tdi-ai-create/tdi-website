@@ -212,7 +212,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
       {screen === 'done' && (
         <DoneScreen
           title="Level Up Complete!"
-          message="Level 2 is the trap — it sounds good but doesn't give students enough to grow."
+          message="Level 2 is the trap -  it sounds good but doesn't give students enough to grow."
           tableTalk="Where do you honestly land most days?"
           color="green"
           onBack={onBack}

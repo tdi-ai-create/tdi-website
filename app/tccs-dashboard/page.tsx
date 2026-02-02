@@ -343,7 +343,7 @@ export default function TCCSDashboard() {
                     <Gift className="w-5 h-5 text-emerald-600 mt-0.5" />
                     <div>
                       <p className="font-medium text-gray-800">Complimentary Spring Session</p>
-                      <p className="text-sm text-gray-500">45 min bonus session — on us! · Schedule by April 2026</p>
+                      <p className="text-sm text-gray-500">45 min bonus session -  on us! · Schedule by April 2026</p>
                     </div>
                   </div>
                   <a
@@ -649,7 +649,7 @@ export default function TCCSDashboard() {
                         <li>• Q&A and growth planning</li>
                       </ul>
                     </div>
-                    <p className="text-xs text-amber-600">Date is on hold — needs confirmation</p>
+                    <p className="text-xs text-amber-600">Date is on hold -  needs confirmation</p>
                     <a
                       href="mailto:rae@teachersdeserveit.com?subject=TCCS%20March%20Session%20-%20Let's%20Finalize%20Our%20Plan"
                       className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2896ee] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -675,7 +675,7 @@ export default function TCCSDashboard() {
                     </div>
                   </div>
                   <div className="p-4 border-t border-green-200 bg-white">
-                    <p className="text-gray-600 mb-3">A complimentary 45-minute bonus session — on us! Use it for extra coaching, planning, or questions.</p>
+                    <p className="text-gray-600 mb-3">A complimentary 45-minute bonus session -  on us! Use it for extra coaching, planning, or questions.</p>
                     <p className="text-xs text-green-700 mb-3">Schedule by April 2026</p>
                     <a
                       href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
@@ -799,7 +799,7 @@ export default function TCCSDashboard() {
               <p className="text-sm text-gray-600 mb-4">These courses were designed specifically for Beth and James&apos;s role</p>
               <div className="grid md:grid-cols-2 gap-3">
                 {[
-                  'Paraprofessional Foundations – Understanding Your Role & Impact',
+                  'Paraprofessional Foundations -  Understanding Your Role & Impact',
                   'Understanding Student Needs & Modifications',
                   'Building Strong Teacher-Para Partnerships',
                   'Effective Small-Group & One-on-One Instruction',

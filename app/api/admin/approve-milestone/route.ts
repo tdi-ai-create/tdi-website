@@ -145,7 +145,7 @@ export async function POST(request: Request) {
                 Questions? Reply to this email or reach out to Rachel at rachel@teachersdeserveit.com
               </p>
 
-              <p style="color: #666; font-size: 14px;">– The TDI Team</p>
+              <p style="color: #666; font-size: 14px;"> -  The TDI Team</p>
             </div>
           `,
         }),

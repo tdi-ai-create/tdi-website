@@ -509,7 +509,7 @@ function DashboardPanel() {
             </div>
           </a>
           <p className="text-sm text-center mt-3" style={{ color: '#1e2749', opacity: 0.5 }}>
-            Example dashboard shown — yours is customized to your school
+            Example dashboard shown -  yours is customized to your school
           </p>
         </div>
       </div>
@@ -1126,7 +1126,7 @@ export default function HowWePartnerPage() {
                   Stay Connected With Your Dashboard
                 </h2>
                 <p className="text-lg mb-6" style={{ color: '#1e2749', opacity: 0.8 }}>
-                  Your personalized dashboard keeps you informed between visits — see survey results, track implementation, and know exactly where your teachers are in their journey.
+                  Your personalized dashboard keeps you informed between visits -  see survey results, track implementation, and know exactly where your teachers are in their journey.
                 </p>
                 <a
                   href="/Example-Dashboard"

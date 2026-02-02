@@ -304,10 +304,10 @@ export default function ForSchoolsPage() {
                 Your Partner Dashboard
               </h2>
               <p className="text-xl mb-4" style={{ color: '#38618C' }}>
-                Track progress, see real data, and stay connected — all in one place.
+                Track progress, see real data, and stay connected -  all in one place.
               </p>
               <p className="text-lg max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Every TDI partner gets a personalized dashboard. No more wondering if PD is working — you'll see the data yourself.
+                Every TDI partner gets a personalized dashboard. No more wondering if PD is working -  you'll see the data yourself.
               </p>
             </div>
 
@@ -328,7 +328,7 @@ export default function ForSchoolsPage() {
                 <div className="p-5">
                   <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>At-a-Glance Progress</h4>
                   <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                    See staff enrollment, observations completed, and what needs attention — updated in real-time.
+                    See staff enrollment, observations completed, and what needs attention -  updated in real-time.
                   </p>
                 </div>
               </div>
@@ -348,7 +348,7 @@ export default function ForSchoolsPage() {
                 <div className="p-5">
                   <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>Teacher Wellbeing Data</h4>
                   <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                    Track stress levels, retention intent, and what teachers say would help — straight from their surveys.
+                    Track stress levels, retention intent, and what teachers say would help -  straight from their surveys.
                   </p>
                 </div>
               </div>
@@ -389,7 +389,7 @@ export default function ForSchoolsPage() {
                 </svg>
               </a>
               <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.5 }}>
-                Fictional example shown — your dashboard reflects your school's real goals and data.
+                Fictional example shown -  your dashboard reflects your school's real goals and data.
               </p>
             </div>
           </div>

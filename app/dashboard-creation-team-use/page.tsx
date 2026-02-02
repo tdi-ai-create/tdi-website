@@ -141,7 +141,7 @@ SECONDARY: ${formData.secondaryContactName || 'None'}
 
 AUDIENCE: ${formData.audience}
 ENROLLED: ${formData.totalEnrolled}
-PARTNERSHIP: ${formData.startDate} – ${formData.endDate}
+PARTNERSHIP: ${formData.startDate} -  ${formData.endDate}
 HUB ACCESS: Through ${formData.hubAccessUntil}
 PHASE: ${formData.currentPhase}
 
@@ -461,9 +461,9 @@ SUBMITTED BY: ${formData.submittedBy}
                   value={formData.currentPhase}
                   onChange={(e) => setFormData({...formData, currentPhase: e.target.value})}
                 >
-                  <option value="IGNITE">IGNITE (Phase 1) — Building foundation</option>
-                  <option value="ACCELERATE">ACCELERATE (Phase 2) — Expanding team</option>
-                  <option value="SUSTAIN">SUSTAIN (Phase 3) — Embedding systems</option>
+                  <option value="IGNITE">IGNITE (Phase 1) -  Building foundation</option>
+                  <option value="ACCELERATE">ACCELERATE (Phase 2) -  Expanding team</option>
+                  <option value="SUSTAIN">SUSTAIN (Phase 3) -  Embedding systems</option>
                 </select>
               </div>
             </div>

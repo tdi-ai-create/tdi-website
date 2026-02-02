@@ -65,7 +65,7 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
           color="orange"
           rules={[
             "Partner up. One person plays the student scenario.",
-            "The other is the para — but you can ONLY ask questions.",
+            "The other is the para -  but you can ONLY ask questions.",
             "If you accidentally TELL... you're out!",
           ]}
           onStart={handleStart}

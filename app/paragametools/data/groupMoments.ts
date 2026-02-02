@@ -10,7 +10,7 @@ export const KNOCKOUT_GROUP_MOMENTS = [
 export const TELL_OR_ASK_GROUP_MOMENTS = [
   "Which statement caused the biggest debate at your table?",
   "Raise your hand if 'Sound it out' tricked you.",
-  "'Didn't we just go over this?' — why is that a tell, not a question?",
+  "'Didn't we just go over this?' -  why is that a tell, not a question?",
   "What's the difference between 'Can you sit down?' and 'What do you need right now?'",
 ];
 
@@ -25,7 +25,7 @@ export const MAKEOVER_GROUP_MOMENTS = [
   "Let's hear a table read their best Level 3 rewrite out loud!",
   "Which makeover was the hardest? Why?",
   "What's the hardest part: Notice, Name, or Next Step?",
-  "Share one — who wants to go?",
+  "Share one -  who wants to go?",
 ];
 
 export const GROUP_MOMENTS_BY_GAME = {

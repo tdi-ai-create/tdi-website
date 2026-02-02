@@ -130,7 +130,7 @@ export default function PartnerDataPage() {
             <div className="mb-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 What were your most recent benchmark/standardized test results?
-                <span className="block text-gray-500 font-normal text-xs mt-1">Overall % proficient or Mastery+ — include the test name if possible</span>
+                <span className="block text-gray-500 font-normal text-xs mt-1">Overall % proficient or Mastery+ -  include the test name if possible</span>
               </label>
               <textarea
                 name="benchmark_results"
@@ -344,7 +344,7 @@ export default function PartnerDataPage() {
               <textarea
                 name="anything_else"
                 rows={4}
-                placeholder="This is your space — share anything on your mind..."
+                placeholder="This is your space -  share anything on your mind..."
                 className="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-[#35A7FF] focus:border-transparent"
               />
             </div>

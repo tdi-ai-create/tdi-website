@@ -1,7 +1,7 @@
 // Rotating tips for Facilitator Mode
 
 export const KNOCKOUT_TIPS = [
-  "If you catch yourself starting with 'You need to...' — that's a TELL!",
+  "If you catch yourself starting with 'You need to...' -  that's a TELL!",
   "Try starting with 'What do you notice about...'",
   "The best questions don't have a specific answer in mind.",
   "Silence after a question is GOOD. Give them time to think.",
@@ -19,7 +19,7 @@ export const TELL_OR_ASK_TIPS = [
 ];
 
 export const LEVEL_UP_TIPS = [
-  "Level 2 is the trap — it SOUNDS good but lacks specifics.",
+  "Level 2 is the trap -  it SOUNDS good but lacks specifics.",
   "NOTICE: What specifically did the student do?",
   "NAME: What is the skill or strategy called?",
   "NEXT STEP: What exactly should they try next?",
@@ -33,7 +33,7 @@ export const MAKEOVER_TIPS = [
   "Be specific enough that the student knows exactly what to do.",
   "If you can't name the skill, describe what you see.",
   "A good next step is ONE thing, not five things.",
-  "The context card is your cheat sheet — use the details!",
+  "The context card is your cheat sheet -  use the details!",
 ];
 
 export const TIPS_BY_GAME = {

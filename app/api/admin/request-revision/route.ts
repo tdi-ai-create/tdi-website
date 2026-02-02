@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
                   <p style="color: #78350f; margin: 0; white-space: pre-wrap;">${note}</p>
                 </div>
 
-                <p style="color: #374151; line-height: 1.6;">Don't worry – this is a normal part of the process! We want to make sure your course is the best it can be.</p>
+                <p style="color: #374151; line-height: 1.6;">Don't worry -  this is a normal part of the process! We want to make sure your course is the best it can be.</p>
 
                 <a href="https://www.teachersdeserveit.com/creator-portal/dashboard"
                    style="display: inline-block; background: #1e2749; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; margin-top: 16px; font-weight: 600;">
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
                   Questions? Reach out to Rachel at <a href="mailto:rachel@teachersdeserveit.com" style="color: #80a4ed;">rachel@teachersdeserveit.com</a>
                 </p>
 
-                <p style="color: #6b7280; font-size: 14px;">– The TDI Team</p>
+                <p style="color: #6b7280; font-size: 14px;"> -  The TDI Team</p>
               </div>
             `,
           }),
