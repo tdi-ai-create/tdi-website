@@ -39,6 +39,7 @@ import {
   Download,
   CreditCard,
   Unlock,
+  Camera,
 } from 'lucide-react';
 
 // Update this number as spots fill
@@ -1592,12 +1593,12 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 5. Refer a School, Celebrate Your Staff - Unified Narrative Section */}
+      {/* 5. Celebration Section */}
       <section className="py-16 lg:py-24" style={{ backgroundColor: '#1B2A4A' }} ref={celebrationRef}>
         <div className="container-default">
 
-          {/* ===== PART 1: Header + Three Steps ===== */}
-          <div className="text-center mb-16">
+          {/* ===== Three-Step Process ===== */}
+          <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
               Refer a School, Celebrate Your Staff
             </h2>
@@ -1606,7 +1607,6 @@ export default function NominatePage() {
             </p>
           </div>
 
-          {/* Three Steps - Minimal & Elegant */}
           <div className="max-w-4xl mx-auto mb-20">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
               {/* Step 1 */}
@@ -1665,106 +1665,118 @@ export default function NominatePage() {
             </div>
           </div>
 
-          {/* ===== PART 2: The Vision - "Picture This" ===== */}
-          <div className="max-w-4xl mx-auto mb-20">
+          {/* ===== The Vision - "Picture This" ===== */}
+          <div className="max-w-5xl mx-auto mb-20">
             {/* Label */}
-            <div className="text-center mb-8">
+            <div className="text-center mb-6">
               <span
                 className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
-                style={{ backgroundColor: 'rgba(246, 173, 85, 0.15)', color: '#F6AD55' }}
+                style={{ backgroundColor: 'rgba(43, 140, 150, 0.2)', color: '#2B8C96' }}
               >
                 Picture This
               </span>
             </div>
 
-            {/* Narrative Block */}
-            <div
-              className={`text-center mb-12 transition-all duration-700 delay-200 ease-out ${
-                celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-            >
-              <p
-                className="text-xl md:text-2xl leading-relaxed mb-6"
-                style={{ color: 'rgba(255, 255, 255, 0.9)' }}
-              >
-                It's Friday afternoon. The lounge smells like fresh coffee and warm cinnamon rolls.
-                Your teachers walk in to find handwritten thank-you cards at their seats,
-                a catered lunch from their favorite spot, and gift cards tucked inside.
-              </p>
-              <p
-                className="text-lg md:text-xl italic"
-                style={{ color: '#F6AD55' }}
-              >
-                Someone did this for them. That someone was you.
-              </p>
-            </div>
-
-            {/* Three Moment Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Moment 1 - Catered Lunch */}
+            {/* Two-column layout: Narrative left, Cards right */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+              {/* Narrative Block - Left */}
               <div
-                className={`rounded-xl p-6 text-center transition-all duration-700 delay-300 ease-out ${
+                className={`transition-all duration-700 delay-200 ease-out ${
                   celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
-                style={{
-                  backgroundColor: 'rgba(255,255,255,0.05)',
-                  borderLeft: '3px solid #E8734A'
-                }}
               >
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
-                  style={{ backgroundColor: 'rgba(232, 115, 74, 0.2)' }}
-                >
-                  <UtensilsCrossed className="w-6 h-6" style={{ color: '#E8734A' }} />
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-6 leading-tight">
+                  It's Friday Evening. Your Entire Staff Just Pulled Up to a Restaurant.
+                </h3>
+                <div className="space-y-4" style={{ color: '#cbd5e1', lineHeight: '1.8' }}>
+                  <p>
+                    Not the lounge. Not the cafeteria. A restaurant. Their favorite one.
+                  </p>
+                  <p>
+                    There's a private room reserved in their honor. Spouses are there. The table is set. There's a TDI swag bag at every chair — hats, t-shirts, something that says "we see you." Inside each bag: a personal gift card and a handwritten note from you.
+                  </p>
+                  <p>
+                    The food is paid for. The drinks are paid for. The night is theirs.
+                  </p>
+                  <p>
+                    Someone pulls out their phone to take a photo. Then everyone does. A teacher who almost quit last semester leans over and says, "I didn't know admin cared like this." But you did. You always did. You just never had the budget.
+                  </p>
+                  <p className="text-xl font-semibold" style={{ color: '#F6AD55' }}>
+                    Now you do.
+                  </p>
                 </div>
-                <h4 className="font-semibold text-white mb-2">Catered Lunch</h4>
-                <p className="text-sm" style={{ color: '#94a3b8' }}>
-                  From their favorite local restaurant
-                </p>
               </div>
 
-              {/* Moment 2 - Gift Cards */}
-              <div
-                className={`rounded-xl p-6 text-center transition-all duration-700 delay-400 ease-out ${
-                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
-                style={{
-                  backgroundColor: 'rgba(255,255,255,0.05)',
-                  borderLeft: '3px solid #2B8C96'
-                }}
-              >
+              {/* Moment Cards - Right */}
+              <div className="space-y-4">
+                {/* Moment 1 - Private Dinner */}
                 <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
-                  style={{ backgroundColor: 'rgba(43, 140, 150, 0.2)' }}
+                  className={`rounded-xl p-5 transition-all duration-700 delay-300 ease-out ${
+                    celebrationVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
+                  }`}
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    borderLeft: '3px solid #E8734A'
+                  }}
                 >
-                  <CreditCard className="w-6 h-6" style={{ color: '#2B8C96' }} />
+                  <div className="flex items-start gap-4">
+                    <div
+                      className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: 'rgba(232, 115, 74, 0.2)' }}
+                    >
+                      <UtensilsCrossed className="w-5 h-5" style={{ color: '#E8734A' }} />
+                    </div>
+                    <p className="text-sm leading-relaxed" style={{ color: '#e2e8f0' }}>
+                      A private dinner at a local restaurant — fully paid, spouses included
+                    </p>
+                  </div>
                 </div>
-                <h4 className="font-semibold text-white mb-2">Personal Gift Cards</h4>
-                <p className="text-sm" style={{ color: '#94a3b8' }}>
-                  A little something just for them
-                </p>
-              </div>
 
-              {/* Moment 3 - Wish Lists */}
-              <div
-                className={`rounded-xl p-6 text-center transition-all duration-700 delay-500 ease-out ${
-                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
-                style={{
-                  backgroundColor: 'rgba(255,255,255,0.05)',
-                  borderLeft: '3px solid #F6AD55'
-                }}
-              >
+                {/* Moment 2 - Swag Bags */}
                 <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
-                  style={{ backgroundColor: 'rgba(246, 173, 85, 0.2)' }}
+                  className={`rounded-xl p-5 transition-all duration-700 delay-400 ease-out ${
+                    celebrationVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
+                  }`}
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    borderLeft: '3px solid #2B8C96'
+                  }}
                 >
-                  <BookOpen className="w-6 h-6" style={{ color: '#F6AD55' }} />
+                  <div className="flex items-start gap-4">
+                    <div
+                      className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: 'rgba(43, 140, 150, 0.2)' }}
+                    >
+                      <Gift className="w-5 h-5" style={{ color: '#2B8C96' }} />
+                    </div>
+                    <p className="text-sm leading-relaxed" style={{ color: '#e2e8f0' }}>
+                      TDI swag bags with personal gift cards and handwritten notes from admin
+                    </p>
+                  </div>
                 </div>
-                <h4 className="font-semibold text-white mb-2">Classroom Wish Lists</h4>
-                <p className="text-sm" style={{ color: '#94a3b8' }}>
-                  The supplies they've been waiting for
-                </p>
+
+                {/* Moment 3 - The Night */}
+                <div
+                  className={`rounded-xl p-5 transition-all duration-700 delay-500 ease-out ${
+                    celebrationVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
+                  }`}
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    borderLeft: '3px solid #F6AD55'
+                  }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div
+                      className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: 'rgba(246, 173, 85, 0.2)' }}
+                    >
+                      <Camera className="w-5 h-5" style={{ color: '#F6AD55' }} />
+                    </div>
+                    <p className="text-sm leading-relaxed" style={{ color: '#e2e8f0' }}>
+                      The kind of night your teachers post about — and talk about for years
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
