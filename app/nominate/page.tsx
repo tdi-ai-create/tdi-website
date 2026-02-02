@@ -37,6 +37,8 @@ import {
   PartyPopper,
   KeyRound,
   Download,
+  CreditCard,
+  Unlock,
 } from 'lucide-react';
 
 // Update this number as spots fill
@@ -1590,370 +1592,238 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 5. Refer a School, Celebrate Your Staff - Three Step Process */}
+      {/* 5. Refer a School, Celebrate Your Staff - Unified Narrative Section */}
       <section className="py-16 lg:py-24" style={{ backgroundColor: '#1B2A4A' }} ref={celebrationRef}>
         <div className="container-default">
-          {/* Section Header */}
-          <div className="text-center mb-12 md:mb-16">
+
+          {/* ===== PART 1: Header + Three Steps ===== */}
+          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
               Refer a School, Celebrate Your Staff
             </h2>
             <p className="text-lg max-w-2xl mx-auto" style={{ color: '#94a3b8' }}>
-              Here's how one referral turns into a celebration your teachers won't forget.
+              One simple referral. One transformative partnership. One unforgettable celebration.
             </p>
           </div>
 
-          {/* Three-Step Process Flow */}
-          <div className="max-w-5xl mx-auto">
-            {/* Desktop Layout */}
-            <div className="hidden md:block relative">
-              {/* Connecting dashed line */}
+          {/* Three Steps - Minimal & Elegant */}
+          <div className="max-w-4xl mx-auto mb-20">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+              {/* Step 1 */}
               <div
-                className="absolute top-24 left-1/2 -translate-x-1/2 w-2/3 h-0.5"
-                style={{
-                  backgroundImage: 'linear-gradient(to right, rgba(255,255,255,0.3) 50%, transparent 50%)',
-                  backgroundSize: '20px 100%'
-                }}
-              />
-
-              <div className="flex items-start justify-center gap-8 relative z-10">
-                {/* Step 1 */}
-                <div
-                  className={`flex-1 max-w-xs text-center transition-all duration-700 ease-out ${
-                    celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                  }`}
-                >
-                  <div
-                    className="rounded-2xl p-8 border"
-                    style={{
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      borderColor: 'rgba(255,255,255,0.1)',
-                      boxShadow: '0 0 40px rgba(43, 140, 150, 0.15)'
-                    }}
-                  >
-                    {/* Number Badge */}
-                    <div
-                      className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-white"
-                      style={{ backgroundColor: '#2B8C96' }}
-                    >
-                      1
-                    </div>
-                    {/* Icon */}
-                    <div
-                      className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
-                      style={{ backgroundColor: '#2B8C96' }}
-                    >
-                      <Send className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="font-bold text-xl mb-3 text-white">
-                      You Refer a School
-                    </h3>
-                    <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
-                      Tell us about a school that deserves better professional development.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Arrow 1 */}
-                <div className="flex items-center pt-24" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                  <ChevronRight className="w-8 h-8" />
-                </div>
-
-                {/* Step 2 */}
-                <div
-                  className={`flex-1 max-w-xs text-center transition-all duration-700 delay-150 ease-out ${
-                    celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                  }`}
-                >
-                  <div
-                    className="rounded-2xl p-8 border"
-                    style={{
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      borderColor: 'rgba(255,255,255,0.1)'
-                    }}
-                  >
-                    {/* Number Badge */}
-                    <div
-                      className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold text-white"
-                      style={{ backgroundColor: '#E8734A' }}
-                    >
-                      2
-                    </div>
-                    {/* Icon */}
-                    <div
-                      className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
-                      style={{ backgroundColor: '#E8734A' }}
-                    >
-                      <Handshake className="w-8 h-8 text-white" />
-                    </div>
-                    <h3 className="font-bold text-xl mb-3 text-white">
-                      They Partner with TDI
-                    </h3>
-                    <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
-                      We begin a conversation, and they agree to our PD services.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Arrow 2 */}
-                <div className="flex items-center pt-24" style={{ color: 'rgba(255,255,255,0.3)' }}>
-                  <ChevronRight className="w-8 h-8" />
-                </div>
-
-                {/* Step 3 - The Payoff */}
-                <div
-                  className={`flex-1 max-w-xs text-center transition-all duration-700 delay-300 ease-out ${
-                    celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                  }`}
-                >
-                  <div
-                    className="rounded-2xl p-8 border-2 relative overflow-hidden"
-                    style={{
-                      backgroundColor: 'rgba(255,255,255,0.08)',
-                      borderColor: '#F6AD55',
-                      boxShadow: '0 0 60px rgba(246, 173, 85, 0.2)'
-                    }}
-                  >
-                    {/* Subtle celebration dots */}
-                    <div className="absolute top-2 right-3 w-2 h-2 rounded-full" style={{ backgroundColor: '#E8734A', opacity: 0.6 }} />
-                    <div className="absolute top-4 right-8 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#F6AD55', opacity: 0.5 }} />
-                    <div className="absolute top-6 right-4 w-1 h-1 rounded-full" style={{ backgroundColor: '#2B8C96', opacity: 0.5 }} />
-
-                    {/* Number Badge */}
-                    <div
-                      className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold"
-                      style={{ backgroundColor: '#F6AD55', color: '#1B2A4A' }}
-                    >
-                      3
-                    </div>
-                    {/* Icon */}
-                    <div
-                      className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5"
-                      style={{ backgroundColor: '#F6AD55' }}
-                    >
-                      <PartyPopper className="w-8 h-8" style={{ color: '#1B2A4A' }} />
-                    </div>
-                    <h3 className="font-bold text-xl mb-3 text-white">
-                      Your Staff Gets Celebrated
-                    </h3>
-                    <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
-                      You receive a budget to design the perfect appreciation moment for your team.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Mobile Layout */}
-            <div className="md:hidden relative">
-              {/* Vertical connecting line on the left */}
-              <div
-                className="absolute left-6 top-20 bottom-20 w-0.5"
-                style={{
-                  backgroundImage: 'linear-gradient(to bottom, rgba(255,255,255,0.3) 50%, transparent 50%)',
-                  backgroundSize: '100% 16px'
-                }}
-              />
-
-              <div className="space-y-6 pl-16 relative">
-                {/* Step 1 */}
-                <div
-                  className={`transition-all duration-700 ease-out ${
-                    celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                  }`}
-                >
-                  {/* Number badge positioned on the line */}
-                  <div
-                    className="absolute left-0 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold text-white"
-                    style={{ backgroundColor: '#2B8C96' }}
-                  >
-                    1
-                  </div>
-                  <div
-                    className="rounded-xl p-6 border"
-                    style={{
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      borderColor: 'rgba(255,255,255,0.1)'
-                    }}
-                  >
-                    <div className="flex items-center gap-4 mb-3">
-                      <div
-                        className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: '#2B8C96' }}
-                      >
-                        <Send className="w-6 h-6 text-white" />
-                      </div>
-                      <h3 className="font-bold text-lg text-white">You Refer a School</h3>
-                    </div>
-                    <p className="text-sm" style={{ color: '#94a3b8' }}>
-                      Tell us about a school that deserves better professional development.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 2 */}
-                <div
-                  className={`transition-all duration-700 delay-150 ease-out ${
-                    celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                  }`}
-                >
-                  <div
-                    className="absolute left-0 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold text-white"
-                    style={{ backgroundColor: '#E8734A', marginTop: '0' }}
-                  >
-                    2
-                  </div>
-                  <div
-                    className="rounded-xl p-6 border"
-                    style={{
-                      backgroundColor: 'rgba(255,255,255,0.05)',
-                      borderColor: 'rgba(255,255,255,0.1)'
-                    }}
-                  >
-                    <div className="flex items-center gap-4 mb-3">
-                      <div
-                        className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: '#E8734A' }}
-                      >
-                        <Handshake className="w-6 h-6 text-white" />
-                      </div>
-                      <h3 className="font-bold text-lg text-white">They Partner with TDI</h3>
-                    </div>
-                    <p className="text-sm" style={{ color: '#94a3b8' }}>
-                      We begin a conversation, and they agree to our PD services.
-                    </p>
-                  </div>
-                </div>
-
-                {/* Step 3 */}
-                <div
-                  className={`transition-all duration-700 delay-300 ease-out ${
-                    celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                  }`}
-                >
-                  <div
-                    className="absolute left-0 w-12 h-12 rounded-full flex items-center justify-center text-xl font-bold"
-                    style={{ backgroundColor: '#F6AD55', color: '#1B2A4A' }}
-                  >
-                    3
-                  </div>
-                  <div
-                    className="rounded-xl p-6 border-2 relative overflow-hidden"
-                    style={{
-                      backgroundColor: 'rgba(255,255,255,0.08)',
-                      borderColor: '#F6AD55'
-                    }}
-                  >
-                    {/* Celebration dots */}
-                    <div className="absolute top-2 right-3 w-2 h-2 rounded-full" style={{ backgroundColor: '#E8734A', opacity: 0.6 }} />
-                    <div className="absolute top-4 right-8 w-1.5 h-1.5 rounded-full" style={{ backgroundColor: '#F6AD55', opacity: 0.5 }} />
-
-                    <div className="flex items-center gap-4 mb-3">
-                      <div
-                        className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: '#F6AD55' }}
-                      >
-                        <PartyPopper className="w-6 h-6" style={{ color: '#1B2A4A' }} />
-                      </div>
-                      <h3 className="font-bold text-lg text-white">Your Staff Gets Celebrated</h3>
-                    </div>
-                    <p className="text-sm" style={{ color: '#94a3b8' }}>
-                      You receive a budget to design the perfect appreciation moment for your team.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Impact Cards and Download Section */}
-      <section className="py-16 lg:py-20" style={{ backgroundColor: '#f9fafb' }}>
-        <div className="container-default">
-          {/* Three Impact Cards */}
-          <div className="max-w-5xl mx-auto mb-12">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Impact Card A */}
-              <div
-                className={`rounded-lg p-6 transition-all duration-700 delay-100 ease-out ${
+                className={`text-center transition-all duration-700 ease-out ${
                   celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
-                style={{ backgroundColor: 'rgba(20, 184, 166, 0.08)' }}
               >
                 <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
-                  style={{ backgroundColor: 'rgba(20, 184, 166, 0.15)' }}
+                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 text-2xl font-bold"
+                  style={{ backgroundColor: '#2B8C96', color: '#ffffff' }}
                 >
-                  <Gift className="w-6 h-6" style={{ color: '#14b8a6' }} />
+                  1
                 </div>
-                <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>
-                  Design the Moment Your Team Deserves
-                </h4>
-                <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
-                  Use your budget for surprise lunches, personal gift cards, or fulfilling classroom wish lists.
+                <h3 className="font-semibold text-xl mb-2 text-white">You nominate a school</h3>
+                <p className="text-sm" style={{ color: '#94a3b8' }}>
+                  Takes 2 minutes. Tell us who deserves better PD.
                 </p>
               </div>
 
-              {/* Impact Card B */}
+              {/* Step 2 */}
               <div
-                className={`rounded-lg p-6 transition-all duration-700 delay-200 ease-out ${
+                className={`text-center transition-all duration-700 delay-150 ease-out ${
                   celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
-                style={{ backgroundColor: 'rgba(20, 184, 166, 0.08)' }}
               >
                 <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
-                  style={{ backgroundColor: 'rgba(20, 184, 166, 0.15)' }}
+                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 text-2xl font-bold"
+                  style={{ backgroundColor: '#E8734A', color: '#ffffff' }}
                 >
-                  <TrendingUp className="w-6 h-6" style={{ color: '#14b8a6' }} />
+                  2
                 </div>
-                <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>
-                  Achieve 15-25% Higher Teacher Retention
-                </h4>
-                <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
-                  Schools with consistent recognition see their best people stay.
+                <h3 className="font-semibold text-xl mb-2 text-white">They become a TDI partner</h3>
+                <p className="text-sm" style={{ color: '#94a3b8' }}>
+                  We connect with them and begin the partnership.
                 </p>
               </div>
 
-              {/* Impact Card C */}
+              {/* Step 3 */}
               <div
-                className={`rounded-lg p-6 transition-all duration-700 delay-300 ease-out ${
+                className={`text-center transition-all duration-700 delay-300 ease-out ${
                   celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
                 }`}
-                style={{ backgroundColor: 'rgba(20, 184, 166, 0.08)' }}
               >
                 <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
-                  style={{ backgroundColor: 'rgba(20, 184, 166, 0.15)' }}
+                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 text-2xl font-bold"
+                  style={{ backgroundColor: '#F6AD55', color: '#1B2A4A' }}
                 >
-                  <KeyRound className="w-6 h-6" style={{ color: '#14b8a6' }} />
+                  3
                 </div>
-                <h4 className="font-bold text-lg mb-2" style={{ color: '#1e2749' }}>
-                  Your Budget, Your Rules — No Red Tape
-                </h4>
-                <p className="text-sm leading-relaxed" style={{ color: '#6b7280' }}>
-                  You have complete freedom to decide how to celebrate your own people.
+                <h3 className="font-semibold text-xl mb-2 text-white">You get a celebration budget</h3>
+                <p className="text-sm" style={{ color: '#94a3b8' }}>
+                  Use it however you want to celebrate your staff.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* PDF Download Link */}
-          <div className="text-center">
-            <a
-              href="/celebration-guide.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 shadow-md w-full sm:w-auto justify-center"
-              style={{ backgroundColor: '#14b8a6', color: '#ffffff' }}
+          {/* ===== PART 2: The Vision - "Picture This" ===== */}
+          <div className="max-w-4xl mx-auto mb-20">
+            {/* Label */}
+            <div className="text-center mb-8">
+              <span
+                className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
+                style={{ backgroundColor: 'rgba(246, 173, 85, 0.15)', color: '#F6AD55' }}
+              >
+                Picture This
+              </span>
+            </div>
+
+            {/* Narrative Block */}
+            <div
+              className={`text-center mb-12 transition-all duration-700 delay-200 ease-out ${
+                celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              }`}
             >
-              <Download className="w-5 h-5" />
-              See the Full Celebration Guide
-            </a>
-            <p className="text-sm mt-3" style={{ color: '#9ca3af' }}>
-              A printable overview of celebration options, impact, and how the budget works.
-            </p>
+              <p
+                className="text-xl md:text-2xl leading-relaxed mb-6"
+                style={{ color: 'rgba(255, 255, 255, 0.9)' }}
+              >
+                It's Friday afternoon. The lounge smells like fresh coffee and warm cinnamon rolls.
+                Your teachers walk in to find handwritten thank-you cards at their seats,
+                a catered lunch from their favorite spot, and gift cards tucked inside.
+              </p>
+              <p
+                className="text-lg md:text-xl italic"
+                style={{ color: '#F6AD55' }}
+              >
+                Someone did this for them. That someone was you.
+              </p>
+            </div>
+
+            {/* Three Moment Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Moment 1 - Catered Lunch */}
+              <div
+                className={`rounded-xl p-6 text-center transition-all duration-700 delay-300 ease-out ${
+                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                  borderLeft: '3px solid #E8734A'
+                }}
+              >
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+                  style={{ backgroundColor: 'rgba(232, 115, 74, 0.2)' }}
+                >
+                  <UtensilsCrossed className="w-6 h-6" style={{ color: '#E8734A' }} />
+                </div>
+                <h4 className="font-semibold text-white mb-2">Catered Lunch</h4>
+                <p className="text-sm" style={{ color: '#94a3b8' }}>
+                  From their favorite local restaurant
+                </p>
+              </div>
+
+              {/* Moment 2 - Gift Cards */}
+              <div
+                className={`rounded-xl p-6 text-center transition-all duration-700 delay-400 ease-out ${
+                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                  borderLeft: '3px solid #2B8C96'
+                }}
+              >
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+                  style={{ backgroundColor: 'rgba(43, 140, 150, 0.2)' }}
+                >
+                  <CreditCard className="w-6 h-6" style={{ color: '#2B8C96' }} />
+                </div>
+                <h4 className="font-semibold text-white mb-2">Personal Gift Cards</h4>
+                <p className="text-sm" style={{ color: '#94a3b8' }}>
+                  A little something just for them
+                </p>
+              </div>
+
+              {/* Moment 3 - Wish Lists */}
+              <div
+                className={`rounded-xl p-6 text-center transition-all duration-700 delay-500 ease-out ${
+                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+                style={{
+                  backgroundColor: 'rgba(255,255,255,0.05)',
+                  borderLeft: '3px solid #F6AD55'
+                }}
+              >
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+                  style={{ backgroundColor: 'rgba(246, 173, 85, 0.2)' }}
+                >
+                  <BookOpen className="w-6 h-6" style={{ color: '#F6AD55' }} />
+                </div>
+                <h4 className="font-semibold text-white mb-2">Classroom Wish Lists</h4>
+                <p className="text-sm" style={{ color: '#94a3b8' }}>
+                  The supplies they've been waiting for
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== PART 3: The Proof + Download ===== */}
+          <div className="max-w-3xl mx-auto">
+            {/* Proof Points */}
+            <div
+              className={`flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 mb-10 transition-all duration-700 delay-400 ease-out ${
+                celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              }`}
+            >
+              {/* Proof 1 */}
+              <div className="flex items-center gap-3">
+                <Heart className="w-5 h-5" style={{ color: '#E8734A' }} />
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                  Teachers talk about it for weeks
+                </span>
+              </div>
+
+              {/* Divider (desktop only) */}
+              <div className="hidden md:block w-px h-4" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }} />
+
+              {/* Proof 2 */}
+              <div className="flex items-center gap-3">
+                <TrendingUp className="w-5 h-5" style={{ color: '#2B8C96' }} />
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                  15-25% higher retention
+                </span>
+              </div>
+
+              {/* Divider (desktop only) */}
+              <div className="hidden md:block w-px h-4" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }} />
+
+              {/* Proof 3 */}
+              <div className="flex items-center gap-3">
+                <Unlock className="w-5 h-5" style={{ color: '#F6AD55' }} />
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                  Your budget, your rules
+                </span>
+              </div>
+            </div>
+
+            {/* PDF Download */}
+            <div className="text-center">
+              <a
+                href="/celebration-guide.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold transition-all hover:scale-105"
+                style={{ backgroundColor: '#2B8C96', color: '#ffffff' }}
+              >
+                <Download className="w-5 h-5" />
+                See the Full Celebration Guide
+              </a>
+              <p className="text-sm mt-4" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                A printable overview of celebration ideas and how the budget works.
+              </p>
+            </div>
           </div>
         </div>
       </section>
