@@ -129,7 +129,9 @@ export function NominatePopup() {
             className="text-xl lg:text-2xl font-bold mb-3"
             style={{ color: '#1B2A4A' }}
           >
-            Know a School That Deserves Better PD?
+            Know a School<br />
+            That Deserves<br />
+            Better PD?
           </h2>
 
           {/* Body text */}
