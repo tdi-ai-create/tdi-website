@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, FileText, Upload, CheckCircle, ExternalLink, Send, Loader2, Eye, Mail, MessageSquare, PartyPopper, Copy, Check, AlertCircle, Link2, PenLine, GraduationCap, Package, BookOpen } from 'lucide-react';
+import { Calendar, FileText, Upload, CheckCircle, ExternalLink, Send, Loader2, Eye, Mail, MessageSquare, PartyPopper, Copy, Check, AlertCircle, Link2, PenLine, GraduationCap, Package, BookOpen, ChevronDown, ChevronUp, Handshake, DollarSign } from 'lucide-react';
 
 interface MilestoneActionProps {
   milestone: {
@@ -48,6 +48,8 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
   const [formData, setFormData] = useState<Record<string, string>>({});
   // Selected path state (for content path selection)
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
+  // Program overview expandable state (for content path selection)
+  const [showProgramOverview, setShowProgramOverview] = useState(true);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const config = (milestone.action_config || {}) as any;
@@ -945,10 +947,118 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
       );
 
     case 'select':
-      // Content path selection with visual cards
+      // Content path selection with visual cards and program overview
+      const getCompensationBadge = (pathValue: string) => {
+        switch (pathValue) {
+          case 'blog':
+            return (
+              <span className="inline-flex items-center gap-1 text-xs text-gray-500 mt-2">
+                <Handshake className="w-3 h-3" />
+                Collaborative contribution - Builds your visibility
+              </span>
+            );
+          case 'download':
+            return (
+              <span className="inline-flex items-center gap-1 text-xs text-gray-500 mt-2">
+                <Handshake className="w-3 h-3" />
+                Collaborative contribution - Builds your portfolio
+              </span>
+            );
+          case 'course':
+            return (
+              <span className="inline-flex items-center gap-1 text-xs text-green-600 font-medium mt-2">
+                <DollarSign className="w-3 h-3" />
+                Revenue share - Earn with every enrollment
+              </span>
+            );
+          default:
+            return null;
+        }
+      };
+
       return (
         <AdminPreviewWrapper actionLabel={config.label || 'Select an Option'}>
           <div className="space-y-4">
+            {/* Program Overview - Expandable TLDR Section */}
+            <div className="bg-gradient-to-br from-[#f8fafc] to-[#f1f5f9] border border-gray-200 rounded-xl overflow-hidden">
+              <button
+                onClick={() => setShowProgramOverview(!showProgramOverview)}
+                className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50/50 transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">📋</span>
+                  <span className="font-semibold text-[#1e2749]">How the TDI Creator Program Works</span>
+                </div>
+                {showProgramOverview ? (
+                  <ChevronUp className="w-5 h-5 text-gray-400" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-400" />
+                )}
+              </button>
+
+              {showProgramOverview && (
+                <div className="px-4 pb-4 space-y-4 border-t border-gray-100">
+                  <p className="text-sm text-gray-600 pt-3">
+                    Welcome to the TDI Creator Program! Here&apos;s a quick overview before you choose your path.
+                  </p>
+
+                  {/* What We Provide */}
+                  <div className="bg-white rounded-lg p-3 border border-gray-100">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-base">🤝</span>
+                      <span className="font-medium text-[#1e2749] text-sm">What We Provide</span>
+                    </div>
+                    <p className="text-xs text-gray-600 leading-relaxed">
+                      Every creator gets hands-on support from our team - we&apos;ll guide you through the process, provide templates and resources, and handle editing, design, and publishing so you can focus on your content.
+                    </p>
+                  </div>
+
+                  {/* Path Descriptions */}
+                  <div className="grid gap-3">
+                    <div className="bg-white rounded-lg p-3 border border-gray-100">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-base">📝</span>
+                        <span className="font-medium text-[#1e2749] text-sm">Blog Posts</span>
+                      </div>
+                      <p className="text-xs text-gray-600 leading-relaxed">
+                        Write and share your expertise as a featured article on the TDI blog. Great for getting your voice out there and building your presence in the education community. This is a collaborative contribution - no direct compensation, but you&apos;ll reach thousands of educators and build your brand.
+                      </p>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-3 border border-gray-100">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-base">📦</span>
+                        <span className="font-medium text-[#1e2749] text-sm">Digital Downloads</span>
+                      </div>
+                      <p className="text-xs text-gray-600 leading-relaxed">
+                        Create downloadable resources like guides, toolkits, or templates that educators can use in their classrooms. Like blog posts, these are collaborative contributions that build your visibility and portfolio.
+                      </p>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-3 border border-green-100 ring-1 ring-green-200">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-base">🎓</span>
+                        <span className="font-medium text-[#1e2749] text-sm">Learning Hub Courses</span>
+                        <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium">REVENUE</span>
+                      </div>
+                      <p className="text-xs text-gray-600 leading-relaxed">
+                        Build a full online course with video lessons and downloadable resources. This is our most involved path - and the one where you earn ongoing revenue. You&apos;ll receive a personal discount code and earn money every time an educator enrolls. We handle production, marketing, and distribution.
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Tip */}
+                  <div className="flex items-start gap-2 bg-amber-50 rounded-lg p-3 border border-amber-100">
+                    <span className="text-base">💡</span>
+                    <p className="text-xs text-amber-800">
+                      <strong>Not sure?</strong> Start with a blog post or download - you can always create a course later! Each path includes everything before it, so a course creator also gets a blog feature and downloadable resources.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Path Selection Cards */}
             <div className="grid gap-4">
               {(config.options || []).map((option: { value: string; label: string; description: string }) => (
                 <button
@@ -963,23 +1073,35 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   className={`relative flex items-start gap-4 p-5 rounded-xl border-2 transition-all text-left ${
                     selectedPath === option.value
                       ? 'border-[#ffba06] bg-[#fff9eb] ring-2 ring-[#ffba06] ring-offset-2'
-                      : 'border-gray-200 bg-white hover:border-[#80a4ed] hover:shadow-md'
+                      : option.value === 'course'
+                        ? 'border-green-200 bg-green-50/30 hover:border-green-300 hover:shadow-md'
+                        : 'border-gray-200 bg-white hover:border-[#80a4ed] hover:shadow-md'
                   } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <div className={`flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center ${
                     selectedPath === option.value
                       ? 'bg-[#ffba06] text-white'
-                      : 'bg-gray-100 text-[#1e2749]'
+                      : option.value === 'course'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-100 text-[#1e2749]'
                   }`}>
                     {getPathIcon(option.value)}
                   </div>
                   <div className="flex-1">
-                    <div className="font-semibold text-[#1e2749] text-lg mb-1">
-                      {option.label}
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-[#1e2749] text-lg">
+                        {option.label}
+                      </span>
+                      {option.value === 'course' && (
+                        <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium">
+                          EARN REVENUE
+                        </span>
+                      )}
                     </div>
                     <p className="text-sm text-gray-600 leading-relaxed">
                       {option.description}
                     </p>
+                    {getCompensationBadge(option.value)}
                   </div>
                   {selectedPath === option.value && isSubmitting && (
                     <div className="absolute top-4 right-4">
@@ -989,6 +1111,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                 </button>
               ))}
             </div>
+
             {error && (
               <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
