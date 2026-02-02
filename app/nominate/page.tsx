@@ -631,7 +631,7 @@ export default function NominatePage() {
             Know a School That<br />Deserves Better PD?
           </h1>
           <p className="text-xl md:text-2xl mb-4 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
-            Nominate them. If it leads to a partnership, we celebrate you.
+            Nominate them. If it leads to a partnership, <span className="font-bold">we celebrate you.</span>
           </p>
 
           {/* Trust Line */}
@@ -1190,7 +1190,7 @@ export default function NominatePage() {
                   Nominate a School
                 </h2>
                 <p className="text-center mb-8" style={{ color: '#35A7FF' }}>
-                  <span className="font-semibold">{VIP_SPOTS_REMAINING} of 5</span> Blueprint Founders Circle spots remaining for Fall 2026
+                  <span className="font-bold">{VIP_SPOTS_REMAINING} of 5 Blueprint Founders Circle</span> spots remaining for Fall 2026
                 </p>
 
                 <form onSubmit={handleSubmit}>
