@@ -651,8 +651,8 @@ export default function NominatePage() {
           <div>
             <button
               onClick={scrollToForm}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105"
-              style={{ backgroundColor: '#ffffff', color: '#1e2749' }}
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 shadow-lg"
+              style={{ backgroundColor: '#ffba06', color: '#ffffff' }}
             >
               Start Your Nomination
               <ArrowDown className="w-5 h-5" />
@@ -1147,7 +1147,7 @@ export default function NominatePage() {
       </section>
 
       {/* 5. Stats + Form Section */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#ffba06' }}>
         <div className="container-default">
           {/* Stats Bar */}
           <div className="grid grid-cols-3 gap-4 md:gap-8 text-center mb-8 max-w-2xl mx-auto">
