@@ -936,7 +936,7 @@ export default function NominatePage() {
       </section>
 
       {/* 4. Celebration Section - Picture This */}
-      <section className="py-16 lg:py-24" style={{ backgroundColor: '#1B2A4A' }} ref={celebrationRef}>
+      <section className="py-16 lg:py-24" style={{ backgroundColor: '#1e2749' }} ref={celebrationRef}>
         <div className="container-default">
 
           {/* ===== The Vision - "Picture This" ===== */}
@@ -1075,10 +1075,10 @@ export default function NominatePage() {
               }`}
             >
               {/* Proof 1 */}
-              <div className="flex items-center gap-3">
-                <Heart className="w-5 h-5" style={{ color: '#E8734A' }} />
+              <div className="flex items-start gap-3 max-w-[260px]">
+                <Heart className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#E8734A' }} />
                 <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                  The teacher who almost quit? She's staying.
+                  The teacher who almost quit?<br />She's staying.
                 </span>
               </div>
 
@@ -1086,10 +1086,10 @@ export default function NominatePage() {
               <div className="hidden md:block w-px h-4" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }} />
 
               {/* Proof 2 */}
-              <div className="flex items-center gap-3">
-                <Users className="w-5 h-5" style={{ color: '#2B8C96' }} />
+              <div className="flex items-start gap-3 max-w-[260px]">
+                <Users className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#2B8C96' }} />
                 <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                  One referral celebrates your staff and lifts another building
+                  One referral celebrates your staff<br />and lifts another building
                 </span>
               </div>
 
@@ -1097,10 +1097,10 @@ export default function NominatePage() {
               <div className="hidden md:block w-px h-4" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }} />
 
               {/* Proof 3 */}
-              <div className="flex items-center gap-3">
-                <Download className="w-5 h-5" style={{ color: '#F6AD55' }} />
+              <div className="flex items-start gap-3 max-w-[260px]">
+                <Download className="w-5 h-5 flex-shrink-0 mt-0.5" style={{ color: '#F6AD55' }} />
                 <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                  Get the full guide below - it's yours to keep and share
+                  Get the full guide below<br />it's yours to keep and share
                 </span>
               </div>
             </div>
