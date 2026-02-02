@@ -177,6 +177,10 @@ export default function NominatePage() {
   const [celebrationVisible, setCelebrationVisible] = useState(false);
   const celebrationRef = useRef<HTMLDivElement>(null);
 
+  // Hero visibility for sticky CTA
+  const [heroVisible, setHeroVisible] = useState(true);
+  const heroRef = useRef<HTMLElement>(null);
+
   // Animated counter values for impact metrics
   const planningHours = useCounter(6, 1000, impactVisible);
   const stressLevel = useCounter(5, 1000, impactVisible);
@@ -233,6 +237,18 @@ export default function NominatePage() {
       { threshold: 0.2 }
     );
     if (celebrationRef.current) observer.observe(celebrationRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  // Track hero visibility for sticky mobile CTA
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setHeroVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+    if (heroRef.current) observer.observe(heroRef.current);
     return () => observer.disconnect();
   }, []);
 
@@ -632,7 +648,7 @@ export default function NominatePage() {
   return (
     <main className="min-h-screen">
       {/* 1. Hero Section */}
-      <section className="relative py-16 md:py-24 overflow-hidden">
+      <section ref={heroRef} className="relative py-16 md:py-24 overflow-hidden">
         {/* Background Image */}
         <div
           className="absolute inset-0"
@@ -919,7 +935,202 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 4. Stats + Form Section */}
+      {/* 4. Celebration Section - Picture This */}
+      <section className="py-16 lg:py-24" style={{ backgroundColor: '#1B2A4A' }} ref={celebrationRef}>
+        <div className="container-default">
+
+          {/* ===== The Vision - "Picture This" ===== */}
+          <div className="max-w-5xl mx-auto mb-20">
+            {/* Connector Line */}
+            <p className="text-center text-lg md:text-xl font-medium text-white mb-8">
+              This is what your nomination leads to.
+            </p>
+
+            {/* Label */}
+            <div className="text-center mb-8">
+              <span
+                className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
+                style={{ backgroundColor: 'rgba(43, 140, 150, 0.2)', color: '#2B8C96' }}
+              >
+                Picture This
+              </span>
+            </div>
+
+            {/* Two-column layout: Narrative left, Cards right */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
+              {/* Narrative Block - Left */}
+              <div
+                className={`transition-all duration-700 delay-200 ease-out ${
+                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                }`}
+              >
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-6 leading-tight">
+                  It's Friday Evening. Your Entire Staff Just Pulled Up to a Restaurant.
+                </h3>
+                <div className="space-y-4" style={{ color: '#cbd5e1', lineHeight: '1.8' }}>
+                  <p>
+                    Not the lounge. Not the cafeteria. A restaurant - their favorite one. Private room. Spouses invited. Everything paid for.
+                  </p>
+                  <p>
+                    There's a TDI swag bag at every chair. Inside: a gift card, a handwritten note from you, and gear that says "we see you."
+                  </p>
+                  <p>
+                    A teacher who almost quit last semester leans over and whispers, "I didn't know admin cared like this."
+                  </p>
+                  <p className="text-xl font-semibold" style={{ color: '#F6AD55' }}>
+                    You always did. You just never had the budget. Now you do.
+                  </p>
+                </div>
+              </div>
+
+              {/* Moment Cards - Right */}
+              <div className="space-y-4">
+                {/* Moment 1 - Dinner, Lunch, or Happy Hour */}
+                <div
+                  className={`rounded-xl p-5 transition-all duration-700 delay-300 ease-out ${
+                    celebrationVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
+                  }`}
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    borderLeft: '3px solid #E8734A'
+                  }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div
+                      className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: 'rgba(232, 115, 74, 0.2)' }}
+                    >
+                      <UtensilsCrossed className="w-5 h-5" style={{ color: '#E8734A' }} />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-white mb-1">Dinner, Lunch, or Happy Hour</h4>
+                      <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
+                        You pick the venue and the vibe. It's your staff - you know what they'd love.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Moment 2 - Gift Cards, Swag & Handwritten Notes */}
+                <div
+                  className={`rounded-xl p-5 transition-all duration-700 delay-400 ease-out ${
+                    celebrationVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
+                  }`}
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    borderLeft: '3px solid #2B8C96'
+                  }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div
+                      className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: 'rgba(43, 140, 150, 0.2)' }}
+                    >
+                      <Gift className="w-5 h-5" style={{ color: '#2B8C96' }} />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-white mb-1">Gift Cards, Swag & Handwritten Notes</h4>
+                      <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
+                        Every teacher walks away with something personal. Not generic - chosen by you.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Moment 3 - Or Something Entirely Your Own */}
+                <div
+                  className={`rounded-xl p-5 transition-all duration-700 delay-500 ease-out ${
+                    celebrationVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
+                  }`}
+                  style={{
+                    backgroundColor: 'rgba(255,255,255,0.05)',
+                    borderLeft: '3px solid #F6AD55'
+                  }}
+                >
+                  <div className="flex items-start gap-4">
+                    <div
+                      className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: 'rgba(246, 173, 85, 0.2)' }}
+                    >
+                      <Wand2 className="w-5 h-5" style={{ color: '#F6AD55' }} />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-white mb-1">Or Something Entirely Your Own</h4>
+                      <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
+                        Classroom wish lists. A spa day. A surprise assembly. You design it from scratch.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ===== PART 3: The Proof + Download ===== */}
+          <div className="max-w-3xl mx-auto">
+            {/* Proof Points */}
+            <div
+              className={`flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 mb-10 transition-all duration-700 delay-400 ease-out ${
+                celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+              }`}
+            >
+              {/* Proof 1 */}
+              <div className="flex items-center gap-3">
+                <Heart className="w-5 h-5" style={{ color: '#E8734A' }} />
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                  The teacher who almost quit? She's staying.
+                </span>
+              </div>
+
+              {/* Divider (desktop only) */}
+              <div className="hidden md:block w-px h-4" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }} />
+
+              {/* Proof 2 */}
+              <div className="flex items-center gap-3">
+                <Users className="w-5 h-5" style={{ color: '#2B8C96' }} />
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                  One referral celebrates your staff and lifts another building
+                </span>
+              </div>
+
+              {/* Divider (desktop only) */}
+              <div className="hidden md:block w-px h-4" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }} />
+
+              {/* Proof 3 */}
+              <div className="flex items-center gap-3">
+                <Download className="w-5 h-5" style={{ color: '#F6AD55' }} />
+                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                  Get the full guide below - it's yours to keep and share
+                </span>
+              </div>
+            </div>
+
+            {/* PDF Download */}
+            <div className="text-center">
+              <a
+                href="/celebration-guide.pdf"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  if (typeof window !== 'undefined' && window.gtag) {
+                    window.gtag('event', 'celebration_guide_download', { source: 'nominate_page' });
+                  }
+                }}
+                className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold transition-all hover:scale-105"
+                style={{ backgroundColor: '#2B8C96', color: '#ffffff' }}
+              >
+                <Download className="w-5 h-5" />
+                See the Full Celebration Guide
+              </a>
+              <p className="text-sm mt-4 max-w-md mx-auto" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                See exactly what's possible - celebration options, how the budget works, and the impact it has on your building. Everything you just read, in a guide you can share with your team.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. Stats + Form Section */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           {/* Stats Bar */}
@@ -1594,196 +1805,6 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 5. Celebration Section - Picture This */}
-      <section className="py-16 lg:py-24" style={{ backgroundColor: '#1B2A4A' }} ref={celebrationRef}>
-        <div className="container-default">
-
-          {/* ===== The Vision - "Picture This" ===== */}
-          <div className="max-w-5xl mx-auto mb-20">
-            {/* Connector Line */}
-            <p className="text-center text-lg md:text-xl font-medium text-white mb-8">
-              This is what your nomination leads to.
-            </p>
-
-            {/* Label */}
-            <div className="text-center mb-8">
-              <span
-                className="inline-block px-4 py-1.5 rounded-full text-xs font-semibold tracking-widest uppercase"
-                style={{ backgroundColor: 'rgba(43, 140, 150, 0.2)', color: '#2B8C96' }}
-              >
-                Picture This
-              </span>
-            </div>
-
-            {/* Two-column layout: Narrative left, Cards right */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-start">
-              {/* Narrative Block - Left */}
-              <div
-                className={`transition-all duration-700 delay-200 ease-out ${
-                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
-              >
-                <h3 className="text-2xl md:text-3xl font-bold text-white mb-6 leading-tight">
-                  It's Friday Evening. Your Entire Staff Just Pulled Up to a Restaurant.
-                </h3>
-                <div className="space-y-4" style={{ color: '#cbd5e1', lineHeight: '1.8' }}>
-                  <p>
-                    Not the lounge. Not the cafeteria. A restaurant - their favorite one. Private room. Spouses invited. Everything paid for.
-                  </p>
-                  <p>
-                    There's a TDI swag bag at every chair. Inside: a gift card, a handwritten note from you, and gear that says "we see you."
-                  </p>
-                  <p>
-                    A teacher who almost quit last semester leans over and whispers, "I didn't know admin cared like this."
-                  </p>
-                  <p className="text-xl font-semibold" style={{ color: '#F6AD55' }}>
-                    You always did. You just never had the budget. Now you do.
-                  </p>
-                </div>
-              </div>
-
-              {/* Moment Cards - Right */}
-              <div className="space-y-4">
-                {/* Moment 1 - Dinner, Lunch, or Happy Hour */}
-                <div
-                  className={`rounded-xl p-5 transition-all duration-700 delay-300 ease-out ${
-                    celebrationVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
-                  }`}
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.05)',
-                    borderLeft: '3px solid #E8734A'
-                  }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div
-                      className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: 'rgba(232, 115, 74, 0.2)' }}
-                    >
-                      <UtensilsCrossed className="w-5 h-5" style={{ color: '#E8734A' }} />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-white mb-1">Dinner, Lunch, or Happy Hour</h4>
-                      <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
-                        You pick the venue and the vibe. It's your staff - you know what they'd love.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Moment 2 - Gift Cards, Swag & Handwritten Notes */}
-                <div
-                  className={`rounded-xl p-5 transition-all duration-700 delay-400 ease-out ${
-                    celebrationVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
-                  }`}
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.05)',
-                    borderLeft: '3px solid #2B8C96'
-                  }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div
-                      className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: 'rgba(43, 140, 150, 0.2)' }}
-                    >
-                      <Gift className="w-5 h-5" style={{ color: '#2B8C96' }} />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-white mb-1">Gift Cards, Swag & Handwritten Notes</h4>
-                      <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
-                        Every teacher walks away with something personal. Not generic - chosen by you.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Moment 3 - Or Something Entirely Your Own */}
-                <div
-                  className={`rounded-xl p-5 transition-all duration-700 delay-500 ease-out ${
-                    celebrationVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
-                  }`}
-                  style={{
-                    backgroundColor: 'rgba(255,255,255,0.05)',
-                    borderLeft: '3px solid #F6AD55'
-                  }}
-                >
-                  <div className="flex items-start gap-4">
-                    <div
-                      className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0"
-                      style={{ backgroundColor: 'rgba(246, 173, 85, 0.2)' }}
-                    >
-                      <Wand2 className="w-5 h-5" style={{ color: '#F6AD55' }} />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-white mb-1">Or Something Entirely Your Own</h4>
-                      <p className="text-sm leading-relaxed" style={{ color: '#94a3b8' }}>
-                        Classroom wish lists. A spa day. A surprise assembly. You design it from scratch.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ===== PART 3: The Proof + Download ===== */}
-          <div className="max-w-3xl mx-auto">
-            {/* Proof Points */}
-            <div
-              className={`flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 mb-10 transition-all duration-700 delay-400 ease-out ${
-                celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-              }`}
-            >
-              {/* Proof 1 */}
-              <div className="flex items-center gap-3">
-                <Heart className="w-5 h-5" style={{ color: '#E8734A' }} />
-                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                  The teacher who almost quit? She's staying.
-                </span>
-              </div>
-
-              {/* Divider (desktop only) */}
-              <div className="hidden md:block w-px h-4" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }} />
-
-              {/* Proof 2 */}
-              <div className="flex items-center gap-3">
-                <Users className="w-5 h-5" style={{ color: '#2B8C96' }} />
-                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                  One referral celebrates your staff and lifts another building
-                </span>
-              </div>
-
-              {/* Divider (desktop only) */}
-              <div className="hidden md:block w-px h-4" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }} />
-
-              {/* Proof 3 */}
-              <div className="flex items-center gap-3">
-                <Download className="w-5 h-5" style={{ color: '#F6AD55' }} />
-                <span className="text-sm" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                  Get the full guide below - it's yours to keep and share
-                </span>
-              </div>
-            </div>
-
-            {/* PDF Download */}
-            <div className="text-center">
-              <a
-                href="/celebration-guide.pdf"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-8 py-3 rounded-full font-semibold transition-all hover:scale-105"
-                style={{ backgroundColor: '#2B8C96', color: '#ffffff' }}
-              >
-                <Download className="w-5 h-5" />
-                See the Full Celebration Guide
-              </a>
-              <p className="text-sm mt-4 max-w-md mx-auto" style={{ color: 'rgba(255,255,255,0.5)' }}>
-                See exactly what's possible - celebration options, how the budget works, and the impact it has on your building. Everything you just read, in a guide you can share with your team.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* 6. Accordion - What Happens When You Nominate */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
@@ -2079,6 +2100,22 @@ export default function NominatePage() {
           </Link>
         </div>
       </section>
+
+      {/* Sticky Mobile CTA - appears when hero is not visible */}
+      <div
+        className={`lg:hidden fixed bottom-0 left-0 right-0 z-50 p-4 pb-6 transition-all duration-300 ${
+          heroVisible ? 'translate-y-full opacity-0' : 'translate-y-0 opacity-100'
+        }`}
+        style={{ backgroundColor: 'rgba(255, 255, 255, 0.95)', backdropFilter: 'blur(8px)' }}
+      >
+        <button
+          onClick={scrollToForm}
+          className="w-full py-3 rounded-full font-semibold shadow-lg transition-all hover:scale-[1.02]"
+          style={{ backgroundColor: '#2B8C96', color: '#ffffff' }}
+        >
+          Nominate a School
+        </button>
+      </div>
     </main>
   );
 }
