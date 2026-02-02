@@ -1593,77 +1593,9 @@ export default function NominatePage() {
         </div>
       </section>
 
-      {/* 5. Celebration Section */}
+      {/* 5. Celebration Section - Picture This */}
       <section className="py-16 lg:py-24" style={{ backgroundColor: '#1B2A4A' }} ref={celebrationRef}>
         <div className="container-default">
-
-          {/* ===== Three-Step Process ===== */}
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">
-              Refer a School, Celebrate Your Staff
-            </h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#94a3b8' }}>
-              One simple referral. One transformative partnership. One unforgettable celebration.
-            </p>
-          </div>
-
-          <div className="max-w-4xl mx-auto mb-20">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-              {/* Step 1 */}
-              <div
-                className={`text-center transition-all duration-700 ease-out ${
-                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
-              >
-                <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 text-2xl font-bold"
-                  style={{ backgroundColor: '#2B8C96', color: '#ffffff' }}
-                >
-                  1
-                </div>
-                <h3 className="font-semibold text-xl mb-2 text-white">You nominate a school</h3>
-                <p className="text-sm" style={{ color: '#94a3b8' }}>
-                  Takes 2 minutes. Tell us who deserves better PD.
-                </p>
-              </div>
-
-              {/* Step 2 */}
-              <div
-                className={`text-center transition-all duration-700 delay-150 ease-out ${
-                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
-              >
-                <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 text-2xl font-bold"
-                  style={{ backgroundColor: '#E8734A', color: '#ffffff' }}
-                >
-                  2
-                </div>
-                <h3 className="font-semibold text-xl mb-2 text-white">They become a TDI partner</h3>
-                <p className="text-sm" style={{ color: '#94a3b8' }}>
-                  We connect with them and begin the partnership.
-                </p>
-              </div>
-
-              {/* Step 3 */}
-              <div
-                className={`text-center transition-all duration-700 delay-300 ease-out ${
-                  celebrationVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                }`}
-              >
-                <div
-                  className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-5 text-2xl font-bold"
-                  style={{ backgroundColor: '#F6AD55', color: '#1B2A4A' }}
-                >
-                  3
-                </div>
-                <h3 className="font-semibold text-xl mb-2 text-white">You get a celebration budget</h3>
-                <p className="text-sm" style={{ color: '#94a3b8' }}>
-                  Use it however you want to celebrate your staff.
-                </p>
-              </div>
-            </div>
-          </div>
 
           {/* ===== The Vision - "Picture This" ===== */}
           <div className="max-w-5xl mx-auto mb-20">
