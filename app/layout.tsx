@@ -8,6 +8,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { EmailPopup } from "@/components/EmailPopup";
 import { SocialProofPopup } from "@/components/SocialProofPopup";
+import { NominatePopup } from "@/components/NominatePopup";
 
 export const metadata: Metadata = {
   title: {
@@ -74,6 +75,7 @@ export default function RootLayout({
         <Footer />
         <EmailPopup />
         <SocialProofPopup />
+        <NominatePopup />
       </body>
     </html>
   );
