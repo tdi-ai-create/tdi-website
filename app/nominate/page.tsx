@@ -1177,14 +1177,11 @@ export default function NominatePage() {
           {/* Compact Testimonial Strip */}
           <div className="max-w-2xl mx-auto mb-8">
             <div
-              className="flex items-center justify-center gap-3 px-4 py-3 rounded-lg text-center"
+              className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 px-4 py-3 rounded-lg text-center"
               style={{ backgroundColor: 'rgba(53, 167, 255, 0.1)', border: '1px solid rgba(53, 167, 255, 0.2)' }}
             >
-              <span className="text-lg" style={{ color: '#35A7FF' }}>"</span>
               <p className="text-sm italic" style={{ color: '#1e2749' }}>
-                {TESTIMONIALS[activeTestimonialIndex].quote.length > 80
-                  ? TESTIMONIALS[activeTestimonialIndex].quote.substring(0, 77) + '...'
-                  : TESTIMONIALS[activeTestimonialIndex].quote}
+                "{TESTIMONIALS[activeTestimonialIndex].quote}"
               </p>
               <span className="text-xs font-medium whitespace-nowrap" style={{ color: '#35A7FF' }}>
                 — {TESTIMONIALS[activeTestimonialIndex].attribution}
