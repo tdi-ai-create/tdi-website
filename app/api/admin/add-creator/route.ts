@@ -55,11 +55,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: 'Failed to fetch milestones' }, { status: 500 });
     }
 
-    // 3. Create milestone progress records (first = available, rest = locked)
+    // 3. Create milestone progress records
+    // When admin adds a creator, intake is already done (completed)
+    // Second milestone (content path selection) should be available
     const milestoneRecords = milestones.map((milestone, index) => ({
       creator_id: creator.id,
       milestone_id: milestone.id,
-      status: index === 0 ? 'available' : 'locked',
+      status: index === 0 ? 'completed' : index === 1 ? 'available' : 'locked',
+      completed_at: index === 0 ? new Date().toISOString() : null,
     }));
 
     const { error: progressError } = await supabase

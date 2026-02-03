@@ -135,11 +135,13 @@ export async function createCreator(data: {
   }
 
   // Create milestone progress records
+  // When admin adds a creator, intake is already done (completed)
+  // Second milestone (content path selection) should be available
   const milestoneRecords = milestones.map((milestone, index) => ({
     creator_id: creator.id,
     milestone_id: milestone.id,
-    // First milestone is available, rest are locked
-    status: index === 0 ? 'available' : 'locked',
+    status: index === 0 ? 'completed' : index === 1 ? 'available' : 'locked',
+    completed_at: index === 0 ? new Date().toISOString() : null,
   }));
 
   const { error: progressError } = await serviceSupabase
