@@ -121,7 +121,7 @@ export async function POST(request: Request) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: 'TDI Creator Studio <onboarding@resend.dev>',
+          from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
           to: [creator.email],
           subject: `✅ You're approved! Next step unlocked`,
           html: `

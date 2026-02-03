@@ -18,7 +18,7 @@ export async function GET() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'TDI Creator Studio <onboarding@resend.dev>',
+        from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
         to: ['rae@teachersdeserveit.com'],
         subject: 'TDI Creator Studio Notifications are Working!',
         html: `

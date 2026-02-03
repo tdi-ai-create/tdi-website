@@ -145,6 +145,55 @@ export async function POST(request: NextRequest) {
       console.warn('[sign-agreement] No agreement milestones found - agreement signed but milestone not updated');
     }
 
+    // Send email notification to team
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (resendApiKey) {
+      try {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${resendApiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
+            to: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
+            subject: `🎉 ${existingCreator.name} signed their agreement!`,
+            html: `
+              <div style="font-family: sans-serif; max-width: 600px;">
+                <h2 style="color: #1e2749;">Agreement Signed!</h2>
+
+                <p><strong>${existingCreator.name}</strong> just signed their Creator Partnership Agreement.</p>
+
+                <div style="background: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px; margin: 20px 0;">
+                  <strong style="color: #166534;">Signed as:</strong> ${signedName}<br>
+                  <strong style="color: #166534;">Date:</strong> ${new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                </div>
+
+                <a href="https://www.teachersdeserveit.com/admin/creators/${creatorId}"
+                   style="display: inline-block; background: #1e2749; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin-top: 16px;">
+                  View Creator Profile
+                </a>
+              </div>
+            `,
+          }),
+        });
+        console.log('[sign-agreement] Team notification email sent');
+      } catch (emailError) {
+        console.error('[sign-agreement] Email error (non-fatal):', emailError);
+      }
+    }
+
+    // Create admin notification
+    await supabase
+      .from('admin_notifications')
+      .insert({
+        creator_id: creatorId,
+        type: 'agreement_signed',
+        message: `${existingCreator.name} signed their creator agreement`,
+        link: `/admin/creators/${creatorId}`,
+      });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('[sign-agreement] Unexpected error:', error);

@@ -181,8 +181,10 @@ export async function POST(request: Request) {
       }
     }
 
-    // 5. Send email notification to team if needed (also always for change requests)
-    if (notifyTeam || submissionType === 'change_request') {
+    // 5. Send email notification to team if needed
+    // Always notify when: submission needs team review (waiting_approval), change request, or explicit notifyTeam
+    const needsTeamReview = newStatus === 'waiting_approval';
+    if (notifyTeam || needsTeamReview || submissionType === 'change_request') {
       const { data: creator } = await supabase
         .from('creators')
         .select('name, email')
@@ -256,7 +258,7 @@ export async function POST(request: Request) {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              from: 'TDI Creator Studio <onboarding@resend.dev>',
+              from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
               to: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
               subject: emailSubject,
               html: `
