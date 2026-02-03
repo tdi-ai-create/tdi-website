@@ -513,12 +513,13 @@ export default function AdminCreatorsPage() {
           </button>
         </div>
 
-        {/* SECTION 2: Two-column layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 items-start">
-          {/* LEFT: Pipeline Funnel */}
-          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Creator Pipeline</h2>
-            <div className="space-y-3">
+        {/* COMPACT 2x2 GRID LAYOUT */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+          {/* ROW 1: Pipeline + Closest to Launch */}
+          {/* Pipeline Funnel */}
+          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-5">
+            <h2 className="text-base font-semibold text-[#1e2749] mb-3">Creator Pipeline</h2>
+            <div className="space-y-2">
               {[
                 { key: 'onboarding', label: 'Onboarding', color: 'bg-[#1e2749]' },
                 { key: 'agreement', label: 'Agreement', color: 'bg-[#3d5a99]' },
@@ -529,18 +530,18 @@ export default function AdminCreatorsPage() {
                 const count = phaseCounts[phase.key as keyof typeof phaseCounts];
                 const widthPercent = Math.max((count / maxPhaseCount) * 100, 8);
                 return (
-                  <div key={phase.key} className="flex items-center gap-3">
-                    <div className="w-28 text-sm text-gray-600 flex-shrink-0">{phase.label}</div>
+                  <div key={phase.key} className="flex items-center gap-2">
+                    <div className="w-24 text-sm text-gray-600 flex-shrink-0">{phase.label}</div>
                     <div className="flex-1 flex items-center gap-2">
                       <div
-                        className={`h-8 ${phase.color} rounded flex items-center justify-end px-3 transition-all`}
-                        style={{ width: `${widthPercent}%`, minWidth: count > 0 ? '40px' : '8px' }}
+                        className={`h-6 ${phase.color} rounded flex items-center justify-end px-2 transition-all`}
+                        style={{ width: `${widthPercent}%`, minWidth: count > 0 ? '32px' : '8px' }}
                       >
                         {count > 0 && (
-                          <span className="text-white text-sm font-medium">{count}</span>
+                          <span className="text-white text-xs font-medium">{count}</span>
                         )}
                       </div>
-                      {count === 0 && <span className="text-gray-400 text-sm">0</span>}
+                      {count === 0 && <span className="text-gray-400 text-xs">0</span>}
                     </div>
                   </div>
                 );
@@ -548,190 +549,182 @@ export default function AdminCreatorsPage() {
             </div>
           </div>
 
-          {/* RIGHT: Stacked cards */}
-          <div className="space-y-4">
-            {/* Closest to Launch */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3 className="text-sm font-semibold text-[#1e2749] mb-3 flex items-center gap-2">
-                <Trophy className="w-4 h-4 text-yellow-500" />
-                Closest to Launch
-              </h3>
-              {closestToLaunch.length === 0 ? (
-                <p className="text-sm text-gray-500">No creators in progress</p>
-              ) : (
-                <div className="space-y-3">
-                  {closestToLaunch.map((creator) => (
-                    <Link
-                      key={creator.id}
-                      href={`/admin/creators/${creator.id}`}
-                      className="flex items-center gap-3 group"
-                    >
-                      <div className="w-8 h-8 rounded-full bg-[#1e2749] text-white flex items-center justify-center text-sm font-medium flex-shrink-0">
-                        {creator.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#1e2749] group-hover:text-[#80a4ed] truncate">
-                          {creator.name}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">
-                          {creator.course_title || 'No course title'}
-                        </p>
-                      </div>
-                      <div className="text-right flex-shrink-0">
-                        <p className="text-sm font-semibold text-[#1e2749]">{creator.progressPercentage}%</p>
-                        <div className="w-16 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className="h-full bg-[#80a4ed] rounded-full"
-                            style={{ width: `${creator.progressPercentage}%` }}
-                          />
-                        </div>
-                      </div>
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Content Paths */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3 className="text-sm font-semibold text-[#1e2749] mb-3">Content Paths</h3>
-              <div className="grid grid-cols-4 gap-2">
-                {[
-                  { key: 'blog', icon: '📝', label: 'Blog', count: pathCounts.blog },
-                  { key: 'download', icon: '📦', label: 'Download', count: pathCounts.download },
-                  { key: 'course', icon: '🎓', label: 'Course', count: pathCounts.course },
-                  { key: 'notSet', icon: '❓', label: 'Not Set', count: pathCounts.notSet },
-                ].map((path) => (
-                  <div key={path.key} className="text-center p-2 bg-gray-50 rounded-lg">
-                    <div className="text-lg mb-1">{path.icon}</div>
-                    <p className="text-lg font-bold text-[#1e2749]">{path.count}</p>
-                    <p className="text-xs text-gray-500">{path.label}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Needs Your Attention Section */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-          <h2 className="text-lg font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-amber-500" />
-            Needs Your Attention
-            {stats.waitingOnTDI > 0 && (
-              <span className="text-sm font-normal text-gray-500">({stats.waitingOnTDI})</span>
-            )}
-          </h2>
-          {needsAttention.length === 0 ? (
-            <div className="flex items-center gap-2 text-green-600 py-4">
-              <span className="text-lg">✓</span>
-              <p className="text-sm">All caught up! No creators waiting on team feedback.</p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {needsAttention.map((creator: EnrichedCreator) => (
-                <Link
-                  key={creator.id}
-                  href={`/admin/creators/${creator.id}`}
-                  className="flex items-center gap-4 p-3 rounded-lg hover:bg-amber-50 border border-transparent hover:border-amber-100 transition-colors group"
-                >
-                  <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-medium flex-shrink-0">
-                    {creator.name.charAt(0).toUpperCase()}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-[#1e2749] group-hover:text-amber-700 truncate">
-                      {creator.name}
-                    </p>
-                    <p className="text-sm text-gray-500 truncate">
-                      {creator.currentMilestoneName || 'Waiting on review'}
-                    </p>
-                  </div>
-                  <div className="text-right flex-shrink-0">
-                    <p className="text-sm text-amber-600 font-medium">
-                      {getRelativeTime(creator.lastActivityDate)}
-                    </p>
-                  </div>
-                </Link>
-              ))}
-              {stats.waitingOnTDI > 5 && (
-                <button
-                  onClick={() => handleStatCardClick('waitingOnTDI')}
-                  className="w-full text-center text-sm text-[#80a4ed] hover:text-[#1e2749] py-2"
-                >
-                  View all {stats.waitingOnTDI} waiting →
-                </button>
-              )}
-            </div>
-          )}
-        </div>
-
-        {/* SECTION 3: Second two-column row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          {/* LEFT: Topics in Pipeline */}
-          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Topics in the Pipeline</h2>
-            {topics.length === 0 ? (
-              <p className="text-sm text-gray-500">No course topics yet</p>
-            ) : (
-              <>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {topics.map((topic) => (
-                    <Link
-                      key={topic.id}
-                      href={`/admin/creators/${topic.id}`}
-                      className={`px-3 py-1.5 text-sm rounded-full border transition-colors hover:opacity-80 ${getTopicTagColor(topic.phase)}`}
-                    >
-                      {topic.title}
-                    </Link>
-                  ))}
-                </div>
-                <p className="text-xs text-gray-500">
-                  <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span> Near launch
-                  <span className="mx-2">·</span>
-                  <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 mr-1"></span> In progress
-                  <span className="mx-2">·</span>
-                  <span className="inline-block w-2 h-2 rounded-full bg-gray-300 mr-1"></span> Early stage
-                </p>
-              </>
-            )}
-          </div>
-
-          {/* RIGHT: Recent Activity */}
+          {/* Closest to Launch */}
           <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h3 className="text-sm font-semibold text-[#1e2749] mb-3">Recent Activity</h3>
-            {recentActivity.length === 0 ? (
-              <p className="text-sm text-gray-500">No recent activity</p>
+            <h3 className="text-sm font-semibold text-[#1e2749] mb-3 flex items-center gap-2">
+              <Trophy className="w-4 h-4 text-yellow-500" />
+              Closest to Launch
+            </h3>
+            {closestToLaunch.length === 0 ? (
+              <p className="text-sm text-gray-500">No creators in progress</p>
             ) : (
-              <div className="space-y-3">
-                {recentActivity.map((activity) => (
+              <div className="space-y-2">
+                {closestToLaunch.map((creator) => (
                   <Link
-                    key={activity.id}
-                    href={`/admin/creators/${activity.creatorId}`}
-                    className="flex items-start gap-2 group"
+                    key={creator.id}
+                    href={`/admin/creators/${creator.id}`}
+                    className="flex items-center gap-2 group"
                   >
-                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
-                      activity.type === 'team' ? 'bg-blue-500' : 'bg-green-500'
-                    }`} />
+                    <div className="w-7 h-7 rounded-full bg-[#1e2749] text-white flex items-center justify-center text-xs font-medium flex-shrink-0">
+                      {creator.name.charAt(0).toUpperCase()}
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm">
-                        <span className="font-medium text-[#1e2749] group-hover:text-[#80a4ed]">
-                          {activity.creatorName}
-                        </span>
-                        <span className="text-gray-600"> completed </span>
-                        <span className="text-gray-700">{activity.milestoneName}</span>
+                      <p className="text-sm font-medium text-[#1e2749] group-hover:text-[#80a4ed] truncate">
+                        {creator.name}
                       </p>
-                      <p className="text-xs text-gray-400">{getRelativeTime(activity.completedAt)}</p>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <div className="w-12 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-[#80a4ed] rounded-full"
+                          style={{ width: `${creator.progressPercentage}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium text-gray-600 w-8">{creator.progressPercentage}%</span>
                     </div>
                   </Link>
                 ))}
               </div>
             )}
-            <p className="text-xs text-gray-500 mt-3 pt-3 border-t border-gray-100">
-              <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span> Creator
-              <span className="mx-2">·</span>
-              <span className="inline-block w-2 h-2 rounded-full bg-blue-500 mr-1"></span> Team
-            </p>
           </div>
+
+          {/* ROW 2: Needs Attention + Content Paths */}
+          {/* Needs Your Attention */}
+          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-5">
+            <h3 className="text-sm font-semibold text-[#1e2749] mb-3 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 text-amber-500" />
+              Needs Your Attention
+              {stats.waitingOnTDI > 0 && (
+                <span className="text-xs font-normal text-gray-500">({stats.waitingOnTDI})</span>
+              )}
+            </h3>
+            {needsAttention.length === 0 ? (
+              <div className="flex items-center gap-2 text-green-600 py-2">
+                <span>✓</span>
+                <p className="text-sm">All caught up! No creators waiting on team feedback.</p>
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {needsAttention.map((creator: EnrichedCreator) => (
+                  <Link
+                    key={creator.id}
+                    href={`/admin/creators/${creator.id}`}
+                    className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-amber-50 transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-medium flex-shrink-0">
+                      {creator.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-[#1e2749] group-hover:text-amber-700 truncate">
+                        {creator.name}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {creator.currentMilestoneName || 'Waiting on review'}
+                      </p>
+                    </div>
+                    <p className="text-xs text-amber-600 font-medium flex-shrink-0">
+                      {getRelativeTime(creator.lastActivityDate)}
+                    </p>
+                  </Link>
+                ))}
+                {stats.waitingOnTDI > 5 && (
+                  <button
+                    onClick={() => handleStatCardClick('waitingOnTDI')}
+                    className="w-full text-center text-xs text-[#80a4ed] hover:text-[#1e2749] pt-1"
+                  >
+                    View all {stats.waitingOnTDI} waiting →
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Content Paths */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <h3 className="text-sm font-semibold text-[#1e2749] mb-3">Content Paths</h3>
+            <div className="grid grid-cols-2 gap-2">
+              {[
+                { key: 'blog', icon: '📝', label: 'Blog', count: pathCounts.blog },
+                { key: 'download', icon: '📦', label: 'Download', count: pathCounts.download },
+                { key: 'course', icon: '🎓', label: 'Course', count: pathCounts.course },
+                { key: 'notSet', icon: '❓', label: 'Not Set', count: pathCounts.notSet },
+              ].map((path) => (
+                <div key={path.key} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
+                  <span className="text-base">{path.icon}</span>
+                  <div>
+                    <p className="text-lg font-bold text-[#1e2749] leading-none">{path.count}</p>
+                    <p className="text-xs text-gray-500">{path.label}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Topics in Pipeline - Full Width */}
+        <div className="bg-white rounded-xl border border-gray-200 p-5 mb-4">
+          <h2 className="text-base font-semibold text-[#1e2749] mb-3">Topics in the Pipeline</h2>
+          {topics.length === 0 ? (
+            <p className="text-sm text-gray-500">No course topics yet</p>
+          ) : (
+            <>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {topics.map((topic) => (
+                  <Link
+                    key={topic.id}
+                    href={`/admin/creators/${topic.id}`}
+                    className={`px-3 py-1 text-sm rounded-full border transition-colors hover:opacity-80 ${getTopicTagColor(topic.phase)}`}
+                  >
+                    {topic.title}
+                  </Link>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500">
+                <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span> Near launch
+                <span className="mx-2">·</span>
+                <span className="inline-block w-2 h-2 rounded-full bg-yellow-400 mr-1"></span> In progress
+                <span className="mx-2">·</span>
+                <span className="inline-block w-2 h-2 rounded-full bg-gray-300 mr-1"></span> Early stage
+              </p>
+            </>
+          )}
+        </div>
+
+        {/* Recent Activity - Full Width */}
+        <div className="bg-white rounded-xl border border-gray-200 p-5 mb-4">
+          <h3 className="text-sm font-semibold text-[#1e2749] mb-3">Recent Activity</h3>
+          {recentActivity.length === 0 ? (
+            <p className="text-sm text-gray-500">No recent activity</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-2">
+              {recentActivity.map((activity) => (
+                <Link
+                  key={activity.id}
+                  href={`/admin/creators/${activity.creatorId}`}
+                  className="flex items-start gap-2 group"
+                >
+                  <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${
+                    activity.type === 'team' ? 'bg-blue-500' : 'bg-green-500'
+                  }`} />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm">
+                      <span className="font-medium text-[#1e2749] group-hover:text-[#80a4ed]">
+                        {activity.creatorName}
+                      </span>
+                      <span className="text-gray-600"> · </span>
+                      <span className="text-gray-500 text-xs">{activity.milestoneName}</span>
+                    </p>
+                    <p className="text-xs text-gray-400">{getRelativeTime(activity.completedAt)}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+          <p className="text-xs text-gray-500 mt-3 pt-2 border-t border-gray-100">
+            <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-1"></span> Creator
+            <span className="mx-2">·</span>
+            <span className="inline-block w-2 h-2 rounded-full bg-blue-500 mr-1"></span> Team
+          </p>
         </div>
 
         {/* SECTION 4: Search, Filters, and Creator Table */}
