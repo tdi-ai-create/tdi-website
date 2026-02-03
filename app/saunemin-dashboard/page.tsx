@@ -68,14 +68,18 @@ export default function SauneminDashboard() {
   const [showPhase3Preview, setShowPhase3Preview] = useState(false);
   const [showPolicy, setShowPolicy] = useState(false);
 
-  // Needs Attention completion state
-  const [completedItems, setCompletedItems] = useState<string[]>([]);
+  // Needs Attention completion state - all items completed as of April 8, 2026
+  const allItemIds = ['observation-day-2', 'spring-leadership', 'baseline-data'];
+  const [completedItems, setCompletedItems] = useState<string[]>(allItemIds);
 
-  // Load completed items from localStorage
+  // Load completed items from localStorage (defaults to all complete)
   useEffect(() => {
     const saved = localStorage.getItem('saunemin-completed-items');
     if (saved) {
       setCompletedItems(JSON.parse(saved));
+    } else {
+      // Default: all items are completed
+      setCompletedItems(allItemIds);
     }
   }, []);
 
@@ -96,16 +100,16 @@ export default function SauneminDashboard() {
   // Check if item is complete
   const isComplete = (itemId: string) => completedItems.includes(itemId);
 
-  // Needs Attention items
+  // Needs Attention items - all completed on April 8, 2026
   const needsAttentionItems = [
     {
       id: 'observation-day-2',
       title: 'Second On-Site Observation Day',
       description: 'Included in contract',
-      deadline: 'MARCH 2026',
-      deadlineMonth: 3,
+      deadline: 'APRIL 8, 2026',
+      deadlineMonth: 4,
       deadlineYear: 2026,
-      actionLabel: 'Schedule',
+      actionLabel: 'Completed',
       actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone',
       icon: 'calendar',
     },
@@ -113,10 +117,10 @@ export default function SauneminDashboard() {
       id: 'spring-leadership',
       title: 'Spring Leadership Meeting with Gary & Michael',
       description: 'Courtesy session',
-      deadline: 'MARCH 2026',
-      deadlineMonth: 3,
+      deadline: 'APRIL 8, 2026',
+      deadlineMonth: 4,
       deadlineYear: 2026,
-      actionLabel: 'Schedule',
+      actionLabel: 'Completed',
       actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
       icon: 'calendar',
     },
@@ -124,10 +128,10 @@ export default function SauneminDashboard() {
       id: 'baseline-data',
       title: 'Collect Baseline Data for Leading Indicators',
       description: 'Survey or in-person collection',
-      deadline: 'MARCH 2026',
-      deadlineMonth: 3,
+      deadline: 'APRIL 8, 2026',
+      deadlineMonth: 4,
       deadlineYear: 2026,
-      actionLabel: 'Email Preference',
+      actionLabel: 'Completed',
       actionUrl: 'mailto:rae@teachersdeserveit.com?subject=Baseline Data Collection - Saunemin&body=Hi Rae,%0D%0A%0D%0AWe would like to set up baseline data collection for our team.',
       icon: 'clipboard',
     },
@@ -283,8 +287,8 @@ export default function SauneminDashboard() {
 
   // Due dates for this partnership
   const dueDates = {
-    day2Observation: { month: 3, year: 2026 },  // March 2026
-    springMeeting: { month: 5, year: 2026 },    // May 2026
+    day2Observation: { month: 4, day: 8, year: 2026 },  // April 8, 2026
+    springMeeting: { month: 4, day: 8, year: 2026 },    // April 8, 2026
   };
 
   // Phase data for Saunemin (Phase 1)
@@ -309,7 +313,7 @@ export default function SauneminDashboard() {
         '9 personalized Love Notes sent'
       ],
       pending: [
-        'Second observation day (TBD)',
+        'Second observation day (April 8, 2026)',
         'Spring leadership meeting'
       ],
       outcomes: [
@@ -1391,14 +1395,14 @@ export default function SauneminDashboard() {
                   </div>
                 </Accordion>
 
-                {/* Day 2 - Pending */}
+                {/* Day 2 - April 8, 2026 */}
                 <Accordion
                   id="observation-day2"
-                  title="Day 2 - TBD"
+                  title="Day 2 - April 8, 2026"
                   subtitle="Second on-site observation day"
                   icon={<Calendar className="w-5 h-5" />}
-                  badge="Pending"
-                  badgeColor="bg-[#E07A5F]/10 text-[#E07A5F]"
+                  badge="Scheduled"
+                  badgeColor="bg-green-100 text-green-700"
                 >
                   <div className="pt-4 space-y-4">
                     <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
@@ -2127,7 +2131,7 @@ export default function SauneminDashboard() {
                   <div className="font-semibold text-gray-800">Saunemin CCSD #438</div>
                   <div className="text-sm text-gray-600 mt-2 flex items-start gap-2">
                     <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#38618C]" />
-                    Saunemin, IL 61769
+                    39 Main St, Saunemin, IL 61769
                   </div>
                 </div>
                 <div className="space-y-2 text-sm">
