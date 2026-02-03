@@ -506,7 +506,7 @@ export default function AdminCreatorsPage() {
         </div>
 
         {/* SECTION 2: Two-column layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6 items-start">
           {/* LEFT: Pipeline Funnel */}
           <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Creator Pipeline</h2>
