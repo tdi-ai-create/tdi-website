@@ -501,27 +501,27 @@ export default function SauneminDashboard() {
                 <div className="text-xs text-green-600">✓ Complete</div>
               </div>
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#35A7FF]">
+              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-green-500">
                 <div className="flex items-center gap-2 mb-1">
-                  <Eye className="w-4 h-4 text-[#35A7FF]" />
+                  <Eye className="w-4 h-4 text-green-600" />
                   <span className="text-xs text-gray-500 uppercase">Observations</span>
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">1/2</div>
-                <div className="text-xs text-[#35A7FF]">1 remaining</div>
+                <div className="text-2xl font-bold text-green-600">2/2</div>
+                <div className="text-xs text-green-600">✓ Complete</div>
               </div>
 
               <div
                 onClick={() => {
                   document.getElementById('next-steps-section')?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#35A7FF] cursor-pointer hover:shadow-md transition-all"
+                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-green-500 cursor-pointer hover:shadow-md transition-all"
               >
                 <div className="flex items-center gap-2 mb-1">
-                  <Calendar className="w-4 h-4 text-[#35A7FF]" />
+                  <Calendar className="w-4 h-4 text-green-600" />
                   <span className="text-xs text-gray-500 uppercase">Next Steps</span>
                 </div>
-                <div className="text-2xl font-bold text-[#35A7FF]">3</div>
-                <div className="text-xs text-[#35A7FF] font-medium">Ready to schedule</div>
+                <div className="text-2xl font-bold text-green-600">0</div>
+                <div className="text-xs text-green-600 font-medium">✓ All scheduled</div>
               </div>
 
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
@@ -554,16 +554,11 @@ export default function SauneminDashboard() {
                   <div className="text-xs text-gray-600 mt-1">Love Notes Sent</div>
                   <div className="text-xs text-green-600 mt-1">✓ Complete</div>
                 </div>
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-center p-3 bg-[#E07A5F]/10 rounded-lg hover:bg-[#E07A5F]/20 transition-colors"
-                >
-                  <div className="text-2xl font-bold text-[#E07A5F]">1/2</div>
+                <div className="text-center p-3 bg-green-50 rounded-lg">
+                  <div className="text-2xl font-bold text-green-600">2/2</div>
                   <div className="text-xs text-gray-600 mt-1">On-Site Days</div>
-                  <div className="text-xs text-[#E07A5F] mt-1 font-medium">Schedule Day 2 →</div>
-                </a>
+                  <div className="text-xs text-green-600 mt-1">✓ Complete</div>
+                </div>
               </div>
             </div>
 
@@ -628,7 +623,7 @@ export default function SauneminDashboard() {
               <div className="relative px-4">
                 {/* Progress bar background */}
                 <div className="h-2 bg-gray-200 rounded-full mb-8">
-                  <div className="h-full bg-gradient-to-r from-[#38618C] to-[#35A7FF] rounded-full" style={{ width: '60%' }} />
+                  <div className="h-full bg-gradient-to-r from-[#38618C] to-green-500 rounded-full" style={{ width: '100%' }} />
                 </div>
 
                 {/* Milestones - use flex with equal spacing */}
@@ -652,16 +647,16 @@ export default function SauneminDashboard() {
                     <span className="text-xs text-gray-600 text-center">Day 1<br/>Complete</span>
                   </div>
                   <div className="flex flex-col items-center" style={{ width: '20%' }}>
-                    <div className="w-10 h-10 bg-[#E07A5F] rounded-full flex items-center justify-center mb-2 -mt-14">
-                      <Clock className="w-5 h-5 text-white" />
+                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mb-2 -mt-14">
+                      <Check className="w-5 h-5 text-white" />
                     </div>
-                    <span className="text-xs text-[#E07A5F] font-medium text-center">Day 2<br/>Pending</span>
+                    <span className="text-xs text-gray-600 text-center">Day 2<br/>Scheduled</span>
                   </div>
                   <div className="flex flex-col items-center" style={{ width: '20%' }}>
-                    <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mb-2 -mt-14">
-                      <Calendar className="w-5 h-5 text-white" />
+                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center mb-2 -mt-14">
+                      <Check className="w-5 h-5 text-white" />
                     </div>
-                    <span className="text-xs text-gray-500 text-center">Spring<br/>Meeting</span>
+                    <span className="text-xs text-gray-600 text-center">Spring<br/>Meeting</span>
                   </div>
                 </div>
               </div>
