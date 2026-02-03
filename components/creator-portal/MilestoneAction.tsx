@@ -1004,10 +1004,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
 
                   {/* What We Provide */}
                   <div className="bg-white rounded-lg p-3 border border-gray-100">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-base">🤝</span>
-                      <span className="font-medium text-[#1e2749] text-sm">What We Provide</span>
-                    </div>
+                    <p className="font-medium text-[#1e2749] text-sm mb-2">What We Provide</p>
                     <p className="text-xs text-gray-600 leading-relaxed">
                       Every creator gets hands-on support from our team - we&apos;ll guide you through the process, provide templates and resources, and handle editing, design, and publishing so you can focus on your content.
                     </p>
@@ -1016,20 +1013,14 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   {/* Path Descriptions */}
                   <div className="grid gap-3">
                     <div className="bg-white rounded-lg p-3 border border-gray-100">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-base">📝</span>
-                        <span className="font-medium text-[#1e2749] text-sm">Blog Posts</span>
-                      </div>
+                      <p className="font-medium text-[#1e2749] text-sm mb-1">Blog Posts</p>
                       <p className="text-xs text-gray-600 leading-relaxed">
                         Write and share your expertise as a featured article on the TDI blog. Great for getting your voice out there and building your presence in the education community. This is a collaborative contribution - no direct compensation, but you&apos;ll reach thousands of educators and build your brand.
                       </p>
                     </div>
 
                     <div className="bg-white rounded-lg p-3 border border-gray-100">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-base">📦</span>
-                        <span className="font-medium text-[#1e2749] text-sm">Digital Downloads</span>
-                      </div>
+                      <p className="font-medium text-[#1e2749] text-sm mb-1">Digital Downloads</p>
                       <p className="text-xs text-gray-600 leading-relaxed">
                         Create downloadable resources like guides, toolkits, or templates that educators can use in their classrooms. Like blog posts, these are collaborative contributions that build your visibility and portfolio.
                       </p>
@@ -1037,7 +1028,6 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
 
                     <div className="bg-white rounded-lg p-3 border border-green-100 ring-1 ring-green-200">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="text-base">🎓</span>
                         <span className="font-medium text-[#1e2749] text-sm">Learning Hub Courses</span>
                         <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium">REVENUE</span>
                       </div>
@@ -1048,8 +1038,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   </div>
 
                   {/* Tip */}
-                  <div className="flex items-start gap-2 bg-amber-50 rounded-lg p-3 border border-amber-100">
-                    <span className="text-base">💡</span>
+                  <div className="bg-amber-50 rounded-lg p-3 border border-amber-100">
                     <p className="text-xs text-amber-800">
                       <strong>Not sure?</strong> Start with a blog post or download - you can always create a course later! Each path includes everything before it, so a course creator also gets a blog feature and downloadable resources.
                     </p>
