@@ -74,7 +74,7 @@ export default function SauneminDashboard() {
 
   // Load completed items from localStorage (defaults to all complete)
   useEffect(() => {
-    const saved = localStorage.getItem('saunemin-completed-items');
+    const saved = localStorage.getItem('saunemin-completed-items-v2');
     if (saved) {
       setCompletedItems(JSON.parse(saved));
     } else {
@@ -85,7 +85,7 @@ export default function SauneminDashboard() {
 
   // Save to localStorage when completedItems changes
   useEffect(() => {
-    localStorage.setItem('saunemin-completed-items', JSON.stringify(completedItems));
+    localStorage.setItem('saunemin-completed-items-v2', JSON.stringify(completedItems));
   }, [completedItems]);
 
   // Toggle completion
