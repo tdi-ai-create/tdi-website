@@ -368,6 +368,14 @@ export default function AdminCreatorsPage() {
   const { stats, phaseCounts, pathCounts, closestToLaunch, recentActivity, topics } = dashboardData;
   const maxPhaseCount = Math.max(...Object.values(phaseCounts), 1);
 
+  // Compute creators needing team attention, sorted by longest waiting first
+  const needsAttention = dashboardData.creators
+    .filter((c: EnrichedCreator) => c.waitingOn === 'tdi')
+    .sort((a: EnrichedCreator, b: EnrichedCreator) =>
+      new Date(a.lastActivityDate).getTime() - new Date(b.lastActivityDate).getTime()
+    )
+    .slice(0, 5);
+
   return (
     <div className="min-h-screen bg-[#f5f5f5]">
       {/* Header */}
@@ -603,6 +611,58 @@ export default function AdminCreatorsPage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Needs Your Attention Section */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+          <h2 className="text-lg font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5 text-amber-500" />
+            Needs Your Attention
+            {stats.waitingOnTDI > 0 && (
+              <span className="text-sm font-normal text-gray-500">({stats.waitingOnTDI})</span>
+            )}
+          </h2>
+          {needsAttention.length === 0 ? (
+            <div className="flex items-center gap-2 text-green-600 py-4">
+              <span className="text-lg">✓</span>
+              <p className="text-sm">All caught up! No creators waiting on team feedback.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {needsAttention.map((creator: EnrichedCreator) => (
+                <Link
+                  key={creator.id}
+                  href={`/admin/creators/${creator.id}`}
+                  className="flex items-center gap-4 p-3 rounded-lg hover:bg-amber-50 border border-transparent hover:border-amber-100 transition-colors group"
+                >
+                  <div className="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-medium flex-shrink-0">
+                    {creator.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-[#1e2749] group-hover:text-amber-700 truncate">
+                      {creator.name}
+                    </p>
+                    <p className="text-sm text-gray-500 truncate">
+                      {creator.currentMilestoneName || 'Waiting on review'}
+                    </p>
+                  </div>
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-sm text-amber-600 font-medium">
+                      {getRelativeTime(creator.lastActivityDate)}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+              {stats.waitingOnTDI > 5 && (
+                <button
+                  onClick={() => handleStatCardClick('waitingOnTDI')}
+                  className="w-full text-center text-sm text-[#80a4ed] hover:text-[#1e2749] py-2"
+                >
+                  View all {stats.waitingOnTDI} waiting →
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* SECTION 3: Second two-column row */}
