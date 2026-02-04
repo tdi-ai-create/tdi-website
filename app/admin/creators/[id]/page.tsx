@@ -196,8 +196,32 @@ export default function AdminCreatorDetailPage() {
         discount_code: data.creator.discount_code || '',
       });
 
-      // Expand current phase by default
-      setExpandedPhases(new Set([data.creator.current_phase]));
+      // Find the phase containing the first available/in_progress milestone
+      // This is the "current step" phase that should be expanded
+      let currentPhaseId: string | null = null;
+      for (const phase of data.phases) {
+        // Filter to applicable milestones
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const applicableMilestones = phase.milestones.filter((m: any) => m.isApplicable !== false);
+        const hasCurrentStep = applicableMilestones.some(
+          (m) => m.status === 'available' || m.status === 'in_progress' || m.status === 'waiting_approval'
+        );
+        if (hasCurrentStep) {
+          currentPhaseId = phase.id;
+          break;
+        }
+      }
+
+      // Expand only the phase with the current step
+      if (currentPhaseId) {
+        setExpandedPhases(new Set([currentPhaseId]));
+      } else {
+        // If no current step found (all complete or all locked), expand last incomplete phase
+        const incompletePhase = data.phases.find(p => !p.isComplete);
+        if (incompletePhase) {
+          setExpandedPhases(new Set([incompletePhase.id]));
+        }
+      }
     }
 
     // Get all notes including internal ones
@@ -792,24 +816,41 @@ export default function AdminCreatorDetailPage() {
             {/* Conditional View Rendering */}
             {viewMode === 'admin' ? (
               // Admin View - Original milestone management
-              phases.map((phase) => (
-                <PhaseSection
-                  key={phase.id}
-                  phase={phase}
-                  allPhases={phases}
-                  isExpanded={expandedPhases.has(phase.id)}
-                  onToggle={() => togglePhase(phase.id)}
-                  onApprove={handleApprove}
-                  onRequestRevision={handleRequestRevision}
-                  onReopen={handleReopen}
-                  onToggleMilestone={handleToggleMilestone}
-                  onCompleteAction={handleOpenActionModal}
-                  onToggleOptional={handleOpenOptionalModal}
-                  approvingMilestoneId={approvingMilestoneId}
-                  reopeningMilestone={reopeningMilestone}
-                  togglingMilestone={togglingMilestone}
-                />
-              ))
+              (() => {
+                // Find the first available/in_progress/waiting_approval milestone (current step)
+                let currentStepId: string | null = null;
+                for (const p of phases) {
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const applicableMilestones = p.milestones.filter((m: any) => m.isApplicable !== false);
+                  for (const m of applicableMilestones) {
+                    if (m.status === 'available' || m.status === 'in_progress' || m.status === 'waiting_approval') {
+                      currentStepId = m.id;
+                      break;
+                    }
+                  }
+                  if (currentStepId) break;
+                }
+
+                return phases.map((phase) => (
+                  <PhaseSection
+                    key={phase.id}
+                    phase={phase}
+                    allPhases={phases}
+                    isExpanded={expandedPhases.has(phase.id)}
+                    onToggle={() => togglePhase(phase.id)}
+                    onApprove={handleApprove}
+                    onRequestRevision={handleRequestRevision}
+                    onReopen={handleReopen}
+                    onToggleMilestone={handleToggleMilestone}
+                    onCompleteAction={handleOpenActionModal}
+                    onToggleOptional={handleOpenOptionalModal}
+                    approvingMilestoneId={approvingMilestoneId}
+                    reopeningMilestone={reopeningMilestone}
+                    togglingMilestone={togglingMilestone}
+                    currentStepId={currentStepId}
+                  />
+                ));
+              })()
             ) : (
               // Creator View Preview - Uses the same component creators see
               <PhaseProgress
@@ -1542,6 +1583,7 @@ function PhaseSection({
   approvingMilestoneId,
   reopeningMilestone,
   togglingMilestone,
+  currentStepId,
 }: {
   phase: PhaseWithMilestones;
   allPhases: PhaseWithMilestones[];
@@ -1556,6 +1598,7 @@ function PhaseSection({
   approvingMilestoneId: string | null;
   reopeningMilestone: string | null;
   togglingMilestone: string | null;
+  currentStepId: string | null;
 }) {
   // Filter to only applicable milestones for this creator's content path
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -1664,6 +1707,7 @@ function PhaseSection({
                   key={milestone.id}
                   milestone={milestone}
                   isOptional={isOptional}
+                  isCurrentStep={currentStepId === milestone.id}
                   onApprove={() => onApprove(milestone.id, milestoneTitle)}
                   onRequestRevision={() => onRequestRevision(milestone.id, milestoneTitle)}
                   onReopen={() => onReopen(milestone.id, milestoneTitle)}
@@ -1686,6 +1730,7 @@ function PhaseSection({
 function MilestoneRow({
   milestone,
   isOptional,
+  isCurrentStep,
   onApprove,
   onRequestRevision,
   onReopen,
@@ -1698,6 +1743,7 @@ function MilestoneRow({
 }: {
   milestone: MilestoneWithStatus;
   isOptional: boolean;
+  isCurrentStep: boolean;
   onApprove: () => void;
   onRequestRevision: () => void;
   onCompleteAction: () => void;
@@ -1755,7 +1801,7 @@ function MilestoneRow({
   const wasOutOfOrder = m.metadata?.out_of_order === true;
 
   return (
-    <div className="px-6 py-4">
+    <div className={`px-6 py-4 ${isCurrentStep ? 'bg-[#fff9eb] border-l-4 border-[#ffba06]' : ''}`}>
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3 min-w-0 flex-1">
           {/* Clickable checkbox - admin can click locked milestones for out-of-order completion */}
@@ -1780,12 +1826,17 @@ function MilestoneRow({
             ) : null}
           </button>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <p className={`font-medium ${
                 milestone.status === 'locked' ? 'text-gray-400' : 'text-[#1e2749]'
               }`}>
                 {milestoneTitle}
               </p>
+              {isCurrentStep && (
+                <span className="text-xs bg-[#ffba06] text-[#1e2749] px-2 py-0.5 rounded-full font-semibold">
+                  Current Step
+                </span>
+              )}
               {isOptional && (
                 <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Star className="w-3 h-3" />
