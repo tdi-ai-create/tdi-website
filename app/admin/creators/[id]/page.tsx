@@ -1557,7 +1557,17 @@ function PhaseSection({
   reopeningMilestone: string | null;
   togglingMilestone: string | null;
 }) {
-  const completedCount = phase.milestones.filter((m) => m.status === 'completed').length;
+  // Filter to only applicable milestones for this creator's content path
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const applicableMilestones = phase.milestones.filter((m: any) => m.isApplicable !== false);
+  const completedCount = applicableMilestones.filter((m) => m.status === 'completed').length;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isSkipped = (phase as any).isSkipped || applicableMilestones.length === 0;
+
+  // Don't render skipped phases in admin view
+  if (isSkipped) {
+    return null;
+  }
 
   return (
     <div className={`bg-white rounded-xl border overflow-hidden ${
@@ -1583,7 +1593,7 @@ function PhaseSection({
               )}
             </div>
             <p className="text-xs text-gray-500">
-              {completedCount} / {phase.milestones.length} completed
+              {completedCount} / {applicableMilestones.length} completed
             </p>
           </div>
         </div>
@@ -1603,7 +1613,7 @@ function PhaseSection({
             </div>
           )}
           <div className="divide-y divide-gray-100">
-            {phase.milestones.map((milestone) => {
+            {applicableMilestones.map((milestone) => {
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const m = milestone as any;
               const milestoneTitle = m.title || m.name || m.admin_description || `Milestone`;
