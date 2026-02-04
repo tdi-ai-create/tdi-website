@@ -11,6 +11,7 @@ import type {
   PhaseWithMilestones,
   CreatorDashboardData,
   CreatorListItem,
+  ProgressBreakdown,
 } from '@/types/creator-portal';
 
 // Phase order for progression
@@ -71,23 +72,57 @@ export async function getAllCreators(): Promise<CreatorListItem[]> {
     .from('milestones')
     .select('*', { count: 'exact', head: true });
 
-  // Get completed milestones for each creator
+  // Get milestones for each creator with optional status
   const creatorList: CreatorListItem[] = await Promise.all(
     creators.map(async (creator) => {
-      const { count: completedCount } = await supabase
+      // Get all creator milestones with their metadata
+      const { data: creatorMilestones } = await supabase
         .from('creator_milestones')
-        .select('*', { count: 'exact', head: true })
-        .eq('creator_id', creator.id)
-        .eq('status', 'completed');
+        .select('status, metadata')
+        .eq('creator_id', creator.id);
 
-      const completed = completedCount || 0;
+      const milestones = creatorMilestones || [];
+
+      // Separate core (required) and bonus (optional) milestones
+      // Check is_optional in metadata since we store it there
+      const coreMilestones = milestones.filter(m => {
+        const meta = m.metadata as Record<string, unknown> | null;
+        return !meta?.is_optional;
+      });
+      const bonusMilestones = milestones.filter(m => {
+        const meta = m.metadata as Record<string, unknown> | null;
+        return meta?.is_optional === true;
+      });
+
+      const coreCompleted = coreMilestones.filter(m => m.status === 'completed').length;
+      const coreTotal = coreMilestones.length;
+      const corePercent = coreTotal > 0 ? Math.round((coreCompleted / coreTotal) * 100) : 100;
+
+      const bonusCompleted = bonusMilestones.filter(m => m.status === 'completed').length;
+      const bonusAvailable = bonusMilestones.filter(m => m.status === 'available' || m.status === 'in_progress').length;
+      const bonusTotal = bonusMilestones.length;
+
+      // Total progress (for backwards compatibility)
+      const completed = coreCompleted + bonusCompleted;
       const total = totalMilestones || 27;
+
+      const progress: ProgressBreakdown = {
+        coreTotal,
+        coreCompleted,
+        corePercent,
+        bonusTotal,
+        bonusCompleted,
+        bonusAvailable,
+        isComplete: corePercent === 100,
+      };
 
       return {
         ...creator,
         completedMilestones: completed,
         totalMilestones: total,
-        progressPercentage: Math.round((completed / total) * 100),
+        // Use core percent as main progress (creator is "done" when core is 100%)
+        progressPercentage: corePercent,
+        progress,
       };
     })
   );
@@ -476,14 +511,45 @@ export async function getCreatorDashboardData(
   // Calculate progress based only on applicable milestones
   const applicableMilestones = milestones.filter(m => milestoneAppliesTo(m));
   const applicableMilestoneIds = new Set(applicableMilestones.map(m => m.id));
+
+  // Get applicable creator milestones
+  const applicableCreatorMilestones = creatorMilestones.filter(
+    cm => applicableMilestoneIds.has(cm.milestone_id)
+  );
+
+  // Separate core (required) and bonus (optional) milestones
+  const coreMilestones = applicableCreatorMilestones.filter(cm => {
+    const meta = cm.metadata as Record<string, unknown> | null;
+    return !meta?.is_optional;
+  });
+  const bonusMilestones = applicableCreatorMilestones.filter(cm => {
+    const meta = cm.metadata as Record<string, unknown> | null;
+    return meta?.is_optional === true;
+  });
+
+  const coreCompleted = coreMilestones.filter(cm => cm.status === 'completed').length;
+  const coreTotal = coreMilestones.length;
+  const corePercent = coreTotal > 0 ? Math.round((coreCompleted / coreTotal) * 100) : 100;
+
+  const bonusCompleted = bonusMilestones.filter(cm => cm.status === 'completed').length;
+  const bonusAvailable = bonusMilestones.filter(cm => cm.status === 'available' || cm.status === 'in_progress').length;
+  const bonusTotal = bonusMilestones.length;
+
+  // Total progress (for backwards compatibility)
   const totalMilestones = applicableMilestones.length;
-  const completedMilestones = creatorMilestones.filter(
-    (cm) => cm.status === 'completed' && applicableMilestoneIds.has(cm.milestone_id)
-  ).length;
-  const progressPercentage =
-    totalMilestones > 0
-      ? Math.round((completedMilestones / totalMilestones) * 100)
-      : 0;
+  const completedMilestones = coreCompleted + bonusCompleted;
+  // Use core percent as main progress (creator is "done" when core is 100%)
+  const progressPercentage = corePercent;
+
+  const progress: ProgressBreakdown = {
+    coreTotal,
+    coreCompleted,
+    corePercent,
+    bonusTotal,
+    bonusCompleted,
+    bonusAvailable,
+    isComplete: corePercent === 100,
+  };
 
   return {
     creator,
@@ -493,6 +559,7 @@ export async function getCreatorDashboardData(
     completedMilestones,
     progressPercentage,
     contentPath,
+    progress,
   };
 }
 

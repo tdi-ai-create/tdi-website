@@ -46,6 +46,15 @@ interface EnrichedCreator {
   requiresTeamAction: boolean;
   waitingOn: 'creator' | 'tdi' | 'stalled' | 'launched';
   isStalled: boolean;
+  progress?: {
+    coreTotal: number;
+    coreCompleted: number;
+    corePercent: number;
+    bonusTotal: number;
+    bonusCompleted: number;
+    bonusAvailable: number;
+    isComplete: boolean;
+  };
 }
 
 interface DashboardData {
@@ -965,18 +974,25 @@ export default function AdminCreatorsPage() {
 
                         {/* Progress */}
                         <td className="px-4 py-3">
-                          <div className="flex items-center gap-2">
-                            <div className="w-20 h-2 bg-gray-100 rounded-full overflow-hidden">
-                              <div
-                                className={`h-full rounded-full ${
-                                  creator.progressPercentage === 100 ? 'bg-green-500' : 'bg-[#80a4ed]'
-                                }`}
-                                style={{ width: `${creator.progressPercentage}%` }}
-                              />
+                          <div className="flex flex-col gap-0.5">
+                            <div className="flex items-center gap-2">
+                              <div className="w-20 h-2 bg-gray-100 rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full ${
+                                    creator.progressPercentage === 100 ? 'bg-green-500' : 'bg-[#80a4ed]'
+                                  }`}
+                                  style={{ width: `${creator.progressPercentage}%` }}
+                                />
+                              </div>
+                              <span className="text-sm font-medium text-[#1e2749] w-10">
+                                {creator.progressPercentage}%
+                              </span>
                             </div>
-                            <span className="text-sm font-medium text-[#1e2749] w-10">
-                              {creator.progressPercentage}%
-                            </span>
+                            {creator.progress?.bonusAvailable && creator.progress.bonusAvailable > 0 && (
+                              <span className="text-xs text-amber-600">
+                                + {creator.progress.bonusAvailable} bonus available
+                              </span>
+                            )}
                           </div>
                         </td>
 

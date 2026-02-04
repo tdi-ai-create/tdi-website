@@ -45,11 +45,28 @@ export async function GET() {
     const enrichedCreators = creators?.map((creator) => {
       const creatorMilestones = allMilestones?.filter((m) => m.creator_id === creator.id) || [];
 
+      // Separate core (required) and bonus (optional) milestones
+      const coreMilestones = creatorMilestones.filter(m => {
+        const meta = m.metadata as Record<string, unknown> | null;
+        return !meta?.is_optional;
+      });
+      const bonusMilestones = creatorMilestones.filter(m => {
+        const meta = m.metadata as Record<string, unknown> | null;
+        return meta?.is_optional === true;
+      });
+
+      const coreCompleted = coreMilestones.filter(m => m.status === 'completed').length;
+      const coreTotal = coreMilestones.length;
+      const corePercent = coreTotal > 0 ? Math.round((coreCompleted / coreTotal) * 100) : 100;
+
+      const bonusCompleted = bonusMilestones.filter(m => m.status === 'completed').length;
+      const bonusAvailable = bonusMilestones.filter(m => m.status === 'available' || m.status === 'in_progress').length;
+      const bonusTotal = bonusMilestones.length;
+
       const totalMilestones = creatorMilestones.length;
-      const completedMilestones = creatorMilestones.filter((m) => m.status === 'completed').length;
-      const progressPercentage = totalMilestones > 0
-        ? Math.round((completedMilestones / totalMilestones) * 100)
-        : 0;
+      const completedMilestones = coreCompleted + bonusCompleted;
+      // Use core percent as main progress (creator is "done" when core is 100%)
+      const progressPercentage = corePercent;
 
       // Find most recent activity (completed_at)
       const completedDates = creatorMilestones
@@ -68,12 +85,12 @@ export async function GET() {
       const currentMilestoneName = nextMilestone?.milestone?.title || nextMilestone?.milestone?.name || null;
       const requiresTeamAction = nextMilestone?.milestone?.requires_team_action || false;
 
-      // Determine waiting status
-      const hasIncompleteMilestones = completedMilestones < totalMilestones;
-      const isStalled = hasIncompleteMilestones && lastActivityDate < fourteenDaysAgo;
+      // Determine waiting status (use corePercent for "launched" since bonus is optional)
+      const hasIncompleteCoreMillestones = coreCompleted < coreTotal;
+      const isStalled = hasIncompleteCoreMillestones && lastActivityDate < fourteenDaysAgo;
 
       let waitingOn: 'creator' | 'tdi' | 'stalled' | 'launched' = 'creator';
-      if (progressPercentage === 100) {
+      if (corePercent === 100) {
         waitingOn = 'launched';
       } else if (isStalled) {
         waitingOn = 'stalled';
@@ -90,6 +107,16 @@ export async function GET() {
         currentMilestoneName,
         requiresTeamAction,
         waitingOn,
+        // Core vs Bonus progress
+        progress: {
+          coreTotal,
+          coreCompleted,
+          corePercent,
+          bonusTotal,
+          bonusCompleted,
+          bonusAvailable,
+          isComplete: corePercent === 100,
+        },
         isStalled,
       };
     }) || [];

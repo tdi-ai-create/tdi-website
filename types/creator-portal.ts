@@ -121,6 +121,17 @@ export interface PhaseWithMilestones extends Phase {
   applicableMilestoneCount: number;
 }
 
+// Progress breakdown for core vs bonus milestones
+export interface ProgressBreakdown {
+  coreTotal: number;
+  coreCompleted: number;
+  corePercent: number;
+  bonusTotal: number;
+  bonusCompleted: number;
+  bonusAvailable: number;
+  isComplete: boolean; // true when core is 100%
+}
+
 // Creator dashboard data
 export interface CreatorDashboardData {
   creator: Creator;
@@ -130,6 +141,8 @@ export interface CreatorDashboardData {
   completedMilestones: number;
   progressPercentage: number;
   contentPath: ContentPath | null;
+  // New: core vs bonus progress
+  progress?: ProgressBreakdown;
 }
 
 // Admin creator list item
@@ -137,4 +150,6 @@ export interface CreatorListItem extends Creator {
   completedMilestones: number;
   totalMilestones: number;
   progressPercentage: number;
+  // New: core vs bonus progress
+  progress?: ProgressBreakdown;
 }

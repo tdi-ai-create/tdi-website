@@ -29,6 +29,8 @@ import {
   PenLine,
   Package,
   GraduationCap,
+  Star,
+  MoreVertical,
 } from 'lucide-react';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { supabase } from '@/lib/supabase';
@@ -164,6 +166,16 @@ export default function AdminCreatorDetailPage() {
   } | null>(null);
   const [outOfOrderNote, setOutOfOrderNote] = useState('');
   const [isCompletingOutOfOrder, setIsCompletingOutOfOrder] = useState(false);
+
+  // Optional milestone modal state
+  const [showOptionalModal, setShowOptionalModal] = useState(false);
+  const [optionalMilestone, setOptionalMilestone] = useState<{
+    id: string;
+    title: string;
+    isCurrentlyOptional: boolean;
+  } | null>(null);
+  const [optionalReason, setOptionalReason] = useState('');
+  const [isTogglingOptional, setIsTogglingOptional] = useState(false);
 
   const loadData = useCallback(async () => {
     const data = await getCreatorDashboardData(creatorId);
@@ -475,6 +487,51 @@ export default function AdminCreatorDetailPage() {
     }
   };
 
+  // Handle opening the optional milestone modal
+  const handleOpenOptionalModal = (milestoneId: string, milestoneTitle: string, isCurrentlyOptional: boolean) => {
+    setOptionalMilestone({ id: milestoneId, title: milestoneTitle, isCurrentlyOptional });
+    setOptionalReason('');
+    setShowOptionalModal(true);
+  };
+
+  // Handle toggling optional status
+  const handleToggleOptional = async () => {
+    if (!optionalMilestone) return;
+
+    setIsTogglingOptional(true);
+
+    try {
+      const response = await fetch('/api/admin/milestones/optional', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          milestoneIds: [optionalMilestone.id],
+          isOptional: !optionalMilestone.isCurrentlyOptional,
+          reason: optionalReason.trim() || null,
+          adminEmail,
+        }),
+      });
+
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error || 'Failed to update');
+
+      setShowOptionalModal(false);
+      setOptionalMilestone(null);
+      setOptionalReason('');
+      await loadData();
+
+      const action = optionalMilestone.isCurrentlyOptional ? 'required' : 'optional';
+      setSuccessMessage(`Marked as ${action}: ${optionalMilestone.title}`);
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (error) {
+      console.error('Error toggling optional:', error);
+      alert('Error updating milestone');
+    } finally {
+      setIsTogglingOptional(false);
+    }
+  };
+
   const handleOpenActionModal = (
     milestoneId: string,
     milestoneTitle: string,
@@ -739,6 +796,7 @@ export default function AdminCreatorDetailPage() {
                   onReopen={handleReopen}
                   onToggleMilestone={handleToggleMilestone}
                   onCompleteAction={handleOpenActionModal}
+                  onToggleOptional={handleOpenOptionalModal}
                   approvingMilestoneId={approvingMilestoneId}
                   reopeningMilestone={reopeningMilestone}
                   togglingMilestone={togglingMilestone}
@@ -1313,6 +1371,122 @@ export default function AdminCreatorDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Optional Milestone Modal */}
+      {showOptionalModal && optionalMilestone && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  optionalMilestone.isCurrentlyOptional ? 'bg-blue-100' : 'bg-amber-100'
+                }`}>
+                  <Star className={`w-5 h-5 ${
+                    optionalMilestone.isCurrentlyOptional ? 'text-blue-600' : 'text-amber-600'
+                  }`} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-[#1e2749]">
+                    {optionalMilestone.isCurrentlyOptional ? 'Mark as Required' : 'Mark as Optional'}
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    {optionalMilestone.isCurrentlyOptional ? 'Core milestone' : 'Bonus milestone'}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setShowOptionalModal(false);
+                  setOptionalMilestone(null);
+                  setOptionalReason('');
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className={`rounded-lg p-4 mb-4 ${
+              optionalMilestone.isCurrentlyOptional ? 'bg-blue-50 border border-blue-200' : 'bg-amber-50 border border-amber-200'
+            }`}>
+              <p className={`text-sm ${
+                optionalMilestone.isCurrentlyOptional ? 'text-blue-800' : 'text-amber-800'
+              }`}>
+                {optionalMilestone.isCurrentlyOptional
+                  ? 'This will mark the following milestone as required (core) for this creator:'
+                  : 'This will mark the following milestone as optional (bonus) for this creator:'}
+              </p>
+              <p className={`font-semibold mt-1 ${
+                optionalMilestone.isCurrentlyOptional ? 'text-blue-900' : 'text-amber-900'
+              }`}>
+                &ldquo;{optionalMilestone.title}&rdquo;
+              </p>
+            </div>
+
+            {!optionalMilestone.isCurrentlyOptional && (
+              <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                <p className="text-sm text-gray-600">
+                  <strong>Optional milestones:</strong>
+                </p>
+                <ul className="text-sm text-gray-600 mt-1 space-y-1">
+                  <li>• Don&apos;t count against core completion percentage</li>
+                  <li>• Remain available for the creator to complete anytime</li>
+                  <li>• Show as &ldquo;bonus&rdquo; content in progress tracking</li>
+                </ul>
+              </div>
+            )}
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Reason (optional)
+              </label>
+              <textarea
+                value={optionalReason}
+                onChange={(e) => setOptionalReason(e.target.value)}
+                placeholder={optionalMilestone.isCurrentlyOptional
+                  ? "Why is this now required?"
+                  : "e.g., Course published, blog is extra content"}
+                rows={2}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowOptionalModal(false);
+                  setOptionalMilestone(null);
+                  setOptionalReason('');
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleToggleOptional}
+                disabled={isTogglingOptional}
+                className={`flex-1 px-4 py-2 text-white rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors ${
+                  optionalMilestone.isCurrentlyOptional
+                    ? 'bg-blue-600 hover:bg-blue-700'
+                    : 'bg-amber-500 hover:bg-amber-600'
+                }`}
+              >
+                {isTogglingOptional ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <Star className="w-4 h-4" />
+                    {optionalMilestone.isCurrentlyOptional ? 'Mark as Required' : 'Mark as Optional'}
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -1327,6 +1501,7 @@ function PhaseSection({
   onReopen,
   onToggleMilestone,
   onCompleteAction,
+  onToggleOptional,
   approvingMilestoneId,
   reopeningMilestone,
   togglingMilestone,
@@ -1340,6 +1515,7 @@ function PhaseSection({
   onReopen: (milestoneId: string, milestoneTitle: string) => void;
   onToggleMilestone: (milestoneId: string, milestoneTitle: string, currentStatus: string, incompletePrior?: { id: string; title: string }[]) => void;
   onCompleteAction: (milestoneId: string, milestoneTitle: string, actionType: string, actionConfig: Record<string, unknown>) => void;
+  onToggleOptional: (milestoneId: string, milestoneTitle: string, isCurrentlyOptional: boolean) => void;
   approvingMilestoneId: string | null;
   reopeningMilestone: string | null;
   togglingMilestone: string | null;
@@ -1433,15 +1609,20 @@ function PhaseSection({
                 }
               }
 
+              // Check if milestone is optional (from metadata)
+              const isOptional = m.metadata?.is_optional === true;
+
               return (
                 <MilestoneRow
                   key={milestone.id}
                   milestone={milestone}
+                  isOptional={isOptional}
                   onApprove={() => onApprove(milestone.id, milestoneTitle)}
                   onRequestRevision={() => onRequestRevision(milestone.id, milestoneTitle)}
                   onReopen={() => onReopen(milestone.id, milestoneTitle)}
                   onToggle={() => onToggleMilestone(milestone.id, milestoneTitle, milestone.status, incompletePrior)}
                   onCompleteAction={() => onCompleteAction(milestone.id, milestoneTitle, m.action_type || 'confirm', m.action_config || {})}
+                  onToggleOptional={() => onToggleOptional(milestone.id, milestoneTitle, isOptional)}
                   isApproving={approvingMilestoneId === milestone.id}
                   isReopening={reopeningMilestone === milestone.id}
                   isToggling={togglingMilestone === milestone.id}
@@ -1457,21 +1638,25 @@ function PhaseSection({
 
 function MilestoneRow({
   milestone,
+  isOptional,
   onApprove,
   onRequestRevision,
   onReopen,
   onToggle,
   onCompleteAction,
+  onToggleOptional,
   isApproving,
   isReopening,
   isToggling,
 }: {
   milestone: MilestoneWithStatus;
+  isOptional: boolean;
   onApprove: () => void;
   onRequestRevision: () => void;
   onCompleteAction: () => void;
   onReopen: () => void;
   onToggle: () => void;
+  onToggleOptional: () => void;
   isApproving: boolean;
   isReopening: boolean;
   isToggling: boolean;
@@ -1548,11 +1733,19 @@ function MilestoneRow({
             ) : null}
           </button>
           <div className="min-w-0 flex-1">
-            <p className={`font-medium ${
-              milestone.status === 'locked' ? 'text-gray-400' : 'text-[#1e2749]'
-            }`}>
-              {milestoneTitle}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className={`font-medium ${
+                milestone.status === 'locked' ? 'text-gray-400' : 'text-[#1e2749]'
+              }`}>
+                {milestoneTitle}
+              </p>
+              {isOptional && (
+                <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <Star className="w-3 h-3" />
+                  Bonus
+                </span>
+              )}
+            </div>
             {adminDescription && (
               <p className="text-sm text-gray-500 mt-1">{adminDescription}</p>
             )}
@@ -1696,6 +1889,20 @@ function MilestoneRow({
               </Tooltip>
             </div>
           )}
+          {/* Menu button for optional toggle */}
+          <Tooltip content={isOptional ? "Mark as required (core)" : "Mark as optional (bonus)"} position="left">
+            <button
+              onClick={onToggleOptional}
+              className={`p-1.5 rounded transition-colors ${
+                isOptional
+                  ? 'text-amber-500 hover:bg-amber-50'
+                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+              }`}
+              title={isOptional ? "Mark as required" : "Mark as optional"}
+            >
+              <Star className={`w-4 h-4 ${isOptional ? 'fill-current' : ''}`} />
+            </button>
+          </Tooltip>
         </div>
       </div>
     </div>
