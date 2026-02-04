@@ -120,7 +120,7 @@ export async function POST(request: Request) {
       // Get all milestones in order
       const { data: allMilestones } = await supabase
         .from('milestones')
-        .select('id, phase_id, sort_order, title, name')
+        .select('id, phase_id, sort_order, name')
         .order('phase_id')
         .order('sort_order');
 
@@ -158,7 +158,7 @@ export async function POST(request: Request) {
                 .eq('milestone_id', ms.id);
 
               if (!nextMilestoneName) {
-                nextMilestoneName = ms.title || ms.name || 'Next step';
+                nextMilestoneName = ms.name || 'Next step';
               }
             }
           }
