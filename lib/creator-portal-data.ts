@@ -192,7 +192,7 @@ export async function createCreator(data: {
 
 export async function updateCreator(
   id: string,
-  data: Partial<Pick<Creator, 'course_title' | 'course_audience' | 'target_launch_month' | 'discount_code'>>
+  data: Partial<Pick<Creator, 'content_path' | 'course_title' | 'course_audience' | 'target_launch_month' | 'discount_code'>>
 ): Promise<Creator | null> {
   const serviceSupabase = getServiceSupabase();
 

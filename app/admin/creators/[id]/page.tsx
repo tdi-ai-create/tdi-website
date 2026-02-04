@@ -114,7 +114,14 @@ export default function AdminCreatorDetailPage() {
 
   // Course details editing
   const [isEditingDetails, setIsEditingDetails] = useState(false);
-  const [editedDetails, setEditedDetails] = useState({
+  const [editedDetails, setEditedDetails] = useState<{
+    content_path: 'blog' | 'download' | 'course' | null;
+    course_title: string;
+    course_audience: string;
+    target_launch_month: string;
+    discount_code: string;
+  }>({
+    content_path: null,
     course_title: '',
     course_audience: '',
     target_launch_month: '',
@@ -182,6 +189,7 @@ export default function AdminCreatorDetailPage() {
     if (data) {
       setDashboardData(data);
       setEditedDetails({
+        content_path: data.creator.content_path || null,
         course_title: data.creator.course_title || '',
         course_audience: data.creator.course_audience || '',
         target_launch_month: data.creator.target_launch_month || '',
@@ -866,6 +874,26 @@ export default function AdminCreatorDetailPage() {
                 <div className="space-y-4">
                   <div>
                     <label className="block text-xs text-gray-500 uppercase mb-1">
+                      Content Path
+                    </label>
+                    <select
+                      value={editedDetails.content_path || ''}
+                      onChange={(e) =>
+                        setEditedDetails({
+                          ...editedDetails,
+                          content_path: (e.target.value as 'blog' | 'download' | 'course') || null
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent bg-white"
+                    >
+                      <option value="">Not selected</option>
+                      <option value="blog">Blog posts</option>
+                      <option value="download">Digital downloads</option>
+                      <option value="course">Learning Hub course</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 uppercase mb-1">
                       Course Title
                     </label>
                     <input
@@ -919,6 +947,15 @@ export default function AdminCreatorDetailPage() {
                 </div>
               ) : (
                 <div className="space-y-3 text-sm">
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase">Content Path</p>
+                    <p className={creator.content_path ? 'text-[#1e2749] font-medium' : 'text-gray-400 italic'}>
+                      {creator.content_path === 'blog' ? 'Blog posts' :
+                       creator.content_path === 'download' ? 'Digital downloads' :
+                       creator.content_path === 'course' ? 'Learning Hub course' :
+                       'Not selected'}
+                    </p>
+                  </div>
                   <div>
                     <p className="text-xs text-gray-500 uppercase">Course Title</p>
                     <p className={creator.course_title ? 'text-[#1e2749] font-medium' : 'text-gray-400 italic'}>
