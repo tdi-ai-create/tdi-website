@@ -163,6 +163,7 @@ export async function POST(request: NextRequest) {
           completed_at: progress?.completed_at || null,
           progress_id: progress?.id || null,
           metadata: progress?.metadata || null,
+          submission_data: progress?.submission_data || null,
           isApplicable,
         };
       });

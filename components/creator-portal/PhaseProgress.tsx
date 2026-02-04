@@ -16,8 +16,60 @@ import {
   Hourglass,
   HelpCircle,
 } from 'lucide-react';
-import type { PhaseWithMilestones, MilestoneWithStatus, MilestoneStatus } from '@/types/creator-portal';
+import type { PhaseWithMilestones, MilestoneWithStatus, MilestoneStatus, SubmissionData } from '@/types/creator-portal';
 import { MilestoneAction } from './MilestoneAction';
+
+// Helper to format submission data for display
+function formatSubmissionData(data: SubmissionData): { label: string; timestamp: string | null } | null {
+  if (!data || !data.type) return null;
+
+  const formatDate = (dateStr: string | undefined) => {
+    if (!dateStr) return null;
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  switch (data.type) {
+    case 'path_selection': {
+      const pathLabels: Record<string, string> = {
+        blog: 'Blog Post',
+        download: 'Free Download',
+        course: 'Learning Hub Course',
+      };
+      const label = pathLabels[data.content_path || ''] || data.content_path || '';
+      return { label: `Selected: ${label}`, timestamp: formatDate(data.selected_at) };
+    }
+    case 'meeting_scheduled': {
+      const meetingDate = data.scheduled_date
+        ? new Date(data.scheduled_date + 'T' + (data.scheduled_time || '12:00'))
+        : null;
+      const formattedMeeting = meetingDate
+        ? meetingDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+        : null;
+      return {
+        label: formattedMeeting ? `Meeting: ${formattedMeeting}` : 'Meeting scheduled',
+        timestamp: formatDate(data.submitted_at),
+      };
+    }
+    case 'link':
+      return { label: data.link ? `Submitted link` : 'Link submitted', timestamp: formatDate(data.submitted_at) };
+    case 'confirmation':
+      return { label: 'Confirmed', timestamp: formatDate(data.confirmed_at) };
+    case 'preferences': {
+      const prefs: string[] = [];
+      if (data.wants_video_editing) prefs.push('Video editing');
+      if (data.wants_download_design) prefs.push('Download design');
+      return {
+        label: prefs.length > 0 ? `Selected: ${prefs.join(', ')}` : 'Preferences saved',
+        timestamp: formatDate(data.submitted_at),
+      };
+    }
+    case 'form':
+      return { label: 'Form submitted', timestamp: formatDate(data.submitted_at) };
+    default:
+      return null;
+  }
+}
 
 interface PhaseProgressProps {
   phases: PhaseWithMilestones[];
@@ -309,7 +361,22 @@ function MilestoneItem({
           </div>
         )}
 
-        {milestone.completed_at && (
+        {/* Submission data display for completed milestones */}
+        {milestone.status === 'completed' && milestone.submission_data && (() => {
+          const formattedData = formatSubmissionData(milestone.submission_data);
+          if (!formattedData) return null;
+          return (
+            <div className="mt-3 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
+              <p className="text-sm text-gray-700">{formattedData.label}</p>
+              {formattedData.timestamp && (
+                <p className="text-xs text-gray-500 mt-0.5">Submitted {formattedData.timestamp}</p>
+              )}
+            </div>
+          );
+        })()}
+
+        {/* Fallback to just showing completion date if no submission data */}
+        {milestone.completed_at && !milestone.submission_data && (
           <p className="text-xs text-gray-500 mt-2">
             Completed on {new Date(milestone.completed_at).toLocaleDateString()}
           </p>

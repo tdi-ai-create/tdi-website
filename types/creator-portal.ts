@@ -103,12 +103,40 @@ export interface AdminUser {
 
 // Extended types for UI
 
+// Submission data structure for different submission types
+export interface SubmissionData {
+  type: 'path_selection' | 'meeting_scheduled' | 'form' | 'link' | 'confirmation' | 'preferences' | 'change_request';
+  // Path selection
+  content_path?: 'blog' | 'download' | 'course';
+  selected_at?: string;
+  // Meeting scheduled
+  scheduled_date?: string;
+  scheduled_time?: string;
+  // Form
+  fields?: Record<string, unknown>;
+  // Link
+  link?: string;
+  // Confirmation
+  confirmed?: boolean;
+  confirmed_at?: string;
+  // Preferences
+  wants_video_editing?: boolean;
+  wants_download_design?: boolean;
+  // Change request
+  request?: string;
+  requested_at?: string;
+  // Common
+  notes?: string | null;
+  submitted_at?: string;
+}
+
 // Milestone with status for display
 export interface MilestoneWithStatus extends Milestone {
   status: MilestoneStatus;
   completed_at: string | null;
   progress_id: string | null;
   metadata: Record<string, unknown> | null;
+  submission_data: SubmissionData | null;
   isApplicable: boolean;
 }
 
