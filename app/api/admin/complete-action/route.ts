@@ -99,17 +99,69 @@ export async function POST(request: Request) {
       }
     }
 
+    const completedAt = new Date().toISOString();
+    const adminName = adminEmail?.split('@')[0] || 'admin';
+
     // Build metadata with audit trail
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const metadata: any = {
       ...content,
       completed_by_admin: true,
       admin_email: adminEmail,
-      completed_at: new Date().toISOString(),
+      completed_at: completedAt,
     };
 
     if (adminNote) {
       metadata.admin_note = adminNote;
+    }
+
+    // Build submission_data based on action type
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let submissionData: any = {
+      type: actionType,
+      completed_by_admin: true,
+      admin_name: adminName,
+      admin_email: adminEmail,
+      completed_at: completedAt,
+    };
+
+    // Add action-specific data
+    if (actionType === 'select' || actionType === 'path_selection') {
+      submissionData = {
+        ...submissionData,
+        type: 'path_selection',
+        content_path: content?.selected_path,
+        selected_at: completedAt,
+      };
+    } else if (actionType === 'submit_link' || actionType === 'link_submit') {
+      submissionData = {
+        ...submissionData,
+        type: 'link',
+        link: content?.link,
+        submitted_at: completedAt,
+      };
+    } else if (actionType === 'calendly') {
+      submissionData = {
+        ...submissionData,
+        type: 'meeting_scheduled',
+        booked_externally: true,
+        submitted_at: completedAt,
+      };
+    } else if (actionType === 'sign_agreement') {
+      submissionData = {
+        ...submissionData,
+        type: 'agreement',
+        signed_externally: true,
+        submitted_at: completedAt,
+      };
+    } else {
+      submissionData = {
+        ...submissionData,
+        type: 'team_review',
+        reviewed_by: adminName,
+        review_notes: adminNote || null,
+        reviewed_at: completedAt,
+      };
     }
 
     // Update milestone status to completed with audit trail
@@ -118,10 +170,11 @@ export async function POST(request: Request) {
       .update({
         status: 'completed',
         metadata,
+        submission_data: submissionData,
         completed_by: `admin:${adminEmail}`,
-        completed_at: new Date().toISOString(),
+        completed_at: completedAt,
         notes: adminNote || null,
-        updated_at: new Date().toISOString()
+        updated_at: completedAt
       })
       .eq('creator_id', creatorId)
       .eq('milestone_id', milestoneId);

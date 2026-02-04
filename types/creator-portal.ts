@@ -105,7 +105,7 @@ export interface AdminUser {
 
 // Submission data structure for different submission types
 export interface SubmissionData {
-  type: 'path_selection' | 'meeting_scheduled' | 'form' | 'link' | 'confirmation' | 'preferences' | 'change_request';
+  type: 'path_selection' | 'meeting_scheduled' | 'form' | 'link' | 'confirmation' | 'preferences' | 'change_request' | 'team_review' | 'course_title' | 'course_outline' | 'agreement';
   // Path selection
   content_path?: 'blog' | 'download' | 'course';
   selected_at?: string;
@@ -125,6 +125,17 @@ export interface SubmissionData {
   // Change request
   request?: string;
   requested_at?: string;
+  // Team review (admin completed)
+  reviewed_by?: string;
+  review_notes?: string | null;
+  reviewed_at?: string;
+  admin_email?: string;
+  completed_by_admin?: boolean;
+  admin_name?: string;
+  // Course title
+  title?: string;
+  // Course outline
+  document_url?: string;
   // Common
   notes?: string | null;
   submitted_at?: string;

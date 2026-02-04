@@ -20,7 +20,7 @@ import type { PhaseWithMilestones, MilestoneWithStatus, MilestoneStatus, Submiss
 import { MilestoneAction } from './MilestoneAction';
 
 // Helper to format submission data for display
-function formatSubmissionData(data: SubmissionData): { label: string; timestamp: string | null } | null {
+function formatSubmissionData(data: SubmissionData): { label: string; timestamp: string | null; sublabel?: string } | null {
   if (!data || !data.type) return null;
 
   const formatDate = (dateStr: string | undefined) => {
@@ -66,6 +66,30 @@ function formatSubmissionData(data: SubmissionData): { label: string; timestamp:
     }
     case 'form':
       return { label: 'Form submitted', timestamp: formatDate(data.submitted_at) };
+    case 'team_review': {
+      const reviewer = data.reviewed_by || data.admin_name || 'TDI Team';
+      return {
+        label: `Reviewed by ${reviewer}`,
+        sublabel: data.review_notes || undefined,
+        timestamp: formatDate(data.reviewed_at),
+      };
+    }
+    case 'course_title':
+      return {
+        label: data.title ? `"${data.title}"` : 'Title submitted',
+        timestamp: formatDate(data.submitted_at),
+      };
+    case 'course_outline':
+      return {
+        label: 'Outline submitted',
+        sublabel: data.document_url ? 'Google Doc linked' : undefined,
+        timestamp: formatDate(data.submitted_at),
+      };
+    case 'agreement':
+      return {
+        label: data.completed_by_admin ? 'Agreement processed by team' : 'Agreement signed',
+        timestamp: formatDate(data.submitted_at),
+      };
     default:
       return null;
   }
@@ -368,6 +392,9 @@ function MilestoneItem({
           return (
             <div className="mt-3 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
               <p className="text-sm text-gray-700">{formattedData.label}</p>
+              {formattedData.sublabel && (
+                <p className="text-xs text-gray-600 mt-0.5">{formattedData.sublabel}</p>
+              )}
               {formattedData.timestamp && (
                 <p className="text-xs text-gray-500 mt-0.5">Submitted {formattedData.timestamp}</p>
               )}

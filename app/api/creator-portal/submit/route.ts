@@ -82,7 +82,7 @@ export async function POST(request: Request) {
     // For confirmations, meeting_scheduled, preferences, path_selection, and form submissions, mark as complete
     // For change_request, mark as in_progress (pending team review)
     // For link submissions needing review, mark as waiting_approval
-    const completionTypes = ['confirmation', 'meeting_scheduled', 'preferences', 'path_selection', 'form'];
+    const completionTypes = ['confirmation', 'meeting_scheduled', 'preferences', 'path_selection', 'form', 'course_title'];
     let newStatus = completionTypes.includes(submissionType) ? 'completed' : 'waiting_approval';
 
     // Change requests go back to in_progress as team needs to make updates
@@ -187,6 +187,52 @@ export async function POST(request: Request) {
         wants_download_design: content.wants_download_design || false,
         submitted_at: new Date().toISOString()
       };
+    }
+
+    // If course title submission, store the title
+    if (submissionType === 'course_title' && content.title) {
+      submissionData = {
+        type: 'course_title',
+        title: content.title,
+        submitted_at: new Date().toISOString()
+      };
+      updateData.metadata = {
+        title: content.title,
+        submitted_at: new Date().toISOString()
+      };
+
+      // Also update the creator's course_title field
+      await supabase
+        .from('creators')
+        .update({
+          course_title: content.title,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', creatorId);
+    }
+
+    // If course outline submission, store the document URL
+    if (submissionType === 'course_outline' && content.document_url) {
+      submissionData = {
+        type: 'course_outline',
+        document_url: content.document_url,
+        notes: content.notes || null,
+        submitted_at: new Date().toISOString()
+      };
+      updateData.metadata = {
+        document_url: content.document_url,
+        notes: content.notes || null,
+        submitted_at: new Date().toISOString()
+      };
+
+      // Also update the creator's google_doc_link field
+      await supabase
+        .from('creators')
+        .update({
+          google_doc_link: content.document_url,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', creatorId);
     }
 
     // Add submission_data to update if we have it

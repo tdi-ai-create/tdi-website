@@ -58,10 +58,13 @@ export async function POST(request: Request) {
 
     // 3. Mark milestone as completed (only update columns that exist)
     // Build update object with optional metadata for out-of-order completions
+    const completedAt = new Date().toISOString();
+    const adminName = adminEmail?.split('@')[0] || 'admin';
+
     const updateObj: Record<string, unknown> = {
       status: 'completed',
-      updated_at: new Date().toISOString(),
-      completed_at: new Date().toISOString(),
+      updated_at: completedAt,
+      completed_at: completedAt,
       completed_by: adminEmail ? `admin:${adminEmail}` : 'admin',
     };
 
@@ -71,9 +74,18 @@ export async function POST(request: Request) {
         out_of_order: true,
         admin_email: adminEmail,
         admin_note: note || null,
-        completed_at: new Date().toISOString(),
+        completed_at: completedAt,
       };
     }
+
+    // Add submission_data for team-completed milestones (captures who reviewed)
+    updateObj.submission_data = {
+      type: 'team_review',
+      reviewed_by: adminName,
+      review_notes: note || null,
+      reviewed_at: completedAt,
+      admin_email: adminEmail,
+    };
 
     const { data: updateData, error: updateError } = await supabase
       .from('creator_milestones')

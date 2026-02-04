@@ -336,6 +336,10 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
     setIsSubmitting(true);
     setError(null);
 
+    // Determine submission type based on config
+    const submissionType = config.submission_type || 'link';
+    const contentKey = config.content_key || 'link';
+
     try {
       const response = await fetch('/api/creator-portal/submit', {
         method: 'POST',
@@ -343,8 +347,8 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
         body: JSON.stringify({
           creatorId,
           milestoneId: milestone.id,
-          submissionType: 'link',
-          content: { link },
+          submissionType,
+          content: { [contentKey]: link, notes },
           notifyTeam: true
         }),
       });
@@ -353,6 +357,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
 
       if (response.ok && data.success) {
         setLink('');
+        setNotes('');
         onComplete();
       } else {
         setError(data.error || 'Failed to submit. Please try again.');
@@ -360,6 +365,51 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
     } catch (err) {
       setError('Network error. Please try again.');
       console.error('Link submit error:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // State for text input
+  const [textInput, setTextInput] = useState('');
+
+  // Handle text input submission (course_title action type)
+  const handleTextInputSubmit = async () => {
+    if (!textInput.trim()) {
+      setError('Please enter a value.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+
+    const submissionType = config.submission_type || 'course_title';
+    const contentKey = config.content_key || 'title';
+
+    try {
+      const response = await fetch('/api/creator-portal/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          milestoneId: milestone.id,
+          submissionType,
+          content: { [contentKey]: textInput.trim() },
+          notifyTeam: config.notify_team || false
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setTextInput('');
+        onComplete();
+      } else {
+        setError(data.error || 'Failed to submit. Please try again.');
+      }
+    } catch (err) {
+      setError('Network error. Please try again.');
+      console.error('Text input submit error:', err);
     } finally {
       setIsSubmitting(false);
     }
@@ -1211,7 +1261,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
       );
 
     case 'link_submit':
-      // Simple link submission inline
+      // Simple link submission inline (also used for course_outline with notes)
       return (
         <AdminPreviewWrapper actionLabel={config.label || 'Submit Link'}>
           <div className="space-y-3">
@@ -1236,6 +1286,60 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
                     Submitting...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    {config.button_text || 'Submit'}
+                  </>
+                )}
+              </button>
+            </div>
+            {config.show_notes && (
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder={config.notes_placeholder || 'Any notes for the team? (optional)'}
+                disabled={isAdminPreview}
+                rows={2}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffba06] focus:border-transparent resize-none text-sm"
+              />
+            )}
+            {error && (
+              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                {error}
+              </div>
+            )}
+          </div>
+        </AdminPreviewWrapper>
+      );
+
+    case 'text_input':
+      // Simple text input (for course title, etc.)
+      return (
+        <AdminPreviewWrapper actionLabel={config.label || 'Submit'}>
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <input
+                  type="text"
+                  value={textInput}
+                  onChange={(e) => setTextInput(e.target.value)}
+                  placeholder={config.placeholder || 'Enter your response'}
+                  disabled={isAdminPreview}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#ffba06] focus:border-transparent"
+                />
+              </div>
+              <button
+                onClick={() => !isAdminPreview && handleTextInputSubmit()}
+                disabled={!textInput.trim() || isSubmitting || isAdminPreview}
+                className="px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors whitespace-nowrap"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Saving...
                   </>
                 ) : (
                   <>
