@@ -47,7 +47,7 @@ export async function GET(request: Request) {
     // Get all milestones
     const { data: allMilestones, error: milestonesError } = await supabase
       .from('milestones')
-      .select('id, phase_id, sort_order, applies_to, title, name');
+      .select('id, phase_id, sort_order, applies_to, name');
 
     if (milestonesError) {
       return NextResponse.json({ success: false, error: `Milestones error: ${milestonesError.message}` }, { status: 500 });
@@ -76,7 +76,7 @@ export async function GET(request: Request) {
 
       return {
         id: m.id,
-        title: m.title || m.name,
+        title: m.name,
         phase: phase?.name,
         phaseOrder: phase?.sort_order,
         sortOrder: m.sort_order,

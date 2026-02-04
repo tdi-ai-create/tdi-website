@@ -41,7 +41,7 @@ export async function GET() {
     // Get all milestones
     const { data: allMilestones } = await supabase
       .from('milestones')
-      .select('id, phase_id, sort_order, applies_to, title, name');
+      .select('id, phase_id, sort_order, applies_to, name');
 
     const fixes: { creatorName: string; unlockedMilestone: string }[] = [];
 
@@ -128,7 +128,7 @@ export async function GET() {
 
           fixes.push({
             creatorName: creator.name,
-            unlockedMilestone: milestone.title || milestone.name || milestone.id,
+            unlockedMilestone: milestone.name || milestone.id,
           });
 
           break; // Only unlock one per creator
