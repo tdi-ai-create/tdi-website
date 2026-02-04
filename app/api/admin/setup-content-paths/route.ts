@@ -15,7 +15,7 @@ const milestonePathMapping: Record<string, string[]> = {
   // ONBOARDING - All paths (6 milestones)
   // ===================
   'intake_completed': ['blog', 'download', 'course'],
-  'choose_content_path': ['blog', 'download', 'course'],
+  'content_path_selection': ['blog', 'download', 'course'],  // ID in DB is content_path_selection
   'team_intake_review': ['blog', 'download', 'course'],
   'creator_intake_review': ['blog', 'download', 'course'],
   'rae_meeting_scheduled': ['blog', 'download', 'course'],
@@ -45,12 +45,11 @@ const milestonePathMapping: Record<string, string[]> = {
   'test_video_recorded': ['course'],
   'test_video_submitted': ['course'],
   'test_video_approved': ['course'],
-  'downloads_started': ['course'],
-  // Download-specific milestones
-  'define_download': ['download'],
+  // Download-specific milestones (also apply to course since courses have downloads)
+  'download_defined': ['download', 'course'],      // ID in DB is download_defined
   'download_concept_approved': ['download'],
-  'draft_download': ['download'],
-  'download_review_handoff': ['download'],
+  'download_drafted': ['download', 'course'],      // ID in DB is download_drafted
+  'download_handoff': ['download', 'course'],      // ID in DB is download_handoff
 
   // ===================
   // PRODUCTION - Course only (6 milestones)
