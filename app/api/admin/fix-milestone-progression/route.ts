@@ -54,18 +54,30 @@ export async function GET() {
 
       if (!creatorMilestones) continue;
 
-      // Check if creator has any available milestones
-      const hasAvailable = creatorMilestones.some(cm => cm.status === 'available' || cm.status === 'in_progress');
+      const contentPath = creator.content_path;
 
-      // If they have available milestones, they're fine
+      // Helper to check if a milestone applies to this creator's content path
+      const isApplicableToCreator = (milestoneId: string) => {
+        const milestone = allMilestones?.find(m => m.id === milestoneId);
+        if (!milestone) return false;
+        const appliesTo = milestone.applies_to as string[] | null;
+        return !contentPath ||
+          !appliesTo || appliesTo.length === 0 ||
+          appliesTo.includes(contentPath);
+      };
+
+      // Check if creator has any available APPLICABLE milestones
+      const hasAvailable = creatorMilestones.some(cm =>
+        (cm.status === 'available' || cm.status === 'in_progress') &&
+        isApplicableToCreator(cm.milestone_id)
+      );
+
+      // If they have available applicable milestones, they're fine
       if (hasAvailable) continue;
 
       // Check if they have any completed milestones (not stuck at start)
       const hasCompleted = creatorMilestones.some(cm => cm.status === 'completed');
       if (!hasCompleted) continue;
-
-      // Find the first locked milestone that should be available based on content path
-      const contentPath = creator.content_path;
 
       // Sort milestones by phase order then sort_order
       const sortedMilestones = allMilestones?.sort((a, b) => {
