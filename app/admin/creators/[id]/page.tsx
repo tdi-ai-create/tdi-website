@@ -155,6 +155,16 @@ export default function AdminCreatorDetailPage() {
   const [selectedPathForAction, setSelectedPathForAction] = useState<string | null>(null);
   const [adminLinkInput, setAdminLinkInput] = useState('');
 
+  // Out-of-order completion modal state
+  const [showOutOfOrderModal, setShowOutOfOrderModal] = useState(false);
+  const [outOfOrderMilestone, setOutOfOrderMilestone] = useState<{
+    id: string;
+    title: string;
+    incompletePrior: { id: string; title: string }[];
+  } | null>(null);
+  const [outOfOrderNote, setOutOfOrderNote] = useState('');
+  const [isCompletingOutOfOrder, setIsCompletingOutOfOrder] = useState(false);
+
   const loadData = useCallback(async () => {
     const data = await getCreatorDashboardData(creatorId);
     if (data) {
@@ -368,10 +378,16 @@ export default function AdminCreatorDetailPage() {
     }
   };
 
-  const handleToggleMilestone = async (milestoneId: string, milestoneTitle: string, currentStatus: string) => {
-    // Don't allow toggling locked milestones
+  const handleToggleMilestone = async (milestoneId: string, milestoneTitle: string, currentStatus: string, incompletePrior?: { id: string; title: string }[]) => {
+    // For locked milestones, show the out-of-order confirmation modal
     if (currentStatus === 'locked') {
-      alert('This milestone is locked. Complete previous milestones first.');
+      setOutOfOrderMilestone({
+        id: milestoneId,
+        title: milestoneTitle,
+        incompletePrior: incompletePrior || [],
+      });
+      setOutOfOrderNote('');
+      setShowOutOfOrderModal(true);
       return;
     }
 
@@ -420,6 +436,42 @@ export default function AdminCreatorDetailPage() {
       alert('Error updating milestone');
     } finally {
       setTogglingMilestone(null);
+    }
+  };
+
+  // Handle out-of-order completion
+  const handleOutOfOrderComplete = async () => {
+    if (!outOfOrderMilestone) return;
+
+    setIsCompletingOutOfOrder(true);
+
+    try {
+      const response = await fetch('/api/admin/approve-milestone', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          milestoneId: outOfOrderMilestone.id,
+          creatorId,
+          adminEmail,
+          outOfOrder: true,
+          note: outOfOrderNote.trim() || null,
+        }),
+      });
+
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error || 'Failed to complete');
+
+      setShowOutOfOrderModal(false);
+      setOutOfOrderMilestone(null);
+      setOutOfOrderNote('');
+      await loadData();
+      setSuccessMessage(`Completed (out of order): ${outOfOrderMilestone.title}`);
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (error) {
+      console.error('Error completing out of order:', error);
+      alert('Error completing milestone');
+    } finally {
+      setIsCompletingOutOfOrder(false);
     }
   };
 
@@ -679,6 +731,7 @@ export default function AdminCreatorDetailPage() {
                 <PhaseSection
                   key={phase.id}
                   phase={phase}
+                  allPhases={phases}
                   isExpanded={expandedPhases.has(phase.id)}
                   onToggle={() => togglePhase(phase.id)}
                   onApprove={handleApprove}
@@ -1158,12 +1211,115 @@ export default function AdminCreatorDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Out-of-Order Completion Modal */}
+      {showOutOfOrderModal && outOfOrderMilestone && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                  <AlertCircle className="w-5 h-5 text-amber-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-[#1e2749]">Out-of-Order Completion</h3>
+                  <p className="text-sm text-gray-500">Admin override</p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setShowOutOfOrderModal(false);
+                  setOutOfOrderMilestone(null);
+                  setOutOfOrderNote('');
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-4">
+              <p className="text-sm text-amber-800">
+                You are completing this milestone out of sequence:
+              </p>
+              <p className="font-semibold text-amber-900 mt-1">
+                &ldquo;{outOfOrderMilestone.title}&rdquo;
+              </p>
+            </div>
+
+            {outOfOrderMilestone.incompletePrior.length > 0 && (
+              <div className="mb-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">
+                  Previous incomplete milestones ({outOfOrderMilestone.incompletePrior.length}):
+                </p>
+                <div className="bg-gray-50 rounded-lg p-3 max-h-40 overflow-y-auto">
+                  <ul className="space-y-1">
+                    {outOfOrderMilestone.incompletePrior.map((prior) => (
+                      <li key={prior.id} className="flex items-center gap-2 text-sm text-gray-600">
+                        <Circle className="w-3 h-3 text-gray-400 flex-shrink-0" />
+                        {prior.title}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  These milestones will remain available for the creator to complete later.
+                </p>
+              </div>
+            )}
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Note (optional)
+              </label>
+              <textarea
+                value={outOfOrderNote}
+                onChange={(e) => setOutOfOrderNote(e.target.value)}
+                placeholder="Why are you completing this out of order? (e.g., Course already live, discussed on call)"
+                rows={2}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
+              />
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowOutOfOrderModal(false);
+                  setOutOfOrderMilestone(null);
+                  setOutOfOrderNote('');
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleOutOfOrderComplete}
+                disabled={isCompletingOutOfOrder}
+                className="flex-1 px-4 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+              >
+                {isCompletingOutOfOrder ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Completing...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4" />
+                    Complete Anyway
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 function PhaseSection({
   phase,
+  allPhases,
   isExpanded,
   onToggle,
   onApprove,
@@ -1176,12 +1332,13 @@ function PhaseSection({
   togglingMilestone,
 }: {
   phase: PhaseWithMilestones;
+  allPhases: PhaseWithMilestones[];
   isExpanded: boolean;
   onToggle: () => void;
   onApprove: (milestoneId: string, milestoneTitle: string) => void;
   onRequestRevision: (milestoneId: string, milestoneTitle: string) => void;
   onReopen: (milestoneId: string, milestoneTitle: string) => void;
-  onToggleMilestone: (milestoneId: string, milestoneTitle: string, currentStatus: string) => void;
+  onToggleMilestone: (milestoneId: string, milestoneTitle: string, currentStatus: string, incompletePrior?: { id: string; title: string }[]) => void;
   onCompleteAction: (milestoneId: string, milestoneTitle: string, actionType: string, actionConfig: Record<string, unknown>) => void;
   approvingMilestoneId: string | null;
   reopeningMilestone: string | null;
@@ -1237,6 +1394,45 @@ function PhaseSection({
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const m = milestone as any;
               const milestoneTitle = m.title || m.name || m.admin_description || `Milestone`;
+
+              // Calculate incomplete prior milestones for out-of-order completion
+              const incompletePrior: { id: string; title: string }[] = [];
+              if (milestone.status === 'locked') {
+                // Get all milestones across all phases in order
+                for (const p of allPhases) {
+                  for (const ms of p.milestones) {
+                    // Stop when we reach the current milestone
+                    if (ms.id === milestone.id) break;
+                    // Add incomplete milestones (anything not completed)
+                    if (ms.status !== 'completed') {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      const msAny = ms as any;
+                      incompletePrior.push({
+                        id: ms.id,
+                        title: msAny.title || msAny.name || msAny.admin_description || 'Milestone',
+                      });
+                    }
+                  }
+                  // If we've processed the current phase, stop
+                  if (p.id === phase.id) break;
+                }
+                // Also check milestones in current phase before this one
+                for (const ms of phase.milestones) {
+                  if (ms.id === milestone.id) break;
+                  if (ms.status !== 'completed') {
+                    // Check if not already added
+                    if (!incompletePrior.find(ip => ip.id === ms.id)) {
+                      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                      const msAny = ms as any;
+                      incompletePrior.push({
+                        id: ms.id,
+                        title: msAny.title || msAny.name || msAny.admin_description || 'Milestone',
+                      });
+                    }
+                  }
+                }
+              }
+
               return (
                 <MilestoneRow
                   key={milestone.id}
@@ -1244,7 +1440,7 @@ function PhaseSection({
                   onApprove={() => onApprove(milestone.id, milestoneTitle)}
                   onRequestRevision={() => onRequestRevision(milestone.id, milestoneTitle)}
                   onReopen={() => onReopen(milestone.id, milestoneTitle)}
-                  onToggle={() => onToggleMilestone(milestone.id, milestoneTitle, milestone.status)}
+                  onToggle={() => onToggleMilestone(milestone.id, milestoneTitle, milestone.status, incompletePrior)}
                   onCompleteAction={() => onCompleteAction(milestone.id, milestoneTitle, m.action_type || 'confirm', m.action_config || {})}
                   isApproving={approvingMilestoneId === milestone.id}
                   isReopening={reopeningMilestone === milestone.id}
@@ -1296,7 +1492,8 @@ function MilestoneRow({
 
   const isLocked = milestone.status === 'locked';
   const isCompleted = milestone.status === 'completed';
-  const isClickable = !isLocked && !isToggling;
+  // Admin can click locked milestones to complete out of order
+  const isClickable = !isToggling;
 
   // Check if this milestone has a creator action that admin can complete on their behalf
   const actionType = m.action_type || 'confirm';
@@ -1320,33 +1517,34 @@ function MilestoneRow({
     (milestone.status === 'available' || milestone.status === 'in_progress') &&
     !isLocked;
 
-  // Check if milestone was completed by admin
+  // Check if milestone was completed by admin and/or out of order
   const completedByAdmin = m.metadata?.completed_by_admin || (m.completed_by && m.completed_by.startsWith('admin:'));
   const adminWhoCompleted = m.completed_by?.replace('admin:', '') || m.metadata?.admin_email;
+  const wasOutOfOrder = m.metadata?.out_of_order === true;
 
   return (
     <div className="px-6 py-4">
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-start gap-3 min-w-0 flex-1">
-          {/* Clickable checkbox */}
+          {/* Clickable checkbox - admin can click locked milestones for out-of-order completion */}
           <button
             onClick={onToggle}
-            disabled={isLocked || isToggling}
+            disabled={isToggling}
             className={`flex-shrink-0 mt-0.5 w-7 h-7 rounded-full border-2 flex items-center justify-center transition-all ${
               isCompleted
                 ? 'bg-green-500 border-green-500 text-white hover:bg-green-600'
                 : isLocked
-                ? 'border-gray-300 bg-gray-100 cursor-not-allowed'
+                ? 'border-amber-400 bg-amber-50 hover:bg-amber-100 cursor-pointer'
                 : 'border-[#1e2749] hover:bg-gray-100 cursor-pointer'
             }`}
-            title={isCompleted ? 'Click to reopen' : isLocked ? 'Locked - complete previous steps first' : 'Click to mark complete'}
+            title={isCompleted ? 'Click to reopen' : isLocked ? 'Click to complete out of order (admin only)' : 'Click to mark complete'}
           >
             {isToggling ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : isCompleted ? (
               <Check className="w-4 h-4" />
             ) : isLocked ? (
-              <Lock className="w-3 h-3 text-gray-400" />
+              <Lock className="w-3 h-3 text-amber-500" />
             ) : null}
           </button>
           <div className="min-w-0 flex-1">
@@ -1376,9 +1574,15 @@ function MilestoneRow({
             {/* Show admin completion indicator */}
             {isCompleted && completedByAdmin && adminWhoCompleted && (
               <div className="flex items-center gap-1.5 mt-2">
-                <span className="text-xs text-gray-500 italic">
-                  Completed by {adminWhoCompleted.split('@')[0]} on behalf of creator
-                </span>
+                {wasOutOfOrder ? (
+                  <span className="text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded">
+                    Completed out of sequence by {adminWhoCompleted.split('@')[0]}
+                  </span>
+                ) : (
+                  <span className="text-xs text-gray-500 italic">
+                    Completed by {adminWhoCompleted.split('@')[0]} on behalf of creator
+                  </span>
+                )}
               </div>
             )}
             {/* Show scheduled meeting date if exists */}

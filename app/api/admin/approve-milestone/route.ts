@@ -18,7 +18,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     console.log('[approve-milestone] Request body:', body);
 
-    const { milestoneId, creatorId, adminEmail } = body;
+    const { milestoneId, creatorId, adminEmail, outOfOrder, note } = body;
 
     if (!milestoneId || !creatorId) {
       console.error('[approve-milestone] Missing required fields:', { milestoneId, creatorId });
@@ -27,6 +27,8 @@ export async function POST(request: Request) {
         error: 'Missing milestoneId or creatorId'
       }, { status: 400 });
     }
+
+    const isOutOfOrder = outOfOrder === true;
 
     // 1. Get creator info
     const { data: creator, error: creatorError } = await supabase
@@ -55,12 +57,27 @@ export async function POST(request: Request) {
     console.log('[approve-milestone] Found milestone:', milestone);
 
     // 3. Mark milestone as completed (only update columns that exist)
+    // Build update object with optional metadata for out-of-order completions
+    const updateObj: Record<string, unknown> = {
+      status: 'completed',
+      updated_at: new Date().toISOString(),
+      completed_at: new Date().toISOString(),
+      completed_by: adminEmail ? `admin:${adminEmail}` : 'admin',
+    };
+
+    // Add metadata for out-of-order completions
+    if (isOutOfOrder) {
+      updateObj.metadata = {
+        out_of_order: true,
+        admin_email: adminEmail,
+        admin_note: note || null,
+        completed_at: new Date().toISOString(),
+      };
+    }
+
     const { data: updateData, error: updateError } = await supabase
       .from('creator_milestones')
-      .update({
-        status: 'completed',
-        updated_at: new Date().toISOString()
-      })
+      .update(updateObj)
       .eq('creator_id', creatorId)
       .eq('milestone_id', milestoneId)
       .select();
@@ -80,10 +97,63 @@ export async function POST(request: Request) {
       }, { status: 404 });
     }
 
-    // 4. Find and unlock the next milestone
+    // 4. Handle unlock logic
     let nextMilestoneName = null;
 
-    if (milestone) {
+    if (isOutOfOrder) {
+      // Out-of-order completion: Don't auto-unlock next milestone
+      // Instead, recalculate which milestones can now be unlocked
+      console.log('[approve-milestone] Out-of-order completion - recalculating unlocks');
+
+      // Get all milestones in order
+      const { data: allMilestones } = await supabase
+        .from('milestones')
+        .select('id, phase_id, sort_order, title, name')
+        .order('phase_id')
+        .order('sort_order');
+
+      // Get all creator_milestones
+      const { data: creatorMilestones } = await supabase
+        .from('creator_milestones')
+        .select('milestone_id, status')
+        .eq('creator_id', creatorId);
+
+      if (allMilestones && creatorMilestones) {
+        const statusMap = new Map(creatorMilestones.map(cm => [cm.milestone_id, cm.status]));
+
+        // For each locked milestone, check if it can now be unlocked
+        for (let i = 0; i < allMilestones.length; i++) {
+          const ms = allMilestones[i];
+          const currentStatus = statusMap.get(ms.id);
+
+          if (currentStatus === 'locked') {
+            // Check if all previous milestones are completed
+            let canUnlock = true;
+            for (let j = 0; j < i; j++) {
+              const prevStatus = statusMap.get(allMilestones[j].id);
+              if (prevStatus !== 'completed') {
+                canUnlock = false;
+                break;
+              }
+            }
+
+            if (canUnlock) {
+              console.log('[approve-milestone] Unlocking milestone:', ms.id);
+              await supabase
+                .from('creator_milestones')
+                .update({ status: 'available' })
+                .eq('creator_id', creatorId)
+                .eq('milestone_id', ms.id);
+
+              if (!nextMilestoneName) {
+                nextMilestoneName = ms.title || ms.name || 'Next step';
+              }
+            }
+          }
+        }
+      }
+    } else if (milestone) {
+      // Normal sequential completion: unlock next milestone in sequence
       const { data: nextMilestone } = await supabase
         .from('milestones')
         .select('*')
@@ -114,6 +184,10 @@ export async function POST(request: Request) {
         ? `Your next step is ready: <strong>${nextMilestoneName}</strong>`
         : `You've completed this phase! Check your portal for what's next.`;
 
+      const emailSubject = isOutOfOrder
+        ? `✅ Milestone completed: ${milestone?.title || milestone?.name || 'Your milestone'}`
+        : `✅ You're approved! Next step unlocked`;
+
       await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -123,12 +197,12 @@ export async function POST(request: Request) {
         body: JSON.stringify({
           from: 'TDI Creator Studio <notifications@teachersdeserveit.com>',
           to: [creator.email],
-          subject: `✅ You're approved! Next step unlocked`,
+          subject: emailSubject,
           html: `
             <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
               <h2 style="color: #1e2749;">Great news, ${creator.name}! 🎉</h2>
 
-              <p>The TDI team has reviewed and approved your progress:</p>
+              <p>The TDI team has updated your progress:</p>
 
               <div style="background: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px; margin: 20px 0;">
                 <strong style="color: #166534;">✓ Completed:</strong> ${milestone?.title || milestone?.name || 'Your milestone'}
@@ -145,7 +219,7 @@ export async function POST(request: Request) {
                 Questions? Reply to this email or reach out to Rachel at rachel@teachersdeserveit.com
               </p>
 
-              <p style="color: #666; font-size: 14px;"> -  The TDI Team</p>
+              <p style="color: #666; font-size: 14px;"> - The TDI Team</p>
             </div>
           `,
         }),
