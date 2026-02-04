@@ -97,8 +97,18 @@ export async function POST(request: Request) {
       updated_at: new Date().toISOString()
     };
 
-    // If meeting scheduled, store the date/time in metadata
+    // Build submission data object for structured data capture
+    let submissionData: Record<string, unknown> | null = null;
+
+    // If meeting scheduled, store the date/time in metadata and submission_data
     if (submissionType === 'meeting_scheduled' && content.scheduled_date) {
+      submissionData = {
+        type: 'meeting_scheduled',
+        scheduled_date: content.scheduled_date,
+        scheduled_time: content.scheduled_time,
+        notes: content.notes || null,
+        submitted_at: new Date().toISOString()
+      };
       updateData.metadata = {
         scheduled_date: content.scheduled_date,
         scheduled_time: content.scheduled_time,
@@ -106,37 +116,82 @@ export async function POST(request: Request) {
       };
     }
 
-    // If change request, store the request in metadata
+    // If change request, store the request in metadata and submission_data
     if (submissionType === 'change_request' && content.request) {
+      submissionData = {
+        type: 'change_request',
+        request: content.request,
+        requested_at: new Date().toISOString()
+      };
       updateData.metadata = {
         change_request: content.request,
         requested_at: new Date().toISOString()
       };
     }
 
-    // If path selection, store the selected path in metadata
+    // If path selection, store the selected path in metadata and submission_data
     if (submissionType === 'path_selection' && content.selected_path) {
+      submissionData = {
+        type: 'path_selection',
+        content_path: content.selected_path,
+        selected_at: new Date().toISOString()
+      };
       updateData.metadata = {
         selected_path: content.selected_path,
         selected_at: new Date().toISOString()
       };
     }
 
-    // If form submission, store all form data in metadata
+    // If form submission, store all form data in metadata and submission_data
     if (submissionType === 'form') {
+      submissionData = {
+        type: 'form',
+        fields: content,
+        submitted_at: new Date().toISOString()
+      };
       updateData.metadata = {
         ...content,
         submitted_at: new Date().toISOString()
       };
     }
 
-    // If link submission, store link in metadata
+    // If link submission, store link in metadata and submission_data
     if (submissionType === 'link' && content.link) {
+      submissionData = {
+        type: 'link',
+        link: content.link,
+        notes: content.notes || null,
+        submitted_at: new Date().toISOString()
+      };
       updateData.metadata = {
         link: content.link,
         notes: content.notes || null,
         submitted_at: new Date().toISOString()
       };
+    }
+
+    // If confirmation, just record the timestamp
+    if (submissionType === 'confirmation') {
+      submissionData = {
+        type: 'confirmation',
+        confirmed: true,
+        confirmed_at: new Date().toISOString()
+      };
+    }
+
+    // If preferences, store the preferences
+    if (submissionType === 'preferences') {
+      submissionData = {
+        type: 'preferences',
+        wants_video_editing: content.wants_video_editing || false,
+        wants_download_design: content.wants_download_design || false,
+        submitted_at: new Date().toISOString()
+      };
+    }
+
+    // Add submission_data to update if we have it
+    if (submissionData) {
+      updateData.submission_data = submissionData;
     }
 
     const { error: updateError } = await supabase
