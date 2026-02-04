@@ -35,21 +35,33 @@ export async function GET(request: Request) {
     const creator = creators[0];
 
     // Get all phases ordered
-    const { data: phases } = await supabase
+    const { data: phases, error: phasesError } = await supabase
       .from('phases')
       .select('id, name, sort_order')
       .order('sort_order', { ascending: true });
 
+    if (phasesError) {
+      return NextResponse.json({ success: false, error: `Phases error: ${phasesError.message}` }, { status: 500 });
+    }
+
     // Get all milestones
-    const { data: allMilestones } = await supabase
+    const { data: allMilestones, error: milestonesError } = await supabase
       .from('milestones')
       .select('id, phase_id, sort_order, applies_to, title, name');
 
+    if (milestonesError) {
+      return NextResponse.json({ success: false, error: `Milestones error: ${milestonesError.message}` }, { status: 500 });
+    }
+
     // Get creator's milestones
-    const { data: creatorMilestones } = await supabase
+    const { data: creatorMilestones, error: creatorMsError } = await supabase
       .from('creator_milestones')
       .select('milestone_id, status')
       .eq('creator_id', creator.id);
+
+    if (creatorMsError) {
+      return NextResponse.json({ success: false, error: `Creator milestones error: ${creatorMsError.message}` }, { status: 500 });
+    }
 
     const contentPath = creator.content_path;
 
@@ -102,10 +114,16 @@ export async function GET(request: Request) {
         name: creator.name,
         contentPath: creator.content_path,
       },
+      counts: {
+        phases: phases?.length || 0,
+        allMilestones: allMilestones?.length || 0,
+        creatorMilestones: creatorMilestones?.length || 0,
+        applicableMilestones: applicableMilestones?.length || 0,
+      },
       diagnosis: {
         hasAvailableApplicable,
         hasCompleted,
-        wouldBeFixed: !hasAvailableApplicable && hasCompleted && firstUnlockable,
+        wouldBeFixed: !hasAvailableApplicable && hasCompleted && !!firstUnlockable,
         firstUnlockable: firstUnlockable?.title || null,
       },
       applicableMilestones: applicableMilestones?.map(m => ({
@@ -113,7 +131,6 @@ export async function GET(request: Request) {
         phase: m.phase,
         status: m.status,
       })),
-      allMilestones: milestoneDetails,
     });
   } catch (error) {
     console.error('[debug-creator-milestones] Error:', error);
