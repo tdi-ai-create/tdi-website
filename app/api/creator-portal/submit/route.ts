@@ -260,9 +260,17 @@ export async function POST(request: Request) {
         .eq('id', milestoneId)
         .single();
 
+      // Get creator's content path
+      const { data: creatorData } = await supabase
+        .from('creators')
+        .select('content_path')
+        .eq('id', creatorId)
+        .single();
+      const contentPath = creatorData?.content_path;
+
       if (milestone) {
         // Find next milestone in same phase
-        const { data: nextMilestone } = await supabase
+        let { data: nextMilestone } = await supabase
           .from('milestones')
           .select('id')
           .eq('phase_id', milestone.phase_id)
@@ -270,6 +278,43 @@ export async function POST(request: Request) {
           .order('sort_order', { ascending: true })
           .limit(1)
           .maybeSingle();
+
+        // If no next milestone in current phase, find first milestone in next applicable phase
+        if (!nextMilestone) {
+          // Get all phases ordered
+          const { data: phases } = await supabase
+            .from('phases')
+            .select('id, sort_order')
+            .order('sort_order', { ascending: true });
+
+          // Get current phase sort order
+          const currentPhase = phases?.find(p => p.id === milestone.phase_id);
+          const currentPhaseOrder = currentPhase?.sort_order ?? 0;
+
+          // Find milestones in subsequent phases
+          const { data: futureMilestones } = await supabase
+            .from('milestones')
+            .select('*, phases!inner(sort_order)')
+            .gt('phases.sort_order', currentPhaseOrder)
+            .order('phases(sort_order)', { ascending: true })
+            .order('sort_order', { ascending: true });
+
+          // Find first applicable milestone in future phases
+          if (futureMilestones && futureMilestones.length > 0) {
+            for (const fm of futureMilestones) {
+              // Check if milestone applies to this creator's content path
+              const appliesTo = fm.applies_to as string[] | null;
+              const isApplicable = !contentPath || // No path selected = show all
+                !appliesTo || appliesTo.length === 0 || // No restriction = course only (legacy)
+                appliesTo.includes(contentPath);
+
+              if (isApplicable) {
+                nextMilestone = fm;
+                break;
+              }
+            }
+          }
+        }
 
         if (nextMilestone) {
           await supabase
