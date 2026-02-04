@@ -619,8 +619,9 @@ export function PhaseProgress({
   contentPath,
   creator,
 }: PhaseProgressProps) {
-  // Find the FIRST non-skipped phase that has a current actionable milestone (not team action)
-  const firstActionPhaseId = phases.find((phase) => {
+  // Find the FIRST non-skipped phase that has ANY current step milestone
+  // (available, in_progress, or waiting_approval - including team action milestones)
+  const currentStepPhaseId = phases.find((phase) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const isSkipped = (phase as any).isSkipped;
     if (isSkipped) return false;
@@ -629,29 +630,48 @@ export function PhaseProgress({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const applicableMilestones = phase.milestones.filter((m: any) => m.isApplicable !== false);
     return applicableMilestones.some(
-      (m) => (m.status === 'available' || m.status === 'in_progress') && !m.requires_team_action
+      (m) => m.status === 'available' || m.status === 'in_progress' || m.status === 'waiting_approval'
     );
   })?.id;
 
+  // Find if the current step phase has a creator action (not team action)
+  const hasCreatorAction = phases.find((phase) => {
+    if (phase.id !== currentStepPhaseId) return false;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const applicableMilestones = phase.milestones.filter((m: any) => m.isApplicable !== false);
+    return applicableMilestones.some(
+      (m) => (m.status === 'available' || m.status === 'in_progress') && !m.requires_team_action
+    );
+  });
+
   return (
     <div className="space-y-4">
-      {phases.map((phase) => (
-        <PhaseCard
-          key={phase.id}
-          phase={phase}
-          creatorId={creatorId}
-          onMarkComplete={onMarkComplete}
-          onRefresh={onRefresh}
-          isLoading={isLoading}
-          defaultExpanded={phase.isCurrentPhase || phase.id === firstActionPhaseId}
-          isActionPhase={phase.id === firstActionPhaseId}
-          isAdminPreview={isAdminPreview}
-          teamNotes={teamNotes}
-          creatorName={creatorName}
-          contentPath={contentPath}
-          creator={creator}
-        />
-      ))}
+      {phases.map((phase) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const isSkipped = (phase as any).isSkipped;
+        // Only expand the phase with the current step (not completed phases)
+        const shouldExpand = !isSkipped && phase.id === currentStepPhaseId;
+        // Mark as action phase if it has the current step
+        const isActionPhase = phase.id === currentStepPhaseId;
+
+        return (
+          <PhaseCard
+            key={phase.id}
+            phase={phase}
+            creatorId={creatorId}
+            onMarkComplete={onMarkComplete}
+            onRefresh={onRefresh}
+            isLoading={isLoading}
+            defaultExpanded={shouldExpand}
+            isActionPhase={isActionPhase}
+            isAdminPreview={isAdminPreview}
+            teamNotes={teamNotes}
+            creatorName={creatorName}
+            contentPath={contentPath}
+            creator={creator}
+          />
+        );
+      })}
     </div>
   );
 }
