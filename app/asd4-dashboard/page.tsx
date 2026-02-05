@@ -58,7 +58,8 @@ import {
   HelpCircle,
   FileText,
   Send,
-  Check
+  Check,
+  CheckCircle2
 } from 'lucide-react';
 
 export default function ASD4Dashboard() {
@@ -203,6 +204,23 @@ export default function ASD4Dashboard() {
       external: true,
       showCalendar: true
     }
+  ];
+
+  // Completed sessions data
+  const completedSessions = [
+    {
+      title: "Partnership Kickoff",
+      date: "January 5, 2026",
+      format: "In-Person",
+      duration: "Multi-Hour Session",
+      focusAreas: [
+        "Feedback models for paraprofessional support",
+        "Questioning techniques in the classroom",
+        "Learning Hub onboarding and login walkthrough"
+      ],
+      status: "complete" as const
+    }
+    // Future sessions will be added here
   ];
 
   // Progress tab data
@@ -1163,6 +1181,49 @@ Thanks for everything you do.`
               </div>
               <div className="text-emerald-100 text-sm mt-2">
                 That&apos;s 49 strategies ready to use in classrooms tomorrow.
+              </div>
+            </div>
+
+            {/* Sessions Completed */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                Sessions Completed ({completedSessions.length})
+              </h3>
+              <div className="space-y-3">
+                {completedSessions.map((session, idx) => (
+                  <div key={idx} className="bg-white rounded-xl border border-emerald-200 shadow-sm overflow-hidden">
+                    <div className="border-l-4 border-emerald-500 p-5">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start gap-3">
+                          <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                            <Check className="w-4 h-4 text-emerald-600" />
+                          </div>
+                          <div>
+                            <h4 className="font-semibold text-gray-900">{session.title}</h4>
+                            <p className="text-sm text-gray-500 mt-0.5">
+                              {session.date} · {session.format} · {session.duration}
+                            </p>
+                            <div className="mt-3">
+                              <p className="text-sm font-medium text-gray-700 mb-1">Focus Areas:</p>
+                              <ul className="space-y-1">
+                                {session.focusAreas.map((area, i) => (
+                                  <li key={i} className="text-sm text-gray-600 flex items-start gap-2">
+                                    <span className="text-emerald-400 mt-1">&#8226;</span>
+                                    {area}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                        <span className="text-xs font-medium bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full flex-shrink-0">
+                          Complete
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
