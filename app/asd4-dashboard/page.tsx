@@ -264,23 +264,25 @@ export default function ASD4Dashboard() {
   ];
 
   const topCourses = [
-    { name: "Paraprofessional Foundations", started: 19, completed70: 11, completionRate: 58 },
-    { name: "Understanding Student Needs & Modifications", started: 9, completed70: 6, completionRate: 67 },
-    { name: "Classroom Management Toolkit", started: 8, completed70: 5, completionRate: 63 },
-    { name: "Calm Classrooms, Not Chaos", started: 5, completed70: 5, completionRate: 100 },
-    { name: "Building Strong Teacher-Para Partnerships", started: 6, completed70: 4, completionRate: 67 },
-    { name: "Effective Small-Group & One-on-One Instruction", started: 6, completed70: 3, completionRate: 50 },
-    { name: "Differentiated Choice Boards", started: 9, completed70: 3, completionRate: 33 },
-    { name: "Streamline Your Inbox", started: 9, completed70: 3, completionRate: 33 },
-    { name: "Connected Educators", started: 5, completed70: 1, completionRate: 20 },
-    { name: "Maximize Impact: One-on-One Conferences", started: 5, completed70: 3, completionRate: 60 },
-    { name: "How to get the MOST out of the TDI Hub", started: 5, completed70: 1, completionRate: 20 },
-    { name: "De-Escalation Strategies", started: 3, completed70: 3, completionRate: 100 },
-    { name: "Communication that Clicks", started: 2, completed70: 2, completionRate: 100 },
-    { name: "Parent Tools That Support Student Success", started: 1, completed70: 1, completionRate: 100 },
-    { name: "Supporting Students Through Their Daily Schedule", started: 1, completed70: 1, completionRate: 100 },
-    { name: "The Differentiation Fix", started: 1, completed70: 1, completionRate: 100 },
-    { name: "Effective Communication Strategies for Leaders", started: 1, completed70: 0, completionRate: 0 }
+    { name: "Paraprofessional Foundations", started: 19, completed70: 9, inProgress: 10, completionRate: 47 },
+    { name: "Differentiated Choice Boards", started: 9, completed70: 3, inProgress: 6, completionRate: 33 },
+    { name: "Streamline Your Inbox", started: 9, completed70: 3, inProgress: 6, completionRate: 33 },
+    { name: "Understanding Student Needs & Modifications", started: 9, completed70: 5, inProgress: 4, completionRate: 56 },
+    { name: "Classroom Management Toolkit", started: 8, completed70: 5, inProgress: 3, completionRate: 63 },
+    { name: "Building Strong Teacher-Para Partnerships", started: 6, completed70: 4, inProgress: 2, completionRate: 67 },
+    { name: "Effective Small-Group & One-on-One Instruction", started: 6, completed70: 3, inProgress: 3, completionRate: 50 },
+    { name: "Calm Classrooms, Not Chaos", started: 5, completed70: 5, inProgress: 0, completionRate: 100 },
+    { name: "Connected Educators", started: 5, completed70: 1, inProgress: 4, completionRate: 20 },
+    { name: "How to Get the MOST out of the TDI Learning Hub", started: 5, completed70: 1, inProgress: 4, completionRate: 20 },
+    { name: "Maximize Impact: One-on-One Student Conferences", started: 5, completed70: 3, inProgress: 2, completionRate: 60 },
+    { name: "De-Escalation Strategies for Unstructured Environments", started: 3, completed70: 3, inProgress: 0, completionRate: 100 },
+    { name: "Communication that Clicks", started: 2, completed70: 2, inProgress: 0, completionRate: 100 },
+    { name: "Effective Communication Strategies for Leaders", started: 1, completed70: 0, inProgress: 1, completionRate: 0 },
+    { name: "Parent Tools That Support Student Success", started: 1, completed70: 0, inProgress: 1, completionRate: 0 },
+    { name: "Procedures & Daily Routines for Art Teachers", started: 1, completed70: 0, inProgress: 1, completionRate: 0 },
+    { name: "Supporting Students Through Their Daily Schedule", started: 1, completed70: 1, inProgress: 0, completionRate: 100 },
+    { name: "The Differentiation Fix", started: 1, completed70: 1, inProgress: 0, completionRate: 100 },
+    { name: "Your Designation Isn\u2019t Your Destiny", started: 1, completed70: 1, inProgress: 0, completionRate: 100 },
   ];
 
   // School-level engagement data (with real course metrics)
@@ -751,7 +753,7 @@ Thanks for everything you do.`
                   <span className="text-xs text-gray-500 uppercase">Paras Enrolled</span>
                   <Tooltip text="Total paraprofessionals with Learning Hub access." position="bottom" iconSize={12} />
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">117/117</div>
+                <div className="text-2xl font-bold text-[#1e2749]">123/123</div>
                 <div className="text-xs text-[#38618C] font-medium">Hub Access</div>
               </div>
 
@@ -761,8 +763,8 @@ Thanks for everything you do.`
                   <span className="text-xs text-gray-500 uppercase">Hub Logins</span>
                   <Tooltip text="Percentage of enrolled paras who have logged into the Learning Hub at least once. Industry average is ~40%." position="bottom" iconSize={12} />
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">78%</div>
-                <div className="text-xs text-[#38618C] font-medium">91/117 logged in</div>
+                <div className="text-2xl font-bold text-[#1e2749]">74%</div>
+                <div className="text-xs text-[#38618C] font-medium">91/123 logged in</div>
                 <div className="text-xs text-gray-400 mt-1">Goal: 100% before Observation Day 1</div>
               </div>
 
@@ -777,7 +779,7 @@ Thanks for everything you do.`
                   <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
                   <Tooltip text="Action items to complete for your partnership. Click to view details." position="bottom" iconSize={12} />
                 </div>
-                <div className="text-2xl font-bold text-[#E07A5F]">9</div>
+                <div className="text-2xl font-bold text-[#E07A5F]">8</div>
                 <div className="text-xs text-[#E07A5F] font-medium">Items pending</div>
               </div>
 
@@ -798,13 +800,13 @@ Thanks for everything you do.`
               <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
                 <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
                 <p className="text-sm font-semibold text-green-800">Kickoff Complete</p>
-                <p className="text-xs text-green-600">Obs Day 1 scheduled · 91 paras logged in</p>
+                <p className="text-xs text-green-600">Obs Day 1 scheduled · 91+ paras logged in</p>
               </div>
 
               {/* Card 2: Action Needed */}
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
                 <Lightbulb className="w-8 h-8 text-amber-600 mx-auto mb-2" />
-                <p className="text-sm font-semibold text-amber-800">26 Paras Remaining</p>
+                <p className="text-sm font-semibold text-amber-800">32 Paras Remaining</p>
                 <p className="text-xs text-amber-600">Try a walkthrough at your next meeting</p>
               </div>
 
@@ -1202,14 +1204,14 @@ Thanks for everything you do.`
             <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-8 text-white text-center">
               <div className="text-5xl font-bold mb-2 flex items-center justify-center gap-3">
                 <Trophy className="w-10 h-10" />
-                49
+                50
               </div>
               <div className="text-xl font-medium mb-1">Courses Completed</div>
               <div className="text-emerald-100 text-sm">
                 by your paraprofessionals -  and counting!
               </div>
               <div className="text-emerald-100 text-sm mt-2">
-                That&apos;s 49 strategies ready to use in classrooms tomorrow.
+                That&apos;s 50 strategies ready to use in classrooms tomorrow.
               </div>
             </div>
 
@@ -1336,48 +1338,48 @@ Thanks for everything you do.`
                     </div>
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-gray-900">88<span className="text-lg text-gray-400">/111</span></div>
-                <div className="text-sm text-gray-500 mb-3">79% logged in</div>
+                <div className="text-3xl font-bold text-gray-900">91<span className="text-lg text-gray-400">/123</span></div>
+                <div className="text-sm text-gray-500 mb-3">74% logged in</div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-teal-500 h-2 rounded-full" style={{width: '79%'}}></div>
+                  <div className="bg-teal-500 h-2 rounded-full" style={{width: '74%'}}></div>
                 </div>
               </div>
 
               {/* Courses Started Card */}
               <div className="bg-white rounded-xl p-6 shadow-sm border">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-500 text-sm">Courses Started</span>
+                  <span className="text-gray-500 text-sm">Course Enrollments</span>
                   <div className="relative group">
                     <Info className="w-4 h-4 text-gray-400 cursor-help" />
                     <div className="absolute z-10 w-48 p-2 text-xs text-white bg-gray-900 rounded-lg shadow-lg -top-2 left-6 hidden group-hover:block">
-                      Paras who opened a course and began learning
+                      Total course enrollments with engagement across the Learning Hub
                     </div>
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-gray-900">51</div>
-                <div className="text-sm text-gray-500 mb-3">paras exploring content</div>
+                <div className="text-3xl font-bold text-gray-900">97</div>
+                <div className="text-sm text-gray-500 mb-3">engaged enrollments across 19 courses</div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '46%'}}></div>
+                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '58%'}}></div>
                 </div>
               </div>
 
               {/* Deep Engagement Card */}
               <div className="bg-white rounded-xl p-6 shadow-sm border">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-500 text-sm">Deep Engagement</span>
+                  <span className="text-gray-500 text-sm">Courses Completed</span>
                   <div className="relative group">
                     <Info className="w-4 h-4 text-gray-400 cursor-help" />
                     <div className="absolute z-10 w-48 p-2 text-xs text-white bg-gray-900 rounded-lg shadow-lg -top-2 left-6 hidden group-hover:block">
-                      Course completions at 70% or higher -  our threshold for meaningful learning
+                      Course completions at 100% -  fully finished courses
                     </div>
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-gray-900">53</div>
-                <div className="text-sm text-gray-500 mb-3">completions at 70%+</div>
+                <div className="text-3xl font-bold text-gray-900">50</div>
+                <div className="text-sm text-gray-500 mb-3">courses fully completed</div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-emerald-500 h-2 rounded-full" style={{width: '96%'}}></div>
+                  <div className="bg-emerald-500 h-2 rounded-full" style={{width: '52%'}}></div>
                 </div>
-                <div className="text-xs text-emerald-600 mt-2">96% of starters finish!</div>
+                <div className="text-xs text-emerald-600 mt-2">52% of enrollments completed!</div>
               </div>
             </div>
 
@@ -1441,9 +1443,12 @@ Thanks for everything you do.`
 
             {/* Section 5: What's Resonating (Top Courses, Expandable) */}
             <div className="bg-white rounded-xl p-6 shadow-sm border">
-              <div className="flex items-center gap-2 mb-4">
-                <BookOpen className="w-5 h-5 text-blue-500" />
-                <h3 className="text-lg font-semibold text-gray-900">What&apos;s Resonating</h3>
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-blue-500" />
+                  <h3 className="text-lg font-semibold text-gray-900">What&apos;s Resonating</h3>
+                </div>
+                <span className="text-xs text-gray-500">19 of 33 courses with engagement</span>
               </div>
 
               <div className="space-y-3">
@@ -1452,10 +1457,10 @@ Thanks for everything you do.`
                     <div className="flex items-center gap-3">
                       <span className="text-gray-400 text-sm w-4">{index + 1}.</span>
                       <span className="text-gray-700">{course.name}</span>
-                      {course.completionRate === 100 && (
+                      {course.completionRate === 100 && course.started > 1 && (
                         <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
                           <Star className="w-3 h-3" />
-                          100% finish rate
+                          100% Finish Rate
                         </span>
                       )}
                     </div>
@@ -1488,7 +1493,7 @@ Thanks for everything you do.`
                     <Users className="w-5 h-5 text-amber-600" />
                   </div>
                   <div className="text-left">
-                    <div className="font-semibold text-gray-900">23 paras haven&apos;t logged in yet</div>
+                    <div className="font-semibold text-gray-900">32 paras haven&apos;t logged in yet</div>
                     <div className="text-sm text-amber-700">They may need a quick walkthrough to get started</div>
                   </div>
                 </div>
@@ -2361,7 +2366,7 @@ Thanks for everything you do.`
               <h3 className="font-bold text-[#1e2749] mb-4">Your Partnership Includes</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <p className="text-2xl font-bold text-[#1e2749]">117</p>
+                  <p className="text-2xl font-bold text-[#1e2749]">123</p>
                   <p className="text-xs text-gray-500">Paras Enrolled</p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
