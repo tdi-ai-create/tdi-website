@@ -254,13 +254,13 @@ export default function ASD4Dashboard() {
 
   // Progress tab data
   const topEngagedParas = [
-    { name: "Melissa Velazquez", email: "mvelazquez@asd4.org", coursesStarted: 9, avgCompletion: 91 },
-    { name: "Scott Nyquist", email: "snyquist@asd4.org", coursesStarted: 6, avgCompletion: 81 },
-    { name: "J Perez", email: "jperez@asd4.org", coursesStarted: 5, avgCompletion: 100 },
-    { name: "Tracy Wojnicki", email: "twojnicki@asd4.org", coursesStarted: 4, avgCompletion: 100 },
-    { name: "Ingrid Balbuena", email: "ibalbuena@asd4.org", coursesStarted: 4, avgCompletion: 100 },
-    { name: "Ruby Medina", email: "rmedina@asd4.org", coursesStarted: 4, avgCompletion: 100 },
-    { name: "Sandra DeLaGarza", email: "sdelagarza@asd4.org", coursesStarted: 4, avgCompletion: 100 }
+    { name: "Sandra DeLaGarza", logins: 4, lastActive: "Jan 23" },
+    { name: "Michele Gorostieta", logins: 3, lastActive: "Jan 30" },
+    { name: "Carmen Tirado", logins: 3, lastActive: "Jan 23" },
+    { name: "Michelle Alecksen", logins: 3, lastActive: "Jan 23" },
+    { name: "Leslie Olvera", logins: 3, lastActive: "Jan 20" },
+    { name: "J Perez", logins: 3, lastActive: "Jan 23" },
+    { name: "Jonathan Roeglin", logins: 2, lastActive: "Feb 2" },
   ];
 
   const topCourses = [
@@ -530,29 +530,39 @@ export default function ASD4Dashboard() {
   ];
 
   const notLoggedInParas = [
-    { name: "Michelle Bezdicek", email: "mbezdicek@asd4.org" },
-    { name: "Aysha Chaudary", email: "achaudary@asd4.org" },
-    { name: "Kristine Colbert", email: "kcolbert@asd4.org" },
-    { name: "Daniela Cova Gonzalez", email: "dcgonzalez@asd4.org" },
-    { name: "Mary Falco", email: "mfalco@asd4.org" },
-    { name: "Jessica Gonzalez", email: "jesgonzalez@asd4.org" },
-    { name: "Nancy Gremo", email: "ngremo@asd4.org" },
-    { name: "Sarah Hendricks", email: "shendricks@asd4.org" },
-    { name: "Mirela Hodo", email: "mhodo@asd4.org" },
     { name: "Alexia Juarez", email: "ajuarez@asd4.org" },
+    { name: "Anahi Carrera", email: "acarrera@asd4.org" },
+    { name: "Aysha Chaudary", email: "achaudary@asd4.org" },
     { name: "Brittany Lanzo", email: "blanzo@asd4.org" },
-    { name: "Maribel Marquez", email: "mmarquez@asd4.org" },
-    { name: "Irma Martinez", email: "imartinez@asd4.org" },
+    { name: "Daniela Cova Gonzalez", email: "dcgonzalez@asd4.org" },
+    { name: "Daniela Juarez", email: "djuarez@asd4.org" },
     { name: "Georjina Mendiola", email: "gmendiola@asd4.org" },
-    { name: "Sugey Mondragon", email: "smondragon@asd4.org" },
-    { name: "Monika Nicieja", email: "mnicieja@asd4.org" },
-    { name: "Leslie Olvera", email: "lolvera@asd4.org" },
-    { name: "Maribel Ontiveros", email: "montiveros@asd4.org" },
+    { name: "Giselle Galvan", email: "ggalvan@asd4.org" },
+    { name: "Irma Martinez", email: "imartinez@asd4.org" },
+    { name: "Irma Robles", email: "irobles@asd4.org" },
+    { name: "Jessica Gonzalez", email: "jesgonzalez@asd4.org" },
+    { name: "Kayla Carrillo", email: "kcarrillo@asd4.org" },
+    { name: "Kristine Colbert", email: "kcolbert@asd4.org" },
+    { name: "Leslie Olvera (typo account)", email: "lolvera@skd4.org" },
     { name: "Maria Ortiz", email: "mortiz@asd4.org" },
+    { name: "Maribel Marquez", email: "mmarquez@asd4.org" },
+    { name: "Maribel Ontiveros", email: "montiveros@asd4.org" },
+    { name: "Marie Cano", email: "mcano@asd4.org" },
+    { name: "Mary Falco", email: "mfalco@asd4.org" },
+    { name: "Mayra Saucedo", email: "msaucedo@asd4.org" },
+    { name: "Melany Tinajero Monroy", email: "mtinajero@asd4.org" },
+    { name: "Michelle Bezdicek", email: "mbezdicek@asd4.org" },
+    { name: "Michelle Samples", email: "msamples@asd4.org" },
+    { name: "Mirela Hodo", email: "mhodo@asd4.org" },
+    { name: "Monika Nicieja", email: "mnicieja@asd4.org" },
+    { name: "Nancy Gremo", email: "ngremo@asd4.org" },
+    { name: "Natalia Villalobos", email: "nvillalobos@asd4.org" },
+    { name: "Nuvia Rodriguez Luna", email: "nrodriguez@asd4.org" },
     { name: "Patricia Schlesser", email: "pschlesser@asd4.org" },
     { name: "Patricia Simone", email: "psimone@asd4.org" },
-    { name: "Melany Tinajero Monroy", email: "mtinajero@asd4.org" },
-    { name: "Natalia Villalobos", email: "nvillalobos@asd4.org" }
+    { name: "Sarah Hendricks", email: "shendricks@asd4.org" },
+    { name: "Sugey Mondragon", email: "smondragon@asd4.org" },
+    { name: "Yasmin Villa Casillas", email: "yvillacasillas@asd4.org" },
   ];
 
   // Generate individual nudge email
@@ -607,7 +617,7 @@ Thanks for everything you do.`
   };
 
   // Generate "High Five" celebration email for top performers
-  const generateHighFiveEmail = (para: { name: string; email: string; coursesStarted: number; avgCompletion: number }) => {
+  const generateHighFiveEmail = (para: { name: string; logins: number; lastActive: string }) => {
     const firstName = para.name.split(' ')[0];
 
     const subject = encodeURIComponent('Thank you for leading the way');
@@ -617,7 +627,7 @@ Thanks for everything you do.`
       '',
       'I was looking at our TDI Learning Hub progress and wanted to reach out personally.',
       '',
-      `You've completed ${para.coursesStarted} courses with a ${para.avgCompletion}% average -  that puts you at the top of our team. That kind of dedication doesn't go unnoticed.`,
+      `You've logged in ${para.logins} times and are one of our most active paras on the platform. That kind of dedication doesn't go unnoticed.`,
       '',
       'I know your time is limited and there\'s always more to do. The fact that you\'re investing in your own growth shows real commitment to our students and to yourself.',
       '',
@@ -626,7 +636,8 @@ Thanks for everything you do.`
 
     const body = encodeURIComponent(bodyText);
 
-    return `mailto:${para.email}?subject=${subject}&body=${body}`;
+    // Email not available in this data shape — open blank mailto for admin to fill in
+    return `mailto:?subject=${subject}&body=${body}`;
   };
 
   const handleTabClick = (tabId: string) => {
@@ -753,7 +764,7 @@ Thanks for everything you do.`
                   <span className="text-xs text-gray-500 uppercase">Paras Enrolled</span>
                   <Tooltip text="Total paraprofessionals with Learning Hub access." position="bottom" iconSize={12} />
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">123/123</div>
+                <div className="text-2xl font-bold text-[#1e2749]">119/119</div>
                 <div className="text-xs text-[#38618C] font-medium">Hub Access</div>
               </div>
 
@@ -763,8 +774,8 @@ Thanks for everything you do.`
                   <span className="text-xs text-gray-500 uppercase">Hub Logins</span>
                   <Tooltip text="Percentage of enrolled paras who have logged into the Learning Hub at least once. Industry average is ~40%." position="bottom" iconSize={12} />
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">74%</div>
-                <div className="text-xs text-[#38618C] font-medium">91/123 logged in</div>
+                <div className="text-2xl font-bold text-[#1e2749]">72%</div>
+                <div className="text-xs text-[#38618C] font-medium">86/119 logged in</div>
                 <div className="text-xs text-gray-400 mt-1">Goal: 100% before Observation Day 1</div>
               </div>
 
@@ -800,13 +811,13 @@ Thanks for everything you do.`
               <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
                 <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
                 <p className="text-sm font-semibold text-green-800">Kickoff Complete</p>
-                <p className="text-xs text-green-600">Obs Day 1 scheduled · 91+ paras logged in</p>
+                <p className="text-xs text-green-600">Obs Day 1 scheduled · 86 paras logged in · 19 returning</p>
               </div>
 
               {/* Card 2: Action Needed */}
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
                 <Lightbulb className="w-8 h-8 text-amber-600 mx-auto mb-2" />
-                <p className="text-sm font-semibold text-amber-800">32 Paras Remaining</p>
+                <p className="text-sm font-semibold text-amber-800">33 Paras Remaining</p>
                 <p className="text-xs text-amber-600">Try a walkthrough at your next meeting</p>
               </div>
 
@@ -1338,10 +1349,10 @@ Thanks for everything you do.`
                     </div>
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-gray-900">91<span className="text-lg text-gray-400">/123</span></div>
-                <div className="text-sm text-gray-500 mb-3">74% logged in</div>
+                <div className="text-3xl font-bold text-gray-900">86<span className="text-lg text-gray-400">/119</span></div>
+                <div className="text-sm text-gray-500 mb-3">72% logged in</div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-teal-500 h-2 rounded-full" style={{width: '74%'}}></div>
+                  <div className="bg-teal-500 h-2 rounded-full" style={{width: '72%'}}></div>
                 </div>
               </div>
 
@@ -1419,8 +1430,11 @@ Thanks for everything you do.`
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-sm text-gray-500">
-                        {para.coursesStarted} courses · {para.avgCompletion}% avg
+                        {para.logins} logins · Last active {para.lastActive}
                       </span>
+                      {para.lastActive === 'Feb 2' && (
+                        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Recently Active</span>
+                      )}
                       <a
                         href={generateHighFiveEmail(para)}
                         className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-medium rounded-full transition-colors"
@@ -1433,7 +1447,11 @@ Thanks for everything you do.`
                 ))}
               </div>
 
-              <div className="mt-4 pt-4 border-t border-gray-100">
+              <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
+                <div className="flex items-start gap-2 text-sm text-slate-600 bg-emerald-50 rounded-lg p-3">
+                  <TrendingUp className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                  <span><strong>19 paras</strong> have returned to the Hub multiple times — nearly 1 in 5 logged-in paras came back on their own.</span>
+                </div>
                 <div className="flex items-start gap-2 text-sm text-slate-600 bg-amber-50 rounded-lg p-3">
                   <Lightbulb className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
                   <span>These paras could mentor peers who need support getting started.</span>
@@ -1493,7 +1511,7 @@ Thanks for everything you do.`
                     <Users className="w-5 h-5 text-amber-600" />
                   </div>
                   <div className="text-left">
-                    <div className="font-semibold text-gray-900">32 paras haven&apos;t logged in yet</div>
+                    <div className="font-semibold text-gray-900">33 paras haven&apos;t logged in yet</div>
                     <div className="text-sm text-amber-700">They may need a quick walkthrough to get started</div>
                   </div>
                 </div>
@@ -2366,7 +2384,7 @@ Thanks for everything you do.`
               <h3 className="font-bold text-[#1e2749] mb-4">Your Partnership Includes</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <p className="text-2xl font-bold text-[#1e2749]">123</p>
+                  <p className="text-2xl font-bold text-[#1e2749]">119</p>
                   <p className="text-xs text-gray-500">Paras Enrolled</p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
