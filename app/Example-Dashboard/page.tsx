@@ -1069,14 +1069,14 @@ export default function ExampleDashboard() {
                           <Calendar className="w-4 h-4" />
                           {item.actionLabel}
                         </span>
-                        <button
-                          onClick={() => toggleComplete(item.id)}
-                          className="px-3 py-2 bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-700 text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
-                          title="Mark as complete"
+                        <span
+                          onClick={handleDisabledClick}
+                          className="px-3 py-2 bg-gray-100 text-gray-400 text-sm font-medium rounded-lg flex items-center gap-1 opacity-50 cursor-not-allowed"
+                          title="This is an example dashboard"
                         >
                           <Check className="w-4 h-4" />
                           Done
-                        </button>
+                        </span>
                       </div>
                     </div>
                   ))}
@@ -1102,12 +1102,13 @@ export default function ExampleDashboard() {
                             </div>
                             <span className="text-gray-500 line-through">{item.title}</span>
                           </div>
-                          <button
-                            onClick={() => toggleComplete(item.id)}
-                            className="text-xs text-gray-400 hover:text-gray-600 underline"
+                          <span
+                            onClick={handleDisabledClick}
+                            className="text-xs text-gray-400 cursor-not-allowed"
+                            title="This is an example dashboard"
                           >
                             Undo
-                          </button>
+                          </span>
                         </div>
                       ))}
                   </div>
