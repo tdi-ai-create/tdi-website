@@ -118,11 +118,21 @@ export async function POST(request: NextRequest) {
     }
 
     // 6. Add a note explaining the revision request
+    const adminName = adminEmail
+      ? adminEmail.split('@')[0].charAt(0).toUpperCase() + adminEmail.split('@')[0].slice(1)
+      : 'TDI Admin';
+    const dateStr = new Date().toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+
     await supabase.from('creator_notes').insert({
       creator_id: creatorId,
-      note: `📝 Revision requested for "${milestoneTitle}":\n\n${note}`,
-      created_by: adminEmail || 'TDI Admin',
+      content: `[Revision Requested] ${milestoneTitle}\n${note}\n— ${adminName}, ${dateStr}`,
+      author: adminName,
       visible_to_creator: true,
+      phase_id: milestone?.phase_id || null,
     });
 
     // 7. Send email to creator
