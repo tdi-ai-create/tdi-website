@@ -2176,7 +2176,10 @@ export default function ExampleDashboard() {
             {/* Fictional Data Note */}
             <div className="bg-[#35A7FF]/10 rounded-lg py-3 px-4 text-center">
               <p className="text-sm text-[#1e2749] italic">
-                All school names, staff names, and engagement data are fictional — designed to model the real-time tracking our partner districts receive. And yes, our Founder & CEO is a Motown fan, so the naming theme was non-negotiable.
+                All school names, staff names, and engagement data are fictional — designed to model the real-time tracking our partner districts receive.
+              </p>
+              <p className="text-sm text-[#1e2749] italic mt-1">
+                And yes, our Founder &amp; CEO is a Motown fan, so the naming theme was a nod to this passion.
               </p>
             </div>
 
