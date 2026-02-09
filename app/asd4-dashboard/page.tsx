@@ -75,7 +75,13 @@ export default function ASD4Dashboard() {
 
   // Needs Attention completion state with localStorage persistence
   // Items that are permanently complete (scheduled/done server-side)
-  const permanentlyComplete = ['observation-day-1'];
+  const permanentlyComplete = [
+    'observation-day-1',
+    'observation-day-2',
+    'virtual-session-1',
+    'virtual-session-2',
+    'virtual-session-3'
+  ];
   const [completedItems, setCompletedItems] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('asd4-completed-items');
@@ -224,33 +230,83 @@ export default function ASD4Dashboard() {
         "Learning Hub onboarding and login walkthrough"
       ],
       status: "complete" as const
-    }
-    // Future sessions will be added here
-  ];
-
-  // Upcoming sessions data
-  const upcomingSessions = [
+    },
     {
       title: 'Observation Day 1: "The Moves That Matter: Part 2"',
       date: "February 13, 2026",
-      time: "1:00 - 3:00 PM",
       format: "In-Person",
-      location: "Gym 1",
-      participants: "70-90 paraprofessionals",
+      duration: "1:00 - 3:00 PM",
       focusAreas: [
-        "Ask, Don\u2019t Tell \u2014 10+ questioning scenarios with partner role-play and real student situations",
-        "Feedback That Builds Capacity \u2014 Using the Notice. Name. Next Step. formula (6+ practice reps)"
+        "Ask, Don't Tell — 10+ questioning scenarios with partner role-play",
+        "Feedback That Builds Capacity — Using the Notice. Name. Next Step. formula",
+        "Initial survey data collection (baseline metrics)"
       ],
-      additionalNotes: [
-        "Initial survey data collection (baseline metrics)",
-        "Learning Hub goal updates",
-        "Game-based practice tool introduction (teachersdeserveit.com/paragametools)"
+      status: "complete" as const
+    },
+    {
+      title: "Observation Day 2",
+      date: "February 26, 2026",
+      format: "In-Person",
+      duration: "Follow-up Observation",
+      focusAreas: [
+        "Strategy implementation check-ins",
+        "Growth Group formation and planning",
+        "Pilot group progress review"
       ],
-      highlightStat: "44 total practice reps (5.5x more than January kickoff)",
-      status: "scheduled" as const
+      status: "complete" as const
+    },
+    {
+      title: "Virtual Visit 1",
+      date: "March 2, 2026",
+      format: "Virtual",
+      duration: "45 min",
+      focusAreas: [
+        "Observation debrief and reflection",
+        "Strategy check-ins and adjustments",
+        "Progress celebration"
+      ],
+      status: "complete" as const
+    },
+    {
+      title: "Virtual Visit 2",
+      date: "April 6, 2026",
+      format: "Virtual",
+      duration: "45 min",
+      focusAreas: [
+        "Mid-partnership progress review",
+        "Growth Group updates",
+        "Implementation support"
+      ],
+      status: "complete" as const
+    },
+    {
+      title: "Virtual Visit 3",
+      date: "April 20, 2026",
+      format: "Virtual",
+      duration: "45 min",
+      focusAreas: [
+        "End-of-year planning",
+        "Success metrics review",
+        "Next steps discussion"
+      ],
+      status: "complete" as const
     }
-    // Future sessions will be added here
   ];
+
+
+  // Upcoming sessions data (Virtual Session 4 and Executive Session 2 still pending in Needs Attention)
+  const upcomingSessions: {
+    title: string;
+    date: string;
+    time: string;
+    format: string;
+    location?: string;
+    participants?: string;
+    focusAreas: string[];
+    additionalNotes?: string[];
+    highlightStat?: string;
+    status: "scheduled";
+  }[] = [];
 
   // Progress tab data
   const topEngagedParas = [
@@ -810,8 +866,8 @@ Thanks for everything you do.`
               {/* Card 1: Wins */}
               <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
                 <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                <p className="text-sm font-semibold text-green-800">Kickoff Complete</p>
-                <p className="text-xs text-green-600">Obs Day 1 scheduled · 86 paras logged in · 19 returning</p>
+                <p className="text-sm font-semibold text-green-800">6 Sessions Complete</p>
+                <p className="text-xs text-green-600">2/2 Observations · 3/4 Virtual Sessions · 86 paras logged in</p>
               </div>
 
               {/* Card 2: Action Needed */}
@@ -1306,23 +1362,27 @@ Thanks for everything you do.`
                                 </ul>
                               </div>
 
-                              <div className="mt-3">
-                                <p className="text-sm font-medium text-gray-500 mb-1">Also This Session:</p>
-                                <ul className="space-y-1">
-                                  {session.additionalNotes.map((note, i) => (
-                                    <li key={i} className="text-sm text-gray-500 flex items-start gap-2">
-                                      <span className="text-gray-300 mt-1">&#8226;</span>
-                                      {note}
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
+                              {session.additionalNotes && session.additionalNotes.length > 0 && (
+                                <div className="mt-3">
+                                  <p className="text-sm font-medium text-gray-500 mb-1">Also This Session:</p>
+                                  <ul className="space-y-1">
+                                    {session.additionalNotes.map((note, i) => (
+                                      <li key={i} className="text-sm text-gray-500 flex items-start gap-2">
+                                        <span className="text-gray-300 mt-1">&#8226;</span>
+                                        {note}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
 
-                              <div className="mt-3 bg-blue-50 rounded-lg px-3 py-2 inline-block">
-                                <p className="text-sm text-blue-700 font-medium">
-                                  {session.highlightStat}
-                                </p>
-                              </div>
+                              {session.highlightStat && (
+                                <div className="mt-3 bg-blue-50 rounded-lg px-3 py-2 inline-block">
+                                  <p className="text-sm text-blue-700 font-medium">
+                                    {session.highlightStat}
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           </div>
                           <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full flex-shrink-0">
@@ -1583,37 +1643,71 @@ Thanks for everything you do.`
               </div>
 
               <div className="space-y-3">
+                {/* Completed Sessions */}
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50/50">
                   <div className="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <Check className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <div className="font-medium text-gray-400 line-through">Schedule Observation Day 1</div>
-                    <div className="text-sm text-emerald-600">February 13, 2026 · 1:00 - 3:00 PM</div>
+                    <div className="font-medium text-gray-400 line-through">Observation Day 1</div>
+                    <div className="text-sm text-emerald-600">February 13, 2026 · Complete</div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50/50">
+                  <div className="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check className="w-3 h-3 text-white" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-400 line-through">Observation Day 2</div>
+                    <div className="text-sm text-emerald-600">February 26, 2026 · Complete</div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50/50">
+                  <div className="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check className="w-3 h-3 text-white" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-400 line-through">Virtual Visit 1</div>
+                    <div className="text-sm text-emerald-600">March 2, 2026 · Complete</div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50/50">
+                  <div className="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check className="w-3 h-3 text-white" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-400 line-through">Virtual Visit 2</div>
+                    <div className="text-sm text-emerald-600">April 6, 2026 · Complete</div>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50/50">
+                  <div className="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check className="w-3 h-3 text-white" />
+                  </div>
+                  <div>
+                    <div className="font-medium text-gray-400 line-through">Virtual Visit 3</div>
+                    <div className="text-sm text-emerald-600">April 20, 2026 · Complete</div>
+                  </div>
+                </div>
+
+                {/* Upcoming Actions */}
+                <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 mt-0.5"></div>
+                  <div>
+                    <div className="font-medium text-gray-900">Schedule Virtual Session 4</div>
+                    <div className="text-sm text-gray-500">Final coaching check-in before partnership wrap-up</div>
                   </div>
                 </div>
 
                 <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
                   <div className="w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 mt-0.5"></div>
                   <div>
-                    <div className="font-medium text-gray-900">Recognize your top engaged paras</div>
-                    <div className="text-sm text-gray-500">A quick shout-out at your next meeting goes a long way</div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 mt-0.5"></div>
-                  <div>
-                    <div className="font-medium text-gray-900">Try a 15-min Hub walkthrough</div>
-                    <div className="text-sm text-gray-500">For paras who haven&apos;t logged in -  we can help facilitate</div>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                  <div className="w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 mt-0.5"></div>
-                  <div>
-                    <div className="font-medium text-gray-900">Share &quot;Paraprofessional Foundations&quot; as the starting course</div>
-                    <div className="text-sm text-gray-500">It&apos;s your most popular course with 19 paras already engaged</div>
+                    <div className="font-medium text-gray-900">Schedule Executive Session 2</div>
+                    <div className="text-sm text-gray-500">End-of-year results review with leadership</div>
                   </div>
                 </div>
               </div>
