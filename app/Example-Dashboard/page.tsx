@@ -499,6 +499,18 @@ export default function ExampleDashboard() {
     return now >= dueDate;
   };
 
+  // Navigate to a specific section (cross-tab navigation)
+  const navigateToSection = (tab: string, sectionId: string) => {
+    setActiveTab(tab);
+    // Small delay to allow tab content to render
+    setTimeout(() => {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 100);
+  };
+
   // Due dates for each item (month, year)
   const dueDates = {
     leadershipRecap: { month: 4, year: 2026 },  // April 2026
@@ -745,42 +757,68 @@ export default function ExampleDashboard() {
           <div className="space-y-6">
             {/* Quick Stats */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
+              <div
+                onClick={() => navigateToSection('implementation', 'progress-hub-engagement')}
+                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C] cursor-pointer hover:shadow-md hover:border-[#4ecdc4]/30 transition-all group"
+              >
                 <div className="flex items-center gap-2 mb-1">
                   <Users className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
+                  <Tooltip text="Total staff with active Learning Hub accounts across all buildings in your district.">
+                    <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
+                  </Tooltip>
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">255</div>
                 <div className="text-xs text-[#38618C] font-medium">across 6 schools</div>
+                <div className="flex items-center gap-1 text-xs text-[#4ecdc4] opacity-0 group-hover:opacity-100 transition-opacity mt-2">
+                  <ArrowRight className="w-3 h-3" />
+                  <span>View details</span>
+                </div>
               </div>
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
+              <div
+                onClick={() => navigateToSection('implementation', 'progress-observations')}
+                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C] cursor-pointer hover:shadow-md hover:border-[#4ecdc4]/30 transition-all group"
+              >
                 <div className="flex items-center gap-2 mb-1">
                   <Eye className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-xs text-gray-500 uppercase">Observations</span>
+                  <Tooltip text="TDI observation days completed. Observations include classroom walk-throughs with personalized feedback and follow-up coaching.">
+                    <span className="text-xs text-gray-500 uppercase">Observations</span>
+                  </Tooltip>
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">2<span className="text-lg font-normal text-gray-400">/4</span></div>
                 <div className="text-xs text-[#38618C] font-medium">Para Pilot + Teacher Pilot</div>
+                <div className="flex items-center gap-1 text-xs text-[#4ecdc4] opacity-0 group-hover:opacity-100 transition-opacity mt-2">
+                  <ArrowRight className="w-3 h-3" />
+                  <span>View details</span>
+                </div>
               </div>
 
               <div
                 onClick={() => {
                   document.getElementById('needs-attention-section')?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#E07A5F] cursor-pointer hover:shadow-md transition-all"
+                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#E07A5F] cursor-pointer hover:shadow-md hover:border-[#4ecdc4]/30 transition-all group"
               >
                 <div className="flex items-center gap-2 mb-1">
                   <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
-                  <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
+                  <Tooltip text="Action items that need scheduling or completion to stay on track. Click to jump to details below.">
+                    <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
+                  </Tooltip>
                 </div>
                 <div className="text-2xl font-bold text-[#E07A5F]">3</div>
                 <div className="text-xs text-[#E07A5F] font-medium">Items pending</div>
+                <div className="flex items-center gap-1 text-xs text-[#4ecdc4] opacity-0 group-hover:opacity-100 transition-opacity mt-2">
+                  <ArrowRight className="w-3 h-3" />
+                  <span>View details</span>
+                </div>
               </div>
 
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
                 <div className="flex items-center gap-2 mb-1">
                   <TrendingUp className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-xs text-gray-500 uppercase">Current Phase</span>
+                  <Tooltip text="ACCELERATE focuses on deepening strategies introduced in Phase 1 through coaching cycles, observation days, and data-driven adjustments.">
+                    <span className="text-xs text-gray-500 uppercase">Current Phase</span>
+                  </Tooltip>
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">Phase 2</div>
                 <div className="text-xs text-[#38618C] font-medium">ACCELERATE</div>
@@ -801,18 +839,40 @@ export default function ExampleDashboard() {
               <div className="grid grid-cols-3 gap-4 mb-4">
 
                 {/* Hub Logins */}
-                <div className="text-center p-3 bg-amber-50 rounded-lg">
+                <div
+                  onClick={() => navigateToSection('implementation', 'progress-hub-engagement')}
+                  className="text-center p-3 bg-amber-50 rounded-lg cursor-pointer hover:shadow-md hover:bg-amber-100/50 transition-all group"
+                >
                   <div className="text-2xl font-bold text-amber-600">87%</div>
-                  <div className="text-xs text-gray-600 mt-1">Hub Logins</div>
+                  <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
+                    <Tooltip text="Percentage of enrolled staff who have logged into the TDI Learning Hub at least once. Industry average for PD platform engagement is 40-50%.">
+                      <span>Hub Logins</span>
+                    </Tooltip>
+                  </div>
                   <div className="text-xs text-gray-500 mt-1">223/255 logged in</div>
                   <div className="text-xs text-amber-600 mt-0.5">Goal: 100% by Observation Day</div>
+                  <div className="flex items-center justify-center gap-1 text-xs text-[#4ecdc4] opacity-0 group-hover:opacity-100 transition-opacity mt-1">
+                    <ArrowRight className="w-3 h-3" />
+                    <span>View details</span>
+                  </div>
                 </div>
 
                 {/* Love Notes */}
-                <div className="text-center p-3 bg-green-50 rounded-lg">
+                <div
+                  onClick={() => navigateToSection('implementation', 'progress-observations')}
+                  className="text-center p-3 bg-green-50 rounded-lg cursor-pointer hover:shadow-md hover:bg-green-100/50 transition-all group"
+                >
                   <div className="text-2xl font-bold text-green-600">277</div>
-                  <div className="text-xs text-gray-600 mt-1">Love Notes Sent</div>
+                  <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
+                    <Tooltip text="Personalized encouragement messages sent to educators after onboarding and observations. Love Notes increase engagement by 34% on average.">
+                      <span>Love Notes Sent</span>
+                    </Tooltip>
+                  </div>
                   <div className="text-xs text-green-600 mt-1">255 welcome + 22 observation</div>
+                  <div className="flex items-center justify-center gap-1 text-xs text-[#4ecdc4] opacity-0 group-hover:opacity-100 transition-opacity mt-1">
+                    <ArrowRight className="w-3 h-3" />
+                    <span>View details</span>
+                  </div>
                 </div>
 
                 {/* Virtual Sessions */}
@@ -822,7 +882,11 @@ export default function ExampleDashboard() {
                   onClick={handleDisabledClick}
                 >
                   <div className="text-2xl font-bold text-amber-600">3/6</div>
-                  <div className="text-xs text-gray-600 mt-1">Virtual Sessions</div>
+                  <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
+                    <Tooltip text="Live coaching sessions included in your contract. Sessions are recorded and added to your Hub for staff who can't attend live.">
+                      <span>Virtual Sessions</span>
+                    </Tooltip>
+                  </div>
                   <div className="text-xs text-[#35A7FF] mt-1 font-medium">Schedule Next →</div>
                 </div>
 
@@ -842,50 +906,104 @@ export default function ExampleDashboard() {
 
               <div className="grid grid-cols-3 gap-4 mb-3">
                 {/* Newsletter Subscribers */}
-                <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <Mail className="w-5 h-5 text-[#38618C] mx-auto mb-1" />
+                <div
+                  onClick={() => navigateToSection('implementation', 'progress-movement')}
+                  className="text-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#35A7FF]/10 hover:shadow-md transition-all group"
+                >
+                  <Mail className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
                   <div className="text-lg font-bold text-[#1e2749]">197</div>
-                  <div className="text-xs text-gray-600 mt-1">Newsletter Subscribers</div>
+                  <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
+                    <Tooltip text="Staff subscribed to the TDI weekly newsletter. Subscribers show 2x higher course completion rates.">
+                      <span>Newsletter Subscribers</span>
+                    </Tooltip>
+                  </div>
                 </div>
 
                 {/* Blog Readers */}
-                <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer"
-                   className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
+                <div
+                  onClick={() => navigateToSection('implementation', 'progress-movement')}
+                  className="text-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#35A7FF]/10 hover:shadow-md transition-all group"
+                >
                   <BookOpen className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
                   <div className="text-lg font-bold text-[#1e2749]">131</div>
-                  <div className="text-xs text-gray-600 mt-1">Blog Readers</div>
-                </a>
+                  <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
+                    <Tooltip text="Staff engaging with TDI blog content. Blog readers report higher confidence implementing new strategies (TDI Survey Data, 2025).">
+                      <span>Blog Readers</span>
+                    </Tooltip>
+                  </div>
+                </div>
 
                 {/* Podcast Listeners */}
-                <a href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" target="_blank" rel="noopener noreferrer"
-                   className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
+                <div
+                  onClick={() => navigateToSection('implementation', 'progress-movement')}
+                  className="text-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#35A7FF]/10 hover:shadow-md transition-all group"
+                >
                   <Headphones className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
                   <div className="text-lg font-bold text-[#1e2749]">78</div>
-                  <div className="text-xs text-gray-600 mt-1">Podcast Listeners</div>
-                </a>
+                  <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
+                    <Tooltip text="Staff listening to the Sustainable Teaching podcast. Podcast listeners show 28% higher strategy implementation rates compared to non-listeners (TDI Internal Data, 2025).">
+                      <span>Podcast Listeners</span>
+                    </Tooltip>
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 {/* Community Members */}
-                <a href="https://www.facebook.com/groups/tdimovement" target="_blank" rel="noopener noreferrer"
-                   className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
+                <div
+                  onClick={() => navigateToSection('implementation', 'progress-movement')}
+                  className="text-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#35A7FF]/10 hover:shadow-md transition-all group"
+                >
                   <Users className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
                   <div className="text-lg font-bold text-[#1e2749]">48</div>
-                  <div className="text-xs text-gray-600 mt-1">Community Members</div>
-                </a>
+                  <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
+                    <Tooltip text="Staff who joined the free TDI Facebook community for ongoing peer support and strategy sharing.">
+                      <span>Community Members</span>
+                    </Tooltip>
+                  </div>
+                </div>
 
                 {/* Resources Downloaded */}
-                <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <FileText className="w-5 h-5 text-[#38618C] mx-auto mb-1" />
+                <div
+                  onClick={() => navigateToSection('implementation', 'progress-resources')}
+                  className="text-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#35A7FF]/10 hover:shadow-md transition-all group"
+                >
+                  <FileText className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
                   <div className="text-lg font-bold text-[#1e2749]">361</div>
-                  <div className="text-xs text-gray-600 mt-1">Resources Downloaded</div>
+                  <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
+                    <Tooltip text="Total templates, guides, and tools downloaded by your staff from the Learning Hub.">
+                      <span>Resources Downloaded</span>
+                    </Tooltip>
+                  </div>
                 </div>
 
                 {/* Courses Started */}
-                <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <GraduationCap className="w-5 h-5 text-[#38618C] mx-auto mb-1" />
+                <div
+                  onClick={() => navigateToSection('implementation', 'progress-courses')}
+                  className="text-center p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#35A7FF]/10 hover:shadow-md transition-all group"
+                >
+                  <GraduationCap className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
                   <div className="text-lg font-bold text-[#1e2749]">224</div>
-                  <div className="text-xs text-gray-600 mt-1">Courses Started</div>
+                  <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
+                    <Tooltip text="Individual course enrollments across your staff. TDI partners average 65% course completion vs. the 10% industry standard.">
+                      <span>Courses Started</span>
+                    </Tooltip>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Metrics Customization Note */}
+            <div className="bg-gradient-to-r from-[#1e2749]/5 to-[#4ecdc4]/5 rounded-xl p-4 border border-[#4ecdc4]/20">
+              <div className="flex items-start gap-3">
+                <BarChart3 className="w-5 h-5 text-[#4ecdc4] mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold text-[#1e2749]">
+                    Your Metrics, Your Way
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    All progress data can be tied to state assessment results, district-specific benchmarks, or TDI survey metrics — whichever tells your school&apos;s story best. Your TDI partner will customize this with you during onboarding.
+                  </p>
                 </div>
               </div>
             </div>
@@ -1533,7 +1651,7 @@ export default function ExampleDashboard() {
               </div>
 
               {/* EVENT 4: Virtual Session 1 - Teacher Cohort */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <div id="journey-sessions" className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <button
                   onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-4' ? null : 'event-4')}
                   className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
@@ -1963,7 +2081,7 @@ export default function ExampleDashboard() {
           <div className="space-y-8">
 
             {/* SECTION 1: Hub Login Goal Graphic - Always Visible */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div id="progress-hub-engagement" className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h3 className="text-xl font-bold text-[#1B2A4A]">Learning Hub Login Progress</h3>
@@ -2021,7 +2139,7 @@ export default function ExampleDashboard() {
             </div>
 
             {/* SECTION 2: Observation Timeline */}
-            <div>
+            <div id="progress-observations">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-[#1B2A4A]">Observation Timeline</h3>
                 <span className="text-sm text-gray-500">2 of 4 complete</span>
@@ -2234,7 +2352,7 @@ export default function ExampleDashboard() {
             </div>
 
             {/* SECTION 3: Survey Data Visualizations */}
-            <div>
+            <div id="progress-movement">
               <Accordion
                 id="survey-data"
                 title="Survey Data & Leading Indicators"
@@ -2381,7 +2499,7 @@ export default function ExampleDashboard() {
             </div>
 
             {/* SECTION 4: Growth Groups */}
-            <div>
+            <div id="progress-courses">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h3 className="text-xl font-bold text-[#1B2A4A]">Growth Groups</h3>
@@ -2597,7 +2715,7 @@ export default function ExampleDashboard() {
             </div>
 
             {/* SECTION 6: Supporting Resources */}
-            <div>
+            <div id="progress-resources">
               <h3 className="text-lg font-semibold text-[#1B2A4A] mb-2">Supporting Resources</h3>
               <p className="text-gray-500 text-sm mb-4">Tools available in the Learning Hub to support implementation</p>
 
