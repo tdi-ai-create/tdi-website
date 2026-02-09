@@ -496,8 +496,8 @@ export default function ExampleDashboard() {
   const needsAttentionItems = [
     {
       id: 'leadership-recap',
-      title: 'Spring Leadership Recap',
-      description: 'Review progress + set goals for next year',
+      title: 'Spring Leadership Recap with District Team',
+      description: 'Review district-wide progress + set building-level goals for next year',
       deadline: 'APRIL 2026',
       deadlineMonth: dueDates.leadershipRecap.month,
       deadlineYear: dueDates.leadershipRecap.year,
@@ -505,8 +505,8 @@ export default function ExampleDashboard() {
       actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
     },
     {
-      id: 'instructional-design',
-      title: 'Virtual session for Instructional Design group',
+      id: 'teacher-cohort',
+      title: 'Virtual session: Teacher Cohort (Harmony & Crescendo)',
       description: 'Included in contract',
       deadline: 'MAY 2026',
       deadlineMonth: dueDates.instructionalDesign.month,
@@ -515,8 +515,8 @@ export default function ExampleDashboard() {
       actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
     },
     {
-      id: 'class-management',
-      title: 'Virtual session for Class Management group',
+      id: 'para-cohort',
+      title: 'Virtual session: Para Cohort (District-wide)',
       description: 'Included in contract',
       deadline: 'MAY 2026',
       deadlineMonth: dueDates.classManagement.month,
@@ -542,8 +542,8 @@ export default function ExampleDashboard() {
         'Growth group formation'
       ],
       outcomes: [
-        { label: 'Observations', value: '25', sublabel: 'Completed' },
-        { label: 'Love Notes Sent', value: '25', sublabel: 'Personalized feedback' }
+        { label: 'Observations', value: '101', sublabel: 'Completed' },
+        { label: 'Love Notes Sent', value: '101', sublabel: 'Personalized feedback' }
       ],
       blueprintPreview: 'This phase establishes trust and captures baseline data to inform targeted support.'
     },
@@ -565,9 +565,9 @@ export default function ExampleDashboard() {
         'Retention tracking tools'
       ],
       completed: [
-        'Hub access activated for all 25 staff',
+        'Hub access activated for all 101 staff across 6 buildings',
         'Executive Impact Session #1 (July planning)',
-        'On-Campus Day #1 with observations'
+        'On-Campus Days completed at 2 buildings'
       ],
       pending: [
         'Executive Impact Sessions #2-4',
@@ -624,7 +624,7 @@ export default function ExampleDashboard() {
         <div className="bg-[#35A7FF]/10 border-b border-[#35A7FF]/20 py-2 px-4">
           <div className="max-w-5xl mx-auto flex items-center justify-center gap-3">
             <span className="text-sm text-[#1e2749] text-center">
-              This is a fictional example dashboard to showcase features schools often enjoy.
+              This is a fictional example dashboard to showcase features districts and schools often enjoy.
             </span>
             <button
               onClick={() => setShowBanner(false)}
@@ -672,7 +672,7 @@ export default function ExampleDashboard() {
           <div className="flex items-center gap-3 text-sm">
             <div className="bg-white/10 px-3 py-1.5 rounded-lg">
               <span className="text-white/60">Status:</span>
-              <span className="ml-2 font-semibold text-[#38618C] bg-white px-2 py-0.5 rounded">Phase 2 - Activation</span>
+              <span className="ml-2 font-semibold text-[#38618C] bg-white px-2 py-0.5 rounded">Phase 2 - ACCELERATE</span>
             </div>
           </div>
         </div>
@@ -735,8 +735,8 @@ export default function ExampleDashboard() {
                   <Eye className="w-4 h-4 text-[#38618C]" />
                   <span className="text-xs text-gray-500 uppercase">Observations</span>
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">2<span className="text-lg font-normal text-gray-400">/2</span></div>
-                <div className="text-xs text-green-600 font-medium">Complete</div>
+                <div className="text-2xl font-bold text-[#1e2749]">8<span className="text-lg font-normal text-gray-400">/12</span></div>
+                <div className="text-xs text-amber-600 font-medium">In Progress</div>
               </div>
 
               <div
@@ -777,28 +777,29 @@ export default function ExampleDashboard() {
               <div className="grid grid-cols-3 gap-4 mb-4">
 
                 {/* Hub Logins */}
-                <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">87%</div>
+                <div className="text-center p-3 bg-amber-50 rounded-lg">
+                  <div className="text-2xl font-bold text-amber-600">87%</div>
                   <div className="text-xs text-gray-600 mt-1">Hub Logins</div>
-                  <div className="text-xs text-green-600 mt-1">88/101 logged in</div>
+                  <div className="text-xs text-gray-500 mt-1">88/101 logged in</div>
+                  <div className="text-xs text-amber-600 mt-0.5">Goal: 100% by Observation Day</div>
                 </div>
 
                 {/* Love Notes */}
                 <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">25</div>
+                  <div className="text-2xl font-bold text-green-600">101</div>
                   <div className="text-xs text-gray-600 mt-1">Love Notes Sent</div>
                   <div className="text-xs text-green-600 mt-1">✓ Complete</div>
                 </div>
 
                 {/* Virtual Sessions */}
                 <div
-                  className="text-center p-3 bg-[#E07A5F]/10 rounded-lg opacity-50 cursor-not-allowed"
+                  className="text-center p-3 bg-amber-50 rounded-lg opacity-50 cursor-not-allowed"
                   title="This is an example dashboard"
                   onClick={handleDisabledClick}
                 >
-                  <div className="text-2xl font-bold text-[#E07A5F]">0/2</div>
+                  <div className="text-2xl font-bold text-amber-600">3/6</div>
                   <div className="text-xs text-gray-600 mt-1">Virtual Sessions</div>
-                  <div className="text-xs text-[#E07A5F] mt-1 font-medium">Schedule Now →</div>
+                  <div className="text-xs text-[#35A7FF] mt-1 font-medium">Schedule Next →</div>
                 </div>
 
               </div>
@@ -810,7 +811,7 @@ export default function ExampleDashboard() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
                   <Heart className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-sm font-medium text-[#1e2749]">Movement Involvement</span>
+                  <span className="text-sm font-medium text-[#1e2749]">District-wide Movement Involvement</span>
                 </div>
                 <span className="text-xs text-gray-400">Updated Jan 14, 2026</span>
               </div>
@@ -958,11 +959,11 @@ export default function ExampleDashboard() {
                     Recommendation: Dedicated Hub Time
                   </h3>
                   <p className="text-gray-600 text-sm mb-3">
-                    Schools that build in 15-30 minutes of protected time during PLCs or staff meetings see 3x higher implementation rates.
+                    Districts that build in 15-30 minutes of protected Hub time during PLCs or staff meetings see 3x higher implementation rates. We recommend each building designate a TDI Champion to keep momentum going.
                   </p>
                   <div className="flex flex-wrap gap-2">
                     <span className="bg-[#F5F5F5] text-[#1e2749] px-3 py-1 rounded-full text-xs font-medium">Add Hub time to PLC agenda</span>
-                    <span className="bg-[#F5F5F5] text-[#1e2749] px-3 py-1 rounded-full text-xs font-medium">Share "Resource of the Week"</span>
+                    <span className="bg-[#F5F5F5] text-[#1e2749] px-3 py-1 rounded-full text-xs font-medium">Designate building TDI Champions</span>
                   </div>
                 </div>
               </div>
@@ -978,7 +979,7 @@ export default function ExampleDashboard() {
                   <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Looking Ahead</span>
                   <h3 className="text-lg font-bold mt-2">2026-27 Partnership Plan</h3>
                   <p className="text-sm opacity-80 mt-1">
-                    Based on your TerraNova data, we&apos;ve built a differentiation-focused plan for next year.
+                    Based on your district&apos;s engagement data and building-level feedback, we&apos;ve built a tailored plan for scaling your partnership in 2026-27.
                   </p>
                 </div>
                 <div className="text-right flex flex-col items-center">
@@ -1170,9 +1171,9 @@ export default function ExampleDashboard() {
                   </span>
                 </div>
 
-                {/* Principal Ford's Focus */}
+                {/* Dr. Ford's Focus */}
                 <div className="bg-[#1e2749] text-white rounded-lg p-4 mt-4">
-                  <p className="text-sm font-medium mb-1">Principal Ford&apos;s Goal for Next Year:</p>
+                  <p className="text-sm font-medium mb-1">Dr. Ford&apos;s District Goal for Next Year:</p>
                   <p className="text-sm opacity-90">&quot;More engaging lessons and differentiated learning in the regular classroom&quot;</p>
                 </div>
               </div>
@@ -1191,7 +1192,7 @@ export default function ExampleDashboard() {
                   Research shows these four indicators are the strongest predictors of sustainable classroom change and student outcomes.<sup className="text-[#35A7FF]">1</sup> Each indicator is personalized to Motown District 360&apos;s goals, established during our partnership kickoff.
                 </p>
                 <p className="text-xs text-gray-400">
-                  <sup>1</sup> RAND Corporation (2025), Learning Policy Institute · Indicators selected based on your school&apos;s specific priorities
+                  <sup>1</sup> RAND Corporation (2025), Learning Policy Institute · Indicators selected based on your district&apos;s specific priorities
                 </p>
               </div>
 
@@ -1899,7 +1900,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-start gap-2">
                       <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
                       <p className="text-xs text-gray-600">
-                        <span className="font-semibold text-[#1e2749]">Recommendation:</span> Celebrate these wins at your next staff meeting -  teachers need to hear what's working
+                        <span className="font-semibold text-[#1e2749]">Recommendation:</span> Celebrate these wins at your next district-wide or building staff meeting — teachers need to hear what's working
                       </p>
                     </div>
                   </div>
@@ -2579,7 +2580,7 @@ export default function ExampleDashboard() {
                   <div>
                     <p className="text-sm font-medium text-amber-800">Why These Metrics?</p>
                     <p className="text-sm text-amber-700 mt-1">
-                      These goals come directly from your Jan 2026 survey (84% cited time management, 53% cited behavior) and Principal Ford&apos;s stated goal of &quot;more engaging lessons and differentiated learning.&quot; We&apos;ll measure progress at each touchpoint.
+                      These goals come directly from your Jan 2026 survey (84% cited time management, 53% cited behavior) and Dr. Ford&apos;s stated district goal of &quot;more engaging lessons and differentiated learning.&quot; We&apos;ll measure progress at each touchpoint.
                     </p>
                   </div>
                 </div>
@@ -2929,7 +2930,7 @@ export default function ExampleDashboard() {
               </div>
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-xs text-gray-500 mb-1">Principal Ford&apos;s Goal:</p>
+                  <p className="text-xs text-gray-500 mb-1">Dr. Ford&apos;s District Goal:</p>
                   <p className="text-sm text-[#1e2749] font-medium">&quot;More engaging lessons and differentiated learning in the regular classroom&quot;</p>
                 </div>
                 <div className="bg-[#35A7FF]/10 rounded-lg p-4">
@@ -3014,7 +3015,7 @@ export default function ExampleDashboard() {
                   <p className="text-[#38618C] font-medium mb-3">Lead Partner, Motown District 360 Account</p>
                   
                   <p className="text-gray-600 text-sm mb-4">
-                    Rae is the co-founder of Teachers Deserve It and your dedicated partner throughout this journey. She is here to support your school's success every step of the way.
+                    Rae is the co-founder of Teachers Deserve It and your dedicated partner throughout this journey. She is here to support your district&apos;s success every step of the way.
                   </p>
 
                   <div className="space-y-2 mb-4">
@@ -3059,15 +3060,16 @@ export default function ExampleDashboard() {
               Meet the Full TDI Team →
             </a>
 
-            {/* School Info */}
+            {/* District Info */}
             <div className="bg-white rounded-xl p-5 shadow-sm max-w-2xl mx-auto">
               <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
                 <Building className="w-5 h-5 text-[#38618C]" />
-                School Information
+                District Information
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <div className="font-semibold text-gray-800">Motown District 360</div>
+                  <div className="text-sm text-gray-600">District Contact: Dr. J. Ford, Superintendent</div>
                   <div className="text-sm text-gray-600 mt-2 flex items-start gap-2">
                     <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#38618C]" />
                     Glenview, Illinois
@@ -3082,6 +3084,17 @@ export default function ExampleDashboard() {
                     <Mail className="w-4 h-4 text-[#38618C]" />
                     Info@TeachersDeserveit.com
                   </div>
+                </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <div className="text-xs text-gray-500 uppercase tracking-wide mb-2">Partner Buildings</div>
+                <div className="flex flex-wrap gap-2">
+                  <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-1 rounded">Motown ELC</span>
+                  <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-1 rounded">Harmony Elementary</span>
+                  <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-1 rounded">Rhythm Academy</span>
+                  <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-1 rounded">Motown Middle School</span>
+                  <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-1 rounded">Crescendo High School</span>
+                  <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-1 rounded">Bridges Alternative</span>
                 </div>
               </div>
             </div>
@@ -3113,7 +3126,7 @@ export default function ExampleDashboard() {
           <div className="bg-white rounded-xl shadow-xl px-6 py-4 flex items-center gap-4 max-w-lg border border-gray-100">
             <div className="flex-1">
               <p className="text-[#1e2749] font-medium text-sm">
-                This is an example dashboard. Ready to see what your school's dashboard could look like?
+                This is an example dashboard. Ready to see what your district&apos;s dashboard could look like?
               </p>
             </div>
             <a
