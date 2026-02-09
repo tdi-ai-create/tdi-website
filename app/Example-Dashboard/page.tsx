@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
-import { Tooltip } from '@/components/Tooltip';
 import {
   Calendar,
   CheckCircle,
@@ -49,8 +48,25 @@ import {
   Quote,
   RefreshCw,
   Handshake,
-  Search
+  Search,
+  Trophy,
+  Download,
+  Monitor,
+  Megaphone,
+  Calculator
 } from 'lucide-react';
+
+// Local Tooltip component with named group to avoid hover conflicts
+const Tooltip = ({ children, content }: { children: React.ReactNode; content: string }) => (
+  <div className="relative group/tooltip inline-flex items-center">
+    {children}
+    <Info className="w-3.5 h-3.5 text-gray-400 ml-1.5 cursor-help flex-shrink-0" />
+    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2.5 bg-[#1e2749] text-white text-xs leading-relaxed rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-normal max-w-[300px] text-center z-50 shadow-xl">
+      {content}
+      <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1e2749]"></div>
+    </div>
+  </div>
+);
 
 export default function ExampleDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -209,6 +225,18 @@ export default function ExampleDashboard() {
       grades: 'PreK-K',
       teachers: { total: 16, loggedIn: 15 },
       paras: { total: 14, loggedIn: 9 },
+      coursesCompleted: 61,
+      avgStress: 6.1,
+      implementationRate: 22,
+      observationStatus: 'Scheduled April',
+      champion: 'Mrs. Patel',
+      tdiNote: 'Strong early childhood focus. Staff particularly engaged with SEL content.',
+      medals: [
+        { type: 'bronze', category: 'Top Learners' },
+        { type: 'bronze', category: 'Wellness Leader' },
+        { type: 'bronze', category: 'Implementation' },
+        { type: 'bronze', category: 'Retention' },
+      ],
       teacherCourses: ['Social-Emotional Learning Foundations', 'Play-Based Assessment', 'Classroom Environment Design'],
       paraCourses: ['Supporting Early Learners', 'Calm Classroom Strategies', 'Communication that Clicks'],
       teacherStaff: [
@@ -233,6 +261,21 @@ export default function ExampleDashboard() {
       grades: 'K-5',
       teachers: { total: 45, loggedIn: 42 },
       paras: { total: 20, loggedIn: 15 },
+      coursesCompleted: 72,
+      avgStress: 5.2,
+      implementationRate: 34,
+      observationStatus: 'Complete',
+      champion: 'Ms. Rivera',
+      tdiNote: 'Leading the district in implementation. Ms. Rivera\'s PLC structure is a model we\'d love to share with other buildings.',
+      medals: [
+        { type: 'gold', category: 'Most Engaged' },
+        { type: 'gold', category: 'Top Learners' },
+        { type: 'gold', category: 'Wellness Leader' },
+        { type: 'gold', category: 'Implementation' },
+        { type: 'gold', category: 'Resource Champion' },
+        { type: 'gold', category: 'Retention' },
+        { type: 'gold', category: 'Movement Leader' },
+      ],
       teacherCourses: ['The Differentiation Fix', 'Small Group Mastery', 'Time Management for Teachers'],
       paraCourses: ['Building Strong Teacher-Para Partnerships', 'Small-Group & One-on-One Instruction', 'De-Escalation Strategies'],
       teacherStaff: [
@@ -256,6 +299,13 @@ export default function ExampleDashboard() {
       grades: 'K-8',
       teachers: { total: 32, loggedIn: 30 },
       paras: null,
+      coursesCompleted: 58,
+      avgStress: 6.4,
+      implementationRate: 19,
+      observationStatus: 'Scheduled April',
+      champion: null,
+      tdiNote: null,
+      medals: [],
       teacherCourses: ['Student Engagement Strategies', 'Formative Assessment Toolkit', 'Collaborative Planning'],
       paraCourses: null,
       teacherStaff: [
@@ -273,6 +323,17 @@ export default function ExampleDashboard() {
       grades: '6-8',
       teachers: { total: 28, loggedIn: 26 },
       paras: { total: 10, loggedIn: 7 },
+      coursesCompleted: 65,
+      avgStress: 5.8,
+      implementationRate: 28,
+      observationStatus: 'Complete',
+      champion: 'Mr. Okafor',
+      tdiNote: 'Strong middle school team. Excellent advisory period implementation.',
+      medals: [
+        { type: 'bronze', category: 'Resource Champion' },
+        { type: 'bronze', category: 'Movement Leader' },
+        { type: 'bronze', category: 'Most Engaged' },
+      ],
       teacherCourses: ['Classroom Management Reset', 'Student Voice & Choice', 'Advisory Period Design'],
       paraCourses: ['Supporting Students Through Their Daily Schedule', 'Behavior Support in Transitions'],
       teacherStaff: [
@@ -295,6 +356,21 @@ export default function ExampleDashboard() {
       grades: '9-12',
       teachers: { total: 52, loggedIn: 47 },
       paras: { total: 16, loggedIn: 13 },
+      coursesCompleted: 48,
+      avgStress: 7.1,
+      implementationRate: 14,
+      observationStatus: 'Not yet scheduled',
+      champion: 'Coach Williams',
+      tdiNote: null,
+      medals: [
+        { type: 'silver', category: 'Most Engaged' },
+        { type: 'silver', category: 'Top Learners' },
+        { type: 'silver', category: 'Wellness Leader' },
+        { type: 'silver', category: 'Implementation' },
+        { type: 'silver', category: 'Resource Champion' },
+        { type: 'silver', category: 'Retention' },
+        { type: 'silver', category: 'Movement Leader' },
+      ],
       teacherCourses: ['Engagement in Large Classes', 'Student-Led Conferences', 'Reducing Grading Load'],
       paraCourses: ['Supporting Students with IEPs', 'Study Skills Coaching', 'Communication that Clicks'],
       teacherStaff: [
@@ -318,6 +394,13 @@ export default function ExampleDashboard() {
       grades: '7-12',
       teachers: { total: 14, loggedIn: 12 },
       paras: { total: 8, loggedIn: 7 },
+      coursesCompleted: 55,
+      avgStress: 6.7,
+      implementationRate: 17,
+      observationStatus: 'Scheduled May',
+      champion: 'Dr. Nguyen',
+      tdiNote: 'Trauma-informed practices showing early positive impact.',
+      medals: [],
       teacherCourses: ['Trauma-Informed Practices', 'Restorative Conversations', 'Flexible Scheduling'],
       paraCourses: ['De-Escalation Strategies', 'Building Trust with Students'],
       teacherStaff: [
@@ -509,6 +592,17 @@ export default function ExampleDashboard() {
         element.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
     }, 100);
+  };
+
+  // Handle tab change with scroll to top
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+    setTimeout(() => {
+      const tabContent = document.getElementById('tab-content-area');
+      if (tabContent) {
+        tabContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 50);
   };
 
   // Due dates for each item (month, year)
@@ -729,7 +823,7 @@ export default function ExampleDashboard() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabChange(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                   activeTab === tab.id
                     ? 'bg-[#1e2749] text-white shadow-md'
@@ -750,7 +844,7 @@ export default function ExampleDashboard() {
       </div>
 
       {/* Tab Content */}
-      <div className="max-w-5xl mx-auto px-4 py-6">
+      <div id="tab-content-area" className="max-w-5xl mx-auto px-4 py-6">
         
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
@@ -763,7 +857,7 @@ export default function ExampleDashboard() {
               >
                 <div className="flex items-center gap-2 mb-1">
                   <Users className="w-4 h-4 text-[#38618C]" />
-                  <Tooltip text="Total staff with active Learning Hub accounts across all buildings in your district.">
+                  <Tooltip content="Total staff with active Learning Hub accounts across all buildings in your district.">
                     <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
                   </Tooltip>
                 </div>
@@ -777,17 +871,20 @@ export default function ExampleDashboard() {
 
               <div
                 onClick={() => navigateToSection('implementation', 'progress-observations')}
-                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C] cursor-pointer hover:shadow-md hover:border-[#4ecdc4]/30 transition-all group"
+                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C] cursor-pointer hover:shadow-md hover:border-[#4ecdc4]/30 transition-all group/card"
               >
                 <div className="flex items-center gap-2 mb-1">
                   <Eye className="w-4 h-4 text-[#38618C]" />
-                  <Tooltip text="TDI observation days completed. Observations include classroom walk-throughs with personalized feedback and follow-up coaching.">
+                  <Tooltip content="TDI observation days completed. Observations include classroom walk-throughs with personalized feedback and follow-up coaching.">
                     <span className="text-xs text-gray-500 uppercase">Observations</span>
                   </Tooltip>
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">2<span className="text-lg font-normal text-gray-400">/4</span></div>
-                <div className="text-xs text-[#38618C] font-medium">Para Pilot + Teacher Pilot</div>
-                <div className="flex items-center gap-1 text-xs text-[#4ecdc4] opacity-0 group-hover:opacity-100 transition-opacity mt-2">
+                <div className="text-xs text-[#38618C] font-medium mb-2">Para Pilot + Teacher Pilot</div>
+                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-[#4ecdc4] rounded-full" style={{width: '50%'}}></div>
+                </div>
+                <div className="flex items-center gap-1 text-xs text-[#4ecdc4] opacity-0 group-hover/card:opacity-100 transition-opacity mt-2">
                   <ArrowRight className="w-3 h-3" />
                   <span>View details</span>
                 </div>
@@ -801,7 +898,7 @@ export default function ExampleDashboard() {
               >
                 <div className="flex items-center gap-2 mb-1">
                   <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
-                  <Tooltip text="Action items that need scheduling or completion to stay on track. Click to jump to details below.">
+                  <Tooltip content="Action items that need scheduling or completion to stay on track. Click to jump to details below.">
                     <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
                   </Tooltip>
                 </div>
@@ -813,15 +910,198 @@ export default function ExampleDashboard() {
                 </div>
               </div>
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
+              <div
+                onClick={() => navigateToSection('journey', 'journey-phases')}
+                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C] cursor-pointer hover:shadow-md hover:border-[#4ecdc4]/30 transition-all group/card"
+              >
                 <div className="flex items-center gap-2 mb-1">
                   <TrendingUp className="w-4 h-4 text-[#38618C]" />
-                  <Tooltip text="ACCELERATE focuses on deepening strategies introduced in Phase 1 through coaching cycles, observation days, and data-driven adjustments.">
+                  <Tooltip content="ACCELERATE focuses on deepening strategies introduced in Phase 1 through coaching cycles, observation days, and data-driven adjustments.">
                     <span className="text-xs text-gray-500 uppercase">Current Phase</span>
                   </Tooltip>
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">Phase 2</div>
-                <div className="text-xs text-[#38618C] font-medium">ACCELERATE</div>
+                <div className="text-xs text-[#38618C] font-medium mb-2">ACCELERATE</div>
+                <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-[#38618C] rounded-full" style={{width: '66%'}}></div>
+                </div>
+                <div className="text-xs text-gray-400 mt-1">Phase 2 of 3 · 66%</div>
+                <div className="flex items-center gap-1 text-xs text-[#4ecdc4] opacity-0 group-hover/card:opacity-100 transition-opacity mt-2">
+                  <ArrowRight className="w-3 h-3" />
+                  <span>View journey</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Hub Engagement Visual Section */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-[#1e2749]">Hub Engagement</h3>
+                  <Tooltip content="Tracks how many staff have logged into the TDI Learning Hub and their engagement depth. Industry average for PD platform engagement is 40-50%. Your district is at 87%.">
+                    <span></span>
+                  </Tooltip>
+                </div>
+                <span className="text-xs text-gray-400">Updated Jan 13, 2026</span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Donut Chart - Login Rate */}
+                <div className="flex flex-col items-center">
+                  <div className="relative w-36 h-36">
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                      <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                      <circle cx="18" cy="18" r="15.915" fill="none" stroke="#4ecdc4" strokeWidth="3"
+                        strokeDasharray="87, 100" strokeLinecap="round" />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-3xl font-bold text-[#1e2749]">87%</span>
+                      <span className="text-xs text-gray-500">logged in</span>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-center">
+                    <p className="text-sm font-semibold text-[#1e2749]">Hub Logins</p>
+                    <p className="text-xs text-gray-500">223 of 255 staff</p>
+                    <p className="text-xs text-[#4ecdc4] font-medium mt-1">Goal: 100% by Observation Day</p>
+                  </div>
+                </div>
+
+                {/* Vertical Bar Chart - Engagement Depth */}
+                <div className="flex flex-col">
+                  <p className="text-sm font-semibold text-[#1e2749] mb-3">Engagement Depth</p>
+                  <div className="space-y-3 flex-1">
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Completed 1+ course</span>
+                        <span className="font-semibold text-[#1e2749]">68%</span>
+                      </div>
+                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#1e2749] rounded-full" style={{width: '68%'}}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Downloaded resources</span>
+                        <span className="font-semibold text-[#38618C]">74%</span>
+                      </div>
+                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#38618C] rounded-full" style={{width: '74%'}}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Active this month</span>
+                        <span className="font-semibold text-[#4ecdc4]">52%</span>
+                      </div>
+                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#4ecdc4] rounded-full" style={{width: '52%'}}></div>
+                      </div>
+                    </div>
+                  </div>
+                  <Tooltip content="Engagement depth shows how staff interact beyond just logging in. Active this month means at least one Hub interaction in the past 30 days.">
+                    <span className="text-xs text-gray-400 mt-2">What does this mean?</span>
+                  </Tooltip>
+                </div>
+
+                {/* Building Breakdown - Mini Horizontal Bars */}
+                <div className="flex flex-col">
+                  <p className="text-sm font-semibold text-[#1e2749] mb-3">By Building</p>
+                  <div className="space-y-2 flex-1">
+                    {[
+                      { name: 'Harmony Elementary', pct: 95, count: '38/40' },
+                      { name: 'Crescendo High', pct: 91, count: '41/45' },
+                      { name: 'Rhythm Academy', pct: 88, count: '37/42' },
+                      { name: 'Motown Early Learning', pct: 85, count: '34/40' },
+                      { name: 'Motown Middle', pct: 82, count: '37/45' },
+                      { name: 'Bridges Alternative', pct: 84, count: '36/43' },
+                    ].map((school) => (
+                      <div key={school.name} className="cursor-pointer hover:bg-gray-50 rounded p-1 -mx-1 transition-colors"
+                        onClick={() => setActiveTab('schools')}>
+                        <div className="flex justify-between text-xs mb-0.5">
+                          <span className="text-gray-600 truncate">{school.name}</span>
+                          <span className="font-medium text-gray-700 ml-2">{school.pct}%</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all"
+                            style={{width: `${school.pct}%`, backgroundColor: school.pct >= 90 ? '#4ecdc4' : school.pct >= 85 ? '#38618C' : '#f59e0b'}}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-[#4ecdc4] mt-2 cursor-pointer hover:underline"
+                    onClick={() => setActiveTab('schools')}>
+                    View all buildings →
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Building Awards Leaderboard */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Trophy className="w-5 h-5 text-amber-500" />
+                  <h3 className="text-lg font-bold text-[#1e2749]">Building Awards</h3>
+                  <Tooltip content="Buildings are ranked across 7 key metrics. Awards update as new data comes in from observations, Hub engagement, and staff surveys. Celebrate your leaders and identify where to focus support!">
+                    <span></span>
+                  </Tooltip>
+                </div>
+                <button className="text-xs text-[#4ecdc4] font-medium hover:underline"
+                  onClick={() => navigateToSection('schools', 'full-leaderboard')}>
+                  See full leaderboard →
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 mb-5">Ranked across engagement, learning, wellness, and implementation</p>
+
+              {/* Medal Summary — Show total medals per building */}
+              <div className="space-y-3">
+                {[
+                  { name: 'Harmony Elementary', gold: 7, silver: 0, bronze: 0, total: 7 },
+                  { name: 'Crescendo High School', gold: 0, silver: 7, bronze: 0, total: 7 },
+                  { name: 'Motown Early Learning', gold: 0, silver: 0, bronze: 4, total: 4 },
+                  { name: 'Motown Middle School', gold: 0, silver: 0, bronze: 3, total: 3 },
+                  { name: 'Bridges Alternative', gold: 0, silver: 0, bronze: 0, total: 0 },
+                  { name: 'Rhythm Academy', gold: 0, silver: 0, bronze: 0, total: 0 },
+                ].map((building, i) => (
+                  <div key={building.name}
+                    className="flex items-center justify-between p-3 rounded-xl hover:bg-gray-50 cursor-pointer transition-colors"
+                    onClick={() => setActiveTab('schools')}>
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg font-bold text-gray-300 w-6">{i + 1}</span>
+                      <div>
+                        <p className="text-sm font-semibold text-[#1e2749]">{building.name}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {building.gold > 0 && (
+                        <span className="flex items-center gap-1 text-xs bg-amber-50 text-amber-700 px-2 py-1 rounded-full font-medium">
+                          🥇 ×{building.gold}
+                        </span>
+                      )}
+                      {building.silver > 0 && (
+                        <span className="flex items-center gap-1 text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full font-medium">
+                          🥈 ×{building.silver}
+                        </span>
+                      )}
+                      {building.bronze > 0 && (
+                        <span className="flex items-center gap-1 text-xs bg-orange-50 text-orange-600 px-2 py-1 rounded-full font-medium">
+                          🥉 ×{building.bronze}
+                        </span>
+                      )}
+                      {building.total === 0 && (
+                        <span className="text-xs text-gray-400 italic">Keep going!</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Encouraging note for buildings without medals */}
+              <div className="mt-4 p-3 bg-[#4ecdc4]/5 rounded-lg border border-[#4ecdc4]/10">
+                <p className="text-xs text-gray-600">
+                  <span className="font-semibold text-[#1e2749]">Every building is growing.</span> Awards highlight leaders —
+                  but every school in your district is above the national average for PD engagement. That&apos;s worth celebrating.
+                </p>
               </div>
             </div>
 
@@ -845,7 +1125,7 @@ export default function ExampleDashboard() {
                 >
                   <div className="text-2xl font-bold text-amber-600">87%</div>
                   <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
-                    <Tooltip text="Percentage of enrolled staff who have logged into the TDI Learning Hub at least once. Industry average for PD platform engagement is 40-50%.">
+                    <Tooltip content="Percentage of enrolled staff who have logged into the TDI Learning Hub at least once. Industry average for PD platform engagement is 40-50%.">
                       <span>Hub Logins</span>
                     </Tooltip>
                   </div>
@@ -864,7 +1144,7 @@ export default function ExampleDashboard() {
                 >
                   <div className="text-2xl font-bold text-green-600">277</div>
                   <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
-                    <Tooltip text="Personalized encouragement messages sent to educators after onboarding and observations. Love Notes increase engagement by 34% on average.">
+                    <Tooltip content="Personalized encouragement messages sent to educators after onboarding and observations. Love Notes increase engagement by 34% on average.">
                       <span>Love Notes Sent</span>
                     </Tooltip>
                   </div>
@@ -883,7 +1163,7 @@ export default function ExampleDashboard() {
                 >
                   <div className="text-2xl font-bold text-amber-600">3/6</div>
                   <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
-                    <Tooltip text="Live coaching sessions included in your contract. Sessions are recorded and added to your Hub for staff who can't attend live.">
+                    <Tooltip content="Live coaching sessions included in your contract. Sessions are recorded and added to your Hub for staff who can't attend live.">
                       <span>Virtual Sessions</span>
                     </Tooltip>
                   </div>
@@ -913,7 +1193,7 @@ export default function ExampleDashboard() {
                   <Mail className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
                   <div className="text-lg font-bold text-[#1e2749]">197</div>
                   <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
-                    <Tooltip text="Staff subscribed to the TDI weekly newsletter. Subscribers show 2x higher course completion rates.">
+                    <Tooltip content="Staff subscribed to the TDI weekly newsletter. Subscribers show 2x higher course completion rates.">
                       <span>Newsletter Subscribers</span>
                     </Tooltip>
                   </div>
@@ -927,7 +1207,7 @@ export default function ExampleDashboard() {
                   <BookOpen className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
                   <div className="text-lg font-bold text-[#1e2749]">131</div>
                   <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
-                    <Tooltip text="Staff engaging with TDI blog content. Blog readers report higher confidence implementing new strategies (TDI Survey Data, 2025).">
+                    <Tooltip content="Staff engaging with TDI blog content. Blog readers report higher confidence implementing new strategies (TDI Survey Data, 2025).">
                       <span>Blog Readers</span>
                     </Tooltip>
                   </div>
@@ -941,7 +1221,7 @@ export default function ExampleDashboard() {
                   <Headphones className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
                   <div className="text-lg font-bold text-[#1e2749]">78</div>
                   <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
-                    <Tooltip text="Staff listening to the Sustainable Teaching podcast. Podcast listeners show 28% higher strategy implementation rates compared to non-listeners (TDI Internal Data, 2025).">
+                    <Tooltip content="Staff listening to the Sustainable Teaching podcast. Podcast listeners show 28% higher strategy implementation rates compared to non-listeners (TDI Internal Data, 2025).">
                       <span>Podcast Listeners</span>
                     </Tooltip>
                   </div>
@@ -957,7 +1237,7 @@ export default function ExampleDashboard() {
                   <Users className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
                   <div className="text-lg font-bold text-[#1e2749]">48</div>
                   <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
-                    <Tooltip text="Staff who joined the free TDI Facebook community for ongoing peer support and strategy sharing.">
+                    <Tooltip content="Staff who joined the free TDI Facebook community for ongoing peer support and strategy sharing.">
                       <span>Community Members</span>
                     </Tooltip>
                   </div>
@@ -971,7 +1251,7 @@ export default function ExampleDashboard() {
                   <FileText className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
                   <div className="text-lg font-bold text-[#1e2749]">361</div>
                   <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
-                    <Tooltip text="Total templates, guides, and tools downloaded by your staff from the Learning Hub.">
+                    <Tooltip content="Total templates, guides, and tools downloaded by your staff from the Learning Hub.">
                       <span>Resources Downloaded</span>
                     </Tooltip>
                   </div>
@@ -985,12 +1265,136 @@ export default function ExampleDashboard() {
                   <GraduationCap className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
                   <div className="text-lg font-bold text-[#1e2749]">224</div>
                   <div className="text-xs text-gray-600 mt-1 flex items-center justify-center">
-                    <Tooltip text="Individual course enrollments across your staff. TDI partners average 65% course completion vs. the 10% industry standard.">
+                    <Tooltip content="Individual course enrollments across your staff. TDI partners average 65% course completion vs. the 10% industry standard.">
                       <span>Courses Started</span>
                     </Tooltip>
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Leading Indicators Preview */}
+            <div id="leading-indicators" className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-[#1e2749]">Leading Indicators</h3>
+                  <Tooltip content="These indicators are tracked via observations, Hub data, and staff surveys. They compare your district against industry averages and the TDI partner network. Data sources: RAND Corporation (2025), Learning Policy Institute, TDI Partner Surveys.">
+                    <span></span>
+                  </Tooltip>
+                </div>
+                <span className="text-xs px-2 py-1 bg-orange-50 text-orange-600 rounded-full font-medium">Baseline: Jan 14, 2026</span>
+              </div>
+              <p className="text-xs text-gray-500 mb-5">Compared against national industry data and TDI partner averages</p>
+
+              {/* Compact indicator rows */}
+              <div className="space-y-4">
+                {[
+                  { label: 'Teacher Stress', direction: 'Lower is better', industry: '8-9/10', tdi: '5-7/10', district: '6.0/10', districtPct: 60, industryPct: 87, tdiPct: 60, good: true },
+                  { label: 'Strategy Implementation', direction: 'Higher is better', industry: '10%', tdi: '65%', district: '21%', districtPct: 21, industryPct: 10, tdiPct: 65, good: false },
+                  { label: 'Retention Intent', direction: 'Higher is better', industry: '2-4/10', tdi: '5-7/10', district: '9.8/10', districtPct: 98, industryPct: 30, tdiPct: 60, good: true },
+                ].map((indicator) => (
+                  <div key={indicator.label}
+                    className="cursor-pointer hover:bg-gray-50 rounded-lg p-3 -mx-3 transition-colors"
+                    onClick={() => navigateToSection('journey', 'leading-indicators')}>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-semibold text-[#1e2749]">{indicator.label}</span>
+                        {indicator.good && <span className="text-xs px-1.5 py-0.5 bg-green-50 text-green-600 rounded">✓ On track</span>}
+                        {!indicator.good && <span className="text-xs px-1.5 py-0.5 bg-amber-50 text-amber-600 rounded">↑ Growing</span>}
+                      </div>
+                      <span className="text-xs text-gray-400">{indicator.direction}</span>
+                    </div>
+                    <div className="grid grid-cols-3 gap-4 text-xs">
+                      <div>
+                        <div className="flex justify-between mb-1">
+                          <span className="text-gray-500">Industry</span>
+                          <span className="text-red-400 font-medium">{indicator.industry}</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: `${indicator.industryPct}%`}}></div></div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between mb-1">
+                          <span className="text-gray-500">TDI Partners</span>
+                          <span className="text-[#1e2749] font-medium">{indicator.tdi}</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: `${indicator.tdiPct}%`}}></div></div>
+                      </div>
+                      <div>
+                        <div className="flex justify-between mb-1">
+                          <span className="text-gray-500">Motown 360</span>
+                          <span className="text-[#4ecdc4] font-medium">{indicator.district}</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#4ecdc4] rounded-full" style={{width: `${indicator.districtPct}%`}}></div></div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+                <p className="text-xs text-gray-400">Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys</p>
+                <button className="text-xs text-[#4ecdc4] font-medium hover:underline"
+                  onClick={() => navigateToSection('journey', 'leading-indicators')}>
+                  See full breakdown →
+                </button>
+              </div>
+            </div>
+
+            {/* Student Performance Snapshot */}
+            <div id="student-performance" className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-[#1e2749]">Student Performance</h3>
+                  <Tooltip content="TerraNova National Percentiles for grades 3-7. Classroom grades average A (90-100%), but standardized scores tell a different story. This is the gap TDI strategies help close.">
+                    <span></span>
+                  </Tooltip>
+                </div>
+                <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">2024-25 Data</span>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-amber-800">
+                  <span className="font-semibold">The Gap:</span> Classroom grades average <span className="font-bold text-green-600">A (90-100%)</span>, but TerraNova scores for grades 3-6 range from <span className="font-bold text-red-500">30th-58th percentile</span>.
+                </p>
+              </div>
+
+              {/* Compact subject averages */}
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                {[
+                  { subject: 'Reading', avg: 43, color: '#ef4444' },
+                  { subject: 'Language', avg: 48, color: '#f59e0b' },
+                  { subject: 'Math', avg: 57, color: '#3b82f6' },
+                ].map((s) => (
+                  <div key={s.subject} className="text-center">
+                    <div className="relative w-20 h-20 mx-auto mb-2">
+                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                        <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                        <circle cx="18" cy="18" r="15.915" fill="none" stroke={s.color} strokeWidth="3"
+                          strokeDasharray={`${s.avg}, 100`} strokeLinecap="round" />
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-lg font-bold" style={{color: s.color}}>{s.avg}th</span>
+                      </div>
+                    </div>
+                    <p className="text-xs font-medium text-gray-700">{s.subject}</p>
+                    <p className="text-xs text-gray-400">Avg. percentile (Gr. 3-6)</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* 7th grade highlight */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-3">
+                <span className="text-green-500 text-xl">✓</span>
+                <div>
+                  <p className="text-sm font-semibold text-green-700">7th Grade: Strong across all subjects</p>
+                  <p className="text-xs text-green-600">Reading 66th · Language 65th · Math 75th percentile</p>
+                </div>
+              </div>
+
+              <button className="mt-4 text-xs text-[#4ecdc4] font-medium hover:underline"
+                onClick={() => navigateToSection('journey', 'student-performance')}>
+                See full grade-by-grade breakdown →
+              </button>
             </div>
 
             {/* Metrics Customization Note */}
@@ -1135,22 +1539,45 @@ export default function ExampleDashboard() {
               </div>
             </div>
 
-            {/* 2026-27 Teaser */}
+            {/* 2026-27 Teaser - Enhanced */}
             <div
-              className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-[1.01] mt-8"
+              className="relative bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-6 text-white cursor-pointer hover:shadow-xl transition-all hover:scale-[1.01] mt-8 overflow-hidden group"
               onClick={() => setActiveTab('next-year')}
             >
-              <div className="flex justify-between items-center">
-                <div>
-                  <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Looking Ahead</span>
-                  <h3 className="text-lg font-bold mt-2">2026-27 Partnership Plan</h3>
-                  <p className="text-sm opacity-80 mt-1">
-                    Based on your district&apos;s engagement data and building-level feedback, we&apos;ve built a tailored plan for scaling your partnership in 2026-27.
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-1/2 w-24 h-24 bg-white/5 rounded-full translate-y-1/2" />
+
+              <div className="relative z-10 flex justify-between items-center">
+                <div className="max-w-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs bg-[#4ecdc4] text-[#1e2749] px-3 py-1 rounded-full font-bold uppercase tracking-wide">Phase 3: SUSTAIN</span>
+                    <span className="text-xs bg-white/20 px-3 py-1 rounded-full">2026-27</span>
+                  </div>
+                  <h3 className="text-xl font-bold">Year 3: Make the Gains Permanent</h3>
+                  <p className="text-sm opacity-90 mt-2">
+                    You&apos;ve built momentum. Now lock it in with internal coaching capacity, peer observation circles, and systems that sustain beyond the partnership.
                   </p>
+                  <div className="flex items-center gap-4 mt-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <TrendingUp className="w-4 h-4" />
+                      </div>
+                      <span className="text-xs">72% projected adoption</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
+                        <Award className="w-4 h-4" />
+                      </div>
+                      <span className="text-xs">40% internal coaches</span>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-right flex flex-col items-center">
-                  <span className="text-4xl">→</span>
-                  <p className="text-xs opacity-70">See the plan</p>
+                <div className="flex flex-col items-center">
+                  <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                    <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                  <p className="text-xs opacity-70 mt-2">See Year 3 Plan</p>
                 </div>
               </div>
             </div>
@@ -1494,7 +1921,7 @@ export default function ExampleDashboard() {
             </div>
 
             {/* Partnership Event Timeline */}
-            <div className="space-y-4">
+            <div id="journey-phases" className="space-y-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-lg font-bold text-[#1e2749]">Partnership Timeline</h3>
                 <span className="text-xs text-gray-500">10 complete · 6 upcoming</span>
@@ -2840,6 +3267,178 @@ export default function ExampleDashboard() {
         {/* SCHOOLS TAB */}
         {activeTab === 'schools' && (
           <div className="space-y-6">
+            {/* Full Leaderboard — Schools Tab */}
+            <div id="full-leaderboard" className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-2">
+                <Trophy className="w-6 h-6 text-amber-500" />
+                <h3 className="text-xl font-bold text-[#1e2749]">Building Awards Leaderboard</h3>
+              </div>
+              <p className="text-sm text-gray-500 mb-6">Celebrating what&apos;s working across your district. Click any category to learn more.</p>
+
+              {/* Category-by-Category Breakdown */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {[
+                  {
+                    category: 'Most Engaged',
+                    metric: 'Hub Login Rate',
+                    icon: Monitor,
+                    tooltip: 'Percentage of staff who logged into the Learning Hub. Industry average is 40-50%.',
+                    podium: [
+                      { name: 'Harmony Elementary', value: '95%', medal: '🥇' },
+                      { name: 'Crescendo High School', value: '91%', medal: '🥈' },
+                      { name: 'Rhythm Academy', value: '88%', medal: '🥉' },
+                    ],
+                    districtAvg: '87%',
+                    industryAvg: '40-50%',
+                  },
+                  {
+                    category: 'Top Learners',
+                    metric: 'Course Completion',
+                    icon: BookOpen,
+                    tooltip: 'Staff who completed at least one full Learning Hub course. TDI partners average 65% vs. 10% industry standard.',
+                    podium: [
+                      { name: 'Harmony Elementary', value: '72%', medal: '🥇' },
+                      { name: 'Crescendo High School', value: '65%', medal: '🥈' },
+                      { name: 'Motown Early Learning', value: '61%', medal: '🥉' },
+                    ],
+                    districtAvg: '60%',
+                    industryAvg: '10%',
+                  },
+                  {
+                    category: 'Wellness Leaders',
+                    metric: 'Lowest Stress Level',
+                    icon: Heart,
+                    tooltip: 'Self-reported stress from TDI survey (lower is better). National average is 8-9/10. TDI partners average 5-7/10.',
+                    podium: [
+                      { name: 'Harmony Elementary', value: '5.2/10', medal: '🥇' },
+                      { name: 'Crescendo High School', value: '5.8/10', medal: '🥈' },
+                      { name: 'Motown Early Learning', value: '6.1/10', medal: '🥉' },
+                    ],
+                    districtAvg: '6.2/10',
+                    industryAvg: '8-9/10',
+                  },
+                  {
+                    category: 'Implementation Champions',
+                    metric: 'Strategy Use in Classroom',
+                    icon: Target,
+                    tooltip: 'Teachers actively using TDI strategies, measured via observations. Industry standard is 10% (TNTP). TDI partners average 65%.',
+                    podium: [
+                      { name: 'Harmony Elementary', value: '34%', medal: '🥇' },
+                      { name: 'Crescendo High School', value: '28%', medal: '🥈' },
+                      { name: 'Motown Early Learning', value: '22%', medal: '🥉' },
+                    ],
+                    districtAvg: '21%',
+                    industryAvg: '10%',
+                  },
+                  {
+                    category: 'Resource Champions',
+                    metric: 'Resources Downloaded',
+                    icon: Download,
+                    tooltip: 'Templates, guides, and planning tools downloaded per building. More downloads correlate with higher implementation.',
+                    podium: [
+                      { name: 'Harmony Elementary', value: '89', medal: '🥇' },
+                      { name: 'Crescendo High School', value: '76', medal: '🥈' },
+                      { name: 'Motown Early Learning', value: '68', medal: '🥉' },
+                    ],
+                    districtAvg: '68',
+                    industryAvg: null,
+                  },
+                  {
+                    category: 'Most Likely to Stay',
+                    metric: 'Retention Intent',
+                    icon: Users,
+                    tooltip: 'Self-reported intent to remain in education (higher is better). National average is 2-4/10. TDI partners average 5-7/10.',
+                    podium: [
+                      { name: 'Harmony Elementary', value: '9.8/10', medal: '🥇' },
+                      { name: 'Crescendo High School', value: '8.9/10', medal: '🥈' },
+                      { name: 'Motown Early Learning', value: '8.1/10', medal: '🥉' },
+                    ],
+                    districtAvg: '8.1/10',
+                    industryAvg: '2-4/10',
+                  },
+                  {
+                    category: 'Movement Leaders',
+                    metric: 'Community Participation',
+                    icon: Megaphone,
+                    tooltip: 'Staff actively participating in the broader TDI movement (newsletter, podcast, blog, Facebook group).',
+                    podium: [
+                      { name: 'Harmony Elementary', value: '42', medal: '🥇' },
+                      { name: 'Crescendo High School', value: '38', medal: '🥈' },
+                      { name: 'Motown Early Learning', value: '35', medal: '🥉' },
+                    ],
+                    districtAvg: '33',
+                    industryAvg: null,
+                  },
+                ].map((award) => (
+                  <div key={award.category} className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2">
+                        <award.icon className="w-4 h-4 text-[#38618C]" />
+                        <span className="text-sm font-bold text-[#1e2749]">{award.category}</span>
+                        <Tooltip content={award.tooltip}><span></span></Tooltip>
+                      </div>
+                      <span className="text-xs text-gray-400">{award.metric}</span>
+                    </div>
+
+                    {/* Podium */}
+                    <div className="space-y-2">
+                      {award.podium.map((winner) => (
+                        <div key={winner.name} className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-base">{winner.medal}</span>
+                            <span className="text-sm text-gray-700">{winner.name}</span>
+                          </div>
+                          <span className="text-sm font-bold text-[#1e2749]">{winner.value}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Context bar */}
+                    <div className="mt-3 pt-3 border-t border-gray-200 flex justify-between text-xs text-gray-400">
+                      <span>District avg: <span className="text-gray-600 font-medium">{award.districtAvg}</span></span>
+                      {award.industryAvg && (
+                        <span>Industry avg: <span className="text-red-400 font-medium">{award.industryAvg}</span></span>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Total Medal Count Banner */}
+              <div className="mt-6 bg-gradient-to-r from-amber-50 via-gray-50 to-orange-50 rounded-xl p-5 border border-amber-100">
+                <h4 className="text-sm font-bold text-[#1e2749] mb-3">Total Medal Count</h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                  {[
+                    { name: 'Harmony', gold: 7, silver: 0, bronze: 0 },
+                    { name: 'Crescendo', gold: 0, silver: 7, bronze: 0 },
+                    { name: 'Motown ELC', gold: 0, silver: 0, bronze: 4 },
+                    { name: 'Motown MS', gold: 0, silver: 0, bronze: 3 },
+                    { name: 'Bridges', gold: 0, silver: 0, bronze: 0 },
+                    { name: 'Rhythm', gold: 0, silver: 0, bronze: 0 },
+                  ].map((b) => (
+                    <div key={b.name} className="text-center p-3 bg-white rounded-lg shadow-sm">
+                      <p className="text-xs font-semibold text-[#1e2749] mb-2">{b.name}</p>
+                      <div className="flex justify-center gap-1.5 text-sm">
+                        {b.gold > 0 && <span>🥇{b.gold}</span>}
+                        {b.silver > 0 && <span>🥈{b.silver}</span>}
+                        {b.bronze > 0 && <span>🥉{b.bronze}</span>}
+                        {(b.gold + b.silver + b.bronze) === 0 && <span className="text-gray-300 text-xs italic">Rising</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Celebration Note */}
+              <div className="mt-4 p-4 bg-[#1e2749] rounded-xl text-white">
+                <p className="text-sm">
+                  <span className="font-semibold">Share these wins!</span> Building Awards are designed to be shared at
+                  staff meetings, board presentations, and PLC gatherings. When educators see their building recognized,
+                  it fuels the momentum that drives real change.
+                </p>
+              </div>
+            </div>
+
             {/* District Summary Bar */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
@@ -2873,6 +3472,80 @@ export default function ExampleDashboard() {
               </p>
             </div>
 
+            {/* District-wide Building Comparison */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h3 className="text-lg font-bold text-[#1e2749] mb-4">Building Comparison</h3>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-2 text-gray-500 font-medium">Building</th>
+                      <th className="text-center py-2 text-gray-500 font-medium">
+                        <Tooltip content="Percentage of staff who have logged into the Learning Hub at least once."><span>Hub Login</span></Tooltip>
+                      </th>
+                      <th className="text-center py-2 text-gray-500 font-medium">
+                        <Tooltip content="Percentage of staff who have completed at least one full course."><span>Courses</span></Tooltip>
+                      </th>
+                      <th className="text-center py-2 text-gray-500 font-medium">
+                        <Tooltip content="Average self-reported stress level from TDI baseline survey. Lower is better."><span>Stress</span></Tooltip>
+                      </th>
+                      <th className="text-center py-2 text-gray-500 font-medium">
+                        <Tooltip content="Percentage of teachers actively using TDI strategies in their classroom, measured via observations."><span>Implementation</span></Tooltip>
+                      </th>
+                      <th className="text-center py-2 text-gray-500 font-medium">Observation</th>
+                      <th className="text-center py-2 text-gray-500 font-medium">Champion</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {districtSchools.map((school) => {
+                      const schoolTotal = school.teachers.total + (school.paras?.total || 0);
+                      const schoolLoggedIn = school.teachers.loggedIn + (school.paras?.loggedIn || 0);
+                      const loginRate = Math.round((schoolLoggedIn / schoolTotal) * 100);
+
+                      return (
+                        <tr key={school.id} className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer" onClick={() => setExpandedSchool(school.id)}>
+                          <td className="py-3 text-[#1e2749] font-medium">{school.name}</td>
+                          <td className="py-3 text-center">
+                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${loginRate >= 90 ? 'bg-green-50 text-green-600' : loginRate >= 85 ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
+                              {loginRate}%
+                            </span>
+                          </td>
+                          <td className="py-3 text-center">
+                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${school.coursesCompleted >= 65 ? 'bg-green-50 text-green-600' : school.coursesCompleted >= 55 ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
+                              {school.coursesCompleted}%
+                            </span>
+                          </td>
+                          <td className="py-3 text-center">
+                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${school.avgStress <= 5.5 ? 'bg-green-50 text-green-600' : school.avgStress <= 6.5 ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
+                              {school.avgStress}/10
+                            </span>
+                          </td>
+                          <td className="py-3 text-center">
+                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${school.implementationRate >= 30 ? 'bg-green-50 text-green-600' : school.implementationRate >= 20 ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
+                              {school.implementationRate}%
+                            </span>
+                          </td>
+                          <td className="py-3 text-center">
+                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${school.observationStatus === 'Complete' ? 'bg-green-50 text-green-600' : school.observationStatus === 'Not yet scheduled' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'}`}>
+                              {school.observationStatus === 'Complete' ? '✓ Complete' : school.observationStatus}
+                            </span>
+                          </td>
+                          <td className="py-3 text-center">
+                            {school.champion ? (
+                              <span className="text-xs text-green-600 font-medium">{school.champion}</span>
+                            ) : (
+                              <span className="text-xs text-red-500 font-medium">Not assigned ⚠</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
             {/* School Cards - Full Width Stack */}
             <div className="space-y-4">
               {districtSchools.map((school) => {
@@ -2890,15 +3563,24 @@ export default function ExampleDashboard() {
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
+                          <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <h3 className="font-bold text-[#1e2749]">{school.name}</h3>
                             <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-0.5 rounded-full">{school.grades}</span>
+                            {school.champion && (
+                              <span className="text-xs bg-green-50 text-green-600 px-2 py-0.5 rounded-full">Champion: {school.champion}</span>
+                            )}
+                            {!school.champion && (
+                              <span className="text-xs bg-red-50 text-red-500 px-2 py-0.5 rounded-full">No champion ⚠</span>
+                            )}
                           </div>
                           <p className="text-sm text-gray-600">
                             {school.teachers.total} Teachers{school.paras ? ` · ${school.paras.total} Paras` : ''}
                           </p>
                         </div>
                         <div className="flex items-center gap-3">
+                          <span className={`text-xs px-2 py-1 rounded-full font-medium ${school.observationStatus === 'Complete' ? 'bg-green-50 text-green-600' : school.observationStatus === 'Not yet scheduled' ? 'bg-red-50 text-red-600' : 'bg-amber-50 text-amber-600'}`}>
+                            {school.observationStatus === 'Complete' ? 'Obs. ✓' : school.observationStatus}
+                          </span>
                           <div className="text-right">
                             <div className={`text-lg font-bold ${loginRate >= 85 ? 'text-green-600' : loginRate >= 70 ? 'text-amber-600' : 'text-red-500'}`}>
                               {loginRate}%
@@ -2924,6 +3606,64 @@ export default function ExampleDashboard() {
                     {/* Expanded Content */}
                     {isExpanded && (
                       <div className="border-t border-gray-100 p-4 bg-gray-50">
+                        {/* School Medals */}
+                        {school.medals && school.medals.length > 0 ? (
+                          <div className="flex flex-wrap gap-2 mb-4">
+                            {school.medals.map((medal: { type: string; category: string }, idx: number) => (
+                              <span key={idx} className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                                medal.type === 'gold' ? 'bg-amber-50 text-amber-700' :
+                                medal.type === 'silver' ? 'bg-gray-100 text-gray-600' :
+                                'bg-orange-50 text-orange-600'
+                              }`}>
+                                {medal.type === 'gold' ? '🥇' : medal.type === 'silver' ? '🥈' : '🥉'} {medal.category}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="mb-4 p-2 bg-blue-50 rounded-lg">
+                            <p className="text-xs text-blue-600">
+                              📈 Growing in all areas — on track to earn awards as engagement deepens this spring
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Mini dashboard grid for this building */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                          <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
+                            <p className={`text-2xl font-bold ${loginRate >= 85 ? 'text-[#4ecdc4]' : 'text-amber-500'}`}>{loginRate}%</p>
+                            <p className="text-xs text-gray-500">Hub Logins</p>
+                          </div>
+                          <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
+                            <p className={`text-2xl font-bold ${school.coursesCompleted >= 65 ? 'text-[#1e2749]' : 'text-[#38618C]'}`}>{school.coursesCompleted}%</p>
+                            <p className="text-xs text-gray-500">Courses Completed</p>
+                          </div>
+                          <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
+                            <p className={`text-2xl font-bold ${school.avgStress <= 5.5 ? 'text-green-500' : school.avgStress <= 6.5 ? 'text-amber-500' : 'text-red-500'}`}>{school.avgStress}/10</p>
+                            <p className="text-xs text-gray-500">Avg. Stress Level</p>
+                          </div>
+                          <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
+                            <p className={`text-2xl font-bold ${school.implementationRate >= 30 ? 'text-[#38618C]' : 'text-amber-500'}`}>{school.implementationRate}%</p>
+                            <p className="text-xs text-gray-500">Implementation Rate</p>
+                          </div>
+                        </div>
+
+                        {/* Observation summary */}
+                        <div className={`mb-4 p-3 rounded-lg ${school.observationStatus === 'Complete' ? 'bg-green-50' : school.observationStatus === 'Not yet scheduled' ? 'bg-red-50' : 'bg-amber-50'}`}>
+                          <p className={`text-sm ${school.observationStatus === 'Complete' ? 'text-green-700' : school.observationStatus === 'Not yet scheduled' ? 'text-red-700' : 'text-amber-700'}`}>
+                            <span className="font-semibold">Observation Day:</span>{' '}
+                            {school.observationStatus === 'Complete' ? 'Completed ✓ — Personalized feedback delivered, follow-up coaching scheduled' : school.observationStatus}
+                          </p>
+                        </div>
+
+                        {/* Building-specific TDI note */}
+                        {school.tdiNote && (
+                          <div className="mb-4 p-3 bg-[#1e2749]/5 rounded-lg">
+                            <p className="text-sm text-[#1e2749]">
+                              <span className="font-semibold">TDI Note:</span> {school.tdiNote}
+                            </p>
+                          </div>
+                        )}
+
                         <div className={`grid ${school.paras ? 'md:grid-cols-2' : 'grid-cols-1'} gap-8 ${school.paras ? 'md:divide-x md:divide-gray-200' : ''}`}>
                           {/* Teachers Column */}
                           <div className={school.paras ? 'md:pr-4' : ''}>
@@ -3098,679 +3838,541 @@ export default function ExampleDashboard() {
           </div>
         )}
 
-        {/* 2026-27 PREVIEW TAB */}
+        {/* 2026-27 PREVIEW TAB - OVERHAULED */}
         {activeTab === 'next-year' && (
-          <div className="space-y-6">
+          <div className="space-y-8">
 
-            {/* Header */}
-            <div className="bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
-              <div className="flex justify-between items-start mb-6">
-                <div>
-                  <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Looking Ahead</span>
-                  <h3 className="text-2xl font-bold mt-2">Continue Building on Your District&apos;s Momentum</h3>
-                  <p className="text-sm opacity-80 mt-1">Your 6 buildings have established a strong foundation. Here&apos;s how Year 2 takes it further.</p>
+            {/* SECTION A: Hero Banner */}
+            <div className="relative bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-8 text-white overflow-hidden">
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+
+              <div className="relative z-10">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="max-w-2xl">
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-xs bg-[#4ecdc4] text-[#1e2749] px-3 py-1 rounded-full font-bold uppercase tracking-wide">Phase 3: SUSTAIN</span>
+                      <span className="text-xs bg-white/20 px-3 py-1 rounded-full">2026-27</span>
+                    </div>
+                    <h2 className="text-3xl md:text-4xl font-bold mb-3">Year 3: Make the Gains Permanent</h2>
+                    <p className="text-lg opacity-90">
+                      You&apos;ve built momentum. You&apos;ve seen the data shift. Now it&apos;s time to lock it in — embedding what works into your district&apos;s DNA so the transformation outlasts any single initiative.
+                    </p>
+                  </div>
+                  <div className="hidden md:block text-right">
+                    <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
+                      <p className="text-4xl font-bold text-[#4ecdc4]">3</p>
+                      <p className="text-xs opacity-80 uppercase tracking-wide">Year</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-2xl font-bold">Phase 2 → Phase 3</span>
-                  <p className="text-xs opacity-70">ACCELERATE → SUSTAIN</p>
+
+                {/* Momentum Bar */}
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mt-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium">District Transformation Progress</span>
+                    <span className="text-sm opacity-80">Phase 3 of 3</span>
+                  </div>
+                  <div className="w-full bg-white/20 rounded-full h-3">
+                    <div className="bg-gradient-to-r from-[#4ecdc4] to-white h-3 rounded-full" style={{ width: '85%' }} />
+                  </div>
+                  <div className="flex justify-between mt-2 text-xs opacity-70">
+                    <span>Launch (Complete)</span>
+                    <span>Accelerate (Current)</span>
+                    <span className="text-[#4ecdc4] font-medium">Sustain (Next)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION B: Phase Journey Visual */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h3 className="text-lg font-bold text-[#1e2749] mb-6 text-center">Your District&apos;s TDI Journey</h3>
+
+              <div className="grid md:grid-cols-3 gap-4">
+                {/* Year 1 - LAUNCH (Complete) */}
+                <div className="relative">
+                  <div className="bg-gray-100 rounded-xl p-5 border-2 border-gray-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 bg-gray-400 rounded-full flex items-center justify-center">
+                        <Check className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <span className="text-xs text-gray-500 uppercase tracking-wide">Year 1</span>
+                        <p className="font-bold text-gray-600">LAUNCH</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-sm text-gray-500">
+                      <p>✓ Built foundation</p>
+                      <p>✓ Onboarded 255 educators</p>
+                      <p>✓ First observations</p>
+                      <p>✓ Established baseline data</p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-gray-200">
+                      <p className="text-xs text-gray-400">Status: Complete</p>
+                    </div>
+                  </div>
+                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
+                    <ChevronRight className="w-8 h-8 text-gray-300" />
+                  </div>
+                </div>
+
+                {/* Year 2 - ACCELERATE (Current) */}
+                <div className="relative">
+                  <div className="bg-[#38618C]/10 rounded-xl p-5 border-2 border-[#38618C]">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 bg-[#38618C] rounded-full flex items-center justify-center animate-pulse">
+                        <TrendingUp className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <span className="text-xs text-[#38618C] uppercase tracking-wide">Year 2</span>
+                        <p className="font-bold text-[#38618C]">ACCELERATE</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-sm text-[#38618C]">
+                      <p>→ Deepening implementation</p>
+                      <p>→ Stress down 25%</p>
+                      <p>→ Implementation up 4x</p>
+                      <p>→ Building momentum</p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-[#38618C]/20">
+                      <p className="text-xs text-[#38618C] font-medium">Status: In Progress</p>
+                    </div>
+                  </div>
+                  <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2 z-10">
+                    <ChevronRight className="w-8 h-8 text-[#4ecdc4]" />
+                  </div>
+                </div>
+
+                {/* Year 3 - SUSTAIN (Next) */}
+                <div className="relative">
+                  <div className="bg-gradient-to-br from-[#4ecdc4]/20 to-[#1e2749]/10 rounded-xl p-5 border-2 border-[#4ecdc4] shadow-lg">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 bg-[#4ecdc4] rounded-full flex items-center justify-center">
+                        <Star className="w-5 h-5 text-[#1e2749]" />
+                      </div>
+                      <div>
+                        <span className="text-xs text-[#4ecdc4] uppercase tracking-wide font-bold">Year 3</span>
+                        <p className="font-bold text-[#1e2749]">SUSTAIN</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-sm text-[#1e2749]">
+                      <p>★ Embed systems permanently</p>
+                      <p>★ Internal coaching capacity</p>
+                      <p>★ Self-sustaining culture</p>
+                      <p>★ Long-term retention gains</p>
+                    </div>
+                    <div className="mt-4 pt-3 border-t border-[#4ecdc4]/30">
+                      <p className="text-xs text-[#4ecdc4] font-bold">Status: Your Next Step</p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              {/* The Why - Research Connection */}
-              <div className="bg-white/10 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="w-4 h-4 text-white" />
-                  <p className="text-sm font-medium">Why This Plan?</p>
-                </div>
-                <p className="text-sm opacity-90">
-                  Your district&apos;s mid-year data shows remarkable progress: educator stress down <strong>25%</strong>, strategy implementation up <strong>4x</strong>, and para &quot;feeling valued&quot; scores improved by <strong>67%</strong>. Year 2 builds on this momentum — expanding support from pilot groups to full buildings, deepening teacher-para collaboration, and sustaining the culture shift your educators are already experiencing.
+              <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
+                <p className="text-sm text-amber-800">
+                  <strong>Research says:</strong> 3-year implementations see <strong>3x better retention</strong> of practices vs. 1-year initiatives (Learning Forward, 2024)
                 </p>
               </div>
             </div>
 
-            {/* The Plan - 4 Components */}
-            <div className="grid md:grid-cols-2 gap-4">
-
-              {/* Expanded Observation Cycles */}
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-                <div className="flex items-center gap-3 mb-3">
-                  <Search className="w-6 h-6 text-[#1e2749]" />
-                  <span className="font-semibold text-[#1e2749]">Expanded Observation Cycles</span>
-                </div>
-                <p className="text-sm text-gray-600 mb-4">Move from pilot groups to broader classroom coverage across all 6 buildings.</p>
-                <div className="text-xs text-gray-500 space-y-1">
-                  <p>✓ Multiple observation rounds per semester</p>
-                  <p>✓ Personalized Love Notes for every educator observed</p>
-                  <p>✓ Building-level growth tracking</p>
-                </div>
+            {/* SECTION C: Year 2 vs Year 3 Projections */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-6">
+                <TrendingUp className="w-5 h-5 text-[#1e2749]" />
+                <h3 className="text-lg font-bold text-[#1e2749]">What Year 3 Will Achieve</h3>
               </div>
 
-              {/* Leadership Capacity Building */}
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-                <div className="flex items-center gap-3 mb-3">
-                  <Award className="w-6 h-6 text-[#1e2749]" />
-                  <span className="font-semibold text-[#1e2749]">Leadership Capacity Building</span>
-                </div>
-                <p className="text-sm text-gray-600 mb-4">Develop internal coaching skills so your momentum continues beyond TDI.</p>
-                <div className="text-xs text-gray-500 space-y-1">
-                  <p>✓ Peer observation circles</p>
-                  <p>✓ TDI Champion advanced training</p>
-                  <p>✓ Leadership pathway for teacher-leaders and para-leaders</p>
-                </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-3 text-sm font-medium text-gray-500">Metric</th>
+                      <th className="text-center py-3 text-sm font-medium text-gray-400">Year 1<br/><span className="text-xs font-normal">Baseline</span></th>
+                      <th className="text-center py-3 text-sm font-medium text-[#38618C]">Year 2<br/><span className="text-xs font-normal">Current</span></th>
+                      <th className="text-center py-3 text-sm font-medium text-[#4ecdc4]">Year 3<br/><span className="text-xs font-normal">Projected</span></th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    <tr className="hover:bg-gray-50">
+                      <td className="py-4 text-sm text-gray-700">Educator Stress Level</td>
+                      <td className="py-4 text-center"><span className="text-gray-400">8.2/10</span></td>
+                      <td className="py-4 text-center"><span className="text-[#38618C] font-semibold">6.1/10</span> <span className="text-xs text-green-600">↓25%</span></td>
+                      <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-1 rounded font-bold">5.2/10</span></td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="py-4 text-sm text-gray-700">Strategy Implementation</td>
+                      <td className="py-4 text-center"><span className="text-gray-400">13%</span></td>
+                      <td className="py-4 text-center"><span className="text-[#38618C] font-semibold">52%</span> <span className="text-xs text-green-600">↑4x</span></td>
+                      <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-1 rounded font-bold">72%</span></td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="py-4 text-sm text-gray-700">Retention Intent</td>
+                      <td className="py-4 text-center"><span className="text-gray-400">5.2/10</span></td>
+                      <td className="py-4 text-center"><span className="text-[#38618C] font-semibold">7.8/10</span> <span className="text-xs text-green-600">↑50%</span></td>
+                      <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-1 rounded font-bold">8.5/10</span></td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="py-4 text-sm text-gray-700">Hub Engagement</td>
+                      <td className="py-4 text-center"><span className="text-gray-400">—</span></td>
+                      <td className="py-4 text-center"><span className="text-[#38618C] font-semibold">87%</span></td>
+                      <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-1 rounded font-bold">92%</span></td>
+                    </tr>
+                    <tr className="hover:bg-gray-50">
+                      <td className="py-4 text-sm text-gray-700">Internal Coaching Capacity</td>
+                      <td className="py-4 text-center"><span className="text-gray-400">0%</span></td>
+                      <td className="py-4 text-center"><span className="text-[#38618C] font-semibold">12%</span> <span className="text-xs text-gray-500">(TDI Champions)</span></td>
+                      <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-1 rounded font-bold">40%</span></td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
 
-              {/* Deepened Teacher-Para Partnership */}
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-                <div className="flex items-center gap-3 mb-3">
-                  <Handshake className="w-6 h-6 text-[#1e2749]" />
-                  <span className="font-semibold text-[#1e2749]">Deepened Teacher-Para Partnership</span>
-                </div>
-                <p className="text-sm text-gray-600 mb-4">Strengthen the collaboration systems started this year across every building.</p>
-                <div className="text-xs text-gray-500 space-y-1">
-                  <p>✓ Co-planning structures embedded in schedules</p>
-                  <p>✓ Joint Growth Groups (teachers + paras together)</p>
-                  <p>✓ Communication systems that stick</p>
-                </div>
-              </div>
-
-              {/* Sustained Support & Growth */}
-              <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-                <div className="flex items-center gap-3 mb-3">
-                  <TrendingUp className="w-6 h-6 text-[#1e2749]" />
-                  <span className="font-semibold text-[#1e2749]">Sustained Support & Growth</span>
-                </div>
-                <p className="text-sm text-gray-600 mb-4">Everything your team loved this year — plus more.</p>
-                <div className="text-xs text-gray-500 space-y-1">
-                  <p>✓ Full Hub access continues for all 255 educators</p>
-                  <p>✓ Weekly Love Notes and strategy spotlights</p>
-                  <p>✓ Dashboard tracking with building-level detail</p>
-                  <p>✓ Direct line to Rae</p>
-                </div>
+              <div className="mt-4 p-3 bg-blue-50 rounded-lg">
+                <p className="text-xs text-blue-700 text-center">
+                  Projections based on TDI partner averages for Year 3 districts with similar demographics and engagement patterns
+                </p>
               </div>
             </div>
 
-            {/* 2026-27 Focus Areas */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 mb-4">
-                <Target className="w-5 h-5 text-[#1e2749]" />
-                <h4 className="font-semibold text-[#1e2749]">Year 2 Focus Areas</h4>
+            {/* SECTION D: What Year 3 Unlocks */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles className="w-5 h-5 text-[#4ecdc4]" />
+                <h3 className="text-lg font-bold text-[#1e2749]">What Year 3 Unlocks</h3>
               </div>
-              <p className="text-sm text-gray-600 mb-6">
-                Based on your mid-year survey data, observation insights, and leadership priorities, we&apos;ve identified three strategic focus areas for 2026-27. Each includes measurable goals we&apos;ll track together.
-              </p>
+              <p className="text-sm text-gray-500 mb-6">Everything that made Year 2 successful — plus sustainability features that make it permanent</p>
 
               <div className="grid md:grid-cols-3 gap-4">
-
-                {/* Educator Retention & Wellness - Primary Focus */}
-                <div className="bg-[#1e2749] text-white rounded-xl p-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Heart className="w-5 h-5" />
-                    <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">Primary Focus</span>
+                {/* Hub Access */}
+                <div className="bg-gradient-to-br from-[#4ecdc4]/10 to-transparent rounded-xl p-5 border border-[#4ecdc4]/20">
+                  <div className="w-12 h-12 bg-[#4ecdc4]/20 rounded-xl flex items-center justify-center mb-4">
+                    <Laptop className="w-6 h-6 text-[#4ecdc4]" />
                   </div>
-                  <h5 className="font-semibold text-lg mb-2">Educator Retention & Wellness</h5>
-                  <p className="text-sm opacity-80 mb-4">Sustain the stress reduction and build long-term educator satisfaction across all buildings</p>
-                  <div className="border-t border-white/20 pt-3 mt-3">
-                    <p className="text-xs opacity-60 mb-2">Success Metrics:</p>
-                    <ul className="text-sm space-y-1">
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
-                        Stress level maintained below 6.0/10 district-wide
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
-                        Retention intent above 8.5/10
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
-                        Para &quot;feeling valued&quot; sustained above 7.0/10
-                      </li>
-                    </ul>
-                  </div>
+                  <h4 className="font-semibold text-[#1e2749] mb-2">Full Hub Access</h4>
+                  <p className="text-sm text-gray-600 mb-3">All 255 educators continue with unlimited access to 300+ resources, templates, and tools</p>
+                  <span className="text-xs bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-1 rounded-full">Continues</span>
                 </div>
 
-                {/* Implementation Depth */}
-                <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Layers className="w-5 h-5 text-[#38618C]" />
-                    <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-0.5 rounded-full">Supporting Focus</span>
+                {/* Observations */}
+                <div className="bg-gradient-to-br from-[#38618C]/10 to-transparent rounded-xl p-5 border border-[#38618C]/20">
+                  <div className="w-12 h-12 bg-[#38618C]/20 rounded-xl flex items-center justify-center mb-4">
+                    <Search className="w-6 h-6 text-[#38618C]" />
                   </div>
-                  <h5 className="font-semibold text-lg text-[#1e2749] mb-2">Implementation Depth</h5>
-                  <p className="text-sm text-gray-600 mb-4">Move from trying strategies to embedding them into daily practice</p>
-                  <div className="border-t border-gray-200 pt-3 mt-3">
-                    <p className="text-xs text-gray-500 mb-2">Success Metrics:</p>
-                    <ul className="text-sm text-gray-700 space-y-1">
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full" />
-                        Strategy implementation above 65% (TDI partner benchmark)
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full" />
-                        Planning time sustained below 7 hrs/week
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full" />
-                        80%+ of Growth Group members report using strategies weekly
-                      </li>
-                    </ul>
-                  </div>
+                  <h4 className="font-semibold text-[#1e2749] mb-2">Extended Observations</h4>
+                  <p className="text-sm text-gray-600 mb-3">2 full on-campus days with expanded classroom coverage and personalized Love Notes</p>
+                  <span className="text-xs bg-[#38618C]/20 text-[#1e2749] px-2 py-1 rounded-full">Continues</span>
                 </div>
 
-                {/* Teacher-Para Collaboration */}
-                <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Handshake className="w-5 h-5 text-[#35A7FF]" />
-                    <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-0.5 rounded-full">Supporting Focus</span>
+                {/* Leadership Sessions */}
+                <div className="bg-gradient-to-br from-[#1e2749]/10 to-transparent rounded-xl p-5 border border-[#1e2749]/20">
+                  <div className="w-12 h-12 bg-[#1e2749]/20 rounded-xl flex items-center justify-center mb-4">
+                    <Users className="w-6 h-6 text-[#1e2749]" />
                   </div>
-                  <h5 className="font-semibold text-lg text-[#1e2749] mb-2">Teacher-Para Collaboration</h5>
-                  <p className="text-sm text-gray-600 mb-4">Build systematic co-planning and shared accountability between teachers and paras</p>
-                  <div className="border-t border-gray-200 pt-3 mt-3">
-                    <p className="text-xs text-gray-500 mb-2">Success Metrics:</p>
-                    <ul className="text-sm text-gray-700 space-y-1">
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
-                        90%+ of teacher-para pairs have weekly co-planning touchpoint
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
-                        Para inclusion in professional development above 80%
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
-                        Teacher satisfaction with para support above 8.0/10
-                      </li>
-                    </ul>
-                  </div>
+                  <h4 className="font-semibold text-[#1e2749] mb-2">Executive Impact Sessions</h4>
+                  <p className="text-sm text-gray-600 mb-3">4 strategic sessions with Dr. Ford and leadership team for data-driven decisions</p>
+                  <span className="text-xs bg-[#1e2749]/20 text-[#1e2749] px-2 py-1 rounded-full">Continues</span>
                 </div>
 
-              </div>
-
-              {/* Connection to Data */}
-              <div className="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <TrendingUp className="w-5 h-5 text-amber-600 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-medium text-amber-800">Why These Metrics?</p>
-                    <p className="text-sm text-amber-700 mt-1">
-                      These goals come directly from your mid-year survey data (stress down 25%, implementation up 4x), observation insights across both pilot groups, and Dr. Ford&apos;s commitment to building sustainable support systems for every adult in the building. We&apos;ll measure progress at each touchpoint.
-                    </p>
+                {/* Internal Coaching - NEW */}
+                <div className="bg-gradient-to-br from-amber-500/10 to-transparent rounded-xl p-5 border-2 border-amber-400">
+                  <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-4">
+                    <Award className="w-6 h-6 text-amber-600" />
                   </div>
+                  <h4 className="font-semibold text-[#1e2749] mb-2">Internal Coaching Capacity</h4>
+                  <p className="text-sm text-gray-600 mb-3">Train your TDI Champions to lead peer observations and Growth Groups independently</p>
+                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">NEW in Year 3</span>
                 </div>
-              </div>
-            </div>
 
-            {/* 2026-27 Timeline - Accordion Style */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-[#1e2749]" />
-                  <h4 className="font-semibold text-[#1e2749]">Proposed 2026-27 Timeline</h4>
+                {/* Peer Observation Circles - NEW */}
+                <div className="bg-gradient-to-br from-amber-500/10 to-transparent rounded-xl p-5 border-2 border-amber-400">
+                  <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-4">
+                    <Eye className="w-6 h-6 text-amber-600" />
+                  </div>
+                  <h4 className="font-semibold text-[#1e2749] mb-2">Peer Observation Circles</h4>
+                  <p className="text-sm text-gray-600 mb-3">Teacher-led observation structures that continue after TDI partnership ends</p>
+                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">NEW in Year 3</span>
                 </div>
-                <div className="flex gap-2 text-xs">
-                  <button
-                    onClick={() => setOpenSections(prev => ({
-                      ...prev,
-                      'timeline-july': true, 'timeline-sept': true, 'timeline-oct': true,
-                      'timeline-dec': true, 'timeline-jan': true, 'timeline-feb': true,
-                      'timeline-mar-onsite': true, 'timeline-mar-virtual': true,
-                      'timeline-apr': true, 'timeline-may': true
-                    }))}
-                    className="text-[#35A7FF] hover:underline"
-                  >
-                    Expand All
-                  </button>
-                  <span className="text-gray-300">|</span>
-                  <button
-                    onClick={() => setOpenSections(prev => ({
-                      ...prev,
-                      'timeline-july': false, 'timeline-sept': false, 'timeline-oct': false,
-                      'timeline-dec': false, 'timeline-jan': false, 'timeline-feb': false,
-                      'timeline-mar-onsite': false, 'timeline-mar-virtual': false,
-                      'timeline-apr': false, 'timeline-may': false
-                    }))}
-                    className="text-[#35A7FF] hover:underline"
-                  >
-                    Collapse All
-                  </button>
-                </div>
-              </div>
-              <p className="text-sm text-gray-500 mb-6">Phase 2 (ACCELERATE) -  Click each session for details</p>
 
-              <div className="space-y-3">
-
-                {/* July 2026 - Executive Impact Session #1 */}
-                <TimelineAccordion id="timeline-july" number={1} date="July 2026" title="Executive Impact Session #1" type="leadership" duration="90 minutes">
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Goals:</p>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Review 2025-26 outcomes and celebrate wins</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Set Year 2 goals for each building</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Align on success metrics and tracking approach</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Plan expanded observation rollout and kickoff logistics</li>
-                      </ul>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-500 mb-1">Growth Connection:</p>
-                      <p className="text-sm text-gray-700">Establish baseline expectations — what does Year 2 success look like across all 6 buildings? Define observable indicators.</p>
-                    </div>
+                {/* Sustainability Toolkit - NEW */}
+                <div className="bg-gradient-to-br from-amber-500/10 to-transparent rounded-xl p-5 border-2 border-amber-400">
+                  <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-4">
+                    <Download className="w-6 h-6 text-amber-600" />
                   </div>
-                </TimelineAccordion>
-
-                {/* Sept/Oct 2026 - On-Campus Day #1 */}
-                <TimelineAccordion id="timeline-sept" number={2} date="Sept/Oct 2026" title="On-Campus Day #1" type="onsite" duration="Full Day">
-                  <div className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Sun className="w-4 h-4 text-amber-600" />
-                          <p className="text-sm font-medium text-amber-800">Morning: All-Staff Session</p>
-                        </div>
-                        <ul className="text-sm text-amber-700 space-y-1">
-                          <li>• Year 2 kickoff: celebrate Year 1 wins</li>
-                          <li>• Introduce expanded observation model</li>
-                          <li>• TDI Champion refresher + new Champion onboarding</li>
-                          <li>• Hub resource orientation for new staff</li>
-                        </ul>
-                      </div>
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Sunset className="w-4 h-4 text-blue-600" />
-                          <p className="text-sm font-medium text-blue-800">Afternoon: Classroom Observations</p>
-                        </div>
-                        <ul className="text-sm text-blue-700 space-y-1">
-                          <li>• Focus: Baseline observations for expanded groups</li>
-                          <li>• Building-level observation notes</li>
-                          <li>• 1:1 educator check-ins</li>
-                          <li>• Identify bright spots to share</li>
-                        </ul>
-                      </div>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-500 mb-1">Growth Connection:</p>
-                      <p className="text-sm text-gray-700">Observations establish baseline for Year 2 growth tracking. Building on Year 1 pilot data to set personalized goals.</p>
-                    </div>
-                  </div>
-                </TimelineAccordion>
-
-                {/* Oct/Nov 2026 - Virtual Session #1 */}
-                <TimelineAccordion id="timeline-oct" number={3} date="Oct/Nov 2026" title="Virtual Strategy Session #1" type="virtual" duration="60 minutes">
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Focus: Deepening Implementation</p>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Building on Year 1 strategies: What&apos;s working?</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Teacher-para collaboration check-in</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Hub resource deep-dive: New tools for Year 2</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Peer sharing: Bright spots from observations</li>
-                      </ul>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-500 mb-1">Implementation Connection:</p>
-                      <p className="text-sm text-gray-700">Move from &quot;trying&quot; strategies to embedding them into daily practice across all classrooms.</p>
-                    </div>
-                  </div>
-                </TimelineAccordion>
-
-                {/* Dec 2026 - Executive Impact Session #2 */}
-                <TimelineAccordion id="timeline-dec" number={4} date="Dec 2026" title="Executive Impact Session #2" type="leadership" duration="90 minutes">
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Goals:</p>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Mid-year data review: What&apos;s moving?</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Teacher retention pulse check</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Adjust strategy based on observation data</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Plan spring differentiation push</li>
-                      </ul>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-500 mb-1">Metrics Check:</p>
-                      <p className="text-sm text-gray-700">Compare teacher survey results to baseline. Are stress levels holding? Is differentiation showing up in classrooms?</p>
-                    </div>
-                  </div>
-                </TimelineAccordion>
-
-                {/* Jan 2027 - Virtual Session #2 */}
-                <TimelineAccordion id="timeline-jan" number={5} date="Jan 2027" title="Virtual Strategy Session #2" type="virtual" duration="60 minutes">
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Focus: Teacher-Para Partnership Deep-Dive</p>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Co-planning structures that work: Models from Year 1</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Building-level collaboration check-ins</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Joint Growth Group planning: Teachers + paras together</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Troubleshooting: Communication challenges</li>
-                      </ul>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-500 mb-1">Collaboration Connection:</p>
-                      <p className="text-sm text-gray-700">Build systematic structures for teacher-para collaboration that stick beyond Year 2.</p>
-                    </div>
-                  </div>
-                </TimelineAccordion>
-
-                {/* Feb 2027 - Executive Impact Session #3 */}
-                <TimelineAccordion id="timeline-feb" number={6} date="Feb 2027" title="Executive Impact Session #3" type="leadership" duration="90 minutes">
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Goals:</p>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Mid-year wellness pulse check across all buildings</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Implementation depth review: What&apos;s embedded?</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Spring observation focus areas</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Teacher-para collaboration metrics review</li>
-                      </ul>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-500 mb-1">Sustainability Connection:</p>
-                      <p className="text-sm text-gray-700">Are we on track to sustain these gains into Year 3? Identify what needs reinforcement.</p>
-                    </div>
-                  </div>
-                </TimelineAccordion>
-
-                {/* Mar 2027 - On-Campus Day #2 */}
-                <TimelineAccordion id="timeline-mar-onsite" number={7} date="Mar 2027" title="On-Campus Day #2" type="onsite" duration="Full Day">
-                  <div className="space-y-4">
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Sun className="w-4 h-4 text-blue-600" />
-                          <p className="text-sm font-medium text-blue-800">Morning: Classroom Observations</p>
-                        </div>
-                        <ul className="text-sm text-blue-700 space-y-1">
-                          <li>• Focus: Differentiation in action</li>
-                          <li>• Look-fors: Tiered tasks, flexible groups</li>
-                          <li>• Compare to Sept baseline</li>
-                          <li>• Document growth and bright spots</li>
-                        </ul>
-                      </div>
-                      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Sunset className="w-4 h-4 text-amber-600" />
-                          <p className="text-sm font-medium text-amber-800">Afternoon: Coaching Conversations</p>
-                        </div>
-                        <ul className="text-sm text-amber-700 space-y-1">
-                          <li>• 1:1 feedback from morning observations</li>
-                          <li>• Growth group check-ins</li>
-                          <li>• Celebrate implementation wins</li>
-                          <li>• Problem-solve remaining challenges</li>
-                        </ul>
-                      </div>
-                    </div>
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                      <p className="text-xs text-green-600 mb-1">Why Flipped?</p>
-                      <p className="text-sm text-green-700">Morning observations allow afternoon conversations to be immediately actionable -  feedback is fresh.</p>
-                    </div>
-                  </div>
-                </TimelineAccordion>
-
-                {/* Mar/Apr 2027 - Virtual Session #3 */}
-                <TimelineAccordion id="timeline-mar-virtual" number={8} date="Mar/Apr 2027" title="Virtual Strategy Session #3" type="virtual" duration="60 minutes">
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Focus: Scaling Success</p>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Building-level bright spots: What&apos;s working where?</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Cross-building collaboration opportunities</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Hub resource showcase: Educator favorites</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Peer sharing: Biggest wins this year</li>
-                      </ul>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-500 mb-1">Sustainability Connection:</p>
-                      <p className="text-sm text-gray-700">Identify practices that should become permanent fixtures across all 6 buildings.</p>
-                    </div>
-                  </div>
-                </TimelineAccordion>
-
-                {/* Apr 2027 - Virtual Session #4 */}
-                <TimelineAccordion id="timeline-apr" number={9} date="Apr 2027" title="Virtual Strategy Session #4" type="virtual" duration="60 minutes">
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Focus: Sustainability Planning</p>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />What&apos;s working? What sticks?</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Building peer support structures</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Teacher-leader identification</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Summer planning for 2027-28</li>
-                      </ul>
-                    </div>
-                    <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-500 mb-1">Classroom Management Connection:</p>
-                      <p className="text-sm text-gray-700">Lock in routines and systems that support differentiation long-term.</p>
-                    </div>
-                  </div>
-                </TimelineAccordion>
-
-                {/* May 2027 - Celebration */}
-                <TimelineAccordion id="timeline-may" number={10} date="May 2027" title="Executive Impact Session #4 + Year-End Celebration" type="celebration" duration="2 hours">
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Goals:</p>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Celebrate growth: Compare to Year 1 baseline</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Review wellness and retention metrics vs. goals</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Implementation depth and collaboration data</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Plan 2027-28 continuation (Phase 3: SUSTAIN)</li>
-                      </ul>
-                    </div>
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-                      <p className="text-xs text-green-600 mb-1">Metrics Review:</p>
-                      <div className="grid grid-cols-3 gap-3 mt-2 text-center">
-                        <div>
-                          <p className="text-lg font-bold text-green-700">&lt;6.0</p>
-                          <p className="text-xs text-green-600">Stress level maintained</p>
-                        </div>
-                        <div>
-                          <p className="text-lg font-bold text-green-700">65%+</p>
-                          <p className="text-xs text-green-600">Implementation depth</p>
-                        </div>
-                        <div>
-                          <p className="text-lg font-bold text-green-700">90%+</p>
-                          <p className="text-xs text-green-600">Co-planning pairs</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </TimelineAccordion>
-
-              </div>
-
-              {/* Summary Stats - Matches Package */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-100">
-                <div className="text-center">
-                  <div className="flex justify-center mb-1">
-                    <School className="w-4 h-4 text-[#38618C]" />
-                  </div>
-                  <p className="text-2xl font-bold text-[#1e2749]">2</p>
-                  <p className="text-xs text-gray-500">On-Campus Days</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex justify-center mb-1">
-                    <Video className="w-4 h-4 text-[#35A7FF]" />
-                  </div>
-                  <p className="text-2xl font-bold text-[#35A7FF]">4</p>
-                  <p className="text-xs text-gray-500">Virtual Sessions</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex justify-center mb-1">
-                    <Users className="w-4 h-4 text-[#1e2749]" />
-                  </div>
-                  <p className="text-2xl font-bold text-[#1e2749]">4</p>
-                  <p className="text-xs text-gray-500">Executive Impact Sessions</p>
-                </div>
-                <div className="text-center">
-                  <div className="flex justify-center mb-1">
-                    <Award className="w-4 h-4 text-green-500" />
-                  </div>
-                  <p className="text-2xl font-bold text-green-500">1</p>
-                  <p className="text-xs text-gray-500">Celebration</p>
+                  <h4 className="font-semibold text-[#1e2749] mb-2">Sustainability Toolkit</h4>
+                  <p className="text-sm text-gray-600 mb-3">Templates, protocols, and systems designed to run independently post-partnership</p>
+                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">NEW in Year 3</span>
                 </div>
               </div>
 
-              {/* Ongoing Support - Always Included */}
+              {/* Also Included */}
               <div className="mt-6 pt-6 border-t border-gray-100">
-                <p className="text-sm font-medium text-[#1e2749] mb-3">Ongoing Throughout the Year:</p>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Laptop className="w-4 h-4 text-[#35A7FF]" />
-                    <span>Hub Access (All Staff)</span>
+                <p className="text-sm font-medium text-gray-500 mb-3">Also Included:</p>
+                <div className="flex flex-wrap gap-3">
+                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                    <Video className="w-3.5 h-3.5" /> 4 Virtual Strategy Sessions
+                  </span>
+                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                    <Heart className="w-3.5 h-3.5" /> Weekly Love Notes
+                  </span>
+                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                    <Monitor className="w-3.5 h-3.5" /> Leadership Dashboard
+                  </span>
+                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                    <Megaphone className="w-3.5 h-3.5" /> Direct Line to Rae
+                  </span>
+                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5" /> Full Resource Library
+                  </span>
+                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                    <Award className="w-3.5 h-3.5" /> Year-End Celebration
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION E: ROI / Numbers That Matter */}
+            <div className="bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-2xl p-8 text-white">
+              <div className="text-center mb-8">
+                <span className="text-xs bg-white/20 px-3 py-1 rounded-full">The Numbers That Matter</span>
+                <h3 className="text-2xl font-bold mt-3">Your Return on Investment</h3>
+                <p className="text-sm opacity-80 mt-2">Here&apos;s what your TDI partnership has already delivered — and what Year 3 will amplify</p>
+              </div>
+
+              {/* ROI Stats Grid */}
+              <div className="grid md:grid-cols-4 gap-4 mb-6">
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 text-center">
+                  <p className="text-4xl font-bold text-[#4ecdc4]">$847K</p>
+                  <p className="text-sm opacity-80 mt-1">Estimated Retention Savings</p>
+                  <p className="text-xs opacity-60 mt-2">Based on reduced turnover costs</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 text-center">
+                  <p className="text-4xl font-bold">25%</p>
+                  <p className="text-sm opacity-80 mt-1">Stress Reduction</p>
+                  <p className="text-xs opacity-60 mt-2">8.2 → 6.1 avg rating</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 text-center">
+                  <p className="text-4xl font-bold">4x</p>
+                  <p className="text-sm opacity-80 mt-1">Implementation Growth</p>
+                  <p className="text-xs opacity-60 mt-2">13% → 52% adoption</p>
+                </div>
+                <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 text-center">
+                  <p className="text-4xl font-bold">87%</p>
+                  <p className="text-sm opacity-80 mt-1">Hub Engagement</p>
+                  <p className="text-xs opacity-60 mt-2">vs 10% industry avg</p>
+                </div>
+              </div>
+
+              {/* What It Means */}
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5">
+                <p className="text-sm font-medium mb-3">What This Means for Motown:</p>
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-[#4ecdc4] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Check className="w-4 h-4 text-[#1e2749]" />
+                    </div>
+                    <p className="opacity-90">Teachers are less burned out and more likely to stay</p>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <BookOpen className="w-4 h-4 text-[#38618C]" />
-                    <span>TDI Resource Library (All Educators)</span>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-[#4ecdc4] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Check className="w-4 h-4 text-[#1e2749]" />
+                    </div>
+                    <p className="opacity-90">Strategies are actually being used in classrooms</p>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <TrendingUp className="w-4 h-4 text-green-500" />
-                    <span>Retention Tracking</span>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-[#4ecdc4] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Check className="w-4 h-4 text-[#1e2749]" />
+                    </div>
+                    <p className="opacity-90">Paras feel valued and included in professional growth</p>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <Heart className="w-4 h-4 text-[#E07A5F]" />
-                    <span>Weekly Love Notes</span>
+                  <div className="flex items-start gap-3">
+                    <div className="w-6 h-6 bg-[#4ecdc4] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Check className="w-4 h-4 text-[#1e2749]" />
+                    </div>
+                    <p className="opacity-90">Hub resources are being actively used (not shelfware)</p>
                   </div>
                 </div>
               </div>
 
+              {/* ROI Calculator Link */}
+              <div className="mt-6 text-center">
+                <a
+                  href="/calculator"
+                  className="inline-flex items-center gap-2 bg-white text-[#1e2749] px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+                >
+                  <Calculator className="w-5 h-5" />
+                  See Full ROI Breakdown →
+                </a>
+              </div>
+
             </div>
 
-            {/* Goals Alignment */}
-            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 mb-4">
+            {/* SECTION F: Goals Alignment */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-6">
                 <Target className="w-5 h-5 text-[#1e2749]" />
-                <p className="font-semibold text-[#1e2749]">Aligned to Your Goals</p>
+                <h3 className="text-lg font-bold text-[#1e2749]">Aligned to Your District Goals</h3>
               </div>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <p className="text-xs text-gray-500 mb-1">Dr. Ford&apos;s District Goal:</p>
-                  <p className="text-sm text-[#1e2749] font-medium">&quot;Build sustainable support systems for every teacher and para — so students get consistent, high-quality instruction from every adult in the room.&quot;</p>
+
+              <div className="grid md:grid-cols-3 gap-4">
+                {/* District Goal */}
+                <div className="bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-xl p-5 text-white">
+                  <div className="flex items-center gap-2 mb-3">
+                    <School className="w-5 h-5" />
+                    <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">Your Goal</span>
+                  </div>
+                  <p className="text-sm font-medium">
+                    &quot;Build sustainable support systems for every teacher and para — so students get consistent, high-quality instruction from every adult in the room.&quot;
+                  </p>
+                  <p className="text-xs opacity-70 mt-3">— Dr. Ford, Superintendent</p>
                 </div>
-                <div className="bg-[#35A7FF]/10 rounded-lg p-4">
-                  <p className="text-xs text-[#35A7FF] mb-1">TDI Commitment:</p>
-                  <p className="text-sm text-[#1e2749] font-medium">Deepen educator wellness, implementation depth, and teacher-para collaboration across all 6 buildings through embedded, year-long support.</p>
+
+                {/* How Year 3 Delivers */}
+                <div className="bg-[#4ecdc4]/10 border border-[#4ecdc4]/20 rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Check className="w-5 h-5 text-[#4ecdc4]" />
+                    <span className="text-xs bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-0.5 rounded-full">Year 3 Delivers</span>
+                  </div>
+                  <ul className="text-sm text-gray-700 space-y-2">
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-[#4ecdc4] rounded-full mt-1.5 flex-shrink-0" />
+                      Internal coaching capacity built into your team
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-[#4ecdc4] rounded-full mt-1.5 flex-shrink-0" />
+                      Systems that run without external support
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-[#4ecdc4] rounded-full mt-1.5 flex-shrink-0" />
+                      Culture change that outlasts the partnership
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Research Backing */}
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <BookOpen className="w-5 h-5 text-gray-600" />
+                    <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">Research Says</span>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Multi-year professional development programs show <strong>3x better retention</strong> of practices vs. single-year initiatives. Year 3 is where change becomes permanent.
+                  </p>
+                  <p className="text-xs text-gray-400 mt-3">— Learning Forward, 2024</p>
+                </div>
+              </div>
+
+              {/* Strategic Priorities Alignment */}
+              <div className="mt-6 pt-6 border-t border-gray-100">
+                <p className="text-sm font-medium text-gray-600 mb-4">Year 3 Strategic Priorities:</p>
+                <div className="grid md:grid-cols-3 gap-3">
+                  <div className="flex items-center gap-3 bg-green-50 rounded-lg p-3">
+                    <Heart className="w-5 h-5 text-green-600" />
+                    <div>
+                      <p className="text-sm font-medium text-green-800">Educator Wellness</p>
+                      <p className="text-xs text-green-600">Sustain below 6.0 stress</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 bg-blue-50 rounded-lg p-3">
+                    <Layers className="w-5 h-5 text-blue-600" />
+                    <div>
+                      <p className="text-sm font-medium text-blue-800">Implementation Depth</p>
+                      <p className="text-xs text-blue-600">Target 72% adoption</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 bg-purple-50 rounded-lg p-3">
+                    <Award className="w-5 h-5 text-purple-600" />
+                    <div>
+                      <p className="text-sm font-medium text-purple-800">Internal Capacity</p>
+                      <p className="text-xs text-purple-600">40% trained coaches</p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Teacher Impact Stats */}
-            <div className="bg-green-50 border border-green-200 rounded-xl p-5">
-              <div className="flex items-center gap-2 mb-4">
-                <Heart className="w-5 h-5 text-green-600" />
-                <p className="font-semibold text-green-800">What Teachers Get</p>
+            {/* SECTION G: Renewal CTA */}
+            <div className="relative bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-8 text-white overflow-hidden">
+              {/* Decorative */}
+              <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+
+              <div className="relative z-10 text-center max-w-2xl mx-auto">
+                <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full mb-4">
+                  <Sparkles className="w-4 h-4" />
+                  <span className="text-sm font-medium">Ready for Year 3?</span>
+                </div>
+
+                <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                  Let&apos;s Make These Gains Permanent
+                </h3>
+                <p className="text-lg opacity-90 mb-6">
+                  Your district has built incredible momentum. Year 3 is where we lock it in — building the internal capacity to sustain this transformation for years to come.
+                </p>
+
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+                  <span
+                    className="inline-flex items-center gap-2 bg-white text-[#1e2749] px-8 py-4 rounded-xl font-bold text-lg opacity-85 cursor-default"
+                    title="This is an example dashboard"
+                  >
+                    <Calendar className="w-5 h-5" />
+                    Schedule Renewal Conversation
+                  </span>
+                  <a
+                    href="/calculator"
+                    className="inline-flex items-center gap-2 bg-transparent border-2 border-white/50 text-white px-6 py-3 rounded-xl font-medium hover:bg-white/10 transition-colors"
+                  >
+                    <Calculator className="w-5 h-5" />
+                    See ROI Calculator
+                  </a>
+                </div>
+
+                <p className="text-sm opacity-70 italic">
+                  Available in active partnerships — your TDI partner will reach out to schedule
+                </p>
               </div>
-              <div className="grid grid-cols-3 gap-4 text-center">
+
+              {/* Trust Indicators */}
+              <div className="mt-8 pt-6 border-t border-white/20 grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <p className="text-3xl font-bold text-green-700">30+</p>
-                  <p className="text-xs text-green-600">Hours of PD</p>
+                  <p className="text-2xl font-bold">94%</p>
+                  <p className="text-xs opacity-70">Partner Renewal Rate</p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-green-700">1:1</p>
-                  <p className="text-xs text-green-600">Personalized Feedback</p>
+                  <p className="text-2xl font-bold">3yr</p>
+                  <p className="text-xs opacity-70">Avg Partnership Length</p>
                 </div>
                 <div>
-                  <p className="text-3xl font-bold text-green-700">24/7</p>
-                  <p className="text-xs text-green-600">Hub Access</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Research Foundation */}
-            <div className="bg-gray-50 rounded-xl p-5">
-              <p className="text-xs text-gray-500 mb-2">Research Foundation:</p>
-              <p className="text-sm text-gray-600">
-                Differentiated instruction improves student outcomes by 0.5 standard deviations (Hattie, 2023). Schools implementing TDI&apos;s model see <strong>65% strategy implementation</strong> vs. 10% industry average, with measurable improvements in teacher retention and student engagement.
-              </p>
-            </div>
-
-            {/* ROI / Impact Summary */}
-            <div className="bg-gradient-to-r from-[#1B2A4A] to-[#38618C] rounded-xl p-6 text-white">
-              <div className="flex items-center justify-between mb-6">
-                <h4 className="text-lg font-bold">What Your Partnership Has Delivered This Year</h4>
-                <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Example Data</span>
-              </div>
-
-              {/* First Row */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div className="text-center">
-                  <p className="text-3xl font-bold">255</p>
-                  <p className="text-xs opacity-80">Educators Supported</p>
-                  <p className="text-xs opacity-60">across 6 buildings</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold">87%</p>
-                  <p className="text-xs opacity-80">Hub Engagement</p>
-                  <p className="text-xs opacity-60">vs 10% industry average</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold">52%</p>
-                  <p className="text-xs opacity-80">Strategy Implementation</p>
-                  <p className="text-xs opacity-60">vs 10% industry average</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold">277</p>
-                  <p className="text-xs opacity-80">Love Notes Delivered</p>
-                  <p className="text-xs opacity-60">255 welcome + 22 observation</p>
-                </div>
-              </div>
-
-              {/* Second Row */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-white/20">
-                <div className="text-center">
-                  <p className="text-3xl font-bold">↓ 25%</p>
-                  <p className="text-xs opacity-80">Educator Stress</p>
-                  <p className="text-xs opacity-60">8.2 → 6.1</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold">↓ 32%</p>
-                  <p className="text-xs opacity-80">Planning Time</p>
-                  <p className="text-xs opacity-60">11 → 7.5 hrs/wk</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold">↑ 50%</p>
-                  <p className="text-xs opacity-80">Retention Intent</p>
-                  <p className="text-xs opacity-60">5.2 → 7.8</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-3xl font-bold text-[#35A7FF]">+</p>
-                  <p className="text-xs opacity-80">Zero-Cost Extras</p>
-                  <p className="text-xs opacity-60">Newsletter, podcast, blog, community</p>
+                  <p className="text-2xl font-bold">100%</p>
+                  <p className="text-xs opacity-70">Satisfaction Score</p>
                 </div>
               </div>
             </div>
 
             {/* Board Presentation Offer */}
-            <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
-              <p className="font-bold text-[#1e2749] text-lg mb-2">NEED HELP MAKING THE CASE?</p>
-              <p className="text-gray-600 text-sm mb-4">
-                We&apos;ll help you build a board presentation with your actual impact data, cost analysis, and recommended next steps. Your success is our pitch.
-              </p>
-              <a
-                href="/calculator"
-                className="inline-flex items-center gap-2 text-[#35A7FF] font-semibold hover:underline"
-              >
-                Explore Our Impact Calculator →
-              </a>
-            </div>
-
-            {/* CTA */}
-            <div className="bg-[#1e2749] rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="text-white">
-                <p className="font-semibold text-lg">Ready to continue the journey?</p>
-                <p className="text-sm opacity-80">Let&apos;s build your custom 2026-27 plan together.</p>
-              </div>
-              <div className="flex flex-col items-center">
-                <span
-                  className="bg-white text-[#1e2749] px-8 py-3 rounded-lg font-semibold text-sm whitespace-nowrap opacity-85 cursor-default"
-                  title="This is an example dashboard"
-                >
-                  Schedule Renewal Chat →
-                </span>
-                <p className="text-white/60 text-xs italic mt-2">Available in active partnerships</p>
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <FileText className="w-6 h-6 text-amber-600" />
+                </div>
+                <div>
+                  <h4 className="font-bold text-amber-900 text-lg mb-1">Need Help Making the Case?</h4>
+                  <p className="text-amber-800 text-sm mb-3">
+                    We&apos;ll help you build a board presentation with your actual impact data, cost analysis, and recommended next steps. Your success is our pitch.
+                  </p>
+                  <a
+                    href="/calculator"
+                    className="inline-flex items-center gap-2 text-amber-700 font-semibold hover:underline text-sm"
+                  >
+                    Explore Our Impact Calculator →
+                  </a>
+                </div>
               </div>
             </div>
 
             {/* Closing Statement */}
-            <p className="text-gray-500 text-sm italic text-center mt-6">
-              Your TDI partner will build a custom Year 2 plan based on your district&apos;s specific needs, goals, and budget. Every partnership is different — because every district is different.
+            <p className="text-gray-500 text-sm italic text-center">
+              Your TDI partner will build a custom Year 3 plan based on your district&apos;s specific progress, goals, and budget. Every partnership evolves — because every district&apos;s journey is unique.
             </p>
 
           </div>
