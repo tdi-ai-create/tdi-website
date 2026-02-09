@@ -204,6 +204,9 @@ export default function ExampleDashboard() {
   // Schools tab - expanded school accordion state
   const [expandedSchool, setExpandedSchool] = useState<string | null>(null);
 
+  // Journey tab - expanded event accordion state (default to mid-year survey - event 9)
+  const [expandedJourneyEvent, setExpandedJourneyEvent] = useState<string | null>('event-9');
+
   // District Schools Data
   const districtSchools = [
     {
@@ -1327,170 +1330,583 @@ export default function ExampleDashboard() {
               </p>
             </div>
 
-            {/* Phase Tabs - Button Style */}
-            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
-              {phases.map((phase) => {
-                const isActive = activePhase === phase.id;
-                const styles = getPhaseStyles(phase);
-                return (
-                  <button
-                    key={phase.id}
-                    onClick={() => setActivePhase(phase.id)}
-                    className={`px-3 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-1 whitespace-nowrap ${
-                      isActive
-                        ? 'bg-[#1e2749] text-white shadow-md'
-                        : phase.isLocked
-                          ? 'bg-gray-200 text-gray-500'
-                          : 'bg-white text-gray-700 hover:bg-gray-100 shadow-sm'
-                    }`}
-                  >
-                    {phase.isLocked && <Lock className="w-4 h-4" />}
-                    {phase.isComplete && <CheckCircle className="w-4 h-4 text-[#38618C]" />}
-                    Phase {phase.id}: {phase.name}
-                    {phase.isCurrent && (
-                      <span className="bg-[#35A7FF] text-white text-xs px-2 py-0.5 rounded-full animate-pulse">
-                        YOU ARE HERE
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+            {/* Partnership Event Timeline */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="text-lg font-bold text-[#1e2749]">Partnership Timeline</h3>
+                <span className="text-xs text-gray-500">10 complete · 6 upcoming</span>
+              </div>
 
-            {/* Phase Content */}
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-              {/* Phase Header */}
-              <div
-                className="p-4 text-white"
-                style={{ backgroundColor: getPhaseStyles(currentPhase).bg }}
-              >
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <div className="flex items-center gap-3">
-                    {currentPhase.isLocked && <Lock className="w-5 h-5" />}
-                    {currentPhase.isComplete && <CheckCircle className="w-5 h-5" />}
-                    <div>
-                      <div className="flex items-center gap-3 flex-wrap">
-                        <h3 className="text-xl font-bold">Phase {currentPhase.id}: {currentPhase.name}</h3>
-                        {currentPhase.isCurrent && (
-                          <span className="bg-[#35A7FF] text-white text-xs px-3 py-1 rounded-full animate-pulse">
-                            YOU ARE HERE
-                          </span>
-                        )}
+              {/* EVENT 1: District Kickoff */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <button
+                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-1' ? null : 'event-1')}
+                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-green-600 text-lg">✅</span>
+                      <div>
+                        <div className="font-semibold text-[#1e2749]">District Kickoff — All 6 Buildings</div>
+                        <div className="text-sm text-gray-500">August 18, 2025</div>
                       </div>
-                      <p className="text-white/80 text-sm">{currentPhase.description}</p>
+                    </div>
+                    {expandedJourneyEvent === 'event-1' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+                  </div>
+                </button>
+                {expandedJourneyEvent === 'event-1' && (
+                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Happened</h4>
+                      <p className="text-sm text-gray-600">Full-day kickoff with district leadership team and building representatives from all 6 schools. Set partnership goals, introduced TDI framework, aligned on vision.</p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Key Outcomes</h4>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Partnership goal established with Dr. Ford</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Phase 1 (IGNITE) timeline mapped</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Building-level TDI Champions identified</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Baseline survey timeline set</li>
+                      </ul>
+                    </div>
+                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
+                      <p className="text-sm italic text-gray-700">&quot;When Rae asked us what we actually needed instead of telling us what we should do — that&apos;s when I knew this would be different.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">— Dr. J. Ford, Superintendent</p>
                     </div>
                   </div>
-                  <div className="bg-white/20 px-3 py-1 rounded-lg text-sm font-semibold">
-                    {currentPhase.status}
+                )}
+              </div>
+
+              {/* EVENT 2: Hub Onboarding */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <button
+                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-2' ? null : 'event-2')}
+                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-green-600 text-lg">✅</span>
+                      <div>
+                        <div className="font-semibold text-[#1e2749]">Hub Onboarding — 101 Educators Enrolled</div>
+                        <div className="text-sm text-gray-500">September 8-12, 2025</div>
+                      </div>
+                    </div>
+                    {expandedJourneyEvent === 'event-2' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+                  </div>
+                </button>
+                {expandedJourneyEvent === 'event-2' && (
+                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Happened</h4>
+                      <p className="text-sm text-gray-600">All 101 educators (73 teachers + 28 paras) enrolled in the Learning Hub. Every single person received a personalized Welcome Love Note.</p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Key Outcomes</h4>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />101/101 accounts created</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />101 Welcome Love Notes delivered</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Building-level onboarding sessions held at each school</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />TDI Champions trained on Hub navigation</li>
+                      </ul>
+                    </div>
+                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
+                      <p className="text-sm italic text-gray-700">&quot;I&apos;ve been a para for 11 years and nobody has ever sent me a personal note welcoming me to professional development. I saved it.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">— Para, Motown Early Learning Center</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* EVENT 3: Baseline Survey */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <button
+                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-3' ? null : 'event-3')}
+                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-green-600 text-lg">✅</span>
+                      <div>
+                        <div className="font-semibold text-[#1e2749]">Baseline Survey — 94/101 Responses (93%)</div>
+                        <div className="text-sm text-gray-500">September 22-26, 2025</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Example Data</span>
+                      {expandedJourneyEvent === 'event-3' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+                    </div>
+                  </div>
+                </button>
+                {expandedJourneyEvent === 'event-3' && (
+                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Baseline Results</h4>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b">
+                              <th className="text-left py-2 text-gray-600">Metric</th>
+                              <th className="text-center py-2 text-gray-600">Teachers (n=68)</th>
+                              <th className="text-center py-2 text-gray-600">Paras (n=26)</th>
+                              <th className="text-center py-2 text-gray-600">Combined</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-gray-700">
+                            <tr className="border-b"><td className="py-2">Stress Level</td><td className="text-center">7.9/10</td><td className="text-center text-red-600 font-medium">8.8/10</td><td className="text-center">8.2/10</td></tr>
+                            <tr className="border-b"><td className="py-2">Strategy Implementation</td><td className="text-center">14%</td><td className="text-center">8%</td><td className="text-center">12%</td></tr>
+                            <tr className="border-b"><td className="py-2">Planning Time/Week</td><td className="text-center">10 hrs</td><td className="text-center">13 hrs</td><td className="text-center">11 hrs</td></tr>
+                            <tr className="border-b"><td className="py-2">Retention Intent</td><td className="text-center">5.8/10</td><td className="text-center text-red-600 font-medium">4.1/10</td><td className="text-center">5.2/10</td></tr>
+                            <tr><td className="py-2">Feeling Valued</td><td className="text-center">6.2/10</td><td className="text-center text-red-600 font-medium">3.9/10</td><td className="text-center">5.4/10</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Stood Out</h4>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li>• Paras reported significantly higher stress and lower feeling of being valued than teachers</li>
+                        <li>• 67% of paras said they &quot;rarely&quot; or &quot;never&quot; receive professional development</li>
+                        <li>• Teachers reported wanting more co-planning time with paras but not knowing how to structure it</li>
+                      </ul>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-[#1e2749] text-sm">Selected Open Responses</h4>
+                      <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-3" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
+                        <p className="text-sm italic text-gray-700">&quot;I love my students but I feel invisible to the adults in this building.&quot;</p>
+                        <p className="text-xs text-gray-500 mt-1">— Para</p>
+                      </div>
+                      <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-3" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
+                        <p className="text-sm italic text-gray-700">&quot;I want to use my para more effectively but no one ever taught me how.&quot;</p>
+                        <p className="text-xs text-gray-500 mt-1">— Teacher</p>
+                      </div>
+                    </div>
+                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
+                      <p className="text-sm italic text-gray-700">&quot;The baseline data confirmed what we suspected but had never quantified. Seeing a 3.9 out of 10 for paras feeling valued — that number changed how our principals approached the rest of the year.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">— Dr. J. Ford, Superintendent</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* EVENT 4: Virtual Session 1 - Teacher Cohort */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <button
+                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-4' ? null : 'event-4')}
+                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-green-600 text-lg">✅</span>
+                      <div>
+                        <div className="font-semibold text-[#1e2749]">Virtual Session 1 — Teacher Cohort Launch</div>
+                        <div className="text-sm text-gray-500">October 7, 2025</div>
+                      </div>
+                    </div>
+                    {expandedJourneyEvent === 'event-4' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+                  </div>
+                </button>
+                {expandedJourneyEvent === 'event-4' && (
+                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Happened</h4>
+                      <p className="text-sm text-gray-600">First virtual session with teacher cohort (42 teachers from across all 6 buildings). Focused on understanding baseline data, setting individual strategy goals, and introducing Hub resources.</p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Key Outcomes</h4>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Teachers self-selected into focus areas: Differentiation (18), Engagement (14), Classroom Management (10)</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Hub &quot;Getting Started&quot; course completion jumped from 12% to 67% within 48 hours</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />3 teachers volunteered for pilot observation group</li>
+                      </ul>
+                    </div>
+                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
+                      <p className="text-sm italic text-gray-700">&quot;This was the first PD session where I didn&apos;t check my phone once. I was actually engaged.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">— Teacher, Rhythm Academy</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* EVENT 5: Virtual Session 2 - Para Cohort */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <button
+                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-5' ? null : 'event-5')}
+                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-green-600 text-lg">✅</span>
+                      <div>
+                        <div className="font-semibold text-[#1e2749]">Virtual Session 2 — Para Cohort Launch</div>
+                        <div className="text-sm text-gray-500">October 14, 2025</div>
+                      </div>
+                    </div>
+                    {expandedJourneyEvent === 'event-5' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+                  </div>
+                </button>
+                {expandedJourneyEvent === 'event-5' && (
+                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Happened</h4>
+                      <p className="text-sm text-gray-600">First virtual session with para cohort (22 paras from across 5 buildings). Focused on validating baseline data, building trust, and navigating the Hub together.</p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Key Outcomes</h4>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Paras identified top needs: feeling valued by teachers (82%), behavior support training (71%), clearer daily expectations (64%)</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Live Hub walkthrough resulted in 15 paras starting a course during the session</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Emotional moment when paras realized the PD was designed specifically FOR them</li>
+                      </ul>
+                    </div>
+                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
+                      <p className="text-sm italic text-gray-700">&quot;I cried during the session. Not because I was sad — because someone finally asked us what WE needed.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">— Para, Harmony Elementary</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* EVENT 6: Observation Day 1 - Para Pilot */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <button
+                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-6' ? null : 'event-6')}
+                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-green-600 text-lg">✅</span>
+                      <div>
+                        <div className="font-semibold text-[#1e2749]">Observation Day 1 — Para Pilot at Harmony Elementary</div>
+                        <div className="text-sm text-gray-500">November 12, 2025 · 10 Classrooms · 10 Love Notes</div>
+                      </div>
+                    </div>
+                    {expandedJourneyEvent === 'event-6' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+                  </div>
+                </button>
+                {expandedJourneyEvent === 'event-6' && (
+                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What We Did</h4>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li>• Visited 10 classrooms across PreK-5</li>
+                        <li>• Observed para-student interactions during small group and one-on-one support</li>
+                        <li>• Delivered 10 personalized Love Notes to every para observed</li>
+                        <li>• Debrief with building principal + TDI Champion</li>
+                      </ul>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <h4 className="font-semibold text-green-600 text-sm mb-2">Top Strengths</h4>
+                        <ul className="text-sm text-gray-600 space-y-1">
+                          <li>• Student rapport and relationship building (9/10)</li>
+                          <li>• Calm redirection during challenging moments (8/10)</li>
+                          <li>• Small group facilitation and engagement (7/10)</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-amber-600 text-sm mb-2">Growth Areas</h4>
+                        <ul className="text-sm text-gray-600 space-y-1">
+                          <li>• Wait time before stepping in to help</li>
+                          <li>• Data collection during small group sessions</li>
+                          <li>• Communication with lead teacher about progress</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="bg-[#FFFBEB] border-l-3 border-[#FFBA06] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#FFBA06'}}>
+                      <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Sample Love Note</p>
+                      <p className="text-sm italic text-gray-700">&quot;Maria, I noticed how you positioned yourself at eye level with Jayden during the reading activity — that small shift made him visibly more engaged. You have a natural gift for creating connection. Keep using that superpower!&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">— Rae Hughart, TDI</p>
+                    </div>
+                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
+                      <p className="text-sm italic text-gray-700">&quot;Three paras came to me after school and said it was the best day of their career. Not because anything extraordinary happened — because someone noticed them.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">— Principal, Harmony Elementary</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* EVENT 7: Observation Day 2 - Teacher Pilot */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <button
+                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-7' ? null : 'event-7')}
+                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-green-600 text-lg">✅</span>
+                      <div>
+                        <div className="font-semibold text-[#1e2749]">Observation Day 2 — Teacher Pilot at Motown MS</div>
+                        <div className="text-sm text-gray-500">December 10, 2025 · 12 Classrooms · 12 Love Notes</div>
+                      </div>
+                    </div>
+                    {expandedJourneyEvent === 'event-7' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+                  </div>
+                </button>
+                {expandedJourneyEvent === 'event-7' && (
+                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What We Did</h4>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li>• Visited 12 classrooms across grades 6-8</li>
+                        <li>• Observed instructional strategies and teacher-para collaboration</li>
+                        <li>• Delivered 12 personalized Love Notes to every teacher observed</li>
+                        <li>• Debrief with building principal + TDI Champion</li>
+                      </ul>
+                    </div>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div>
+                        <h4 className="font-semibold text-green-600 text-sm mb-2">Top Strengths</h4>
+                        <ul className="text-sm text-gray-600 space-y-1">
+                          <li>• Clear learning objectives visible and referenced (11/12)</li>
+                          <li>• Strong student engagement strategies (10/12)</li>
+                          <li>• Inclusive utilization of paraprofessionals (8/12)</li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-amber-600 text-sm mb-2">Growth Areas</h4>
+                        <ul className="text-sm text-gray-600 space-y-1">
+                          <li>• Differentiation for diverse learners</li>
+                          <li>• Dedicated co-planning time between teachers and paras</li>
+                          <li>• Formative assessment checks</li>
+                        </ul>
+                      </div>
+                    </div>
+                    <div className="bg-[#FFFBEB] border-l-3 border-[#FFBA06] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#FFBA06'}}>
+                      <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Sample Love Note</p>
+                      <p className="text-sm italic text-gray-700">&quot;Mr. Chen, the way you seamlessly included your paraprofessional in the small group rotation was exceptional. When you handed Rosa the discussion prompts and stepped back, your students got two quality interactions instead of one. That&apos;s the kind of teacher-para collaboration that changes outcomes.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">— Rae Hughart, TDI</p>
+                    </div>
+                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
+                      <p className="text-sm italic text-gray-700">&quot;I&apos;ve had dozens of walkthrough observations in my career. This is the first time someone told me specifically what I did WELL instead of what I need to fix.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">— Teacher, Motown Middle School</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* EVENT 8: Virtual Session 3 - Growth Groups */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <button
+                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-8' ? null : 'event-8')}
+                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-green-600 text-lg">✅</span>
+                      <div>
+                        <div className="font-semibold text-[#1e2749]">Virtual Session 3 — Growth Groups Formed from Observation Data</div>
+                        <div className="text-sm text-gray-500">January 14, 2026</div>
+                      </div>
+                    </div>
+                    {expandedJourneyEvent === 'event-8' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+                  </div>
+                </button>
+                {expandedJourneyEvent === 'event-8' && (
+                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Happened</h4>
+                      <p className="text-sm text-gray-600">Combined session with both teacher and para cohorts. Shared observation themes (anonymized), formed Growth Groups based on common growth areas, assigned targeted Hub resources.</p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">3 Growth Groups Formed</h4>
+                      <div className="grid md:grid-cols-3 gap-3">
+                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                          <div className="font-medium text-[#1e2749] text-sm">Differentiation Strategies</div>
+                          <div className="text-xs text-gray-500">6 teachers</div>
+                        </div>
+                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                          <div className="font-medium text-[#1e2749] text-sm">Teacher-Para Collaboration</div>
+                          <div className="text-xs text-gray-500">4 teachers + 4 paras</div>
+                        </div>
+                        <div className="bg-white rounded-lg p-3 border border-gray-200">
+                          <div className="font-medium text-[#1e2749] text-sm">Classroom Management Reset</div>
+                          <div className="text-xs text-gray-500">5 teachers</div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
+                      <p className="text-sm italic text-gray-700">&quot;Being in a Growth Group with a para from a completely different building opened my eyes. She sees things in my teaching I never would have noticed.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">— Teacher, Crescendo High School</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* EVENT 9: Mid-Year Survey - DEFAULT EXPANDED */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <button
+                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-9' ? null : 'event-9')}
+                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-green-600 text-lg">✅</span>
+                      <div>
+                        <div className="font-semibold text-[#1e2749]">Mid-Year Survey — 89/101 Responses (88%)</div>
+                        <div className="text-sm text-gray-500">January 20-24, 2026</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">↓25% Stress</span>
+                      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Example Data</span>
+                      {expandedJourneyEvent === 'event-9' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+                    </div>
+                  </div>
+                </button>
+                {expandedJourneyEvent === 'event-9' && (
+                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Mid-Year Results vs Baseline</h4>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b">
+                              <th className="text-left py-2 text-gray-600">Metric</th>
+                              <th className="text-center py-2 text-gray-600">Baseline (Sept)</th>
+                              <th className="text-center py-2 text-gray-600">Mid-Year (Jan)</th>
+                              <th className="text-center py-2 text-gray-600">Change</th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-gray-700">
+                            <tr className="border-b"><td className="py-2">Stress Level</td><td className="text-center">8.2/10</td><td className="text-center">6.1/10</td><td className="text-center text-green-600 font-medium">↓ 25%</td></tr>
+                            <tr className="border-b"><td className="py-2">Strategy Implementation</td><td className="text-center">12%</td><td className="text-center">48%</td><td className="text-center text-green-600 font-medium">↑ 4x</td></tr>
+                            <tr className="border-b"><td className="py-2">Planning Time/Week</td><td className="text-center">11 hrs</td><td className="text-center">7.5 hrs</td><td className="text-center text-green-600 font-medium">↓ 32%</td></tr>
+                            <tr className="border-b"><td className="py-2">Retention Intent</td><td className="text-center">5.2/10</td><td className="text-center">7.8/10</td><td className="text-center text-green-600 font-medium">↑ 50%</td></tr>
+                            <tr><td className="py-2">Feeling Valued</td><td className="text-center">5.4/10</td><td className="text-center">7.1/10</td><td className="text-center text-green-600 font-medium">↑ 31%</td></tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <p className="text-sm font-medium text-green-800">🎉 Highlight: Para &quot;Feeling Valued&quot; saw the single largest improvement — from 3.9 to 6.5 (67% increase)</p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-[#1e2749] text-sm">Selected Open Responses (Mid-Year)</h4>
+                      <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-3" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
+                        <p className="text-sm italic text-gray-700">&quot;The Love Note from my observation is framed on my desk. I read it when I&apos;m having a hard day.&quot;</p>
+                        <p className="text-xs text-gray-500 mt-1">— Para, Harmony Elementary</p>
+                      </div>
+                      <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-3" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
+                        <p className="text-sm italic text-gray-700">&quot;I&apos;m actually using strategies from the Hub in my classroom. Not because I have to — because they work.&quot;</p>
+                        <p className="text-xs text-gray-500 mt-1">— Teacher, Crescendo High School</p>
+                      </div>
+                      <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-3" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
+                        <p className="text-sm italic text-gray-700">&quot;I told my sister to apply for the open para position. I never would have said that in September.&quot;</p>
+                        <p className="text-xs text-gray-500 mt-1">— Para, Bridges Alternative Program</p>
+                      </div>
+                    </div>
+                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
+                      <p className="text-sm italic text-gray-700">&quot;The para data is what gets me. Going from 3.9 to 6.5 on feeling valued — that&apos;s not a number, that&apos;s a cultural shift in how we treat the adults in our buildings.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">— Dr. J. Ford, Superintendent</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* EVENT 10: Executive Session 1 */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <button
+                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-10' ? null : 'event-10')}
+                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-green-600 text-lg">✅</span>
+                      <div>
+                        <div className="font-semibold text-[#1e2749]">Executive Session 1 — Leadership Progress Review</div>
+                        <div className="text-sm text-gray-500">February 4, 2026</div>
+                      </div>
+                    </div>
+                    {expandedJourneyEvent === 'event-10' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+                  </div>
+                </button>
+                {expandedJourneyEvent === 'event-10' && (
+                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Happened</h4>
+                      <p className="text-sm text-gray-600">60-minute session with Dr. Ford and building principals. Reviewed mid-year data, celebrated wins, aligned on spring priorities.</p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Key Discussion Points</h4>
+                      <ul className="text-sm text-gray-600 space-y-1">
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Reviewed all leading indicator improvements</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Discussed building-level variations (ELC login rate needs attention)</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Aligned on spring observation focus areas</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Previewed 2026-27 partnership options</li>
+                      </ul>
+                    </div>
+                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
+                      <p className="text-sm italic text-gray-700">&quot;I&apos;ve never had a PD partner sit down with my leadership team and walk us through our own data like this. You made it feel like a conversation, not a report.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">— Dr. J. Ford, Superintendent</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Upcoming Events Header */}
+              <div className="flex items-center gap-3 pt-4">
+                <div className="flex-1 border-t border-gray-300"></div>
+                <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Upcoming</span>
+                <div className="flex-1 border-t border-gray-300"></div>
+              </div>
+
+              {/* EVENT 11-16: Upcoming Events (Non-expandable) */}
+              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-gray-400 text-lg">⬜</span>
+                  <div>
+                    <div className="font-semibold text-gray-600">Virtual Session 4 — Differentiation Growth Group</div>
+                    <div className="text-sm text-gray-400">March 2026 · 6 teachers from Harmony + Crescendo</div>
                   </div>
                 </div>
               </div>
 
-              {/* Phase Body */}
-              <div className="p-5">
-                <div className="grid md:grid-cols-3 gap-6">
-                  <div className="md:col-span-2 space-y-5">
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] mb-2 text-sm uppercase tracking-wide">What's Included</h4>
-                      <ul className="space-y-1.5">
-                        {currentPhase.includes.map((item, i) => (
-                          <li key={i} className="flex items-start gap-2 text-gray-600 text-sm">
-                            <CheckCircle className={`w-4 h-4 mt-0.5 flex-shrink-0 ${currentPhase.isLocked ? 'text-gray-400' : 'text-[#38618C]'}`} />
-                            {item}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {currentPhase.completed && (
-                      <div>
-                        <h4 className="font-semibold text-[#38618C] mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
-                          <CheckCircle className="w-4 h-4" />
-                          Completed
-                        </h4>
-                        <ul className="space-y-1.5">
-                          {currentPhase.completed.map((item, i) => (
-                            <li key={i} className="flex items-start gap-2 text-gray-600 text-sm">
-                              <CheckCircle className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {currentPhase.pending && (
-                      <div>
-                        <h4 className="font-semibold text-[#E07A5F] mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
-                          <AlertCircle className="w-4 h-4" />
-                          Needs Attention
-                        </h4>
-                        <ul className="space-y-1.5">
-                          {currentPhase.pending.map((item, i) => (
-                            <li key={i} className="flex items-start gap-2 text-gray-600 text-sm">
-                              <Calendar className="w-4 h-4 text-[#E07A5F] mt-0.5 flex-shrink-0" />
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {currentPhase.goals && (
-                      <div>
-                        <h4 className="font-semibold text-[#1e2749] mb-2 text-sm uppercase tracking-wide">Goals</h4>
-                        <ul className="space-y-1.5">
-                          {currentPhase.goals.map((item, i) => (
-                            <li key={i} className="flex items-start gap-2 text-gray-600 text-sm">
-                              <Target className={`w-4 h-4 mt-0.5 flex-shrink-0 ${currentPhase.isLocked ? 'text-gray-400' : 'text-[#38618C]'}`} />
-                              {item}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {currentPhase.unlocks && (
-                      <div className="bg-gray-100 rounded-lg p-4 border border-gray-200">
-                        <h4 className="font-semibold text-gray-600 mb-1 text-sm flex items-center gap-2">
-                          <Lock className="w-4 h-4" />
-                          <Tooltip content="Phase progression is evidence-based, not time-based"><span>Unlocks When</span></Tooltip>
-                        </h4>
-                        <p className="text-gray-500 text-sm">{currentPhase.unlocks}</p>
-                      </div>
-                    )}
+              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-gray-400 text-lg">⬜</span>
+                  <div>
+                    <div className="font-semibold text-gray-600">Observation Day 3 — Para Pilot Group (Spring Cycle)</div>
+                    <div className="text-sm text-gray-400">April 2026 · Building on November observations</div>
                   </div>
+                </div>
+              </div>
 
-                  <div className="space-y-4">
-                    <div className="bg-[#F5F5F5] rounded-lg p-4">
-                      <h4 className="font-semibold text-gray-700 mb-2 text-sm">Key Metrics</h4>
-                      <div className="space-y-2">
-                        {currentPhase.outcomes.map((outcome, i) => (
-                          <div key={i} className="bg-white rounded-lg p-3">
-                            <div className="text-xs text-gray-500 uppercase">{outcome.label}</div>
-                            <div className={`text-lg font-bold ${currentPhase.isLocked ? 'text-gray-400' : 'text-[#1e2749]'}`}>
-                              {outcome.value}
-                            </div>
-                            <div className="text-xs text-gray-500">{outcome.sublabel}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
+              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-gray-400 text-lg">⬜</span>
+                  <div>
+                    <div className="font-semibold text-gray-600">Observation Day 4 — Teacher Pilot Group (Spring Cycle)</div>
+                    <div className="text-sm text-gray-400">April 2026 · Building on December observations</div>
+                  </div>
+                </div>
+              </div>
 
-                    <div
-                      onClick={() => {
-                        setActiveTab('blueprint');
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className={`rounded-lg p-4 border cursor-pointer hover:shadow-md transition-all ${currentPhase.isLocked ? 'bg-gray-50 border-gray-200 hover:bg-gray-100' : 'bg-[#38618C]/5 border-[#38618C]/20 hover:bg-[#38618C]/10'}`}
-                    >
-                      <h4 className={`font-semibold mb-1 text-sm flex items-center gap-2 ${currentPhase.isLocked ? 'text-gray-500' : 'text-[#1e2749]'}`}>
-                        <Star className={`w-4 h-4 ${currentPhase.isLocked ? 'text-gray-400' : 'text-[#38618C]'}`} />
-                        With Full Blueprint
-                      </h4>
-                      <p className={`text-xs ${currentPhase.isLocked ? 'text-gray-400' : 'text-gray-600'}`}>{currentPhase.blueprintPreview}</p>
-                      <span className="text-xs text-[#35A7FF] mt-2 inline-block">Learn more →</span>
-                    </div>
+              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-gray-400 text-lg">⬜</span>
+                  <div>
+                    <div className="font-semibold text-gray-600">Spring Leadership Recap with District Team</div>
+                    <div className="text-sm text-gray-400">April 2026 · Review full-year progress · set goals for 2026-27</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-gray-400 text-lg">⬜</span>
+                  <div>
+                    <div className="font-semibold text-gray-600">Virtual Sessions 5 &amp; 6 — Teacher-Para Collaboration + Classroom Management</div>
+                    <div className="text-sm text-gray-400">May 2026 · Final Growth Group sessions</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-gray-400 text-lg">⬜</span>
+                  <div>
+                    <div className="font-semibold text-gray-600">Executive Impact Session — Annual Results &amp; 2026-27 Planning</div>
+                    <div className="text-sm text-gray-400">May 2026 · Full impact report · board presentation support</div>
                   </div>
                 </div>
               </div>
