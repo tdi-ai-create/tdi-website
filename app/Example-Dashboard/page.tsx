@@ -2172,6 +2172,13 @@ export default function ExampleDashboard() {
               </div>
             </div>
 
+            {/* Fictional Data Note */}
+            <div className="bg-[#35A7FF]/10 rounded-lg py-3 px-4 text-center">
+              <p className="text-sm text-[#1e2749] italic">
+                All school names, staff names, and engagement data are fictional — designed to model the real-time tracking our partner districts receive. And yes, our Founder & CEO is a Motown fan, so the naming theme was non-negotiable.
+              </p>
+            </div>
+
             {/* School Cards Grid */}
             <div className="grid md:grid-cols-2 gap-4">
               {districtSchools.map((school) => {
