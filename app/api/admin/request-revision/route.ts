@@ -139,6 +139,7 @@ export async function POST(request: NextRequest) {
           body: JSON.stringify({
             from: 'TDI Creator Studio <creators@teachersdeserveit.com>',
             to: [creator.email],
+            cc: ['rachel@teachersdeserveit.com', 'rae@teachersdeserveit.com'],
             subject: `Action Needed: Revision requested for your course`,
             html: `
               <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
