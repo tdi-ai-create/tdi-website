@@ -201,6 +201,137 @@ export default function ExampleDashboard() {
     });
   };
 
+  // Schools tab - expanded school accordion state
+  const [expandedSchool, setExpandedSchool] = useState<string | null>(null);
+
+  // District Schools Data
+  const districtSchools = [
+    {
+      id: 'motown-elc',
+      name: 'Motown Early Learning Center',
+      grades: 'PreK-K',
+      teachers: { total: 8, loggedIn: 7 },
+      paras: { total: 6, loggedIn: 4 },
+      teacherCourses: ['Social-Emotional Learning Foundations', 'Play-Based Assessment', 'Classroom Environment Design'],
+      paraCourses: ['Supporting Early Learners', 'Calm Classroom Strategies', 'Communication that Clicks'],
+      teacherStaff: [
+        { name: 'Sarah M.', loggedIn: true }, { name: 'Maria L.', loggedIn: true }, { name: 'James K.', loggedIn: true },
+        { name: 'Priya S.', loggedIn: true }, { name: 'Tom R.', loggedIn: false }, { name: 'Ana G.', loggedIn: true },
+        { name: 'Michael C.', loggedIn: true }, { name: 'Jennifer H.', loggedIn: true }
+      ],
+      paraStaff: [
+        { name: 'Rosa M.', loggedIn: true }, { name: 'David L.', loggedIn: true }, { name: 'Kim N.', loggedIn: false },
+        { name: 'Carlos R.', loggedIn: true }, { name: 'Lisa T.', loggedIn: false }, { name: 'Amara J.', loggedIn: true }
+      ]
+    },
+    {
+      id: 'harmony-elementary',
+      name: 'Harmony Elementary',
+      grades: 'K-5',
+      teachers: { total: 18, loggedIn: 17 },
+      paras: { total: 10, loggedIn: 8 },
+      teacherCourses: ['The Differentiation Fix', 'Small Group Mastery', 'Time Management for Teachers'],
+      paraCourses: ['Building Strong Teacher-Para Partnerships', 'Small-Group & One-on-One Instruction', 'De-Escalation Strategies'],
+      teacherStaff: [
+        { name: 'Emily W.', loggedIn: true }, { name: 'Robert J.', loggedIn: true }, { name: 'Michelle P.', loggedIn: true },
+        { name: 'Kevin D.', loggedIn: true }, { name: 'Patricia A.', loggedIn: true }, { name: 'Brian M.', loggedIn: true },
+        { name: 'Jessica L.', loggedIn: true }, { name: 'Daniel K.', loggedIn: true }, { name: 'Amanda R.', loggedIn: true },
+        { name: 'Christopher S.', loggedIn: true }, { name: 'Stephanie H.', loggedIn: true }, { name: 'Matthew T.', loggedIn: true },
+        { name: 'Ashley B.', loggedIn: true }, { name: 'Joshua C.', loggedIn: true }, { name: 'Nicole F.', loggedIn: false },
+        { name: 'Andrew G.', loggedIn: true }, { name: 'Elizabeth Y.', loggedIn: true }, { name: 'Ryan V.', loggedIn: true }
+      ],
+      paraStaff: [
+        { name: 'Carmen S.', loggedIn: true }, { name: 'Jose M.', loggedIn: true }, { name: 'Linda R.', loggedIn: true },
+        { name: 'Marcus T.', loggedIn: true }, { name: 'Fatima A.', loggedIn: false }, { name: 'Derek W.', loggedIn: true },
+        { name: 'Yolanda J.', loggedIn: true }, { name: 'Tyler B.', loggedIn: false }, { name: 'Keisha L.', loggedIn: true },
+        { name: 'Victor H.', loggedIn: true }
+      ]
+    },
+    {
+      id: 'rhythm-academy',
+      name: 'Rhythm Academy',
+      grades: 'K-8',
+      teachers: { total: 14, loggedIn: 13 },
+      paras: null,
+      teacherCourses: ['Student Engagement Strategies', 'Formative Assessment Toolkit', 'Collaborative Planning'],
+      paraCourses: null,
+      teacherStaff: [
+        { name: 'William H.', loggedIn: true }, { name: 'Susan K.', loggedIn: true }, { name: 'Charles M.', loggedIn: true },
+        { name: 'Karen P.', loggedIn: true }, { name: 'Joseph R.', loggedIn: true }, { name: 'Nancy S.', loggedIn: true },
+        { name: 'Thomas W.', loggedIn: true }, { name: 'Lisa A.', loggedIn: false }, { name: 'Mark B.', loggedIn: true },
+        { name: 'Betty C.', loggedIn: true }, { name: 'Donald D.', loggedIn: true }, { name: 'Sandra E.', loggedIn: true },
+        { name: 'Paul F.', loggedIn: true }, { name: 'Dorothy G.', loggedIn: true }
+      ],
+      paraStaff: null
+    },
+    {
+      id: 'motown-middle',
+      name: 'Motown Middle School',
+      grades: '6-8',
+      teachers: { total: 12, loggedIn: 11 },
+      paras: { total: 4, loggedIn: 3 },
+      teacherCourses: ['Classroom Management Reset', 'Student Voice & Choice', 'Advisory Period Design'],
+      paraCourses: ['Supporting Students Through Their Daily Schedule', 'Behavior Support in Transitions'],
+      teacherStaff: [
+        { name: 'George H.', loggedIn: true }, { name: 'Helen I.', loggedIn: true }, { name: 'Edward J.', loggedIn: true },
+        { name: 'Ruth K.', loggedIn: true }, { name: 'Frank L.', loggedIn: true }, { name: 'Virginia M.', loggedIn: true },
+        { name: 'Raymond N.', loggedIn: true }, { name: 'Marie O.', loggedIn: true }, { name: 'Eugene P.', loggedIn: false },
+        { name: 'Gloria Q.', loggedIn: true }, { name: 'Arthur R.', loggedIn: true }, { name: 'Rose S.', loggedIn: true }
+      ],
+      paraStaff: [
+        { name: 'Albert T.', loggedIn: true }, { name: 'Teresa U.', loggedIn: true }, { name: 'Lawrence V.', loggedIn: false },
+        { name: 'Diana W.', loggedIn: true }
+      ]
+    },
+    {
+      id: 'crescendo-hs',
+      name: 'Crescendo High School',
+      grades: '9-12',
+      teachers: { total: 15, loggedIn: 13 },
+      paras: { total: 5, loggedIn: 4 },
+      teacherCourses: ['Engagement in Large Classes', 'Student-Led Conferences', 'Reducing Grading Load'],
+      paraCourses: ['Supporting Students with IEPs', 'Study Skills Coaching', 'Communication that Clicks'],
+      teacherStaff: [
+        { name: 'Harold A.', loggedIn: true }, { name: 'Sharon B.', loggedIn: true }, { name: 'Douglas C.', loggedIn: true },
+        { name: 'Catherine D.', loggedIn: true }, { name: 'Gerald E.', loggedIn: false }, { name: 'Deborah F.', loggedIn: true },
+        { name: 'Walter G.', loggedIn: true }, { name: 'Laura H.', loggedIn: true }, { name: 'Henry I.', loggedIn: true },
+        { name: 'Kimberly J.', loggedIn: true }, { name: 'Carl K.', loggedIn: true }, { name: 'Donna L.', loggedIn: false },
+        { name: 'Russell M.', loggedIn: true }, { name: 'Carol N.', loggedIn: true }, { name: 'Ralph O.', loggedIn: true }
+      ],
+      paraStaff: [
+        { name: 'Judith P.', loggedIn: true }, { name: 'Roy Q.', loggedIn: true }, { name: 'Janet R.', loggedIn: true },
+        { name: 'Philip S.', loggedIn: false }, { name: 'Cheryl T.', loggedIn: true }
+      ]
+    },
+    {
+      id: 'bridges-alt',
+      name: 'Bridges Alternative Program',
+      grades: '7-12',
+      teachers: { total: 6, loggedIn: 6 },
+      paras: { total: 3, loggedIn: 3 },
+      teacherCourses: ['Trauma-Informed Practices', 'Restorative Conversations', 'Flexible Scheduling'],
+      paraCourses: ['De-Escalation Strategies', 'Building Trust with Students'],
+      teacherStaff: [
+        { name: 'Samuel A.', loggedIn: true }, { name: 'Diane B.', loggedIn: true }, { name: 'Gregory C.', loggedIn: true },
+        { name: 'Joyce D.', loggedIn: true }, { name: 'Patrick E.', loggedIn: true }, { name: 'Theresa F.', loggedIn: true }
+      ],
+      paraStaff: [
+        { name: 'Jack G.', loggedIn: true }, { name: 'Joan H.', loggedIn: true }, { name: 'Dennis I.', loggedIn: true }
+      ]
+    }
+  ];
+
+  // Calculate district totals
+  const districtTotals = {
+    schools: districtSchools.length,
+    teachers: districtSchools.reduce((sum, s) => sum + s.teachers.total, 0),
+    teachersLoggedIn: districtSchools.reduce((sum, s) => sum + s.teachers.loggedIn, 0),
+    paras: districtSchools.reduce((sum, s) => sum + (s.paras?.total || 0), 0),
+    parasLoggedIn: districtSchools.reduce((sum, s) => sum + (s.paras?.loggedIn || 0), 0),
+  };
+  const totalStaff = districtTotals.teachers + districtTotals.paras;
+  const totalLoggedIn = districtTotals.teachersLoggedIn + districtTotals.parasLoggedIn;
+
   // Accordion Component
   interface AccordionProps {
     id: string;
@@ -535,8 +666,8 @@ export default function ExampleDashboard() {
         
         <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">Motown Middle School</h1>
-            <p className="text-white/80 text-sm">Glenview, Illinois | Partner Dashboard</p>
+            <h1 className="text-2xl md:text-3xl font-bold">Motown District 360</h1>
+            <p className="text-white/80 text-sm">Glenview, Illinois | District Partnership</p>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <div className="bg-white/10 px-3 py-1.5 rounded-lg">
@@ -555,6 +686,7 @@ export default function ExampleDashboard() {
               { id: 'overview', label: 'Overview', icon: Eye },
               { id: 'journey', label: 'Journey', icon: TrendingUp },
               { id: 'implementation', label: 'Progress', icon: Users },
+              { id: 'schools', label: 'Schools', icon: School },
               { id: 'blueprint', label: 'Blueprint', icon: Star },
               { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
               { id: 'team', label: 'Team', icon: User },
@@ -594,8 +726,8 @@ export default function ExampleDashboard() {
                   <Users className="w-4 h-4 text-[#38618C]" />
                   <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">25/25</div>
-                <div className="text-xs text-[#38618C] font-medium">Complete</div>
+                <div className="text-2xl font-bold text-[#1e2749]">101</div>
+                <div className="text-xs text-[#38618C] font-medium">across 6 schools</div>
               </div>
 
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
@@ -646,9 +778,9 @@ export default function ExampleDashboard() {
 
                 {/* Hub Logins */}
                 <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">100%</div>
+                  <div className="text-2xl font-bold text-green-600">87%</div>
                   <div className="text-xs text-gray-600 mt-1">Hub Logins</div>
-                  <div className="text-xs text-green-600 mt-1">✓ Goal Exceeded</div>
+                  <div className="text-xs text-green-600 mt-1">88/101 logged in</div>
                 </div>
 
                 {/* Love Notes */}
@@ -1056,7 +1188,7 @@ export default function ExampleDashboard() {
               {/* Leading Indicators Description */}
               <div className="mb-6">
                 <p className="text-sm text-gray-600 mb-2">
-                  Research shows these four indicators are the strongest predictors of sustainable classroom change and student outcomes.<sup className="text-[#35A7FF]">1</sup> Each indicator is personalized to Motown Middle School&apos;s goals, established during our partnership kickoff.
+                  Research shows these four indicators are the strongest predictors of sustainable classroom change and student outcomes.<sup className="text-[#35A7FF]">1</sup> Each indicator is personalized to Motown District 360&apos;s goals, established during our partnership kickoff.
                 </p>
                 <p className="text-xs text-gray-400">
                   <sup>1</sup> RAND Corporation (2025), Learning Policy Institute · Indicators selected based on your school&apos;s specific priorities
@@ -1089,9 +1221,9 @@ export default function ExampleDashboard() {
                       </div>
                       <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
                     </div>
-                    {/* Motown Middle School 6.0/10 = LOW stress = BEST = LONGEST bar */}
+                    {/* Motown District 360 6.0/10 = LOW stress = BEST = LONGEST bar */}
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown Middle School</span>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown District 360</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-green-500" style={{ width: '40%' }}></div>
                       </div>
@@ -1122,7 +1254,7 @@ export default function ExampleDashboard() {
                       <span className="text-xs font-semibold text-[#38618C] w-14 text-right">65%</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown Middle School</span>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown District 360</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#35A7FF]" style={{ width: '21%' }}></div>
                       </div>
@@ -1146,7 +1278,7 @@ export default function ExampleDashboard() {
                       <span className="text-xs font-semibold text-[#38618C] w-14 text-right">100%</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown Middle School</span>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown District 360</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
                       </div>
@@ -1177,7 +1309,7 @@ export default function ExampleDashboard() {
                       <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown Middle School</span>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown District 360</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-green-500" style={{ width: '98%' }}></div>
                       </div>
@@ -2014,6 +2146,214 @@ export default function ExampleDashboard() {
           </div>
         )}
 
+        {/* SCHOOLS TAB */}
+        {activeTab === 'schools' && (
+          <div className="space-y-6">
+            {/* District Summary Bar */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
+                <div className="text-3xl font-bold text-[#1e2749]">{districtTotals.schools}</div>
+                <div className="text-sm text-gray-500">Schools</div>
+              </div>
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
+                <div className="text-3xl font-bold text-[#38618C]">{districtTotals.teachers}</div>
+                <div className="text-sm text-gray-500">Teachers</div>
+                <div className="text-xs text-green-600 mt-1">{Math.round((districtTotals.teachersLoggedIn / districtTotals.teachers) * 100)}% logged in</div>
+              </div>
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
+                <div className="text-3xl font-bold text-[#35A7FF]">{districtTotals.paras}</div>
+                <div className="text-sm text-gray-500">Paras</div>
+                <div className="text-xs text-green-600 mt-1">{Math.round((districtTotals.parasLoggedIn / districtTotals.paras) * 100)}% logged in</div>
+              </div>
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
+                <div className="text-3xl font-bold text-[#1e2749]">{totalStaff}</div>
+                <div className="text-sm text-gray-500">Total Staff</div>
+                <div className="text-xs text-green-600 mt-1">{Math.round((totalLoggedIn / totalStaff) * 100)}% logged in</div>
+              </div>
+            </div>
+
+            {/* School Cards Grid */}
+            <div className="grid md:grid-cols-2 gap-4">
+              {districtSchools.map((school) => {
+                const schoolTotal = school.teachers.total + (school.paras?.total || 0);
+                const schoolLoggedIn = school.teachers.loggedIn + (school.paras?.loggedIn || 0);
+                const loginRate = Math.round((schoolLoggedIn / schoolTotal) * 100);
+                const isExpanded = expandedSchool === school.id;
+
+                return (
+                  <div key={school.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                    {/* School Card Header */}
+                    <button
+                      onClick={() => setExpandedSchool(isExpanded ? null : school.id)}
+                      className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-bold text-[#1e2749]">{school.name}</h3>
+                            <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-0.5 rounded-full">{school.grades}</span>
+                          </div>
+                          <p className="text-sm text-gray-600">
+                            {school.teachers.total} Teachers{school.paras ? ` · ${school.paras.total} Paras` : ''}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="text-right">
+                            <div className={`text-lg font-bold ${loginRate >= 85 ? 'text-green-600' : loginRate >= 70 ? 'text-amber-600' : 'text-[#1e2749]'}`}>
+                              {loginRate}%
+                            </div>
+                            <div className="text-xs text-gray-500">logged in</div>
+                          </div>
+                          {isExpanded ? (
+                            <ChevronDown className="w-5 h-5 text-gray-400" />
+                          ) : (
+                            <ChevronRight className="w-5 h-5 text-gray-400" />
+                          )}
+                        </div>
+                      </div>
+                      {/* Progress Bar */}
+                      <div className="mt-3 bg-gray-100 rounded-full h-2 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all ${loginRate >= 85 ? 'bg-green-500' : loginRate >= 70 ? 'bg-amber-500' : 'bg-[#38618C]'}`}
+                          style={{ width: `${loginRate}%` }}
+                        />
+                      </div>
+                    </button>
+
+                    {/* Expanded Content */}
+                    {isExpanded && (
+                      <div className="border-t border-gray-100 p-4 bg-gray-50">
+                        <div className={`grid ${school.paras ? 'md:grid-cols-2' : 'grid-cols-1'} gap-6`}>
+                          {/* Teachers Column */}
+                          <div>
+                            <div className="flex items-center justify-between mb-3">
+                              <h4 className="font-semibold text-[#1e2749] flex items-center gap-2">
+                                <GraduationCap className="w-4 h-4" />
+                                Teachers
+                              </h4>
+                              <span className="text-sm text-gray-600">
+                                {school.teachers.loggedIn}/{school.teachers.total} logged in ({Math.round((school.teachers.loggedIn / school.teachers.total) * 100)}%)
+                              </span>
+                            </div>
+                            {/* Progress Bar */}
+                            <div className="bg-gray-200 rounded-full h-2 mb-3 overflow-hidden">
+                              <div
+                                className="h-full rounded-full bg-[#38618C]"
+                                style={{ width: `${(school.teachers.loggedIn / school.teachers.total) * 100}%` }}
+                              />
+                            </div>
+                            {/* Courses */}
+                            <div className="mb-3">
+                              <p className="text-xs text-gray-500 mb-2">What Teachers Are Exploring:</p>
+                              <div className="flex flex-wrap gap-1">
+                                {school.teacherCourses.map((course, i) => (
+                                  <span key={i} className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-1 rounded-full">
+                                    {course}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            {/* Staff Roster */}
+                            <div className="bg-white rounded-lg p-3 border border-gray-100">
+                              <div className="flex flex-wrap gap-2">
+                                {school.teacherStaff.map((staff, i) => (
+                                  <span key={i} className="text-xs text-gray-600 flex items-center gap-1">
+                                    <span className={`w-2 h-2 rounded-full ${staff.loggedIn ? 'bg-green-500' : 'bg-gray-300'}`} />
+                                    {staff.name}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Paras Column */}
+                          {school.paras && school.paraStaff && (
+                            <div>
+                              <div className="flex items-center justify-between mb-3">
+                                <h4 className="font-semibold text-[#35A7FF] flex items-center gap-2">
+                                  <Users className="w-4 h-4" />
+                                  Paras
+                                </h4>
+                                <span className="text-sm text-gray-600">
+                                  {school.paras.loggedIn}/{school.paras.total} logged in ({Math.round((school.paras.loggedIn / school.paras.total) * 100)}%)
+                                </span>
+                              </div>
+                              {/* Progress Bar */}
+                              <div className="bg-gray-200 rounded-full h-2 mb-3 overflow-hidden">
+                                <div
+                                  className="h-full rounded-full bg-[#35A7FF]"
+                                  style={{ width: `${(school.paras.loggedIn / school.paras.total) * 100}%` }}
+                                />
+                              </div>
+                              {/* Courses */}
+                              <div className="mb-3">
+                                <p className="text-xs text-gray-500 mb-2">What Paras Are Exploring:</p>
+                                <div className="flex flex-wrap gap-1">
+                                  {school.paraCourses?.map((course, i) => (
+                                    <span key={i} className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full">
+                                      {course}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                              {/* Staff Roster */}
+                              <div className="bg-white rounded-lg p-3 border border-gray-100">
+                                <div className="flex flex-wrap gap-2">
+                                  {school.paraStaff.map((staff, i) => (
+                                    <span key={i} className="text-xs text-gray-600 flex items-center gap-1">
+                                      <span className={`w-2 h-2 rounded-full ${staff.loggedIn ? 'bg-green-500' : 'bg-gray-300'}`} />
+                                      {staff.name}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Teacher-Only Note */}
+                          {!school.paras && (
+                            <div className="md:col-span-1 flex items-center justify-center p-4 bg-gray-100 rounded-lg">
+                              <p className="text-sm text-gray-500 italic">Teacher-Only Partnership</p>
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Demo-only action buttons */}
+                        <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
+                          <div className="flex gap-2">
+                            <button
+                              onClick={handleDisabledClick}
+                              className="text-xs px-3 py-1.5 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed flex items-center gap-1"
+                            >
+                              <Mail className="w-3 h-3" />
+                              Nudge
+                            </button>
+                            <button
+                              onClick={handleDisabledClick}
+                              className="text-xs px-3 py-1.5 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed flex items-center gap-1"
+                            >
+                              <Star className="w-3 h-3" />
+                              High Five
+                            </button>
+                          </div>
+                          <span className="text-xs text-gray-400 italic">Available in active partnerships</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* District Note */}
+            <div className="bg-[#38618C]/5 border border-[#38618C]/20 rounded-xl p-4 text-center">
+              <p className="text-sm text-[#38618C]">
+                <strong>District-wide tracking</strong> — See engagement across all buildings, identify trends, and celebrate wins at every level.
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* FULL BLUEPRINT TAB */}
         {activeTab === 'blueprint' && (
           <div className="space-y-6">
@@ -2664,7 +3004,7 @@ export default function ExampleDashboard() {
                 {/* Rae's Info */}
                 <div className="flex-1 text-center md:text-left">
                   <h3 className="text-xl font-bold text-[#1e2749]">Rae Hughart</h3>
-                  <p className="text-[#38618C] font-medium mb-3">Lead Partner, Motown Middle School Account</p>
+                  <p className="text-[#38618C] font-medium mb-3">Lead Partner, Motown District 360 Account</p>
                   
                   <p className="text-gray-600 text-sm mb-4">
                     Rae is the co-founder of Teachers Deserve It and your dedicated partner throughout this journey. She is here to support your school's success every step of the way.
@@ -2720,7 +3060,7 @@ export default function ExampleDashboard() {
               </h3>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <div className="font-semibold text-gray-800">Motown Middle School</div>
+                  <div className="font-semibold text-gray-800">Motown District 360</div>
                   <div className="text-sm text-gray-600 mt-2 flex items-start gap-2">
                     <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#38618C]" />
                     Glenview, Illinois
@@ -2747,7 +3087,7 @@ export default function ExampleDashboard() {
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <div>
             <div className="font-bold">Teachers Deserve It</div>
-            <p className="text-white/60 text-sm">Partner Dashboard for Motown Middle School</p>
+            <p className="text-white/60 text-sm">Partner Dashboard for Motown District 360</p>
           </div>
           <span
             className="inline-flex items-center gap-2 bg-[#35A7FF] text-white px-4 py-2 rounded-lg font-semibold text-sm opacity-50 cursor-not-allowed"
