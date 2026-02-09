@@ -2180,8 +2180,8 @@ export default function ExampleDashboard() {
               </p>
             </div>
 
-            {/* School Cards Grid */}
-            <div className="grid md:grid-cols-2 gap-4">
+            {/* School Cards - Full Width Stack */}
+            <div className="space-y-4">
               {districtSchools.map((school) => {
                 const schoolTotal = school.teachers.total + (school.paras?.total || 0);
                 const schoolLoggedIn = school.teachers.loggedIn + (school.paras?.loggedIn || 0);
