@@ -207,54 +207,60 @@ export default function ExampleDashboard() {
   // Journey tab - expanded event accordion state (default to mid-year survey - event 9)
   const [expandedJourneyEvent, setExpandedJourneyEvent] = useState<string | null>('event-9');
 
-  // District Schools Data
+  // District Schools Data - 255 total staff (187 teachers + 68 paras)
   const districtSchools = [
     {
       id: 'motown-elc',
       name: 'Motown Early Learning Center',
       grades: 'PreK-K',
-      teachers: { total: 8, loggedIn: 7 },
-      paras: { total: 6, loggedIn: 4 },
+      teachers: { total: 16, loggedIn: 15 },
+      paras: { total: 14, loggedIn: 9 },
       teacherCourses: ['Social-Emotional Learning Foundations', 'Play-Based Assessment', 'Classroom Environment Design'],
       paraCourses: ['Supporting Early Learners', 'Calm Classroom Strategies', 'Communication that Clicks'],
       teacherStaff: [
         { name: 'Sarah M.', loggedIn: true }, { name: 'Maria L.', loggedIn: true }, { name: 'James K.', loggedIn: true },
-        { name: 'Priya S.', loggedIn: true }, { name: 'Tom R.', loggedIn: false }, { name: 'Ana G.', loggedIn: true },
-        { name: 'Michael C.', loggedIn: true }, { name: 'Jennifer H.', loggedIn: true }
+        { name: 'Priya S.', loggedIn: true }, { name: 'Ana G.', loggedIn: true }, { name: 'Michael C.', loggedIn: true },
+        { name: 'Jennifer H.', loggedIn: true }, { name: 'David R.', loggedIn: true }, { name: 'Sophia W.', loggedIn: true },
+        { name: 'Marcus T.', loggedIn: true }, { name: 'Elena V.', loggedIn: true }, { name: 'Brandon F.', loggedIn: true },
+        { name: 'Aisha N.', loggedIn: true }, { name: 'Tyler B.', loggedIn: true }, { name: 'Jasmine C.', loggedIn: true },
+        { name: 'Nathan P.', loggedIn: false }
       ],
       paraStaff: [
         { name: 'Rosa M.', loggedIn: true }, { name: 'David L.', loggedIn: true }, { name: 'Kim N.', loggedIn: false },
-        { name: 'Carlos R.', loggedIn: true }, { name: 'Lisa T.', loggedIn: false }, { name: 'Amara J.', loggedIn: true }
+        { name: 'Carlos R.', loggedIn: true }, { name: 'Lisa T.', loggedIn: false }, { name: 'Amara J.', loggedIn: true },
+        { name: 'Teresa P.', loggedIn: true }, { name: 'Miguel S.', loggedIn: false }, { name: 'Keisha W.', loggedIn: true },
+        { name: 'Omar H.', loggedIn: false }, { name: 'Destiny R.', loggedIn: true }, { name: 'Victor G.', loggedIn: false },
+        { name: 'Sandra K.', loggedIn: true }, { name: 'Jamal B.', loggedIn: true }
       ]
     },
     {
       id: 'harmony-elementary',
       name: 'Harmony Elementary',
       grades: 'K-5',
-      teachers: { total: 18, loggedIn: 17 },
-      paras: { total: 10, loggedIn: 8 },
+      teachers: { total: 45, loggedIn: 42 },
+      paras: { total: 20, loggedIn: 15 },
       teacherCourses: ['The Differentiation Fix', 'Small Group Mastery', 'Time Management for Teachers'],
       paraCourses: ['Building Strong Teacher-Para Partnerships', 'Small-Group & One-on-One Instruction', 'De-Escalation Strategies'],
       teacherStaff: [
         { name: 'Emily W.', loggedIn: true }, { name: 'Robert J.', loggedIn: true }, { name: 'Michelle P.', loggedIn: true },
         { name: 'Kevin D.', loggedIn: true }, { name: 'Patricia A.', loggedIn: true }, { name: 'Brian M.', loggedIn: true },
         { name: 'Jessica L.', loggedIn: true }, { name: 'Daniel K.', loggedIn: true }, { name: 'Amanda R.', loggedIn: true },
-        { name: 'Christopher S.', loggedIn: true }, { name: 'Stephanie H.', loggedIn: true }, { name: 'Matthew T.', loggedIn: true },
-        { name: 'Ashley B.', loggedIn: true }, { name: 'Joshua C.', loggedIn: true }, { name: 'Nicole F.', loggedIn: false },
-        { name: 'Andrew G.', loggedIn: true }, { name: 'Elizabeth Y.', loggedIn: true }, { name: 'Ryan V.', loggedIn: true }
+        { name: 'Christopher S.', loggedIn: true }, { name: 'Nicole F.', loggedIn: false }, { name: 'Andrew G.', loggedIn: true }
       ],
+      teacherStaffOverflow: 33,
       paraStaff: [
         { name: 'Carmen S.', loggedIn: true }, { name: 'Jose M.', loggedIn: true }, { name: 'Linda R.', loggedIn: true },
         { name: 'Marcus T.', loggedIn: true }, { name: 'Fatima A.', loggedIn: false }, { name: 'Derek W.', loggedIn: true },
         { name: 'Yolanda J.', loggedIn: true }, { name: 'Tyler B.', loggedIn: false }, { name: 'Keisha L.', loggedIn: true },
-        { name: 'Victor H.', loggedIn: true }
-      ]
+        { name: 'Victor H.', loggedIn: true }, { name: 'Maria G.', loggedIn: false }, { name: 'James P.', loggedIn: false }
+      ],
+      paraStaffOverflow: 8
     },
     {
       id: 'rhythm-academy',
       name: 'Rhythm Academy',
       grades: 'K-8',
-      teachers: { total: 14, loggedIn: 13 },
+      teachers: { total: 32, loggedIn: 30 },
       paras: null,
       teacherCourses: ['Student Engagement Strategies', 'Formative Assessment Toolkit', 'Collaborative Planning'],
       paraCourses: null,
@@ -262,17 +268,17 @@ export default function ExampleDashboard() {
         { name: 'William H.', loggedIn: true }, { name: 'Susan K.', loggedIn: true }, { name: 'Charles M.', loggedIn: true },
         { name: 'Karen P.', loggedIn: true }, { name: 'Joseph R.', loggedIn: true }, { name: 'Nancy S.', loggedIn: true },
         { name: 'Thomas W.', loggedIn: true }, { name: 'Lisa A.', loggedIn: false }, { name: 'Mark B.', loggedIn: true },
-        { name: 'Betty C.', loggedIn: true }, { name: 'Donald D.', loggedIn: true }, { name: 'Sandra E.', loggedIn: true },
-        { name: 'Paul F.', loggedIn: true }, { name: 'Dorothy G.', loggedIn: true }
+        { name: 'Betty C.', loggedIn: true }, { name: 'Donald D.', loggedIn: true }, { name: 'Sandra E.', loggedIn: true }
       ],
+      teacherStaffOverflow: 20,
       paraStaff: null
     },
     {
       id: 'motown-middle',
       name: 'Motown Middle School',
       grades: '6-8',
-      teachers: { total: 12, loggedIn: 11 },
-      paras: { total: 4, loggedIn: 3 },
+      teachers: { total: 28, loggedIn: 26 },
+      paras: { total: 10, loggedIn: 7 },
       teacherCourses: ['Classroom Management Reset', 'Student Voice & Choice', 'Advisory Period Design'],
       paraCourses: ['Supporting Students Through Their Daily Schedule', 'Behavior Support in Transitions'],
       teacherStaff: [
@@ -281,45 +287,56 @@ export default function ExampleDashboard() {
         { name: 'Raymond N.', loggedIn: true }, { name: 'Marie O.', loggedIn: true }, { name: 'Eugene P.', loggedIn: false },
         { name: 'Gloria Q.', loggedIn: true }, { name: 'Arthur R.', loggedIn: true }, { name: 'Rose S.', loggedIn: true }
       ],
+      teacherStaffOverflow: 16,
       paraStaff: [
         { name: 'Albert T.', loggedIn: true }, { name: 'Teresa U.', loggedIn: true }, { name: 'Lawrence V.', loggedIn: false },
-        { name: 'Diana W.', loggedIn: true }
+        { name: 'Diana W.', loggedIn: true }, { name: 'Marcus J.', loggedIn: true }, { name: 'Paula K.', loggedIn: false },
+        { name: 'Robert F.', loggedIn: true }, { name: 'Angela M.', loggedIn: true }, { name: 'Steven B.', loggedIn: false },
+        { name: 'Crystal R.', loggedIn: true }
       ]
     },
     {
       id: 'crescendo-hs',
       name: 'Crescendo High School',
       grades: '9-12',
-      teachers: { total: 15, loggedIn: 13 },
-      paras: { total: 5, loggedIn: 4 },
+      teachers: { total: 52, loggedIn: 47 },
+      paras: { total: 16, loggedIn: 13 },
       teacherCourses: ['Engagement in Large Classes', 'Student-Led Conferences', 'Reducing Grading Load'],
       paraCourses: ['Supporting Students with IEPs', 'Study Skills Coaching', 'Communication that Clicks'],
       teacherStaff: [
         { name: 'Harold A.', loggedIn: true }, { name: 'Sharon B.', loggedIn: true }, { name: 'Douglas C.', loggedIn: true },
         { name: 'Catherine D.', loggedIn: true }, { name: 'Gerald E.', loggedIn: false }, { name: 'Deborah F.', loggedIn: true },
         { name: 'Walter G.', loggedIn: true }, { name: 'Laura H.', loggedIn: true }, { name: 'Henry I.', loggedIn: true },
-        { name: 'Kimberly J.', loggedIn: true }, { name: 'Carl K.', loggedIn: true }, { name: 'Donna L.', loggedIn: false },
-        { name: 'Russell M.', loggedIn: true }, { name: 'Carol N.', loggedIn: true }, { name: 'Ralph O.', loggedIn: true }
+        { name: 'Kimberly J.', loggedIn: true }, { name: 'Carl K.', loggedIn: true }, { name: 'Donna L.', loggedIn: false }
       ],
+      teacherStaffOverflow: 40,
       paraStaff: [
         { name: 'Judith P.', loggedIn: true }, { name: 'Roy Q.', loggedIn: true }, { name: 'Janet R.', loggedIn: true },
-        { name: 'Philip S.', loggedIn: false }, { name: 'Cheryl T.', loggedIn: true }
-      ]
+        { name: 'Philip S.', loggedIn: false }, { name: 'Cheryl T.', loggedIn: true }, { name: 'Benjamin W.', loggedIn: true },
+        { name: 'Andrea M.', loggedIn: true }, { name: 'Kenneth H.', loggedIn: false }, { name: 'Barbara J.', loggedIn: true },
+        { name: 'Ronald K.', loggedIn: true }, { name: 'Michelle L.', loggedIn: true }, { name: 'Edward N.', loggedIn: false }
+      ],
+      paraStaffOverflow: 4
     },
     {
       id: 'bridges-alt',
       name: 'Bridges Alternative Program',
       grades: '7-12',
-      teachers: { total: 6, loggedIn: 6 },
-      paras: { total: 3, loggedIn: 3 },
+      teachers: { total: 14, loggedIn: 12 },
+      paras: { total: 8, loggedIn: 7 },
       teacherCourses: ['Trauma-Informed Practices', 'Restorative Conversations', 'Flexible Scheduling'],
       paraCourses: ['De-Escalation Strategies', 'Building Trust with Students'],
       teacherStaff: [
         { name: 'Samuel A.', loggedIn: true }, { name: 'Diane B.', loggedIn: true }, { name: 'Gregory C.', loggedIn: true },
-        { name: 'Joyce D.', loggedIn: true }, { name: 'Patrick E.', loggedIn: true }, { name: 'Theresa F.', loggedIn: true }
+        { name: 'Joyce D.', loggedIn: true }, { name: 'Patrick E.', loggedIn: true }, { name: 'Theresa F.', loggedIn: true },
+        { name: 'Anthony G.', loggedIn: true }, { name: 'Christine H.', loggedIn: true }, { name: 'Brian I.', loggedIn: false },
+        { name: 'Kelly J.', loggedIn: true }, { name: 'Richard K.', loggedIn: true }, { name: 'Jennifer L.', loggedIn: true },
+        { name: 'Matthew M.', loggedIn: false }, { name: 'Angela N.', loggedIn: true }
       ],
       paraStaff: [
-        { name: 'Jack G.', loggedIn: true }, { name: 'Joan H.', loggedIn: true }, { name: 'Dennis I.', loggedIn: true }
+        { name: 'Jack G.', loggedIn: true }, { name: 'Joan H.', loggedIn: true }, { name: 'Dennis I.', loggedIn: true },
+        { name: 'Martha J.', loggedIn: true }, { name: 'Larry K.', loggedIn: true }, { name: 'Dorothy L.', loggedIn: true },
+        { name: 'Frank M.', loggedIn: true }, { name: 'Ruth N.', loggedIn: false }
       ]
     }
   ];
@@ -545,8 +562,8 @@ export default function ExampleDashboard() {
         'Growth group formation'
       ],
       outcomes: [
-        { label: 'Observations', value: '101', sublabel: 'Completed' },
-        { label: 'Love Notes Sent', value: '101', sublabel: 'Personalized feedback' }
+        { label: 'Observations', value: '48', sublabel: 'Completed' },
+        { label: 'Love Notes Sent', value: '48', sublabel: 'Personalized feedback' }
       ],
       blueprintPreview: 'This phase establishes trust and captures baseline data to inform targeted support.'
     },
@@ -568,7 +585,7 @@ export default function ExampleDashboard() {
         'Retention tracking tools'
       ],
       completed: [
-        'Hub access activated for all 101 staff across 6 buildings',
+        'Hub access activated for all 255 staff across 6 buildings',
         'Executive Impact Session #1 (July planning)',
         'On-Campus Days completed at 2 buildings'
       ],
@@ -729,7 +746,7 @@ export default function ExampleDashboard() {
                   <Users className="w-4 h-4 text-[#38618C]" />
                   <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">101</div>
+                <div className="text-2xl font-bold text-[#1e2749]">255</div>
                 <div className="text-xs text-[#38618C] font-medium">across 6 schools</div>
               </div>
 
@@ -783,15 +800,15 @@ export default function ExampleDashboard() {
                 <div className="text-center p-3 bg-amber-50 rounded-lg">
                   <div className="text-2xl font-bold text-amber-600">87%</div>
                   <div className="text-xs text-gray-600 mt-1">Hub Logins</div>
-                  <div className="text-xs text-gray-500 mt-1">88/101 logged in</div>
+                  <div className="text-xs text-gray-500 mt-1">223/255 logged in</div>
                   <div className="text-xs text-amber-600 mt-0.5">Goal: 100% by Observation Day</div>
                 </div>
 
                 {/* Love Notes */}
                 <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">101</div>
+                  <div className="text-2xl font-bold text-green-600">277</div>
                   <div className="text-xs text-gray-600 mt-1">Love Notes Sent</div>
-                  <div className="text-xs text-green-600 mt-1">✓ Complete</div>
+                  <div className="text-xs text-green-600 mt-1">255 welcome + 22 observation</div>
                 </div>
 
                 {/* Virtual Sessions */}
@@ -824,7 +841,7 @@ export default function ExampleDashboard() {
                 <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer"
                    className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
                   <Mail className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-[#1e2749]">9</div>
+                  <div className="text-lg font-bold text-[#1e2749]">23</div>
                   <div className="text-xs text-gray-600 mt-1">Blog Readers</div>
                 </a>
 
@@ -832,7 +849,7 @@ export default function ExampleDashboard() {
                 <a href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" target="_blank" rel="noopener noreferrer"
                    className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
                   <Headphones className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-[#1e2749]">1</div>
+                  <div className="text-lg font-bold text-[#1e2749]">3</div>
                   <div className="text-xs text-gray-600 mt-1">Podcast Listeners</div>
                 </a>
 
@@ -840,7 +857,7 @@ export default function ExampleDashboard() {
                 <a href="https://www.facebook.com/groups/tdimovement" target="_blank" rel="noopener noreferrer"
                    className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
                   <Users className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-[#1e2749]">2</div>
+                  <div className="text-lg font-bold text-[#1e2749]">5</div>
                   <div className="text-xs text-gray-600 mt-1">Community Members</div>
                 </a>
               </div>
@@ -1387,7 +1404,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-green-600 text-lg">✅</span>
                       <div>
-                        <div className="font-semibold text-[#1e2749]">Hub Onboarding — 101 Educators Enrolled</div>
+                        <div className="font-semibold text-[#1e2749]">Hub Onboarding — 255 Educators Enrolled</div>
                         <div className="text-sm text-gray-500">September 8-12, 2025</div>
                       </div>
                     </div>
@@ -1398,13 +1415,13 @@ export default function ExampleDashboard() {
                   <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
                     <div>
                       <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Happened</h4>
-                      <p className="text-sm text-gray-600">All 101 educators (73 teachers + 28 paras) enrolled in the Learning Hub. Every single person received a personalized Welcome Love Note.</p>
+                      <p className="text-sm text-gray-600">All 255 educators (187 teachers + 68 paras) enrolled in the Learning Hub. Every single person received a personalized Welcome Love Note.</p>
                     </div>
                     <div>
                       <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Key Outcomes</h4>
                       <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />101/101 accounts created</li>
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />101 Welcome Love Notes delivered</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />255/255 accounts created</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />255 Welcome Love Notes delivered</li>
                         <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Building-level onboarding sessions held at each school</li>
                         <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />TDI Champions trained on Hub navigation</li>
                       </ul>
@@ -1427,7 +1444,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-green-600 text-lg">✅</span>
                       <div>
-                        <div className="font-semibold text-[#1e2749]">Baseline Survey — 94/101 Responses (93%)</div>
+                        <div className="font-semibold text-[#1e2749]">Baseline Survey — 237/255 Responses (93%)</div>
                         <div className="text-sm text-gray-500">September 22-26, 2025</div>
                       </div>
                     </div>
@@ -1446,8 +1463,8 @@ export default function ExampleDashboard() {
                           <thead>
                             <tr className="border-b">
                               <th className="text-left py-2 text-gray-600">Metric</th>
-                              <th className="text-center py-2 text-gray-600">Teachers (n=68)</th>
-                              <th className="text-center py-2 text-gray-600">Paras (n=26)</th>
+                              <th className="text-center py-2 text-gray-600">Teachers (n=174)</th>
+                              <th className="text-center py-2 text-gray-600">Paras (n=63)</th>
                               <th className="text-center py-2 text-gray-600">Combined</th>
                             </tr>
                           </thead>
@@ -1509,12 +1526,12 @@ export default function ExampleDashboard() {
                   <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
                     <div>
                       <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Happened</h4>
-                      <p className="text-sm text-gray-600">First virtual session with teacher cohort (42 teachers from across all 6 buildings). Focused on understanding baseline data, setting individual strategy goals, and introducing Hub resources.</p>
+                      <p className="text-sm text-gray-600">First virtual session with teacher cohort (107 teachers from across all 6 buildings). Focused on understanding baseline data, setting individual strategy goals, and introducing Hub resources.</p>
                     </div>
                     <div>
                       <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Key Outcomes</h4>
                       <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Teachers self-selected into focus areas: Differentiation (18), Engagement (14), Classroom Management (10)</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Teachers self-selected into focus areas: Differentiation (45), Engagement (35), Classroom Management (27)</li>
                         <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Hub &quot;Getting Started&quot; course completion jumped from 12% to 67% within 48 hours</li>
                         <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />3 teachers volunteered for pilot observation group</li>
                       </ul>
@@ -1548,13 +1565,13 @@ export default function ExampleDashboard() {
                   <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
                     <div>
                       <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Happened</h4>
-                      <p className="text-sm text-gray-600">First virtual session with para cohort (22 paras from across 5 buildings). Focused on validating baseline data, building trust, and navigating the Hub together.</p>
+                      <p className="text-sm text-gray-600">First virtual session with para cohort (53 paras from across 5 buildings). Focused on validating baseline data, building trust, and navigating the Hub together.</p>
                     </div>
                     <div>
                       <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Key Outcomes</h4>
                       <ul className="text-sm text-gray-600 space-y-1">
                         <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Paras identified top needs: feeling valued by teachers (82%), behavior support training (71%), clearer daily expectations (64%)</li>
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Live Hub walkthrough resulted in 15 paras starting a course during the session</li>
+                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Live Hub walkthrough resulted in 37 paras starting a course during the session</li>
                         <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Emotional moment when paras realized the PD was designed specifically FOR them</li>
                       </ul>
                     </div>
@@ -1742,7 +1759,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-green-600 text-lg">✅</span>
                       <div>
-                        <div className="font-semibold text-[#1e2749]">Mid-Year Survey — 89/101 Responses (88%)</div>
+                        <div className="font-semibold text-[#1e2749]">Mid-Year Survey — 224/255 Responses (88%)</div>
                         <div className="text-sm text-gray-500">January 20-24, 2026</div>
                       </div>
                     </div>
@@ -2694,6 +2711,9 @@ export default function ExampleDashboard() {
                                     {staff.name}
                                   </span>
                                 ))}
+                                {school.teacherStaffOverflow && (
+                                  <span className="text-xs text-gray-400 italic">+{school.teacherStaffOverflow} more</span>
+                                )}
                               </div>
                             </div>
                           </div>
@@ -2742,6 +2762,9 @@ export default function ExampleDashboard() {
                                       {staff.name}
                                     </span>
                                   ))}
+                                  {school.paraStaffOverflow && (
+                                    <span className="text-xs text-gray-400 italic">+{school.paraStaffOverflow} more</span>
+                                  )}
                                 </div>
                               </div>
                             </div>
