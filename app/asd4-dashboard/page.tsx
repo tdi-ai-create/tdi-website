@@ -74,18 +74,8 @@ export default function ASD4Dashboard() {
   const [showRoster, setShowRoster] = useState<string | null>(null);
 
   // Needs Attention completion state with localStorage persistence
-  // Items that are permanently complete (scheduled/done server-side)
-  // Note: observation-day-1 is now "para-training-1" (Feb 13) and observation-day-2 is "observation-day" (Feb 26)
-  // All 5 scheduled events are confirmed - only Virtual 4 and Exec 2 remain as action items
-  const permanentlyComplete = [
-    'partner-data-form',      // Submitted Feb 8, 2026
-    'executive-session-1',    // Complete with PDF report delivered
-    'para-training-1',        // Feb 13, 2026 - In-Person Para Training (scheduled)
-    'observation-day',        // Feb 26, 2026 - Observation Day (scheduled)
-    'virtual-session-1',      // Mar 2, 2026 (scheduled)
-    'virtual-session-2',      // Apr 6, 2026 (scheduled)
-    'virtual-session-3'       // Apr 20, 2026 (scheduled)
-  ];
+  // Only 2 items remain in Needs Attention - Virtual Session 4 and Executive Session 2
+  const permanentlyComplete: string[] = [];
   const [completedItems, setCompletedItems] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('asd4-completed-items');
@@ -113,82 +103,9 @@ export default function ASD4Dashboard() {
   // Check if item is complete
   const isComplete = (itemId: string) => completedItems.includes(itemId);
 
-  // Needs Attention items data
-  // Items marked as complete via permanentlyComplete array will show in "Completed" section
+  // Needs Attention items - only items that actually need action
+  // Completed/scheduled items are shown in Progress tab, not here
   const needsAttentionItems = [
-    // COMPLETED ITEMS (will show as done)
-    {
-      id: 'partner-data-form',
-      title: 'Partner Data Form',
-      description: 'Submitted February 8, 2026',
-      deadline: 'FEB 2026',
-      actionLabel: 'View Form',
-      actionUrl: '/asd4-dashboard/partner-data',
-      icon: ClipboardList,
-      priority: 'now'
-    },
-    {
-      id: 'executive-session-1',
-      title: 'Executive Impact Session 1',
-      description: 'Complete — Report delivered to leadership',
-      deadline: 'JAN 2026',
-      actionLabel: 'View Report',
-      actionUrl: 'https://drive.google.com/file/d/1XfzJGTyb60kp3t8MbcGtN8ro-psBBnbj/view?usp=sharing',
-      icon: Briefcase,
-      priority: 'now',
-      external: true
-    },
-    {
-      id: 'para-training-1',
-      title: 'In-Person Para Training',
-      description: 'February 13, 2026 · 1:00 - 3:00 PM · Baseline survey collection',
-      deadline: 'FEB 2026',
-      actionLabel: 'Scheduled',
-      actionUrl: '#',
-      icon: Users,
-      priority: 'now'
-    },
-    {
-      id: 'observation-day',
-      title: 'Observation Day',
-      description: 'February 26, 2026 · 7:30 AM - 3:00 PM',
-      deadline: 'FEB 2026',
-      actionLabel: 'Scheduled',
-      actionUrl: '#',
-      icon: Eye,
-      priority: 'now'
-    },
-    {
-      id: 'virtual-session-1',
-      title: 'Virtual Session 1',
-      description: 'March 2, 2026 · 7:30 - 8:15 AM',
-      deadline: 'MAR 2026',
-      actionLabel: 'Scheduled',
-      actionUrl: '#',
-      icon: Monitor,
-      priority: 'upcoming'
-    },
-    {
-      id: 'virtual-session-2',
-      title: 'Virtual Session 2',
-      description: 'April 6, 2026 · 7:30 - 8:15 AM',
-      deadline: 'APR 2026',
-      actionLabel: 'Scheduled',
-      actionUrl: '#',
-      icon: Monitor,
-      priority: 'upcoming'
-    },
-    {
-      id: 'virtual-session-3',
-      title: 'Virtual Session 3',
-      description: 'April 20, 2026 · 7:30 - 8:15 AM',
-      deadline: 'APR 2026',
-      actionLabel: 'Scheduled',
-      actionUrl: '#',
-      icon: Monitor,
-      priority: 'upcoming'
-    },
-    // REMAINING ACTION ITEMS (not yet scheduled)
     {
       id: 'virtual-session-4',
       title: 'Schedule Virtual Session 4',
@@ -197,7 +114,7 @@ export default function ASD4Dashboard() {
       actionLabel: 'Book Your Session',
       actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
       icon: Monitor,
-      priority: 'upcoming',
+      priority: 'now',
       external: true,
       showCalendar: true
     },
@@ -209,7 +126,7 @@ export default function ASD4Dashboard() {
       actionLabel: 'Book Your Session',
       actionUrl: 'https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone',
       icon: Briefcase,
-      priority: 'upcoming',
+      priority: 'now',
       external: true,
       showCalendar: true
     }
