@@ -327,7 +327,18 @@ export async function POST(request: Request) {
       }
     }
 
-    // 5. Send email notification to team if needed
+    // 5. Fetch milestone info for notifications and notes
+    const { data: milestoneInfo } = await supabase
+      .from('milestones')
+      .select('*')
+      .eq('id', milestoneId)
+      .single();
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const m = milestoneInfo as any;
+    const milestoneName = m?.title || m?.name || m?.admin_description || milestoneId;
+
+    // 6. Send email notification to team if needed
     // Always notify when: submission needs team review (waiting_approval), change request, or explicit notifyTeam
     const needsTeamReview = newStatus === 'waiting_approval';
     if (notifyTeam || needsTeamReview || submissionType === 'change_request') {
@@ -336,16 +347,6 @@ export async function POST(request: Request) {
         .select('name, email')
         .eq('id', creatorId)
         .single();
-
-      const { data: milestoneInfo } = await supabase
-        .from('milestones')
-        .select('*')
-        .eq('id', milestoneId)
-        .single();
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const m = milestoneInfo as any;
-      const milestoneName = m?.title || m?.name || m?.admin_description || milestoneId;
 
       const resendApiKey = process.env.RESEND_API_KEY;
       if (resendApiKey && creator) {
@@ -453,6 +454,77 @@ export async function POST(request: Request) {
           message: notificationMessage,
           link: `/admin/creators/${creatorId}`,
         });
+    }
+
+    // 6. Create auto-note for audit trail
+    let autoNoteContent: string | null = null;
+
+    switch (submissionType) {
+      case 'path_selection':
+        const pathLabels: Record<string, string> = {
+          blog: 'Blog Post',
+          download: 'Free Download',
+          course: 'Learning Hub Course',
+        };
+        autoNoteContent = `[Auto] Content path selected: ${pathLabels[content.selected_path] || content.selected_path}`;
+        break;
+      case 'meeting_scheduled':
+        const meetingDate = content.scheduled_date
+          ? new Date(content.scheduled_date + 'T' + (content.scheduled_time || '12:00')).toLocaleDateString('en-US', {
+              weekday: 'short',
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            })
+          : 'date TBD';
+        autoNoteContent = `[Auto] Meeting scheduled for ${milestoneName}: ${meetingDate}${content.scheduled_time ? ` at ${content.scheduled_time}` : ''}`;
+        break;
+      case 'link':
+        autoNoteContent = `[Auto] Link submitted for ${milestoneName}: ${content.link}`;
+        break;
+      case 'confirmation':
+        autoNoteContent = `[Auto] Creator confirmed: ${milestoneName}`;
+        break;
+      case 'preferences':
+        const prefs: string[] = [];
+        if (content.wants_video_editing) prefs.push('video editing');
+        if (content.wants_download_design) prefs.push('download design');
+        autoNoteContent = prefs.length > 0
+          ? `[Auto] Production preferences selected: ${prefs.join(', ')}`
+          : `[Auto] Production preferences submitted (no additional services)`;
+        break;
+      case 'form':
+        autoNoteContent = `[Auto] Form submitted for ${milestoneName}`;
+        break;
+      case 'course_title':
+        autoNoteContent = `[Auto] Course title submitted: "${content.title}"`;
+        break;
+      case 'course_outline':
+        autoNoteContent = `[Auto] Course outline submitted: ${content.document_url}`;
+        break;
+      case 'change_request':
+        autoNoteContent = `[Auto] Change request for ${milestoneName}: ${content.request}`;
+        break;
+    }
+
+    if (autoNoteContent) {
+      // Get the phase_id for the milestone
+      const { data: milestonePhase } = await supabase
+        .from('milestones')
+        .select('phase_id')
+        .eq('id', milestoneId)
+        .single();
+
+      await supabase
+        .from('creator_notes')
+        .insert({
+          creator_id: creatorId,
+          content: autoNoteContent,
+          author: 'System',
+          visible_to_creator: false,
+          phase_id: milestonePhase?.phase_id || null,
+        });
+      console.log('[submit] Auto-note created:', autoNoteContent.substring(0, 50) + '...');
     }
 
     return NextResponse.json({ success: true });

@@ -99,6 +99,150 @@ const phaseDescriptions: Record<string, string> = {
   launch: 'Final preparations for publishing. Create marketing materials and coordinate the launch date.',
 };
 
+// Helper to format submission data for admin display
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function formatSubmissionDataForAdmin(data: any): {
+  label: string;
+  details?: string[];
+  link?: string;
+  timestamp: string | null;
+} | null {
+  if (!data || !data.type) return null;
+
+  const formatDate = (dateStr: string | undefined) => {
+    if (!dateStr) return null;
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' });
+  };
+
+  const formatDateOnly = (dateStr: string | undefined) => {
+    if (!dateStr) return null;
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
+  switch (data.type) {
+    case 'path_selection': {
+      const pathLabels: Record<string, string> = {
+        blog: 'Blog Post',
+        download: 'Free Download',
+        course: 'Learning Hub Course',
+      };
+      return {
+        label: `Content Path: ${pathLabels[data.content_path] || data.content_path}`,
+        timestamp: formatDate(data.selected_at || data.submitted_at),
+      };
+    }
+    case 'meeting_scheduled': {
+      const meetingDate = data.scheduled_date
+        ? new Date(data.scheduled_date + 'T' + (data.scheduled_time || '12:00'))
+        : null;
+      const details: string[] = [];
+      if (meetingDate) {
+        details.push(`Date: ${formatDateOnly(meetingDate.toISOString())}`);
+        if (data.scheduled_time) {
+          details.push(`Time: ${new Date('2000-01-01T' + data.scheduled_time).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}`);
+        }
+      }
+      if (data.notes) details.push(`Notes: ${data.notes}`);
+      if (data.booked_externally) details.push('(Booked externally by admin)');
+      return {
+        label: 'Meeting Scheduled',
+        details: details.length > 0 ? details : undefined,
+        timestamp: formatDate(data.submitted_at),
+      };
+    }
+    case 'link': {
+      const details: string[] = [];
+      if (data.notes) details.push(`Notes: ${data.notes}`);
+      return {
+        label: 'Link Submitted',
+        link: data.link,
+        details: details.length > 0 ? details : undefined,
+        timestamp: formatDate(data.submitted_at),
+      };
+    }
+    case 'confirmation':
+      return {
+        label: 'Confirmed by creator',
+        timestamp: formatDate(data.confirmed_at || data.submitted_at),
+      };
+    case 'preferences': {
+      const details: string[] = [];
+      if (data.wants_video_editing) details.push('Wants video editing');
+      if (data.wants_download_design) details.push('Wants download design');
+      if (details.length === 0) details.push('No additional services selected');
+      return {
+        label: 'Production Preferences',
+        details,
+        timestamp: formatDate(data.submitted_at),
+      };
+    }
+    case 'form': {
+      const details: string[] = [];
+      if (data.fields) {
+        Object.entries(data.fields).forEach(([key, value]) => {
+          if (value && key !== 'submitted_at') {
+            details.push(`${key}: ${value}`);
+          }
+        });
+      }
+      return {
+        label: 'Form Submitted',
+        details: details.length > 0 ? details : undefined,
+        timestamp: formatDate(data.submitted_at),
+      };
+    }
+    case 'team_review': {
+      const details: string[] = [];
+      if (data.reviewed_by || data.admin_name) {
+        details.push(`Reviewed by: ${data.reviewed_by || data.admin_name}`);
+      }
+      if (data.review_notes) details.push(`Notes: ${data.review_notes}`);
+      return {
+        label: 'Team Review Complete',
+        details: details.length > 0 ? details : undefined,
+        timestamp: formatDate(data.reviewed_at || data.completed_at),
+      };
+    }
+    case 'course_title':
+      return {
+        label: `Course Title: "${data.title}"`,
+        timestamp: formatDate(data.submitted_at),
+      };
+    case 'course_outline':
+      return {
+        label: 'Course Outline Submitted',
+        link: data.document_url,
+        timestamp: formatDate(data.submitted_at),
+      };
+    case 'agreement': {
+      const details: string[] = [];
+      if (data.completed_by_admin || data.signed_externally) {
+        details.push('Processed by team');
+      }
+      return {
+        label: 'Agreement Signed',
+        details: details.length > 0 ? details : undefined,
+        timestamp: formatDate(data.submitted_at),
+      };
+    }
+    case 'change_request': {
+      return {
+        label: 'Change Requested',
+        details: data.request ? [`Request: ${data.request}`] : undefined,
+        timestamp: formatDate(data.requested_at || data.submitted_at),
+      };
+    }
+    default:
+      // For unknown types, try to display what we can
+      return {
+        label: `Submission: ${data.type}`,
+        timestamp: formatDate(data.submitted_at || data.completed_at),
+      };
+  }
+}
+
 export default function AdminCreatorDetailPage() {
   const router = useRouter();
   const params = useParams();
@@ -1876,30 +2020,45 @@ function MilestoneRow({
                 )}
               </div>
             )}
-            {/* Show scheduled meeting date if exists */}
-            {m.metadata?.scheduled_date && (
-              <div className="mt-2 flex items-center gap-2 text-sm">
-                <Calendar className="w-4 h-4 text-[#F5A623]" />
-                <span className="text-[#1e2749] font-medium">
-                  Meeting: {new Date(m.metadata.scheduled_date + 'T' + (m.metadata.scheduled_time || '12:00')).toLocaleDateString('en-US', {
-                    weekday: 'short',
-                    month: 'short',
-                    day: 'numeric',
-                  })}
-                  {m.metadata.scheduled_time && (
-                    <> at {new Date('2000-01-01T' + m.metadata.scheduled_time).toLocaleTimeString('en-US', {
-                      hour: 'numeric',
-                      minute: '2-digit',
-                    })}</>
-                  )}
-                </span>
-                {m.metadata.notes && (
-                  <Tooltip content={`Creator notes: ${m.metadata.notes}`} position="right">
-                    <Info className="w-3.5 h-3.5 text-gray-400 cursor-help" />
-                  </Tooltip>
-                )}
-              </div>
-            )}
+            {/* Show submission data for completed or waiting_approval milestones */}
+            {(milestone.status === 'completed' || milestone.status === 'waiting_approval') && (() => {
+              // Prefer submission_data, fall back to metadata for legacy data
+              const submissionInfo = m.submission_data
+                ? formatSubmissionDataForAdmin(m.submission_data)
+                : m.metadata?.scheduled_date
+                  ? formatSubmissionDataForAdmin({ type: 'meeting_scheduled', ...m.metadata })
+                  : null;
+
+              if (!submissionInfo) return null;
+
+              return (
+                <div className="mt-3 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-[#1e2749]">{submissionInfo.label}</p>
+                      {submissionInfo.details && submissionInfo.details.map((detail, idx) => (
+                        <p key={idx} className="text-xs text-gray-600 mt-0.5">{detail}</p>
+                      ))}
+                      {submissionInfo.link && (
+                        <a
+                          href={submissionInfo.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-[#80a4ed] hover:underline mt-1 inline-block"
+                        >
+                          {submissionInfo.link.length > 50
+                            ? submissionInfo.link.substring(0, 50) + '...'
+                            : submissionInfo.link}
+                        </a>
+                      )}
+                    </div>
+                    {submissionInfo.timestamp && (
+                      <span className="text-xs text-gray-400 flex-shrink-0">{submissionInfo.timestamp}</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })()}
             {/* Show submission indicator when waiting for approval */}
             {milestone.status === 'waiting_approval' && (
               <div className="mt-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">

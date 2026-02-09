@@ -229,7 +229,24 @@ export async function POST(request: Request) {
       }
     }
 
-    // 5. Send email to creator
+    // 5. Create auto-note for audit trail
+    const milestoneName = milestone?.title || milestone?.name || 'Milestone';
+    const autoNoteContent = isOutOfOrder
+      ? `[Auto] Milestone approved out of sequence: "${milestoneName}"${note ? ` - Note: ${note}` : ''}`
+      : `[Auto] Milestone approved: "${milestoneName}"`;
+
+    await supabase
+      .from('creator_notes')
+      .insert({
+        creator_id: creatorId,
+        content: autoNoteContent,
+        author: 'System',
+        visible_to_creator: false,
+        phase_id: milestone?.phase_id || null,
+      });
+    console.log('[approve-milestone] Auto-note created');
+
+    // 6. Send email to creator
     const resendApiKey = process.env.RESEND_API_KEY;
 
     if (resendApiKey && creator) {
