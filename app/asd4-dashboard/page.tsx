@@ -772,7 +772,7 @@ Thanks for everything you do.`
                   <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
                   <Tooltip text="Action items to complete for your partnership. Click to view details." position="bottom" iconSize={12} />
                 </div>
-                <div className="text-2xl font-bold text-[#E07A5F]">8</div>
+                <div className="text-2xl font-bold text-[#E07A5F]">{needsAttentionItems.filter(item => !isComplete(item.id)).length}</div>
                 <div className="text-xs text-[#E07A5F] font-medium">Items pending</div>
               </div>
 
