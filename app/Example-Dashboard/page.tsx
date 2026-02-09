@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
+import { Tooltip } from '@/components/Tooltip';
 import {
   Calendar,
   CheckCircle,
@@ -45,18 +46,6 @@ import {
   Sunset,
   X
 } from 'lucide-react';
-
-// Tooltip component
-const Tooltip = ({ children, content }: { children: React.ReactNode; content: string }) => (
-  <span className="relative group inline-flex items-center">
-    {children}
-    <Info className="w-4 h-4 text-gray-500 ml-1 cursor-help" />
-    <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-4 py-2.5 bg-[#1e2749] text-white text-sm leading-snug rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap max-w-sm text-center z-50 shadow-lg">
-      {content}
-      <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1e2749]"></span>
-    </span>
-  </span>
-);
 
 export default function ExampleDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -517,32 +506,42 @@ export default function ExampleDashboard() {
     {
       id: 'leadership-recap',
       title: 'Spring Leadership Recap with District Team',
-      description: 'Review district-wide progress + set building-level goals for next year',
+      description: 'Review district-wide progress across all 6 buildings + set goals for 2026-27',
       deadline: 'APRIL 2026',
       deadlineMonth: dueDates.leadershipRecap.month,
       deadlineYear: dueDates.leadershipRecap.year,
       actionLabel: 'Schedule',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      actionUrl: '#',
     },
     {
       id: 'teacher-cohort',
-      title: 'Virtual session: Teacher Cohort (Harmony & Crescendo)',
-      description: 'Included in contract',
+      title: 'Virtual Session: Teacher Cohort (Harmony & Crescendo)',
+      description: 'Focus on differentiation strategies from recent observations · Included in contract',
       deadline: 'MAY 2026',
       deadlineMonth: dueDates.instructionalDesign.month,
       deadlineYear: dueDates.instructionalDesign.year,
       actionLabel: 'Schedule',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      actionUrl: '#',
     },
     {
       id: 'para-cohort',
-      title: 'Virtual session: Para Cohort (District-wide)',
-      description: 'Included in contract',
+      title: 'Virtual Session: Para Cohort (District-wide)',
+      description: 'Focus on teacher-para collaboration based on pilot group feedback · Included in contract',
       deadline: 'MAY 2026',
       deadlineMonth: dueDates.classManagement.month,
       deadlineYear: dueDates.classManagement.year,
       actionLabel: 'Schedule',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      actionUrl: '#',
+    },
+    {
+      id: 'spring-observations',
+      title: 'Prep for Spring Observation Days (Para & Teacher Pilot Groups)',
+      description: 'Coordinate with building leads for classroom walk-throughs',
+      deadline: 'APRIL 2026',
+      deadlineMonth: dueDates.leadershipRecap.month,
+      deadlineYear: dueDates.leadershipRecap.year,
+      actionLabel: 'Schedule',
+      actionUrl: '#',
     },
   ];
 
@@ -755,8 +754,8 @@ export default function ExampleDashboard() {
                   <Eye className="w-4 h-4 text-[#38618C]" />
                   <span className="text-xs text-gray-500 uppercase">Observations</span>
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">8<span className="text-lg font-normal text-gray-400">/12</span></div>
-                <div className="text-xs text-amber-600 font-medium">In Progress</div>
+                <div className="text-2xl font-bold text-[#1e2749]">2<span className="text-lg font-normal text-gray-400">/4</span></div>
+                <div className="text-xs text-[#38618C] font-medium">Para Pilot + Teacher Pilot</div>
               </div>
 
               <div
@@ -833,15 +832,22 @@ export default function ExampleDashboard() {
                   <Heart className="w-4 h-4 text-[#38618C]" />
                   <span className="text-sm font-medium text-[#1e2749]">District-wide Movement Involvement</span>
                 </div>
-                <span className="text-xs text-gray-400">Updated Jan 14, 2026</span>
+                <span className="text-xs text-gray-400">Updated Feb 7, 2026</span>
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-3 gap-4 mb-3">
+                {/* Newsletter Subscribers */}
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <Mail className="w-5 h-5 text-[#38618C] mx-auto mb-1" />
+                  <div className="text-lg font-bold text-[#1e2749]">197</div>
+                  <div className="text-xs text-gray-600 mt-1">Newsletter Subscribers</div>
+                </div>
+
                 {/* Blog Readers */}
                 <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer"
                    className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
-                  <Mail className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-[#1e2749]">23</div>
+                  <BookOpen className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
+                  <div className="text-lg font-bold text-[#1e2749]">131</div>
                   <div className="text-xs text-gray-600 mt-1">Blog Readers</div>
                 </a>
 
@@ -849,17 +855,33 @@ export default function ExampleDashboard() {
                 <a href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" target="_blank" rel="noopener noreferrer"
                    className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
                   <Headphones className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-[#1e2749]">3</div>
+                  <div className="text-lg font-bold text-[#1e2749]">78</div>
                   <div className="text-xs text-gray-600 mt-1">Podcast Listeners</div>
                 </a>
+              </div>
 
+              <div className="grid grid-cols-3 gap-4">
                 {/* Community Members */}
                 <a href="https://www.facebook.com/groups/tdimovement" target="_blank" rel="noopener noreferrer"
                    className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
                   <Users className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-[#1e2749]">5</div>
+                  <div className="text-lg font-bold text-[#1e2749]">48</div>
                   <div className="text-xs text-gray-600 mt-1">Community Members</div>
                 </a>
+
+                {/* Resources Downloaded */}
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <FileText className="w-5 h-5 text-[#38618C] mx-auto mb-1" />
+                  <div className="text-lg font-bold text-[#1e2749]">361</div>
+                  <div className="text-xs text-gray-600 mt-1">Resources Downloaded</div>
+                </div>
+
+                {/* Courses Started */}
+                <div className="text-center p-3 bg-gray-50 rounded-lg">
+                  <GraduationCap className="w-5 h-5 text-[#38618C] mx-auto mb-1" />
+                  <div className="text-lg font-bold text-[#1e2749]">224</div>
+                  <div className="text-xs text-gray-600 mt-1">Courses Started</div>
+                </div>
               </div>
             </div>
 
