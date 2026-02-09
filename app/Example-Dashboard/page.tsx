@@ -47,7 +47,9 @@ import {
   Sunset,
   X,
   Quote,
-  RefreshCw
+  RefreshCw,
+  Handshake,
+  Search
 } from 'lucide-react';
 
 export default function ExampleDashboard() {
@@ -2985,13 +2987,13 @@ export default function ExampleDashboard() {
             <div className="bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
               <div className="flex justify-between items-start mb-6">
                 <div>
-                  <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Coming Soon</span>
-                  <h3 className="text-2xl font-bold mt-2">2026-27 Partnership Preview</h3>
-                  <p className="text-sm opacity-80 mt-1">Building on this year&apos;s foundation</p>
+                  <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Looking Ahead</span>
+                  <h3 className="text-2xl font-bold mt-2">Continue Building on Your District&apos;s Momentum</h3>
+                  <p className="text-sm opacity-80 mt-1">Your 6 buildings have established a strong foundation. Here&apos;s how Year 2 takes it further.</p>
                 </div>
                 <div className="text-right">
-                  <span className="text-3xl font-bold">Phase 2</span>
-                  <p className="text-xs opacity-70">Continuation</p>
+                  <span className="text-2xl font-bold">Phase 2 → Phase 3</span>
+                  <p className="text-xs opacity-70">ACCELERATE → SUSTAIN</p>
                 </div>
               </div>
 
@@ -3002,7 +3004,7 @@ export default function ExampleDashboard() {
                   <p className="text-sm font-medium">Why This Plan?</p>
                 </div>
                 <p className="text-sm opacity-90">
-                  Your TerraNova data shows grades 3-6 averaging <strong>30th-48th percentile</strong> in Reading while earning <strong>A&apos;s in class</strong>. Research shows this gap closes when teachers implement <strong>differentiated instruction</strong> -  meeting students where they are. That&apos;s our focus.
+                  Your district&apos;s mid-year data shows remarkable progress: educator stress down <strong>25%</strong>, strategy implementation up <strong>4x</strong>, and para &quot;feeling valued&quot; scores improved by <strong>67%</strong>. Year 2 builds on this momentum — expanding support from pilot groups to full buildings, deepening teacher-para collaboration, and sustaining the culture shift your educators are already experiencing.
                 </p>
               </div>
             </div>
@@ -3010,59 +3012,59 @@ export default function ExampleDashboard() {
             {/* The Plan - 4 Components */}
             <div className="grid md:grid-cols-2 gap-4">
 
-              {/* Full Staff Book Study */}
+              {/* Expanded Observation Cycles */}
               <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
                 <div className="flex items-center gap-3 mb-3">
-                  <BookOpen className="w-6 h-6 text-[#1e2749]" />
-                  <span className="font-semibold text-[#1e2749]">Full Staff Book Study</span>
+                  <Search className="w-6 h-6 text-[#1e2749]" />
+                  <span className="font-semibold text-[#1e2749]">Expanded Observation Cycles</span>
                 </div>
-                <p className="text-sm text-gray-600 mb-4">Kick off the year with shared language and strategies for differentiation.</p>
+                <p className="text-sm text-gray-600 mb-4">Move from pilot groups to broader classroom coverage across all 6 buildings.</p>
                 <div className="text-xs text-gray-500 space-y-1">
-                  <p>✓ Research-backed text selection</p>
-                  <p>✓ Facilitated discussion guides</p>
-                  <p>✓ Immediate classroom application</p>
+                  <p>✓ Multiple observation rounds per semester</p>
+                  <p>✓ Personalized Love Notes for every educator observed</p>
+                  <p>✓ Building-level growth tracking</p>
                 </div>
               </div>
 
-              {/* In-Person Intensive */}
+              {/* Leadership Capacity Building */}
               <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
                 <div className="flex items-center gap-3 mb-3">
-                  <School className="w-6 h-6 text-[#1e2749]" />
-                  <span className="font-semibold text-[#1e2749]">In-Person Intensive Days</span>
+                  <Award className="w-6 h-6 text-[#1e2749]" />
+                  <span className="font-semibold text-[#1e2749]">Leadership Capacity Building</span>
                 </div>
-                <p className="text-sm text-gray-600 mb-4">Two on-site visits with AM staff sessions + PM classroom observations.</p>
+                <p className="text-sm text-gray-600 mb-4">Develop internal coaching skills so your momentum continues beyond TDI.</p>
                 <div className="text-xs text-gray-500 space-y-1">
-                  <p>✓ Morning: Collaborative PD</p>
-                  <p>✓ Afternoon: Real-time coaching</p>
-                  <p>✓ Personalized observation notes</p>
+                  <p>✓ Peer observation circles</p>
+                  <p>✓ TDI Champion advanced training</p>
+                  <p>✓ Leadership pathway for teacher-leaders and para-leaders</p>
                 </div>
               </div>
 
-              {/* Differentiation Focus */}
+              {/* Deepened Teacher-Para Partnership */}
               <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
                 <div className="flex items-center gap-3 mb-3">
-                  <Target className="w-6 h-6 text-[#1e2749]" />
-                  <span className="font-semibold text-[#1e2749]">Differentiation Deep-Dive</span>
+                  <Handshake className="w-6 h-6 text-[#1e2749]" />
+                  <span className="font-semibold text-[#1e2749]">Deepened Teacher-Para Partnership</span>
                 </div>
-                <p className="text-sm text-gray-600 mb-4">Virtual sessions specifically targeting grades 3-6 Reading & Math gaps.</p>
+                <p className="text-sm text-gray-600 mb-4">Strengthen the collaboration systems started this year across every building.</p>
                 <div className="text-xs text-gray-500 space-y-1">
-                  <p>✓ Grade-band specific strategies</p>
-                  <p>✓ Tiered instruction models</p>
-                  <p>✓ Formative assessment alignment</p>
+                  <p>✓ Co-planning structures embedded in schedules</p>
+                  <p>✓ Joint Growth Groups (teachers + paras together)</p>
+                  <p>✓ Communication systems that stick</p>
                 </div>
               </div>
 
-              {/* Continued Support */}
+              {/* Sustained Support & Growth */}
               <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
                 <div className="flex items-center gap-3 mb-3">
-                  <Heart className="w-6 h-6 text-[#1e2749]" />
-                  <span className="font-semibold text-[#1e2749]">Sustained Support</span>
+                  <TrendingUp className="w-6 h-6 text-[#1e2749]" />
+                  <span className="font-semibold text-[#1e2749]">Sustained Support & Growth</span>
                 </div>
-                <p className="text-sm text-gray-600 mb-4">Everything teachers loved this year -  plus more.</p>
+                <p className="text-sm text-gray-600 mb-4">Everything your team loved this year — plus more.</p>
                 <div className="text-xs text-gray-500 space-y-1">
-                  <p>✓ Full Hub access continues</p>
-                  <p>✓ Weekly Love Notes</p>
-                  <p>✓ Dashboard tracking progress</p>
+                  <p>✓ Full Hub access continues for all 255 educators</p>
+                  <p>✓ Weekly Love Notes and strategy spotlights</p>
+                  <p>✓ Dashboard tracking with building-level detail</p>
                   <p>✓ Direct line to Rae</p>
                 </div>
               </div>
@@ -3072,90 +3074,90 @@ export default function ExampleDashboard() {
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-4">
                 <Target className="w-5 h-5 text-[#1e2749]" />
-                <h4 className="font-semibold text-[#1e2749]">Year Focus: Closing the Gap</h4>
+                <h4 className="font-semibold text-[#1e2749]">Year 2 Focus Areas</h4>
               </div>
               <p className="text-sm text-gray-600 mb-6">
-                Based on your TerraNova data and teacher feedback, we&apos;ve identified three strategic focus areas for 2026-27. Each includes measurable goals we&apos;ll track together.
+                Based on your mid-year survey data, observation insights, and leadership priorities, we&apos;ve identified three strategic focus areas for 2026-27. Each includes measurable goals we&apos;ll track together.
               </p>
 
               <div className="grid md:grid-cols-3 gap-4">
 
-                {/* Differentiation - Primary Focus */}
+                {/* Educator Retention & Wellness - Primary Focus */}
                 <div className="bg-[#1e2749] text-white rounded-xl p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <Layers className="w-5 h-5" />
+                    <Heart className="w-5 h-5" />
                     <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">Primary Focus</span>
                   </div>
-                  <h5 className="font-semibold text-lg mb-2">Differentiation</h5>
-                  <p className="text-sm opacity-80 mb-4">Meeting students where they are -  especially grades 3-6</p>
+                  <h5 className="font-semibold text-lg mb-2">Educator Retention & Wellness</h5>
+                  <p className="text-sm opacity-80 mb-4">Sustain the stress reduction and build long-term educator satisfaction across all buildings</p>
                   <div className="border-t border-white/20 pt-3 mt-3">
                     <p className="text-xs opacity-60 mb-2">Success Metrics:</p>
                     <ul className="text-sm space-y-1">
                       <li className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
-                        80% using tiered assignments
+                        Stress level maintained below 6.0/10 district-wide
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
-                        Flexible grouping in 75% of classrooms
+                        Retention intent above 8.5/10
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
-                        TerraNova growth: +5 percentile points (Gr 3-6)
+                        Para &quot;feeling valued&quot; sustained above 7.0/10
                       </li>
                     </ul>
                   </div>
                 </div>
 
-                {/* Classroom Management */}
+                {/* Implementation Depth */}
                 <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <Users className="w-5 h-5 text-[#38618C]" />
+                    <Layers className="w-5 h-5 text-[#38618C]" />
                     <span className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-0.5 rounded-full">Supporting Focus</span>
                   </div>
-                  <h5 className="font-semibold text-lg text-[#1e2749] mb-2">Classroom Management</h5>
-                  <p className="text-sm text-gray-600 mb-4">Systems that support differentiated instruction</p>
+                  <h5 className="font-semibold text-lg text-[#1e2749] mb-2">Implementation Depth</h5>
+                  <p className="text-sm text-gray-600 mb-4">Move from trying strategies to embedding them into daily practice</p>
                   <div className="border-t border-gray-200 pt-3 mt-3">
                     <p className="text-xs text-gray-500 mb-2">Success Metrics:</p>
                     <ul className="text-sm text-gray-700 space-y-1">
                       <li className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full" />
-                        Reduce &quot;repeat directions&quot; complaints by 50%
+                        Strategy implementation above 65% (TDI partner benchmark)
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full" />
-                        Transition routines in 90% of classrooms
+                        Planning time sustained below 7 hrs/week
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full" />
-                        Behavior as challenge: drop from 53% to 30%
+                        80%+ of Growth Group members report using strategies weekly
                       </li>
                     </ul>
                   </div>
                 </div>
 
-                {/* Instructional Design */}
+                {/* Teacher-Para Collaboration */}
                 <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
                   <div className="flex items-center gap-2 mb-3">
-                    <BookOpen className="w-5 h-5 text-[#35A7FF]" />
+                    <Handshake className="w-5 h-5 text-[#35A7FF]" />
                     <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-0.5 rounded-full">Supporting Focus</span>
                   </div>
-                  <h5 className="font-semibold text-lg text-[#1e2749] mb-2">Instructional Design</h5>
-                  <p className="text-sm text-gray-600 mb-4">Engaging lessons that reach all learners</p>
+                  <h5 className="font-semibold text-lg text-[#1e2749] mb-2">Teacher-Para Collaboration</h5>
+                  <p className="text-sm text-gray-600 mb-4">Build systematic co-planning and shared accountability between teachers and paras</p>
                   <div className="border-t border-gray-200 pt-3 mt-3">
                     <p className="text-xs text-gray-500 mb-2">Success Metrics:</p>
                     <ul className="text-sm text-gray-700 space-y-1">
                       <li className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
-                        Engagement as challenge: drop from 32% to 15%
+                        90%+ of teacher-para pairs have weekly co-planning touchpoint
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
-                        100% using formative checks (exit tickets, etc.)
+                        Para inclusion in professional development above 80%
                       </li>
                       <li className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-[#35A7FF] rounded-full" />
-                        Planning time stress: drop from 84% to 50%
+                        Teacher satisfaction with para support above 8.0/10
                       </li>
                     </ul>
                   </div>
@@ -3170,7 +3172,7 @@ export default function ExampleDashboard() {
                   <div>
                     <p className="text-sm font-medium text-amber-800">Why These Metrics?</p>
                     <p className="text-sm text-amber-700 mt-1">
-                      These goals come directly from your Jan 2026 survey (84% cited time management, 53% cited behavior) and Dr. Ford&apos;s stated district goal of &quot;more engaging lessons and differentiated learning.&quot; We&apos;ll measure progress at each touchpoint.
+                      These goals come directly from your mid-year survey data (stress down 25%, implementation up 4x), observation insights across both pilot groups, and Dr. Ford&apos;s commitment to building sustainable support systems for every adult in the building. We&apos;ll measure progress at each touchpoint.
                     </p>
                   </div>
                 </div>
@@ -3223,14 +3225,14 @@ export default function ExampleDashboard() {
                       <p className="text-sm font-medium text-[#1e2749] mb-2">Session Goals:</p>
                       <ul className="text-sm text-gray-600 space-y-1">
                         <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Review 2025-26 outcomes and celebrate wins</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Set differentiation goals for each grade band</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Set Year 2 goals for each building</li>
                         <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Align on success metrics and tracking approach</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Plan book study rollout and kickoff logistics</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Plan expanded observation rollout and kickoff logistics</li>
                       </ul>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-500 mb-1">Differentiation Connection:</p>
-                      <p className="text-sm text-gray-700">Establish baseline expectations -  what does differentiation look like at SPC? Define observable indicators.</p>
+                      <p className="text-xs text-gray-500 mb-1">Growth Connection:</p>
+                      <p className="text-sm text-gray-700">Establish baseline expectations — what does Year 2 success look like across all 6 buildings? Define observable indicators.</p>
                     </div>
                   </div>
                 </TimelineAccordion>
@@ -3245,10 +3247,10 @@ export default function ExampleDashboard() {
                           <p className="text-sm font-medium text-amber-800">Morning: All-Staff Session</p>
                         </div>
                         <ul className="text-sm text-amber-700 space-y-1">
-                          <li>• Book study kickoff + distribution</li>
-                          <li>• Differentiation framework introduction</li>
-                          <li>• &quot;What does this look like at SPC?&quot; discussion</li>
-                          <li>• Hub resource orientation</li>
+                          <li>• Year 2 kickoff: celebrate Year 1 wins</li>
+                          <li>• Introduce expanded observation model</li>
+                          <li>• TDI Champion refresher + new Champion onboarding</li>
+                          <li>• Hub resource orientation for new staff</li>
                         </ul>
                       </div>
                       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -3257,16 +3259,16 @@ export default function ExampleDashboard() {
                           <p className="text-sm font-medium text-blue-800">Afternoon: Classroom Observations</p>
                         </div>
                         <ul className="text-sm text-blue-700 space-y-1">
-                          <li>• Focus: Current differentiation practices</li>
-                          <li>• Baseline observation notes</li>
-                          <li>• 1:1 teacher check-ins</li>
+                          <li>• Focus: Baseline observations for expanded groups</li>
+                          <li>• Building-level observation notes</li>
+                          <li>• 1:1 educator check-ins</li>
                           <li>• Identify bright spots to share</li>
                         </ul>
                       </div>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-500 mb-1">Differentiation Connection:</p>
-                      <p className="text-sm text-gray-700">Launch shared vocabulary and look-fors. Observations establish baseline for measuring growth.</p>
+                      <p className="text-xs text-gray-500 mb-1">Growth Connection:</p>
+                      <p className="text-sm text-gray-700">Observations establish baseline for Year 2 growth tracking. Building on Year 1 pilot data to set personalized goals.</p>
                     </div>
                   </div>
                 </TimelineAccordion>
@@ -3275,17 +3277,17 @@ export default function ExampleDashboard() {
                 <TimelineAccordion id="timeline-oct" number={3} date="Oct/Nov 2026" title="Virtual Strategy Session #1" type="virtual" duration="60 minutes">
                   <div className="space-y-4">
                     <div>
-                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Focus: Tiered Instruction Basics</p>
+                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Focus: Deepening Implementation</p>
                       <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Tiered assignments: What, why, and how</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Planning templates for tiered lessons</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Book study Chapter 1-2 discussion</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Peer sharing: What&apos;s working so far?</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Building on Year 1 strategies: What&apos;s working?</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Teacher-para collaboration check-in</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Hub resource deep-dive: New tools for Year 2</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Peer sharing: Bright spots from observations</li>
                       </ul>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-500 mb-1">Classroom Management Connection:</p>
-                      <p className="text-sm text-gray-700">Introduce routines for managing multiple groups -  &quot;What are the other students doing?&quot;</p>
+                      <p className="text-xs text-gray-500 mb-1">Implementation Connection:</p>
+                      <p className="text-sm text-gray-700">Move from &quot;trying&quot; strategies to embedding them into daily practice across all classrooms.</p>
                     </div>
                   </div>
                 </TimelineAccordion>
@@ -3313,17 +3315,17 @@ export default function ExampleDashboard() {
                 <TimelineAccordion id="timeline-jan" number={5} date="Jan 2027" title="Virtual Strategy Session #2" type="virtual" duration="60 minutes">
                   <div className="space-y-4">
                     <div>
-                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Focus: Flexible Grouping Strategies</p>
+                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Focus: Teacher-Para Partnership Deep-Dive</p>
                       <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Data-driven grouping: Using formative assessments</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Grades 3-6 Reading focus: Targeted interventions</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Book study Chapter 3-4 discussion</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Troubleshooting: Management challenges with groups</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Co-planning structures that work: Models from Year 1</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Building-level collaboration check-ins</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Joint Growth Group planning: Teachers + paras together</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Troubleshooting: Communication challenges</li>
                       </ul>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-500 mb-1">Instructional Design Connection:</p>
-                      <p className="text-sm text-gray-700">Connect grouping to lesson design -  how does this change planning?</p>
+                      <p className="text-xs text-gray-500 mb-1">Collaboration Connection:</p>
+                      <p className="text-sm text-gray-700">Build systematic structures for teacher-para collaboration that stick beyond Year 2.</p>
                     </div>
                   </div>
                 </TimelineAccordion>
@@ -3334,15 +3336,15 @@ export default function ExampleDashboard() {
                     <div>
                       <p className="text-sm font-medium text-[#1e2749] mb-2">Session Goals:</p>
                       <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />TerraNova prep strategy alignment</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Test-taking skills + differentiation connection</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Mid-year wellness pulse check across all buildings</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Implementation depth review: What&apos;s embedded?</li>
                         <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Spring observation focus areas</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Review implementation metrics</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Teacher-para collaboration metrics review</li>
                       </ul>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-500 mb-1">Differentiation Connection:</p>
-                      <p className="text-sm text-gray-700">How do we differentiate test prep? Avoid one-size-fits-all review.</p>
+                      <p className="text-xs text-gray-500 mb-1">Sustainability Connection:</p>
+                      <p className="text-sm text-gray-700">Are we on track to sustain these gains into Year 3? Identify what needs reinforcement.</p>
                     </div>
                   </div>
                 </TimelineAccordion>
@@ -3387,17 +3389,17 @@ export default function ExampleDashboard() {
                 <TimelineAccordion id="timeline-mar-virtual" number={8} date="Mar/Apr 2027" title="Virtual Strategy Session #3" type="virtual" duration="60 minutes">
                   <div className="space-y-4">
                     <div>
-                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Focus: Assessment Alignment</p>
+                      <p className="text-sm font-medium text-[#1e2749] mb-2">Session Focus: Scaling Success</p>
                       <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Closing the grades vs. test score gap</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Differentiated assessment strategies</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Book study final chapters</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Building-level bright spots: What&apos;s working where?</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Cross-building collaboration opportunities</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Hub resource showcase: Educator favorites</li>
                         <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Peer sharing: Biggest wins this year</li>
                       </ul>
                     </div>
                     <div className="bg-gray-50 rounded-lg p-3">
-                      <p className="text-xs text-gray-500 mb-1">Instructional Design Connection:</p>
-                      <p className="text-sm text-gray-700">How do we grade fairly when students are working at different levels?</p>
+                      <p className="text-xs text-gray-500 mb-1">Sustainability Connection:</p>
+                      <p className="text-sm text-gray-700">Identify practices that should become permanent fixtures across all 6 buildings.</p>
                     </div>
                   </div>
                 </TimelineAccordion>
@@ -3427,26 +3429,26 @@ export default function ExampleDashboard() {
                     <div>
                       <p className="text-sm font-medium text-[#1e2749] mb-2">Session Goals:</p>
                       <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Celebrate growth: Compare to baseline</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Review TerraNova results vs. goals</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Teacher retention data</li>
-                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Plan 2027-28 continuation (Phase 3?)</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Celebrate growth: Compare to Year 1 baseline</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Review wellness and retention metrics vs. goals</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Implementation depth and collaboration data</li>
+                        <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" />Plan 2027-28 continuation (Phase 3: SUSTAIN)</li>
                       </ul>
                     </div>
                     <div className="bg-green-50 border border-green-200 rounded-lg p-3">
                       <p className="text-xs text-green-600 mb-1">Metrics Review:</p>
                       <div className="grid grid-cols-3 gap-3 mt-2 text-center">
                         <div>
-                          <p className="text-lg font-bold text-green-700">80%</p>
-                          <p className="text-xs text-green-600">Tiered assignments</p>
+                          <p className="text-lg font-bold text-green-700">&lt;6.0</p>
+                          <p className="text-xs text-green-600">Stress level maintained</p>
                         </div>
                         <div>
-                          <p className="text-lg font-bold text-green-700">+5</p>
-                          <p className="text-xs text-green-600">TerraNova growth</p>
+                          <p className="text-lg font-bold text-green-700">65%+</p>
+                          <p className="text-xs text-green-600">Implementation depth</p>
                         </div>
                         <div>
-                          <p className="text-lg font-bold text-green-700">30%</p>
-                          <p className="text-xs text-green-600">Behavior challenge</p>
+                          <p className="text-lg font-bold text-green-700">90%+</p>
+                          <p className="text-xs text-green-600">Co-planning pairs</p>
                         </div>
                       </div>
                     </div>
@@ -3497,7 +3499,7 @@ export default function ExampleDashboard() {
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <BookOpen className="w-4 h-4 text-[#38618C]" />
-                    <span>TDI Book (Every Educator)</span>
+                    <span>TDI Resource Library (All Educators)</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-gray-600">
                     <TrendingUp className="w-4 h-4 text-green-500" />
@@ -3521,11 +3523,11 @@ export default function ExampleDashboard() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 rounded-lg p-4">
                   <p className="text-xs text-gray-500 mb-1">Dr. Ford&apos;s District Goal:</p>
-                  <p className="text-sm text-[#1e2749] font-medium">&quot;More engaging lessons and differentiated learning in the regular classroom&quot;</p>
+                  <p className="text-sm text-[#1e2749] font-medium">&quot;Build sustainable support systems for every teacher and para — so students get consistent, high-quality instruction from every adult in the room.&quot;</p>
                 </div>
                 <div className="bg-[#35A7FF]/10 rounded-lg p-4">
                   <p className="text-xs text-[#35A7FF] mb-1">TDI Commitment:</p>
-                  <p className="text-sm text-[#1e2749] font-medium">Close the grades 3-6 performance gap through targeted differentiation support</p>
+                  <p className="text-sm text-[#1e2749] font-medium">Deepen educator wellness, implementation depth, and teacher-para collaboration across all 6 buildings through embedded, year-long support.</p>
                 </div>
               </div>
             </div>
@@ -3543,7 +3545,7 @@ export default function ExampleDashboard() {
                 </div>
                 <div>
                   <p className="text-3xl font-bold text-green-700">1:1</p>
-                  <p className="text-xs text-green-600">Coaching Support</p>
+                  <p className="text-xs text-green-600">Personalized Feedback</p>
                 </div>
                 <div>
                   <p className="text-3xl font-bold text-green-700">24/7</p>
@@ -3560,20 +3562,97 @@ export default function ExampleDashboard() {
               </p>
             </div>
 
+            {/* ROI / Impact Summary */}
+            <div className="bg-gradient-to-r from-[#1B2A4A] to-[#38618C] rounded-xl p-6 text-white">
+              <div className="flex items-center justify-between mb-6">
+                <h4 className="text-lg font-bold">What Your Partnership Has Delivered This Year</h4>
+                <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Example Data</span>
+              </div>
+
+              {/* First Row */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                <div className="text-center">
+                  <p className="text-3xl font-bold">255</p>
+                  <p className="text-xs opacity-80">Educators Supported</p>
+                  <p className="text-xs opacity-60">across 6 buildings</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-3xl font-bold">87%</p>
+                  <p className="text-xs opacity-80">Hub Engagement</p>
+                  <p className="text-xs opacity-60">vs 10% industry average</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-3xl font-bold">52%</p>
+                  <p className="text-xs opacity-80">Strategy Implementation</p>
+                  <p className="text-xs opacity-60">vs 10% industry average</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-3xl font-bold">277</p>
+                  <p className="text-xs opacity-80">Love Notes Delivered</p>
+                  <p className="text-xs opacity-60">255 welcome + 22 observation</p>
+                </div>
+              </div>
+
+              {/* Second Row */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4 border-t border-white/20">
+                <div className="text-center">
+                  <p className="text-3xl font-bold">↓ 25%</p>
+                  <p className="text-xs opacity-80">Educator Stress</p>
+                  <p className="text-xs opacity-60">8.2 → 6.1</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-3xl font-bold">↓ 32%</p>
+                  <p className="text-xs opacity-80">Planning Time</p>
+                  <p className="text-xs opacity-60">11 → 7.5 hrs/wk</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-3xl font-bold">↑ 50%</p>
+                  <p className="text-xs opacity-80">Retention Intent</p>
+                  <p className="text-xs opacity-60">5.2 → 7.8</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-[#35A7FF]">+</p>
+                  <p className="text-xs opacity-80">Zero-Cost Extras</p>
+                  <p className="text-xs opacity-60">Newsletter, podcast, blog, community</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Board Presentation Offer */}
+            <div className="bg-white border border-gray-200 rounded-xl p-6 text-center">
+              <p className="font-bold text-[#1e2749] text-lg mb-2">NEED HELP MAKING THE CASE?</p>
+              <p className="text-gray-600 text-sm mb-4">
+                We&apos;ll help you build a board presentation with your actual impact data, cost analysis, and recommended next steps. Your success is our pitch.
+              </p>
+              <a
+                href="/calculator"
+                className="inline-flex items-center gap-2 text-[#35A7FF] font-semibold hover:underline"
+              >
+                Explore Our Impact Calculator →
+              </a>
+            </div>
+
             {/* CTA */}
             <div className="bg-[#1e2749] rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-white">
                 <p className="font-semibold text-lg">Ready to continue the journey?</p>
-                <p className="text-sm opacity-80">Let&apos;s lock in your 2026-27 partnership.</p>
+                <p className="text-sm opacity-80">Let&apos;s build your custom 2026-27 plan together.</p>
               </div>
-              <span
-                className="bg-white text-[#1e2749] px-8 py-3 rounded-lg font-semibold text-sm whitespace-nowrap opacity-50 cursor-not-allowed"
-                title="This is an example dashboard"
-                onClick={handleDisabledClick}
-              >
-                Schedule Renewal Chat →
-              </span>
+              <div className="flex flex-col items-center">
+                <span
+                  className="bg-white text-[#1e2749] px-8 py-3 rounded-lg font-semibold text-sm whitespace-nowrap opacity-85 cursor-default"
+                  title="This is an example dashboard"
+                >
+                  Schedule Renewal Chat →
+                </span>
+                <p className="text-white/60 text-xs italic mt-2">Available in active partnerships</p>
+              </div>
             </div>
+
+            {/* Closing Statement */}
+            <p className="text-gray-500 text-sm italic text-center mt-6">
+              Your TDI partner will build a custom Year 2 plan based on your district&apos;s specific needs, goals, and budget. Every partnership is different — because every district is different.
+            </p>
 
           </div>
         )}

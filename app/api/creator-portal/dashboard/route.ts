@@ -189,11 +189,27 @@ export async function POST(request: NextRequest) {
       };
     });
 
-    // Calculate progress based only on applicable milestones
-    const totalMilestones = applicableMilestones.length;
+    // Calculate progress based only on applicable, non-optional milestones
+    // Optional milestones (bonus items) don't count against core completion percentage
+    const optionalMilestoneIds = new Set(
+      (creatorMilestones || [])
+        .filter(cm => cm.metadata && (cm.metadata as { is_optional?: boolean }).is_optional === true)
+        .map(cm => cm.milestone_id)
+    );
+
+    const requiredMilestones = applicableMilestones.filter(m => !optionalMilestoneIds.has(m.id));
+    const requiredMilestoneIds = new Set(requiredMilestones.map(m => m.id));
+
+    const totalMilestones = requiredMilestones.length;
     const completedMilestones = (creatorMilestones || []).filter(
-      (cm) => cm.status === 'completed' && applicableMilestoneIds.has(cm.milestone_id)
+      (cm) => cm.status === 'completed' && requiredMilestoneIds.has(cm.milestone_id)
     ).length;
+
+    // Bonus: count optional milestones completed
+    const optionalCompleted = (creatorMilestones || []).filter(
+      (cm) => cm.status === 'completed' && optionalMilestoneIds.has(cm.milestone_id)
+    ).length;
+
     const progressPercentage =
       totalMilestones > 0 ? Math.round((completedMilestones / totalMilestones) * 100) : 0;
 
@@ -203,6 +219,8 @@ export async function POST(request: NextRequest) {
       notes: notes || [],
       totalMilestones,
       completedMilestones,
+      optionalMilestones: optionalMilestoneIds.size,
+      optionalCompleted,
       progressPercentage,
       contentPath,
     };
