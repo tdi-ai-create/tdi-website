@@ -75,12 +75,16 @@ export default function ASD4Dashboard() {
 
   // Needs Attention completion state with localStorage persistence
   // Items that are permanently complete (scheduled/done server-side)
+  // Note: observation-day-1 is now "para-training-1" (Feb 13) and observation-day-2 is "observation-day" (Feb 26)
+  // All 5 scheduled events are confirmed - only Virtual 4 and Exec 2 remain as action items
   const permanentlyComplete = [
-    'observation-day-1',
-    'observation-day-2',
-    'virtual-session-1',
-    'virtual-session-2',
-    'virtual-session-3'
+    'partner-data-form',      // Submitted Feb 8, 2026
+    'executive-session-1',    // Complete with PDF report delivered
+    'para-training-1',        // Feb 13, 2026 - In-Person Para Training (scheduled)
+    'observation-day',        // Feb 26, 2026 - Observation Day (scheduled)
+    'virtual-session-1',      // Mar 2, 2026 (scheduled)
+    'virtual-session-2',      // Apr 6, 2026 (scheduled)
+    'virtual-session-3'       // Apr 20, 2026 (scheduled)
   ];
   const [completedItems, setCompletedItems] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
@@ -110,92 +114,86 @@ export default function ASD4Dashboard() {
   const isComplete = (itemId: string) => completedItems.includes(itemId);
 
   // Needs Attention items data
+  // Items marked as complete via permanentlyComplete array will show in "Completed" section
   const needsAttentionItems = [
+    // COMPLETED ITEMS (will show as done)
     {
       id: 'partner-data-form',
-      title: 'Complete Partner Data Form',
-      description: 'Help us customize your dashboard',
+      title: 'Partner Data Form',
+      description: 'Submitted February 8, 2026',
       deadline: 'FEB 2026',
-      actionLabel: 'Complete Your Form',
+      actionLabel: 'View Form',
       actionUrl: '/asd4-dashboard/partner-data',
       icon: ClipboardList,
       priority: 'now'
     },
     {
-      id: 'pilot-group',
-      title: 'Identify Pilot Group',
-      description: 'Select 10-20 paras for focused coaching',
+      id: 'executive-session-1',
+      title: 'Executive Impact Session 1',
+      description: 'Complete — Report delivered to leadership',
+      deadline: 'JAN 2026',
+      actionLabel: 'View Report',
+      actionUrl: 'https://drive.google.com/file/d/1XfzJGTyb60kp3t8MbcGtN8ro-psBBnbj/view?usp=sharing',
+      icon: Briefcase,
+      priority: 'now',
+      external: true
+    },
+    {
+      id: 'para-training-1',
+      title: 'In-Person Para Training',
+      description: 'February 13, 2026 · 1:00 - 3:00 PM · Baseline survey collection',
       deadline: 'FEB 2026',
-      actionLabel: 'Choose Your Pilot Paras',
-      actionUrl: '/asd4-dashboard/pilot-selection',
+      actionLabel: 'Scheduled',
+      actionUrl: '#',
       icon: Users,
       priority: 'now'
     },
     {
-      id: 'observation-day-1',
-      title: 'Schedule Observation Day 1',
-      description: 'February 13, 2026 · 1:00 - 3:00 PM',
+      id: 'observation-day',
+      title: 'Observation Day',
+      description: 'February 26, 2026 · 7:30 AM - 3:00 PM',
       deadline: 'FEB 2026',
-      actionLabel: 'Book Observation Day',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone',
+      actionLabel: 'Scheduled',
+      actionUrl: '#',
       icon: Eye,
-      priority: 'now',
-      external: true,
-      showCalendar: true
+      priority: 'now'
     },
     {
       id: 'virtual-session-1',
-      title: 'Virtual Session 1 · 45 min',
-      description: 'Flexible session -  schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
-      deadline: 'FEB 2026',
-      actionLabel: 'Book Your Session',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
-      icon: Monitor,
-      priority: 'upcoming',
-      external: true,
-      showCalendar: true
-    },
-    {
-      id: 'observation-day-2',
-      title: 'Schedule Observation Day 2',
-      description: 'Follow-up on-site observation',
+      title: 'Virtual Session 1',
+      description: 'March 2, 2026 · 7:30 - 8:15 AM',
       deadline: 'MAR 2026',
-      actionLabel: 'Book Observation Day',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone',
-      icon: Eye,
-      priority: 'upcoming',
-      external: true,
-      showCalendar: true
+      actionLabel: 'Scheduled',
+      actionUrl: '#',
+      icon: Monitor,
+      priority: 'upcoming'
     },
     {
       id: 'virtual-session-2',
-      title: 'Virtual Session 2 · 45 min',
-      description: 'Flexible session -  schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
-      deadline: 'MAR 2026',
-      actionLabel: 'Book Your Session',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      title: 'Virtual Session 2',
+      description: 'April 6, 2026 · 7:30 - 8:15 AM',
+      deadline: 'APR 2026',
+      actionLabel: 'Scheduled',
+      actionUrl: '#',
       icon: Monitor,
-      priority: 'upcoming',
-      external: true,
-      showCalendar: true
+      priority: 'upcoming'
     },
     {
       id: 'virtual-session-3',
-      title: 'Virtual Session 3 · 45 min',
-      description: 'Flexible session -  schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
+      title: 'Virtual Session 3',
+      description: 'April 20, 2026 · 7:30 - 8:15 AM',
       deadline: 'APR 2026',
-      actionLabel: 'Book Your Session',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      actionLabel: 'Scheduled',
+      actionUrl: '#',
       icon: Monitor,
-      priority: 'upcoming',
-      external: true,
-      showCalendar: true
+      priority: 'upcoming'
     },
+    // REMAINING ACTION ITEMS (not yet scheduled)
     {
       id: 'virtual-session-4',
-      title: 'Virtual Session 4 · 45 min',
-      description: 'Flexible session -  schedule when it works for you. Suggested uses: observation debriefs, strategy check-ins, Growth Group planning, or progress celebrations.',
-      deadline: 'APR 2026',
+      title: 'Schedule Virtual Session 4',
+      description: 'Final coaching check-in — schedule after April 20',
+      deadline: 'MAY 2026',
       actionLabel: 'Book Your Session',
       actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
       icon: Monitor,
@@ -206,8 +204,8 @@ export default function ASD4Dashboard() {
     {
       id: 'executive-session-2',
       title: 'Schedule Executive Session 2',
-      description: 'Results review with leadership',
-      deadline: 'APR 2026',
+      description: 'End-of-partnership leadership review — preference: Early May',
+      deadline: 'MAY 2026',
       actionLabel: 'Book Your Session',
       actionUrl: 'https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone',
       icon: Briefcase,
@@ -232,81 +230,92 @@ export default function ASD4Dashboard() {
       status: "complete" as const
     },
     {
-      title: 'Observation Day 1: "The Moves That Matter: Part 2"',
-      date: "February 13, 2026",
-      format: "In-Person",
-      duration: "1:00 - 3:00 PM",
+      title: "Executive Impact Session 1",
+      date: "January 2026",
+      format: "Leadership Meeting",
+      duration: "Executive Briefing",
       focusAreas: [
-        "Ask, Don't Tell — 10+ questioning scenarios with partner role-play",
-        "Feedback That Builds Capacity — Using the Notice. Name. Next Step. formula",
-        "Initial survey data collection (baseline metrics)"
+        "Partnership overview and goals alignment",
+        "Baseline metrics and success criteria",
+        "Implementation roadmap review"
       ],
-      status: "complete" as const
-    },
-    {
-      title: "Observation Day 2",
-      date: "February 26, 2026",
-      format: "In-Person",
-      duration: "Follow-up Observation",
-      focusAreas: [
-        "Strategy implementation check-ins",
-        "Growth Group formation and planning",
-        "Pilot group progress review"
-      ],
-      status: "complete" as const
-    },
-    {
-      title: "Virtual Visit 1",
-      date: "March 2, 2026",
-      format: "Virtual",
-      duration: "45 min",
-      focusAreas: [
-        "Observation debrief and reflection",
-        "Strategy check-ins and adjustments",
-        "Progress celebration"
-      ],
-      status: "complete" as const
-    },
-    {
-      title: "Virtual Visit 2",
-      date: "April 6, 2026",
-      format: "Virtual",
-      duration: "45 min",
-      focusAreas: [
-        "Mid-partnership progress review",
-        "Growth Group updates",
-        "Implementation support"
-      ],
-      status: "complete" as const
-    },
-    {
-      title: "Virtual Visit 3",
-      date: "April 20, 2026",
-      format: "Virtual",
-      duration: "45 min",
-      focusAreas: [
-        "End-of-year planning",
-        "Success metrics review",
-        "Next steps discussion"
-      ],
-      status: "complete" as const
+      status: "complete" as const,
+      reportUrl: "https://drive.google.com/file/d/1XfzJGTyb60kp3t8MbcGtN8ro-psBBnbj/view?usp=sharing",
+      reportLabel: "View Executive Summary Report →"
     }
   ];
 
-
-  // Upcoming sessions data (Virtual Session 4 and Executive Session 2 still pending in Needs Attention)
-  const upcomingSessions: {
-    title: string;
-    date: string;
-    time: string;
-    format: string;
-    location?: string;
-    participants?: string;
-    focusAreas: string[];
-    additionalNotes?: string[];
-    highlightStat?: string;
-    status: "scheduled";
-  }[] = [];
+  // Upcoming/Scheduled sessions data
+  const upcomingSessions = [
+    {
+      title: "In-Person Para Training",
+      date: "February 13, 2026",
+      time: "1:00 - 3:00 PM",
+      format: "In-Person",
+      location: "222 N. JF Kennedy Dr., Addison, IL 60101",
+      participants: "All paraprofessionals",
+      focusAreas: [
+        "Ask, Don't Tell — Questioning scenarios with partner role-play",
+        "Feedback That Builds Capacity — Notice. Name. Next Step. formula"
+      ],
+      additionalNotes: [
+        "Baseline survey data collection (tied to district success metrics)",
+        "Learning Hub goal updates",
+        "Game-based practice tool introduction"
+      ],
+      highlightStat: "First hands-on strategy practice session",
+      status: "scheduled" as const
+    },
+    {
+      title: "Observation Day",
+      date: "February 26, 2026",
+      time: "7:30 AM - 3:00 PM",
+      format: "In-Person",
+      location: "District Schools",
+      focusAreas: [
+        "Classroom observation of para-student interactions",
+        "Strategy implementation check-ins",
+        "Real-time coaching feedback"
+      ],
+      status: "scheduled" as const
+    },
+    {
+      title: "Virtual Session 1",
+      date: "March 2, 2026",
+      time: "7:30 - 8:15 AM",
+      format: "Virtual",
+      focusAreas: [
+        "Observation debrief and reflection",
+        "Strategy adjustments based on observation data",
+        "Growth Group formation planning"
+      ],
+      status: "scheduled" as const
+    },
+    {
+      title: "Virtual Session 2",
+      date: "April 6, 2026",
+      time: "7:30 - 8:15 AM",
+      format: "Virtual",
+      focusAreas: [
+        "Mid-partnership progress review",
+        "Growth Group updates and wins",
+        "Implementation support"
+      ],
+      status: "scheduled" as const
+    },
+    {
+      title: "Virtual Session 3",
+      date: "April 20, 2026",
+      time: "7:30 - 8:15 AM",
+      format: "Virtual",
+      focusAreas: [
+        "Strategy refinement",
+        "Success metrics check-in",
+        "Preparation for end-of-year review"
+      ],
+      status: "scheduled" as const
+    }
+  ];
 
   // Progress tab data
   const topEngagedParas = [
@@ -866,8 +875,8 @@ Thanks for everything you do.`
               {/* Card 1: Wins */}
               <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
                 <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                <p className="text-sm font-semibold text-green-800">6 Sessions Complete</p>
-                <p className="text-xs text-green-600">2/2 Observations · 3/4 Virtual Sessions · 86 paras logged in</p>
+                <p className="text-sm font-semibold text-green-800">Exec Session 1 Complete</p>
+                <p className="text-xs text-green-600">1/2 Exec · 5 sessions scheduled · 86 paras logged in</p>
               </div>
 
               {/* Card 2: Action Needed */}
@@ -1119,8 +1128,39 @@ Thanks for everything you do.`
                 <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Your Partnership Goal</span>
               </div>
               <p className="text-xl md:text-2xl font-semibold text-[#1e2749] max-w-2xl mx-auto leading-relaxed">
-                &ldquo;Equip paraprofessionals with practical strategies and resources to confidently support students and teachers.&rdquo;
+                &ldquo;Empower paraprofessionals across all 9 buildings with immediate, actionable strategies — so every para supporting IEP, EL, and behavioral needs feels confident, valued, and making measurable impact.&rdquo;
               </p>
+            </div>
+
+            {/* Partner Profile Card */}
+            <div className="bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
+              <div className="flex items-center gap-2 mb-4">
+                <Building className="w-5 h-5" />
+                <h3 className="font-bold">District Snapshot</h3>
+                <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full ml-auto">From Partner Data Form</span>
+              </div>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <p className="text-xs text-white/60 uppercase tracking-wide mb-1">Para Types Served</p>
+                  <p className="text-sm font-medium">Special Education/IEP · English Learners · Behavioral Support</p>
+                </div>
+                <div>
+                  <p className="text-xs text-white/60 uppercase tracking-wide mb-1">Buildings</p>
+                  <p className="text-sm font-medium">All 9 Schools</p>
+                </div>
+                <div>
+                  <p className="text-xs text-white/60 uppercase tracking-wide mb-1">Success Metrics</p>
+                  <p className="text-sm font-medium">Surveys + Para Retention</p>
+                </div>
+                <div>
+                  <p className="text-xs text-white/60 uppercase tracking-wide mb-1">Quick Win Goal</p>
+                  <p className="text-sm font-medium">&ldquo;Helping staff feel instructionally empowered&rdquo;</p>
+                </div>
+              </div>
+              <div className="mt-4 pt-4 border-t border-white/20">
+                <p className="text-xs text-white/60 uppercase tracking-wide mb-1">Top Priority</p>
+                <p className="text-sm italic">&ldquo;Ensuring trainings include strategies paras can take away immediately and carry out the next day&rdquo;</p>
+              </div>
             </div>
 
             {/* Section 2: Implementation Equation */}
@@ -1290,12 +1330,16 @@ Thanks for everything you do.`
               </h3>
               <div className="space-y-3">
                 {completedSessions.map((session, idx) => (
-                  <div key={idx} className="bg-white rounded-xl border border-emerald-200 shadow-sm overflow-hidden">
+                  <div key={idx} className={`bg-white rounded-xl border shadow-sm overflow-hidden ${
+                    session.reportUrl ? 'border-emerald-300 ring-1 ring-emerald-100' : 'border-emerald-200'
+                  }`}>
                     <div className="border-l-4 border-emerald-500 p-5">
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-start gap-3">
-                          <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                            <Check className="w-4 h-4 text-emerald-600" />
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${
+                            session.reportUrl ? 'bg-emerald-500' : 'bg-emerald-100'
+                          }`}>
+                            <Check className={`w-4 h-4 ${session.reportUrl ? 'text-white' : 'text-emerald-600'}`} />
                           </div>
                           <div>
                             <h4 className="font-semibold text-gray-900">{session.title}</h4>
@@ -1313,6 +1357,19 @@ Thanks for everything you do.`
                                 ))}
                               </ul>
                             </div>
+                            {session.reportUrl && (
+                              <div className="mt-4">
+                                <a
+                                  href={session.reportUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+                                >
+                                  <FileText className="w-4 h-4" />
+                                  {session.reportLabel || 'View Report'}
+                                </a>
+                              </div>
+                            )}
                           </div>
                         </div>
                         <span className="text-xs font-medium bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full flex-shrink-0">
@@ -1643,14 +1700,14 @@ Thanks for everything you do.`
               </div>
 
               <div className="space-y-3">
-                {/* Completed Sessions */}
+                {/* Completed */}
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50/50">
                   <div className="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <Check className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <div className="font-medium text-gray-400 line-through">Observation Day 1</div>
-                    <div className="text-sm text-emerald-600">February 13, 2026 · Complete</div>
+                    <div className="font-medium text-gray-400 line-through">Executive Impact Session 1</div>
+                    <div className="text-sm text-emerald-600">Complete · Report delivered to leadership</div>
                   </div>
                 </div>
 
@@ -1659,47 +1716,48 @@ Thanks for everything you do.`
                     <Check className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <div className="font-medium text-gray-400 line-through">Observation Day 2</div>
-                    <div className="text-sm text-emerald-600">February 26, 2026 · Complete</div>
+                    <div className="font-medium text-gray-400 line-through">Partner Data Form</div>
+                    <div className="text-sm text-emerald-600">Submitted February 8, 2026</div>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50/50">
-                  <div className="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3 h-3 text-white" />
+                {/* Scheduled Sessions */}
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50/50">
+                  <div className="w-5 h-5 rounded bg-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Calendar className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <div className="font-medium text-gray-400 line-through">Virtual Visit 1</div>
-                    <div className="text-sm text-emerald-600">March 2, 2026 · Complete</div>
+                    <div className="font-medium text-blue-900">In-Person Para Training</div>
+                    <div className="text-sm text-blue-600">February 13, 2026 · 1:00 - 3:00 PM · Baseline survey collection</div>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50/50">
-                  <div className="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3 h-3 text-white" />
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50/50">
+                  <div className="w-5 h-5 rounded bg-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Calendar className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <div className="font-medium text-gray-400 line-through">Virtual Visit 2</div>
-                    <div className="text-sm text-emerald-600">April 6, 2026 · Complete</div>
+                    <div className="font-medium text-blue-900">Observation Day</div>
+                    <div className="text-sm text-blue-600">February 26, 2026 · 7:30 AM - 3:00 PM</div>
                   </div>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50/50">
-                  <div className="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Check className="w-3 h-3 text-white" />
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50/50">
+                  <div className="w-5 h-5 rounded bg-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Calendar className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <div className="font-medium text-gray-400 line-through">Virtual Visit 3</div>
-                    <div className="text-sm text-emerald-600">April 20, 2026 · Complete</div>
+                    <div className="font-medium text-blue-900">Virtual Sessions 1-3</div>
+                    <div className="text-sm text-blue-600">Mar 2, Apr 6, Apr 20 · 7:30 - 8:15 AM</div>
                   </div>
                 </div>
 
-                {/* Upcoming Actions */}
+                {/* Still to Schedule */}
                 <div className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
                   <div className="w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 mt-0.5"></div>
                   <div>
                     <div className="font-medium text-gray-900">Schedule Virtual Session 4</div>
-                    <div className="text-sm text-gray-500">Final coaching check-in before partnership wrap-up</div>
+                    <div className="text-sm text-gray-500">Final coaching check-in · Schedule after April 20</div>
                   </div>
                 </div>
 
@@ -1707,7 +1765,7 @@ Thanks for everything you do.`
                   <div className="w-5 h-5 rounded border-2 border-gray-300 flex-shrink-0 mt-0.5"></div>
                   <div>
                     <div className="font-medium text-gray-900">Schedule Executive Session 2</div>
-                    <div className="text-sm text-gray-500">End-of-year results review with leadership</div>
+                    <div className="text-sm text-gray-500">End-of-partnership leadership review · Preference: Early May</div>
                   </div>
                 </div>
               </div>
