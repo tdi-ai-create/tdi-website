@@ -2207,7 +2207,7 @@ export default function ExampleDashboard() {
                         </div>
                         <div className="flex items-center gap-3">
                           <div className="text-right">
-                            <div className={`text-lg font-bold ${loginRate >= 85 ? 'text-green-600' : loginRate >= 70 ? 'text-amber-600' : 'text-[#1e2749]'}`}>
+                            <div className={`text-lg font-bold ${loginRate >= 85 ? 'text-green-600' : loginRate >= 70 ? 'text-amber-600' : 'text-red-500'}`}>
                               {loginRate}%
                             </div>
                             <div className="text-xs text-gray-500">logged in</div>
@@ -2222,7 +2222,7 @@ export default function ExampleDashboard() {
                       {/* Progress Bar */}
                       <div className="mt-3 bg-gray-100 rounded-full h-2 overflow-hidden">
                         <div
-                          className={`h-full rounded-full transition-all ${loginRate >= 85 ? 'bg-green-500' : loginRate >= 70 ? 'bg-amber-500' : 'bg-[#38618C]'}`}
+                          className={`h-full rounded-full transition-all ${loginRate >= 85 ? 'bg-green-500' : loginRate >= 70 ? 'bg-amber-500' : 'bg-red-500'}`}
                           style={{ width: `${loginRate}%` }}
                         />
                       </div>
@@ -2231,11 +2231,12 @@ export default function ExampleDashboard() {
                     {/* Expanded Content */}
                     {isExpanded && (
                       <div className="border-t border-gray-100 p-4 bg-gray-50">
-                        <div className={`grid ${school.paras ? 'md:grid-cols-2' : 'grid-cols-1'} gap-6`}>
+                        <div className={`grid ${school.paras ? 'md:grid-cols-2' : 'grid-cols-1'} gap-8 ${school.paras ? 'md:divide-x md:divide-gray-200' : ''}`}>
                           {/* Teachers Column */}
-                          <div>
-                            <div className="flex items-center justify-between mb-3">
-                              <h4 className="font-semibold text-[#1e2749] flex items-center gap-2">
+                          <div className={school.paras ? 'md:pr-4' : ''}>
+                            {/* Header - Stacked Layout */}
+                            <div className="mb-3">
+                              <h4 className="font-semibold text-[#1e2749] flex items-center gap-2 mb-1">
                                 <GraduationCap className="w-4 h-4" />
                                 Teachers
                               </h4>
@@ -2244,18 +2245,18 @@ export default function ExampleDashboard() {
                               </span>
                             </div>
                             {/* Progress Bar */}
-                            <div className="bg-gray-200 rounded-full h-2 mb-3 overflow-hidden">
+                            <div className="bg-gray-200 rounded-full h-2 mb-4 overflow-hidden">
                               <div
-                                className="h-full rounded-full bg-[#38618C]"
+                                className="h-full rounded-full bg-[#1e2749]"
                                 style={{ width: `${(school.teachers.loggedIn / school.teachers.total) * 100}%` }}
                               />
                             </div>
                             {/* Courses */}
-                            <div className="mb-3">
+                            <div className="mb-4">
                               <p className="text-xs text-gray-500 mb-2">What Teachers Are Exploring:</p>
-                              <div className="flex flex-wrap gap-1">
+                              <div className="flex flex-wrap gap-1.5">
                                 {school.teacherCourses.map((course, i) => (
-                                  <span key={i} className="text-xs bg-[#38618C]/10 text-[#38618C] px-2 py-1 rounded-full">
+                                  <span key={i} className="text-xs bg-[#1e2749]/10 text-[#1e2749] px-3 py-1 rounded-full">
                                     {course}
                                   </span>
                                 ))}
@@ -2265,8 +2266,12 @@ export default function ExampleDashboard() {
                             <div className="bg-white rounded-lg p-3 border border-gray-100">
                               <div className="flex flex-wrap gap-2">
                                 {school.teacherStaff.map((staff, i) => (
-                                  <span key={i} className="text-xs text-gray-600 flex items-center gap-1">
-                                    <span className={`w-2 h-2 rounded-full ${staff.loggedIn ? 'bg-green-500' : 'bg-gray-300'}`} />
+                                  <span key={i} className="text-xs text-gray-600 flex items-center gap-1.5">
+                                    {staff.loggedIn ? (
+                                      <span className="w-2 h-2 rounded-full bg-green-500" />
+                                    ) : (
+                                      <span className="w-2 h-2 rounded-full border-2 border-gray-400 bg-transparent" />
+                                    )}
                                     {staff.name}
                                   </span>
                                 ))}
@@ -2276,9 +2281,10 @@ export default function ExampleDashboard() {
 
                           {/* Paras Column */}
                           {school.paras && school.paraStaff && (
-                            <div>
-                              <div className="flex items-center justify-between mb-3">
-                                <h4 className="font-semibold text-[#35A7FF] flex items-center gap-2">
+                            <div className="md:pl-4">
+                              {/* Header - Stacked Layout */}
+                              <div className="mb-3">
+                                <h4 className="font-semibold text-[#35A7FF] flex items-center gap-2 mb-1">
                                   <Users className="w-4 h-4" />
                                   Paras
                                 </h4>
@@ -2287,18 +2293,18 @@ export default function ExampleDashboard() {
                                 </span>
                               </div>
                               {/* Progress Bar */}
-                              <div className="bg-gray-200 rounded-full h-2 mb-3 overflow-hidden">
+                              <div className="bg-gray-200 rounded-full h-2 mb-4 overflow-hidden">
                                 <div
                                   className="h-full rounded-full bg-[#35A7FF]"
                                   style={{ width: `${(school.paras.loggedIn / school.paras.total) * 100}%` }}
                                 />
                               </div>
                               {/* Courses */}
-                              <div className="mb-3">
+                              <div className="mb-4">
                                 <p className="text-xs text-gray-500 mb-2">What Paras Are Exploring:</p>
-                                <div className="flex flex-wrap gap-1">
+                                <div className="flex flex-wrap gap-1.5">
                                   {school.paraCourses?.map((course, i) => (
-                                    <span key={i} className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full">
+                                    <span key={i} className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-3 py-1 rounded-full">
                                       {course}
                                     </span>
                                   ))}
@@ -2308,8 +2314,12 @@ export default function ExampleDashboard() {
                               <div className="bg-white rounded-lg p-3 border border-gray-100">
                                 <div className="flex flex-wrap gap-2">
                                   {school.paraStaff.map((staff, i) => (
-                                    <span key={i} className="text-xs text-gray-600 flex items-center gap-1">
-                                      <span className={`w-2 h-2 rounded-full ${staff.loggedIn ? 'bg-green-500' : 'bg-gray-300'}`} />
+                                    <span key={i} className="text-xs text-gray-600 flex items-center gap-1.5">
+                                      {staff.loggedIn ? (
+                                        <span className="w-2 h-2 rounded-full bg-green-500" />
+                                      ) : (
+                                        <span className="w-2 h-2 rounded-full border-2 border-gray-400 bg-transparent" />
+                                      )}
                                       {staff.name}
                                     </span>
                                   ))}
@@ -2327,24 +2337,26 @@ export default function ExampleDashboard() {
                         </div>
 
                         {/* Demo-only action buttons */}
-                        <div className="mt-4 pt-4 border-t border-gray-200 flex items-center justify-between">
-                          <div className="flex gap-2">
-                            <button
-                              onClick={handleDisabledClick}
-                              className="text-xs px-3 py-1.5 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed flex items-center gap-1"
-                            >
-                              <Mail className="w-3 h-3" />
-                              Nudge
-                            </button>
-                            <button
-                              onClick={handleDisabledClick}
-                              className="text-xs px-3 py-1.5 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed flex items-center gap-1"
-                            >
-                              <Star className="w-3 h-3" />
-                              High Five
-                            </button>
+                        <div className="mt-6 pt-4 border-t border-gray-200">
+                          <div className="flex items-center justify-between">
+                            <div className="flex gap-2">
+                              <button
+                                onClick={handleDisabledClick}
+                                className="text-xs px-3 py-1.5 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed flex items-center gap-1.5 opacity-60"
+                              >
+                                <Mail className="w-3 h-3" />
+                                Nudge
+                              </button>
+                              <button
+                                onClick={handleDisabledClick}
+                                className="text-xs px-3 py-1.5 bg-gray-200 text-gray-500 rounded-lg cursor-not-allowed flex items-center gap-1.5 opacity-60"
+                              >
+                                <Star className="w-3 h-3" />
+                                High Five
+                              </button>
+                            </div>
+                            <span className="text-xs text-gray-400 italic">Available in active partnerships</span>
                           </div>
-                          <span className="text-xs text-gray-400 italic">Available in active partnerships</span>
                         </div>
                       </div>
                     )}
