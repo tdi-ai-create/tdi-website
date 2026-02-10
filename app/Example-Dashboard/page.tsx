@@ -1212,87 +1212,6 @@ export default function ExampleDashboard() {
               </div>
             </div>
 
-            {/* District-wide Movement — Collapsed with Stacked Bar */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-[#4ecdc4]" />
-                  <h3 className="text-lg font-bold text-[#1e2749]">District-wide Movement</h3>
-                  <Tooltip content="Staff engaging with TDI beyond the Hub — newsletter, blog, podcast, and community. Higher movement involvement correlates with 2x implementation rates.">
-                    <span></span>
-                  </Tooltip>
-                </div>
-                <span className="text-xs text-gray-400">Updated Feb 7, 2026</span>
-              </div>
-
-              {/* HEADLINE: Visual summary bar */}
-              <div className="mb-4">
-                <div className="flex items-baseline gap-2 mb-2">
-                  <span className="text-3xl font-bold text-[#1e2749]">585</span>
-                  <span className="text-sm text-gray-500">total touchpoints across your district</span>
-                </div>
-                {/* Stacked bar showing proportions */}
-                <div className="h-4 rounded-full overflow-hidden flex">
-                  <div className="bg-[#1e2749] h-full" style={{width: '34%'}} title="Newsletter: 197"></div>
-                  <div className="bg-[#38618C] h-full" style={{width: '22%'}} title="Blog: 131"></div>
-                  <div className="bg-[#4ecdc4] h-full" style={{width: '13%'}} title="Podcast: 78"></div>
-                  <div className="bg-[#7edcd5] h-full" style={{width: '8%'}} title="Community: 48"></div>
-                  <div className="bg-amber-400 h-full" style={{width: '15%'}} title="Resources: 361 (scaled)"></div>
-                  <div className="bg-amber-300 h-full" style={{width: '8%'}} title="Courses: 224 (scaled)"></div>
-                </div>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
-                  <span className="flex items-center gap-1 text-xs text-gray-500">
-                    <span className="w-2 h-2 rounded-full bg-[#1e2749]"></span> Newsletter
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-gray-500">
-                    <span className="w-2 h-2 rounded-full bg-[#38618C]"></span> Blog
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-gray-500">
-                    <span className="w-2 h-2 rounded-full bg-[#4ecdc4]"></span> Podcast
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-gray-500">
-                    <span className="w-2 h-2 rounded-full bg-[#7edcd5]"></span> Community
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-gray-500">
-                    <span className="w-2 h-2 rounded-full bg-amber-400"></span> Resources
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-gray-500">
-                    <span className="w-2 h-2 rounded-full bg-amber-300"></span> Courses
-                  </span>
-                </div>
-              </div>
-
-              {/* DETAIL: Expandable breakdown */}
-              <button
-                onClick={() => toggleSection('movement-detail')}
-                className="w-full flex items-center justify-between py-2 text-xs text-gray-500 hover:text-gray-700 transition-colors border-t border-gray-100">
-                <span>View channel breakdown</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${openSections['movement-detail'] ? 'rotate-180' : ''}`} />
-              </button>
-
-              {openSections['movement-detail'] && (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 pt-3">
-                  {[
-                    { icon: Mail, label: 'Newsletter', value: 197, tooltip: 'TDI partner average: 65% of enrolled staff subscribe to the newsletter. Your 197 subscribers out of 255 staff (77%) is above the network average.' },
-                    { icon: BookOpen, label: 'Blog Readers', value: 131, tooltip: 'TDI partner average: 45 blog readers per school. Your 131 readers puts you 2.9x above the network average. Readers report higher confidence implementing new strategies.' },
-                    { icon: Headphones, label: 'Podcast', value: 78, tooltip: 'Podcast listeners show 28% higher implementation rates than non-listeners. TDI partner average: 25 listeners per school. Your 78 listeners is 3x the network average.' },
-                    { icon: Users, label: 'Community', value: 48, tooltip: 'TDI partner average: 35 community members per school. Your 48 members provides free peer support and strategy sharing beyond formal PD.' },
-                    { icon: FileText, label: 'Resources', value: 361, tooltip: 'TDI partner average: 280 resources per school. Your 361 downloads puts you 29% above the TDI network average.' },
-                    { icon: GraduationCap, label: 'Courses', value: 224, tooltip: 'TDI partner average: 3.2 courses started per educator. TDI partners average 65% completion vs. 10% industry standard.' },
-                  ].map((channel) => (
-                    <div key={channel.label} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                      <channel.icon className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold text-[#1e2749]">{channel.value}</p>
-                        <p className="text-xs text-gray-500 truncate">{channel.label}</p>
-                      </div>
-                      <Tooltip content={channel.tooltip}><span></span></Tooltip>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
             {/* Building Spotlight — Awards + Insights merged */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-2">
@@ -1678,6 +1597,41 @@ export default function ExampleDashboard() {
                 className="inline-flex items-center gap-2 text-xs text-[#4ecdc4] font-medium hover:underline mt-4">
                 <Monitor className="w-3.5 h-3.5" /> Open Learning Hub →
               </a>
+
+              {/* Hub Extras - Love Notes & Virtual Sessions */}
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <button
+                  onClick={() => toggleSection('hub-extras')}
+                  className="w-full flex items-center justify-between py-2 text-left hover:bg-gray-50 rounded-lg px-2 -mx-2 transition-colors">
+                  <div className="flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-pink-500" />
+                    <span className="text-sm font-medium text-gray-600">Love Notes & Coaching Sessions</span>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openSections['hub-extras'] ? 'rotate-180' : ''}`} />
+                </button>
+                {openSections['hub-extras'] && (
+                  <div className="grid grid-cols-2 gap-4 mt-3">
+                    <div className="bg-pink-50 rounded-lg p-4 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
+                        <Heart className="w-5 h-5 text-pink-500" />
+                      </div>
+                      <div>
+                        <span className="text-xl font-bold text-[#1e2749]">277</span>
+                        <p className="text-xs text-gray-500">Love Notes sent</p>
+                      </div>
+                    </div>
+                    <div className="bg-purple-50 rounded-lg p-4 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                        <Video className="w-5 h-5 text-purple-600" />
+                      </div>
+                      <div>
+                        <span className="text-xl font-bold text-[#1e2749]">3 of 6</span>
+                        <p className="text-xs text-gray-500">Virtual sessions complete</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Your TDI Team — personal connection */}
@@ -1699,29 +1653,29 @@ export default function ExampleDashboard() {
               </div>
             </div>
 
-            {/* Needs Attention — Collapsed Header with Expandable List */}
-            <div id="needs-attention-section" className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            {/* Action Items — Combined Needs Attention + Recommendations */}
+            <div id="action-items-section" className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               <button
-                onClick={() => toggleSection('needs-attention')}
+                onClick={() => toggleSection('action-items')}
                 className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
                     <AlertCircle className="w-4 h-4 text-amber-500" />
                   </div>
                   <div className="text-left">
-                    <p className="text-sm font-bold text-[#1e2749]">{needsAttentionItems.filter(item => !isComplete(item.id)).length} Items Need Attention</p>
-                    <p className="text-xs text-gray-500">Next due: Spring Leadership Recap · April 2026</p>
+                    <p className="text-sm font-bold text-[#1e2749]">Action Items</p>
+                    <p className="text-xs text-gray-500">{needsAttentionItems.filter(item => !isComplete(item.id)).length} to complete · 1 recommendation</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs px-2 py-1 bg-amber-50 text-amber-600 rounded-full font-medium">
                     2 to schedule
                   </span>
-                  <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${openSections['needs-attention'] ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${openSections['action-items'] ? 'rotate-180' : ''}`} />
                 </div>
               </button>
 
-              {openSections['needs-attention'] && (
+              {openSections['action-items'] && (
                 <div className="px-5 pb-5 space-y-3 border-t border-gray-100 pt-4">
                   {/* Active Items */}
                   {needsAttentionItems
@@ -1783,6 +1737,29 @@ export default function ExampleDashboard() {
                       </div>
                     ))}
 
+                  {/* Recommendation - Folded In */}
+                  <div className="rounded-lg p-4 bg-blue-50 border border-blue-100">
+                    <div className="flex items-start gap-3">
+                      <Lightbulb className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-blue-700 mb-1">Recommendation: Dedicated Hub Time</p>
+                        <p className="text-sm text-gray-600">
+                          Districts that build in 15-30 minutes of protected Hub time during PLCs or
+                          staff meetings see <Tooltip content="Based on TDI partner data 2023-2025. Districts that protect 15-30 minutes of Hub time during PLCs see implementation rates 3x higher than districts without dedicated Hub time."><span className="font-bold text-[#1e2749]">3x higher implementation rates</span></Tooltip>.
+                          We&apos;d suggest each building designate a TDI Champion.
+                        </p>
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          <button className="text-xs px-3 py-1.5 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors">
+                            Add Hub time to PLC agenda
+                          </button>
+                          <button className="text-xs px-3 py-1.5 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors">
+                            Designate building TDI Champions
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {/* Completed Items */}
                   {needsAttentionItems.filter(item => isComplete(item.id)).length > 0 && (
                     <div className="mt-4 pt-4 border-t border-gray-100">
@@ -1819,32 +1796,83 @@ export default function ExampleDashboard() {
               )}
             </div>
 
-            {/* Recommendation — Collapsed by default */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <button
-                onClick={() => toggleSection('recommendation')}
-                className="w-full p-4 flex items-center justify-between hover:bg-blue-50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <Lightbulb className="w-5 h-5 text-blue-500" />
-                  <span className="text-sm font-semibold text-blue-700">💡 Recommendation: Dedicated Hub Time</span>
+            {/* District-wide Movement — Collapsed with Stacked Bar */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Heart className="w-5 h-5 text-[#4ecdc4]" />
+                  <h3 className="text-lg font-bold text-[#1e2749]">District-wide Movement</h3>
+                  <Tooltip content="Staff engaging with TDI beyond the Hub — newsletter, blog, podcast, and community. Higher movement involvement correlates with 2x implementation rates.">
+                    <span></span>
+                  </Tooltip>
                 </div>
-                <ChevronDown className={`w-4 h-4 text-blue-400 transition-transform ${openSections['recommendation'] ? 'rotate-180' : ''}`} />
+                <span className="text-xs text-gray-400">Updated Feb 7, 2026</span>
+              </div>
+
+              {/* HEADLINE: Visual summary bar */}
+              <div className="mb-4">
+                <div className="flex items-baseline gap-2 mb-2">
+                  <span className="text-3xl font-bold text-[#1e2749]">585</span>
+                  <span className="text-sm text-gray-500">total touchpoints across your district</span>
+                </div>
+                {/* Stacked bar showing proportions */}
+                <div className="h-4 rounded-full overflow-hidden flex">
+                  <div className="bg-[#1e2749] h-full" style={{width: '34%'}} title="Newsletter: 197"></div>
+                  <div className="bg-[#38618C] h-full" style={{width: '22%'}} title="Blog: 131"></div>
+                  <div className="bg-[#4ecdc4] h-full" style={{width: '13%'}} title="Podcast: 78"></div>
+                  <div className="bg-[#7edcd5] h-full" style={{width: '8%'}} title="Community: 48"></div>
+                  <div className="bg-amber-400 h-full" style={{width: '15%'}} title="Resources: 361 (scaled)"></div>
+                  <div className="bg-amber-300 h-full" style={{width: '8%'}} title="Courses: 224 (scaled)"></div>
+                </div>
+                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
+                  <span className="flex items-center gap-1 text-xs text-gray-500">
+                    <span className="w-2 h-2 rounded-full bg-[#1e2749]"></span> Newsletter
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-gray-500">
+                    <span className="w-2 h-2 rounded-full bg-[#38618C]"></span> Blog
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-gray-500">
+                    <span className="w-2 h-2 rounded-full bg-[#4ecdc4]"></span> Podcast
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-gray-500">
+                    <span className="w-2 h-2 rounded-full bg-[#7edcd5]"></span> Community
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-gray-500">
+                    <span className="w-2 h-2 rounded-full bg-amber-400"></span> Resources
+                  </span>
+                  <span className="flex items-center gap-1 text-xs text-gray-500">
+                    <span className="w-2 h-2 rounded-full bg-amber-300"></span> Courses
+                  </span>
+                </div>
+              </div>
+
+              {/* DETAIL: Expandable breakdown */}
+              <button
+                onClick={() => toggleSection('movement-detail')}
+                className="w-full flex items-center justify-between py-2 text-xs text-gray-500 hover:text-gray-700 transition-colors border-t border-gray-100">
+                <span>View channel breakdown</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${openSections['movement-detail'] ? 'rotate-180' : ''}`} />
               </button>
-              {openSections['recommendation'] && (
-                <div className="bg-blue-50 px-4 pb-4 space-y-3">
-                  <p className="text-sm text-gray-600">
-                    Districts that build in 15-30 minutes of protected Hub time during PLCs or
-                    staff meetings see <Tooltip content="Based on TDI partner data 2023-2025. Districts that protect 15-30 minutes of Hub time during PLCs see implementation rates 3x higher than districts without dedicated Hub time."><span className="font-bold text-[#1e2749]">3x higher implementation rates</span></Tooltip>.
-                    We'd suggest each building designate a TDI Champion.
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <button className="text-xs px-3 py-1.5 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-50">
-                      Add Hub time to PLC agenda
-                    </button>
-                    <button className="text-xs px-3 py-1.5 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-50">
-                      Designate building TDI Champions
-                    </button>
-                  </div>
+
+              {openSections['movement-detail'] && (
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 pt-3">
+                  {[
+                    { icon: Mail, label: 'Newsletter', value: 197, tooltip: 'TDI partner average: 65% of enrolled staff subscribe to the newsletter. Your 197 subscribers out of 255 staff (77%) is above the network average.' },
+                    { icon: BookOpen, label: 'Blog Readers', value: 131, tooltip: 'TDI partner average: 45 blog readers per school. Your 131 readers puts you 2.9x above the network average. Readers report higher confidence implementing new strategies.' },
+                    { icon: Headphones, label: 'Podcast', value: 78, tooltip: 'Podcast listeners show 28% higher implementation rates than non-listeners. TDI partner average: 25 listeners per school. Your 78 listeners is 3x the network average.' },
+                    { icon: Users, label: 'Community', value: 48, tooltip: 'TDI partner average: 35 community members per school. Your 48 members provides free peer support and strategy sharing beyond formal PD.' },
+                    { icon: FileText, label: 'Resources', value: 361, tooltip: 'TDI partner average: 280 resources per school. Your 361 downloads puts you 29% above the TDI network average.' },
+                    { icon: GraduationCap, label: 'Courses', value: 224, tooltip: 'TDI partner average: 3.2 courses started per educator. TDI partners average 65% completion vs. 10% industry standard.' },
+                  ].map((channel) => (
+                    <div key={channel.label} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                      <channel.icon className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-[#1e2749]">{channel.value}</p>
+                        <p className="text-xs text-gray-500 truncate">{channel.label}</p>
+                      </div>
+                      <Tooltip content={channel.tooltip}><span></span></Tooltip>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>
@@ -2192,30 +2220,6 @@ export default function ExampleDashboard() {
                   </div>
                 </div>
 
-                {/* Grading Alignment (higher is better) */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-[#1e2749]">Grading Alignment</span>
-                    <span className="text-xs text-gray-400">Higher is better</span>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Target</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '100%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">100%</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown District 360</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
-                      </div>
-                      <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
-                    </div>
-                  </div>
-                </div>
-
                 {/* Retention Intent (higher is better) */}
                 <div>
                   <div className="flex items-center justify-between mb-2">
@@ -2251,6 +2255,30 @@ export default function ExampleDashboard() {
                         <div className="h-full rounded-full bg-green-500" style={{ width: '98%' }}></div>
                       </div>
                       <span className="text-xs font-semibold text-green-600 w-14 text-right">9.8/10</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Grading Alignment (higher is better) */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Grading Alignment</span>
+                    <span className="text-xs text-gray-400">Higher is better</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Target</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '100%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">100%</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown District 360</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
                     </div>
                   </div>
                 </div>
@@ -3610,195 +3638,6 @@ export default function ExampleDashboard() {
         {/* SCHOOLS TAB */}
         {activeTab === 'schools' && (
           <div className="space-y-6">
-            {/* Full Leaderboard — Schools Tab (Collapsed Accordion) */}
-            <div id="full-leaderboard" className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <button
-                onClick={() => toggleSection('full-leaderboard')}
-                className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <Trophy className="w-6 h-6 text-amber-500" />
-                  <div className="text-left">
-                    <h3 className="text-lg font-bold text-[#1e2749]">Building Awards Leaderboard</h3>
-                    <p className="text-sm text-gray-500">Full breakdown with district & industry comparisons</p>
-                  </div>
-                </div>
-                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${openSections['full-leaderboard'] ? 'rotate-180' : ''}`} />
-              </button>
-
-              {openSections['full-leaderboard'] && (
-              <div className="px-6 pb-6 border-t border-gray-100">
-
-              {/* Category-by-Category Breakdown */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {[
-                  {
-                    category: 'Most Engaged',
-                    metric: 'Hub Login Rate',
-                    icon: Monitor,
-                    tooltip: 'Percentage of staff who logged into the Learning Hub. Industry average is 40-50%.',
-                    podium: [
-                      { name: 'Harmony Elementary', value: '95%', medal: '🥇' },
-                      { name: 'Crescendo High School', value: '91%', medal: '🥈' },
-                      { name: 'Rhythm Academy', value: '88%', medal: '🥉' },
-                    ],
-                    districtAvg: '87%',
-                    industryAvg: '40-50%',
-                  },
-                  {
-                    category: 'Top Learners',
-                    metric: 'Course Completion',
-                    icon: BookOpen,
-                    tooltip: 'Staff who completed at least one full Learning Hub course. TDI partners average 65% vs. 10% industry standard.',
-                    podium: [
-                      { name: 'Harmony Elementary', value: '72%', medal: '🥇' },
-                      { name: 'Crescendo High School', value: '65%', medal: '🥈' },
-                      { name: 'Motown Early Learning', value: '61%', medal: '🥉' },
-                    ],
-                    districtAvg: '60%',
-                    industryAvg: '10%',
-                  },
-                  {
-                    category: 'Wellness Leaders',
-                    metric: 'Lowest Stress Level',
-                    icon: Heart,
-                    tooltip: 'Self-reported stress from TDI survey (lower is better). National average is 8-9/10. TDI partners average 5-7/10.',
-                    podium: [
-                      { name: 'Harmony Elementary', value: '5.2/10', medal: '🥇' },
-                      { name: 'Crescendo High School', value: '5.8/10', medal: '🥈' },
-                      { name: 'Motown Early Learning', value: '6.1/10', medal: '🥉' },
-                    ],
-                    districtAvg: '6.2/10',
-                    industryAvg: '8-9/10',
-                  },
-                  {
-                    category: 'Implementation Champions',
-                    metric: 'Strategy Use in Classroom',
-                    icon: Target,
-                    tooltip: 'Teachers actively using TDI strategies, measured via observations. Industry standard is 10% (TNTP). TDI partners average 65%.',
-                    podium: [
-                      { name: 'Harmony Elementary', value: '34%', medal: '🥇' },
-                      { name: 'Crescendo High School', value: '28%', medal: '🥈' },
-                      { name: 'Motown Early Learning', value: '22%', medal: '🥉' },
-                    ],
-                    districtAvg: '21%',
-                    industryAvg: '10%',
-                  },
-                  {
-                    category: 'Resource Champions',
-                    metric: 'Resources Downloaded',
-                    icon: Download,
-                    tooltip: 'Templates, guides, and planning tools downloaded per building. More downloads correlate with higher implementation.',
-                    podium: [
-                      { name: 'Harmony Elementary', value: '89', medal: '🥇' },
-                      { name: 'Crescendo High School', value: '76', medal: '🥈' },
-                      { name: 'Motown Early Learning', value: '68', medal: '🥉' },
-                    ],
-                    districtAvg: '68',
-                    industryAvg: null,
-                  },
-                  {
-                    category: 'Most Likely to Stay',
-                    metric: 'Retention Intent',
-                    icon: Users,
-                    tooltip: 'Self-reported intent to remain in education (higher is better). National average is 2-4/10. TDI partners average 5-7/10.',
-                    podium: [
-                      { name: 'Harmony Elementary', value: '9.8/10', medal: '🥇' },
-                      { name: 'Crescendo High School', value: '8.9/10', medal: '🥈' },
-                      { name: 'Motown Early Learning', value: '8.1/10', medal: '🥉' },
-                    ],
-                    districtAvg: '8.1/10',
-                    industryAvg: '2-4/10',
-                  },
-                  {
-                    category: 'Movement Leaders',
-                    metric: 'Community Participation',
-                    icon: Megaphone,
-                    tooltip: 'Staff actively participating in the broader TDI movement (newsletter, podcast, blog, Facebook group).',
-                    podium: [
-                      { name: 'Harmony Elementary', value: '42', medal: '🥇' },
-                      { name: 'Crescendo High School', value: '38', medal: '🥈' },
-                      { name: 'Motown Early Learning', value: '35', medal: '🥉' },
-                    ],
-                    districtAvg: '33',
-                    industryAvg: null,
-                  },
-                ].map((award) => (
-                  <div key={award.category} className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <award.icon className="w-4 h-4 text-[#38618C]" />
-                        <span className="text-sm font-bold text-[#1e2749]">{award.category}</span>
-                        <Tooltip content={award.tooltip}><span></span></Tooltip>
-                      </div>
-                      <span className="text-xs text-gray-400">{award.metric}</span>
-                    </div>
-
-                    {/* Podium */}
-                    <div className="space-y-2">
-                      {award.podium.map((winner) => (
-                        <div key={winner.name} className="flex items-center justify-between">
-                          <div className="flex items-center gap-2">
-                            <span className="text-base">{winner.medal}</span>
-                            <span className="text-sm text-gray-700">{winner.name}</span>
-                          </div>
-                          <span className="text-sm font-bold text-[#1e2749]">{winner.value}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Context bar */}
-                    <div className="mt-3 pt-3 border-t border-gray-200 flex justify-between text-xs text-gray-400">
-                      <Tooltip content="Average across all buildings in your district for this metric.">
-                        <span>District avg: <span className="text-gray-600 font-medium">{award.districtAvg}</span></span>
-                      </Tooltip>
-                      {award.industryAvg && (
-                        <Tooltip content="National averages based on RAND Corporation (2025), TNTP, and Learning Policy Institute research.">
-                          <span>Industry avg: <span className="text-red-400 font-medium">{award.industryAvg}</span></span>
-                        </Tooltip>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Total Medal Count Banner */}
-              <div className="mt-6 bg-gradient-to-r from-amber-50 via-gray-50 to-orange-50 rounded-xl p-5 border border-amber-100">
-                <h4 className="text-sm font-bold text-[#1e2749] mb-3">Total Medal Count</h4>
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-                  {[
-                    { name: 'Harmony', gold: 7, silver: 0, bronze: 0 },
-                    { name: 'Crescendo', gold: 0, silver: 7, bronze: 0 },
-                    { name: 'Motown ELC', gold: 0, silver: 0, bronze: 4 },
-                    { name: 'Motown MS', gold: 0, silver: 0, bronze: 3 },
-                    { name: 'Bridges', gold: 0, silver: 0, bronze: 0 },
-                    { name: 'Rhythm', gold: 0, silver: 0, bronze: 0 },
-                  ].map((b) => (
-                    <div key={b.name} className="text-center p-3 bg-white rounded-lg shadow-sm">
-                      <p className="text-xs font-semibold text-[#1e2749] mb-2">{b.name}</p>
-                      <div className="flex justify-center gap-1.5 text-sm">
-                        {b.gold > 0 && <span>🥇{b.gold}</span>}
-                        {b.silver > 0 && <span>🥈{b.silver}</span>}
-                        {b.bronze > 0 && <span>🥉{b.bronze}</span>}
-                        {(b.gold + b.silver + b.bronze) === 0 && <span className="text-gray-400 text-xs italic">Rising</span>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Celebration Note */}
-              <div className="mt-4 p-4 bg-[#1e2749] rounded-xl text-white">
-                <p className="text-sm">
-                  <span className="font-semibold">Share these wins!</span> Building Awards are designed to be shared at
-                  staff meetings, board presentations, and PLC gatherings. When educators see their building recognized,
-                  it fuels the momentum that drives real change.
-                </p>
-              </div>
-              </div>
-              )}
-            </div>
-
             {/* District Summary Bar */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
@@ -3848,7 +3687,15 @@ export default function ExampleDashboard() {
                     </tr>
                   </thead>
                   <tbody>
-                    {districtSchools.map((school) => {
+                    {[...districtSchools].sort((a, b) => {
+                      const scoreA = a.medals.filter(m => m.type === 'gold').length * 100 +
+                                     a.medals.filter(m => m.type === 'silver').length * 10 +
+                                     a.medals.filter(m => m.type === 'bronze').length;
+                      const scoreB = b.medals.filter(m => m.type === 'gold').length * 100 +
+                                     b.medals.filter(m => m.type === 'silver').length * 10 +
+                                     b.medals.filter(m => m.type === 'bronze').length;
+                      return scoreB - scoreA;
+                    }).map((school) => {
                       const schoolTotal = school.teachers.total + (school.paras?.total || 0);
                       const schoolLoggedIn = school.teachers.loggedIn + (school.paras?.loggedIn || 0);
                       const loginRate = Math.round((schoolLoggedIn / schoolTotal) * 100);
@@ -3896,9 +3743,17 @@ export default function ExampleDashboard() {
               </div>
             </div>
 
-            {/* School Cards - Full Width Stack */}
+            {/* School Cards - Full Width Stack (sorted by medal count) */}
             <div className="space-y-4">
-              {districtSchools.map((school) => {
+              {[...districtSchools].sort((a, b) => {
+                const scoreA = a.medals.filter(m => m.type === 'gold').length * 100 +
+                               a.medals.filter(m => m.type === 'silver').length * 10 +
+                               a.medals.filter(m => m.type === 'bronze').length;
+                const scoreB = b.medals.filter(m => m.type === 'gold').length * 100 +
+                               b.medals.filter(m => m.type === 'silver').length * 10 +
+                               b.medals.filter(m => m.type === 'bronze').length;
+                return scoreB - scoreA;
+              }).map((school) => {
                 const schoolTotal = school.teachers.total + (school.paras?.total || 0);
                 const schoolLoggedIn = school.teachers.loggedIn + (school.paras?.loggedIn || 0);
                 const loginRate = Math.round((schoolLoggedIn / schoolTotal) * 100);
@@ -4406,7 +4261,91 @@ export default function ExampleDashboard() {
               </div>
             </div>
 
-            {/* SECTION C: Year 2 vs Year 3 Projections */}
+            {/* SECTION C: Goals Alignment (moved to position #3) */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center gap-2 mb-6">
+                <Target className="w-5 h-5 text-[#1e2749]" />
+                <h3 className="text-lg font-bold text-[#1e2749]">Aligned to Your District Goals</h3>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-4">
+                {/* District Goal */}
+                <div className="bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-xl p-5 text-white">
+                  <div className="flex items-center gap-2 mb-3">
+                    <School className="w-5 h-5" />
+                    <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">Your Goal</span>
+                  </div>
+                  <p className="text-sm font-medium">
+                    &quot;Build sustainable support systems for every teacher and para — so students get consistent, high-quality instruction from every adult in the room.&quot;
+                  </p>
+                  <p className="text-xs opacity-70 mt-3">— Dr. Ford, Superintendent</p>
+                </div>
+
+                {/* How Year 3 Delivers */}
+                <div className="bg-[#4ecdc4]/10 border border-[#4ecdc4]/20 rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Check className="w-5 h-5 text-[#4ecdc4]" />
+                    <span className="text-xs bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-0.5 rounded-full">Year 3 Delivers</span>
+                  </div>
+                  <ul className="text-sm text-gray-700 space-y-2">
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-[#4ecdc4] rounded-full mt-1.5 flex-shrink-0" />
+                      Internal coaching capacity built into your team
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-[#4ecdc4] rounded-full mt-1.5 flex-shrink-0" />
+                      Systems that run without external support
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-1.5 h-1.5 bg-[#4ecdc4] rounded-full mt-1.5 flex-shrink-0" />
+                      Culture change that outlasts the partnership
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Research Backing */}
+                <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
+                  <div className="flex items-center gap-2 mb-3">
+                    <BookOpen className="w-5 h-5 text-gray-600" />
+                    <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">Research Says</span>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Multi-year professional development programs show <strong>3x better retention</strong> of practices vs. single-year initiatives. Year 3 is where change becomes permanent.
+                  </p>
+                  <p className="text-xs text-gray-400 mt-3">— Learning Forward, 2024</p>
+                </div>
+              </div>
+
+              {/* Strategic Priorities Alignment */}
+              <div className="mt-6 pt-6 border-t border-gray-100">
+                <p className="text-sm font-medium text-gray-600 mb-4">Year 3 Strategic Priorities:</p>
+                <div className="grid md:grid-cols-3 gap-3">
+                  <div className="flex items-center gap-3 bg-green-50 rounded-lg p-3">
+                    <Heart className="w-5 h-5 text-green-600" />
+                    <div>
+                      <p className="text-sm font-medium text-green-800">Educator Wellness</p>
+                      <p className="text-xs text-green-600">Sustain below 6.0 stress</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 bg-blue-50 rounded-lg p-3">
+                    <Layers className="w-5 h-5 text-blue-600" />
+                    <div>
+                      <p className="text-sm font-medium text-blue-800">Implementation Depth</p>
+                      <p className="text-xs text-blue-600">Target 72% adoption</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 bg-purple-50 rounded-lg p-3">
+                    <Award className="w-5 h-5 text-purple-600" />
+                    <div>
+                      <p className="text-sm font-medium text-purple-800">Internal Capacity</p>
+                      <p className="text-xs text-purple-600">40% trained coaches</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION D: Year 2 vs Year 3 Projections */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center gap-2 mb-6">
                 <TrendingUp className="w-5 h-5 text-[#1e2749]" />
@@ -4654,86 +4593,35 @@ export default function ExampleDashboard() {
 
             </div>
 
-            {/* SECTION F: Goals Alignment */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 mb-6">
-                <Target className="w-5 h-5 text-[#1e2749]" />
-                <h3 className="text-lg font-bold text-[#1e2749]">Aligned to Your District Goals</h3>
-              </div>
-
-              <div className="grid md:grid-cols-3 gap-4">
-                {/* District Goal */}
-                <div className="bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-xl p-5 text-white">
-                  <div className="flex items-center gap-2 mb-3">
-                    <School className="w-5 h-5" />
-                    <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">Your Goal</span>
+            {/* SECTION F: Mid-Page CTA */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#4ecdc4]/30">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-[#4ecdc4]/10 rounded-full flex items-center justify-center">
+                    <Users className="w-6 h-6 text-[#4ecdc4]" />
                   </div>
-                  <p className="text-sm font-medium">
-                    &quot;Build sustainable support systems for every teacher and para — so students get consistent, high-quality instruction from every adult in the room.&quot;
-                  </p>
-                  <p className="text-xs opacity-70 mt-3">— Dr. Ford, Superintendent</p>
+                  <div>
+                    <p className="text-lg font-bold text-[#1e2749]">Questions about Year 3?</p>
+                    <p className="text-sm text-gray-600">Talk with your TDI partner to explore what SUSTAIN looks like for Motown.</p>
+                  </div>
                 </div>
-
-                {/* How Year 3 Delivers */}
-                <div className="bg-[#4ecdc4]/10 border border-[#4ecdc4]/20 rounded-xl p-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Check className="w-5 h-5 text-[#4ecdc4]" />
-                    <span className="text-xs bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-0.5 rounded-full">Year 3 Delivers</span>
-                  </div>
-                  <ul className="text-sm text-gray-700 space-y-2">
-                    <li className="flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 bg-[#4ecdc4] rounded-full mt-1.5 flex-shrink-0" />
-                      Internal coaching capacity built into your team
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 bg-[#4ecdc4] rounded-full mt-1.5 flex-shrink-0" />
-                      Systems that run without external support
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 bg-[#4ecdc4] rounded-full mt-1.5 flex-shrink-0" />
-                      Culture change that outlasts the partnership
-                    </li>
-                  </ul>
-                </div>
-
-                {/* Research Backing */}
-                <div className="bg-gray-50 border border-gray-200 rounded-xl p-5">
-                  <div className="flex items-center gap-2 mb-3">
-                    <BookOpen className="w-5 h-5 text-gray-600" />
-                    <span className="text-xs bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full">Research Says</span>
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    Multi-year professional development programs show <strong>3x better retention</strong> of practices vs. single-year initiatives. Year 3 is where change becomes permanent.
-                  </p>
-                  <p className="text-xs text-gray-400 mt-3">— Learning Forward, 2024</p>
-                </div>
-              </div>
-
-              {/* Strategic Priorities Alignment */}
-              <div className="mt-6 pt-6 border-t border-gray-100">
-                <p className="text-sm font-medium text-gray-600 mb-4">Year 3 Strategic Priorities:</p>
-                <div className="grid md:grid-cols-3 gap-3">
-                  <div className="flex items-center gap-3 bg-green-50 rounded-lg p-3">
-                    <Heart className="w-5 h-5 text-green-600" />
-                    <div>
-                      <p className="text-sm font-medium text-green-800">Educator Wellness</p>
-                      <p className="text-xs text-green-600">Sustain below 6.0 stress</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 bg-blue-50 rounded-lg p-3">
-                    <Layers className="w-5 h-5 text-blue-600" />
-                    <div>
-                      <p className="text-sm font-medium text-blue-800">Implementation Depth</p>
-                      <p className="text-xs text-blue-600">Target 72% adoption</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 bg-purple-50 rounded-lg p-3">
-                    <Award className="w-5 h-5 text-purple-600" />
-                    <div>
-                      <p className="text-sm font-medium text-purple-800">Internal Capacity</p>
-                      <p className="text-xs text-purple-600">40% trained coaches</p>
-                    </div>
-                  </div>
+                <div className="flex items-center gap-3">
+                  <a
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-[#4ecdc4] text-[#1e2749] px-6 py-3 rounded-lg font-semibold hover:bg-[#3dbdb5] transition-colors"
+                  >
+                    <Calendar className="w-5 h-5" />
+                    Schedule a Call
+                  </a>
+                  <a
+                    href="/calculator"
+                    className="inline-flex items-center gap-2 border border-[#4ecdc4] text-[#1e2749] px-4 py-3 rounded-lg font-medium hover:bg-[#4ecdc4]/10 transition-colors"
+                  >
+                    <Calculator className="w-4 h-4" />
+                    ROI Calculator
+                  </a>
                 </div>
               </div>
             </div>
