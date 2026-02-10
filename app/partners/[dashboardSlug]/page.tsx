@@ -23,13 +23,21 @@ import {
   ChevronRight,
   Loader2,
   Upload,
-  Pause,
   Play,
   Zap,
   TrendingUp,
   School,
   Sparkles,
   X,
+  ExternalLink,
+  Copy,
+  Plus,
+  Save,
+  Link2,
+  Clock,
+  Target,
+  Award,
+  ArrowRight,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -58,6 +66,15 @@ interface Organization {
   org_type: string;
   address_city: string;
   address_state: string;
+  website?: string;
+}
+
+interface BuildingInput {
+  name: string;
+  building_type: string;
+  lead_name: string;
+  lead_email: string;
+  staff_count: number;
 }
 
 interface ActionItem {
@@ -220,6 +237,16 @@ export default function PartnerDashboard() {
   const [showPausedItems, setShowPausedItems] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [uploadingItemId, setUploadingItemId] = useState<string | null>(null);
+  const [savingItemId, setSavingItemId] = useState<string | null>(null);
+  const [copiedLink, setCopiedLink] = useState(false);
+
+  // Action item form state
+  const [championName, setChampionName] = useState('');
+  const [championEmail, setChampionEmail] = useState('');
+  const [websiteUrl, setWebsiteUrl] = useState('');
+  const [buildings, setBuildings] = useState<BuildingInput[]>([
+    { name: '', building_type: 'elementary', lead_name: '', lead_email: '', staff_count: 0 },
+  ]);
 
   // View tracking refs
   const tabStartTime = useRef<number>(Date.now());
@@ -488,7 +515,7 @@ export default function PartnerDashboard() {
     }
   };
 
-  const handleFileUpload = async (itemId: string, file: File) => {
+  const handleFileUpload = async (itemId: string, file: File, folder?: string) => {
     if (!partnership?.id || !userId) return;
 
     setUploadingItemId(itemId);
@@ -500,6 +527,7 @@ export default function PartnerDashboard() {
       formData.append('partnershipId', partnership.id);
       formData.append('itemId', itemId);
       formData.append('userId', userId);
+      if (folder) formData.append('folder', folder);
 
       const response = await fetch('/api/partners/upload-evidence', {
         method: 'POST',
@@ -530,6 +558,97 @@ export default function PartnerDashboard() {
       setToastMessage('Failed to upload file. Please try again.');
     } finally {
       setUploadingItemId(null);
+    }
+  };
+
+  // Save action item form data
+  const handleSaveActionData = async (
+    itemId: string,
+    dataType: 'champion' | 'website' | 'buildings' | 'confirmation',
+    data: Record<string, unknown>
+  ) => {
+    if (!partnership?.id || !userId) return;
+
+    setSavingItemId(itemId);
+
+    try {
+      const response = await fetch('/api/partners/action-item-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          partnershipId: partnership.id,
+          actionItemId: itemId,
+          userId,
+          dataType,
+          data,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setActionItems(prev =>
+          prev.map(item =>
+            item.id === itemId
+              ? { ...item, status: 'completed', completed_at: new Date().toISOString() }
+              : item
+          )
+        );
+
+        // Clear form state
+        if (dataType === 'champion') {
+          setChampionName('');
+          setChampionEmail('');
+        } else if (dataType === 'website') {
+          setWebsiteUrl('');
+        } else if (dataType === 'buildings') {
+          setBuildings([{ name: '', building_type: 'elementary', lead_name: '', lead_email: '', staff_count: 0 }]);
+        }
+
+        setToastMessage(result.message || 'Saved successfully!');
+      } else {
+        throw new Error(result.error);
+      }
+    } catch (error) {
+      console.error('Error saving data:', error);
+      setToastMessage('Failed to save. Please try again.');
+    } finally {
+      setSavingItemId(null);
+    }
+  };
+
+  // Copy hub link to clipboard
+  const handleCopyHubLink = async () => {
+    const hubUrl = 'https://hub.teachersdeserveit.com'; // Replace with actual Hub URL
+    try {
+      await navigator.clipboard.writeText(hubUrl);
+      setCopiedLink(true);
+      setToastMessage('Hub access link copied to clipboard!');
+      setTimeout(() => setCopiedLink(false), 2000);
+    } catch {
+      setToastMessage('Failed to copy link');
+    }
+  };
+
+  // Add building to form
+  const addBuilding = () => {
+    setBuildings(prev => [
+      ...prev,
+      { name: '', building_type: 'elementary', lead_name: '', lead_email: '', staff_count: 0 },
+    ]);
+  };
+
+  // Update building in form
+  const updateBuilding = (index: number, field: keyof BuildingInput, value: string | number) => {
+    setBuildings(prev =>
+      prev.map((b, i) => (i === index ? { ...b, [field]: value } : b))
+    );
+  };
+
+  // Remove building from form
+  const removeBuilding = (index: number) => {
+    if (buildings.length > 1) {
+      setBuildings(prev => prev.filter((_, i) => i !== index));
     }
   };
 
@@ -870,74 +989,333 @@ export default function PartnerDashboard() {
                       >
                         {group.emoji} {group.label}
                       </h3>
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         {items.sort((a, b) => a.sort_order - b.sort_order).map((item) => {
                           const Icon = categoryIcons[item.category] || FileText;
-                          const showUpload = ['data', 'documentation'].includes(item.category);
+                          const isSaving = savingItemId === item.id;
+                          const isUploading = uploadingItemId === item.id;
+
+                          // Render inline action based on item title
+                          const renderInlineAction = () => {
+                            const titleLower = item.title.toLowerCase();
+
+                            // Item 1: Complete Hub Onboarding
+                            if (titleLower.includes('hub onboarding') || titleLower.includes('hub access')) {
+                              return (
+                                <div className="mt-3 flex flex-wrap items-center gap-3">
+                                  <button
+                                    onClick={handleCopyHubLink}
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
+                                  >
+                                    {copiedLink ? (
+                                      <Check className="w-4 h-4" />
+                                    ) : (
+                                      <Copy className="w-4 h-4" />
+                                    )}
+                                    {copiedLink ? 'Copied!' : 'Share Hub Access Link'}
+                                  </button>
+                                  <span className="text-xs text-gray-500">
+                                    {staffStats.hubLoggedIn}/{staffStats.total} logged in
+                                  </span>
+                                </div>
+                              );
+                            }
+
+                            // Item 2: Schedule Virtual Session
+                            if (titleLower.includes('virtual session')) {
+                              return (
+                                <div className="mt-3">
+                                  <a
+                                    href="https://calendly.com/teachersdeserveit"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
+                                  >
+                                    <Calendar className="w-4 h-4" />
+                                    Schedule Now
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                </div>
+                              );
+                            }
+
+                            // Item 3: Suggest TDI Champion(s)
+                            if (titleLower.includes('champion')) {
+                              return (
+                                <div className="mt-3 space-y-2">
+                                  <div className="flex flex-wrap gap-2">
+                                    <input
+                                      type="text"
+                                      placeholder="Champion Name"
+                                      value={championName}
+                                      onChange={(e) => setChampionName(e.target.value)}
+                                      className="flex-1 min-w-[150px] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                    <input
+                                      type="email"
+                                      placeholder="Champion Email"
+                                      value={championEmail}
+                                      onChange={(e) => setChampionEmail(e.target.value)}
+                                      className="flex-1 min-w-[150px] px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    />
+                                    <button
+                                      onClick={() => handleSaveActionData(item.id, 'champion', { championName, championEmail })}
+                                      disabled={!championName.trim() || isSaving}
+                                      className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                    >
+                                      {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                      Save
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            // Item 4: Add Hub Time to PLCs
+                            if (titleLower.includes('hub time') || titleLower.includes('plc')) {
+                              return (
+                                <div className="mt-3">
+                                  <button
+                                    onClick={() => handleSaveActionData(item.id, 'confirmation', { confirmationMessage: 'Hub time added to PLCs!' })}
+                                    disabled={isSaving}
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors disabled:opacity-50"
+                                  >
+                                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                                    We&apos;ve added Hub time to our PLC schedule
+                                  </button>
+                                </div>
+                              );
+                            }
+
+                            // Item 5: Share Website
+                            if (titleLower.includes('website')) {
+                              return (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                  <div className="flex-1 min-w-[200px] flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white">
+                                    <Link2 className="w-4 h-4 text-gray-400" />
+                                    <input
+                                      type="url"
+                                      placeholder="https://yourschool.edu"
+                                      value={websiteUrl}
+                                      onChange={(e) => setWebsiteUrl(e.target.value)}
+                                      className="flex-1 text-sm focus:outline-none"
+                                    />
+                                  </div>
+                                  <button
+                                    onClick={() => handleSaveActionData(item.id, 'website', { website: websiteUrl })}
+                                    disabled={!websiteUrl.trim() || isSaving}
+                                    className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                  >
+                                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                    Save
+                                  </button>
+                                </div>
+                              );
+                            }
+
+                            // Item 6: Add Building Details (Districts only)
+                            if (titleLower.includes('building') && partnership?.partnership_type === 'district') {
+                              return (
+                                <div className="mt-3 space-y-3">
+                                  {buildings.map((building, idx) => (
+                                    <div key={idx} className="flex flex-wrap gap-2 p-3 bg-gray-100 rounded-lg">
+                                      <input
+                                        type="text"
+                                        placeholder="Building Name"
+                                        value={building.name}
+                                        onChange={(e) => updateBuilding(idx, 'name', e.target.value)}
+                                        className="flex-1 min-w-[140px] px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                                      />
+                                      <select
+                                        value={building.building_type}
+                                        onChange={(e) => updateBuilding(idx, 'building_type', e.target.value)}
+                                        className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                                      >
+                                        <option value="elementary">Elementary</option>
+                                        <option value="middle">Middle School</option>
+                                        <option value="high">High School</option>
+                                        <option value="k8">K-8</option>
+                                        <option value="other">Other</option>
+                                      </select>
+                                      <input
+                                        type="text"
+                                        placeholder="Lead Name"
+                                        value={building.lead_name}
+                                        onChange={(e) => updateBuilding(idx, 'lead_name', e.target.value)}
+                                        className="flex-1 min-w-[120px] px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                                      />
+                                      <input
+                                        type="email"
+                                        placeholder="Lead Email"
+                                        value={building.lead_email}
+                                        onChange={(e) => updateBuilding(idx, 'lead_email', e.target.value)}
+                                        className="flex-1 min-w-[140px] px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                                      />
+                                      <input
+                                        type="number"
+                                        placeholder="Staff #"
+                                        value={building.staff_count || ''}
+                                        onChange={(e) => updateBuilding(idx, 'staff_count', parseInt(e.target.value) || 0)}
+                                        className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                                      />
+                                      {buildings.length > 1 && (
+                                        <button
+                                          onClick={() => removeBuilding(idx)}
+                                          className="p-2 text-gray-400 hover:text-red-500"
+                                        >
+                                          <X className="w-4 h-4" />
+                                        </button>
+                                      )}
+                                    </div>
+                                  ))}
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={addBuilding}
+                                      className="flex items-center gap-1 px-3 py-2 text-sm text-blue-600 hover:text-blue-700"
+                                    >
+                                      <Plus className="w-4 h-4" />
+                                      Add Another Building
+                                    </button>
+                                    <button
+                                      onClick={() => handleSaveActionData(item.id, 'buildings', { buildings })}
+                                      disabled={!buildings.some(b => b.name.trim()) || isSaving}
+                                      className="ml-auto px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center gap-2"
+                                    >
+                                      {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                      Save Buildings
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            }
+
+                            // Item 7 & 8: File uploads (Baseline Survey, SIP)
+                            if (titleLower.includes('survey') || titleLower.includes('improvement plan') || titleLower.includes('sip')) {
+                              const folder = titleLower.includes('survey') ? 'baseline-survey' : 'sip';
+                              return (
+                                <div className="mt-3">
+                                  <label className="flex items-center justify-center gap-2 px-4 py-6 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
+                                    {isUploading ? (
+                                      <Loader2 className="w-5 h-5 animate-spin text-blue-500" />
+                                    ) : (
+                                      <Upload className="w-5 h-5 text-gray-400" />
+                                    )}
+                                    <span className="text-sm text-gray-600">
+                                      {isUploading ? 'Uploading...' : 'Drop file here or click to upload'}
+                                    </span>
+                                    <input
+                                      type="file"
+                                      className="hidden"
+                                      accept=".pdf,.docx,.xlsx,.csv"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) handleFileUpload(item.id, file, folder);
+                                      }}
+                                      disabled={isUploading}
+                                    />
+                                  </label>
+                                  <p className="text-xs text-gray-500 mt-1 text-center">
+                                    Accepted: PDF, DOCX, XLSX, CSV
+                                  </p>
+                                </div>
+                              );
+                            }
+
+                            // Item 9: Confirm Observation Day Dates
+                            if (titleLower.includes('observation')) {
+                              return (
+                                <div className="mt-3 flex flex-wrap gap-2">
+                                  <a
+                                    href="https://calendly.com/teachersdeserveit"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
+                                  >
+                                    <Calendar className="w-4 h-4" />
+                                    Schedule with TDI
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                  <a
+                                    href="mailto:hello@teachersdeserveit.com?subject=Observation Day Scheduling"
+                                    className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
+                                  >
+                                    <Mail className="w-4 h-4" />
+                                    Email TDI to Schedule
+                                  </a>
+                                </div>
+                              );
+                            }
+
+                            // Item 10: Schedule Executive Impact Session
+                            if (titleLower.includes('executive') || titleLower.includes('impact session')) {
+                              return (
+                                <div className="mt-3">
+                                  <a
+                                    href="https://calendly.com/teachersdeserveit"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
+                                  >
+                                    <Calendar className="w-4 h-4" />
+                                    Schedule Now
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                </div>
+                              );
+                            }
+
+                            // Default: no specific action
+                            return null;
+                          };
 
                           return (
                             <div
                               key={item.id}
-                              className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                              className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100/50 transition-colors"
                             >
-                              <div
-                                className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                                style={{ backgroundColor: `${group.color}20` }}
-                              >
-                                <Icon className="w-5 h-5" style={{ color: group.color }} />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className="font-medium text-[#1e2749]">{item.title}</span>
-                                  <span
-                                    className="text-xs px-2 py-0.5 rounded-full"
-                                    style={{
-                                      backgroundColor: `${group.color}20`,
-                                      color: group.color,
-                                    }}
-                                  >
-                                    {priority}
-                                  </span>
+                              <div className="flex items-start gap-3">
+                                <div
+                                  className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                                  style={{ backgroundColor: `${group.color}20` }}
+                                >
+                                  <Icon className="w-5 h-5" style={{ color: group.color }} />
                                 </div>
-                                <p className="text-xs text-gray-500 mt-1">{item.description}</p>
-                              </div>
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                {showUpload && (
-                                  <label
-                                    className="p-2 hover:bg-blue-50 rounded-lg cursor-pointer transition-colors group"
-                                    title="Upload evidence"
-                                  >
-                                    {uploadingItemId === item.id ? (
-                                      <Loader2 className="w-4 h-4 animate-spin text-blue-500" />
-                                    ) : (
-                                      <Upload className="w-4 h-4 text-gray-400 group-hover:text-blue-500" />
-                                    )}
-                                    <input
-                                      type="file"
-                                      className="hidden"
-                                      accept=".pdf,.docx,.xlsx,.csv,.png,.jpg,.jpeg"
-                                      onChange={(e) => {
-                                        const file = e.target.files?.[0];
-                                        if (file) handleFileUpload(item.id, file);
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="font-medium text-[#1e2749]">{item.title}</span>
+                                    <span
+                                      className="text-xs px-2 py-0.5 rounded-full uppercase"
+                                      style={{
+                                        backgroundColor: `${group.color}20`,
+                                        color: group.color,
                                       }}
-                                      disabled={uploadingItemId === item.id}
-                                    />
-                                  </label>
-                                )}
-                                <button
-                                  onClick={() => handleCompleteItem(item.id)}
-                                  className="p-2 hover:bg-green-50 rounded-lg transition-colors group"
-                                  title="Mark as done"
-                                >
-                                  <Check className="w-4 h-4 text-gray-400 group-hover:text-green-500" />
-                                </button>
-                                <button
-                                  onClick={() => handlePauseItem(item.id)}
-                                  className="p-2 hover:bg-amber-50 rounded-lg transition-colors group"
-                                  title="Pause for later"
-                                >
-                                  <Pause className="w-4 h-4 text-gray-400 group-hover:text-amber-500" />
-                                </button>
+                                    >
+                                      {priority}
+                                    </span>
+                                  </div>
+                                  <p className="text-sm text-gray-500 mt-1">{item.description}</p>
+
+                                  {/* Inline Action */}
+                                  {renderInlineAction()}
+
+                                  {/* Secondary Buttons */}
+                                  <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-200">
+                                    <button
+                                      onClick={() => handleCompleteItem(item.id)}
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-green-700 border border-green-300 rounded-lg hover:bg-green-50 transition-colors"
+                                    >
+                                      <Check className="w-4 h-4" />
+                                      Mark Complete
+                                    </button>
+                                    <button
+                                      onClick={() => handlePauseItem(item.id)}
+                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                    >
+                                      <Clock className="w-4 h-4" />
+                                      Not Right Now
+                                    </button>
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           );
@@ -1091,13 +1469,70 @@ export default function PartnerDashboard() {
             aria-labelledby="tab-team"
             className="space-y-6"
           >
-            {/* School/District Contact */}
+            {/* TDI Team */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">
-                {partnership.partnership_type === 'district' ? 'District' : 'School'} Contact
-              </h2>
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Your TDI Team</h2>
+              <div className="flex flex-col sm:flex-row items-start gap-6">
+                <div className="w-24 h-24 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
+                  <Image
+                    src="/images/rae.webp"
+                    alt="Rae Hughart"
+                    width={96}
+                    height={96}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xl font-semibold text-[#1e2749]">Rae Hughart</p>
+                  <p className="text-gray-500">Founder & CEO</p>
+                  <div className="mt-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-gray-400" />
+                      <a
+                        href="mailto:hello@teachersdeserveit.com"
+                        className="text-blue-600 hover:underline"
+                      >
+                        hello@teachersdeserveit.com
+                      </a>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-4 h-4 text-gray-400" />
+                      <a
+                        href="tel:+18477215503"
+                        className="text-blue-600 hover:underline"
+                      >
+                        847-721-5503
+                      </a>
+                    </div>
+                  </div>
+                  <a
+                    href="https://calendly.com/teachersdeserveit"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-[#FFBA06] text-[#1e2749] rounded-lg font-medium hover:bg-[#e5a805] transition-colors"
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Schedule a Call
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </div>
+              </div>
+              <div className="mt-6 p-4 bg-[#1e2749]/5 rounded-lg">
+                <p className="text-sm text-gray-600">
+                  <strong className="text-[#1e2749]">Your TDI partner is with you every step of the way.</strong>{' '}
+                  Reach out anytime — we mean it.
+                </p>
+              </div>
+            </div>
+
+            {/* Your Team (Partnership Contact) */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Your Team</h2>
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 bg-[#1e2749] rounded-full flex items-center justify-center text-white font-bold text-xl">
+                <div className="w-14 h-14 bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-full flex items-center justify-center text-white font-bold text-xl">
                   {partnership.contact_name.charAt(0).toUpperCase()}
                 </div>
                 <div>
@@ -1116,108 +1551,272 @@ export default function PartnerDashboard() {
               </div>
             </div>
 
-            {/* TDI Team */}
+            {/* Partnership Details */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Your TDI Team</h2>
-              <div className="flex items-start gap-4">
-                <div className="w-20 h-20 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
-                  <Image
-                    src="/images/rae.webp"
-                    alt="Rae Hughart"
-                    width={80}
-                    height={80}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      // Fallback to initials
-                      e.currentTarget.style.display = 'none';
-                    }}
-                  />
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Partnership Details</h2>
+              <div className="grid sm:grid-cols-2 gap-6">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Contract Period</p>
+                    <p className="font-medium text-[#1e2749]">
+                      {partnership.contract_start
+                        ? new Date(partnership.contract_start).toLocaleDateString('en-US', {
+                            month: 'long',
+                            year: 'numeric',
+                          })
+                        : 'Not set'}{' '}
+                      —{' '}
+                      {partnership.contract_end
+                        ? new Date(partnership.contract_end).toLocaleDateString('en-US', {
+                            month: 'long',
+                            year: 'numeric',
+                          })
+                        : 'Not set'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Partnership Type</p>
+                    <p className="font-medium text-[#1e2749] capitalize">{partnership.partnership_type}</p>
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="font-semibold text-[#1e2749]">Rae Hughart</p>
-                  <p className="text-sm text-gray-500">Founder & CEO</p>
-                  <div className="mt-3 space-y-2">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Current Phase</p>
                     <div className="flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-gray-400" />
-                      <a
-                        href="mailto:hello@teachersdeserveit.com"
-                        className="text-sm text-blue-600 hover:underline"
+                      <span
+                        className="px-3 py-1 rounded-full text-sm font-medium"
+                        style={{ backgroundColor: colors.teal + '20', color: colors.teal }}
                       >
-                        hello@teachersdeserveit.com
-                      </a>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-gray-400" />
-                      <a
-                        href="tel:+18477215503"
-                        className="text-sm text-blue-600 hover:underline"
-                      >
-                        847-721-5503
-                      </a>
+                        {partnership.contract_phase}
+                      </span>
                     </div>
                   </div>
-                  <a
-                    href="https://calendly.com/teachersdeserveit"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 mt-4 px-4 py-2 bg-[#FFBA06] text-[#1e2749] rounded-lg text-sm font-medium hover:bg-[#e5a805] transition-colors"
-                  >
-                    <Calendar className="w-4 h-4" />
-                    Schedule a Call
-                  </a>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Location</p>
+                    <p className="font-medium text-[#1e2749]">
+                      {organization?.address_city}, {organization?.address_state}
+                    </p>
+                  </div>
+                </div>
+              </div>
+              {partnership.contract_end && (
+                <div className="mt-6 pt-4 border-t border-gray-100">
+                  <p className="text-sm text-gray-500">
+                    <strong>Renewal Date:</strong>{' '}
+                    {new Date(partnership.contract_end).toLocaleDateString('en-US', {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                    })}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* BLUEPRINT TAB */}
+        {activeTab === 'blueprint' && (
+          <div
+            role="tabpanel"
+            id="panel-blueprint"
+            aria-labelledby="tab-blueprint"
+            className="space-y-6"
+          >
+            {/* Phase Model */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-6">Your Partnership Journey</h2>
+
+              {/* Phase Timeline */}
+              <div className="relative mb-8">
+                <div className="absolute top-6 left-0 right-0 h-1 bg-gray-200 rounded-full" />
+                <div className="relative flex justify-between">
+                  {[
+                    { phase: 'IGNITE', label: 'Phase 1', number: 1 },
+                    { phase: 'ACCELERATE', label: 'Phase 2', number: 2 },
+                    { phase: 'SUSTAIN', label: 'Phase 3', number: 3 },
+                  ].map((p, idx) => {
+                    const isActive = partnership?.contract_phase === p.phase;
+                    const isPast = (
+                      (partnership?.contract_phase === 'ACCELERATE' && p.phase === 'IGNITE') ||
+                      (partnership?.contract_phase === 'SUSTAIN' && (p.phase === 'IGNITE' || p.phase === 'ACCELERATE'))
+                    );
+
+                    return (
+                      <div key={p.phase} className="flex flex-col items-center">
+                        <div
+                          className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold z-10 transition-all ${
+                            isActive
+                              ? 'bg-[#1e2749] text-white ring-4 ring-[#1e2749]/20'
+                              : isPast
+                              ? 'bg-[#4ecdc4] text-white'
+                              : 'bg-gray-200 text-gray-500'
+                          }`}
+                        >
+                          {isPast ? <Check className="w-6 h-6" /> : p.number}
+                        </div>
+                        <span className={`mt-2 text-sm font-medium ${isActive ? 'text-[#1e2749]' : 'text-gray-500'}`}>
+                          {p.phase}
+                        </span>
+                        {isActive && (
+                          <span className="text-xs text-[#4ecdc4] font-medium">Current</span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Phase Descriptions */}
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className={`p-4 rounded-lg border-2 ${partnership?.contract_phase === 'IGNITE' ? 'border-[#1e2749] bg-[#1e2749]/5' : 'border-gray-100 bg-gray-50'}`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Zap className="w-5 h-5 text-amber-500" />
+                    <h3 className="font-semibold text-[#1e2749]">IGNITE</h3>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Foundation building. Hub onboarding, baseline data collection, first observation cycle, initial virtual sessions. Your team is getting started with TDI strategies.
+                  </p>
+                </div>
+                <div className={`p-4 rounded-lg border-2 ${partnership?.contract_phase === 'ACCELERATE' ? 'border-[#1e2749] bg-[#1e2749]/5' : 'border-gray-100 bg-gray-50'}`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <TrendingUp className="w-5 h-5 text-blue-500" />
+                    <h3 className="font-semibold text-[#1e2749]">ACCELERATE</h3>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Expanding implementation. Growth Groups based on observation data, multiple observation cycles, deeper Hub engagement, mid-year progress review.
+                  </p>
+                </div>
+                <div className={`p-4 rounded-lg border-2 ${partnership?.contract_phase === 'SUSTAIN' ? 'border-[#1e2749] bg-[#1e2749]/5' : 'border-gray-100 bg-gray-50'}`}>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Target className="w-5 h-5 text-teal-500" />
+                    <h3 className="font-semibold text-[#1e2749]">SUSTAIN</h3>
+                  </div>
+                  <p className="text-sm text-gray-600">
+                    Building internal capacity. Peer observation circles, teacher-leader pathways, annual impact report, long-term sustainability planning.
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Partnership Details */}
+            {/* Contract Deliverables */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Partnership Details</h2>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-xs text-gray-500 uppercase mb-1">Contract Period</p>
-                  <p className="font-medium text-[#1e2749]">
-                    {partnership.contract_start
-                      ? new Date(partnership.contract_start).toLocaleDateString('en-US', {
-                          month: 'short',
-                          year: 'numeric',
-                        })
-                      : 'Not set'}{' '}
-                    -{' '}
-                    {partnership.contract_end
-                      ? new Date(partnership.contract_end).toLocaleDateString('en-US', {
-                          month: 'short',
-                          year: 'numeric',
-                        })
-                      : 'Not set'}
-                  </p>
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Your Partnership Includes</h2>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-3 px-4 font-medium text-gray-500">Deliverable</th>
+                      <th className="text-center py-3 px-4 font-medium text-gray-500">Included</th>
+                      <th className="text-center py-3 px-4 font-medium text-gray-500">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 text-[#1e2749]">Learning Hub Memberships</td>
+                      <td className="py-3 px-4 text-center font-medium">{staffStats.total}</td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                          <Check className="w-3 h-3" /> Active
+                        </span>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 text-[#1e2749]">On-Site Observation Days</td>
+                      <td className="py-3 px-4 text-center font-medium">{partnership?.observation_days_total || 0}</td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="text-gray-600">{partnership?.observation_days_completed || 0} Complete</span>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 text-[#1e2749]">Virtual Sessions</td>
+                      <td className="py-3 px-4 text-center font-medium">{partnership?.virtual_sessions_total || 0}</td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="text-gray-600">{virtualSessionsCompleted} Complete</span>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 text-[#1e2749]">Executive Impact Sessions</td>
+                      <td className="py-3 px-4 text-center font-medium">{partnership?.executive_sessions_total || 0}</td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="text-gray-600">0 Complete</span>
+                      </td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 text-[#1e2749]">Personalized Love Notes</td>
+                      <td className="py-3 px-4 text-center font-medium">Per observation</td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="text-gray-600">{loveNotes} Delivered</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="py-3 px-4 text-[#1e2749]">Partnership Dashboard</td>
+                      <td className="py-3 px-4 text-center font-medium">1</td>
+                      <td className="py-3 px-4 text-center">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                          <Check className="w-3 h-3" /> Active
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* TDI Approach */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Our Approach</h2>
+              <div className="grid sm:grid-cols-2 gap-4 mb-6">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Award className="w-5 h-5 text-teal-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-[#1e2749]">65% implementation rate</p>
+                    <p className="text-sm text-gray-500">vs 10% industry average — because we don&apos;t do one-and-done PD</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500 uppercase mb-1">Current Phase</p>
-                  <p className="font-medium text-[#1e2749]">{partnership.contract_phase}</p>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Users className="w-5 h-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Bottom-up, not top-down</p>
+                    <p className="text-sm text-gray-500">We equip teachers with strategies they actually want to use</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500 uppercase mb-1">Partnership Type</p>
-                  <p className="font-medium text-[#1e2749] capitalize">{partnership.partnership_type}</p>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Heart className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Ongoing support</p>
+                    <p className="text-sm text-gray-500">Personalized Love Notes, virtual sessions, observations, and your dashboard</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs text-gray-500 uppercase mb-1">Renewal Date</p>
-                  <p className="font-medium text-[#1e2749]">
-                    {partnership.contract_end
-                      ? new Date(partnership.contract_end).toLocaleDateString('en-US', {
-                          month: 'long',
-                          day: 'numeric',
-                          year: 'numeric',
-                        })
-                      : 'Not set'}
-                  </p>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <BarChart3 className="w-5 h-5 text-amber-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Measurable outcomes</p>
+                    <p className="text-sm text-gray-500">Stress reduction, planning time savings, retention improvement</p>
+                  </div>
                 </div>
               </div>
+              <Link
+                href="/how-we-partner"
+                className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700"
+              >
+                Learn more about how we partner
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </div>
         )}
 
         {/* Placeholder for other tabs */}
-        {!['overview', 'team'].includes(activeTab) && (
+        {!['overview', 'team', 'blueprint'].includes(activeTab) && (
           <div
             role="tabpanel"
             className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center"

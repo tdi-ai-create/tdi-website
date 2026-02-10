@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Google Fonts for Hub */
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+
 /* TDI Brand Colors */
 :root {
   --tdi-yellow: #F9B91B;
@@ -9,6 +12,13 @@
   --tdi-navy: #1E2A4A;
   --tdi-coral: #F96767;
   --tdi-charcoal: #2D2D2D;
+
+  /* Hub-specific colors */
+  --hub-blue: #2B3A67;
+  --hub-gold: #E8B84B;
+  --hub-gold-bright: #F0C238;
+  --hub-gold-light: #FFF8E7;
+  --hub-warm-white: #FAFAF8;
 
   /* Background */
   --background: #ffffff;
@@ -28,8 +38,17 @@
   --color-tdi-blue: var(--tdi-blue);
   --color-tdi-navy: var(--tdi-navy);
 
+  /* Hub Colors */
+  --color-hub-blue: var(--hub-blue);
+  --color-hub-gold: var(--hub-gold);
+  --color-hub-gold-bright: var(--hub-gold-bright);
+  --color-hub-gold-light: var(--hub-gold-light);
+  --color-hub-warm-white: var(--hub-warm-white);
+
   /* Font */
   --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-hub-heading: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --font-hub-body: 'DM Sans', 'Inter', system-ui, sans-serif;
 }
 
 /* Base Styles */
@@ -557,4 +576,179 @@ label {
 
 .animate-fade-in {
   animation: gameFadeIn 0.5s ease-out forwards;
+}
+
+/* ============================================
+   TDI Learning Hub - Styles
+   ============================================ */
+
+/* Hub Typography */
+.hub-heading {
+  font-family: var(--font-hub-heading);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--hub-blue);
+}
+
+.hub-body {
+  font-family: var(--font-hub-body);
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* Hub Button Styles */
+.hub-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background-color: var(--hub-gold);
+  color: var(--hub-blue);
+  font-family: var(--font-hub-body);
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.hub-btn-primary:hover {
+  background-color: var(--hub-gold-bright);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+.hub-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 24px;
+  background-color: transparent;
+  color: var(--hub-blue);
+  font-family: var(--font-hub-body);
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: 2px solid var(--hub-blue);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.hub-btn-secondary:hover {
+  background-color: var(--hub-blue);
+  color: white;
+  text-decoration: none;
+}
+
+.hub-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  background-color: transparent;
+  color: white;
+  font-family: var(--font-hub-body);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.hub-btn-ghost:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+  text-decoration: none;
+}
+
+/* Hub Card Styles */
+.hub-card {
+  background: white;
+  border: 1px solid #E5E5E5;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s ease;
+}
+
+.hub-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Hub Nav Link */
+.hub-nav-link {
+  color: white;
+  font-family: var(--font-hub-body);
+  font-size: 15px;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  position: relative;
+}
+
+.hub-nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  text-decoration: none;
+}
+
+.hub-nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 16px;
+  right: 16px;
+  height: 2px;
+  background-color: var(--hub-gold);
+  border-radius: 1px;
+}
+
+/* Breathing Animation for Moment Mode */
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+.animate-breathe {
+  animation: breathe 5s ease-in-out infinite;
+}
+
+/* Slide in from right for mobile nav */
+@keyframes slideInRight {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out forwards;
+}
+
+/* Fade in overlay */
+@keyframes fadeInOverlay {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in-overlay {
+  animation: fadeInOverlay 0.2s ease-out forwards;
 }
