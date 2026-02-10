@@ -3715,15 +3715,7 @@ export default function ExampleDashboard() {
                 const goldCount = school.medals.filter(m => m.type === 'gold').length;
 
                 return (
-                  <div key={school.id} className={`bg-white rounded-xl shadow-sm overflow-hidden ${hasGoldMedal ? 'border-2 border-amber-400 ring-2 ring-amber-100' : 'border border-gray-200'}`}>
-                    {/* Gold Medal Banner */}
-                    {hasGoldMedal && (
-                      <div className="bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 px-4 py-1.5 flex items-center justify-center gap-2">
-                        <Trophy className="w-4 h-4 text-amber-800" />
-                        <span className="text-xs font-bold text-amber-900">🏆 GOLD MEDAL SCHOOL — {goldCount} Award{goldCount > 1 ? 's' : ''}</span>
-                        <Trophy className="w-4 h-4 text-amber-800" />
-                      </div>
-                    )}
+                  <div key={school.id} className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
                     {/* School Card Header */}
                     <button
                       onClick={() => handleSchoolExpand(school.id, hasGoldMedal, isExpanded)}
