@@ -19,6 +19,7 @@ import {
   Calendar,
   MessageCircle,
   Lightbulb,
+  Compass,
   CheckCheck,
 } from 'lucide-react';
 import AvatarPicker from '@/components/hub/AvatarPicker';
@@ -29,7 +30,7 @@ type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5;
 
 type Role = 'classroom_teacher' | 'para' | 'coach' | 'school_leader' | 'district_staff' | 'other';
 
-type GoalType = 'reduce_stress' | 'save_time' | 'classroom_management' | 'find_joy' | 'team_growth' | 'role_support' | 'stop_bringing_work_home' | 'feel_like_myself' | 'make_it_to_summer' | 'better_parent_communication' | 'fresh_ideas' | 'all_of_the_above';
+type GoalType = 'reduce_stress' | 'save_time' | 'classroom_management' | 'find_joy' | 'team_growth' | 'role_support' | 'stop_bringing_work_home' | 'feel_like_myself' | 'make_it_to_summer' | 'better_parent_communication' | 'fresh_ideas' | 'figure_out_whats_next' | 'all_of_the_above';
 
 const ROLES: { value: Role; label: string; subtitle: string }[] = [
   { value: 'classroom_teacher', label: 'Classroom Teacher', subtitle: 'Any grade, any subject' },
@@ -53,6 +54,7 @@ const GoalIconMap: Record<GoalType, React.ReactNode> = {
   make_it_to_summer: <Calendar size={28} strokeWidth={1.5} />,
   better_parent_communication: <MessageCircle size={28} strokeWidth={1.5} />,
   fresh_ideas: <Lightbulb size={28} strokeWidth={1.5} />,
+  figure_out_whats_next: <Compass size={28} strokeWidth={1.5} />,
   all_of_the_above: <CheckCheck size={28} strokeWidth={1.5} />,
 };
 
@@ -69,6 +71,7 @@ const GRID_GOALS: { value: GoalType; label: string }[] = [
   { value: 'make_it_to_summer', label: 'Make it to summer' },
   { value: 'better_parent_communication', label: 'Better parent convos' },
   { value: 'fresh_ideas', label: 'Fresh ideas for my classroom' },
+  { value: 'figure_out_whats_next', label: 'Figure out what\'s next' },
 ];
 
 // All goals except "all_of_the_above" for the select-all behavior
@@ -292,30 +295,55 @@ export default function OnboardingPage() {
             className="min-h-screen flex flex-col items-center justify-center p-6 text-center relative"
             style={{ backgroundColor: '#2B3A67' }}
           >
-            {/* Two-line logo lockup */}
-            <div className="flex flex-col items-center" style={{ gap: '8px' }}>
+            {/* Logo lockup */}
+            <div className="flex flex-col items-center">
+              {/* Branded label */}
               <p
-                className="text-[18px] md:text-[22px]"
+                className="uppercase"
                 style={{
-                  fontFamily: "'Source Serif 4', Georgia, serif",
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  fontWeight: 400,
-                  letterSpacing: '0.02em',
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '16px',
+                  color: '#E8B84B',
+                  fontWeight: 600,
+                  letterSpacing: '0.12em',
                 }}
               >
                 The Teachers Deserve It
               </p>
+
+              {/* Gold horizontal rule */}
+              <div
+                style={{
+                  width: '40px',
+                  height: '2px',
+                  backgroundColor: '#E8B84B',
+                  marginTop: '12px',
+                  marginBottom: '12px',
+                }}
+              />
+
+              {/* Main name */}
               <h1
-                className="text-[40px] md:text-[56px] font-bold uppercase"
+                className="text-[44px] md:text-[64px] font-bold"
                 style={{
                   fontFamily: "'Source Serif 4', Georgia, serif",
                   color: 'white',
-                  letterSpacing: '0.06em',
+                  letterSpacing: '0.04em',
                   lineHeight: 1,
                 }}
               >
                 LEARNING HUB
               </h1>
+
+              {/* Gold underline accent */}
+              <div
+                style={{
+                  width: '80px',
+                  height: '1.5px',
+                  backgroundColor: '#E8B84B',
+                  marginTop: '8px',
+                }}
+              />
             </div>
 
             {/* Tagline */}
@@ -323,7 +351,7 @@ export default function OnboardingPage() {
               className="text-[18px] md:text-[22px] italic mt-6"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
-                color: 'rgba(255, 255, 255, 0.7)',
+                color: 'rgba(232, 184, 75, 0.9)',
               }}
             >
               Teaching shouldn't feel like survival.
