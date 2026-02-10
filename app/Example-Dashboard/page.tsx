@@ -84,6 +84,31 @@ const Tooltip = ({ children, content }: { children: React.ReactNode; content: st
   );
 };
 
+// Icon helper for data-driven components
+const iconMap: Record<string, any> = { Zap, AlertCircle, TrendingUp, Heart, Star, Sparkles };
+
+// Reusable Mini Donut for school stats
+const MiniDonut = ({ value, max, label, displayValue, color }: {
+  value: number; max: number; label: string; displayValue: string; color: string
+}) => {
+  const pct = Math.min((value / max) * 100, 100);
+  return (
+    <div className="flex flex-col items-center">
+      <div className="relative w-16 h-16 sm:w-20 sm:h-20">
+        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f3f4f6" strokeWidth="3" />
+          <circle cx="18" cy="18" r="15.915" fill="none" stroke={color} strokeWidth="3"
+            strokeDasharray={`${pct}, 100`} strokeLinecap="round" />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-xs sm:text-sm font-bold" style={{ color }}>{displayValue}</span>
+        </div>
+      </div>
+      <p className="text-xs text-gray-500 mt-2 text-center">{label}</p>
+    </div>
+  );
+};
+
 export default function ExampleDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [activePhase, setActivePhase] = useState(2);
@@ -122,6 +147,12 @@ export default function ExampleDashboard() {
     // Overview
     'leading-indicators': true,
     'movement-involvement': false,
+    'building-awards': false,
+    'silver-bronze': false,
+    'insight-rhythm': false,
+    'insight-cadence': false,
+    'insight-tempo-stress': false,
+    'insight-harmony-celebrate': false,
 
     // Journey
     'obs-jan-2026': true,
@@ -960,15 +991,15 @@ export default function ExampleDashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
-                        <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
+                        <AlertCircle className="w-4 h-4 text-amber-500" />
                         <Tooltip content="Action items that need scheduling or completion to stay on track. Click to jump to details below.">
                           <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
                         </Tooltip>
                       </div>
-                      <div className="text-2xl font-bold text-[#E07A5F]">4</div>
-                      <div className="text-xs text-[#E07A5F] font-medium">Items pending</div>
+                      <div className="text-2xl font-bold text-amber-500">4</div>
+                      <div className="text-xs text-amber-600 font-medium">Items pending</div>
                     </div>
-                    <div className="w-10 h-10 rounded-full bg-[#E07A5F]/10 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
                       <span className="text-lg">⚡</span>
                     </div>
                   </div>
@@ -1041,12 +1072,13 @@ export default function ExampleDashboard() {
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-bold text-[#1e2749]">Hub Engagement</h3>
-                  <Tooltip content="Tracks how many staff have logged into the TDI Learning Hub and their engagement depth. Industry average for PD platform engagement is 40-50%. Your district is at 87%.">
+                  <Monitor className="w-5 h-5 text-[#4ecdc4]" />
+                  <h3 className="text-base font-bold text-[#1e2749]">Hub Engagement</h3>
+                  <Tooltip content="Tracks staff engagement with the TDI Learning Hub. Industry average for PD platforms is 40-50%. Your district is at 87%.">
                     <span></span>
                   </Tooltip>
                 </div>
-                <span className="text-xs text-gray-300">Updated Jan 13, 2026</span>
+                <span className="text-xs text-gray-400">Updated Jan 13, 2026</span>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1142,121 +1174,110 @@ export default function ExampleDashboard() {
               </div>
             </div>
 
-            {/* Building Awards — Gold Visible, Silver/Bronze in Dropdown */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
+            {/* Building Awards — Collapsed Accordion with 3-Column Table */}
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <button onClick={() => toggleSection('building-awards')}
+                className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                <div className="flex items-center gap-3">
                   <Trophy className="w-5 h-5 text-amber-500" />
-                  <h3 className="text-lg font-bold text-[#1e2749]">Building Awards</h3>
-                  <Tooltip content="Buildings ranked across 7 key metrics from Hub data, surveys, and observations. Updated as new data comes in.">
-                    <span></span>
-                  </Tooltip>
-                </div>
-                <button className="text-xs text-[#4ecdc4] font-medium hover:underline"
-                  onClick={() => navigateToSection('schools', 'full-leaderboard')}>
-                  See full leaderboard →
-                </button>
-              </div>
-              <p className="text-xs text-gray-500 mb-5">Celebrating what&apos;s working across your district</p>
-
-              {/* GOLD WINNERS — Always visible, one per category */}
-              <div className="space-y-2 mb-4">
-                {[
-                  { category: 'Most Engaged', winner: 'Harmony Elementary', value: '95% Hub Login', icon: Monitor },
-                  { category: 'Top Learners', winner: 'Harmony Elementary', value: '72% Course Completion', icon: BookOpen },
-                  { category: 'Wellness Leader', winner: 'Harmony Elementary', value: '5.2/10 Stress', icon: Heart },
-                  { category: 'Implementation Champ', winner: 'Harmony Elementary', value: '34% Classroom Use', icon: Target },
-                  { category: 'Resource Champion', winner: 'Harmony Elementary', value: '89 Downloads', icon: Download },
-                  { category: 'Most Likely to Stay', winner: 'Harmony Elementary', value: '9.8/10 Retention', icon: Users },
-                  { category: 'Movement Leader', winner: 'Harmony Elementary', value: '42 Touchpoints', icon: Megaphone },
-                ].map((award) => (
-                  <div key={award.category} className="flex items-center justify-between p-3 bg-amber-50/50 rounded-lg">
-                    <div className="flex items-center gap-3">
-                      <span className="text-lg">🥇</span>
-                      <div>
-                        <p className="text-sm font-semibold text-[#1e2749]">{award.category}</p>
-                        <p className="text-xs text-gray-500">{award.winner}</p>
-                      </div>
-                    </div>
-                    <span className="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-1 rounded">
-                      {award.value}
-                    </span>
+                  <div className="text-left">
+                    <p className="text-base font-bold text-[#1e2749]">Building Awards</p>
+                    <p className="text-xs text-gray-500">7 categories · 6 buildings ranked</p>
                   </div>
-                ))}
-              </div>
-
-              {/* SILVER & BRONZE — Hidden behind dropdown */}
-              <button
-                onClick={() => toggleSection('medals-detail')}
-                className="w-full flex items-center justify-center gap-2 py-2.5 text-xs text-gray-500 hover:text-gray-700 transition-colors border-t border-gray-100">
-                <span>See Silver 🥈 & Bronze 🥉 winners</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${openSections['medals-detail'] ? 'rotate-180' : ''}`} />
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="flex -space-x-1"><span className="text-sm">🥇</span><span className="text-sm">🥈</span><span className="text-sm">🥉</span></div>
+                  <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${openSections['building-awards'] ? 'rotate-180' : ''}`} />
+                </div>
               </button>
 
-              {openSections['medals-detail'] && (
-                <div className="space-y-4 pt-3">
+              {openSections['building-awards'] && (
+                <div className="px-5 pb-5 border-t border-gray-100">
+                  {/* Column headers */}
+                  <div className="grid grid-cols-[1fr_1fr_auto] gap-x-4 text-xs text-gray-400 font-medium uppercase tracking-wide pb-2 border-b border-gray-100 mb-1 mt-4">
+                    <span>Award</span><span>School</span><span className="text-right">Result</span>
+                  </div>
+
+                  {/* GOLD WINNERS — varied across buildings */}
                   {[
-                    { category: 'Most Engaged', silver: { name: 'Crescendo High', value: '91%' }, bronze: { name: 'Rhythm Academy', value: '88%' } },
-                    { category: 'Top Learners', silver: { name: 'Crescendo High', value: '65%' }, bronze: { name: 'Motown ELC', value: '61%' } },
-                    { category: 'Wellness Leader', silver: { name: 'Crescendo High', value: '5.8/10' }, bronze: { name: 'Motown ELC', value: '6.1/10' } },
-                    { category: 'Implementation Champ', silver: { name: 'Crescendo High', value: '28%' }, bronze: { name: 'Motown ELC', value: '22%' } },
-                    { category: 'Resource Champion', silver: { name: 'Crescendo High', value: '76' }, bronze: { name: 'Motown Middle', value: '68' } },
-                    { category: 'Most Likely to Stay', silver: { name: 'Crescendo High', value: '8.9/10' }, bronze: { name: 'Motown Middle', value: '8.1/10' } },
-                    { category: 'Movement Leader', silver: { name: 'Crescendo High', value: '38' }, bronze: { name: 'Motown Middle', value: '35' } },
-                  ].map((award) => (
-                    <div key={award.category} className="text-xs">
-                      <p className="font-semibold text-gray-600 mb-1.5">{award.category}</p>
-                      <div className="flex gap-2">
-                        <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100 rounded-lg flex-1">
-                          <span>🥈</span>
-                          <span className="text-gray-600">{award.silver.name}</span>
-                          {award.silver.name === 'Crescendo High' && (
-                            <span className="text-xs px-1.5 py-0.5 bg-purple-100 text-purple-600 rounded font-medium ml-1">💡</span>
-                          )}
-                          <span className="ml-auto font-medium text-gray-700">{award.silver.value}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-orange-50 rounded-lg flex-1">
-                          <span>🥉</span>
-                          <span className="text-gray-600">{award.bronze.name}</span>
-                          {award.bronze.name === 'Rhythm Academy' && (
-                            <span className="text-xs px-1.5 py-0.5 bg-purple-100 text-purple-600 rounded font-medium ml-1">💡</span>
-                          )}
-                          <span className="ml-auto font-medium text-gray-700">{award.bronze.value}</span>
-                        </div>
+                    { award: 'Most Engaged', school: 'Harmony Elementary', result: '95%', color: 'text-[#4ecdc4]' },
+                    { award: 'Top Learners', school: 'Crescendo Middle', result: '72%', color: 'text-[#1e2749]' },
+                    { award: 'Wellness Leader', school: 'Melody Primary', result: '5.0/10', color: 'text-green-500' },
+                    { award: 'Implementation Champ', school: 'Harmony Elementary', result: '34%', color: 'text-[#38618C]' },
+                    { award: 'Resource Champion', school: 'Rhythm Academy', result: '92', color: 'text-[#1e2749]' },
+                    { award: 'Most Likely to Stay', school: 'Cadence K-8', result: '9.8/10', color: 'text-green-500' },
+                    { award: 'Movement Leader', school: 'Crescendo Middle', result: '42', color: 'text-[#4ecdc4]' },
+                  ].map(row => (
+                    <div key={row.award} className="grid grid-cols-[1fr_1fr_auto] gap-x-4 items-center py-3 border-b border-gray-50 last:border-b-0 hover:bg-gray-50 rounded transition-colors">
+                      <div className="flex items-center gap-2">
+                        <span className="text-base">🥇</span>
+                        <span className="text-sm font-medium text-[#1e2749]">{row.award}</span>
                       </div>
+                      <span className="text-sm text-gray-600">{row.school}</span>
+                      <span className={`text-sm font-bold ${row.color} text-right`}>{row.result}</span>
                     </div>
                   ))}
+
+                  {/* Silver & Bronze — nested dropdown */}
+                  <button onClick={() => toggleSection('silver-bronze')}
+                    className="w-full flex items-center justify-center gap-2 py-3 mt-3 text-xs text-gray-400 hover:text-gray-600 transition-colors border-t border-gray-100">
+                    <span>View Silver & Bronze winners</span>
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openSections['silver-bronze'] ? 'rotate-180' : ''}`} />
+                  </button>
+                  {openSections['silver-bronze'] && (
+                    <div className="mt-2 space-y-3">
+                      {[
+                        { award: 'Most Engaged', silver: { s: 'Crescendo Middle', v: '91%' }, bronze: { s: 'Rhythm Academy', v: '88%' }},
+                        { award: 'Top Learners', silver: { s: 'Harmony Elementary', v: '68%' }, bronze: { s: 'Melody Primary', v: '61%' }},
+                        { award: 'Wellness Leader', silver: { s: 'Harmony Elementary', v: '5.2/10' }, bronze: { s: 'Crescendo Middle', v: '5.8/10' }},
+                        { award: 'Implementation Champ', silver: { s: 'Crescendo Middle', v: '28%' }, bronze: { s: 'Melody Primary', v: '22%' }},
+                        { award: 'Resource Champion', silver: { s: 'Crescendo Middle', v: '76' }, bronze: { s: 'Cadence K-8', v: '68' }},
+                        { award: 'Most Likely to Stay', silver: { s: 'Harmony Elementary', v: '9.5/10' }, bronze: { s: 'Melody Primary', v: '9.1/10' }},
+                        { award: 'Movement Leader', silver: { s: 'Harmony Elementary', v: '38' }, bronze: { s: 'Tempo High', v: '35' }},
+                      ].map(row => (
+                        <div key={row.award}>
+                          <p className="text-xs font-semibold text-gray-500 mb-1.5">{row.award}</p>
+                          <div className="grid grid-cols-2 gap-2">
+                            <div className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded-lg text-xs">
+                              <div className="flex items-center gap-1.5"><span>🥈</span><span className="text-gray-600">{row.silver.s}</span></div>
+                              <span className="font-semibold text-gray-700">{row.silver.v}</span>
+                            </div>
+                            <div className="flex items-center justify-between px-3 py-2 bg-orange-50/50 rounded-lg text-xs">
+                              <div className="flex items-center gap-1.5"><span>🥉</span><span className="text-gray-600">{row.bronze.s}</span></div>
+                              <span className="font-semibold text-gray-700">{row.bronze.v}</span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-100">
+                    <p className="text-xs text-green-700"><span className="font-semibold">Every building is above the national average</span> for PD engagement. Share these wins at staff meetings and board presentations!</p>
+                  </div>
+
+                  {/* Data source footer */}
+                  <p className="text-xs text-gray-500 mt-4 pt-3 border-t border-gray-100">
+                    Industry data: RAND Corporation (2025), Learning Policy Institute, TNTP ·
+                    TDI data: Partner school surveys across 21 states ·
+                    District data: Hub analytics + staff surveys
+                  </p>
                 </div>
               )}
-
-              {/* Encouragement for all buildings */}
-              <div className="mt-4 p-3 bg-[#4ecdc4]/5 rounded-lg border border-[#4ecdc4]/10">
-                <p className="text-xs text-gray-600">
-                  <span className="font-semibold text-[#1e2749]">Every building is above the national average</span> for PD engagement.
-                  Awards highlight leaders — share these wins at staff meetings and board presentations!
-                </p>
-              </div>
-
-              {/* Data source footer */}
-              <p className="text-xs text-gray-300 mt-4 pt-3 border-t border-gray-50">
-                Industry data: RAND Corporation (2025), Learning Policy Institute, TNTP ·
-                TDI data: Partner school surveys across 21 states ·
-                District data: Hub analytics + staff surveys
-              </p>
             </div>
 
             {/* Leading Indicators Preview */}
             <div id="leading-indicators" className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-bold text-[#1e2749]">Leading Indicators</h3>
+                  <BarChart3 className="w-5 h-5 text-[#4ecdc4]" />
+                  <h3 className="text-base font-bold text-[#1e2749]">Leading Indicators</h3>
                   <Tooltip content="These indicators are tracked via observations, Hub data, and staff surveys. They compare your district against industry averages and the TDI partner network.">
                     <span></span>
                   </Tooltip>
                 </div>
-                <span className="text-xs px-2 py-1 bg-orange-50 text-orange-600 rounded-full font-medium">Baseline: Jan 14, 2026</span>
+                <span className="text-xs text-[#4ecdc4] font-medium cursor-pointer hover:underline" onClick={() => navigateToSection('progress', 'leading-indicators')}>View full details →</span>
               </div>
-              <p className="text-xs text-gray-500 mb-5">Compared against national industry data and TDI partner averages</p>
 
               {/* Enhanced indicator rows */}
               <div className="space-y-4">
@@ -1397,7 +1418,7 @@ export default function ExampleDashboard() {
               </div>
 
               <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                <p className="text-xs text-gray-300">Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys</p>
+                <p className="text-xs text-gray-500">Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys</p>
                 <button className="text-xs text-[#4ecdc4] font-medium hover:underline"
                   onClick={() => navigateToSection('journey', 'leading-indicators')}>
                   See full breakdown →
@@ -1415,7 +1436,7 @@ export default function ExampleDashboard() {
                     <span></span>
                   </Tooltip>
                 </div>
-                <span className="text-xs text-gray-300">Updated Feb 7, 2026</span>
+                <span className="text-xs text-gray-400">Updated Feb 7, 2026</span>
               </div>
 
               {/* HEADLINE: Visual summary bar */}
@@ -1568,36 +1589,22 @@ export default function ExampleDashboard() {
                     <span></span>
                   </Tooltip>
                 </div>
-                <span className="text-xs text-gray-300">Auto-generated from your data</span>
+                <span className="text-xs text-gray-400">Auto-generated from your data</span>
               </div>
               <p className="text-xs text-gray-500 mb-5">Tailored suggestions based on what's working and where to focus next</p>
 
-              {/* Priority Insight — Always visible (most important recommendation) */}
+              {/* Priority Insight — always visible */}
               <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-4 border border-purple-100 mb-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Zap className="w-4 h-4 text-purple-500" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-[#1e2749]">Top Priority: Tempo High Needs a TDI Champion</p>
-                    <p className="text-xs text-gray-600 mt-1">
-                      Tempo High has the lowest Hub engagement (82%) and highest stress levels (7.1/10) in your district.
-                      Buildings with a designated TDI Champion see <span className="font-semibold">23% higher engagement</span> within
-                      the first 60 days. We recommend identifying a champion there before the spring observation cycle.
+                  <Zap className="w-5 h-5 text-purple-500 mt-0.5 flex-shrink-0" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-[#1e2749]">Top Priority: Suggest a TDI Champion for Tempo High</p>
+                    <p className="text-xs text-gray-600 mt-1 break-words">
+                      Tempo High has the lowest Hub engagement (82%) and highest stress (7.1/10). Buildings with a designated TDI Champion see <span className="font-semibold">23% higher engagement</span> within 60 days.
                     </p>
-                    <div className="flex gap-2 mt-3">
-                      <button
-                        onClick={handleDisabledClick}
-                        className="text-xs px-3 py-1.5 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors opacity-80 cursor-not-allowed"
-                        title="This is an example dashboard">
-                        Identify Tempo Champion →
-                      </button>
-                      <button
-                        onClick={handleDisabledClick}
-                        className="text-xs px-3 py-1.5 bg-white text-purple-600 rounded-lg border border-purple-200 hover:bg-purple-50 transition-colors opacity-80 cursor-not-allowed"
-                        title="This is an example dashboard">
-                        Learn more
-                      </button>
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      <button onClick={handleDisabledClick} className="text-xs px-3 py-1.5 bg-purple-500 text-white rounded-lg hover:bg-purple-600 transition-colors opacity-80 cursor-not-allowed" title="This is an example dashboard">Suggest a Champion for Tempo →</button>
+                      <button onClick={handleDisabledClick} className="text-xs px-3 py-1.5 bg-white text-purple-600 rounded-lg border border-purple-200 hover:bg-purple-50 transition-colors opacity-80 cursor-not-allowed" title="This is an example dashboard">Learn more</button>
                     </div>
                   </div>
                 </div>
@@ -1609,29 +1616,22 @@ export default function ExampleDashboard() {
                 <div className="rounded-xl border overflow-hidden border-amber-100">
                   <button
                     onClick={() => toggleSection('insight-rhythm')}
-                    className="w-full p-3.5 flex items-center justify-between hover:brightness-95 transition-all bg-amber-50">
-                    <div className="flex items-center gap-3 text-left">
-                      <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />
-                      <div>
-                        <p className="text-sm font-semibold text-[#1e2749]">Rhythm Academy: Schedule observation before May</p>
-                        <p className="text-xs text-gray-500 mt-0.5">Observation not yet scheduled. Buildings observed in April see 18% more implementation gains than those observed in May.</p>
-                      </div>
+                    className="w-full p-4 flex items-start gap-3 text-left hover:brightness-95 transition-all bg-amber-50">
+                    <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-[#1e2749]">Rhythm Academy: Suggest scheduling observation before May</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Buildings observed in April see 18% more implementation gains than May.</p>
                     </div>
-                    <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 ml-2 transition-transform ${openSections['insight-rhythm'] ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5 transition-transform ${openSections['insight-rhythm'] ? 'rotate-180' : ''}`} />
                   </button>
                   {openSections['insight-rhythm'] && (
-                    <div className="p-4 bg-white border-t border-gray-100">
-                      <p className="text-sm text-gray-600 leading-relaxed">
-                        Rhythm Academy's observation day hasn't been scheduled yet, and their implementation rate (19%) is below the district average (21%). Research from TDI's partner network shows that earlier observation timing correlates with stronger outcomes — the feedback loop is tighter and teachers have more time to practice.
-                        <br /><br />
-                        We recommend scheduling Rhythm's observation for early-to-mid April and pairing it with a pre-observation virtual check-in to set classroom goals.
-                      </p>
-                      <button
-                        onClick={handleDisabledClick}
-                        className="mt-3 text-xs px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3a6b] transition-colors opacity-80 cursor-not-allowed"
-                        title="This is an example dashboard">
-                        Schedule Rhythm Observation →
-                      </button>
+                    <div className="px-4 pb-4 bg-white border-t border-gray-100">
+                      <p className="text-sm text-gray-600 leading-relaxed mt-3 break-words whitespace-pre-line">Rhythm Academy's observation hasn't been scheduled yet and their implementation rate (19%) is below the district average (21%). Earlier observations give teachers more time to practice feedback.
+
+We'd suggest scheduling for early-to-mid April and pairing it with a pre-observation virtual check-in.</p>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        <button onClick={handleDisabledClick} className="text-xs px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3a6b] transition-colors opacity-80 cursor-not-allowed" title="This is an example dashboard">Suggest Observation Timing →</button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1640,60 +1640,46 @@ export default function ExampleDashboard() {
                 <div className="rounded-xl border overflow-hidden border-blue-100">
                   <button
                     onClick={() => toggleSection('insight-cadence')}
-                    className="w-full p-3.5 flex items-center justify-between hover:brightness-95 transition-all bg-blue-50">
-                    <div className="flex items-center gap-3 text-left">
-                      <TrendingUp className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                      <div>
-                        <p className="text-sm font-semibold text-[#1e2749]">Cadence K-8: Low course completion — try PLC integration</p>
-                        <p className="text-xs text-gray-500 mt-0.5">Course completion at 55% vs district average of 60%. Recommending structured Hub time during existing PLCs.</p>
-                      </div>
+                    className="w-full p-4 flex items-start gap-3 text-left hover:brightness-95 transition-all bg-blue-50">
+                    <TrendingUp className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-[#1e2749]">Cadence K-8: Course completion could improve with PLC integration</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Course completion at 55% vs district average of 60%. Structured Hub time could help.</p>
                     </div>
-                    <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 ml-2 transition-transform ${openSections['insight-cadence'] ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5 transition-transform ${openSections['insight-cadence'] ? 'rotate-180' : ''}`} />
                   </button>
                   {openSections['insight-cadence'] && (
-                    <div className="p-4 bg-white border-t border-gray-100">
-                      <p className="text-sm text-gray-600 leading-relaxed">
-                        Cadence K-8 has solid Hub login rates (84%) but course completion drops off — staff are logging in but not finishing courses. This pattern typically means one of two things: courses feel too long for available time, or there's no structured time to work through them.
-                        <br /><br />
-                        TDI Recommendation: Ask Dr. Nguyen (TDI Champion) to integrate a 15-minute "Hub Focus" block into the next 3 PLC meetings. Districts that do this see course completion jump by 30-40% within one month. We can provide a PLC integration guide.
-                      </p>
-                      <button
-                        onClick={handleDisabledClick}
-                        className="mt-3 text-xs px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3a6b] transition-colors opacity-80 cursor-not-allowed"
-                        title="This is an example dashboard">
-                        Send PLC integration guide →
-                      </button>
+                    <div className="px-4 pb-4 bg-white border-t border-gray-100">
+                      <p className="text-sm text-gray-600 leading-relaxed mt-3 break-words whitespace-pre-line">Cadence has solid login rates (84%) but course completion drops off — staff log in but don't finish. This usually means no protected time to work through courses.
+
+Something to consider: ask Dr. Nguyen (TDI Champion) to add a 15-minute "Hub Focus" block to PLC meetings. Districts doing this see 30-40% completion jumps within one month.</p>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        <button onClick={handleDisabledClick} className="text-xs px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3a6b] transition-colors opacity-80 cursor-not-allowed" title="This is an example dashboard">Share PLC Integration Idea →</button>
+                      </div>
                     </div>
                   )}
                 </div>
 
                 {/* Tempo High Stress Insight */}
-                <div className="rounded-xl border overflow-hidden border-red-100">
+                <div className="rounded-xl border overflow-hidden border-amber-100">
                   <button
                     onClick={() => toggleSection('insight-tempo-stress')}
-                    className="w-full p-3.5 flex items-center justify-between hover:brightness-95 transition-all bg-red-50">
-                    <div className="flex items-center gap-3 text-left">
-                      <Heart className="w-4 h-4 text-red-400 flex-shrink-0" />
-                      <div>
-                        <p className="text-sm font-semibold text-[#1e2749]">Tempo High: Stress level 7.1/10 — highest in district</p>
-                        <p className="text-xs text-gray-500 mt-0.5">Above TDI partner average (5-7/10) and approaching industry levels (8-9/10). Prioritize wellness modules.</p>
-                      </div>
+                    className="w-full p-4 flex items-start gap-3 text-left hover:brightness-95 transition-all bg-amber-50">
+                    <Heart className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-[#1e2749]">Tempo High: Stress level 7.1/10 — highest in district</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Above TDI partner average (5-7/10). Wellness resources could help.</p>
                     </div>
-                    <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 ml-2 transition-transform ${openSections['insight-tempo-stress'] ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5 transition-transform ${openSections['insight-tempo-stress'] ? 'rotate-180' : ''}`} />
                   </button>
                   {openSections['insight-tempo-stress'] && (
-                    <div className="p-4 bg-white border-t border-gray-100">
-                      <p className="text-sm text-gray-600 leading-relaxed">
-                        Tempo High's stress level (7.1/10) is a concern — it's above the TDI partner average and trending toward the national crisis level. High school staff often carry higher stress due to larger class sizes, testing pressure, and extracurricular demands.
-                        <br /><br />
-                        TDI Recommendation: Prioritize the "Burnout Prevention" and "Joy-Finding" modules on the Hub for Tempo staff. We also recommend Coach Williams (TDI Champion) lead a 20-minute wellness check-in at the next staff meeting using TDI's "Energy Audit" activity. Schools that address stress proactively see retention intent increase by 1.5 points within one semester.
-                      </p>
-                      <button
-                        onClick={handleDisabledClick}
-                        className="mt-3 text-xs px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3a6b] transition-colors opacity-80 cursor-not-allowed"
-                        title="This is an example dashboard">
-                        Assign wellness modules to Tempo →
-                      </button>
+                    <div className="px-4 pb-4 bg-white border-t border-gray-100">
+                      <p className="text-sm text-gray-600 leading-relaxed mt-3 break-words whitespace-pre-line">Tempo High's stress (7.1/10) is above the TDI partner average and trending toward the national crisis level (8-9/10). High school staff often carry higher stress due to class sizes and testing pressure.
+
+We'd suggest prioritizing the "Burnout Prevention" and "Joy-Finding" modules for Tempo staff. Schools that address stress proactively see retention intent increase by 1.5 points within one semester.</p>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        <button onClick={handleDisabledClick} className="text-xs px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3a6b] transition-colors opacity-80 cursor-not-allowed" title="This is an example dashboard">Suggest Wellness Resources for Tempo →</button>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -1702,36 +1688,31 @@ export default function ExampleDashboard() {
                 <div className="rounded-xl border overflow-hidden border-green-100">
                   <button
                     onClick={() => toggleSection('insight-harmony-celebrate')}
-                    className="w-full p-3.5 flex items-center justify-between hover:brightness-95 transition-all bg-green-50">
-                    <div className="flex items-center gap-3 text-left">
-                      <Star className="w-4 h-4 text-amber-500 flex-shrink-0" />
-                      <div>
-                        <p className="text-sm font-semibold text-[#1e2749]">Harmony Elementary is your model building</p>
-                        <p className="text-xs text-gray-500 mt-0.5">Gold in all 7 categories. Consider having Ms. Rivera share her PLC approach with other champions.</p>
-                      </div>
+                    className="w-full p-4 flex items-start gap-3 text-left hover:brightness-95 transition-all bg-green-50">
+                    <Star className="w-4 h-4 text-amber-500 flex-shrink-0 mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-[#1e2749]">🏆 Harmony Elementary is leading the way</p>
+                      <p className="text-xs text-gray-500 mt-0.5">Most medals in the district (2 golds, 3 silvers). Ms. Rivera's PLC structure is worth celebrating.</p>
                     </div>
-                    <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 ml-2 transition-transform ${openSections['insight-harmony-celebrate'] ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5 transition-transform ${openSections['insight-harmony-celebrate'] ? 'rotate-180' : ''}`} />
                   </button>
                   {openSections['insight-harmony-celebrate'] && (
-                    <div className="p-4 bg-white border-t border-gray-100">
-                      <p className="text-sm text-gray-600 leading-relaxed">
-                        Harmony Elementary is leading every metric in your district — 95% Hub engagement, 72% course completion, 5.2/10 stress, 34% implementation, and 9.8/10 retention intent. This isn't random — Ms. Rivera has built a system.
-                        <br /><br />
-                        TDI Recommendation: Invite Ms. Rivera to present her PLC structure at the Spring Leadership Recap. When one building's champion shares what's working, other buildings typically see a 15-20% engagement boost within the following month. We can help Ms. Rivera prepare a 10-minute presentation.
-                      </p>
-                      <button
-                        onClick={handleDisabledClick}
-                        className="mt-3 text-xs px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3a6b] transition-colors opacity-80 cursor-not-allowed"
-                        title="This is an example dashboard">
-                        Invite Ms. Rivera to present →
-                      </button>
+                    <div className="px-4 pb-4 bg-white border-t border-gray-100">
+                      <p className="text-sm text-gray-600 leading-relaxed mt-3 break-words whitespace-pre-line">Harmony earned golds in Most Engaged (95% Hub login) and Implementation Champ (34% classroom use), plus silver in three other categories. Ms. Rivera's PLC structure gives teachers protected time to engage with Hub content.
+
+Here's an idea: invite Ms. Rivera to share her approach at the Spring Leadership Recap. When one building's champion presents, other buildings typically see a 15-20% engagement boost.</p>
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        <button onClick={handleDisabledClick} className="text-xs px-4 py-2 rounded-lg transition-colors bg-green-500 text-white hover:bg-green-600 opacity-80 cursor-not-allowed" title="This is an example dashboard">🎉 Congratulate Harmony's Team →</button>
+                        <button onClick={handleDisabledClick} className="text-xs px-4 py-2 rounded-lg transition-colors bg-white text-green-600 border border-green-200 hover:bg-green-50 opacity-80 cursor-not-allowed" title="This is an example dashboard">☕ Send Ms. Rivera a Coffee</button>
+                        <button onClick={handleDisabledClick} className="text-xs px-4 py-2 rounded-lg transition-colors bg-white text-[#1e2749] border border-gray-200 hover:bg-gray-50 opacity-80 cursor-not-allowed" title="This is an example dashboard">💡 Suggest Ms. Rivera Present at Recap</button>
+                      </div>
                     </div>
                   )}
                 </div>
               </div>
 
               {/* Data source footer */}
-              <p className="text-xs text-gray-300 mt-4 pt-3 border-t border-gray-50">
+              <p className="text-xs text-gray-500 mt-4 pt-3 border-t border-gray-50">
                 Industry data: RAND Corporation (2025), Learning Policy Institute, TNTP ·
                 TDI data: Partner school surveys across 21 states ·
                 District data: Hub analytics + staff surveys
@@ -3799,7 +3780,7 @@ export default function ExampleDashboard() {
                         {b.gold > 0 && <span>🥇{b.gold}</span>}
                         {b.silver > 0 && <span>🥈{b.silver}</span>}
                         {b.bronze > 0 && <span>🥉{b.bronze}</span>}
-                        {(b.gold + b.silver + b.bronze) === 0 && <span className="text-gray-300 text-xs italic">Rising</span>}
+                        {(b.gold + b.silver + b.bronze) === 0 && <span className="text-gray-400 text-xs italic">Rising</span>}
                       </div>
                     </div>
                   ))}
@@ -4004,24 +3985,36 @@ export default function ExampleDashboard() {
                           </div>
                         )}
 
-                        {/* Mini dashboard grid for this building */}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                          <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
-                            <p className={`text-2xl font-bold ${loginRate >= 85 ? 'text-[#4ecdc4]' : 'text-amber-500'}`}>{loginRate}%</p>
-                            <p className="text-xs text-gray-500">Hub Logins</p>
-                          </div>
-                          <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
-                            <p className={`text-2xl font-bold ${school.coursesCompleted >= 65 ? 'text-[#1e2749]' : 'text-[#38618C]'}`}>{school.coursesCompleted}%</p>
-                            <p className="text-xs text-gray-500">Courses Completed</p>
-                          </div>
-                          <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
-                            <p className={`text-2xl font-bold ${school.avgStress <= 5.5 ? 'text-green-500' : school.avgStress <= 6.5 ? 'text-amber-500' : 'text-red-500'}`}>{school.avgStress}/10</p>
-                            <p className="text-xs text-gray-500">Avg. Stress Level</p>
-                          </div>
-                          <div className="text-center p-3 bg-white rounded-lg border border-gray-100">
-                            <p className={`text-2xl font-bold ${school.implementationRate >= 30 ? 'text-[#38618C]' : 'text-amber-500'}`}>{school.implementationRate}%</p>
-                            <p className="text-xs text-gray-500">Implementation Rate</p>
-                          </div>
+                        {/* Mini donut rings for this building */}
+                        <div className="grid grid-cols-4 gap-2 sm:gap-4 mb-6 place-items-center">
+                          <MiniDonut
+                            value={loginRate}
+                            max={100}
+                            label="Hub Logins"
+                            displayValue={`${loginRate}%`}
+                            color={loginRate >= 90 ? '#4ecdc4' : loginRate >= 85 ? '#38618C' : '#f59e0b'}
+                          />
+                          <MiniDonut
+                            value={school.coursesCompleted}
+                            max={100}
+                            label="Courses"
+                            displayValue={`${school.coursesCompleted}%`}
+                            color={school.coursesCompleted >= 65 ? '#4ecdc4' : school.coursesCompleted >= 55 ? '#38618C' : '#f59e0b'}
+                          />
+                          <MiniDonut
+                            value={(10 - school.avgStress) * 10}
+                            max={100}
+                            label="Avg. Stress"
+                            displayValue={`${school.avgStress}/10`}
+                            color={school.avgStress <= 5.5 ? '#4ecdc4' : school.avgStress <= 6.5 ? '#38618C' : school.avgStress > 7.0 ? '#ef4444' : '#f59e0b'}
+                          />
+                          <MiniDonut
+                            value={school.implementationRate}
+                            max={65}
+                            label="Implementation"
+                            displayValue={`${school.implementationRate}%`}
+                            color={school.implementationRate >= 30 ? '#4ecdc4' : school.implementationRate >= 20 ? '#38618C' : '#f59e0b'}
+                          />
                         </div>
 
                         {/* Observation summary */}
@@ -4477,7 +4470,7 @@ export default function ExampleDashboard() {
               </div>
 
               {/* Data source footer */}
-              <p className="text-xs text-gray-300 mt-4 pt-3 border-t border-gray-50">
+              <p className="text-xs text-gray-500 mt-4 pt-3 border-t border-gray-50">
                 Industry data: RAND Corporation (2025), Learning Policy Institute, TNTP ·
                 TDI data: Partner school surveys across 21 states ·
                 District data: Hub analytics + staff surveys
