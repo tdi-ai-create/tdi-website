@@ -50,6 +50,7 @@ import {
   Rocket,
   CalendarDays,
   Pencil,
+  ThumbsUp,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getMetricStatus, statusColors, statusShapes, statusLabels, formatMetricValue, getMetricDescription } from '@/lib/metric-thresholds';
@@ -2813,23 +2814,18 @@ export default function PartnerDashboard() {
         {activeTab === 'journey' && (
           <div role="tabpanel" id="panel-journey" aria-labelledby="tab-journey" className="space-y-6">
             {/* Partnership Goal Statement */}
-            <div
-              className="relative bg-gradient-to-r from-slate-50 to-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
-            >
-              {/* Decorative quote mark */}
-              <span className="absolute top-4 left-6 text-6xl text-[#E8B84B] opacity-30 font-serif leading-none select-none">&ldquo;</span>
-              {/* Yellow heart accent */}
-              <div className="absolute top-4 right-6">
-                <Heart className="w-6 h-6 text-[#E8B84B] fill-[#E8B84B]/20" />
-              </div>
-              <div className="p-6 md:p-8 pt-12 md:pt-10">
-                <p className="text-lg text-[#1e2749] leading-relaxed font-medium">
-                  {partnership?.partnership_type === 'district'
-                    ? `Equip educators across ${organization?.name || 'your district'} with practical strategies and resources to confidently support students and each other.`
-                    : `Equip the ${organization?.name || 'your school'} team with practical strategies and resources to transform classrooms and reduce burnout.`
-                  }
-                </p>
-                <p className="text-sm text-gray-500 mt-4">— Your Partnership Goal</p>
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+              <div className="flex">
+                <div className="w-1 bg-[#1B2A4A] flex-shrink-0" />
+                <div className="p-6 md:p-8">
+                  <p className="text-lg text-[#1e2749] leading-relaxed font-medium">
+                    &ldquo;{partnership?.partnership_type === 'district'
+                      ? `Equip educators across ${organization?.name || 'your district'} with practical strategies and resources to confidently support students and each other.`
+                      : `Equip the ${organization?.name || 'your school'} team with practical strategies and resources to transform classrooms and reduce burnout.`
+                    }&rdquo;
+                  </p>
+                  <p className="text-sm text-gray-500 mt-4">— Your Partnership Goal</p>
+                </div>
               </div>
             </div>
 
@@ -2848,7 +2844,7 @@ export default function PartnerDashboard() {
                   onMouseLeave={() => setHoveredEquationCard(null)}
                 >
                   <div className="flex flex-col items-center text-center">
-                    <GraduationCap className={`w-10 h-10 mb-3 transition-colors duration-300 ${
+                    <BookOpen className={`w-10 h-10 mb-3 transition-colors duration-300 ${
                       hoveredEquationCard === 0 ? 'text-white' : 'text-[#1B2A4A]'
                     }`} />
                     <h3 className={`font-semibold transition-colors duration-300 ${
@@ -2880,7 +2876,7 @@ export default function PartnerDashboard() {
                   onMouseLeave={() => setHoveredEquationCard(null)}
                 >
                   <div className="flex flex-col items-center text-center">
-                    <Heart className={`w-10 h-10 mb-3 transition-colors duration-300 ${
+                    <Users className={`w-10 h-10 mb-3 transition-colors duration-300 ${
                       hoveredEquationCard === 1 ? 'text-white' : 'text-[#1B2A4A]'
                     }`} />
                     <h3 className={`font-semibold transition-colors duration-300 ${
@@ -2912,7 +2908,7 @@ export default function PartnerDashboard() {
                   onMouseLeave={() => setHoveredEquationCard(null)}
                 >
                   <div className="flex flex-col items-center text-center">
-                    <Star className={`w-10 h-10 mb-3 transition-colors duration-300 ${
+                    <TrendingUp className={`w-10 h-10 mb-3 transition-colors duration-300 ${
                       hoveredEquationCard === 2 ? 'text-white' : 'text-[#1B2A4A]'
                     }`} />
                     <h3 className={`font-semibold transition-colors duration-300 ${
@@ -3161,7 +3157,7 @@ export default function PartnerDashboard() {
               <div className="grid sm:grid-cols-2 gap-4">
                 {[
                   { icon: TrendingUp, text: 'Staff report increased confidence in classroom strategies' },
-                  { icon: Heart, text: 'Measurable improvement in feeling valued and supported' },
+                  { icon: ThumbsUp, text: 'Measurable improvement in feeling valued and supported' },
                   { icon: TrendingDown, text: 'Reduced stress levels compared to baseline' },
                   { icon: CheckCircle, text: 'Clear implementation of Hub strategies observed in classrooms' },
                 ].map((item, idx) => (
