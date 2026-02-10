@@ -245,7 +245,7 @@ export default function ProfileSettingsPage() {
       {/* Header */}
       <div className="mb-8">
         <h1
-          className="text-2xl md:text-[28px] font-semibold mb-2"
+          className="text-[24px] md:text-[28px] font-bold mb-2"
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
             color: '#2B3A67',
@@ -254,7 +254,7 @@ export default function ProfileSettingsPage() {
           Settings
         </h1>
         <p
-          className="text-gray-500 text-[15px]"
+          className="text-gray-500 text-[15px] max-w-[560px]"
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
           Manage your profile and preferences
@@ -288,7 +288,7 @@ export default function ProfileSettingsPage() {
       {/* Section 1: Your Avatar */}
       <div className="hub-card mb-6">
         <h2
-          className="text-lg font-semibold mb-6"
+          className="text-[18px] font-semibold mb-6"
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
             color: '#2B3A67',
@@ -374,7 +374,7 @@ export default function ProfileSettingsPage() {
       {/* Section 2: Display Name */}
       <div className="hub-card mb-6">
         <h2
-          className="text-lg font-semibold mb-4"
+          className="text-[18px] font-semibold mb-4"
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
             color: '#2B3A67',
@@ -417,7 +417,7 @@ export default function ProfileSettingsPage() {
       {/* Section 3: Your Role */}
       <div className="hub-card mb-6">
         <h2
-          className="text-lg font-semibold mb-4"
+          className="text-[18px] font-semibold mb-4"
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
             color: '#2B3A67',
@@ -469,7 +469,7 @@ export default function ProfileSettingsPage() {
       {/* Section 4: Your Goals */}
       <div className="hub-card mb-6">
         <h2
-          className="text-lg font-semibold mb-4"
+          className="text-[18px] font-semibold mb-4"
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
             color: '#2B3A67',
@@ -536,7 +536,7 @@ export default function ProfileSettingsPage() {
       {/* Section 5: Danger Zone */}
       <div className="hub-card">
         <h2
-          className="text-lg font-semibold mb-4"
+          className="text-[18px] font-semibold mb-4"
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
             color: '#2B3A67',
@@ -571,7 +571,7 @@ export default function ProfileSettingsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl">
             <h3
-              className="text-xl font-semibold mb-4"
+              className="text-[18px] font-semibold mb-4"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
                 color: '#2B3A67',

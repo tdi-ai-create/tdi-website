@@ -116,7 +116,7 @@ export default function CertificatesPage() {
       {/* Header */}
       <div className="mb-8">
         <h1
-          className="text-2xl md:text-[28px] font-semibold mb-2"
+          className="text-[24px] md:text-[28px] font-bold mb-2"
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
             color: '#2B3A67',
@@ -125,7 +125,7 @@ export default function CertificatesPage() {
           Your Certificates
         </h1>
         <p
-          className="text-gray-500 text-[15px]"
+          className="text-gray-500 text-[15px] max-w-[560px]"
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
           Every completed course earns PD hours. Share these with your school.
@@ -153,9 +153,9 @@ export default function CertificatesPage() {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <h3
-                    className="text-lg font-semibold mb-1"
+                    className="text-[16px] font-semibold mb-1"
                     style={{
-                      fontFamily: "'Source Serif 4', Georgia, serif",
+                      fontFamily: "'DM Sans', sans-serif",
                       color: '#2B3A67',
                     }}
                   >

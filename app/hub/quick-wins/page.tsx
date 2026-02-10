@@ -131,7 +131,7 @@ export default function QuickWinsPage() {
       {/* Header */}
       <div className="mb-8">
         <h1
-          className="text-2xl md:text-[28px] font-semibold mb-2"
+          className="text-[24px] md:text-[28px] font-bold mb-2"
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
             color: '#2B3A67',
@@ -140,7 +140,7 @@ export default function QuickWinsPage() {
           Quick Wins
         </h1>
         <p
-          className="text-gray-500 text-[15px]"
+          className="text-gray-500 text-[15px] max-w-[560px]"
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
           Short, practical tools you can use right now. No prep. No commitment.

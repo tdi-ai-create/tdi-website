@@ -159,7 +159,7 @@ export default function RequestCenterPage() {
       {/* Header */}
       <div className="mb-8">
         <h1
-          className="text-2xl md:text-[28px] font-semibold mb-2"
+          className="text-[24px] md:text-[28px] font-bold mb-2"
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
             color: '#2B3A67',
@@ -168,7 +168,7 @@ export default function RequestCenterPage() {
           Request Center
         </h1>
         <p
-          className="text-gray-500 text-[15px]"
+          className="text-gray-500 text-[15px] max-w-[560px]"
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
           Suggest courses, Quick Wins, or topics you would like us to create.
@@ -188,7 +188,7 @@ export default function RequestCenterPage() {
             <CheckCircle size={32} className="text-green-600" />
           </div>
           <h2
-            className="text-xl font-semibold mb-2"
+            className="text-[18px] font-semibold mb-2"
             style={{
               fontFamily: "'Source Serif 4', Georgia, serif",
               color: '#2B3A67',
@@ -220,10 +220,10 @@ export default function RequestCenterPage() {
           {/* Request Type */}
           <div className="hub-card">
             <label
-              className="block text-sm font-medium mb-4"
+              className="block text-[14px] font-medium mb-4"
               style={{
                 fontFamily: "'DM Sans', sans-serif",
-                color: '#2B3A67',
+                color: '#374151',
               }}
             >
               What type of request is this? <span className="text-red-500">*</span>
@@ -268,10 +268,10 @@ export default function RequestCenterPage() {
           <div className="hub-card">
             <label
               htmlFor="title"
-              className="block text-sm font-medium mb-2"
+              className="block text-[14px] font-medium mb-2"
               style={{
                 fontFamily: "'DM Sans', sans-serif",
-                color: '#2B3A67',
+                color: '#374151',
               }}
             >
               Title <span className="text-red-500">*</span>
@@ -298,10 +298,10 @@ export default function RequestCenterPage() {
           <div className="hub-card">
             <label
               htmlFor="description"
-              className="block text-sm font-medium mb-2"
+              className="block text-[14px] font-medium mb-2"
               style={{
                 fontFamily: "'DM Sans', sans-serif",
-                color: '#2B3A67',
+                color: '#374151',
               }}
             >
               Description <span className="text-red-500">*</span>
@@ -327,10 +327,10 @@ export default function RequestCenterPage() {
           {/* Priority (Optional) */}
           <div className="hub-card">
             <label
-              className="block text-sm font-medium mb-4"
+              className="block text-[14px] font-medium mb-4"
               style={{
                 fontFamily: "'DM Sans', sans-serif",
-                color: '#2B3A67',
+                color: '#374151',
               }}
             >
               Priority <span className="text-gray-400 font-normal">(optional)</span>
@@ -452,7 +452,7 @@ export default function RequestCenterPage() {
       {!isLoadingPrevious && previousRequests.length > 0 && (
         <div className="mt-12">
           <h2
-            className="text-lg font-semibold mb-4"
+            className="text-[18px] font-semibold mb-4"
             style={{
               fontFamily: "'Source Serif 4', Georgia, serif",
               color: '#2B3A67',
