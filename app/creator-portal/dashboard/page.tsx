@@ -3,12 +3,13 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { LogOut, Loader2, AlertCircle, Mail, User, CheckCircle, X } from 'lucide-react';
+import { LogOut, AlertCircle, Mail, User, CheckCircle, X } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { CreatorDashboardHeader } from '@/components/creator-portal/CreatorDashboardHeader';
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
 import { CourseDetailsPanel } from '@/components/creator-portal/CourseDetailsPanel';
 import { NotesPanel } from '@/components/creator-portal/NotesPanel';
+import TDIPortalLoader from '@/components/TDIPortalLoader';
 import type { CreatorDashboardData } from '@/types/creator-portal';
 
 // Component to handle search params (must be wrapped in Suspense)
@@ -38,6 +39,10 @@ export default function CreatorDashboardPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [animDone, setAnimDone] = useState(false);
+
+  // Show loader until both data is ready AND animation is complete
+  const showLoader = isLoading || !animDone;
 
   // Callback for when agreement is signed
   const handleAgreementSigned = () => {
@@ -181,17 +186,6 @@ export default function CreatorDashboardPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-[#80a4ed] mx-auto mb-4" />
-          <p className="text-gray-600">Loading your dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
   if (error) {
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
@@ -220,7 +214,7 @@ export default function CreatorDashboardPage() {
     );
   }
 
-  if (!dashboardData) {
+  if (!dashboardData && !isLoading) {
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
         <div className="text-center">
@@ -237,7 +231,14 @@ export default function CreatorDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f5f5]">
+    <>
+      {showLoader && (
+        <TDIPortalLoader
+          portal="creators"
+          onComplete={() => setAnimDone(true)}
+        />
+      )}
+      <div className="min-h-screen bg-[#f5f5f5]">
       {/* Handle search params with Suspense boundary */}
       <Suspense fallback={null}>
         <SearchParamsHandler onAgreementSigned={handleAgreementSigned} />
@@ -291,77 +292,79 @@ export default function CreatorDashboardPage() {
       )}
 
       {/* Main content */}
-      <main className="container-wide py-8">
-        {/* Dashboard header with progress */}
-        <CreatorDashboardHeader
-          creator={dashboardData.creator}
-          completedMilestones={dashboardData.completedMilestones}
-          totalMilestones={dashboardData.totalMilestones}
-          progressPercentage={dashboardData.progressPercentage}
-        />
+      {dashboardData && (
+        <main className="container-wide py-8">
+          {/* Dashboard header with progress */}
+          <CreatorDashboardHeader
+            creator={dashboardData.creator}
+            completedMilestones={dashboardData.completedMilestones}
+            totalMilestones={dashboardData.totalMilestones}
+            progressPercentage={dashboardData.progressPercentage}
+          />
 
-        {/* Content grid */}
-        <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main content - Phase progress */}
-          <div className="lg:col-span-2">
-            <h2 className="text-xl font-semibold text-[#1e2749] mb-4">
-              Your Progress
-            </h2>
-            <PhaseProgress
-              phases={dashboardData.phases}
-              creatorId={dashboardData.creator.id}
-              onMarkComplete={handleMarkComplete}
-              onRefresh={refreshDashboard}
-              isLoading={isSaving}
-              teamNotes={dashboardData.notes.filter(n => n.visible_to_creator).map(n => n.content).join('\n\n')}
-              creatorName={dashboardData.creator.name}
-              contentPath={dashboardData.contentPath || dashboardData.creator.content_path}
-              creator={{
-                google_doc_link: dashboardData.creator.google_doc_link,
-                drive_folder_link: dashboardData.creator.drive_folder_link,
-                marketing_doc_link: dashboardData.creator.marketing_doc_link,
-                course_url: dashboardData.creator.course_url,
-                discount_code: dashboardData.creator.discount_code,
-                wants_video_editing: dashboardData.creator.wants_video_editing,
-                wants_download_design: dashboardData.creator.wants_download_design,
-                content_path: dashboardData.creator.content_path,
-              }}
-            />
-          </div>
+          {/* Content grid */}
+          <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main content - Phase progress */}
+            <div className="lg:col-span-2">
+              <h2 className="text-xl font-semibold text-[#1e2749] mb-4">
+                Your Progress
+              </h2>
+              <PhaseProgress
+                phases={dashboardData.phases}
+                creatorId={dashboardData.creator.id}
+                onMarkComplete={handleMarkComplete}
+                onRefresh={refreshDashboard}
+                isLoading={isSaving}
+                teamNotes={dashboardData.notes.filter(n => n.visible_to_creator).map(n => n.content).join('\n\n')}
+                creatorName={dashboardData.creator.name}
+                contentPath={dashboardData.contentPath || dashboardData.creator.content_path}
+                creator={{
+                  google_doc_link: dashboardData.creator.google_doc_link,
+                  drive_folder_link: dashboardData.creator.drive_folder_link,
+                  marketing_doc_link: dashboardData.creator.marketing_doc_link,
+                  course_url: dashboardData.creator.course_url,
+                  discount_code: dashboardData.creator.discount_code,
+                  wants_video_editing: dashboardData.creator.wants_video_editing,
+                  wants_download_design: dashboardData.creator.wants_download_design,
+                  content_path: dashboardData.creator.content_path,
+                }}
+              />
+            </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            <CourseDetailsPanel creator={dashboardData.creator} />
-            <NotesPanel notes={dashboardData.notes} />
+            {/* Sidebar */}
+            <div className="space-y-6">
+              <CourseDetailsPanel creator={dashboardData.creator} />
+              <NotesPanel notes={dashboardData.notes} />
 
-            {/* TDI Contact Card */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <h3 className="text-lg font-semibold text-[#1e2749] mb-4">
-                Need Help?
-              </h3>
-              <p className="text-sm text-gray-600 mb-4">
-                Questions about your course? Reach out anytime!
-              </p>
-              <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-[#80a4ed]/20 rounded-full flex items-center justify-center flex-shrink-0">
-                  <User className="w-5 h-5 text-[#80a4ed]" />
-                </div>
-                <div>
-                  <p className="font-medium text-[#1e2749]">Rachel Patragas</p>
-                  <p className="text-sm text-gray-500">Director of Creative Solutions</p>
-                  <a
-                    href="mailto:rachel@teachersdeserveit.com"
-                    className="inline-flex items-center gap-1.5 text-sm text-[#80a4ed] hover:text-[#1e2749] mt-2 transition-colors"
-                  >
-                    <Mail className="w-4 h-4" />
-                    rachel@teachersdeserveit.com
-                  </a>
+              {/* TDI Contact Card */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                <h3 className="text-lg font-semibold text-[#1e2749] mb-4">
+                  Need Help?
+                </h3>
+                <p className="text-sm text-gray-600 mb-4">
+                  Questions about your course? Reach out anytime!
+                </p>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-[#80a4ed]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                    <User className="w-5 h-5 text-[#80a4ed]" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Rachel Patragas</p>
+                    <p className="text-sm text-gray-500">Director of Creative Solutions</p>
+                    <a
+                      href="mailto:rachel@teachersdeserveit.com"
+                      className="inline-flex items-center gap-1.5 text-sm text-[#80a4ed] hover:text-[#1e2749] mt-2 transition-colors"
+                    >
+                      <Mail className="w-4 h-4" />
+                      rachel@teachersdeserveit.com
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      </main>
+        </main>
+      )}
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200 mt-12 py-6">
@@ -378,5 +381,6 @@ export default function CreatorDashboardPage() {
         </div>
       </footer>
     </div>
+    </>
   );
 }

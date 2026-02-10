@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Loader2, CheckCircle, AlertCircle, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import TDIPortalLoader from '@/components/TDIPortalLoader';
 
 // Server-side API call to check email (bypasses RLS)
 async function checkEmailExists(email: string): Promise<{ exists: boolean; type: 'creator' | 'admin' | null }> {
@@ -268,9 +269,19 @@ function LoadingFallback() {
 }
 
 export default function CreatorPortalPage() {
+  const [showLoader, setShowLoader] = useState(true);
+
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <CreatorPortalLoginContent />
-    </Suspense>
+    <>
+      {showLoader && (
+        <TDIPortalLoader
+          portal="creators"
+          onComplete={() => setShowLoader(false)}
+        />
+      )}
+      <Suspense fallback={<LoadingFallback />}>
+        <CreatorPortalLoginContent />
+      </Suspense>
+    </>
   );
 }

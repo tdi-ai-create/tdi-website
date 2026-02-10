@@ -288,9 +288,10 @@ export default function ProfileSettingsPage() {
       {/* Section 1: Your Avatar */}
       <div className="hub-card mb-6">
         <h2
-          className="text-[16px] font-semibold mb-6"
+          className="font-semibold mb-6"
           style={{
             fontFamily: "'DM Sans', sans-serif",
+            fontSize: '16px',
             color: '#2B3A67',
           }}
         >
@@ -374,9 +375,10 @@ export default function ProfileSettingsPage() {
       {/* Section 2: Display Name */}
       <div className="hub-card mb-6">
         <h2
-          className="text-[16px] font-semibold mb-4"
+          className="font-semibold mb-4"
           style={{
             fontFamily: "'DM Sans', sans-serif",
+            fontSize: '16px',
             color: '#2B3A67',
           }}
         >
@@ -417,9 +419,10 @@ export default function ProfileSettingsPage() {
       {/* Section 3: Your Role */}
       <div className="hub-card mb-6">
         <h2
-          className="text-[16px] font-semibold mb-4"
+          className="font-semibold mb-4"
           style={{
             fontFamily: "'DM Sans', sans-serif",
+            fontSize: '16px',
             color: '#2B3A67',
           }}
         >
@@ -469,9 +472,10 @@ export default function ProfileSettingsPage() {
       {/* Section 4: Your Goals */}
       <div className="hub-card mb-6">
         <h2
-          className="text-[16px] font-semibold mb-4"
+          className="font-semibold mb-4"
           style={{
             fontFamily: "'DM Sans', sans-serif",
+            fontSize: '16px',
             color: '#2B3A67',
           }}
         >
@@ -536,9 +540,10 @@ export default function ProfileSettingsPage() {
       {/* Section 5: Danger Zone */}
       <div className="hub-card">
         <h2
-          className="text-[16px] font-semibold mb-4"
+          className="font-semibold mb-4"
           style={{
             fontFamily: "'DM Sans', sans-serif",
+            fontSize: '16px',
             color: '#2B3A67',
           }}
         >

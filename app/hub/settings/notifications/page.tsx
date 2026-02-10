@@ -233,6 +233,7 @@ export default function NotificationSettingsPage() {
               className="font-semibold mb-1"
               style={{
                 fontFamily: "'DM Sans', sans-serif",
+                fontSize: '16px',
                 color: '#2B3A67',
               }}
             >
@@ -306,6 +307,7 @@ export default function NotificationSettingsPage() {
               className="font-semibold mb-4"
               style={{
                 fontFamily: "'DM Sans', sans-serif",
+                fontSize: '16px',
                 color: '#2B3A67',
               }}
             >
@@ -391,6 +393,7 @@ export default function NotificationSettingsPage() {
               className="font-semibold mb-1"
               style={{
                 fontFamily: "'DM Sans', sans-serif",
+                fontSize: '16px',
                 color: '#2B3A67',
               }}
             >
@@ -482,6 +485,7 @@ export default function NotificationSettingsPage() {
                   className="font-semibold"
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '16px',
                     color: '#2B3A67',
                   }}
                 >
