@@ -74,6 +74,7 @@ export function SocialProofPopup() {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const animationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const pendingBurstRef = useRef(false); // Track if next notification should be a burst
+  const momentModeActiveRef = useRef(false); // Track Moment Mode state for callbacks
 
   // Get next message from shuffled list
   const getNextMessage = (): NotificationMessage | null => {
@@ -90,8 +91,15 @@ export function SocialProofPopup() {
     return message;
   };
 
+  // Keep ref in sync with state so timeout callbacks have current value
+  useEffect(() => {
+    momentModeActiveRef.current = isMomentModeActive;
+  }, [isMomentModeActive]);
+
   // Show a notification with floating animation
   const showNotification = (isBurstFollow: boolean = false) => {
+    // Check ref for current Moment Mode state (callbacks may have stale closure)
+    if (momentModeActiveRef.current) return;
     if (dismissCount >= 3 || messagesRef.current.length === 0) return;
 
     const message = getNextMessage();
@@ -125,6 +133,9 @@ export function SocialProofPopup() {
 
   // Schedule next notification with random delay
   const scheduleNextNotification = () => {
+    // Don't schedule if Moment Mode is active
+    if (momentModeActiveRef.current) return;
+
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
     }

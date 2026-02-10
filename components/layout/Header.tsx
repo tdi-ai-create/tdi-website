@@ -12,11 +12,13 @@ export function Header() {
   // Hide on creator-portal/dashboard (has its own studio header)
   // Hide on admin pages (has its own header)
   // Hide on partner setup and login pages (focused onboarding experience)
+  // Hide on hub pages (Hub has its own navigation)
   if (
     pathname?.startsWith('/creator-portal/dashboard') ||
     pathname?.startsWith('/admin') ||
     pathname?.startsWith('/partner-setup') ||
-    pathname?.startsWith('/partners')
+    pathname?.startsWith('/partners') ||
+    pathname?.startsWith('/hub')
   ) {
     return null;
   }
