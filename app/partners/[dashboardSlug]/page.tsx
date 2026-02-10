@@ -42,8 +42,15 @@ import {
   Headphones,
   GraduationCap,
   ArrowUpRight,
+  Quote,
+  Hammer,
+  ChartLine,
+  Rocket,
+  CalendarDays,
+  Pencil,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import { getMetricStatus, statusColors, statusShapes, statusLabels, formatMetricValue, getMetricDescription } from '@/lib/metric-thresholds';
 
 // Types
 interface Partnership {
@@ -2798,20 +2805,678 @@ export default function PartnerDashboard() {
           </div>
         )}
 
-        {/* Placeholder for other tabs */}
-        {!['overview', 'team', 'blueprint'].includes(activeTab) && (
-          <div
-            role="tabpanel"
-            className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center"
-          >
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Sparkles className="w-8 h-8 text-gray-400" />
+        {/* JOURNEY TAB */}
+        {activeTab === 'journey' && (
+          <div role="tabpanel" id="panel-journey" aria-labelledby="tab-journey" className="space-y-6">
+            {/* Partnership Goal Statement */}
+            <div className="bg-gradient-to-br from-[#FFF8E7] to-white rounded-2xl p-8 border border-[#E8B84B]/20">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 rounded-full bg-[#E8B84B]/20 flex items-center justify-center flex-shrink-0">
+                  <Quote className="w-6 h-6 text-[#E8B84B]" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xl md:text-2xl font-medium text-[#1e2749] leading-relaxed italic">
+                    &ldquo;{partnership?.partnership_type === 'district'
+                      ? `Equip educators across ${organization?.name || 'your district'} with practical strategies and resources to confidently support students and each other.`
+                      : `Equip the ${organization?.name || 'your school'} team with practical strategies and resources to transform classrooms and reduce burnout.`
+                    }&rdquo;
+                  </p>
+                  <p className="text-sm text-gray-500 mt-4">— Your Partnership Goal</p>
+                </div>
+              </div>
             </div>
-            <h2 className="text-xl font-semibold text-[#1e2749] mb-2">Coming Soon</h2>
-            <p className="text-gray-600">
-              The {tabs.find(t => t.id === activeTab)?.label} tab is being built.
-              Check back soon for more features!
-            </p>
+
+            {/* Implementation Equation */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-6 text-center">The TDI Equation</h2>
+              <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
+                <div className="flex flex-col items-center text-center p-4">
+                  <div className="w-16 h-16 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center mb-3">
+                    <GraduationCap className="w-8 h-8 text-[#4ecdc4]" />
+                  </div>
+                  <h3 className="font-semibold text-[#1e2749]">Strong Teachers</h3>
+                  <p className="text-sm text-gray-500 mt-1">Practical strategies that work</p>
+                </div>
+                <ArrowRight className="w-8 h-8 text-[#E8B84B] hidden md:block" />
+                <div className="w-8 h-8 text-[#E8B84B] md:hidden rotate-90">
+                  <ArrowRight className="w-8 h-8" />
+                </div>
+                <div className="flex flex-col items-center text-center p-4">
+                  <div className="w-16 h-16 rounded-full bg-[#80a4ed]/20 flex items-center justify-center mb-3">
+                    <Heart className="w-8 h-8 text-[#80a4ed]" />
+                  </div>
+                  <h3 className="font-semibold text-[#1e2749]">Strong Support</h3>
+                  <p className="text-sm text-gray-500 mt-1">Ongoing coaching & community</p>
+                </div>
+                <ArrowRight className="w-8 h-8 text-[#E8B84B] hidden md:block" />
+                <div className="w-8 h-8 text-[#E8B84B] md:hidden rotate-90">
+                  <ArrowRight className="w-8 h-8" />
+                </div>
+                <div className="flex flex-col items-center text-center p-4">
+                  <div className="w-16 h-16 rounded-full bg-[#E8B84B]/20 flex items-center justify-center mb-3">
+                    <Star className="w-8 h-8 text-[#E8B84B]" />
+                  </div>
+                  <h3 className="font-semibold text-[#1e2749]">Student Success</h3>
+                  <p className="text-sm text-gray-500 mt-1">Better outcomes for everyone</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Phase Timeline */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-6">Your Partnership Journey</h2>
+              <div className="relative">
+                {/* Timeline connector */}
+                <div className="absolute top-8 left-0 right-0 h-1 bg-gray-200 hidden md:block" style={{ left: '16.67%', right: '16.67%' }} />
+
+                <div className="grid md:grid-cols-3 gap-6">
+                  {/* IGNITE Phase */}
+                  {(() => {
+                    const isActive = partnership?.contract_phase === 'IGNITE';
+                    const isPast = partnership?.contract_phase === 'ACCELERATE' || partnership?.contract_phase === 'SUSTAIN';
+                    return (
+                      <div className={`relative ${!isActive && !isPast ? 'opacity-50' : ''}`}>
+                        <div className="flex flex-col items-center">
+                          <div
+                            className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 z-10 ${
+                              isPast ? 'bg-[#4ecdc4]' : isActive ? 'bg-[#E8B84B]' : 'bg-gray-200'
+                            }`}
+                          >
+                            {isPast ? (
+                              <Check className="w-8 h-8 text-white" />
+                            ) : (
+                              <span className="text-2xl font-bold text-white">1</span>
+                            )}
+                          </div>
+                          {isActive && (
+                            <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#4ecdc4] text-white text-xs font-bold rounded-full whitespace-nowrap">
+                              YOU ARE HERE
+                            </span>
+                          )}
+                        </div>
+                        <div className={`p-4 rounded-xl ${isActive ? 'bg-[#FFF8E7] border-2 border-[#E8B84B]' : 'bg-gray-50'}`}>
+                          <h3 className="font-bold text-[#1e2749] text-center mb-2">IGNITE</h3>
+                          <p className="text-sm text-gray-600 text-center">
+                            {isActive
+                              ? 'Foundation building, pilot group identification, baseline data collection, first observation cycle, Hub onboarding'
+                              : 'Build the foundation'}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* ACCELERATE Phase */}
+                  {(() => {
+                    const isActive = partnership?.contract_phase === 'ACCELERATE';
+                    const isPast = partnership?.contract_phase === 'SUSTAIN';
+                    const isFuture = partnership?.contract_phase === 'IGNITE';
+                    return (
+                      <div className={`relative ${isFuture ? 'opacity-50' : ''}`}>
+                        <div className="flex flex-col items-center">
+                          <div
+                            className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 z-10 ${
+                              isPast ? 'bg-[#4ecdc4]' : isActive ? 'bg-[#80a4ed]' : 'bg-gray-200'
+                            }`}
+                          >
+                            {isPast ? (
+                              <Check className="w-8 h-8 text-white" />
+                            ) : (
+                              <span className="text-2xl font-bold text-white">2</span>
+                            )}
+                          </div>
+                          {isActive && (
+                            <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#4ecdc4] text-white text-xs font-bold rounded-full whitespace-nowrap">
+                              YOU ARE HERE
+                            </span>
+                          )}
+                        </div>
+                        <div className={`p-4 rounded-xl ${isActive ? 'bg-[#f0f9ff] border-2 border-[#80a4ed]' : 'bg-gray-50'}`}>
+                          <h3 className="font-bold text-[#1e2749] text-center mb-2">ACCELERATE</h3>
+                          <p className="text-sm text-gray-600 text-center">
+                            {isActive
+                              ? 'Expand implementation across buildings, Growth Groups based on observation data, multiple virtual sessions, mid-year progress review'
+                              : 'Scale to full staff'}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* SUSTAIN Phase */}
+                  {(() => {
+                    const isActive = partnership?.contract_phase === 'SUSTAIN';
+                    const isFuture = partnership?.contract_phase === 'IGNITE' || partnership?.contract_phase === 'ACCELERATE';
+                    return (
+                      <div className={`relative ${isFuture ? 'opacity-50' : ''}`}>
+                        <div className="flex flex-col items-center">
+                          <div
+                            className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 z-10 ${
+                              isActive ? 'bg-[#abc4ab]' : 'bg-gray-200'
+                            }`}
+                          >
+                            <span className={`text-2xl font-bold ${isActive ? 'text-white' : 'text-gray-400'}`}>3</span>
+                          </div>
+                          {isActive && (
+                            <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#4ecdc4] text-white text-xs font-bold rounded-full whitespace-nowrap">
+                              YOU ARE HERE
+                            </span>
+                          )}
+                        </div>
+                        <div className={`p-4 rounded-xl ${isActive ? 'bg-[#f0fff4] border-2 border-[#abc4ab]' : 'bg-gray-50'}`}>
+                          <h3 className="font-bold text-[#1e2749] text-center mb-2">SUSTAIN</h3>
+                          <p className="text-sm text-gray-600 text-center">
+                            {isActive
+                              ? 'Internal coaching capacity, peer observation circles, leadership pathways for teacher-leaders, annual impact report'
+                              : 'Embed for lasting change'}
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+            </div>
+
+            {/* What Success Looks Like */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">What Success Looks Like</h2>
+              <ul className="space-y-3">
+                {[
+                  'Staff report increased confidence in classroom strategies',
+                  'Measurable improvement in feeling valued and supported',
+                  'Reduced stress levels compared to baseline',
+                  'Clear implementation of Hub strategies observed in classrooms',
+                ].map((target, idx) => (
+                  <li key={idx} className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-4 h-4 text-[#4ecdc4]" />
+                    </div>
+                    <span className="text-gray-700">{target}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {/* PROGRESS TAB */}
+        {activeTab === 'progress' && (
+          <div role="tabpanel" id="panel-progress" aria-labelledby="tab-progress" className="space-y-6">
+            {/* Status Banner */}
+            {(() => {
+              const daysSinceStart = partnership?.contract_start
+                ? Math.floor((Date.now() - new Date(partnership.contract_start).getTime()) / (1000 * 60 * 60 * 24))
+                : 0;
+              const hubLoginPct = staffStats.total > 0 ? (staffStats.hubLoggedIn / staffStats.total) * 100 : 0;
+              const hasObservations = (partnership?.observation_days_completed ?? 0) > 0;
+
+              let banner = {
+                icon: Hammer,
+                color: '#E8B84B',
+                title: 'BUILDING YOUR FOUNDATION',
+                message: "Your team is getting set up. Once Hub onboarding is complete, we'll begin collecting baseline data.",
+              };
+
+              if (hasObservations) {
+                banner = {
+                  icon: Target,
+                  color: '#4ecdc4',
+                  title: 'IMPLEMENTING',
+                  message: 'Observation insights are in! Growth Groups are forming around key strategies.',
+                };
+              } else if (hubLoginPct >= 50) {
+                banner = {
+                  icon: TrendingUp,
+                  color: '#80a4ed',
+                  title: 'GAINING MOMENTUM',
+                  message: 'Your educators are engaging with the Hub. Next milestone: first observation day.',
+                };
+              } else if (daysSinceStart > 90) {
+                banner = {
+                  icon: Zap,
+                  color: '#E8B84B',
+                  title: 'GROWING STRONGER',
+                  message: 'Your team is deepening implementation. Review your progress data below.',
+                };
+              }
+
+              const BannerIcon = banner.icon;
+              return (
+                <div
+                  className="rounded-2xl p-6 text-white"
+                  style={{ backgroundColor: banner.color }}
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                      <BannerIcon className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h2 className="font-bold text-lg">{banner.title}</h2>
+                      <p className="text-white/90">{banner.message}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {/* Observation Day Highlights */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Observation Day Highlights</h2>
+              {(partnership?.observation_days_completed ?? 0) === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Calendar className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <p className="text-gray-600 mb-2">Your first observation day hasn&apos;t been scheduled yet.</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Once it&apos;s complete, highlights, teacher shoutouts, and strategy observations will appear here.
+                  </p>
+                  <button
+                    onClick={() => setActiveTab('overview')}
+                    className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
+                  >
+                    Confirm Observation Dates
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <Check className="w-4 h-4 text-[#4ecdc4]" />
+                    <span>{partnership?.observation_days_completed} observation day{(partnership?.observation_days_completed ?? 0) > 1 ? 's' : ''} completed</span>
+                  </div>
+                  <p className="text-gray-600">
+                    Observation highlights and teacher shoutouts will be added by your TDI partner after each visit.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Hub Engagement Breakdown */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Hub Engagement</h2>
+              {staffStats.hubLoggedIn === 0 ? (
+                <div className="text-center py-6">
+                  <p className="text-gray-500">
+                    Hub engagement data will appear here once your staff begin exploring courses. Check back after your first week!
+                  </p>
+                </div>
+              ) : (
+                <div className="grid sm:grid-cols-3 gap-4">
+                  <div className="p-4 bg-gray-50 rounded-xl text-center">
+                    <p className="text-3xl font-bold text-[#1e2749]">{staffStats.hubLoggedIn}</p>
+                    <p className="text-sm text-gray-500">Staff Logged In</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-xl text-center">
+                    <p className="text-3xl font-bold text-[#1e2749]">
+                      {staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0}%
+                    </p>
+                    <p className="text-sm text-gray-500">Login Rate</p>
+                  </div>
+                  <div className="p-4 bg-gray-50 rounded-xl text-center">
+                    <p className="text-3xl font-bold text-[#1e2749]">{loveNotes}</p>
+                    <p className="text-sm text-gray-500">Love Notes Sent</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Support Delivered Timeline */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Support Delivered</h2>
+              <div className="relative pl-8 space-y-6">
+                {/* Timeline line */}
+                <div className="absolute left-3 top-2 bottom-2 w-0.5 bg-gray-200" />
+
+                {/* Contract Signed */}
+                <div className="relative">
+                  <div className="absolute -left-5 w-4 h-4 rounded-full bg-[#4ecdc4] border-2 border-white" />
+                  <div>
+                    <p className="font-medium text-[#1e2749]">Partnership Started</p>
+                    <p className="text-sm text-gray-500">
+                      {partnership?.contract_start
+                        ? new Date(partnership.contract_start).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+                        : 'Recently'}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Hub Access */}
+                {staffStats.total > 0 && (
+                  <div className="relative">
+                    <div className="absolute -left-5 w-4 h-4 rounded-full bg-[#80a4ed] border-2 border-white" />
+                    <div>
+                      <p className="font-medium text-[#1e2749]">Hub Access Granted</p>
+                      <p className="text-sm text-gray-500">{staffStats.total} staff members added</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Love Notes */}
+                {loveNotes > 0 && (
+                  <div className="relative">
+                    <div className="absolute -left-5 w-4 h-4 rounded-full bg-pink-400 border-2 border-white" />
+                    <div>
+                      <p className="font-medium text-[#1e2749]">Love Notes Delivered</p>
+                      <p className="text-sm text-gray-500">{loveNotes} personalized notes sent</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Virtual Sessions */}
+                {virtualSessionsCompleted > 0 && (
+                  <div className="relative">
+                    <div className="absolute -left-5 w-4 h-4 rounded-full bg-[#E8B84B] border-2 border-white" />
+                    <div>
+                      <p className="font-medium text-[#1e2749]">Virtual Sessions Completed</p>
+                      <p className="text-sm text-gray-500">{virtualSessionsCompleted} session{virtualSessionsCompleted > 1 ? 's' : ''}</p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Observations */}
+                {(partnership?.observation_days_completed ?? 0) > 0 && (
+                  <div className="relative">
+                    <div className="absolute -left-5 w-4 h-4 rounded-full bg-[#4ecdc4] border-2 border-white" />
+                    <div>
+                      <p className="font-medium text-[#1e2749]">Observation Days Completed</p>
+                      <p className="text-sm text-gray-500">{partnership?.observation_days_completed} on-site visit{(partnership?.observation_days_completed ?? 0) > 1 ? 's' : ''}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Curated Starting Points */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Recommended Starting Points</h2>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {(partnership?.partnership_type === 'district'
+                  ? [
+                      { title: 'Building Your Teacher Toolkit', time: '45 min', desc: 'Essential strategies for any classroom' },
+                      { title: 'PLC Power Moves', time: '30 min', desc: 'Make collaboration time count' },
+                      { title: 'Sustainable Grading Practices', time: '1 hr', desc: 'Grade smarter, not harder' },
+                    ]
+                  : [
+                      { title: 'Classroom Reset', time: '30 min', desc: 'Quick wins for immediate impact' },
+                      { title: 'Stress Less, Teach More', time: '45 min', desc: 'Practical stress management' },
+                      { title: 'The 15-Minute Planning Method', time: '20 min', desc: 'Efficient lesson planning' },
+                    ]
+                ).map((course, idx) => (
+                  <a
+                    key={idx}
+                    href="https://tdi.thinkific.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group p-4 bg-gray-50 rounded-xl hover:bg-[#4ecdc4]/10 hover:shadow-md transition-all"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <BookOpen className="w-4 h-4 text-[#4ecdc4]" />
+                      <span className="text-xs text-gray-500">{course.time}</span>
+                    </div>
+                    <h3 className="font-medium text-[#1e2749] group-hover:text-[#4ecdc4] transition-colors">
+                      {course.title}
+                    </h3>
+                    <p className="text-sm text-gray-500 mt-1">{course.desc}</p>
+                  </a>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* SCHOOLS TAB (District Only) */}
+        {activeTab === 'schools' && partnership?.partnership_type === 'district' && (
+          <div role="tabpanel" id="panel-schools" aria-labelledby="tab-schools" className="space-y-6">
+            {/* Schools Overview */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">District Overview</h2>
+              <div className="grid sm:grid-cols-4 gap-4">
+                <div className="p-4 bg-gray-50 rounded-xl text-center">
+                  <p className="text-3xl font-bold text-[#1e2749]">{apiBuildings.length}</p>
+                  <p className="text-sm text-gray-500">Buildings</p>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-xl text-center">
+                  <p className="text-3xl font-bold text-[#1e2749]">{staffStats.total}</p>
+                  <p className="text-sm text-gray-500">Total Staff</p>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-xl text-center">
+                  <p className="text-3xl font-bold text-[#1e2749]">
+                    {staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0}%
+                  </p>
+                  <p className="text-sm text-gray-500">Avg Hub Login</p>
+                </div>
+                <div className="p-4 bg-gray-50 rounded-xl text-center">
+                  <p className="text-3xl font-bold text-[#1e2749]">—</p>
+                  <p className="text-sm text-gray-500">Need Attention</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Building Cards */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Buildings</h2>
+              {apiBuildings.length === 0 ? (
+                <div className="text-center py-8">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Building className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <p className="text-gray-600 mb-2">No buildings added yet.</p>
+                  <p className="text-sm text-gray-500">
+                    Add your buildings in the Overview tab to see per-building metrics.
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {apiBuildings.map((building) => {
+                    const hubStatus = getMetricStatus('hub_login_pct', null);
+                    const coursesStatus = getMetricStatus('courses_avg', null);
+                    const stressStatus = getMetricStatus('avg_stress', null);
+                    const implStatus = getMetricStatus('implementation_pct', null);
+
+                    return (
+                      <div
+                        key={building.id}
+                        className="p-4 bg-gray-50 rounded-xl"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Building className="w-5 h-5 text-gray-400" />
+                            <div>
+                              <h3 className="font-medium text-[#1e2749]">{building.name}</h3>
+                              <p className="text-sm text-gray-500">
+                                {building.building_type} · {building.staff_count || 0} staff
+                                {building.lead_name && ` · ${building.lead_name}`}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            {/* 4-dot health indicator */}
+                            <div className="flex items-center gap-2">
+                              {[
+                                { status: hubStatus, label: 'Hub' },
+                                { status: coursesStatus, label: 'Courses' },
+                                { status: stressStatus, label: 'Stress' },
+                                { status: implStatus, label: 'Impl.' },
+                              ].map((metric, idx) => (
+                                <div
+                                  key={idx}
+                                  className="flex flex-col items-center"
+                                  title={`${metric.label}: ${statusLabels[metric.status]}`}
+                                  aria-label={`${metric.label}: ${statusLabels[metric.status]}`}
+                                >
+                                  <span
+                                    className="text-lg leading-none"
+                                    style={{ color: statusColors[metric.status] }}
+                                  >
+                                    {statusShapes[metric.status]}
+                                  </span>
+                                  <span className="text-[10px] text-gray-400 mt-0.5">{metric.label}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Metric Legend */}
+            <div className="bg-gray-50 rounded-xl p-4">
+              <p className="text-sm font-medium text-gray-600 mb-2">Health Indicator Legend</p>
+              <div className="flex flex-wrap gap-4">
+                {(['strong', 'on_track', 'developing', 'needs_support', 'no_data'] as const).map((status) => (
+                  <div key={status} className="flex items-center gap-2">
+                    <span style={{ color: statusColors[status] }}>{statusShapes[status]}</span>
+                    <span className="text-sm text-gray-600">{statusLabels[status]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 2026-27 PREVIEW TAB */}
+        {activeTab === 'preview' && (
+          <div role="tabpanel" id="panel-preview" aria-labelledby="tab-preview" className="space-y-6">
+            {/* Headline */}
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
+              <h1 className="text-2xl md:text-3xl font-bold text-[#1e2749] mb-2">
+                Continue Building on {organization?.name || 'Your'}&apos;s Momentum
+              </h1>
+              <p className="text-gray-600">
+                {partnership?.partnership_type === 'district'
+                  ? `Your ${apiBuildings.length || ''} building${apiBuildings.length !== 1 ? 's have' : ' has'} established a strong foundation. Here's how Year 2 takes it further.`
+                  : "Your team has established a strong foundation. Here's how Year 2 takes it further."}
+              </p>
+            </div>
+
+            {/* Proposed Year 2 Timeline */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-6">Proposed 2026-27 Timeline</h2>
+              <p className="text-sm text-gray-500 mb-6 italic">
+                This proposed timeline will be customized based on your partnership progress.
+              </p>
+              <div className="relative pl-8 space-y-4">
+                {/* Timeline line */}
+                <div className="absolute left-3 top-2 bottom-2 w-0.5 bg-gray-200" />
+
+                {[
+                  { month: 'August', event: 'Leadership Planning Session', icon: Users },
+                  { month: 'September', event: 'On-Site Kickoff (full team)', icon: Rocket },
+                  { month: 'October', event: 'Virtual Session: Advanced strategies', icon: BookOpen },
+                  { month: 'November', event: 'Observation Day: Expanded groups', icon: Eye },
+                  { month: 'January', event: 'Mid-Year Check-in + Growth Group refresh', icon: TrendingUp },
+                  { month: 'March', event: 'Observation Day: Full implementation', icon: Eye },
+                  { month: 'May', event: 'Executive Impact Session: Annual results + Year 3', icon: Award },
+                ].map((item, idx) => {
+                  const ItemIcon = item.icon;
+                  return (
+                    <div key={idx} className="relative flex items-start gap-4">
+                      <div className="absolute -left-5 w-4 h-4 rounded-full bg-[#80a4ed] border-2 border-white" />
+                      <div className="flex-1 flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                        <ItemIcon className="w-5 h-5 text-[#80a4ed] flex-shrink-0" />
+                        <div>
+                          <span className="font-medium text-[#1e2749]">{item.month}</span>
+                          <span className="text-gray-500 ml-2">— {item.event}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* ROI / Impact Summary */}
+            <div className="bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-8 text-white">
+              <h2 className="text-xl font-bold mb-6">Your Impact Summary</h2>
+              {(() => {
+                const daysSinceStart = partnership?.contract_start
+                  ? Math.floor((Date.now() - new Date(partnership.contract_start).getTime()) / (1000 * 60 * 60 * 24))
+                  : 0;
+                const isEarly = daysSinceStart < 90;
+
+                return (
+                  <>
+                    {isEarly && (
+                      <div className="mb-6 px-3 py-2 bg-white/10 rounded-lg inline-block">
+                        <span className="text-sm font-medium">Example Data — Your metrics will populate as your partnership progresses</span>
+                      </div>
+                    )}
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div>
+                        <p className="text-white/70 text-sm mb-1">Educators Supported</p>
+                        <p className="text-2xl font-bold">
+                          {staffStats.total > 0 ? staffStats.total : '—'}
+                          {partnership?.partnership_type === 'district' && apiBuildings.length > 0 && (
+                            <span className="text-lg font-normal text-white/70"> across {apiBuildings.length} buildings</span>
+                          )}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-white/70 text-sm mb-1">Hub Engagement</p>
+                        <p className="text-2xl font-bold">
+                          {staffStats.total > 0 ? `${Math.round((staffStats.hubLoggedIn / staffStats.total) * 100)}%` : '—'}
+                          <span className="text-lg font-normal text-white/70"> (vs 10% industry avg)</span>
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-white/70 text-sm mb-1">Love Notes Delivered</p>
+                        <p className="text-2xl font-bold">{loveNotes > 0 ? loveNotes : '—'}</p>
+                      </div>
+                      <div>
+                        <p className="text-white/70 text-sm mb-1">Educator Stress</p>
+                        <p className="text-2xl font-bold">—</p>
+                      </div>
+                      <div>
+                        <p className="text-white/70 text-sm mb-1">Planning Time</p>
+                        <p className="text-2xl font-bold">—</p>
+                      </div>
+                      <div>
+                        <p className="text-white/70 text-sm mb-1">Retention Intent</p>
+                        <p className="text-2xl font-bold">—</p>
+                      </div>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+
+            {/* Board Presentation Offer */}
+            <div className="bg-[#FFF8E7] rounded-2xl p-6 border border-[#E8B84B]/30">
+              <h2 className="text-lg font-bold text-[#1e2749] mb-2">NEED HELP MAKING THE CASE?</h2>
+              <p className="text-gray-700 mb-4">
+                We&apos;ll help you build a board presentation with your actual impact data, cost analysis, and recommended next steps. Your success is our pitch.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="/calculator"
+                  className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors inline-flex items-center gap-2"
+                >
+                  Explore Our Impact Calculator
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <a
+                  href="https://calendly.com/teachersdeserveit"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg text-sm font-medium hover:bg-[#1e2749]/5 transition-colors inline-flex items-center gap-2"
+                >
+                  Schedule a Planning Call
+                  <ExternalLink className="w-4 h-4" />
+                </a>
+              </div>
+            </div>
+
+            {/* Closing Statement */}
+            <div className="text-center py-6">
+              <p className="text-gray-600 italic max-w-2xl mx-auto">
+                &ldquo;Your TDI partner will build a custom Year 2 plan based on your specific needs, goals, and budget. Every partnership is different — because every {partnership?.partnership_type === 'district' ? 'district' : 'school'} is different.&rdquo;
+              </p>
+            </div>
           </div>
         )}
       </div>

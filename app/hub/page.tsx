@@ -1,191 +1,656 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useHub } from '@/components/hub/HubContext';
 import AvatarDisplay from '@/components/hub/AvatarDisplay';
-import { BookOpen, Zap, Award, ArrowRight } from 'lucide-react';
+import EmptyState from '@/components/hub/EmptyState';
+import { getSupabase } from '@/lib/supabase';
+import {
+  BookOpen,
+  Zap,
+  Award,
+  ArrowRight,
+  Clock,
+  Sparkles,
+} from 'lucide-react';
+
+// Daily motivational messages - picks based on day of week
+const DAILY_MESSAGES = [
+  'You showed up today. That matters.',
+  'Small steps still move you forward.',
+  'You are more than your to-do list.',
+  'The fact that you are here says everything.',
+  'Today is a good day to take care of you.',
+  'Progress, not perfection.',
+  'You deserve this time.',
+];
+
+// Default TDI tip when no tips in database
+const DEFAULT_TIP = 'Take one thing off your plate today. Not because you have to. Because you can.';
+
+// Check-in response messages
+const CHECKIN_RESPONSES: Record<number, string> = {
+  1: 'Glad you are having a good day.',
+  2: 'Glad you are having a good day.',
+  3: 'Hang in there. You have got this.',
+  4: 'Sending you a deep breath. Remember, "I need a moment" is always here.',
+  5: 'Sending you a deep breath. Remember, "I need a moment" is always here.',
+};
+
+interface Enrollment {
+  id: string;
+  course_id: string;
+  status: string;
+  progress_percentage: number;
+  course: {
+    id: string;
+    slug: string;
+    title: string;
+    category: string;
+    estimated_minutes: number;
+  };
+  lessons_completed: number;
+  total_lessons: number;
+}
+
+interface QuickWin {
+  id: string;
+  slug: string;
+  title: string;
+  estimated_minutes: number;
+  course_slug?: string;
+}
+
+interface TDITip {
+  id: string;
+  tip_text: string;
+}
 
 export default function HubDashboard() {
   const { profile, user } = useHub();
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [quickWin, setQuickWin] = useState<QuickWin | null>(null);
+  const [tip, setTip] = useState<string>(DEFAULT_TIP);
+  const [certificateCount, setCertificateCount] = useState<number>(0);
+  const [todayCheckIn, setTodayCheckIn] = useState<number | null>(null);
+  const [isCheckingIn, setIsCheckingIn] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const firstName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Teacher';
+  const dailyMessage = DAILY_MESSAGES[new Date().getDay()];
+
+  // Role display
+  const roleLabels: Record<string, string> = {
+    classroom_teacher: 'Classroom Teacher',
+    para: 'Paraprofessional',
+    coach: 'Instructional Coach',
+    school_leader: 'School Leader',
+    district_staff: 'District Staff',
+    other: 'Educator',
+  };
+  const roleLabel = profile?.role ? roleLabels[profile.role] || 'Educator' : 'Educator';
+
+  useEffect(() => {
+    async function loadDashboardData() {
+      if (!user?.id) return;
+
+      const supabase = getSupabase();
+      setIsLoading(true);
+
+      try {
+        // Fetch enrollments with course data
+        const { data: enrollmentData } = await supabase
+          .from('hub_enrollments')
+          .select(`
+            id,
+            course_id,
+            status,
+            progress_percentage,
+            course:hub_courses(id, slug, title, category, estimated_minutes)
+          `)
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .order('updated_at', { ascending: false })
+          .limit(3);
+
+        if (enrollmentData) {
+          // Get lesson counts for each enrollment
+          const enrichedEnrollments = await Promise.all(
+            enrollmentData.map(async (enrollment) => {
+              const { count: totalLessons } = await supabase
+                .from('hub_lessons')
+                .select('*', { count: 'exact', head: true })
+                .eq('course_id', enrollment.course_id);
+
+              const { count: completedLessons } = await supabase
+                .from('hub_lesson_progress')
+                .select('*', { count: 'exact', head: true })
+                .eq('user_id', user.id)
+                .eq('status', 'completed')
+                .in('lesson_id',
+                  (await supabase
+                    .from('hub_lessons')
+                    .select('id')
+                    .eq('course_id', enrollment.course_id)
+                  ).data?.map(l => l.id) || []
+                );
+
+              return {
+                ...enrollment,
+                course: Array.isArray(enrollment.course) ? enrollment.course[0] : enrollment.course,
+                lessons_completed: completedLessons || 0,
+                total_lessons: totalLessons || 0,
+              };
+            })
+          );
+          setEnrollments(enrichedEnrollments as Enrollment[]);
+        }
+
+        // Fetch random quick win
+        const { data: quickWinData } = await supabase
+          .from('hub_lessons')
+          .select(`
+            id,
+            slug,
+            title,
+            estimated_minutes,
+            course:hub_courses!inner(slug, is_published)
+          `)
+          .eq('is_quick_win', true)
+          .eq('hub_courses.is_published', true)
+          .limit(10);
+
+        if (quickWinData && quickWinData.length > 0) {
+          const randomIndex = Math.floor(Math.random() * quickWinData.length);
+          const qw = quickWinData[randomIndex];
+          const courseData = qw.course as { slug: string } | { slug: string }[] | null;
+          const courseSlug = Array.isArray(courseData) ? courseData[0]?.slug : courseData?.slug;
+          setQuickWin({
+            id: qw.id,
+            slug: qw.slug,
+            title: qw.title,
+            estimated_minutes: qw.estimated_minutes,
+            course_slug: courseSlug,
+          });
+        }
+
+        // Fetch TDI tip - pick based on date
+        const { data: tipData } = await supabase
+          .from('hub_tdi_tips')
+          .select('id, tip_text')
+          .eq('approval_status', 'approved')
+          .order('created_at', { ascending: true });
+
+        if (tipData && tipData.length > 0) {
+          const dayOfYear = Math.floor(
+            (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
+          );
+          const tipIndex = dayOfYear % tipData.length;
+          setTip(tipData[tipIndex].tip_text);
+        }
+
+        // Fetch certificate count
+        const { count: certCount } = await supabase
+          .from('hub_certificates')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', user.id);
+
+        setCertificateCount(certCount || 0);
+
+        // Check if user already checked in today
+        const today = new Date().toISOString().split('T')[0];
+        const { data: checkInData } = await supabase
+          .from('hub_assessments')
+          .select('score')
+          .eq('user_id', user.id)
+          .eq('type', 'daily_check_in')
+          .gte('created_at', `${today}T00:00:00`)
+          .lte('created_at', `${today}T23:59:59`)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (checkInData && checkInData.length > 0) {
+          setTodayCheckIn(checkInData[0].score);
+        }
+      } catch (error) {
+        console.error('Error loading dashboard data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadDashboardData();
+  }, [user?.id]);
+
+  const handleCheckIn = async (score: number) => {
+    if (!user?.id || isCheckingIn) return;
+
+    setIsCheckingIn(true);
+    const supabase = getSupabase();
+
+    try {
+      const { error } = await supabase.from('hub_assessments').insert({
+        user_id: user.id,
+        type: 'daily_check_in',
+        score: score,
+        data: { source: 'dashboard_widget' },
+      });
+
+      if (!error) {
+        setTodayCheckIn(score);
+      }
+    } catch (error) {
+      console.error('Error saving check-in:', error);
+    } finally {
+      setIsCheckingIn(false);
+    }
+  };
+
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <div className="p-4 md:p-8 max-w-6xl mx-auto">
+        {/* Welcome Banner Skeleton */}
+        <div
+          className="rounded-xl p-6 mb-8 animate-pulse"
+          style={{ backgroundColor: '#2B3A67' }}
+        >
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <div className="h-8 bg-white/20 rounded w-64 mb-3" />
+              <div className="h-5 bg-white/10 rounded w-48" />
+            </div>
+            <div className="hidden md:block">
+              <div className="w-16 h-16 rounded-full bg-white/20" />
+            </div>
+          </div>
+        </div>
+
+        {/* Content Skeleton */}
+        <div className="grid lg:grid-cols-[1fr_340px] gap-6">
+          <div className="space-y-6">
+            <div className="hub-card h-48 animate-pulse">
+              <div className="h-6 bg-gray-200 rounded w-40 mb-4" />
+              <div className="h-32 bg-gray-100 rounded" />
+            </div>
+            <div className="hub-card h-32 animate-pulse">
+              <div className="h-6 bg-gray-200 rounded w-32 mb-4" />
+              <div className="h-16 bg-gray-100 rounded" />
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="hub-card h-32 animate-pulse" />
+            <div className="hub-card h-24 animate-pulse" />
+            <div className="hub-card h-36 animate-pulse" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 md:p-8 max-w-6xl mx-auto">
-      {/* Welcome Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <AvatarDisplay
-          size={48}
-          avatarId={profile?.avatar_id}
-          avatarUrl={profile?.avatar_url}
-          displayName={profile?.display_name}
-        />
-        <div>
-          <h1
-            className="text-2xl md:text-3xl font-semibold"
-            style={{
-              fontFamily: "'Source Serif 4', Georgia, serif",
-              color: '#2B3A67',
-            }}
-          >
-            Welcome back, {firstName}
-          </h1>
-          <p
-            className="text-gray-500"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          >
-            Your learning journey continues here
-          </p>
+      {/* Welcome Banner */}
+      <div
+        className="rounded-xl p-6 mb-8"
+        style={{ backgroundColor: '#2B3A67' }}
+      >
+        <div className="flex items-center justify-between">
+          <div>
+            <h1
+              className="text-2xl md:text-[28px] font-semibold text-white mb-2"
+              style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
+            >
+              Welcome back, {firstName}
+            </h1>
+            <p
+              className="text-white/70 text-base md:text-lg"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {dailyMessage}
+            </p>
+          </div>
+          <div className="hidden md:flex flex-col items-center">
+            <AvatarDisplay
+              size={48}
+              avatarId={profile?.avatar_id}
+              avatarUrl={profile?.avatar_url}
+              displayName={profile?.display_name}
+            />
+            <span
+              className="text-xs mt-2"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: '#E8B84B',
+              }}
+            >
+              {roleLabel}
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* Main Grid */}
-      <div className="grid md:grid-cols-2 gap-6">
-        {/* Continue Learning Card */}
-        <div className="hub-card">
-          <div className="flex items-center gap-3 mb-4">
-            <div
-              className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: '#FFF8E7' }}
-            >
-              <BookOpen size={20} style={{ color: '#E8B84B' }} />
+      {/* Main Grid - Left column (main) + Right column (sidebar) */}
+      <div className="grid lg:grid-cols-[1fr_340px] gap-6">
+        {/* Left Column - Main Content */}
+        <div className="space-y-6">
+          {/* Continue Learning Section */}
+          <div className="hub-card">
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: '#FFF8E7' }}
+              >
+                <BookOpen size={20} style={{ color: '#E8B84B' }} />
+              </div>
+              <h2
+                className="text-lg font-semibold"
+                style={{
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  color: '#2B3A67',
+                }}
+              >
+                Continue Learning
+              </h2>
             </div>
-            <h2
-              className="text-lg font-semibold"
-              style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                color: '#2B3A67',
-              }}
-            >
-              Continue Learning
-            </h2>
+
+            {enrollments.length > 0 ? (
+              <div className="space-y-4">
+                {enrollments.map((enrollment) => (
+                  <div
+                    key={enrollment.id}
+                    className="p-4 rounded-lg border border-gray-100 bg-white"
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex-1">
+                        <span
+                          className="inline-block text-[11px] font-medium px-2 py-0.5 rounded mb-2"
+                          style={{
+                            backgroundColor: '#E8B84B20',
+                            color: '#B45309',
+                            fontFamily: "'DM Sans', sans-serif",
+                          }}
+                        >
+                          {enrollment.course?.category || 'Course'}
+                        </span>
+                        <h3
+                          className="font-bold text-base"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            color: '#2B3A67',
+                          }}
+                        >
+                          {enrollment.course?.title}
+                        </h3>
+                      </div>
+                    </div>
+
+                    {/* Progress bar */}
+                    <div className="mb-3">
+                      <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-300"
+                          style={{
+                            width: `${enrollment.progress_percentage}%`,
+                            backgroundColor: '#E8B84B',
+                          }}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <span
+                        className="text-[13px] text-gray-500"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        {enrollment.lessons_completed} of {enrollment.total_lessons} lessons complete
+                      </span>
+                      <Link
+                        href={`/hub/courses/${enrollment.course?.slug}`}
+                        className="text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                        style={{
+                          backgroundColor: '#E8B84B',
+                          color: '#2B3A67',
+                          fontFamily: "'DM Sans', sans-serif",
+                        }}
+                      >
+                        Continue
+                      </Link>
+                    </div>
+                  </div>
+                ))}
+
+                <Link
+                  href="/hub/courses"
+                  className="inline-flex items-center gap-2 text-sm font-medium hover:underline"
+                  style={{
+                    color: '#2B3A67',
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                >
+                  View all courses
+                  <ArrowRight size={14} />
+                </Link>
+              </div>
+            ) : (
+              <EmptyState
+                icon={BookOpen}
+                iconBgColor="#BFDBFE"
+                title="You have not enrolled in any courses yet."
+                description="Browse the catalog to find your first course."
+                buttonText="Browse Courses"
+                buttonLink="/hub/courses"
+              />
+            )}
           </div>
 
-          <div
-            className="p-6 rounded-lg text-center"
-            style={{ backgroundColor: '#FAFAF8' }}
-          >
-            <p
-              className="text-gray-500 mb-4"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
-              Your courses will appear here once you enroll
-            </p>
-            <Link href="/hub/courses" className="hub-btn-primary inline-flex items-center gap-2">
-              Browse courses
-              <ArrowRight size={16} />
-            </Link>
+          {/* Got 5 Minutes Section */}
+          <div className="hub-card">
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: '#FFF8E7' }}
+              >
+                <Zap size={20} style={{ color: '#E8B84B' }} />
+              </div>
+              <h2
+                className="text-lg font-semibold"
+                style={{
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  color: '#2B3A67',
+                }}
+              >
+                Got 5 Minutes?
+              </h2>
+            </div>
+
+            {quickWin ? (
+              <div
+                className="p-4 rounded-lg"
+                style={{ borderLeft: '4px solid #E8B84B', backgroundColor: '#FAFAF8' }}
+              >
+                <h3
+                  className="font-bold text-base mb-2"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    color: '#2B3A67',
+                  }}
+                >
+                  {quickWin.title}
+                </h3>
+                <div className="flex items-center justify-between">
+                  <span
+                    className="inline-flex items-center gap-1.5 text-[12px] px-2 py-1 rounded"
+                    style={{
+                      backgroundColor: '#F5F5F5',
+                      color: '#6B7280',
+                      fontFamily: "'DM Sans', sans-serif",
+                    }}
+                  >
+                    <Clock size={12} />
+                    Takes about {quickWin.estimated_minutes} minutes
+                  </span>
+                  <Link
+                    href={`/hub/courses/${quickWin.course_slug}/${quickWin.slug}`}
+                    className="text-sm font-medium px-4 py-2 rounded-lg border-2 transition-colors hover:bg-[#FFF8E7]"
+                    style={{
+                      borderColor: '#E8B84B',
+                      color: '#2B3A67',
+                      fontFamily: "'DM Sans', sans-serif",
+                    }}
+                  >
+                    Try it now
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div
+                className="p-6 rounded-lg text-center"
+                style={{ backgroundColor: '#FAFAF8' }}
+              >
+                <p
+                  className="text-gray-500"
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  Quick Wins are coming soon. Short, practical tools you can use in 3-5 minutes.
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Got 5 Minutes Card */}
-        <div className="hub-card">
-          <div className="flex items-center gap-3 mb-4">
-            <div
-              className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: '#FFF8E7' }}
-            >
-              <Zap size={20} style={{ color: '#E8B84B' }} />
-            </div>
-            <h2
-              className="text-lg font-semibold"
-              style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                color: '#2B3A67',
-              }}
-            >
-              Got 5 minutes?
-            </h2>
-          </div>
-
-          <div
-            className="p-6 rounded-lg text-center"
-            style={{ backgroundColor: '#FAFAF8' }}
-          >
-            <p
-              className="text-gray-500 mb-4"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
-              Quick wins for busy days coming soon
-            </p>
-            <Link href="/hub/quick-wins" className="hub-btn-secondary inline-flex items-center gap-2">
-              Explore Quick Wins
-              <ArrowRight size={16} />
-            </Link>
-          </div>
-        </div>
-
-        {/* Certificates Card */}
-        <div className="hub-card">
-          <div className="flex items-center gap-3 mb-4">
-            <div
-              className="w-10 h-10 rounded-lg flex items-center justify-center"
-              style={{ backgroundColor: '#FFF8E7' }}
-            >
-              <Award size={20} style={{ color: '#E8B84B' }} />
-            </div>
-            <h2
-              className="text-lg font-semibold"
-              style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                color: '#2B3A67',
-              }}
-            >
-              Your Certificates
-            </h2>
-          </div>
-
-          <div
-            className="p-6 rounded-lg text-center"
-            style={{ backgroundColor: '#FAFAF8' }}
-          >
-            <p
-              className="text-gray-500 mb-4"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
-              Complete courses to earn PD certificates
-            </p>
-            <Link href="/hub/certificates" className="hub-btn-secondary inline-flex items-center gap-2">
-              View certificates
-              <ArrowRight size={16} />
-            </Link>
-          </div>
-        </div>
-
-        {/* Building Notice */}
-        <div
-          className="hub-card flex flex-col items-center justify-center text-center p-8"
-          style={{ backgroundColor: '#FFF8E7', border: 'none' }}
-        >
-          <div
-            className="w-12 h-12 rounded-full flex items-center justify-center mb-4"
-            style={{ backgroundColor: '#E8B84B' }}
-          >
+        {/* Right Column - Sidebar */}
+        <div className="space-y-4">
+          {/* Today's TDI Tip */}
+          <div className="hub-card">
             <span
-              className="text-2xl font-bold"
+              className="inline-block text-[11px] font-semibold tracking-wide uppercase mb-3"
               style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                color: '#2B3A67',
+                color: '#E8B84B',
+                fontFamily: "'DM Sans', sans-serif",
               }}
             >
-              !
+              TDI Tip
             </span>
+            <p
+              className="text-[15px] text-gray-700 leading-relaxed mb-4"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {tip}
+            </p>
+            <button
+              className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              Share this tip
+            </button>
           </div>
-          <h3
-            className="text-lg font-semibold mb-2"
-            style={{
-              fontFamily: "'Source Serif 4', Georgia, serif",
-              color: '#2B3A67',
-            }}
-          >
-            Your Hub is being built
-          </h3>
-          <p
-            className="text-gray-600"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          >
-            More features are on the way. Check back soon for courses, resources, and your personalized learning path.
-          </p>
+
+          {/* Certificates Widget */}
+          <div className="hub-card">
+            <div className="flex items-center gap-3 mb-2">
+              <div
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: '#FFF8E7' }}
+              >
+                <Award size={20} style={{ color: '#E8B84B' }} />
+              </div>
+              <div>
+                <p
+                  className="text-2xl font-bold"
+                  style={{
+                    fontFamily: "'Source Serif 4', Georgia, serif",
+                    color: '#2B3A67',
+                  }}
+                >
+                  {certificateCount}
+                </p>
+              </div>
+            </div>
+            <p
+              className="text-sm text-gray-600 mb-3"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {certificateCount === 0
+                ? '0 certificates earned yet. Complete a course to earn PD hours.'
+                : `certificate${certificateCount !== 1 ? 's' : ''} earned`}
+            </p>
+            <Link
+              href="/hub/certificates"
+              className="text-sm font-medium hover:underline"
+              style={{
+                color: '#2B3A67',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              View certificates
+            </Link>
+          </div>
+
+          {/* Stress Check-In Widget */}
+          <div className="hub-card">
+            <div className="flex items-center gap-2 mb-4">
+              <Sparkles size={18} style={{ color: '#E8B84B' }} />
+              <h3
+                className="font-bold text-[15px]"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: '#2B3A67',
+                }}
+              >
+                How are you feeling today?
+              </h3>
+            </div>
+
+            {todayCheckIn !== null ? (
+              <div
+                className="p-4 rounded-lg"
+                style={{ backgroundColor: '#FFF8E7' }}
+              >
+                <p
+                  className="text-sm text-gray-700"
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  Thanks for checking in. {CHECKIN_RESPONSES[todayCheckIn]}
+                </p>
+              </div>
+            ) : (
+              <>
+                <div className="flex justify-between mb-2">
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <button
+                      key={num}
+                      onClick={() => handleCheckIn(num)}
+                      disabled={isCheckingIn}
+                      className="w-12 h-12 rounded-lg font-bold text-lg transition-all hover:scale-105 disabled:opacity-50"
+                      style={{
+                        backgroundColor: '#F5F5F5',
+                        color: '#2B3A67',
+                        fontFamily: "'DM Sans', sans-serif",
+                      }}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex justify-between">
+                  <span
+                    className="text-[11px] text-gray-400"
+                    style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    Great
+                  </span>
+                  <span
+                    className="text-[11px] text-gray-400"
+                    style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    Rough
+                  </span>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>
