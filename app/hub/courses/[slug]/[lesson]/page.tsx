@@ -44,9 +44,10 @@ export default async function LessonPage({ params }: LessonPageProps) {
       {/* Lesson Info */}
       <div className="hub-card mb-6">
         <h1
-          className="text-xl md:text-2xl font-semibold mb-4"
+          className="font-semibold mb-4"
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
+            fontSize: '24px',
             color: '#2B3A67',
           }}
         >

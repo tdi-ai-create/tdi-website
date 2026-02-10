@@ -134,9 +134,10 @@ export default function CertificateVerifyClient({ code }: CertificateVerifyClien
                 <XCircle size={32} className="text-red-500" />
               </div>
               <h2
-                className="text-xl font-semibold mb-3"
+                className="font-semibold mb-3"
                 style={{
                   fontFamily: "'Source Serif 4', Georgia, serif",
+                  fontSize: '18px',
                   color: '#2B3A67',
                 }}
               >
@@ -166,9 +167,10 @@ export default function CertificateVerifyClient({ code }: CertificateVerifyClien
                   <CheckCircle size={32} className="text-green-600" />
                 </div>
                 <h2
-                  className="text-xl font-semibold"
+                  className="font-semibold"
                   style={{
                     fontFamily: "'Source Serif 4', Georgia, serif",
+                    fontSize: '18px',
                     color: '#2B3A67',
                   }}
                 >
