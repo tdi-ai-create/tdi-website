@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu, Heart } from 'lucide-react';
 import AvatarDisplay from './AvatarDisplay';
@@ -45,26 +46,42 @@ export default function HubNavBar({ profile, userEmail }: HubNavBarProps) {
         {/* Logo */}
         <Link
           href="/hub"
-          className="flex-shrink-0 text-xl font-bold"
-          style={{
-            fontFamily: "'Source Serif 4', Georgia, serif",
-            color: '#E8B84B',
-          }}
+          className="flex-shrink-0"
         >
-          TDI
+          <Image
+            src="/images/logo.webp"
+            alt="Teachers Deserve It"
+            width={120}
+            height={36}
+            style={{ height: '36px', width: 'auto', filter: 'brightness(0) invert(1)' }}
+            priority
+          />
         </Link>
 
         {/* Desktop Nav Links */}
         <div className="hidden md:flex items-center justify-center flex-1 gap-1">
-          {NAV_ITEMS.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`hub-nav-link ${isActive(item.href, item.exact) ? 'active' : ''}`}
-            >
-              {item.label}
-            </Link>
-          ))}
+          {NAV_ITEMS.map((item) => {
+            const active = isActive(item.href, item.exact);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="hub-nav-link"
+                style={{
+                  color: active ? '#FFFFFF' : 'rgba(255, 255, 255, 0.8)',
+                  borderBottomColor: active ? '#E8B84B' : 'transparent',
+                }}
+                onMouseEnter={(e) => {
+                  if (!active) e.currentTarget.style.color = '#FFFFFF';
+                }}
+                onMouseLeave={(e) => {
+                  if (!active) e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)';
+                }}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </div>
 
         {/* Right Side - Desktop */}
