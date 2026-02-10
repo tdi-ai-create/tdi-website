@@ -88,23 +88,16 @@ const Tooltip = ({ children, content }: { children: React.ReactNode; content: st
 const iconMap: Record<string, any> = { Zap, AlertCircle, TrendingUp, Heart, Star, Sparkles };
 
 // Reusable Mini Donut for school stats
-const MiniDonut = ({ value, max, label, displayValue, color, isInverted = false }: {
-  value: number; max: number; label: string; displayValue: string; color: string; isInverted?: boolean
+// Colors: Blue (#38618C) = Excellent, Green (#22c55e) = On Track, Amber (#f59e0b) = Developing, Red (#ef4444) = Needs Support
+const MiniDonut = ({ value, max, label, displayValue, color }: {
+  value: number; max: number; label: string; displayValue: string; color: string
 }) => {
   const pct = Math.min((value / max) * 100, 100);
-  // For inverted metrics (like stress), lower is better
+  // Status based on color (traffic light system)
   const getStatus = () => {
-    if (isInverted) {
-      // Lower is better (e.g., stress)
-      if (pct <= 50) return 'Strong';
-      if (pct <= 60) return 'On Track';
-      if (pct <= 70) return 'Developing';
-      return 'Needs Support';
-    }
-    // Higher is better (default)
-    if (pct >= 90) return 'Strong';
-    if (pct >= 75) return 'On Track';
-    if (pct >= 60) return 'Developing';
+    if (color === '#38618C') return 'Excellent';
+    if (color === '#22c55e') return 'On Track';
+    if (color === '#f59e0b') return 'Developing';
     return 'Needs Support';
   };
   return (
@@ -3991,29 +3984,28 @@ export default function ExampleDashboard() {
                             max={100}
                             label="Hub Logins"
                             displayValue={`${loginRate}%`}
-                            color={loginRate >= 90 ? '#4ecdc4' : loginRate >= 85 ? '#38618C' : '#f59e0b'}
+                            color={loginRate >= 95 ? '#38618C' : loginRate >= 85 ? '#22c55e' : loginRate >= 75 ? '#f59e0b' : '#ef4444'}
                           />
                           <MiniDonut
                             value={school.coursesCompleted}
                             max={100}
                             label="Courses"
                             displayValue={`${school.coursesCompleted}%`}
-                            color={school.coursesCompleted >= 65 ? '#4ecdc4' : school.coursesCompleted >= 55 ? '#38618C' : '#f59e0b'}
+                            color={school.coursesCompleted >= 70 ? '#38618C' : school.coursesCompleted >= 60 ? '#22c55e' : school.coursesCompleted >= 50 ? '#f59e0b' : '#ef4444'}
                           />
                           <MiniDonut
                             value={(10 - school.avgStress) * 10}
                             max={100}
                             label="Avg. Stress"
                             displayValue={`${school.avgStress}/10`}
-                            color={school.avgStress <= 5.5 ? '#4ecdc4' : school.avgStress <= 6.5 ? '#38618C' : school.avgStress > 7.0 ? '#ef4444' : '#f59e0b'}
-                            isInverted={false}
+                            color={school.avgStress <= 5.0 ? '#38618C' : school.avgStress <= 6.0 ? '#22c55e' : school.avgStress <= 7.0 ? '#f59e0b' : '#ef4444'}
                           />
                           <MiniDonut
                             value={school.implementationRate}
                             max={65}
                             label="Implementation"
                             displayValue={`${school.implementationRate}%`}
-                            color={school.implementationRate >= 30 ? '#4ecdc4' : school.implementationRate >= 20 ? '#38618C' : '#f59e0b'}
+                            color={school.implementationRate >= 35 ? '#38618C' : school.implementationRate >= 25 ? '#22c55e' : school.implementationRate >= 15 ? '#f59e0b' : '#ef4444'}
                           />
                         </div>
 
