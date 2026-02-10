@@ -225,6 +225,7 @@ export default function ExampleDashboard() {
     'building-awards': true,
     'silver-bronze': true,
     'full-leaderboard': false,
+    'action-items': true,
     'insight-rhythm': false,
     'insight-cadence': false,
     'insight-tempo-stress': false,
