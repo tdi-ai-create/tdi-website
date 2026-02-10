@@ -1058,321 +1058,6 @@ export default function ExampleDashboard() {
               </div>
             </div>
 
-            {/* Hub Engagement Visual Section */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                  <Monitor className="w-5 h-5 text-[#4ecdc4]" />
-                  <h3 className="text-base font-bold text-[#1e2749]">Hub Engagement</h3>
-                  <Tooltip content="Tracks staff engagement with the TDI Learning Hub. Industry average for PD platforms is 40-50%. Your district is at 87%.">
-                    <span></span>
-                  </Tooltip>
-                </div>
-                <span className="text-xs text-gray-400">Updated Jan 13, 2026</span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Donut Chart - Login Rate */}
-                <div className="flex flex-col items-center">
-                  <div className="relative w-36 h-36">
-                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                      <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
-                      <circle cx="18" cy="18" r="15.915" fill="none" stroke="#4ecdc4" strokeWidth="3"
-                        strokeDasharray="87, 100" strokeLinecap="round" />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <Tooltip content="Average login and engagement rate for PD platforms nationally is 40-50%. Your 87% is nearly double the industry average. Source: Digital Promise (2024).">
-                        <span className="text-3xl font-bold text-[#1e2749]">87%</span>
-                      </Tooltip>
-                      <span className="text-xs text-gray-500">logged in</span>
-                    </div>
-                  </div>
-                  <div className="mt-3 text-center">
-                    <p className="text-sm font-semibold text-[#1e2749]">Hub Logins</p>
-                    <p className="text-xs text-gray-500">223 of 255 staff</p>
-                    <p className="text-xs text-[#4ecdc4] font-medium mt-1">Goal: 100% by Observation Day</p>
-                  </div>
-                </div>
-
-                {/* Vertical Bar Chart - Engagement Depth */}
-                <div className="flex flex-col">
-                  <p className="text-sm font-semibold text-[#1e2749] mb-3">Engagement Depth</p>
-                  <div className="space-y-3 flex-1">
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Completed 1+ course</span>
-                        <span className="font-semibold text-[#1e2749]">68%</span>
-                      </div>
-                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#1e2749] rounded-full" style={{width: '68%'}}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Downloaded resources</span>
-                        <span className="font-semibold text-[#38618C]">74%</span>
-                      </div>
-                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#38618C] rounded-full" style={{width: '74%'}}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Active this month</span>
-                        <span className="font-semibold text-[#4ecdc4]">52%</span>
-                      </div>
-                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#4ecdc4] rounded-full" style={{width: '52%'}}></div>
-                      </div>
-                    </div>
-                  </div>
-                  <Tooltip content="Engagement depth shows how staff interact beyond just logging in. Active this month means at least one Hub interaction in the past 30 days.">
-                    <span className="text-xs text-gray-400 mt-2">What does this mean?</span>
-                  </Tooltip>
-                </div>
-
-                {/* Building Breakdown - Mini Horizontal Bars */}
-                <div className="flex flex-col">
-                  <p className="text-sm font-semibold text-[#1e2749] mb-3">By Building</p>
-                  <div className="space-y-2 flex-1">
-                    {[
-                      { name: 'Harmony Elementary', pct: 95, count: '38/40' },
-                      { name: 'Crescendo High', pct: 91, count: '41/45' },
-                      { name: 'Rhythm Academy', pct: 88, count: '37/42' },
-                      { name: 'Motown Early Learning', pct: 85, count: '34/40' },
-                      { name: 'Motown Middle', pct: 82, count: '37/45' },
-                      { name: 'Bridges Alternative', pct: 84, count: '36/43' },
-                    ].map((school) => (
-                      <div key={school.name} className="cursor-pointer hover:bg-gray-50 rounded p-1 -mx-1 transition-colors"
-                        onClick={() => setActiveTab('schools')}>
-                        <div className="flex justify-between text-xs mb-0.5">
-                          <span className="text-gray-600 truncate">{school.name}</span>
-                          <span className="font-medium text-gray-700 ml-2">{school.pct}%</span>
-                        </div>
-                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full transition-all"
-                            style={{width: `${school.pct}%`, backgroundColor: school.pct >= 90 ? '#4ecdc4' : school.pct >= 85 ? '#38618C' : '#f59e0b'}}></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-xs text-[#4ecdc4] mt-2 cursor-pointer hover:underline"
-                    onClick={() => setActiveTab('schools')}>
-                    View all buildings →
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Building Awards — Celebratory Cards with CTAs */}
-            <div className="bg-gradient-to-br from-amber-50 via-white to-green-50 rounded-2xl shadow-sm border border-amber-100 overflow-hidden">
-              <div className="p-5 border-b border-amber-100/50">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-500 rounded-xl flex items-center justify-center shadow-sm">
-                      <Trophy className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-lg font-bold text-[#1e2749]">🎉 Building Awards</p>
-                      <p className="text-sm text-gray-500">Celebrating excellence across 7 categories</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-2xl">🥇</span>
-                    <span className="text-xl">🥈</span>
-                    <span className="text-lg">🥉</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-5 space-y-4">
-                {/* Gold Winner Cards with CTAs */}
-                {[
-                  {
-                    award: 'Most Engaged',
-                    school: 'Harmony Elementary',
-                    leader: 'Ms. Rivera',
-                    result: '95%',
-                    metric: 'Hub Login Rate',
-                    celebration: 'Highest engagement in the district! 95% of staff logged in regularly.',
-                    suggestion: 'Invite Ms. Rivera to share her engagement strategy at the next PLC.',
-                    bgColor: 'bg-teal-50',
-                    borderColor: 'border-teal-200',
-                    resultColor: 'text-[#4ecdc4]',
-                    celebrateBtn: 'Congratulate Team',
-                    suggestBtn: 'Suggest Strategy Share',
-                  },
-                  {
-                    award: 'Top Learners',
-                    school: 'Crescendo Middle',
-                    leader: 'Mr. Thompson',
-                    result: '72%',
-                    metric: 'Course Completion',
-                    celebration: 'Leading the district in course completions — 72% of staff finished at least one course.',
-                    suggestion: 'Recognize Mr. Thompson\'s PLC model that protects learning time.',
-                    bgColor: 'bg-blue-50',
-                    borderColor: 'border-blue-200',
-                    resultColor: 'text-[#38618C]',
-                    celebrateBtn: 'Send Kudos',
-                    suggestBtn: 'Share PLC Model',
-                  },
-                  {
-                    award: 'Wellness Leader',
-                    school: 'Melody Primary',
-                    leader: 'Dr. Chen',
-                    result: '5.0/10',
-                    metric: 'Lowest Stress',
-                    celebration: 'Best wellness scores in the district! Stress level 5.0/10 vs. industry 8-9/10.',
-                    suggestion: 'Dr. Chen\'s wellness initiatives could help other buildings.',
-                    bgColor: 'bg-green-50',
-                    borderColor: 'border-green-200',
-                    resultColor: 'text-green-600',
-                    celebrateBtn: 'Celebrate Wellness',
-                    suggestBtn: 'Share Wellness Tips',
-                  },
-                  {
-                    award: 'Implementation Champ',
-                    school: 'Harmony Elementary',
-                    leader: 'Ms. Rivera',
-                    result: '34%',
-                    metric: 'Strategy Use',
-                    celebration: 'Leading classroom implementation at 34% — that\'s 3.4x the industry average!',
-                    suggestion: 'Feature Harmony\'s implementation journey in the spring newsletter.',
-                    bgColor: 'bg-indigo-50',
-                    borderColor: 'border-indigo-200',
-                    resultColor: 'text-indigo-600',
-                    celebrateBtn: 'High Five',
-                    suggestBtn: 'Feature in Newsletter',
-                  },
-                  {
-                    award: 'Resource Champion',
-                    school: 'Rhythm Academy',
-                    leader: 'Mrs. Davis',
-                    result: '92',
-                    metric: 'Downloads',
-                    celebration: '92 resources downloaded and shared! Rhythm is putting tools into practice.',
-                    suggestion: 'Ask Mrs. Davis which resources had the biggest impact.',
-                    bgColor: 'bg-purple-50',
-                    borderColor: 'border-purple-200',
-                    resultColor: 'text-purple-600',
-                    celebrateBtn: 'Applaud',
-                    suggestBtn: 'Survey Top Resources',
-                  },
-                  {
-                    award: 'Most Likely to Stay',
-                    school: 'Cadence K-8',
-                    leader: 'Principal Martinez',
-                    result: '9.8/10',
-                    metric: 'Retention Intent',
-                    celebration: 'Incredible 9.8/10 retention intent — nearly 5x the industry average!',
-                    suggestion: 'Principal Martinez\'s culture work is worth studying.',
-                    bgColor: 'bg-emerald-50',
-                    borderColor: 'border-emerald-200',
-                    resultColor: 'text-emerald-600',
-                    celebrateBtn: 'Celebrate Culture',
-                    suggestBtn: 'Schedule Visit',
-                  },
-                  {
-                    award: 'Movement Leader',
-                    school: 'Crescendo Middle',
-                    leader: 'Mr. Thompson',
-                    result: '42',
-                    metric: 'Community Participation',
-                    celebration: '42 staff actively engaged in the TDI community — podcast, blog, Facebook group!',
-                    suggestion: 'Highlight Crescendo\'s community engagement at the board meeting.',
-                    bgColor: 'bg-cyan-50',
-                    borderColor: 'border-cyan-200',
-                    resultColor: 'text-cyan-600',
-                    celebrateBtn: 'Shout Out',
-                    suggestBtn: 'Present to Board',
-                  },
-                ].map((award, idx) => (
-                  <div key={award.award} className={`${award.bgColor} rounded-xl p-4 border ${award.borderColor} hover:shadow-md transition-all`}>
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <span className="text-2xl">🥇</span>
-                        <div>
-                          <p className="font-bold text-[#1e2749]">{award.award}</p>
-                          <p className="text-sm text-gray-600">{award.school} · {award.leader}</p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className={`text-xl font-bold ${award.resultColor}`}>{award.result}</p>
-                        <p className="text-xs text-gray-500">{award.metric}</p>
-                      </div>
-                    </div>
-                    <p className="text-sm text-gray-700 mb-3">{award.celebration}</p>
-                    <p className="text-sm text-gray-600 italic mb-3">💡 {award.suggestion}</p>
-                    <div className="flex flex-wrap gap-2">
-                      <button
-                        onClick={handleDisabledClick}
-                        className="px-3 py-1.5 bg-[#4ecdc4] text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 opacity-80 hover:opacity-100 cursor-not-allowed"
-                        title="This is an example dashboard"
-                      >
-                        🎉 {award.celebrateBtn} →
-                      </button>
-                      <button
-                        onClick={handleDisabledClick}
-                        className="px-3 py-1.5 bg-white text-[#38618C] text-xs font-semibold rounded-lg border border-[#38618C]/30 flex items-center gap-1.5 opacity-80 hover:opacity-100 cursor-not-allowed"
-                        title="This is an example dashboard"
-                      >
-                        💡 {award.suggestBtn}
-                      </button>
-                    </div>
-                  </div>
-                ))}
-
-                {/* Silver & Bronze — nested dropdown */}
-                <button onClick={() => toggleSection('silver-bronze')}
-                  className="w-full flex items-center justify-center gap-2 py-3 text-sm text-gray-500 hover:text-gray-700 transition-colors border-t border-amber-100/50 mt-2">
-                  <span>View Silver & Bronze winners</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${openSections['silver-bronze'] ? 'rotate-180' : ''}`} />
-                </button>
-                {openSections['silver-bronze'] && (
-                  <div className="space-y-3 bg-white/50 rounded-xl p-4">
-                    {[
-                      { award: 'Most Engaged', silver: { s: 'Crescendo Middle', v: '91%' }, bronze: { s: 'Rhythm Academy', v: '88%' }},
-                      { award: 'Top Learners', silver: { s: 'Harmony Elementary', v: '68%' }, bronze: { s: 'Melody Primary', v: '61%' }},
-                      { award: 'Wellness Leader', silver: { s: 'Harmony Elementary', v: '5.2/10' }, bronze: { s: 'Crescendo Middle', v: '5.8/10' }},
-                      { award: 'Implementation Champ', silver: { s: 'Crescendo Middle', v: '28%' }, bronze: { s: 'Melody Primary', v: '22%' }},
-                      { award: 'Resource Champion', silver: { s: 'Crescendo Middle', v: '76' }, bronze: { s: 'Cadence K-8', v: '68' }},
-                      { award: 'Most Likely to Stay', silver: { s: 'Harmony Elementary', v: '9.5/10' }, bronze: { s: 'Melody Primary', v: '9.1/10' }},
-                      { award: 'Movement Leader', silver: { s: 'Harmony Elementary', v: '38' }, bronze: { s: 'Tempo High', v: '35' }},
-                    ].map(row => (
-                      <div key={row.award}>
-                        <p className="text-xs font-semibold text-gray-500 mb-1.5">{row.award}</p>
-                        <div className="grid grid-cols-2 gap-2">
-                          <div className="flex items-center justify-between px-3 py-2 bg-gray-100 rounded-lg text-xs">
-                            <div className="flex items-center gap-1.5"><span>🥈</span><span className="text-gray-600">{row.silver.s}</span></div>
-                            <span className="font-semibold text-gray-700">{row.silver.v}</span>
-                          </div>
-                          <div className="flex items-center justify-between px-3 py-2 bg-orange-100/50 rounded-lg text-xs">
-                            <div className="flex items-center gap-1.5"><span>🥉</span><span className="text-gray-600">{row.bronze.s}</span></div>
-                            <span className="font-semibold text-gray-700">{row.bronze.v}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Celebration banner */}
-                <div className="p-4 bg-gradient-to-r from-green-100 to-teal-100 rounded-xl border border-green-200">
-                  <p className="text-sm text-green-800">
-                    <span className="font-bold">🌟 Every building is above the national average</span> for PD engagement.
-                    These wins are designed to be shared at staff meetings, board presentations, and community events!
-                  </p>
-                </div>
-
-                {/* Data source footer */}
-                <p className="text-xs text-gray-500 pt-3 border-t border-amber-100/50">
-                  Industry data: RAND Corporation (2025), Learning Policy Institute, TNTP ·
-                  TDI data: Partner school surveys across 21 states ·
-                  District data: Hub analytics + staff surveys
-                </p>
-              </div>
-            </div>
-
             {/* Leading Indicators Preview */}
             <div id="leading-indicators" className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-4">
@@ -1614,78 +1299,6 @@ export default function ExampleDashboard() {
               )}
             </div>
 
-            {/* Student Performance Snapshot */}
-            <div id="student-performance" className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-bold text-[#1e2749]">Student Performance</h3>
-                  <Tooltip content="TerraNova National Percentiles for grades 3-7. Classroom grades average A (90-100%), but standardized scores tell a different story. This is the gap TDI strategies help close.">
-                    <span></span>
-                  </Tooltip>
-                </div>
-                <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">2024-25 Data</span>
-              </div>
-
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
-                <p className="text-sm text-amber-800">
-                  <span className="font-semibold">The Gap:</span> Classroom grades average <span className="font-bold text-green-600">A (90-100%)</span>, but TerraNova scores for grades 3-6 range from <Tooltip content="TerraNova National Percentiles compare student performance against a nationally representative sample. The 50th percentile is 'average.' Scores below 50th indicate room for growth."><span className="font-bold text-red-500">30th-58th percentile</span></Tooltip>.
-                </p>
-              </div>
-
-              {/* Compact subject averages */}
-              <div className="grid grid-cols-3 gap-4 mb-4">
-                {[
-                  { subject: 'Reading', avg: 43, color: '#ef4444' },
-                  { subject: 'Language', avg: 48, color: '#f59e0b' },
-                  { subject: 'Math', avg: 57, color: '#3b82f6' },
-                ].map((s) => (
-                  <div key={s.subject} className="text-center">
-                    <div className="relative w-20 h-20 mx-auto mb-2">
-                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                        <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
-                        <circle cx="18" cy="18" r="15.915" fill="none" stroke={s.color} strokeWidth="3"
-                          strokeDasharray={`${s.avg}, 100`} strokeLinecap="round" />
-                      </svg>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-lg font-bold" style={{color: s.color}}>{s.avg}th</span>
-                      </div>
-                    </div>
-                    <p className="text-xs font-medium text-gray-700">{s.subject}</p>
-                    <p className="text-xs text-gray-400">Avg. percentile (Gr. 3-6)</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* 7th grade highlight */}
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-3">
-                <span className="text-green-500 text-xl">✓</span>
-                <div>
-                  <p className="text-sm font-semibold text-green-700">7th Grade: Strong across all subjects</p>
-                  <p className="text-xs text-green-600">Reading 66th · Language 65th · Math 75th percentile</p>
-                </div>
-              </div>
-
-              <button className="mt-4 text-xs text-[#4ecdc4] font-medium hover:underline"
-                onClick={() => navigateToSection('journey', 'student-performance')}>
-                See full grade-by-grade breakdown →
-              </button>
-            </div>
-
-            {/* Metrics Customization Note */}
-            <div className="bg-gradient-to-r from-[#1e2749]/5 to-[#4ecdc4]/5 rounded-xl p-4 border border-[#4ecdc4]/20">
-              <div className="flex items-start gap-3">
-                <BarChart3 className="w-5 h-5 text-[#4ecdc4] mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-[#1e2749]">
-                    Your Metrics, Your Way
-                  </p>
-                  <p className="text-xs text-gray-600 mt-1">
-                    All progress data can be tied to state assessment results, district-specific benchmarks, or TDI survey metrics — whichever tells your school&apos;s story best. Your TDI partner will customize this with you during onboarding.
-                  </p>
-                </div>
-              </div>
-            </div>
-
             {/* TDI Insights — Personalized Recommendations */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-2">
@@ -1824,6 +1437,393 @@ Here's an idea: invite Ms. Rivera to share her approach at the Spring Leadership
                 TDI data: Partner school surveys across 21 states ·
                 District data: Hub analytics + staff surveys
               </p>
+            </div>
+
+            {/* Building Awards — Celebratory Cards with CTAs */}
+            <div className="bg-gradient-to-br from-amber-50 via-white to-green-50 rounded-2xl shadow-sm border border-amber-100 overflow-hidden">
+              <div className="p-5 border-b border-amber-100/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-500 rounded-xl flex items-center justify-center shadow-sm">
+                      <Trophy className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-lg font-bold text-[#1e2749]">🎉 Building Awards</p>
+                      <p className="text-sm text-gray-500">Celebrating excellence across 7 categories</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">🥇</span>
+                    <span className="text-xl">🥈</span>
+                    <span className="text-lg">🥉</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-5 space-y-4">
+                {/* Gold Winner Cards with CTAs */}
+                {[
+                  {
+                    award: 'Most Engaged',
+                    school: 'Harmony Elementary',
+                    leader: 'Ms. Rivera',
+                    result: '95%',
+                    metric: 'Hub Login Rate',
+                    celebration: 'Highest engagement in the district! 95% of staff logged in regularly.',
+                    suggestion: 'Invite Ms. Rivera to share her engagement strategy at the next PLC.',
+                    bgColor: 'bg-teal-50',
+                    borderColor: 'border-teal-200',
+                    resultColor: 'text-[#4ecdc4]',
+                    celebrateBtn: 'Congratulate Team',
+                    suggestBtn: 'Suggest Strategy Share',
+                  },
+                  {
+                    award: 'Top Learners',
+                    school: 'Crescendo Middle',
+                    leader: 'Mr. Thompson',
+                    result: '72%',
+                    metric: 'Course Completion',
+                    celebration: 'Leading the district in course completions — 72% of staff finished at least one course.',
+                    suggestion: 'Recognize Mr. Thompson\'s PLC model that protects learning time.',
+                    bgColor: 'bg-blue-50',
+                    borderColor: 'border-blue-200',
+                    resultColor: 'text-[#38618C]',
+                    celebrateBtn: 'Send Kudos',
+                    suggestBtn: 'Share PLC Model',
+                  },
+                  {
+                    award: 'Wellness Leader',
+                    school: 'Melody Primary',
+                    leader: 'Dr. Chen',
+                    result: '5.0/10',
+                    metric: 'Lowest Stress',
+                    celebration: 'Best wellness scores in the district! Stress level 5.0/10 vs. industry 8-9/10.',
+                    suggestion: 'Dr. Chen\'s wellness initiatives could help other buildings.',
+                    bgColor: 'bg-green-50',
+                    borderColor: 'border-green-200',
+                    resultColor: 'text-green-600',
+                    celebrateBtn: 'Celebrate Wellness',
+                    suggestBtn: 'Share Wellness Tips',
+                  },
+                  {
+                    award: 'Implementation Champ',
+                    school: 'Harmony Elementary',
+                    leader: 'Ms. Rivera',
+                    result: '34%',
+                    metric: 'Strategy Use',
+                    celebration: 'Leading classroom implementation at 34% — that\'s 3.4x the industry average!',
+                    suggestion: 'Feature Harmony\'s implementation journey in the spring newsletter.',
+                    bgColor: 'bg-indigo-50',
+                    borderColor: 'border-indigo-200',
+                    resultColor: 'text-indigo-600',
+                    celebrateBtn: 'High Five',
+                    suggestBtn: 'Feature in Newsletter',
+                  },
+                  {
+                    award: 'Resource Champion',
+                    school: 'Rhythm Academy',
+                    leader: 'Mrs. Davis',
+                    result: '92',
+                    metric: 'Downloads',
+                    celebration: '92 resources downloaded and shared! Rhythm is putting tools into practice.',
+                    suggestion: 'Ask Mrs. Davis which resources had the biggest impact.',
+                    bgColor: 'bg-purple-50',
+                    borderColor: 'border-purple-200',
+                    resultColor: 'text-purple-600',
+                    celebrateBtn: 'Applaud',
+                    suggestBtn: 'Survey Top Resources',
+                  },
+                  {
+                    award: 'Most Likely to Stay',
+                    school: 'Cadence K-8',
+                    leader: 'Principal Martinez',
+                    result: '9.8/10',
+                    metric: 'Retention Intent',
+                    celebration: 'Incredible 9.8/10 retention intent — nearly 5x the industry average!',
+                    suggestion: 'Principal Martinez\'s culture work is worth studying.',
+                    bgColor: 'bg-emerald-50',
+                    borderColor: 'border-emerald-200',
+                    resultColor: 'text-emerald-600',
+                    celebrateBtn: 'Celebrate Culture',
+                    suggestBtn: 'Schedule Visit',
+                  },
+                  {
+                    award: 'Movement Leader',
+                    school: 'Crescendo Middle',
+                    leader: 'Mr. Thompson',
+                    result: '42',
+                    metric: 'Community Participation',
+                    celebration: '42 staff actively engaged in the TDI community — podcast, blog, Facebook group!',
+                    suggestion: 'Highlight Crescendo\'s community engagement at the board meeting.',
+                    bgColor: 'bg-cyan-50',
+                    borderColor: 'border-cyan-200',
+                    resultColor: 'text-cyan-600',
+                    celebrateBtn: 'Shout Out',
+                    suggestBtn: 'Present to Board',
+                  },
+                ].map((award, idx) => (
+                  <div key={award.award} className={`${award.bgColor} rounded-xl p-4 border ${award.borderColor} hover:shadow-md transition-all`}>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🥇</span>
+                        <div>
+                          <p className="font-bold text-[#1e2749]">{award.award}</p>
+                          <p className="text-sm text-gray-600">{award.school} · {award.leader}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-xl font-bold ${award.resultColor}`}>{award.result}</p>
+                        <p className="text-xs text-gray-500">{award.metric}</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-700 mb-3">{award.celebration}</p>
+                    <p className="text-sm text-gray-600 italic mb-3">💡 {award.suggestion}</p>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={handleDisabledClick}
+                        className="px-3 py-1.5 bg-[#4ecdc4] text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 opacity-80 hover:opacity-100 cursor-not-allowed"
+                        title="This is an example dashboard"
+                      >
+                        🎉 {award.celebrateBtn} →
+                      </button>
+                      <button
+                        onClick={handleDisabledClick}
+                        className="px-3 py-1.5 bg-white text-[#38618C] text-xs font-semibold rounded-lg border border-[#38618C]/30 flex items-center gap-1.5 opacity-80 hover:opacity-100 cursor-not-allowed"
+                        title="This is an example dashboard"
+                      >
+                        💡 {award.suggestBtn}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Silver & Bronze — nested dropdown */}
+                <button onClick={() => toggleSection('silver-bronze')}
+                  className="w-full flex items-center justify-center gap-2 py-3 text-sm text-gray-500 hover:text-gray-700 transition-colors border-t border-amber-100/50 mt-2">
+                  <span>View Silver & Bronze winners</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${openSections['silver-bronze'] ? 'rotate-180' : ''}`} />
+                </button>
+                {openSections['silver-bronze'] && (
+                  <div className="space-y-3 bg-white/50 rounded-xl p-4">
+                    {[
+                      { award: 'Most Engaged', silver: { s: 'Crescendo Middle', v: '91%' }, bronze: { s: 'Rhythm Academy', v: '88%' }},
+                      { award: 'Top Learners', silver: { s: 'Harmony Elementary', v: '68%' }, bronze: { s: 'Melody Primary', v: '61%' }},
+                      { award: 'Wellness Leader', silver: { s: 'Harmony Elementary', v: '5.2/10' }, bronze: { s: 'Crescendo Middle', v: '5.8/10' }},
+                      { award: 'Implementation Champ', silver: { s: 'Crescendo Middle', v: '28%' }, bronze: { s: 'Melody Primary', v: '22%' }},
+                      { award: 'Resource Champion', silver: { s: 'Crescendo Middle', v: '76' }, bronze: { s: 'Cadence K-8', v: '68' }},
+                      { award: 'Most Likely to Stay', silver: { s: 'Harmony Elementary', v: '9.5/10' }, bronze: { s: 'Melody Primary', v: '9.1/10' }},
+                      { award: 'Movement Leader', silver: { s: 'Harmony Elementary', v: '38' }, bronze: { s: 'Tempo High', v: '35' }},
+                    ].map(row => (
+                      <div key={row.award}>
+                        <p className="text-xs font-semibold text-gray-500 mb-1.5">{row.award}</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex items-center justify-between px-3 py-2 bg-gray-100 rounded-lg text-xs">
+                            <div className="flex items-center gap-1.5"><span>🥈</span><span className="text-gray-600">{row.silver.s}</span></div>
+                            <span className="font-semibold text-gray-700">{row.silver.v}</span>
+                          </div>
+                          <div className="flex items-center justify-between px-3 py-2 bg-orange-100/50 rounded-lg text-xs">
+                            <div className="flex items-center gap-1.5"><span>🥉</span><span className="text-gray-600">{row.bronze.s}</span></div>
+                            <span className="font-semibold text-gray-700">{row.bronze.v}</span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Celebration banner */}
+                <div className="p-4 bg-gradient-to-r from-green-100 to-teal-100 rounded-xl border border-green-200">
+                  <p className="text-sm text-green-800">
+                    <span className="font-bold">🌟 Every building is above the national average</span> for PD engagement.
+                    These wins are designed to be shared at staff meetings, board presentations, and community events!
+                  </p>
+                </div>
+
+                {/* Data source footer */}
+                <p className="text-xs text-gray-500 pt-3 border-t border-amber-100/50">
+                  Industry data: RAND Corporation (2025), Learning Policy Institute, TNTP ·
+                  TDI data: Partner school surveys across 21 states ·
+                  District data: Hub analytics + staff surveys
+                </p>
+              </div>
+            </div>
+
+            {/* Student Performance Snapshot */}
+            <div id="student-performance" className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-lg font-bold text-[#1e2749]">Student Performance</h3>
+                  <Tooltip content="TerraNova National Percentiles for grades 3-7. Classroom grades average A (90-100%), but standardized scores tell a different story. This is the gap TDI strategies help close.">
+                    <span></span>
+                  </Tooltip>
+                </div>
+                <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">2024-25 Data</span>
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
+                <p className="text-sm text-amber-800">
+                  <span className="font-semibold">The Gap:</span> Classroom grades average <span className="font-bold text-green-600">A (90-100%)</span>, but TerraNova scores for grades 3-6 range from <Tooltip content="TerraNova National Percentiles compare student performance against a nationally representative sample. The 50th percentile is 'average.' Scores below 50th indicate room for growth."><span className="font-bold text-red-500">30th-58th percentile</span></Tooltip>.
+                </p>
+              </div>
+
+              {/* Compact subject averages */}
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                {[
+                  { subject: 'Reading', avg: 43, color: '#ef4444' },
+                  { subject: 'Language', avg: 48, color: '#f59e0b' },
+                  { subject: 'Math', avg: 57, color: '#3b82f6' },
+                ].map((s) => (
+                  <div key={s.subject} className="text-center">
+                    <div className="relative w-20 h-20 mx-auto mb-2">
+                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                        <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                        <circle cx="18" cy="18" r="15.915" fill="none" stroke={s.color} strokeWidth="3"
+                          strokeDasharray={`${s.avg}, 100`} strokeLinecap="round" />
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-lg font-bold" style={{color: s.color}}>{s.avg}th</span>
+                      </div>
+                    </div>
+                    <p className="text-xs font-medium text-gray-700">{s.subject}</p>
+                    <p className="text-xs text-gray-400">Avg. percentile (Gr. 3-6)</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* 7th grade highlight */}
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-3">
+                <span className="text-green-500 text-xl">✓</span>
+                <div>
+                  <p className="text-sm font-semibold text-green-700">7th Grade: Strong across all subjects</p>
+                  <p className="text-xs text-green-600">Reading 66th · Language 65th · Math 75th percentile</p>
+                </div>
+              </div>
+
+              <button className="mt-4 text-xs text-[#4ecdc4] font-medium hover:underline"
+                onClick={() => navigateToSection('journey', 'student-performance')}>
+                See full grade-by-grade breakdown →
+              </button>
+            </div>
+
+            {/* Metrics Customization Note */}
+            <div className="bg-gradient-to-r from-[#1e2749]/5 to-[#4ecdc4]/5 rounded-xl p-4 border border-[#4ecdc4]/20">
+              <div className="flex items-start gap-3">
+                <BarChart3 className="w-5 h-5 text-[#4ecdc4] mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold text-[#1e2749]">
+                    Your Metrics, Your Way
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    All progress data can be tied to state assessment results, district-specific benchmarks, or TDI survey metrics — whichever tells your school&apos;s story best. Your TDI partner will customize this with you during onboarding.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Hub Engagement Visual Section */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <Monitor className="w-5 h-5 text-[#4ecdc4]" />
+                  <h3 className="text-base font-bold text-[#1e2749]">Hub Engagement</h3>
+                  <Tooltip content="Tracks staff engagement with the TDI Learning Hub. Industry average for PD platforms is 40-50%. Your district is at 87%.">
+                    <span></span>
+                  </Tooltip>
+                </div>
+                <span className="text-xs text-gray-400">Updated Jan 13, 2026</span>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Donut Chart - Login Rate */}
+                <div className="flex flex-col items-center">
+                  <div className="relative w-36 h-36">
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                      <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                      <circle cx="18" cy="18" r="15.915" fill="none" stroke="#4ecdc4" strokeWidth="3"
+                        strokeDasharray="87, 100" strokeLinecap="round" />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <Tooltip content="Average login and engagement rate for PD platforms nationally is 40-50%. Your 87% is nearly double the industry average. Source: Digital Promise (2024).">
+                        <span className="text-3xl font-bold text-[#1e2749]">87%</span>
+                      </Tooltip>
+                      <span className="text-xs text-gray-500">logged in</span>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-center">
+                    <p className="text-sm font-semibold text-[#1e2749]">Hub Logins</p>
+                    <p className="text-xs text-gray-500">223 of 255 staff</p>
+                    <p className="text-xs text-[#4ecdc4] font-medium mt-1">Goal: 100% by Observation Day</p>
+                  </div>
+                </div>
+
+                {/* Vertical Bar Chart - Engagement Depth */}
+                <div className="flex flex-col">
+                  <p className="text-sm font-semibold text-[#1e2749] mb-3">Engagement Depth</p>
+                  <div className="space-y-3 flex-1">
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Completed 1+ course</span>
+                        <span className="font-semibold text-[#1e2749]">68%</span>
+                      </div>
+                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#1e2749] rounded-full" style={{width: '68%'}}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Downloaded resources</span>
+                        <span className="font-semibold text-[#38618C]">74%</span>
+                      </div>
+                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#38618C] rounded-full" style={{width: '74%'}}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Active this month</span>
+                        <span className="font-semibold text-[#4ecdc4]">52%</span>
+                      </div>
+                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#4ecdc4] rounded-full" style={{width: '52%'}}></div>
+                      </div>
+                    </div>
+                  </div>
+                  <Tooltip content="Engagement depth shows how staff interact beyond just logging in. Active this month means at least one Hub interaction in the past 30 days.">
+                    <span className="text-xs text-gray-400 mt-2">What does this mean?</span>
+                  </Tooltip>
+                </div>
+
+                {/* Building Breakdown - Mini Horizontal Bars */}
+                <div className="flex flex-col">
+                  <p className="text-sm font-semibold text-[#1e2749] mb-3">By Building</p>
+                  <div className="space-y-2 flex-1">
+                    {[
+                      { name: 'Harmony Elementary', pct: 95, count: '38/40' },
+                      { name: 'Crescendo High', pct: 91, count: '41/45' },
+                      { name: 'Rhythm Academy', pct: 88, count: '37/42' },
+                      { name: 'Motown Early Learning', pct: 85, count: '34/40' },
+                      { name: 'Motown Middle', pct: 82, count: '37/45' },
+                      { name: 'Bridges Alternative', pct: 84, count: '36/43' },
+                    ].map((school) => (
+                      <div key={school.name} className="cursor-pointer hover:bg-gray-50 rounded p-1 -mx-1 transition-colors"
+                        onClick={() => setActiveTab('schools')}>
+                        <div className="flex justify-between text-xs mb-0.5">
+                          <span className="text-gray-600 truncate">{school.name}</span>
+                          <span className="font-medium text-gray-700 ml-2">{school.pct}%</span>
+                        </div>
+                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-full rounded-full transition-all"
+                            style={{width: `${school.pct}%`, backgroundColor: school.pct >= 90 ? '#4ecdc4' : school.pct >= 85 ? '#38618C' : '#f59e0b'}}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-[#4ecdc4] mt-2 cursor-pointer hover:underline"
+                    onClick={() => setActiveTab('schools')}>
+                    View all buildings →
+                  </p>
+                </div>
+              </div>
             </div>
 
             {/* Needs Attention — Collapsed Header with Expandable List */}
