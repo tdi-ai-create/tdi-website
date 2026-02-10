@@ -2,7 +2,25 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check, Play, Zap, Shield } from 'lucide-react';
+import Image from 'next/image';
+import {
+  Check,
+  Play,
+  Zap,
+  Shield,
+  Smile,
+  Clock,
+  MonitorSpeaker,
+  Sun,
+  TrendingUp,
+  Users,
+  Home,
+  Heart,
+  Calendar,
+  MessageCircle,
+  Lightbulb,
+  CheckCheck,
+} from 'lucide-react';
 import AvatarPicker from '@/components/hub/AvatarPicker';
 import { getSupabase } from '@/lib/supabase';
 import { getCurrentUser } from '@/lib/hub-auth';
@@ -11,7 +29,7 @@ type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5;
 
 type Role = 'classroom_teacher' | 'para' | 'coach' | 'school_leader' | 'district_staff' | 'other';
 
-type GoalType = 'reduce_stress' | 'save_time' | 'classroom_management' | 'find_joy' | 'team_growth' | 'role_support' | 'stop_bringing_work_home' | 'feel_like_myself' | 'make_it_to_summer' | 'all_of_the_above';
+type GoalType = 'reduce_stress' | 'save_time' | 'classroom_management' | 'find_joy' | 'team_growth' | 'role_support' | 'stop_bringing_work_home' | 'feel_like_myself' | 'make_it_to_summer' | 'better_parent_communication' | 'fresh_ideas' | 'all_of_the_above';
 
 const ROLES: { value: Role; label: string; subtitle: string }[] = [
   { value: 'classroom_teacher', label: 'Classroom Teacher', subtitle: 'Any grade, any subject' },
@@ -22,102 +40,24 @@ const ROLES: { value: Role; label: string; subtitle: string }[] = [
   { value: 'other', label: 'Something Else', subtitle: 'Tell us in settings later' },
 ];
 
-// Goal icons as inline SVGs
-const GoalIcons: Record<GoalType, React.ReactNode> = {
-  reduce_stress: (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="16" cy="12" r="8" />
-      <path d="M8 12c2 0 3-1 3-3" />
-      <path d="M24 12c-2 0-3-1-3-3" />
-      <path d="M12 22c0 2 1.8 4 4 4s4-2 4-4" />
-      <path d="M10 28c1-1 3-2 6-2s5 1 6 2" />
-    </svg>
-  ),
-  save_time: (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="16" cy="16" r="12" />
-      <path d="M16 8v8l5 3" />
-      <path d="M26 10l3-3" />
-      <path d="M24 8l2-2" />
-    </svg>
-  ),
-  classroom_management: (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="4" y="6" width="24" height="16" rx="2" />
-      <path d="M8 26h16" />
-      <path d="M12 22v4" />
-      <path d="M20 22v4" />
-      <path d="M10 12h12" />
-      <path d="M10 16h8" />
-    </svg>
-  ),
-  find_joy: (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="16" cy="16" r="6" />
-      <path d="M16 2v4" />
-      <path d="M16 26v4" />
-      <path d="M2 16h4" />
-      <path d="M26 16h4" />
-      <path d="M6 6l3 3" />
-      <path d="M23 23l3 3" />
-      <path d="M6 26l3-3" />
-      <path d="M23 9l3-3" />
-    </svg>
-  ),
-  team_growth: (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 4v24" />
-      <path d="M8 12l8-8 8 8" />
-      <path d="M6 20h20" />
-    </svg>
-  ),
-  role_support: (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="10" cy="10" r="4" />
-      <circle cx="22" cy="10" r="4" />
-      <path d="M4 24c0-4 2.7-7 6-7 1.5 0 2.9.5 4 1.4" />
-      <path d="M28 24c0-4-2.7-7-6-7-1.5 0-2.9.5-4 1.4" />
-      <path d="M16 18v6" />
-    </svg>
-  ),
-  stop_bringing_work_home: (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5 14l11-10 11 10" />
-      <path d="M7 13v11a2 2 0 002 2h14a2 2 0 002-2V13" />
-      <path d="M6 6l20 20" />
-      <path d="M26 6L6 26" />
-    </svg>
-  ),
-  feel_like_myself: (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 28c-1.5-2-6-6-6-12a6 6 0 0112 0c0 6-4.5 10-6 12z" />
-      <path d="M12 16h8" />
-      <path d="M16 12v8" />
-      <circle cx="16" cy="16" r="2" />
-    </svg>
-  ),
-  make_it_to_summer: (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="4" y="6" width="24" height="20" rx="2" />
-      <path d="M4 12h24" />
-      <path d="M10 4v4" />
-      <path d="M22 4v4" />
-      <circle cx="20" cy="20" r="3" />
-      <path d="M20 15v2" />
-      <path d="M23 18l-1.5 1" />
-      <path d="M17 18l1.5 1" />
-    </svg>
-  ),
-  all_of_the_above: (
-    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 16l6 6L26 8" />
-      <path d="M6 8l6 6" />
-      <path d="M18 20l8-8" />
-    </svg>
-  ),
+// Goal icons mapped to Lucide components
+const GoalIconMap: Record<GoalType, React.ReactNode> = {
+  reduce_stress: <Smile size={28} strokeWidth={1.5} />,
+  save_time: <Clock size={28} strokeWidth={1.5} />,
+  classroom_management: <MonitorSpeaker size={28} strokeWidth={1.5} />,
+  find_joy: <Sun size={28} strokeWidth={1.5} />,
+  team_growth: <TrendingUp size={28} strokeWidth={1.5} />,
+  role_support: <Users size={28} strokeWidth={1.5} />,
+  stop_bringing_work_home: <Home size={28} strokeWidth={1.5} />,
+  feel_like_myself: <Heart size={28} strokeWidth={1.5} />,
+  make_it_to_summer: <Calendar size={28} strokeWidth={1.5} />,
+  better_parent_communication: <MessageCircle size={28} strokeWidth={1.5} />,
+  fresh_ideas: <Lightbulb size={28} strokeWidth={1.5} />,
+  all_of_the_above: <CheckCheck size={28} strokeWidth={1.5} />,
 };
 
-const GOALS: { value: GoalType; label: string }[] = [
+// Grid goals (12 cards in 4x3 layout, excluding all_of_the_above)
+const GRID_GOALS: { value: GoalType; label: string }[] = [
   { value: 'reduce_stress', label: 'Manage my stress' },
   { value: 'save_time', label: 'Get my time back' },
   { value: 'classroom_management', label: 'Classroom management' },
@@ -127,11 +67,12 @@ const GOALS: { value: GoalType; label: string }[] = [
   { value: 'stop_bringing_work_home', label: 'Stop bringing work home' },
   { value: 'feel_like_myself', label: 'Feel like myself again' },
   { value: 'make_it_to_summer', label: 'Make it to summer' },
-  { value: 'all_of_the_above', label: 'Honestly? All of the above' },
+  { value: 'better_parent_communication', label: 'Better parent convos' },
+  { value: 'fresh_ideas', label: 'Fresh ideas for my classroom' },
 ];
 
 // All goals except "all_of_the_above" for the select-all behavior
-const ALL_INDIVIDUAL_GOALS: GoalType[] = GOALS.filter(g => g.value !== 'all_of_the_above').map(g => g.value);
+const ALL_INDIVIDUAL_GOALS: GoalType[] = GRID_GOALS.map(g => g.value);
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -351,43 +292,61 @@ export default function OnboardingPage() {
             className="min-h-screen flex flex-col items-center justify-center p-6 text-center relative"
             style={{ backgroundColor: '#2B3A67' }}
           >
-            <p
-              className="text-sm tracking-widest mb-6 uppercase"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                color: '#E8B84B',
-              }}
-            >
-              The TDI Learning Hub
-            </p>
+            {/* Two-line logo lockup */}
+            <div className="flex flex-col items-center" style={{ gap: '8px' }}>
+              <p
+                className="text-[18px] md:text-[22px]"
+                style={{
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  fontWeight: 400,
+                  letterSpacing: '0.02em',
+                }}
+              >
+                The Teachers Deserve It
+              </p>
+              <h1
+                className="text-[40px] md:text-[56px] font-bold uppercase"
+                style={{
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  color: 'white',
+                  letterSpacing: '0.06em',
+                  lineHeight: 1,
+                }}
+              >
+                LEARNING HUB
+              </h1>
+            </div>
 
-            <h1
-              className="text-3xl md:text-4xl font-semibold mb-6 max-w-lg"
+            {/* Tagline */}
+            <p
+              className="text-[18px] md:text-[22px] italic mt-6"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
-                color: 'white',
-                fontSize: '36px',
-                lineHeight: 1.2,
+                color: 'rgba(255, 255, 255, 0.7)',
               }}
             >
               Teaching shouldn't feel like survival.
-            </h1>
+            </p>
 
+            {/* Body text */}
             <p
-              className="max-w-lg mb-10"
+              className="mt-5"
               style={{
                 fontFamily: "'DM Sans', sans-serif",
-                color: 'rgba(255, 255, 255, 0.7)',
+                color: 'rgba(255, 255, 255, 0.55)',
                 fontSize: '16px',
                 lineHeight: 1.6,
+                maxWidth: '520px',
               }}
             >
               Teachers Deserve It started as a conversation about what educators actually need. The Learning Hub is where that conversation becomes action. Courses, tools, and a space built just for you.
             </p>
 
+            {/* CTA Button */}
             <button
               onClick={() => goToStep(1)}
-              className="px-8 py-4 rounded-lg font-semibold transition-all hover:scale-105"
+              className="mt-8 px-8 py-4 rounded-lg font-semibold transition-all hover:scale-105"
               style={{
                 backgroundColor: '#E8B84B',
                 color: '#2B3A67',
@@ -398,7 +357,7 @@ export default function OnboardingPage() {
             </button>
 
             {/* Scroll to learn more */}
-            <div className="mt-8 flex flex-col items-center">
+            <div className="mt-5 flex flex-col items-center">
               <button
                 onClick={scrollToStory}
                 className="hover:underline transition-all"
@@ -485,12 +444,51 @@ export default function OnboardingPage() {
                 That system was not built with teachers in mind. TDI was. Through books, a podcast, school partnerships, and a growing community of educators who refuse to settle. The Learning Hub is the newest piece: a place where all of those tools, strategies, and resources live in one spot, built around your goals, on your schedule.
               </p>
             </div>
+
+            {/* Rae's headshot */}
+            <div className="mt-6 flex flex-col items-center">
+              <div
+                className="w-[120px] h-[120px] rounded-full overflow-hidden"
+                style={{ border: '3px solid #E8B84B' }}
+              >
+                <Image
+                  src="/images/rae-headshot.webp"
+                  alt="Rae Hughart"
+                  width={120}
+                  height={120}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <p
+                className="mt-4 font-bold"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '14px',
+                  color: '#2B3A67',
+                }}
+              >
+                Rae Hughart, Founder
+              </p>
+              <p
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '13px',
+                  color: '#9CA3AF',
+                }}
+              >
+                TEDx Speaker. Author. Former middle school teacher.
+              </p>
+            </div>
           </section>
 
           {/* Section C: Impact Stats */}
           <section
-            className="py-12 md:py-16 px-6"
-            style={{ backgroundColor: '#2B3A67' }}
+            className="py-12 md:py-16 px-6 relative"
+            style={{
+              backgroundColor: '#2B3A67',
+              backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.04) 2px, transparent 2px)',
+              backgroundSize: '20px 20px',
+            }}
           >
             <div className="max-w-4xl mx-auto">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
@@ -552,14 +550,25 @@ export default function OnboardingPage() {
                 The TDI Blueprint
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+                {/* Vertical connecting line - desktop only */}
+                <div
+                  className="hidden md:block absolute left-[20px] top-[20px] bottom-[20px] w-[2px]"
+                  style={{ backgroundColor: 'rgba(232, 184, 75, 0.3)' }}
+                />
+                {/* Mobile vertical line */}
+                <div
+                  className="md:hidden absolute left-[20px] top-[20px] bottom-[20px] w-[2px]"
+                  style={{ backgroundColor: 'rgba(232, 184, 75, 0.3)' }}
+                />
+
                 {[
                   { num: '1', title: 'Respect Teachers\' Time', desc: 'PD that fits into real life, not consumes it.' },
                   { num: '2', title: 'Deliver Real Strategies', desc: 'Practical tools that work Monday morning.' },
                   { num: '3', title: 'Prioritize Wellness', desc: 'Sustainable teaching starts with supported teachers.' },
                   { num: '4', title: 'Measure What Matters', desc: 'Real impact, not just attendance sheets.' },
                 ].map((item) => (
-                  <div key={item.num} className="flex gap-4 items-start">
+                  <div key={item.num} className="flex gap-4 items-start relative z-10">
                     <div
                       className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ backgroundColor: '#E8B84B' }}
@@ -619,7 +628,14 @@ export default function OnboardingPage() {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Card 1: Courses */}
-                <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#FAFAF8' }}>
+                <div
+                  className="p-6 text-center"
+                  style={{
+                    backgroundColor: '#FAFAF8',
+                    borderTop: '4px solid #E8B84B',
+                    borderRadius: '12px 12px 12px 12px',
+                  }}
+                >
                   <div
                     className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
                     style={{ backgroundColor: '#2B3A67' }}
@@ -648,7 +664,14 @@ export default function OnboardingPage() {
                 </div>
 
                 {/* Card 2: Quick Wins */}
-                <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#FAFAF8' }}>
+                <div
+                  className="p-6 text-center"
+                  style={{
+                    backgroundColor: '#FAFAF8',
+                    borderTop: '4px solid #E8B84B',
+                    borderRadius: '12px 12px 12px 12px',
+                  }}
+                >
                   <div
                     className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
                     style={{ backgroundColor: '#2B3A67' }}
@@ -677,7 +700,14 @@ export default function OnboardingPage() {
                 </div>
 
                 {/* Card 3: Privacy */}
-                <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#FAFAF8' }}>
+                <div
+                  className="p-6 text-center"
+                  style={{
+                    backgroundColor: '#FAFAF8',
+                    borderTop: '4px solid #E8B84B',
+                    borderRadius: '12px 12px 12px 12px',
+                  }}
+                >
                   <div
                     className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
                     style={{ backgroundColor: '#2B3A67' }}
@@ -710,12 +740,28 @@ export default function OnboardingPage() {
 
           {/* Section F: Community Quote */}
           <section
-            className="py-12 md:py-16 px-6 text-center"
+            className="py-12 md:py-16 px-6 text-center relative"
             style={{ backgroundColor: '#FAFAF8' }}
           >
-            <div className="max-w-xl mx-auto">
+            <div className="max-w-xl mx-auto relative">
+              {/* Decorative quotation mark */}
+              <span
+                className="absolute pointer-events-none select-none"
+                style={{
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  fontSize: '200px',
+                  color: 'rgba(232, 184, 75, 0.15)',
+                  top: '-20px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  lineHeight: 1,
+                }}
+              >
+                "
+              </span>
+
               <p
-                className="italic mb-6"
+                className="italic mb-6 relative z-10"
                 style={{
                   fontFamily: "'Source Serif 4', Georgia, serif",
                   fontSize: '22px',
@@ -897,18 +943,24 @@ export default function OnboardingPage() {
               Pick as many as you want. These shape your suggestions.
             </p>
 
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
-              {GOALS.map((goal) => {
+            {/* 4x3 Grid of goal cards */}
+            <div
+              className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4"
+              style={{
+                gridAutoRows: '1fr',
+              }}
+            >
+              {GRID_GOALS.map((goal) => {
                 const isSelected = selectedGoals.includes(goal.value);
                 return (
                   <button
                     key={goal.value}
                     onClick={() => toggleGoal(goal.value)}
-                    className="p-4 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 flex flex-col items-center text-center"
+                    className="p-4 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 flex flex-col items-center justify-center text-center h-full"
                     style={{
                       backgroundColor: isSelected ? '#FFF8E7' : '#FFFFFF',
                       border: isSelected ? '2px solid #E8B84B' : '1.5px solid #E5E7EB',
-                      minHeight: '130px',
+                      minHeight: '120px',
                     }}
                     aria-pressed={isSelected}
                   >
@@ -916,10 +968,10 @@ export default function OnboardingPage() {
                       className="mb-3"
                       style={{ color: isSelected ? '#E8B84B' : '#2B3A67' }}
                     >
-                      {GoalIcons[goal.value]}
+                      {GoalIconMap[goal.value]}
                     </div>
                     <p
-                      className="font-bold text-sm"
+                      className="font-bold text-sm leading-tight"
                       style={{
                         fontFamily: "'DM Sans', sans-serif",
                         color: '#2B3A67',
@@ -931,6 +983,33 @@ export default function OnboardingPage() {
                 );
               })}
             </div>
+
+            {/* "All of the above" - Full width card below grid */}
+            <button
+              onClick={() => toggleGoal('all_of_the_above')}
+              className="w-full p-4 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 flex items-center gap-4 text-left mb-8"
+              style={{
+                backgroundColor: selectedGoals.includes('all_of_the_above') ? '#FFF8E7' : '#FFFFFF',
+                border: selectedGoals.includes('all_of_the_above') ? '2px solid #E8B84B' : '1.5px solid #E5E7EB',
+                borderLeft: '4px solid #E8B84B',
+              }}
+              aria-pressed={selectedGoals.includes('all_of_the_above')}
+            >
+              <div
+                style={{ color: selectedGoals.includes('all_of_the_above') ? '#E8B84B' : '#2B3A67' }}
+              >
+                {GoalIconMap['all_of_the_above']}
+              </div>
+              <p
+                className="font-bold text-sm"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: '#2B3A67',
+                }}
+              >
+                Honestly? All of the above
+              </p>
+            </button>
 
             <div className="flex gap-3">
               <button
