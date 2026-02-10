@@ -854,21 +854,6 @@ export default function PartnerDashboard() {
             aria-labelledby="tab-overview"
             className="space-y-6"
           >
-            {/* Your Metrics, Your Way - Intro Banner */}
-            <div className="bg-gradient-to-r from-[#1e2749]/5 to-[#4ecdc4]/5 rounded-xl p-4 border border-[#4ecdc4]/20">
-              <div className="flex items-start gap-3">
-                <BarChart3 className="w-5 h-5 text-[#4ecdc4] mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-[#1e2749]">
-                    Your Metrics, Your Way
-                  </p>
-                  <p className="text-xs text-gray-600 mt-1">
-                    All progress data can be tied to state assessment results, district-specific benchmarks, or TDI survey metrics — whichever tells your school&apos;s story best. Your TDI partner will customize this with you during onboarding.
-                  </p>
-                </div>
-              </div>
-            </div>
-
             {/* Stat Cards */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Staff Enrolled */}
@@ -880,8 +865,8 @@ export default function PartnerDashboard() {
                   </div>
                   <div className="text-2xl font-bold text-[#1e2749]">{staffStats.total}</div>
                   <div className="text-xs text-[#38618C] font-medium">
-                    {partnership.partnership_type === 'district'
-                      ? `across ${partnership.building_count || 1} school${(partnership.building_count || 1) > 1 ? 's' : ''}`
+                    {partnership.partnership_type === 'district' && apiBuildings.length > 0
+                      ? `across ${apiBuildings.length} school${apiBuildings.length > 1 ? 's' : ''}`
                       : 'staff members'}
                   </div>
                 </div>
@@ -897,9 +882,9 @@ export default function PartnerDashboard() {
                         <span className="text-xs text-gray-500 uppercase">Observations</span>
                       </div>
                       <div className="text-2xl font-bold text-[#1e2749]">
-                        {partnership.observation_days_completed || 0}
+                        {partnership.observation_days_completed ?? 0}
                         <span className="text-lg font-normal text-gray-400">
-                          /{partnership.observation_days_total || 0}
+                          /{partnership.observation_days_total ?? 0}
                         </span>
                       </div>
                     </div>
@@ -909,11 +894,11 @@ export default function PartnerDashboard() {
                         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-[#4ecdc4] rounded-full"
-                            style={{ width: `${((partnership.observation_days_completed || 0) / partnership.observation_days_total) * 100}%` }}
+                            style={{ width: `${((partnership.observation_days_completed ?? 0) / (partnership.observation_days_total || 1)) * 100}%` }}
                           />
                         </div>
                         <p className="text-xs text-gray-400 text-right mt-0.5">
-                          {Math.round(((partnership.observation_days_completed || 0) / partnership.observation_days_total) * 100)}%
+                          {Math.round(((partnership.observation_days_completed ?? 0) / (partnership.observation_days_total || 1)) * 100)}%
                         </p>
                       </div>
                     )}
@@ -1771,7 +1756,7 @@ export default function PartnerDashboard() {
               <div className="flex flex-col sm:flex-row items-start gap-6">
                 <div className="w-24 h-24 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
                   <Image
-                    src="/images/rae.webp"
+                    src="/images/rae-headshot.webp"
                     alt="Rae Hughart"
                     width={96}
                     height={96}
@@ -2019,9 +2004,9 @@ export default function PartnerDashboard() {
                     </tr>
                     <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 text-[#1e2749]">On-Site Observation Days</td>
-                      <td className="py-3 px-4 text-center font-medium">{partnership?.observation_days_total || 0}</td>
+                      <td className="py-3 px-4 text-center font-medium">{partnership?.observation_days_total ?? 0}</td>
                       <td className="py-3 px-4 text-center">
-                        <span className="text-gray-600">{partnership?.observation_days_completed || 0} Complete</span>
+                        <span className="text-gray-600">{partnership?.observation_days_completed ?? 0} Complete</span>
                       </td>
                     </tr>
                     <tr className="border-b border-gray-100">
