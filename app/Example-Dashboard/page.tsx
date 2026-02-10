@@ -1809,40 +1809,11 @@ export default function ExampleDashboard() {
                 <span className="text-xs text-gray-400">Updated Feb 7, 2026</span>
               </div>
 
-              {/* HEADLINE: Visual summary bar */}
+              {/* HEADLINE */}
               <div className="mb-4">
-                <div className="flex items-baseline gap-2 mb-2">
+                <div className="flex items-baseline gap-2">
                   <span className="text-3xl font-bold text-[#1e2749]">585</span>
                   <span className="text-sm text-gray-500">total touchpoints across your district</span>
-                </div>
-                {/* Stacked bar showing proportions */}
-                <div className="h-4 rounded-full overflow-hidden flex">
-                  <div className="bg-[#1e2749] h-full" style={{width: '34%'}} title="Newsletter: 197"></div>
-                  <div className="bg-[#38618C] h-full" style={{width: '22%'}} title="Blog: 131"></div>
-                  <div className="bg-[#4ecdc4] h-full" style={{width: '13%'}} title="Podcast: 78"></div>
-                  <div className="bg-[#7edcd5] h-full" style={{width: '8%'}} title="Community: 48"></div>
-                  <div className="bg-amber-400 h-full" style={{width: '15%'}} title="Resources: 361 (scaled)"></div>
-                  <div className="bg-amber-300 h-full" style={{width: '8%'}} title="Courses: 224 (scaled)"></div>
-                </div>
-                <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2">
-                  <span className="flex items-center gap-1 text-xs text-gray-500">
-                    <span className="w-2 h-2 rounded-full bg-[#1e2749]"></span> Newsletter
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-gray-500">
-                    <span className="w-2 h-2 rounded-full bg-[#38618C]"></span> Blog
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-gray-500">
-                    <span className="w-2 h-2 rounded-full bg-[#4ecdc4]"></span> Podcast
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-gray-500">
-                    <span className="w-2 h-2 rounded-full bg-[#7edcd5]"></span> Community
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-gray-500">
-                    <span className="w-2 h-2 rounded-full bg-amber-400"></span> Resources
-                  </span>
-                  <span className="flex items-center gap-1 text-xs text-gray-500">
-                    <span className="w-2 h-2 rounded-full bg-amber-300"></span> Courses
-                  </span>
                 </div>
               </div>
 
