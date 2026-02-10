@@ -323,7 +323,7 @@ function IntakeWizardContent() {
   };
 
   const goToDashboard = () => {
-    router.push(`/${dashboardSlug}-dashboard`);
+    router.push(`/partners/${dashboardSlug}-dashboard`);
   };
 
   const isStep1Valid = orgData.name.trim() !== '' && orgData.address_city.trim() !== '' && orgData.address_state !== '';
