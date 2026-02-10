@@ -689,13 +689,13 @@ export default function AboutPage() {
               <p>If you've been a teacher, you know the mark.</p>
 
               <p>
-                Not a grade. Not a checkmark. That quick little W a teacher leaves on student work — the one that says "yes, you got it." Students know it instantly. It's not formal. It's human. It's the fastest way to say "I see your knowledge."
+                Not a grade. Not a checkmark. That quick little W a teacher leaves on student work, the one that says "yes, you got it." Students know it instantly. It's not formal. It's human. It's the fastest way to say "I see your knowledge."
               </p>
 
               <p>That's where our symbol starts. The approval mark.</p>
 
               <p>
-                But it doesn't stop there. The pen keeps moving. The final upstroke of the W climbs up and becomes a circle — sweeping around the whole thing. One continuous stroke that never lifts off the paper.
+                But it doesn't stop there. The pen keeps moving. The final upstroke of the W climbs up and becomes a circle, sweeping around the whole thing. One continuous stroke that never lifts off the paper.
               </p>
 
               <p>
@@ -705,7 +705,7 @@ export default function AboutPage() {
               <p>One stroke says two things: I see you. I've got you.</p>
 
               <p>
-                You'll notice this symbol when you enter our portals — the Creators Studio, the Leadership Dashboard, the Learning Hub. A line enters the screen, forms the mark, holds for just a moment, then unravels and carries you in. The symbol was never meant to be permanent. It was always just one line passing through — the same line that wrote "I see you" becomes the line that takes you where you need to go.
+                You'll notice this symbol when you enter our portals: the Creators Studio, the Leadership Dashboard, the Learning Hub. A line enters the screen, forms the mark, holds for just a moment, then unravels and carries you in. The symbol was never meant to be permanent. It was always just one line passing through. The same line that wrote "I see you" becomes the line that takes you where you need to go.
               </p>
 
               <p>
@@ -713,7 +713,7 @@ export default function AboutPage() {
               </p>
 
               <p>
-                One stroke. It draws on, it holds, it unravels. The mark that says "I see you" — then becomes the line that takes you there.
+                One stroke. It draws on, it holds, it unravels. The mark that says "I see you" then becomes the line that takes you there.
               </p>
             </div>
           </div>

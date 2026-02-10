@@ -7,6 +7,8 @@ type PortalType = 'creators' | 'leadership' | 'hub';
 interface TDIPortalLoaderProps {
   portal: PortalType;
   onComplete: () => void;
+  /** If false, animation will hold after completing until this becomes true. Defaults to true. */
+  canComplete?: boolean;
 }
 
 const PORTAL_BACKGROUNDS: Record<PortalType, string> = {
@@ -97,13 +99,15 @@ function generateEntryPath(
   return points;
 }
 
-export default function TDIPortalLoader({ portal, onComplete }: TDIPortalLoaderProps) {
+export default function TDIPortalLoader({ portal, onComplete, canComplete = true }: TDIPortalLoaderProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const [isFading, setIsFading] = useState(false);
+  const [animationFinished, setAnimationFinished] = useState(false);
   const animationRef = useRef<number | null>(null);
   const startTimeRef = useRef<number | null>(null);
+  const hasTriggeredFade = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -298,15 +302,12 @@ export default function TDIPortalLoader({ portal, onComplete }: TDIPortalLoaderP
         ctx.restore();
       }
 
-      // Continue animation or trigger fade
+      // Continue animation or mark as finished
       if (rawProgress < 1) {
         animationRef.current = requestAnimationFrame(animate);
       } else {
-        // Animation complete, start fade out
-        setIsFading(true);
-        setTimeout(() => {
-          onComplete();
-        }, 500);
+        // Animation complete - mark as finished but don't fade yet
+        setAnimationFinished(true);
       }
     };
 
@@ -318,7 +319,18 @@ export default function TDIPortalLoader({ portal, onComplete }: TDIPortalLoaderP
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [portal, onComplete]);
+  }, [portal]);
+
+  // Trigger fade and onComplete when both animation is finished AND canComplete is true
+  useEffect(() => {
+    if (animationFinished && canComplete && !hasTriggeredFade.current) {
+      hasTriggeredFade.current = true;
+      setIsFading(true);
+      setTimeout(() => {
+        onComplete();
+      }, 500);
+    }
+  }, [animationFinished, canComplete, onComplete]);
 
   return (
     <div

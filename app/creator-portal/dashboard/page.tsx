@@ -236,6 +236,7 @@ export default function CreatorDashboardPage() {
         <TDIPortalLoader
           portal="creators"
           onComplete={() => setAnimDone(true)}
+          canComplete={!isLoading}
         />
       )}
       <div className="min-h-screen bg-[#f5f5f5]">
