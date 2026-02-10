@@ -57,7 +57,7 @@ import {
   Zap
 } from 'lucide-react';
 
-// Bulletproof Tooltip component with useState — works on hover (desktop) and tap (mobile)
+// Bulletproof Tooltip component with useState - works on hover (desktop) and tap (mobile)
 const Tooltip = ({ children, content }: { children: React.ReactNode; content: string }) => {
   const [showMobile, setShowMobile] = useState(false);
 
@@ -994,7 +994,7 @@ export default function ExampleDashboard() {
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            {/* Your Metrics, Your Way — Top of Overview */}
+            {/* Your Metrics, Your Way - Top of Overview */}
             <div className="bg-gradient-to-r from-[#1e2749]/5 to-[#4ecdc4]/5 rounded-xl p-4 border border-[#4ecdc4]/20">
               <div className="flex items-start gap-3">
                 <BarChart3 className="w-5 h-5 text-[#4ecdc4] mt-0.5 flex-shrink-0" />
@@ -1003,7 +1003,7 @@ export default function ExampleDashboard() {
                     Your Metrics, Your Way
                   </p>
                   <p className="text-xs text-gray-600 mt-1">
-                    All progress data can be tied to state assessment results, district-specific benchmarks, or TDI survey metrics — whichever tells your school&apos;s story best. Your TDI partner will customize this with you during onboarding.
+                    All progress data can be tied to state assessment results, district-specific benchmarks, or TDI survey metrics - whichever tells your school&apos;s story best. Your TDI partner will customize this with you during onboarding.
                   </p>
                 </div>
               </div>
@@ -1218,7 +1218,7 @@ export default function ExampleDashboard() {
                   <div className="flex items-center flex-wrap gap-2 mb-2">
                     <span className="text-sm font-semibold text-[#1e2749]">Strategy Implementation</span>
                     <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">↑ Higher is better</span>
-                    <span className="text-xs px-2 py-0.5 bg-amber-50 text-amber-600 rounded-full font-medium">↑ Growing — above industry</span>
+                    <span className="text-xs px-2 py-0.5 bg-amber-50 text-amber-600 rounded-full font-medium">↑ Growing - above industry</span>
                   </div>
                   <div className="grid grid-cols-3 gap-4 text-xs">
                     <div>
@@ -1298,7 +1298,7 @@ export default function ExampleDashboard() {
               </div>
             </div>
 
-            {/* Building Spotlight — Awards + Insights merged */}
+            {/* Building Spotlight - Awards + Insights merged */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -1326,7 +1326,7 @@ export default function ExampleDashboard() {
                     insightType: 'celebrate',
                     bgColor: 'bg-green-50',
                     borderColor: 'border-green-100',
-                    insightText: "Harmony is leading the district with 2 golds and 4 silvers. Ms. Rivera's PLC structure gives teachers protected time to engage with Hub content — it's clearly working.",
+                    insightText: "Harmony is leading the district with 2 golds and 4 silvers. Ms. Rivera's PLC structure gives teachers protected time to engage with Hub content - it's clearly working.",
                     ctaButtons: [
                       { label: "🎉 Congratulate Harmony's Team", style: 'bg-green-500 text-white hover:bg-green-600' },
                       { label: '☕ Send Ms. Rivera a Coffee', style: 'bg-white text-green-600 border border-green-200 hover:bg-green-50' },
@@ -1351,7 +1351,7 @@ export default function ExampleDashboard() {
                     insightType: 'praise',
                     bgColor: 'bg-blue-50',
                     borderColor: 'border-blue-100',
-                    insightText: "Crescendo is solid across the board — 2 golds, 3 silvers, and 1 bronze. Mr. Okafor's team is the highest course-completing group in the district. Keep the momentum going.",
+                    insightText: "Crescendo is solid across the board - 2 golds, 3 silvers, and 1 bronze. Mr. Okafor's team is the highest course-completing group in the district. Keep the momentum going.",
                     ctaButtons: [],
                     links: [],
                   },
@@ -1368,7 +1368,7 @@ export default function ExampleDashboard() {
                     insightType: 'celebrate',
                     bgColor: 'bg-green-50',
                     borderColor: 'border-green-100',
-                    insightText: "Melody has the lowest stress in the district at 5.0/10 — something is working here. Mrs. Patel's approach to staff wellness is worth exploring and sharing with other buildings.",
+                    insightText: "Melody has the lowest stress in the district at 5.0/10 - something is working here. Mrs. Patel's approach to staff wellness is worth exploring and sharing with other buildings.",
                     ctaButtons: [
                       { label: "🌟 Spotlight Melody's Wellness Approach", style: 'bg-green-500 text-white hover:bg-green-600' },
                     ],
@@ -1385,7 +1385,7 @@ export default function ExampleDashboard() {
                     insightType: 'action',
                     bgColor: 'bg-amber-50',
                     borderColor: 'border-amber-100',
-                    insightText: "Rhythm leads the district in resource downloads (92!) but doesn't have a TDI Champion yet — that's the #1 lever for turning downloads into classroom practice. We'd also suggest scheduling the observation for early April to maximize the feedback window.",
+                    insightText: "Rhythm leads the district in resource downloads (92!) but doesn't have a TDI Champion yet - that's the #1 lever for turning downloads into classroom practice. We'd also suggest scheduling the observation for early April to maximize the feedback window.",
                     ctaButtons: [
                       { label: 'Suggest a Champion for Rhythm →', style: 'bg-[#1e2749] text-white hover:bg-[#2a3a6b]' },
                       { label: 'Suggest Observation Timing →', style: 'bg-white text-[#1e2749] border border-gray-200 hover:bg-gray-50' },
@@ -1433,13 +1433,13 @@ export default function ExampleDashboard() {
                   },
                 ].map((building) => (
                   <div key={building.id} className={`rounded-xl border overflow-hidden ${building.borderColor}`}>
-                    {/* Collapsed header — always visible */}
+                    {/* Collapsed header - always visible */}
                     <button onClick={() => toggleSection(building.id)}
                       className={`w-full p-4 flex items-start justify-between text-left hover:brightness-95 transition-all ${building.bgColor}`}>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
                           <span className="text-sm font-bold text-[#1e2749]">{building.school}</span>
-                          {/* Medal pills — compact, inline */}
+                          {/* Medal pills - compact, inline */}
                           {building.medals.slice(0, 3).map((m, i) => (
                             <span key={i} className="text-xs px-1.5 py-0.5 bg-white/70 rounded-full font-medium text-gray-600">
                               {m.type} {m.award}
@@ -1704,7 +1704,7 @@ export default function ExampleDashboard() {
               </div>
             </div>
 
-            {/* Action Items — Combined Needs Attention + Recommendations */}
+            {/* Action Items - Combined Needs Attention + Recommendations */}
             <div id="action-items-section" className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
               <button
                 onClick={() => toggleSection('action-items')}
@@ -2293,7 +2293,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-green-600 text-lg">✅</span>
                       <div>
-                        <div className="font-semibold text-[#1e2749]">District Kickoff — All 6 Buildings</div>
+                        <div className="font-semibold text-[#1e2749]">District Kickoff - All 6 Buildings</div>
                         <div className="text-sm text-gray-500">August 18, 2025</div>
                       </div>
                     </div>
@@ -2316,8 +2316,8 @@ export default function ExampleDashboard() {
                       </ul>
                     </div>
                     <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                      <p className="text-sm italic text-gray-700">&quot;When Rae asked us what we actually needed instead of telling us what we should do — that&apos;s when I knew this would be different.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">— Dr. J. Ford, Superintendent</p>
+                      <p className="text-sm italic text-gray-700">&quot;When Rae asked us what we actually needed instead of telling us what we should do - that&apos;s when I knew this would be different.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">- Dr. J. Ford, Superintendent</p>
                     </div>
                   </div>
                 )}
@@ -2333,7 +2333,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-green-600 text-lg">✅</span>
                       <div>
-                        <div className="font-semibold text-[#1e2749]">Hub Onboarding — 255 Educators Enrolled</div>
+                        <div className="font-semibold text-[#1e2749]">Hub Onboarding - 255 Educators Enrolled</div>
                         <div className="text-sm text-gray-500">September 8-12, 2025</div>
                       </div>
                     </div>
@@ -2357,7 +2357,7 @@ export default function ExampleDashboard() {
                     </div>
                     <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
                       <p className="text-sm italic text-gray-700">&quot;I&apos;ve been a para for 11 years and nobody has ever sent me a personal note welcoming me to professional development. I saved it.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">— Para, Motown Early Learning Center</p>
+                      <p className="text-xs text-gray-500 mt-2">- Para, Motown Early Learning Center</p>
                     </div>
                   </div>
                 )}
@@ -2373,7 +2373,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-green-600 text-lg">✅</span>
                       <div>
-                        <div className="font-semibold text-[#1e2749]">Baseline Survey — 237/255 Responses (93%)</div>
+                        <div className="font-semibold text-[#1e2749]">Baseline Survey - 237/255 Responses (93%)</div>
                         <div className="text-sm text-gray-500">September 22-26, 2025</div>
                       </div>
                     </div>
@@ -2419,16 +2419,16 @@ export default function ExampleDashboard() {
                       <h4 className="font-semibold text-[#1e2749] text-sm">Selected Open Responses</h4>
                       <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-3" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
                         <p className="text-sm italic text-gray-700">&quot;I love my students but I feel invisible to the adults in this building.&quot;</p>
-                        <p className="text-xs text-gray-500 mt-1">— Para</p>
+                        <p className="text-xs text-gray-500 mt-1">- Para</p>
                       </div>
                       <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-3" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
                         <p className="text-sm italic text-gray-700">&quot;I want to use my para more effectively but no one ever taught me how.&quot;</p>
-                        <p className="text-xs text-gray-500 mt-1">— Teacher</p>
+                        <p className="text-xs text-gray-500 mt-1">- Teacher</p>
                       </div>
                     </div>
                     <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                      <p className="text-sm italic text-gray-700">&quot;The baseline data confirmed what we suspected but had never quantified. Seeing a 3.9 out of 10 for paras feeling valued — that number changed how our principals approached the rest of the year.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">— Dr. J. Ford, Superintendent</p>
+                      <p className="text-sm italic text-gray-700">&quot;The baseline data confirmed what we suspected but had never quantified. Seeing a 3.9 out of 10 for paras feeling valued - that number changed how our principals approached the rest of the year.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">- Dr. J. Ford, Superintendent</p>
                     </div>
                   </div>
                 )}
@@ -2444,7 +2444,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-green-600 text-lg">✅</span>
                       <div>
-                        <div className="font-semibold text-[#1e2749]">Virtual Session 1 — Teacher Cohort Launch</div>
+                        <div className="font-semibold text-[#1e2749]">Virtual Session 1 - Teacher Cohort Launch</div>
                         <div className="text-sm text-gray-500">October 7, 2025</div>
                       </div>
                     </div>
@@ -2467,7 +2467,7 @@ export default function ExampleDashboard() {
                     </div>
                     <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
                       <p className="text-sm italic text-gray-700">&quot;This was the first PD session where I didn&apos;t check my phone once. I was actually engaged.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">— Teacher, Rhythm Academy</p>
+                      <p className="text-xs text-gray-500 mt-2">- Teacher, Rhythm Academy</p>
                     </div>
                   </div>
                 )}
@@ -2483,7 +2483,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-green-600 text-lg">✅</span>
                       <div>
-                        <div className="font-semibold text-[#1e2749]">Virtual Session 2 — Para Cohort Launch</div>
+                        <div className="font-semibold text-[#1e2749]">Virtual Session 2 - Para Cohort Launch</div>
                         <div className="text-sm text-gray-500">October 14, 2025</div>
                       </div>
                     </div>
@@ -2505,8 +2505,8 @@ export default function ExampleDashboard() {
                       </ul>
                     </div>
                     <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                      <p className="text-sm italic text-gray-700">&quot;I cried during the session. Not because I was sad — because someone finally asked us what WE needed.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">— Para, Harmony Elementary</p>
+                      <p className="text-sm italic text-gray-700">&quot;I cried during the session. Not because I was sad - because someone finally asked us what WE needed.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">- Para, Harmony Elementary</p>
                     </div>
                   </div>
                 )}
@@ -2522,7 +2522,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-green-600 text-lg">✅</span>
                       <div>
-                        <div className="font-semibold text-[#1e2749]">Observation Day 1 — Para Pilot at Harmony Elementary</div>
+                        <div className="font-semibold text-[#1e2749]">Observation Day 1 - Para Pilot at Harmony Elementary</div>
                         <div className="text-sm text-gray-500">November 12, 2025 · 10 Classrooms · 10 Love Notes</div>
                       </div>
                     </div>
@@ -2560,12 +2560,12 @@ export default function ExampleDashboard() {
                     </div>
                     <div className="bg-[#FFFBEB] border-l-3 border-[#FFBA06] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#FFBA06'}}>
                       <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Sample Love Note</p>
-                      <p className="text-sm italic text-gray-700">&quot;Maria, I noticed how you positioned yourself at eye level with Jayden during the reading activity — that small shift made him visibly more engaged. You have a natural gift for creating connection. Keep using that superpower!&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">— Rae Hughart, TDI</p>
+                      <p className="text-sm italic text-gray-700">&quot;Maria, I noticed how you positioned yourself at eye level with Jayden during the reading activity - that small shift made him visibly more engaged. You have a natural gift for creating connection. Keep using that superpower!&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">- Rae Hughart, TDI</p>
                     </div>
                     <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                      <p className="text-sm italic text-gray-700">&quot;Three paras came to me after school and said it was the best day of their career. Not because anything extraordinary happened — because someone noticed them.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">— Principal, Harmony Elementary</p>
+                      <p className="text-sm italic text-gray-700">&quot;Three paras came to me after school and said it was the best day of their career. Not because anything extraordinary happened - because someone noticed them.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">- Principal, Harmony Elementary</p>
                     </div>
                   </div>
                 )}
@@ -2581,7 +2581,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-green-600 text-lg">✅</span>
                       <div>
-                        <div className="font-semibold text-[#1e2749]">Observation Day 2 — Teacher Pilot at Motown MS</div>
+                        <div className="font-semibold text-[#1e2749]">Observation Day 2 - Teacher Pilot at Motown MS</div>
                         <div className="text-sm text-gray-500">December 10, 2025 · 12 Classrooms · 12 Love Notes</div>
                       </div>
                     </div>
@@ -2620,11 +2620,11 @@ export default function ExampleDashboard() {
                     <div className="bg-[#FFFBEB] border-l-3 border-[#FFBA06] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#FFBA06'}}>
                       <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Sample Love Note</p>
                       <p className="text-sm italic text-gray-700">&quot;Mr. Chen, the way you seamlessly included your paraprofessional in the small group rotation was exceptional. When you handed Rosa the discussion prompts and stepped back, your students got two quality interactions instead of one. That&apos;s the kind of teacher-para collaboration that changes outcomes.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">— Rae Hughart, TDI</p>
+                      <p className="text-xs text-gray-500 mt-2">- Rae Hughart, TDI</p>
                     </div>
                     <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
                       <p className="text-sm italic text-gray-700">&quot;I&apos;ve had dozens of walkthrough observations in my career. This is the first time someone told me specifically what I did WELL instead of what I need to fix.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">— Teacher, Motown Middle School</p>
+                      <p className="text-xs text-gray-500 mt-2">- Teacher, Motown Middle School</p>
                     </div>
                   </div>
                 )}
@@ -2640,7 +2640,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-green-600 text-lg">✅</span>
                       <div>
-                        <div className="font-semibold text-[#1e2749]">Virtual Session 3 — Growth Groups Formed from Observation Data</div>
+                        <div className="font-semibold text-[#1e2749]">Virtual Session 3 - Growth Groups Formed from Observation Data</div>
                         <div className="text-sm text-gray-500">January 14, 2026</div>
                       </div>
                     </div>
@@ -2672,7 +2672,7 @@ export default function ExampleDashboard() {
                     </div>
                     <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
                       <p className="text-sm italic text-gray-700">&quot;Being in a Growth Group with a para from a completely different building opened my eyes. She sees things in my teaching I never would have noticed.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">— Teacher, Crescendo High School</p>
+                      <p className="text-xs text-gray-500 mt-2">- Teacher, Crescendo High School</p>
                     </div>
                   </div>
                 )}
@@ -2688,7 +2688,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-green-600 text-lg">✅</span>
                       <div>
-                        <div className="font-semibold text-[#1e2749]">Mid-Year Survey — 224/255 Responses (88%)</div>
+                        <div className="font-semibold text-[#1e2749]">Mid-Year Survey - 224/255 Responses (88%)</div>
                         <div className="text-sm text-gray-500">January 20-24, 2026</div>
                       </div>
                     </div>
@@ -2724,26 +2724,26 @@ export default function ExampleDashboard() {
                       </div>
                     </div>
                     <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <p className="text-sm font-medium text-green-800">🎉 Highlight: Para &quot;Feeling Valued&quot; saw the single largest improvement — from 3.9 to 6.5 (67% increase)</p>
+                      <p className="text-sm font-medium text-green-800">🎉 Highlight: Para &quot;Feeling Valued&quot; saw the single largest improvement - from 3.9 to 6.5 (67% increase)</p>
                     </div>
                     <div className="space-y-2">
                       <h4 className="font-semibold text-[#1e2749] text-sm">Selected Open Responses (Mid-Year)</h4>
                       <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-3" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
                         <p className="text-sm italic text-gray-700">&quot;The Love Note from my observation is framed on my desk. I read it when I&apos;m having a hard day.&quot;</p>
-                        <p className="text-xs text-gray-500 mt-1">— Para, Harmony Elementary</p>
+                        <p className="text-xs text-gray-500 mt-1">- Para, Harmony Elementary</p>
                       </div>
                       <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-3" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                        <p className="text-sm italic text-gray-700">&quot;I&apos;m actually using strategies from the Hub in my classroom. Not because I have to — because they work.&quot;</p>
-                        <p className="text-xs text-gray-500 mt-1">— Teacher, Crescendo High School</p>
+                        <p className="text-sm italic text-gray-700">&quot;I&apos;m actually using strategies from the Hub in my classroom. Not because I have to - because they work.&quot;</p>
+                        <p className="text-xs text-gray-500 mt-1">- Teacher, Crescendo High School</p>
                       </div>
                       <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-3" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
                         <p className="text-sm italic text-gray-700">&quot;I told my sister to apply for the open para position. I never would have said that in September.&quot;</p>
-                        <p className="text-xs text-gray-500 mt-1">— Para, Bridges Alternative Program</p>
+                        <p className="text-xs text-gray-500 mt-1">- Para, Bridges Alternative Program</p>
                       </div>
                     </div>
                     <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                      <p className="text-sm italic text-gray-700">&quot;The para data is what gets me. Going from 3.9 to 6.5 on feeling valued — that&apos;s not a number, that&apos;s a cultural shift in how we treat the adults in our buildings.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">— Dr. J. Ford, Superintendent</p>
+                      <p className="text-sm italic text-gray-700">&quot;The para data is what gets me. Going from 3.9 to 6.5 on feeling valued - that&apos;s not a number, that&apos;s a cultural shift in how we treat the adults in our buildings.&quot;</p>
+                      <p className="text-xs text-gray-500 mt-2">- Dr. J. Ford, Superintendent</p>
                     </div>
                   </div>
                 )}
@@ -2759,7 +2759,7 @@ export default function ExampleDashboard() {
                     <div className="flex items-center gap-3">
                       <span className="text-green-600 text-lg">✅</span>
                       <div>
-                        <div className="font-semibold text-[#1e2749]">Executive Session 1 — Leadership Progress Review</div>
+                        <div className="font-semibold text-[#1e2749]">Executive Session 1 - Leadership Progress Review</div>
                         <div className="text-sm text-gray-500">February 4, 2026</div>
                       </div>
                     </div>
@@ -2783,7 +2783,7 @@ export default function ExampleDashboard() {
                     </div>
                     <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
                       <p className="text-sm italic text-gray-700">&quot;I&apos;ve never had a PD partner sit down with my leadership team and walk us through our own data like this. You made it feel like a conversation, not a report.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">— Dr. J. Ford, Superintendent</p>
+                      <p className="text-xs text-gray-500 mt-2">- Dr. J. Ford, Superintendent</p>
                     </div>
                   </div>
                 )}
@@ -2801,7 +2801,7 @@ export default function ExampleDashboard() {
                 <div className="flex items-center gap-3">
                   <span className="text-gray-400 text-lg">⬜</span>
                   <div>
-                    <div className="font-semibold text-gray-600">Virtual Session 4 — Differentiation Growth Group</div>
+                    <div className="font-semibold text-gray-600">Virtual Session 4 - Differentiation Growth Group</div>
                     <div className="text-sm text-gray-400">March 2026 · 6 teachers from Harmony + Crescendo</div>
                   </div>
                 </div>
@@ -2811,7 +2811,7 @@ export default function ExampleDashboard() {
                 <div className="flex items-center gap-3">
                   <span className="text-gray-400 text-lg">⬜</span>
                   <div>
-                    <div className="font-semibold text-gray-600">Observation Day 3 — Para Pilot Group (Spring Cycle)</div>
+                    <div className="font-semibold text-gray-600">Observation Day 3 - Para Pilot Group (Spring Cycle)</div>
                     <div className="text-sm text-gray-400">April 2026 · Building on November observations</div>
                   </div>
                 </div>
@@ -2821,7 +2821,7 @@ export default function ExampleDashboard() {
                 <div className="flex items-center gap-3">
                   <span className="text-gray-400 text-lg">⬜</span>
                   <div>
-                    <div className="font-semibold text-gray-600">Observation Day 4 — Teacher Pilot Group (Spring Cycle)</div>
+                    <div className="font-semibold text-gray-600">Observation Day 4 - Teacher Pilot Group (Spring Cycle)</div>
                     <div className="text-sm text-gray-400">April 2026 · Building on December observations</div>
                   </div>
                 </div>
@@ -2841,7 +2841,7 @@ export default function ExampleDashboard() {
                 <div className="flex items-center gap-3">
                   <span className="text-gray-400 text-lg">⬜</span>
                   <div>
-                    <div className="font-semibold text-gray-600">Virtual Sessions 5 &amp; 6 — Teacher-Para Collaboration + Classroom Management</div>
+                    <div className="font-semibold text-gray-600">Virtual Sessions 5 &amp; 6 - Teacher-Para Collaboration + Classroom Management</div>
                     <div className="text-sm text-gray-400">May 2026 · Final Growth Group sessions</div>
                   </div>
                 </div>
@@ -2851,7 +2851,7 @@ export default function ExampleDashboard() {
                 <div className="flex items-center gap-3">
                   <span className="text-gray-400 text-lg">⬜</span>
                   <div>
-                    <div className="font-semibold text-gray-600">Executive Impact Session — Annual Results &amp; 2026-27 Planning</div>
+                    <div className="font-semibold text-gray-600">Executive Impact Session - Annual Results &amp; 2026-27 Planning</div>
                     <div className="text-sm text-gray-400">May 2026 · Full impact report · board presentation support</div>
                   </div>
                 </div>
@@ -2988,7 +2988,7 @@ export default function ExampleDashboard() {
                       <p className="text-sm text-gray-700 italic">
                         &quot;Marcus, the way you redirected Jaylen back to the group without missing a beat showed real skill. You kept the whole table on track while giving him exactly what he needed. That&apos;s the kind of support that changes outcomes.&quot;
                       </p>
-                      <p className="text-xs text-gray-500 mt-2">— Delivered to Marcus T., Para at Harmony Elementary</p>
+                      <p className="text-xs text-gray-500 mt-2">- Delivered to Marcus T., Para at Harmony Elementary</p>
                     </div>
 
                     {/* Educator Quote */}
@@ -3000,7 +3000,7 @@ export default function ExampleDashboard() {
                       <p className="text-sm text-gray-700 italic">
                         &quot;I&apos;ve been a para for 12 years and no one has ever watched me work and told me what I was doing right. This meant everything.&quot;
                       </p>
-                      <p className="text-xs text-gray-500 mt-2">— Para at Harmony Elementary</p>
+                      <p className="text-xs text-gray-500 mt-2">- Para at Harmony Elementary</p>
                     </div>
                   </div>
                 </Accordion>
@@ -3058,8 +3058,8 @@ export default function ExampleDashboard() {
                     <div className="bg-green-50 rounded-lg p-4">
                       <p className="text-sm font-medium text-green-800 mb-2">Session Wins:</p>
                       <ul className="text-sm text-green-700 space-y-1">
-                        <li>• <strong>Stress level 5.8/10</strong> — below industry average (8-9/10)</li>
-                        <li>• <strong>Retention intent 9.2/10</strong> — strong commitment to stay</li>
+                        <li>• <strong>Stress level 5.8/10</strong> - below industry average (8-9/10)</li>
+                        <li>• <strong>Retention intent 9.2/10</strong> - strong commitment to stay</li>
                         <li>• <strong>52% feel better</strong> than start of year</li>
                         <li>• <strong>92% teacher Hub login</strong> achieved</li>
                       </ul>
@@ -3072,9 +3072,9 @@ export default function ExampleDashboard() {
                         <span className="font-semibold text-[#1B2A4A] text-sm">Love Note Highlight</span>
                       </div>
                       <p className="text-sm text-gray-700 italic">
-                        &quot;Ms. Chen, your questioning sequence during the fraction lesson was masterful. You didn&apos;t just ask &apos;does everyone understand?&apos; — you asked &apos;what would happen if...&apos; and &apos;how do you know?&apos; That&apos;s the kind of questioning that builds mathematical thinkers.&quot;
+                        &quot;Ms. Chen, your questioning sequence during the fraction lesson was masterful. You didn&apos;t just ask &apos;does everyone understand?&apos; - you asked &apos;what would happen if...&apos; and &apos;how do you know?&apos; That&apos;s the kind of questioning that builds mathematical thinkers.&quot;
                       </p>
-                      <p className="text-xs text-gray-500 mt-2">— Delivered to Sarah Chen, 6th Grade Math</p>
+                      <p className="text-xs text-gray-500 mt-2">- Delivered to Sarah Chen, 6th Grade Math</p>
                     </div>
 
                     {/* Educator Quote */}
@@ -3086,7 +3086,7 @@ export default function ExampleDashboard() {
                       <p className="text-sm text-gray-700 italic">
                         &quot;I read my Love Note three times. Then I put it in my desk drawer where I keep things that matter. This job is hard, but knowing someone sees the effort makes it easier to keep going.&quot;
                       </p>
-                      <p className="text-xs text-gray-500 mt-2">— 7th Grade ELA Teacher, Motown MS</p>
+                      <p className="text-xs text-gray-500 mt-2">- 7th Grade ELA Teacher, Motown MS</p>
                     </div>
                   </div>
                 </Accordion>
@@ -3835,14 +3835,14 @@ export default function ExampleDashboard() {
                                 </span>
                               ))}
                               {!hasGoldMedal && (
-                                <span className="text-xs text-gray-400 italic ml-2">📈 On the rise — building momentum!</span>
+                                <span className="text-xs text-gray-400 italic ml-2">📈 On the rise - building momentum!</span>
                               )}
                             </div>
                           </div>
                         ) : (
                           <div className="bg-blue-50 rounded-lg p-3 mb-4 border border-blue-100">
                             <p className="text-xs text-blue-600">
-                              📈 Growing in all areas — on track to earn awards as engagement deepens
+                              📈 Growing in all areas - on track to earn awards as engagement deepens
                             </p>
                           </div>
                         )}
@@ -3887,7 +3887,7 @@ export default function ExampleDashboard() {
                         <div className={`mb-4 p-3 rounded-lg ${school.observationStatus === 'Complete' ? 'bg-green-50' : school.observationStatus === 'Not yet scheduled' ? 'bg-red-50' : 'bg-amber-50'}`}>
                           <p className={`text-sm ${school.observationStatus === 'Complete' ? 'text-green-700' : school.observationStatus === 'Not yet scheduled' ? 'text-red-700' : 'text-amber-700'}`}>
                             <span className="font-semibold">Observation Day:</span>{' '}
-                            {school.observationStatus === 'Complete' ? 'Completed ✓ — Personalized feedback delivered, follow-up coaching scheduled' : school.observationStatus}
+                            {school.observationStatus === 'Complete' ? 'Completed ✓ - Personalized feedback delivered, follow-up coaching scheduled' : school.observationStatus}
                           </p>
                         </div>
 
@@ -4011,7 +4011,7 @@ export default function ExampleDashboard() {
                           )}
                         </div>
 
-                        {/* TDI Recommendation/Spotlight — Per-building insights */}
+                        {/* TDI Recommendation/Spotlight - Per-building insights */}
                         {school.id === 'harmony-elementary' && (
                           <div className="mt-4 bg-green-50 rounded-lg p-4 border border-green-100">
                             <div className="flex items-start gap-2">
@@ -4050,7 +4050,7 @@ export default function ExampleDashboard() {
                               <div>
                                 <p className="text-xs font-bold text-purple-700">TDI Recommendation</p>
                                 <p className="text-xs text-gray-600 mt-1">
-                                  Rhythm doesn't have a TDI Champion yet — that's the #1 lever for improvement.
+                                  Rhythm doesn't have a TDI Champion yet - that's the #1 lever for improvement.
                                   We also recommend scheduling the observation for early April to maximize the
                                   feedback-to-practice window before end of year.
                                 </p>
@@ -4107,7 +4107,7 @@ export default function ExampleDashboard() {
             {/* District Note */}
             <div className="bg-[#38618C]/5 border border-[#38618C]/20 rounded-xl p-4 text-center">
               <p className="text-sm text-[#38618C]">
-                <strong>District-wide tracking</strong> — See engagement across all buildings, identify trends, and celebrate wins at every level.
+                <strong>District-wide tracking</strong> - See engagement across all buildings, identify trends, and celebrate wins at every level.
               </p>
             </div>
           </div>
@@ -4158,7 +4158,7 @@ export default function ExampleDashboard() {
                     <p className="text-lg opacity-90 mb-2">Motown District 360 has come a long way.</p>
                     <h2 className="text-3xl md:text-4xl font-bold mb-3">You&apos;re ready for Year 3.</h2>
                     <p className="text-sm opacity-70 max-w-lg">
-                      From building a foundation in IGNITE to scaling strategies in ACCELERATE — your district
+                      From building a foundation in IGNITE to scaling strategies in ACCELERATE - your district
                       is positioned for the final phase: <span className="text-[#4ecdc4] font-semibold">SUSTAIN</span>.
                       This is where change becomes permanent.
                     </p>
@@ -4295,9 +4295,9 @@ export default function ExampleDashboard() {
                     <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">Your Goal</span>
                   </div>
                   <p className="text-sm font-medium">
-                    &quot;Build sustainable support systems for every teacher and para — so students get consistent, high-quality instruction from every adult in the room.&quot;
+                    &quot;Build sustainable support systems for every teacher and para - so students get consistent, high-quality instruction from every adult in the room.&quot;
                   </p>
-                  <p className="text-xs opacity-70 mt-3">— Dr. Ford, Superintendent</p>
+                  <p className="text-xs opacity-70 mt-3">- Dr. Ford, Superintendent</p>
                 </div>
 
                 {/* How Year 3 Delivers */}
@@ -4331,7 +4331,7 @@ export default function ExampleDashboard() {
                   <p className="text-sm text-gray-600">
                     Multi-year professional development programs show <strong>3x better retention</strong> of practices vs. single-year initiatives. Year 3 is where change becomes permanent.
                   </p>
-                  <p className="text-xs text-gray-400 mt-3">— Learning Forward, 2024</p>
+                  <p className="text-xs text-gray-400 mt-3">- Learning Forward, 2024</p>
                 </div>
               </div>
 
@@ -4402,7 +4402,7 @@ export default function ExampleDashboard() {
                     </tr>
                     <tr className="hover:bg-gray-50">
                       <td className="py-4 text-sm text-gray-700">Hub Engagement</td>
-                      <td className="py-4 text-center"><span className="text-gray-400">—</span></td>
+                      <td className="py-4 text-center"><span className="text-gray-400">-</span></td>
                       <td className="py-4 text-center"><span className="text-[#38618C] font-semibold">87%</span></td>
                       <td className="py-4 text-center"><span className="bg-[#4ecdc4]/20 text-[#1e2749] px-2 py-1 rounded font-bold">92%</span></td>
                     </tr>
@@ -4436,7 +4436,7 @@ export default function ExampleDashboard() {
                 <Sparkles className="w-5 h-5 text-[#4ecdc4]" />
                 <h3 className="text-lg font-bold text-[#1e2749]">What Year 3 Unlocks</h3>
               </div>
-              <p className="text-sm text-gray-500 mb-6">Everything that made Year 2 successful — plus sustainability features that make it permanent</p>
+              <p className="text-sm text-gray-500 mb-6">Everything that made Year 2 successful - plus sustainability features that make it permanent</p>
 
               <div className="grid md:grid-cols-3 gap-4">
                 {/* Hub Access */}
@@ -4531,7 +4531,7 @@ export default function ExampleDashboard() {
               <div className="text-center mb-8">
                 <span className="text-xs bg-white/20 px-3 py-1 rounded-full">The Numbers That Matter</span>
                 <h3 className="text-2xl font-bold mt-3">Your Return on Investment</h3>
-                <p className="text-sm opacity-80 mt-2">Here&apos;s what your TDI partnership has already delivered — and what Year 3 will amplify</p>
+                <p className="text-sm opacity-80 mt-2">Here&apos;s what your TDI partnership has already delivered - and what Year 3 will amplify</p>
               </div>
 
               {/* ROI Stats Grid */}
@@ -4657,7 +4657,7 @@ export default function ExampleDashboard() {
                   Let&apos;s Make These Gains Permanent
                 </h3>
                 <p className="text-lg opacity-90 mb-6">
-                  Your district has built incredible momentum. Year 3 is where we lock it in — building the internal capacity to sustain this transformation for years to come.
+                  Your district has built incredible momentum. Year 3 is where we lock it in - building the internal capacity to sustain this transformation for years to come.
                 </p>
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
@@ -4685,7 +4685,7 @@ export default function ExampleDashboard() {
                 </div>
 
                 <p className="text-sm opacity-70 italic">
-                  Available in active partnerships — your TDI partner will reach out to schedule
+                  Available in active partnerships - your TDI partner will reach out to schedule
                 </p>
               </div>
 
@@ -4729,7 +4729,7 @@ export default function ExampleDashboard() {
 
             {/* Closing Statement */}
             <p className="text-gray-500 text-sm italic text-center">
-              Your TDI partner will build a custom Year 3 plan based on your district&apos;s specific progress, goals, and budget. Every partnership evolves — because every district&apos;s journey is unique.
+              Your TDI partner will build a custom Year 3 plan based on your district&apos;s specific progress, goals, and budget. Every partnership evolves - because every district&apos;s journey is unique.
             </p>
 
           </div>
