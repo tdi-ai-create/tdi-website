@@ -184,6 +184,28 @@ const MiniDonut = ({ value, max, label, displayValue, color, metricType }: {
   );
 };
 
+// Tiny Donut for Teacher/Para section breakdowns (25% size of school donuts)
+const TinyDonut = ({ value, max, label, displayValue, color }: {
+  value: number; max: number; label: string; displayValue: string; color: string
+}) => {
+  const pct = Math.min((value / max) * 100, 100);
+  return (
+    <div className="flex flex-col items-center">
+      <div className="relative w-10 h-10 sm:w-12 sm:h-12">
+        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#f3f4f6" strokeWidth="3.5" />
+          <circle cx="18" cy="18" r="15.915" fill="none" stroke={color} strokeWidth="3.5"
+            strokeDasharray={`${pct}, 100`} strokeLinecap="round" />
+        </svg>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-[9px] sm:text-[10px] font-bold" style={{ color }}>{displayValue}</span>
+        </div>
+      </div>
+      <p className="text-[8px] sm:text-[9px] text-gray-400 mt-0.5 text-center leading-tight">{label}</p>
+    </div>
+  );
+};
+
 export default function ExampleDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [activePhase, setActivePhase] = useState(2);
@@ -386,6 +408,8 @@ export default function ExampleDashboard() {
       ],
       teacherCourses: ['Social-Emotional Learning Foundations', 'Play-Based Assessment', 'Classroom Environment Design'],
       paraCourses: ['Supporting Early Learners', 'Calm Classroom Strategies', 'Communication that Clicks'],
+      teacherBreakdown: { logins: 94, courses: 68, stress: 4.8, implementation: 26 },
+      paraBreakdown: { logins: 64, courses: 52, stress: 6.1, implementation: 15 },
       teacherStaff: [
         { name: 'Sarah M.', loggedIn: true }, { name: 'Maria L.', loggedIn: true }, { name: 'James K.', loggedIn: true },
         { name: 'Priya S.', loggedIn: true }, { name: 'Ana G.', loggedIn: true }, { name: 'Michael C.', loggedIn: true },
@@ -424,6 +448,8 @@ export default function ExampleDashboard() {
       ],
       teacherCourses: ['The Differentiation Fix', 'Small Group Mastery', 'Time Management for Teachers'],
       paraCourses: ['Building Strong Teacher-Para Partnerships', 'Small-Group & One-on-One Instruction', 'De-Escalation Strategies'],
+      teacherBreakdown: { logins: 100, courses: 78, stress: 4.8, implementation: 38 },
+      paraBreakdown: { logins: 85, courses: 58, stress: 5.9, implementation: 26 },
       teacherStaff: [
         { name: 'Emily W.', loggedIn: true }, { name: 'Robert J.', loggedIn: true }, { name: 'Michelle P.', loggedIn: true },
         { name: 'Kevin D.', loggedIn: true }, { name: 'Patricia A.', loggedIn: true }, { name: 'Brian M.', loggedIn: true },
@@ -457,6 +483,8 @@ export default function ExampleDashboard() {
       ],
       teacherCourses: ['Student Engagement Strategies', 'Formative Assessment Toolkit', 'Collaborative Planning'],
       paraCourses: null,
+      teacherBreakdown: { logins: 88, courses: 58, stress: 6.4, implementation: 19 },
+      paraBreakdown: null,
       teacherStaff: [
         { name: 'William H.', loggedIn: true }, { name: 'Susan K.', loggedIn: true }, { name: 'Charles M.', loggedIn: true },
         { name: 'Karen P.', loggedIn: true }, { name: 'Joseph R.', loggedIn: true }, { name: 'Nancy S.', loggedIn: true },
@@ -488,6 +516,8 @@ export default function ExampleDashboard() {
       ],
       teacherCourses: ['Classroom Management Reset', 'Student Voice & Choice', 'Advisory Period Design'],
       paraCourses: ['Supporting Students Through Their Daily Schedule', 'Behavior Support in Transitions'],
+      teacherBreakdown: { logins: 94, courses: 72, stress: 5.4, implementation: 32 },
+      paraBreakdown: { logins: 81, courses: 51, stress: 6.7, implementation: 18 },
       teacherStaff: [
         { name: 'George H.', loggedIn: true }, { name: 'Helen I.', loggedIn: true }, { name: 'Edward J.', loggedIn: true },
         { name: 'Ruth K.', loggedIn: true }, { name: 'Frank L.', loggedIn: true }, { name: 'Virginia M.', loggedIn: true },
@@ -519,6 +549,8 @@ export default function ExampleDashboard() {
       ],
       teacherCourses: ['Engagement in Large Classes', 'Student-Led Conferences', 'Reducing Grading Load'],
       paraCourses: ['Supporting Students with IEPs', 'Study Skills Coaching', 'Communication that Clicks'],
+      teacherBreakdown: { logins: 90, courses: 55, stress: 6.8, implementation: 18 },
+      paraBreakdown: { logins: 65, courses: 34, stress: 7.8, implementation: 6 },
       teacherStaff: [
         { name: 'Harold A.', loggedIn: true }, { name: 'Sharon B.', loggedIn: true }, { name: 'Douglas C.', loggedIn: true },
         { name: 'Catherine D.', loggedIn: true }, { name: 'Gerald E.', loggedIn: false }, { name: 'Deborah F.', loggedIn: true },
@@ -552,6 +584,8 @@ export default function ExampleDashboard() {
       ],
       teacherCourses: ['Trauma-Informed Practices', 'Restorative Conversations', 'Flexible Scheduling'],
       paraCourses: ['De-Escalation Strategies', 'Building Trust with Students'],
+      teacherBreakdown: { logins: 89, courses: 62, stress: 6.2, implementation: 22 },
+      paraBreakdown: { logins: 75, courses: 43, stress: 7.4, implementation: 9 },
       teacherStaff: [
         { name: 'Samuel A.', loggedIn: true }, { name: 'Diane B.', loggedIn: true }, { name: 'Gregory C.', loggedIn: true },
         { name: 'Joyce D.', loggedIn: true }, { name: 'Patrick E.', loggedIn: true }, { name: 'Theresa F.', loggedIn: true },
@@ -3915,12 +3949,45 @@ export default function ExampleDashboard() {
                               </span>
                             </div>
                             {/* Progress Bar */}
-                            <div className="bg-gray-200 rounded-full h-2 mb-4 overflow-hidden">
+                            <div className="bg-gray-200 rounded-full h-2 mb-3 overflow-hidden">
                               <div
                                 className="h-full rounded-full bg-[#1e2749]"
                                 style={{ width: `${(school.teachers.loggedIn / school.teachers.total) * 100}%` }}
                               />
                             </div>
+                            {/* Tiny Donut Breakdown */}
+                            {school.teacherBreakdown && (
+                              <div className="grid grid-cols-4 gap-1 sm:gap-2 mb-4 place-items-center">
+                                <TinyDonut
+                                  value={school.teacherBreakdown.logins}
+                                  max={100}
+                                  label="Logins"
+                                  displayValue={`${school.teacherBreakdown.logins}%`}
+                                  color={school.teacherBreakdown.logins >= 90 ? '#4ecdc4' : school.teacherBreakdown.logins >= 85 ? '#38618C' : '#f59e0b'}
+                                />
+                                <TinyDonut
+                                  value={school.teacherBreakdown.courses}
+                                  max={100}
+                                  label="Courses"
+                                  displayValue={`${school.teacherBreakdown.courses}%`}
+                                  color={school.teacherBreakdown.courses >= 65 ? '#4ecdc4' : school.teacherBreakdown.courses >= 55 ? '#38618C' : '#f59e0b'}
+                                />
+                                <TinyDonut
+                                  value={(10 - school.teacherBreakdown.stress) * 10}
+                                  max={100}
+                                  label="Stress"
+                                  displayValue={`${school.teacherBreakdown.stress}`}
+                                  color={school.teacherBreakdown.stress <= 5.5 ? '#4ecdc4' : school.teacherBreakdown.stress <= 6.5 ? '#38618C' : school.teacherBreakdown.stress > 7.0 ? '#ef4444' : '#f59e0b'}
+                                />
+                                <TinyDonut
+                                  value={school.teacherBreakdown.implementation}
+                                  max={65}
+                                  label="Impl."
+                                  displayValue={`${school.teacherBreakdown.implementation}%`}
+                                  color={school.teacherBreakdown.implementation >= 30 ? '#4ecdc4' : school.teacherBreakdown.implementation >= 20 ? '#38618C' : '#f59e0b'}
+                                />
+                              </div>
+                            )}
                             {/* Courses */}
                             <div className="mb-4">
                               <p className="text-xs text-gray-500 mb-2">What Teachers Are Exploring:</p>
@@ -3966,12 +4033,45 @@ export default function ExampleDashboard() {
                                 </span>
                               </div>
                               {/* Progress Bar */}
-                              <div className="bg-gray-200 rounded-full h-2 mb-4 overflow-hidden">
+                              <div className="bg-gray-200 rounded-full h-2 mb-3 overflow-hidden">
                                 <div
                                   className="h-full rounded-full bg-[#35A7FF]"
                                   style={{ width: `${(school.paras.loggedIn / school.paras.total) * 100}%` }}
                                 />
                               </div>
+                              {/* Tiny Donut Breakdown */}
+                              {school.paraBreakdown && (
+                                <div className="grid grid-cols-4 gap-1 sm:gap-2 mb-4 place-items-center">
+                                  <TinyDonut
+                                    value={school.paraBreakdown.logins}
+                                    max={100}
+                                    label="Logins"
+                                    displayValue={`${school.paraBreakdown.logins}%`}
+                                    color={school.paraBreakdown.logins >= 90 ? '#4ecdc4' : school.paraBreakdown.logins >= 85 ? '#38618C' : '#f59e0b'}
+                                  />
+                                  <TinyDonut
+                                    value={school.paraBreakdown.courses}
+                                    max={100}
+                                    label="Courses"
+                                    displayValue={`${school.paraBreakdown.courses}%`}
+                                    color={school.paraBreakdown.courses >= 65 ? '#4ecdc4' : school.paraBreakdown.courses >= 55 ? '#38618C' : '#f59e0b'}
+                                  />
+                                  <TinyDonut
+                                    value={(10 - school.paraBreakdown.stress) * 10}
+                                    max={100}
+                                    label="Stress"
+                                    displayValue={`${school.paraBreakdown.stress}`}
+                                    color={school.paraBreakdown.stress <= 5.5 ? '#4ecdc4' : school.paraBreakdown.stress <= 6.5 ? '#38618C' : school.paraBreakdown.stress > 7.0 ? '#ef4444' : '#f59e0b'}
+                                  />
+                                  <TinyDonut
+                                    value={school.paraBreakdown.implementation}
+                                    max={65}
+                                    label="Impl."
+                                    displayValue={`${school.paraBreakdown.implementation}%`}
+                                    color={school.paraBreakdown.implementation >= 30 ? '#4ecdc4' : school.paraBreakdown.implementation >= 20 ? '#38618C' : '#f59e0b'}
+                                  />
+                                </div>
+                              )}
                               {/* Courses */}
                               <div className="mb-4">
                                 <p className="text-xs text-gray-500 mb-2">What Paras Are Exploring:</p>
