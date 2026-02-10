@@ -46,24 +46,24 @@ const AVATAR_ICON_MAP: Record<string, LucideIcon> = {
 // Avatar definitions with LIGHT BRIGHT colors and personality names
 export const AVATARS = [
   // Animals (1-8)
-  { id: 'owl', name: 'Owl', personality: 'Wise but tired', color: '#E8D5F2', iconColor: '#6B21A8' },
-  { id: 'golden-retriever', name: 'Golden Retriever', personality: 'Sunshine in human form', color: '#FFF3C4', iconColor: '#B45309' },
-  { id: 'cat', name: 'Cat', personality: 'Do not disturb', color: '#E2E8F0', iconColor: '#475569' },
+  { id: 'owl', name: 'Owl', personality: 'Old soul energy', color: '#E8D5F2', iconColor: '#6B21A8' },
+  { id: 'golden-retriever', name: 'Golden Retriever', personality: 'Dog lover, obviously', color: '#FFF3C4', iconColor: '#B45309' },
+  { id: 'cat', name: 'Cat', personality: 'Cat lover, no apologies', color: '#E2E8F0', iconColor: '#475569' },
   { id: 'fox', name: 'Fox', personality: 'Quietly running the show', color: '#FFDDC1', iconColor: '#C2410C' },
-  { id: 'hummingbird', name: 'Hummingbird', personality: 'Fueled by caffeine', color: '#C6F6D5', iconColor: '#15803D' },
-  { id: 'turtle', name: 'Turtle', personality: 'Slow and steady wins the sanity', color: '#B2F5EA', iconColor: '#0D9488' },
-  { id: 'bear', name: 'Bear', personality: 'Tough outside, marshmallow inside', color: '#FEEBC8', iconColor: '#92400E' },
+  { id: 'hummingbird', name: 'Hummingbird', personality: 'High achiever', color: '#C6F6D5', iconColor: '#15803D' },
+  { id: 'turtle', name: 'Turtle', personality: 'Patience is my superpower', color: '#B2F5EA', iconColor: '#0D9488' },
+  { id: 'bear', name: 'Bear', personality: 'Tough love specialist', color: '#FEEBC8', iconColor: '#92400E' },
   { id: 'butterfly', name: 'Butterfly', personality: 'Still becoming', color: '#E9D8FD', iconColor: '#7C3AED' },
   // Objects (9-12)
-  { id: 'coffee-mug', name: 'Coffee Mug', personality: "Don't talk to me yet", color: '#FED7AA', iconColor: '#9A3412' },
-  { id: 'books', name: 'Books', personality: 'Has a book for that', color: '#FECACA', iconColor: '#B91C1C' },
-  { id: 'plant', name: 'Plant', personality: 'Growing things is my deal', color: '#C6F6D5', iconColor: '#166534' },
+  { id: 'coffee-mug', name: 'Coffee Mug', personality: 'But first, coffee', color: '#FED7AA', iconColor: '#9A3412' },
+  { id: 'books', name: 'Books', personality: 'Total bookworm', color: '#FECACA', iconColor: '#B91C1C' },
+  { id: 'plant', name: 'Plant', personality: 'Kids first, always', color: '#C6F6D5', iconColor: '#166534' },
   { id: 'headphones', name: 'Headphones', personality: 'Main character energy', color: '#BFDBFE', iconColor: '#1D4ED8' },
   // Nature (13-14)
-  { id: 'sunrise', name: 'Sunrise', personality: 'Tomorrow is a fresh start', color: '#FEF3C7', iconColor: '#D97706' },
-  { id: 'mountain', name: 'Mountain', personality: 'High standards, higher expectations', color: '#D1FAE5', iconColor: '#047857' },
+  { id: 'sunrise', name: 'Sunrise', personality: 'Fresh start kind of person', color: '#FEF3C7', iconColor: '#D97706' },
+  { id: 'mountain', name: 'Mountain', personality: 'Built for the climb', color: '#D1FAE5', iconColor: '#047857' },
   // Abstract (15-16)
-  { id: 'starburst', name: 'Starburst', personality: 'A lot of energy, small package', color: '#FDE68A', iconColor: '#CA8A04' },
+  { id: 'starburst', name: 'Starburst', personality: 'Rule breaker', color: '#FDE68A', iconColor: '#CA8A04' },
   { id: 'spiral', name: 'Spiral', personality: 'Go with the flow type', color: '#DDD6FE', iconColor: '#7C3AED' },
 ];
 

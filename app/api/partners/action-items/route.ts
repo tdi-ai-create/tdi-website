@@ -22,7 +22,7 @@ function getServiceSupabase() {
 export async function PATCH(request: NextRequest) {
   try {
     const body = await request.json();
-    const { itemId, status, evidenceFilePath, userId, partnershipId } = body;
+    const { itemId, status, evidenceFilePath, userId, partnershipId, pausedReason, resurfaceAt } = body;
 
     if (!itemId || !status) {
       return NextResponse.json(
@@ -42,10 +42,16 @@ export async function PATCH(request: NextRequest) {
     if (status === 'completed') {
       updateData.completed_at = new Date().toISOString();
       updateData.paused_at = null;
+      updateData.paused_reason = null;
+      updateData.resurface_at = null;
     } else if (status === 'paused') {
       updateData.paused_at = new Date().toISOString();
+      if (pausedReason) updateData.paused_reason = pausedReason;
+      if (resurfaceAt) updateData.resurface_at = resurfaceAt;
     } else if (status === 'pending') {
       updateData.paused_at = null;
+      updateData.paused_reason = null;
+      updateData.resurface_at = null;
     }
 
     if (evidenceFilePath) {
@@ -84,6 +90,8 @@ export async function PATCH(request: NextRequest) {
           item_title: updatedItem?.title,
           new_status: status,
           has_evidence: !!evidenceFilePath,
+          ...(pausedReason && { snooze_duration: pausedReason }),
+          ...(resurfaceAt && { resurface_at: resurfaceAt }),
         },
       });
     }

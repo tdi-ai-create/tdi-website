@@ -92,6 +92,8 @@ interface ActionItem {
   evidence_file_path?: string;
   completed_at?: string;
   paused_at?: string;
+  paused_reason?: string;
+  resurface_at?: string;
 }
 
 interface MetricSnapshot {
@@ -256,6 +258,8 @@ export default function PartnerDashboard() {
   const [savingItemId, setSavingItemId] = useState<string | null>(null);
   const [expandedActionFormId, setExpandedActionFormId] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [snoozePickerItemId, setSnoozePickerItemId] = useState<string | null>(null);
+  const [recentlyResurfacedIds, setRecentlyResurfacedIds] = useState<string[]>([]);
 
   // Action item form state
   const [championName, setChampionName] = useState('');
@@ -278,6 +282,79 @@ export default function PartnerDashboard() {
   // Check TDI admin
   const isTDIAdmin = (email: string) => email.toLowerCase().endsWith('@teachersdeserveit.com');
 
+  // Helper: Format date with ordinal suffix (e.g., "March 3rd")
+  const formatDateWithOrdinal = (dateString: string) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const suffix = day === 1 || day === 21 || day === 31 ? 'st'
+      : day === 2 || day === 22 ? 'nd'
+      : day === 3 || day === 23 ? 'rd'
+      : 'th';
+    const month = date.toLocaleDateString('en-US', { month: 'long' });
+    return `${month} ${day}${suffix}`;
+  };
+
+  // Auto-resurface paused items that are due
+  const autoResurfaceItems = useCallback(async (items: ActionItem[], partnershipId: string) => {
+    const now = new Date();
+    const itemsToResurface = items.filter(
+      item => item.status === 'paused' && item.resurface_at && new Date(item.resurface_at) <= now
+    );
+
+    if (itemsToResurface.length === 0) return items;
+
+    const resurfacedIds: string[] = [];
+
+    for (const item of itemsToResurface) {
+      try {
+        const response = await fetch('/api/partners/action-items', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            itemId: item.id,
+            status: 'pending',
+            userId,
+            partnershipId,
+          }),
+        });
+
+        if (response.ok) {
+          resurfacedIds.push(item.id);
+          // Log the resurface activity
+          await fetch('/api/partners/log-activity', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              partnershipId,
+              userId,
+              action: 'action_item_resurfaced',
+              details: {
+                item_id: item.id,
+                item_title: item.title,
+                was_paused_for: item.paused_reason,
+              },
+            }),
+          });
+        }
+      } catch (error) {
+        console.error('Error resurfacing item:', error);
+      }
+    }
+
+    if (resurfacedIds.length > 0) {
+      setRecentlyResurfacedIds(resurfacedIds);
+      // Clear the "resurfaced" badges after 5 seconds
+      setTimeout(() => setRecentlyResurfacedIds([]), 5000);
+    }
+
+    // Return updated items
+    return items.map(item =>
+      resurfacedIds.includes(item.id)
+        ? { ...item, status: 'pending' as const, paused_at: undefined, paused_reason: undefined, resurface_at: undefined }
+        : item
+    );
+  }, [userId]);
+
   // Load dashboard data
   const loadDashboardData = useCallback(async (partnershipId: string) => {
     try {
@@ -291,7 +368,10 @@ export default function PartnerDashboard() {
         const data = await response.json();
         if (data.success) {
           setOrganization(data.organization);
-          setActionItems(data.actionItems || []);
+          // Auto-resurface any overdue paused items
+          const items = data.actionItems || [];
+          const updatedItems = await autoResurfaceItems(items, partnershipId);
+          setActionItems(updatedItems);
           setStaffStats(data.staffStats || { total: 0, hubLoggedIn: 0 });
           setMetricSnapshots(data.metricSnapshots || []);
           setApiBuildings(data.buildings || []);
@@ -300,7 +380,7 @@ export default function PartnerDashboard() {
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     }
-  }, [userId]);
+  }, [userId, autoResurfaceItems]);
 
   // Track tab view
   const trackTabView = useCallback(async (tabName: string, duration: number) => {
@@ -474,8 +554,12 @@ export default function PartnerDashboard() {
     }
   };
 
-  const handlePauseItem = async (itemId: string) => {
+  const handlePauseItem = async (itemId: string, weeks: 1 | 2 | 4 = 2) => {
     if (!partnership?.id || !userId) return;
+
+    const now = new Date();
+    const resurfaceAt = new Date(now.getTime() + weeks * 7 * 24 * 60 * 60 * 1000);
+    const pausedReason = `${weeks}_week${weeks > 1 ? 's' : ''}`;
 
     try {
       const response = await fetch('/api/partners/action-items', {
@@ -484,6 +568,8 @@ export default function PartnerDashboard() {
         body: JSON.stringify({
           itemId,
           status: 'paused',
+          pausedReason,
+          resurfaceAt: resurfaceAt.toISOString(),
           userId,
           partnershipId: partnership.id,
         }),
@@ -493,11 +579,30 @@ export default function PartnerDashboard() {
         setActionItems(prev =>
           prev.map(item =>
             item.id === itemId
-              ? { ...item, status: 'paused', paused_at: new Date().toISOString() }
+              ? {
+                  ...item,
+                  status: 'paused',
+                  paused_at: now.toISOString(),
+                  paused_reason: pausedReason,
+                  resurface_at: resurfaceAt.toISOString(),
+                }
               : item
           )
         );
-        setToastMessage('No problem - you can come back to this anytime.');
+        // Format date nicely: "March 3rd"
+        const formattedDate = resurfaceAt.toLocaleDateString('en-US', {
+          month: 'long',
+          day: 'numeric'
+        });
+        // Add ordinal suffix
+        const day = resurfaceAt.getDate();
+        const suffix = day === 1 || day === 21 || day === 31 ? 'st'
+          : day === 2 || day === 22 ? 'nd'
+          : day === 3 || day === 23 ? 'rd'
+          : 'th';
+        const dateWithSuffix = formattedDate.replace(/\d+/, `${day}${suffix}`);
+        setToastMessage(`No problem! We'll bring this back on ${dateWithSuffix}.`);
+        setSnoozePickerItemId(null);
       }
     } catch (error) {
       console.error('Error pausing item:', error);
@@ -1624,6 +1729,11 @@ export default function PartnerDashboard() {
                                     >
                                       {priority}
                                     </span>
+                                    {recentlyResurfacedIds.includes(item.id) && (
+                                      <span className="text-xs px-2 py-0.5 rounded-full bg-[#4ecdc4]/20 text-[#4ecdc4] font-medium animate-pulse">
+                                        ↩ Back on your list
+                                      </span>
+                                    )}
                                   </div>
                                   <p className="text-sm text-gray-500 mt-1">{item.description}</p>
 
@@ -1631,23 +1741,46 @@ export default function PartnerDashboard() {
                                   {renderInlineAction()}
 
                                   {/* Secondary Buttons - hide Mark Complete for PLC item since confirmation button serves same purpose */}
-                                  <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-200">
-                                    {!isPLCItem && (
-                                      <button
-                                        onClick={() => handleCompleteItem(item.id)}
-                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-green-700 border border-green-300 rounded-lg hover:bg-green-50 transition-colors"
-                                      >
-                                        <Check className="w-4 h-4" />
-                                        Mark Complete
-                                      </button>
+                                  <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-200 flex-wrap">
+                                    {snoozePickerItemId === item.id ? (
+                                      <>
+                                        <span className="text-sm text-gray-500">Bring this back in:</span>
+                                        {([1, 2, 4] as const).map((weeks) => (
+                                          <button
+                                            key={weeks}
+                                            onClick={() => handlePauseItem(item.id, weeks)}
+                                            className="px-3 py-1.5 text-sm font-medium text-gray-600 bg-gray-100 rounded-full hover:bg-[#4ecdc4] hover:text-white transition-colors"
+                                          >
+                                            {weeks} week{weeks > 1 ? 's' : ''}
+                                          </button>
+                                        ))}
+                                        <button
+                                          onClick={() => setSnoozePickerItemId(null)}
+                                          className="px-3 py-1.5 text-sm text-gray-500 hover:text-gray-700"
+                                        >
+                                          Cancel
+                                        </button>
+                                      </>
+                                    ) : (
+                                      <>
+                                        {!isPLCItem && (
+                                          <button
+                                            onClick={() => handleCompleteItem(item.id)}
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-green-700 border border-green-300 rounded-lg hover:bg-green-50 transition-colors"
+                                          >
+                                            <Check className="w-4 h-4" />
+                                            Mark Complete
+                                          </button>
+                                        )}
+                                        <button
+                                          onClick={() => setSnoozePickerItemId(item.id)}
+                                          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                                        >
+                                          <Clock className="w-4 h-4" />
+                                          Not Right Now
+                                        </button>
+                                      </>
                                     )}
-                                    <button
-                                      onClick={() => handlePauseItem(item.id)}
-                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                                    >
-                                      <Clock className="w-4 h-4" />
-                                      Not Right Now
-                                    </button>
                                   </div>
                                 </div>
                               </div>
@@ -1679,20 +1812,26 @@ export default function PartnerDashboard() {
                       <div className="mt-3 space-y-2">
                         {pausedItems.map((item) => {
                           const Icon = categoryIcons[item.category] || FileText;
+                          const resurfaceDate = item.resurface_at ? formatDateWithOrdinal(item.resurface_at) : null;
 
                           return (
                             <div
                               key={item.id}
-                              className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg opacity-75"
+                              className="flex items-center gap-3 p-3 bg-gray-100 rounded-lg"
                             >
                               <Icon className="w-4 h-4 text-gray-400" />
-                              <span className="flex-1 text-sm text-gray-600">{item.title}</span>
+                              <div className="flex-1 min-w-0">
+                                <span className="text-sm text-gray-600 block">{item.title}</span>
+                                {resurfaceDate && (
+                                  <span className="text-xs text-[#4ecdc4]">Coming back {resurfaceDate}</span>
+                                )}
+                              </div>
                               <button
                                 onClick={() => handleResumeItem(item.id)}
-                                className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700"
+                                className="flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 whitespace-nowrap"
                               >
                                 <Play className="w-3 h-3" />
-                                Resume
+                                Resume Now
                               </button>
                             </div>
                           );
