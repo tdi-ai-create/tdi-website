@@ -1840,7 +1840,7 @@ export default function ExampleDashboard() {
                     <div className="min-w-0 flex-1">
                       <p className="text-sm font-bold text-[#1e2749]">{channel.value}</p>
                       <p className="text-xs text-gray-500 truncate">{channel.label}</p>
-                      <p className="text-[10px] text-[#4ecdc4] font-medium mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <p className="text-xs text-[#1e2749] font-semibold mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         ↗ {channel.stat}
                       </p>
                     </div>
