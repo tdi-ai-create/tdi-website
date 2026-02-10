@@ -8,9 +8,12 @@ export function Footer() {
 
   // Hide on creator-portal/dashboard (focused studio experience)
   // Hide on admin pages (has its own footer)
+  // Hide on partner setup and login pages (focused onboarding experience)
   if (
     pathname?.startsWith('/creator-portal/dashboard') ||
-    pathname?.startsWith('/admin')
+    pathname?.startsWith('/admin') ||
+    pathname?.startsWith('/partner-setup') ||
+    pathname?.startsWith('/partners')
   ) {
     return null;
   }
