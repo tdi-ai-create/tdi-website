@@ -337,61 +337,45 @@ export default function PartnerDashboard() {
 
         setUserId(session.user.id);
         setUserEmail(session.user.email || null);
-        const isAdmin = session.user.email ? isTDIAdmin(session.user.email) : false;
-        console.log('9. Is TDI Admin:', isAdmin);
+        console.log('9. Calling auth-check API...');
 
-        // Look up partnership by slug
-        console.log('10. Querying partnerships table with slug:', partnerSlug);
-        const { data: partnershipData, error: pError } = await supabase
-          .from('partnerships')
-          .select('*')
-          .eq('slug', partnerSlug)
-          .single();
+        // Use API route to look up partnership (bypasses RLS)
+        const authResponse = await fetch('/api/partners/auth-check', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            slug: partnerSlug,
+            userId: session.user.id,
+            userEmail: session.user.email,
+          }),
+        });
 
-        console.log('11. Partnership query error:', pError);
-        console.log('12. Partnership data:', partnershipData);
+        const authData = await authResponse.json();
+        console.log('10. Auth-check response:', authData);
 
-        if (pError || !partnershipData) {
-          console.log('13. FAILED: Partnership not found - error:', pError?.message, 'code:', pError?.code, 'details:', pError?.details);
+        if (!authData.success) {
+          console.log('11. FAILED:', authData.error);
           console.log('=== DASHBOARD DEBUG END (FAILED) ===');
-          setErrorMessage(`Partnership not found (${pError?.code || 'no data'})`);
+
+          if (authResponse.status === 404) {
+            setErrorMessage('Partnership not found');
+          } else if (authResponse.status === 403) {
+            setErrorMessage('You do not have access to this dashboard');
+          } else {
+            setErrorMessage(authData.error || 'Failed to load dashboard');
+          }
           setIsLoading(false);
           return;
         }
 
-        console.log('14. Partnership found! ID:', partnershipData.id, 'slug:', partnershipData.slug);
-
-        // Check authorization (user linked to partnership OR TDI admin)
-        if (!isAdmin) {
-          console.log('15. Non-admin user - checking partnership_users link');
-          const { data: puData, error: puError } = await supabase
-            .from('partnership_users')
-            .select('id')
-            .eq('partnership_id', partnershipData.id)
-            .eq('user_id', session.user.id)
-            .maybeSingle();
-
-          console.log('16. partnership_users query - data:', puData, 'error:', puError);
-
-          if (!puData) {
-            console.log('17. FAILED: User not linked to partnership');
-            console.log('=== DASHBOARD DEBUG END (UNAUTHORIZED) ===');
-            setErrorMessage('You do not have access to this dashboard');
-            setIsLoading(false);
-            return;
-          }
-        } else {
-          console.log('15. TDI admin - skipping partnership_users check');
-        }
-
-        console.log('18. SUCCESS - User authorized');
-        setPartnership(partnershipData);
+        console.log('12. SUCCESS - User authorized, partnership ID:', authData.partnership.id);
+        setPartnership(authData.partnership);
         setIsAuthorized(true);
 
         // Load additional data
-        console.log('19. Loading additional dashboard data...');
-        await loadDashboardData(partnershipData.id);
-        console.log('20. Dashboard data loaded');
+        console.log('13. Loading additional dashboard data...');
+        await loadDashboardData(authData.partnership.id);
+        console.log('14. Dashboard data loaded');
         console.log('=== DASHBOARD DEBUG END (SUCCESS) ===');
 
         // Log activity
