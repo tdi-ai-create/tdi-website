@@ -891,6 +891,25 @@ export default function ExampleDashboard() {
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
+            {/* Your TDI Team — personal connection (top of Overview) */}
+            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-[#4ecdc4]/10 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-[#4ecdc4]" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-[#1e2749]">Your TDI Partnership Team</p>
+                    <p className="text-xs text-gray-500">Rae Hughart (Lead Coach)</p>
+                  </div>
+                </div>
+                <a href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone" target="_blank" rel="noopener noreferrer"
+                  className="text-xs px-4 py-2 bg-[#4ecdc4] text-white rounded-lg hover:bg-[#3dbdb5] transition-colors">
+                  Schedule a Call →
+                </a>
+              </div>
+            </div>
+
             {/* Quick Stats with Expandable Details */}
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Staff Enrolled */}
@@ -1631,25 +1650,6 @@ export default function ExampleDashboard() {
                     </div>
                   </div>
                 )}
-              </div>
-            </div>
-
-            {/* Your TDI Team — personal connection */}
-            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#4ecdc4]/10 flex items-center justify-center">
-                    <Users className="w-5 h-5 text-[#4ecdc4]" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-[#1e2749]">Your TDI Partnership Team</p>
-                    <p className="text-xs text-gray-500">Kristin Williams (Lead Coach) · Rae Hughart (Support)</p>
-                  </div>
-                </div>
-                <a href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone" target="_blank" rel="noopener noreferrer"
-                  className="text-xs px-4 py-2 bg-[#4ecdc4] text-white rounded-lg hover:bg-[#3dbdb5] transition-colors">
-                  Schedule a Call →
-                </a>
               </div>
             </div>
 
