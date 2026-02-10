@@ -21,6 +21,7 @@ import {
   ChevronDown,
   Filter,
   AlertCircle,
+  Trash2,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -128,6 +129,14 @@ export default function AdminPartnershipsPage() {
     virtual_sessions_total: 0,
     executive_sessions_total: 0,
   });
+
+  // Delete modal state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [partnershipToDelete, setPartnershipToDelete] = useState<Partnership | null>(null);
+  const [deleteConfirmation, setDeleteConfirmation] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
+  const [deleteSuccess, setDeleteSuccess] = useState('');
 
   const loadPartnerships = useCallback(async (email: string) => {
     try {
@@ -262,6 +271,69 @@ export default function AdminPartnershipsPage() {
     await navigator.clipboard.writeText(url);
     setCopiedId(id);
     setTimeout(() => setCopiedId(null), 3000);
+  };
+
+  const openDeleteModal = (partnership: Partnership) => {
+    setPartnershipToDelete(partnership);
+    setDeleteConfirmation('');
+    setDeleteError('');
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (!partnershipToDelete || !userEmail) return;
+
+    const expectedName = partnershipToDelete.org_name || partnershipToDelete.contact_name;
+    if (deleteConfirmation !== expectedName) {
+      setDeleteError('Name does not match. Please type the exact name to confirm.');
+      return;
+    }
+
+    setIsDeleting(true);
+    setDeleteError('');
+
+    try {
+      const response = await fetch(`/api/admin/partnerships/${partnershipToDelete.id}/delete`, {
+        method: 'DELETE',
+        headers: {
+          'x-user-email': userEmail,
+        },
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Remove from local state
+        setPartnerships(prev => prev.filter(p => p.id !== partnershipToDelete.id));
+        setFilteredPartnerships(prev => prev.filter(p => p.id !== partnershipToDelete.id));
+
+        // Update stats
+        if (stats) {
+          setStats({
+            ...stats,
+            activeCount: stats.activeCount - (partnershipToDelete.status === 'active' ? 1 : 0),
+            totalEducators: stats.totalEducators - partnershipToDelete.staff_count,
+            pendingSetup: stats.pendingSetup - (partnershipToDelete.status === 'setup_in_progress' ? 1 : 0),
+            awaitingAccept: stats.awaitingAccept - (partnershipToDelete.status === 'invited' ? 1 : 0),
+          });
+        }
+
+        setShowDeleteModal(false);
+        setPartnershipToDelete(null);
+        setDeleteConfirmation('');
+
+        // Show success message
+        setDeleteSuccess('Partnership deleted. Email can now be reused.');
+        setTimeout(() => setDeleteSuccess(''), 5000);
+      } else {
+        setDeleteError(data.error || 'Failed to delete partnership');
+      }
+    } catch (error) {
+      console.error('Error deleting partnership:', error);
+      setDeleteError('Failed to delete partnership. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const activeFiltersCount =
@@ -639,6 +711,14 @@ export default function AdminPartnershipsPage() {
                               Dashboard
                             </Link>
                           )}
+                          <button
+                            onClick={() => openDeleteModal(partnership)}
+                            className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded text-red-600 hover:bg-red-50 transition-colors"
+                            title="Delete partnership"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            Delete
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -868,6 +948,115 @@ export default function AdminPartnershipsPage() {
               </p>
             </form>
           </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && partnershipToDelete && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
+                  <Trash2 className="w-5 h-5 text-red-600" />
+                </div>
+                <h2 className="text-xl font-semibold text-[#1e2749]">Delete Partnership</h2>
+              </div>
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setPartnershipToDelete(null);
+                  setDeleteConfirmation('');
+                  setDeleteError('');
+                }}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              <p className="text-gray-700 mb-4">
+                Delete <strong>{partnershipToDelete.org_name || partnershipToDelete.contact_name}</strong>?
+                This will remove all data and the partner&apos;s account. This cannot be undone.
+              </p>
+
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-red-700">
+                  <strong>What will be deleted:</strong>
+                </p>
+                <ul className="text-sm text-red-600 mt-2 space-y-1">
+                  <li>• Partnership record and all settings</li>
+                  <li>• {partnershipToDelete.staff_count} staff members</li>
+                  <li>• Action items and activity history</li>
+                  <li>• Organization and building data</li>
+                  <li>• Partner&apos;s login account (email can be reused)</li>
+                </ul>
+              </div>
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Type &quot;{partnershipToDelete.org_name || partnershipToDelete.contact_name}&quot; to confirm:
+                </label>
+                <input
+                  type="text"
+                  value={deleteConfirmation}
+                  onChange={(e) => {
+                    setDeleteConfirmation(e.target.value);
+                    setDeleteError('');
+                  }}
+                  placeholder="Enter name to confirm"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent outline-none"
+                />
+              </div>
+
+              {deleteError && (
+                <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700 text-sm">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                  {deleteError}
+                </div>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowDeleteModal(false);
+                    setPartnershipToDelete(null);
+                    setDeleteConfirmation('');
+                    setDeleteError('');
+                  }}
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDelete}
+                  disabled={isDeleting || deleteConfirmation !== (partnershipToDelete.org_name || partnershipToDelete.contact_name)}
+                  className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {isDeleting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Deleting...
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="w-4 h-4" />
+                      Delete Forever
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Toast */}
+      {deleteSuccess && (
+        <div className="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50 animate-in slide-in-from-bottom-5">
+          <Check className="w-5 h-5" />
+          {deleteSuccess}
         </div>
       )}
     </div>
