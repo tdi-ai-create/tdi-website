@@ -18,6 +18,9 @@ interface HubAuthGuardProps {
 // Routes that don't require authentication
 const PUBLIC_ROUTES = ['/hub/verify'];
 
+// Routes that skip the onboarding redirect check
+const SKIP_ONBOARDING_CHECK_ROUTES = ['/hub/onboarding', '/hub/login', '/hub/auth'];
+
 export default function HubAuthGuard({ children }: HubAuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -27,6 +30,9 @@ export default function HubAuthGuard({ children }: HubAuthGuardProps) {
 
   // Check if current route is public
   const isPublicRoute = PUBLIC_ROUTES.some((route) => pathname.startsWith(route));
+
+  // Check if current route should skip onboarding check
+  const skipOnboardingCheck = SKIP_ONBOARDING_CHECK_ROUTES.some((route) => pathname.startsWith(route));
 
   useEffect(() => {
     async function checkAuth() {
@@ -63,12 +69,10 @@ export default function HubAuthGuard({ children }: HubAuthGuardProps) {
         setProfile(userProfile);
 
         // Check if onboarding is complete
-        // Skip onboarding redirect if we're already on an onboarding page
-        if (userProfile && !userProfile.onboarding_completed && !pathname.includes('/onboarding')) {
-          // For now, skip onboarding redirect since the flow isn't built yet
-          // TODO: Uncomment when onboarding flow is ready
-          // router.push('/hub/onboarding');
-          // return;
+        // Redirect to onboarding if not completed and not already on an excluded route
+        if (userProfile && !userProfile.onboarding_completed && !skipOnboardingCheck) {
+          router.push('/hub/onboarding');
+          return;
         }
 
         setIsLoading(false);
@@ -79,7 +83,7 @@ export default function HubAuthGuard({ children }: HubAuthGuardProps) {
     }
 
     checkAuth();
-  }, [pathname, router, isPublicRoute]);
+  }, [pathname, router, isPublicRoute, skipOnboardingCheck]);
 
   // Show loading state
   if (isLoading && !isPublicRoute) {

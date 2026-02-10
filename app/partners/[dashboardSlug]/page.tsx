@@ -102,6 +102,15 @@ interface StaffStats {
   hubLoggedIn: number;
 }
 
+interface Building {
+  id: string;
+  name: string;
+  building_type: string;
+  lead_name: string | null;
+  lead_email: string | null;
+  staff_count: number;
+}
+
 // Design colors
 const colors = {
   navy: '#1B2A4A',
@@ -231,6 +240,7 @@ export default function PartnerDashboard() {
   const [actionItems, setActionItems] = useState<ActionItem[]>([]);
   const [staffStats, setStaffStats] = useState<StaffStats>({ total: 0, hubLoggedIn: 0 });
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
+  const [apiBuildings, setApiBuildings] = useState<Building[]>([]);
 
   // UI state
   const [activeTab, setActiveTab] = useState('overview');
@@ -277,6 +287,7 @@ export default function PartnerDashboard() {
           setActionItems(data.actionItems || []);
           setStaffStats(data.staffStats || { total: 0, hubLoggedIn: 0 });
           setMetricSnapshots(data.metricSnapshots || []);
+          setApiBuildings(data.buildings || []);
         }
       }
     } catch (error) {
@@ -834,7 +845,7 @@ export default function PartnerDashboard() {
       </div>
 
       {/* Tab Content */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-5xl mx-auto px-4 py-8">
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div
@@ -843,126 +854,380 @@ export default function PartnerDashboard() {
             aria-labelledby="tab-overview"
             className="space-y-6"
           >
-            {/* Stat Cards */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Staff Enrolled */}
-              <div
-                className="bg-white rounded-xl shadow-sm border border-gray-200 p-4"
-                aria-label={`Staff enrolled: ${staffStats.total} ${partnership.partnership_type === 'district' ? `across buildings` : 'staff members'}`}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <Users className="w-4 h-4" style={{ color: colors.teal }} />
-                  <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
-                </div>
-                <div className="text-2xl font-bold text-[#1e2749]">{staffStats.total}</div>
-                <div className="text-xs font-medium" style={{ color: colors.teal }}>
-                  {partnership.partnership_type === 'district'
-                    ? `across ${partnership.building_count || 1} school${(partnership.building_count || 1) > 1 ? 's' : ''}`
-                    : `${staffStats.total} staff members`}
-                </div>
-              </div>
-
-              {/* Observations */}
-              <div
-                className="bg-white rounded-xl shadow-sm border border-gray-200 p-4"
-                aria-label={`Observations: ${getObservationText()}`}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <Eye className="w-4 h-4" style={{ color: getObservationColor() }} />
-                  <span className="text-xs text-gray-500 uppercase">Observations</span>
-                </div>
-                <div className="text-2xl font-bold text-[#1e2749]">
-                  {partnership.observation_days_completed || 0}
-                  <span className="text-lg font-normal text-gray-400">
-                    /{partnership.observation_days_total || 0}
-                  </span>
-                </div>
-                <div className="text-xs font-medium" style={{ color: getObservationColor() }}>
-                  {getObservationText()}
-                </div>
-              </div>
-
-              {/* Needs Attention */}
-              <div
-                className="bg-white rounded-xl shadow-sm border border-gray-200 p-4"
-                aria-label={`Needs attention: ${pendingItems.length} items pending, ${pausedItems.length} paused`}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <AlertCircle className="w-4 h-4" style={{ color: pendingItems.length > 0 ? colors.coral : colors.teal }} />
-                  <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
-                </div>
-                <div
-                  className="text-2xl font-bold"
-                  style={{ color: pendingItems.length > 0 ? colors.coral : colors.teal }}
-                >
-                  {pendingItems.length}
-                </div>
-                <div className="text-xs font-medium" style={{ color: colors.amber }}>
-                  {pausedItems.length} on your timeline
-                </div>
-              </div>
-
-              {/* Current Phase */}
-              <div
-                className="bg-white rounded-xl shadow-sm border border-gray-200 p-4"
-                aria-label={`Current phase: ${partnership.contract_phase}`}
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <Star className="w-4 h-4" style={{ color: colors.blueAccent }} />
-                  <span className="text-xs text-gray-500 uppercase">Current Phase</span>
-                </div>
-                <div className="text-2xl font-bold text-[#1e2749]">
-                  Phase {partnership.contract_phase === 'IGNITE' ? '1' : partnership.contract_phase === 'ACCELERATE' ? '2' : '3'}
-                </div>
-                <div className="text-xs font-medium" style={{ color: colors.blueAccent }}>
-                  {partnership.contract_phase}
+            {/* Your Metrics, Your Way - Intro Banner */}
+            <div className="bg-gradient-to-r from-[#1e2749]/5 to-[#4ecdc4]/5 rounded-xl p-4 border border-[#4ecdc4]/20">
+              <div className="flex items-start gap-3">
+                <BarChart3 className="w-5 h-5 text-[#4ecdc4] mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold text-[#1e2749]">
+                    Your Metrics, Your Way
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    All progress data can be tied to state assessment results, district-specific benchmarks, or TDI survey metrics — whichever tells your school&apos;s story best. Your TDI partner will customize this with you during onboarding.
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Health Check */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Health Check</h2>
-              <div className="flex flex-wrap justify-around gap-6">
-                {/* Hub Logins */}
-                <DonutChart
-                  value={staffStats.hubLoggedIn}
-                  max={staffStats.total}
-                  color={getHubLoginColor(hubLoginPct)}
-                  label={`${hubLoginPct}%`}
-                  subLabel={`${staffStats.hubLoggedIn}/${staffStats.total} logged in`}
-                  ariaLabel={`Hub logins: ${hubLoginPct} percent, ${staffStats.hubLoggedIn} of ${staffStats.total} logged in`}
-                />
-
-                {/* Love Notes Sent */}
-                <DonutChart
-                  value={loveNotes}
-                  max={Math.max(loveNotes, 50)}
-                  color={colors.teal}
-                  label={String(loveNotes)}
-                  subLabel="Love Notes sent"
-                  ariaLabel={`Love notes sent: ${loveNotes}`}
-                />
-
-                {/* Virtual Sessions */}
-                <DonutChart
-                  value={virtualSessionsCompleted}
-                  max={partnership.virtual_sessions_total || 4}
-                  color={
-                    virtualSessionsCompleted >= (partnership.virtual_sessions_total || 4)
-                      ? colors.teal
-                      : virtualSessionsCompleted > 0
-                      ? colors.blueAccent
-                      : colors.amber
-                  }
-                  label={`${virtualSessionsCompleted}/${partnership.virtual_sessions_total || 4}`}
-                  subLabel="Virtual sessions"
-                  ariaLabel={`Virtual sessions: ${virtualSessionsCompleted} of ${partnership.virtual_sessions_total || 4} completed`}
-                />
+            {/* Stat Cards */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Staff Enrolled */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Users className="w-4 h-4 text-[#38618C]" />
+                    <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
+                  </div>
+                  <div className="text-2xl font-bold text-[#1e2749]">{staffStats.total}</div>
+                  <div className="text-xs text-[#38618C] font-medium">
+                    {partnership.partnership_type === 'district'
+                      ? `across ${partnership.building_count || 1} school${(partnership.building_count || 1) > 1 ? 's' : ''}`
+                      : 'staff members'}
+                  </div>
+                </div>
               </div>
-              <p className="text-xs text-gray-500 text-center mt-4">
-                Goal: 100% Hub engagement by Observation Day
-              </p>
+
+              {/* Observations */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <Eye className="w-4 h-4 text-[#38618C]" />
+                        <span className="text-xs text-gray-500 uppercase">Observations</span>
+                      </div>
+                      <div className="text-2xl font-bold text-[#1e2749]">
+                        {partnership.observation_days_completed || 0}
+                        <span className="text-lg font-normal text-gray-400">
+                          /{partnership.observation_days_total || 0}
+                        </span>
+                      </div>
+                    </div>
+                    {/* Mini progress bar */}
+                    {partnership.observation_days_total > 0 && (
+                      <div className="w-16">
+                        <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[#4ecdc4] rounded-full"
+                            style={{ width: `${((partnership.observation_days_completed || 0) / partnership.observation_days_total) * 100}%` }}
+                          />
+                        </div>
+                        <p className="text-xs text-gray-400 text-right mt-0.5">
+                          {Math.round(((partnership.observation_days_completed || 0) / partnership.observation_days_total) * 100)}%
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <div className="text-xs font-medium mt-1" style={{ color: getObservationColor() }}>
+                    {getObservationText()}
+                  </div>
+                </div>
+              </div>
+
+              {/* Needs Attention */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <AlertCircle className="w-4 h-4 text-amber-500" />
+                    <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
+                  </div>
+                  <div className="text-2xl font-bold text-amber-500">
+                    {pendingItems.length}
+                  </div>
+                  <div className="text-xs text-amber-600 font-medium">
+                    {pendingItems.length === 0 ? 'All caught up!' : `${pendingItems.length} item${pendingItems.length !== 1 ? 's' : ''} pending`}
+                  </div>
+                </div>
+              </div>
+
+              {/* Current Phase */}
+              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <div className="flex items-center gap-2 mb-1">
+                        <TrendingUp className="w-4 h-4 text-[#38618C]" />
+                        <span className="text-xs text-gray-500 uppercase">Current Phase</span>
+                      </div>
+                      <div className="text-2xl font-bold text-[#1e2749]">
+                        Phase {partnership.contract_phase === 'IGNITE' ? '1' : partnership.contract_phase === 'ACCELERATE' ? '2' : '3'}
+                      </div>
+                      <div className="text-xs text-[#38618C] font-medium">
+                        {partnership.contract_phase}
+                      </div>
+                    </div>
+                    {/* Phase indicator dots */}
+                    <div className="flex gap-1">
+                      <div className={`w-3 h-3 rounded-full ${partnership.contract_phase === 'IGNITE' ? 'bg-[#38618C]' : 'bg-gray-300'}`} />
+                      <div className={`w-3 h-3 rounded-full ${partnership.contract_phase === 'ACCELERATE' ? 'bg-[#38618C]' : 'bg-gray-200'}`} />
+                      <div className={`w-3 h-3 rounded-full ${partnership.contract_phase === 'SUSTAIN' ? 'bg-[#38618C]' : 'bg-gray-200'}`} />
+                    </div>
+                  </div>
+                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mt-3">
+                    <div
+                      className="h-full bg-[#38618C] rounded-full"
+                      style={{ width: `${partnership.contract_phase === 'IGNITE' ? 33 : partnership.contract_phase === 'ACCELERATE' ? 66 : 100}%` }}
+                    />
+                  </div>
+                  <div className="text-xs text-gray-400 mt-1">
+                    Phase {partnership.contract_phase === 'IGNITE' ? '1' : partnership.contract_phase === 'ACCELERATE' ? '2' : '3'} of 3 · {partnership.contract_phase === 'IGNITE' ? '33' : partnership.contract_phase === 'ACCELERATE' ? '66' : '100'}%
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Leading Indicators */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <BarChart3 className="w-5 h-5 text-[#4ecdc4]" />
+                  <h3 className="text-base font-bold text-[#1e2749]">Leading Indicators</h3>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                {/* Teacher Stress */}
+                <div className="rounded-lg p-3 -mx-3">
+                  <div className="flex items-center flex-wrap gap-2 mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Teacher Stress</span>
+                    <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">↓ Lower is better</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 text-xs">
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-gray-500">Industry</span>
+                        <span className="text-red-400 font-medium">8-9/10</span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: '87%'}} /></div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-gray-500">TDI Partners</span>
+                        <span className="text-[#1e2749] font-medium">5-7/10</span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '60%'}} /></div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-gray-500">Your Data</span>
+                        <span className="text-gray-400 font-medium italic">Pending</span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-gray-200 rounded-full" style={{width: '0%'}} /></div>
+                      <p className="text-[10px] text-gray-400 mt-1">Collecting after baseline survey</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Strategy Implementation */}
+                <div className="rounded-lg p-3 -mx-3">
+                  <div className="flex items-center flex-wrap gap-2 mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Strategy Implementation</span>
+                    <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">↑ Higher is better</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 text-xs">
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-gray-500">Industry</span>
+                        <span className="text-red-400 font-medium">10%</span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: '10%'}} /></div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-gray-500">TDI Partners</span>
+                        <span className="text-[#1e2749] font-medium">65%</span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '65%'}} /></div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-gray-500">Your Data</span>
+                        <span className="text-gray-400 font-medium italic">Pending</span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-gray-200 rounded-full" style={{width: '0%'}} /></div>
+                      <p className="text-[10px] text-gray-400 mt-1">Collecting after first observation</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Retention Intent */}
+                <div className="rounded-lg p-3 -mx-3">
+                  <div className="flex items-center flex-wrap gap-2 mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Retention Intent</span>
+                    <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">↑ Higher is better</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-4 text-xs">
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-gray-500">Industry</span>
+                        <span className="text-red-400 font-medium">2-4/10</span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: '30%'}} /></div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-gray-500">TDI Partners</span>
+                        <span className="text-[#1e2749] font-medium">5-7/10</span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '60%'}} /></div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between mb-1">
+                        <span className="text-gray-500">Your Data</span>
+                        <span className="text-gray-400 font-medium italic">Pending</span>
+                      </div>
+                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-gray-200 rounded-full" style={{width: '0%'}} /></div>
+                      <p className="text-[10px] text-gray-400 mt-1">Collecting after baseline survey</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-100">
+                <p className="text-xs text-gray-500">Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys</p>
+              </div>
+            </div>
+
+            {/* Building Spotlight */}
+            {partnership.partnership_type === 'district' && (
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="flex items-center gap-2 mb-4">
+                  <Award className="w-5 h-5 text-amber-500" />
+                  <h3 className="text-base font-bold text-[#1e2749]">Building Spotlight</h3>
+                </div>
+
+                {apiBuildings.length === 0 ? (
+                  <div className="text-center py-8 bg-gray-50 rounded-lg">
+                    <School className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                    <p className="text-sm text-gray-500 mb-2">
+                      Building spotlight will appear here once you add your buildings and we begin collecting engagement data.
+                    </p>
+                    <button
+                      onClick={() => {
+                        const addBuildingItem = pendingItems.find(item => item.title.toLowerCase().includes('building'));
+                        if (addBuildingItem) {
+                          const el = document.getElementById(`action-${addBuildingItem.id}`);
+                          if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }}
+                      className="text-sm text-[#4ecdc4] font-medium hover:underline"
+                    >
+                      Add Building Details →
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {apiBuildings.map((building) => (
+                      <div key={building.id} className="p-4 bg-gray-50 rounded-lg border border-gray-100">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-[#1e2749]">{building.name}</span>
+                          <span className="text-xs text-gray-400">· {building.staff_count || 0} staff</span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">
+                          Champion: {building.lead_name || 'Not yet assigned'}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Hub Engagement */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-[#4ecdc4]" />
+                  <h3 className="text-base font-bold text-[#1e2749]">Hub Engagement</h3>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* Donut Chart - Login Rate */}
+                <div className="flex flex-col items-center">
+                  <div className="relative w-36 h-36">
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                      <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                      <circle cx="18" cy="18" r="15.915" fill="none" stroke="#4ecdc4" strokeWidth="3"
+                        strokeDasharray={`${hubLoginPct}, 100`} strokeLinecap="round" />
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-3xl font-bold text-[#1e2749]">{hubLoginPct}%</span>
+                      <span className="text-xs text-gray-500">logged in</span>
+                    </div>
+                  </div>
+                  <div className="mt-3 text-center">
+                    <p className="text-sm font-semibold text-[#1e2749]">Hub Logins</p>
+                    <p className="text-xs text-gray-500">{staffStats.hubLoggedIn} of {staffStats.total} staff</p>
+                    <p className="text-xs text-[#4ecdc4] font-medium mt-1">Goal: 100% by Observation Day</p>
+                  </div>
+                </div>
+
+                {/* Engagement Depth */}
+                <div className="flex flex-col">
+                  <p className="text-sm font-semibold text-[#1e2749] mb-3">Engagement Depth</p>
+                  <div className="space-y-3 flex-1">
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Completed 1+ course</span>
+                        <span className="font-semibold text-gray-400">—</span>
+                      </div>
+                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gray-200 rounded-full" style={{width: '0%'}} />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Downloaded resources</span>
+                        <span className="font-semibold text-gray-400">—</span>
+                      </div>
+                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gray-200 rounded-full" style={{width: '0%'}} />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-xs mb-1">
+                        <span className="text-gray-600">Active this month</span>
+                        <span className="font-semibold text-gray-400">—</span>
+                      </div>
+                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                        <div className="h-full bg-gray-200 rounded-full" style={{width: '0%'}} />
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-400 mt-2 italic">Data populates as staff engage with Hub</p>
+                </div>
+
+                {/* Love Notes & Sessions */}
+                <div className="flex flex-col">
+                  <p className="text-sm font-semibold text-[#1e2749] mb-3">Support Delivered</p>
+                  <div className="space-y-3">
+                    <div className="bg-pink-50 rounded-lg p-3 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
+                        <Heart className="w-5 h-5 text-pink-500" />
+                      </div>
+                      <div>
+                        <span className="text-xl font-bold text-[#1e2749]">{loveNotes}</span>
+                        <p className="text-xs text-gray-500">Love Notes sent</p>
+                      </div>
+                    </div>
+                    <div className="bg-purple-50 rounded-lg p-3 flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                        <Calendar className="w-5 h-5 text-purple-600" />
+                      </div>
+                      <div>
+                        <span className="text-xl font-bold text-[#1e2749]">{virtualSessionsCompleted} of {partnership.virtual_sessions_total || 4}</span>
+                        <p className="text-xs text-gray-500">Virtual sessions</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-xs text-[#4ecdc4] font-medium hover:underline mt-4">
+                <BookOpen className="w-3.5 h-3.5" /> Open Learning Hub →
+              </a>
             </div>
 
             {/* Action Items */}
@@ -1380,84 +1645,115 @@ export default function PartnerDashboard() {
               </div>
             </div>
 
-            {/* Recommendation Card */}
-            <div
-              className="rounded-xl p-6"
-              style={{ backgroundColor: 'rgba(30, 39, 73, 0.05)' }}
-            >
-              <div className="flex items-start gap-4">
-                <div
-                  className="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0"
-                  style={{ backgroundColor: colors.yellow }}
-                >
-                  <Zap className="w-6 h-6 text-[#1e2749]" />
-                </div>
+            {/* Recommendation Card - Matching Example Dashboard */}
+            <div className="rounded-xl p-4 bg-blue-50 border border-blue-100">
+              <div className="flex items-start gap-3">
+                <Zap className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
                 <div className="flex-1">
-                  <h3 className="font-semibold text-[#1e2749] mb-2">
-                    Recommendation: Dedicated Hub Time
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Schools that build in 15-30 minutes of protected Hub time during PLCs see 3x higher implementation rates. Consider designating a TDI Champion to help maintain momentum.
+                  <p className="text-sm font-semibold text-blue-700 mb-1">Recommendation: Dedicated Hub Time</p>
+                  <p className="text-sm text-gray-600">
+                    Districts that build in 15-30 minutes of protected Hub time during PLCs or
+                    staff meetings see <span className="font-bold text-[#1e2749]">3x higher implementation rates</span>.
+                    We&apos;d suggest each building designate a TDI Champion.
                   </p>
-                  <div className="flex flex-wrap gap-3">
-                    <button
-                      onClick={() => {
-                        fetch('/api/partners/log-activity', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            user_id: userId,
-                            action: 'recommendation_clicked',
-                            details: { recommendation: 'hub_time_plc' },
-                          }),
-                        });
-                      }}
-                      className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
-                    >
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    <button className="text-xs px-3 py-1.5 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors">
                       Add Hub time to PLC agenda
                     </button>
-                    <button
-                      onClick={() => {
-                        fetch('/api/partners/log-activity', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            user_id: userId,
-                            action: 'recommendation_clicked',
-                            details: { recommendation: 'designate_champion' },
-                          }),
-                        });
-                      }}
-                      className="px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      Designate TDI Champions
+                    <button className="text-xs px-3 py-1.5 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors">
+                      Designate building TDI Champions
                     </button>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Looking Ahead Card */}
-            <button
-              onClick={() => handleTabChange('preview')}
-              className="w-full bg-white rounded-xl shadow-sm border border-gray-200 p-6 text-left hover:shadow-md transition-shadow"
-            >
-              <div className="flex items-center gap-4">
-                <div
-                  className="w-14 h-14 rounded-xl flex items-center justify-center"
-                  style={{ background: 'linear-gradient(135deg, #1B2A4A, #38618C)' }}
-                >
-                  <Sparkles className="w-7 h-7 text-white" />
+            {/* District-wide Movement */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Heart className="w-5 h-5 text-[#4ecdc4]" />
+                  <h3 className="text-lg font-bold text-[#1e2749]">Join the TDI Movement</h3>
                 </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-[#1e2749]">2026-27 Partnership Plan</h3>
-                  <p className="text-sm text-gray-600">
-                    Based on your engagement data, we&apos;ll build a tailored plan for Year 2.
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {[
+                  { icon: Mail, label: 'Newsletter', value: 0, stat: '32% higher strategy adoption', link: 'https://raehughart.substack.com' },
+                  { icon: BookOpen, label: 'Blog', value: 0, stat: '2.5x more likely to try new strategies', link: 'https://raehughart.substack.com' },
+                  { icon: Star, label: 'Podcast', value: 0, stat: '28% higher implementation rates', link: 'https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274' },
+                  { icon: Users, label: 'Community', value: 0, stat: '45% report feeling less isolated', link: 'https://www.facebook.com/groups/tdimovement' },
+                  { icon: FileText, label: 'Resources', value: 0, stat: '3x more classroom tools used', link: 'https://tdi.thinkific.com' },
+                  { icon: BookOpen, label: 'Courses', value: 0, stat: '65% completion vs 10% industry avg', link: 'https://tdi.thinkific.com' },
+                ].map((channel) => (
+                  <a
+                    key={channel.label}
+                    href={channel.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#4ecdc4]/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-transparent hover:border-[#4ecdc4]/30"
+                  >
+                    <channel.icon className="w-4 h-4 text-gray-400 group-hover:text-[#4ecdc4] flex-shrink-0 transition-colors" />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs text-gray-500 truncate">{channel.label}</p>
+                      <p className="text-xs text-[#1e2749] font-semibold mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        ↗ {channel.stat}
+                      </p>
+                    </div>
+                  </a>
+                ))}
+              </div>
+              <p className="text-xs text-gray-400 mt-4 text-center">
+                Your staff engagement with TDI content helps drive implementation
+              </p>
+            </div>
+
+            {/* Phase Preview Teaser */}
+            <div
+              className="relative bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-6 text-white overflow-hidden group"
+            >
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+              <div className="absolute bottom-0 left-1/2 w-24 h-24 bg-white/5 rounded-full translate-y-1/2" />
+
+              <div className="relative z-10 flex justify-between items-center">
+                <div className="max-w-lg">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-xs bg-[#4ecdc4] text-[#1e2749] px-3 py-1 rounded-full font-bold uppercase tracking-wide">
+                      {partnership.contract_phase === 'IGNITE' ? 'Phase 2: ACCELERATE' : partnership.contract_phase === 'ACCELERATE' ? 'Phase 3: SUSTAIN' : 'Renewal'}
+                    </span>
+                  </div>
+                  <h3 className="text-xl font-bold">
+                    {partnership.contract_phase === 'IGNITE'
+                      ? 'Coming Up: Full Implementation'
+                      : partnership.contract_phase === 'ACCELERATE'
+                      ? 'Year 3: Make the Gains Permanent'
+                      : 'Continue Your Partnership'}
+                  </h3>
+                  <p className="text-sm opacity-90 mt-2">
+                    {partnership.contract_phase === 'IGNITE'
+                      ? 'Once IGNITE is complete, you\'ll move into full implementation with Learning Hub access, observation days, and coaching sessions for your entire team.'
+                      : partnership.contract_phase === 'ACCELERATE'
+                      ? 'You\'ve built momentum. Now lock it in with internal coaching capacity, peer observation circles, and systems that sustain beyond the partnership.'
+                      : 'Continue building on your success with ongoing support, advanced modules, and sustainability planning.'}
                   </p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <div className="flex flex-col items-center">
+                  <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center">
+                    <ArrowRight className="w-6 h-6" />
+                  </div>
+                </div>
               </div>
-            </button>
+            </div>
+
+            {/* FERPA / Data Privacy Note */}
+            <div className="p-3 bg-gray-50 rounded-lg border border-gray-100">
+              <p className="text-xs text-gray-500">
+                🔒 <span className="font-medium text-gray-600">Data Privacy:</span> In your partnership dashboard,
+                access is role-based. Superintendents see district-wide data. Principals see only their building.
+                Teacher-level data is never displayed. All data handling follows FERPA guidelines.
+              </p>
+            </div>
           </div>
         )}
 

@@ -54,6 +54,17 @@ export default function HubLayoutClient({
     );
   }
 
+  // For onboarding page, go through auth guard but skip the inner layout (no nav)
+  if (pathname.startsWith('/hub/onboarding')) {
+    return (
+      <HubAuthGuard>
+        <div className="min-h-screen">
+          {children}
+        </div>
+      </HubAuthGuard>
+    );
+  }
+
   // All other routes go through auth guard
   return (
     <HubAuthGuard>
