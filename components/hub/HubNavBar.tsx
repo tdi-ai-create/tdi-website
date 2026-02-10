@@ -51,9 +51,10 @@ export default function HubNavBar({ profile, userEmail }: HubNavBarProps) {
           <Image
             src="/images/logo.webp"
             alt="Teachers Deserve It"
-            width={120}
-            height={36}
-            style={{ height: '36px', width: 'auto', filter: 'brightness(0) invert(1)' }}
+            width={160}
+            height={48}
+            className="h-9 w-auto"
+            style={{ filter: 'brightness(0) invert(1)' }}
             priority
           />
         </Link>
