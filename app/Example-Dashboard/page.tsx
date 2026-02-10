@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import {
@@ -80,6 +80,50 @@ const Tooltip = ({ children, content }: { children: React.ReactNode; content: st
           <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1e2749]"></div>
         </div>
       )}
+    </div>
+  );
+};
+
+// Confetti celebration component for gold medal schools
+const Confetti = ({ isActive }: { isActive: boolean }) => {
+  if (!isActive) return null;
+
+  const confettiPieces = Array.from({ length: 50 }, (_, i) => ({
+    id: i,
+    left: Math.random() * 100,
+    delay: Math.random() * 0.5,
+    duration: 1 + Math.random() * 1,
+    color: ['#FFD700', '#FFA500', '#FF6347', '#4ecdc4', '#38618C', '#22c55e'][Math.floor(Math.random() * 6)],
+    size: 6 + Math.random() * 6,
+  }));
+
+  return (
+    <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
+      {confettiPieces.map((piece) => (
+        <div
+          key={piece.id}
+          className="absolute animate-confetti"
+          style={{
+            left: `${piece.left}%`,
+            top: '-20px',
+            width: piece.size,
+            height: piece.size,
+            backgroundColor: piece.color,
+            borderRadius: Math.random() > 0.5 ? '50%' : '2px',
+            animationDelay: `${piece.delay}s`,
+            animationDuration: `${piece.duration}s`,
+          }}
+        />
+      ))}
+      <style jsx>{`
+        @keyframes confetti-fall {
+          0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        .animate-confetti {
+          animation: confetti-fall linear forwards;
+        }
+      `}</style>
     </div>
   );
 };
@@ -270,6 +314,29 @@ export default function ExampleDashboard() {
 
   // Schools tab - expanded school accordion state
   const [expandedSchool, setExpandedSchool] = useState<string | null>(null);
+
+  // Confetti celebration state
+  const [showConfetti, setShowConfetti] = useState(false);
+
+  // Auto-clear confetti after animation
+  useEffect(() => {
+    if (showConfetti) {
+      const timer = setTimeout(() => setShowConfetti(false), 2500);
+      return () => clearTimeout(timer);
+    }
+  }, [showConfetti]);
+
+  // Handler to expand school and trigger confetti for gold medal winners
+  const handleSchoolExpand = useCallback((schoolId: string, hasGoldMedal: boolean, isCurrentlyExpanded: boolean) => {
+    if (isCurrentlyExpanded) {
+      setExpandedSchool(null);
+    } else {
+      setExpandedSchool(schoolId);
+      if (hasGoldMedal) {
+        setShowConfetti(true);
+      }
+    }
+  }, []);
 
   // Journey tab - expanded event accordion state (default to mid-year survey - event 9)
   const [expandedJourneyEvent, setExpandedJourneyEvent] = useState<string | null>('event-9');
@@ -806,6 +873,9 @@ export default function ExampleDashboard() {
 
   return (
     <div className="min-h-screen bg-[#F5F5F5]">
+      {/* Confetti celebration for gold medal schools */}
+      <Confetti isActive={showConfetti} />
+
       {/* Compact Navigation */}
       <nav className="bg-[#1e2749] sticky top-0 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -835,7 +905,7 @@ export default function ExampleDashboard() {
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl md:text-3xl font-bold">Motown District 360</h1>
-              <Tooltip content="This is a preview dashboard with sample data to showcase the features districts enjoy in their TDI partnership. Your dashboard would be customized with your real data.">
+              <Tooltip content="Preview with sample data. Your dashboard shows your real metrics.">
                 <span></span>
               </Tooltip>
             </div>
@@ -891,22 +961,18 @@ export default function ExampleDashboard() {
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div className="space-y-6">
-            {/* Your TDI Team — personal connection (top of Overview) */}
-            <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#4ecdc4]/10 flex items-center justify-center">
-                    <Users className="w-5 h-5 text-[#4ecdc4]" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-[#1e2749]">Your TDI Partnership Team</p>
-                    <p className="text-xs text-gray-500">Rae Hughart (Lead Coach)</p>
-                  </div>
+            {/* Your Metrics, Your Way — Top of Overview */}
+            <div className="bg-gradient-to-r from-[#1e2749]/5 to-[#4ecdc4]/5 rounded-xl p-4 border border-[#4ecdc4]/20">
+              <div className="flex items-start gap-3">
+                <BarChart3 className="w-5 h-5 text-[#4ecdc4] mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-sm font-semibold text-[#1e2749]">
+                    Your Metrics, Your Way
+                  </p>
+                  <p className="text-xs text-gray-600 mt-1">
+                    All progress data can be tied to state assessment results, district-specific benchmarks, or TDI survey metrics — whichever tells your school&apos;s story best. Your TDI partner will customize this with you during onboarding.
+                  </p>
                 </div>
-                <a href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone" target="_blank" rel="noopener noreferrer"
-                  className="text-xs px-4 py-2 bg-[#4ecdc4] text-white rounded-lg hover:bg-[#3dbdb5] transition-colors">
-                  Schedule a Call →
-                </a>
               </div>
             </div>
 
@@ -921,9 +987,7 @@ export default function ExampleDashboard() {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <Users className="w-4 h-4 text-[#38618C]" />
-                      <Tooltip content="Total staff with active Learning Hub accounts across all buildings in your district.">
-                        <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
-                      </Tooltip>
+                      <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
                     </div>
                     <div className="text-2xl font-bold text-[#1e2749]">255</div>
                     <div className="text-xs text-[#38618C] font-medium">across 6 schools</div>
@@ -957,9 +1021,7 @@ export default function ExampleDashboard() {
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <Eye className="w-4 h-4 text-[#38618C]" />
-                        <Tooltip content="TDI observation days completed. Observations include classroom walk-throughs with personalized feedback and follow-up coaching.">
-                          <span className="text-xs text-gray-500 uppercase">Observations</span>
-                        </Tooltip>
+                        <span className="text-xs text-gray-500 uppercase">Observations</span>
                       </div>
                       <div className="text-2xl font-bold text-[#1e2749]">2<span className="text-lg font-normal text-gray-400">/4</span></div>
                     </div>
@@ -999,9 +1061,7 @@ export default function ExampleDashboard() {
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <AlertCircle className="w-4 h-4 text-amber-500" />
-                      <Tooltip content="Action items that need scheduling or completion to stay on track. Click to jump to details below.">
-                        <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
-                      </Tooltip>
+                      <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
                     </div>
                     <div className="text-2xl font-bold text-amber-500">4</div>
                     <div className="text-xs text-amber-600 font-medium">Items pending</div>
@@ -1033,7 +1093,7 @@ export default function ExampleDashboard() {
                     <div>
                       <div className="flex items-center gap-2 mb-1">
                         <TrendingUp className="w-4 h-4 text-[#38618C]" />
-                        <Tooltip content="ACCELERATE focuses on deepening strategies introduced in Phase 1 through coaching cycles, observation days, and data-driven adjustments.">
+                        <Tooltip content="Coaching cycles, observation days, and data-driven adjustments.">
                           <span className="text-xs text-gray-500 uppercase">Current Phase</span>
                         </Tooltip>
                       </div>
@@ -1077,9 +1137,6 @@ export default function ExampleDashboard() {
                 <div className="flex items-center gap-2">
                   <BarChart3 className="w-5 h-5 text-[#4ecdc4]" />
                   <h3 className="text-base font-bold text-[#1e2749]">Leading Indicators</h3>
-                  <Tooltip content="These indicators are tracked via observations, Hub data, and staff surveys. They compare your district against industry averages and the TDI partner network.">
-                    <span></span>
-                  </Tooltip>
                 </div>
                 <span className="text-xs text-[#4ecdc4] font-medium cursor-pointer hover:underline" onClick={() => navigateToSection('progress', 'leading-indicators')}>View full details →</span>
               </div>
@@ -1098,23 +1155,15 @@ export default function ExampleDashboard() {
                   <div className="grid grid-cols-3 gap-4 text-xs">
                     <div>
                       <div className="flex justify-between mb-1">
-                        <Tooltip content="National averages from RAND Corporation (2025) and Learning Policy Institute research.">
-                          <span className="text-gray-500">Industry</span>
-                        </Tooltip>
-                        <Tooltip content="National average teacher stress level. Source: RAND Corporation's State of the American Teacher Survey (2025). 78% of teachers report their work is 'always' or 'often' stressful.">
-                          <span className="text-red-400 font-medium">8-9/10</span>
-                        </Tooltip>
+                        <span className="text-gray-500">Industry</span>
+                        <span className="text-red-400 font-medium">8-9/10</span>
                       </div>
                       <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: '87%'}}></div></div>
                     </div>
                     <div>
                       <div className="flex justify-between mb-1">
-                        <Tooltip content="From our work with schools across 21 states (2024-2025).">
-                          <span className="text-gray-500">TDI Partners</span>
-                        </Tooltip>
-                        <Tooltip content="Average stress level reported by educators in TDI partner schools after completing at least one phase of the partnership. Represents a 25-40% reduction from pre-partnership levels.">
-                          <span className="text-[#1e2749] font-medium">5-7/10</span>
-                        </Tooltip>
+                        <span className="text-gray-500">TDI Partners</span>
+                        <span className="text-[#1e2749] font-medium">5-7/10</span>
                       </div>
                       <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '60%'}}></div></div>
                     </div>
@@ -1140,23 +1189,15 @@ export default function ExampleDashboard() {
                   <div className="grid grid-cols-3 gap-4 text-xs">
                     <div>
                       <div className="flex justify-between mb-1">
-                        <Tooltip content="National averages from RAND Corporation (2025) and Learning Policy Institute research.">
-                          <span className="text-gray-500">Industry</span>
-                        </Tooltip>
-                        <Tooltip content="The average rate at which teachers implement strategies from traditional PD into their classroom practice. Source: TNTP 'The Mirage' (2015), confirmed by subsequent research through 2025.">
-                          <span className="text-red-400 font-medium">10%</span>
-                        </Tooltip>
+                        <span className="text-gray-500">Industry</span>
+                        <span className="text-red-400 font-medium">10%</span>
                       </div>
                       <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: '10%'}}></div></div>
                     </div>
                     <div>
                       <div className="flex justify-between mb-1">
-                        <Tooltip content="From our work with schools across 21 states (2024-2025).">
-                          <span className="text-gray-500">TDI Partners</span>
-                        </Tooltip>
-                        <Tooltip content="Average implementation rate across TDI partner schools, measured via classroom observations and follow-up surveys. This is 6.5x the industry average.">
-                          <span className="text-[#1e2749] font-medium">65%</span>
-                        </Tooltip>
+                        <span className="text-gray-500">TDI Partners</span>
+                        <span className="text-[#1e2749] font-medium">65%</span>
                       </div>
                       <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '65%'}}></div></div>
                     </div>
@@ -1182,23 +1223,15 @@ export default function ExampleDashboard() {
                   <div className="grid grid-cols-3 gap-4 text-xs">
                     <div>
                       <div className="flex justify-between mb-1">
-                        <Tooltip content="National averages from RAND Corporation (2025) and Learning Policy Institute research.">
-                          <span className="text-gray-500">Industry</span>
-                        </Tooltip>
-                        <Tooltip content="National average retention intent. Only 2-4 out of 10 teachers report strong intent to stay in the profession long-term. Source: Learning Policy Institute (2024).">
-                          <span className="text-red-400 font-medium">2-4/10</span>
-                        </Tooltip>
+                        <span className="text-gray-500">Industry</span>
+                        <span className="text-red-400 font-medium">2-4/10</span>
                       </div>
                       <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: '30%'}}></div></div>
                     </div>
                     <div>
                       <div className="flex justify-between mb-1">
-                        <Tooltip content="From our work with schools across 21 states (2024-2025).">
-                          <span className="text-gray-500">TDI Partners</span>
-                        </Tooltip>
-                        <Tooltip content="Average retention intent across TDI partner schools. Educators in TDI partnerships report significantly higher long-term commitment to the profession.">
-                          <span className="text-[#1e2749] font-medium">5-7/10</span>
-                        </Tooltip>
+                        <span className="text-gray-500">TDI Partners</span>
+                        <span className="text-[#1e2749] font-medium">5-7/10</span>
                       </div>
                       <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '60%'}}></div></div>
                     </div>
@@ -1237,7 +1270,6 @@ export default function ExampleDashboard() {
                 <div className="flex items-center gap-2">
                   <Trophy className="w-5 h-5 text-amber-500" />
                   <h3 className="text-base font-bold text-[#1e2749]">Building Spotlight</h3>
-                  <Tooltip content="Each building's awards and personalized suggestions based on your district's data and TDI's experience across 87,000+ educators."><span></span></Tooltip>
                 </div>
                 <span className="text-xs text-gray-500">Here&apos;s what we&apos;re noticing</span>
               </div>
@@ -1441,7 +1473,7 @@ export default function ExampleDashboard() {
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <h3 className="text-lg font-bold text-[#1e2749]">Student Performance</h3>
-                  <Tooltip content="TerraNova National Percentiles for grades 3-7. Classroom grades average A (90-100%), but standardized scores tell a different story. This is the gap TDI strategies help close.">
+                  <Tooltip content="TerraNova National Percentiles for grades 3-7.">
                     <span></span>
                   </Tooltip>
                 </div>
@@ -1450,7 +1482,7 @@ export default function ExampleDashboard() {
 
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
                 <p className="text-sm text-amber-800">
-                  <span className="font-semibold">The Gap:</span> Classroom grades average <span className="font-bold text-green-600">A (90-100%)</span>, but TerraNova scores for grades 3-6 range from <Tooltip content="TerraNova National Percentiles compare student performance against a nationally representative sample. The 50th percentile is 'average.' Scores below 50th indicate room for growth."><span className="font-bold text-red-500">30th-58th percentile</span></Tooltip>.
+                  <span className="font-semibold">The Gap:</span> Classroom grades average <span className="font-bold text-green-600">A (90-100%)</span>, but TerraNova scores for grades 3-6 range from <Tooltip content="50th percentile = national average. Below 50th = room for growth."><span className="font-bold text-red-500">30th-58th percentile</span></Tooltip>.
                 </p>
               </div>
 
@@ -1493,30 +1525,12 @@ export default function ExampleDashboard() {
               </button>
             </div>
 
-            {/* Metrics Customization Note */}
-            <div className="bg-gradient-to-r from-[#1e2749]/5 to-[#4ecdc4]/5 rounded-xl p-4 border border-[#4ecdc4]/20">
-              <div className="flex items-start gap-3">
-                <BarChart3 className="w-5 h-5 text-[#4ecdc4] mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-[#1e2749]">
-                    Your Metrics, Your Way
-                  </p>
-                  <p className="text-xs text-gray-600 mt-1">
-                    All progress data can be tied to state assessment results, district-specific benchmarks, or TDI survey metrics — whichever tells your school&apos;s story best. Your TDI partner will customize this with you during onboarding.
-                  </p>
-                </div>
-              </div>
-            </div>
-
             {/* Hub Engagement Visual Section */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
                   <Monitor className="w-5 h-5 text-[#4ecdc4]" />
                   <h3 className="text-base font-bold text-[#1e2749]">Hub Engagement</h3>
-                  <Tooltip content="Tracks staff engagement with the TDI Learning Hub. Industry average for PD platforms is 40-50%. Your district is at 87%.">
-                    <span></span>
-                  </Tooltip>
                 </div>
                 <span className="text-xs text-gray-400">Updated Jan 13, 2026</span>
               </div>
@@ -1531,7 +1545,7 @@ export default function ExampleDashboard() {
                         strokeDasharray="87, 100" strokeLinecap="round" />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <Tooltip content="Average login and engagement rate for PD platforms nationally is 40-50%. Your 87% is nearly double the industry average. Source: Digital Promise (2024).">
+                      <Tooltip content="Industry average: 40-50%. You're nearly 2x that.">
                         <span className="text-3xl font-bold text-[#1e2749]">87%</span>
                       </Tooltip>
                       <span className="text-xs text-gray-500">logged in</span>
@@ -1576,7 +1590,7 @@ export default function ExampleDashboard() {
                       </div>
                     </div>
                   </div>
-                  <Tooltip content="Engagement depth shows how staff interact beyond just logging in. Active this month means at least one Hub interaction in the past 30 days.">
+                  <Tooltip content="Active = at least one Hub interaction in the past 30 days.">
                     <span className="text-xs text-gray-400 mt-2">What does this mean?</span>
                   </Tooltip>
                 </div>
@@ -1745,7 +1759,7 @@ export default function ExampleDashboard() {
                         <p className="text-sm font-semibold text-blue-700 mb-1">Recommendation: Dedicated Hub Time</p>
                         <p className="text-sm text-gray-600">
                           Districts that build in 15-30 minutes of protected Hub time during PLCs or
-                          staff meetings see <Tooltip content="Based on TDI partner data 2023-2025. Districts that protect 15-30 minutes of Hub time during PLCs see implementation rates 3x higher than districts without dedicated Hub time."><span className="font-bold text-[#1e2749]">3x higher implementation rates</span></Tooltip>.
+                          staff meetings see <Tooltip content="Based on TDI partner data 2023-2025."><span className="font-bold text-[#1e2749]">3x higher implementation rates</span></Tooltip>.
                           We&apos;d suggest each building designate a TDI Champion.
                         </p>
                         <div className="flex flex-wrap gap-2 mt-3">
@@ -1802,9 +1816,6 @@ export default function ExampleDashboard() {
                 <div className="flex items-center gap-2">
                   <Heart className="w-5 h-5 text-[#4ecdc4]" />
                   <h3 className="text-lg font-bold text-[#1e2749]">District-wide Movement</h3>
-                  <Tooltip content="Staff engaging with TDI beyond the Hub — newsletter, blog, podcast, and community. Higher movement involvement correlates with 2x implementation rates.">
-                    <span></span>
-                  </Tooltip>
                 </div>
                 <span className="text-xs text-gray-400">Updated Feb 7, 2026</span>
               </div>
@@ -1828,12 +1839,12 @@ export default function ExampleDashboard() {
               {openSections['movement-detail'] && (
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 pt-3">
                   {[
-                    { icon: Mail, label: 'Newsletter', value: 197, tooltip: 'TDI partner average: 65% of enrolled staff subscribe to the newsletter. Your 197 subscribers out of 255 staff (77%) is above the network average.' },
-                    { icon: BookOpen, label: 'Blog Readers', value: 131, tooltip: 'TDI partner average: 45 blog readers per school. Your 131 readers puts you 2.9x above the network average. Readers report higher confidence implementing new strategies.' },
-                    { icon: Headphones, label: 'Podcast', value: 78, tooltip: 'Podcast listeners show 28% higher implementation rates than non-listeners. TDI partner average: 25 listeners per school. Your 78 listeners is 3x the network average.' },
-                    { icon: Users, label: 'Community', value: 48, tooltip: 'TDI partner average: 35 community members per school. Your 48 members provides free peer support and strategy sharing beyond formal PD.' },
-                    { icon: FileText, label: 'Resources', value: 361, tooltip: 'TDI partner average: 280 resources per school. Your 361 downloads puts you 29% above the TDI network average.' },
-                    { icon: GraduationCap, label: 'Courses', value: 224, tooltip: 'TDI partner average: 3.2 courses started per educator. TDI partners average 65% completion vs. 10% industry standard.' },
+                    { icon: Mail, label: 'Newsletter', value: 197 },
+                    { icon: BookOpen, label: 'Blog Readers', value: 131 },
+                    { icon: Headphones, label: 'Podcast', value: 78 },
+                    { icon: Users, label: 'Community', value: 48 },
+                    { icon: FileText, label: 'Resources', value: 361 },
+                    { icon: GraduationCap, label: 'Courses', value: 224 },
                   ].map((channel) => (
                     <div key={channel.label} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                       <channel.icon className="w-4 h-4 text-gray-400 flex-shrink-0" />
@@ -1841,7 +1852,6 @@ export default function ExampleDashboard() {
                         <p className="text-sm font-bold text-[#1e2749]">{channel.value}</p>
                         <p className="text-xs text-gray-500 truncate">{channel.label}</p>
                       </div>
-                      <Tooltip content={channel.tooltip}><span></span></Tooltip>
                     </div>
                   ))}
                 </div>
@@ -2119,27 +2129,19 @@ export default function ExampleDashboard() {
                   <div className="space-y-2">
                     {/* Industry 8-9/10 = HIGH stress = BAD = SHORT bar */}
                     <div className="flex items-center gap-3">
-                      <Tooltip content="National averages based on RAND Corporation Teacher Wellbeing Survey (2025), TNTP's 'The Mirage' report, and Learning Policy Institute research.">
-                        <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
-                      </Tooltip>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '15%' }}></div>
                       </div>
-                      <Tooltip content="National average teacher stress level. 78% of teachers report their work is 'always' or 'often' stressful. Source: RAND Corporation (2025).">
-                        <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">8-9/10</span>
-                      </Tooltip>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">8-9/10</span>
                     </div>
                     {/* TDI 5-7/10 = MEDIUM stress = BETTER = LONGER bar */}
                     <div className="flex items-center gap-3">
-                      <Tooltip content="From our work with schools across 21 states (2024-2025), including 87,000+ educators.">
-                        <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
-                      </Tooltip>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#38618C]" style={{ width: '45%' }}></div>
                       </div>
-                      <Tooltip content="Average stress level in TDI partner schools after completing at least one partnership phase. Represents 25-40% reduction from pre-partnership levels.">
-                        <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
-                      </Tooltip>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
                     </div>
                     {/* Motown District 360 6.0/10 = LOW stress = BEST = LONGEST bar */}
                     <div className="flex items-center gap-3">
@@ -2160,26 +2162,18 @@ export default function ExampleDashboard() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <Tooltip content="National averages based on RAND Corporation Teacher Wellbeing Survey (2025), TNTP's 'The Mirage' report, and Learning Policy Institute research.">
-                        <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
-                      </Tooltip>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '10%' }}></div>
                       </div>
-                      <Tooltip content="The average rate at which teachers implement strategies from traditional PD. Source: TNTP 'The Mirage' (2015), confirmed by subsequent research.">
-                        <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">10%</span>
-                      </Tooltip>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">10%</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Tooltip content="From our work with schools across 21 states (2024-2025), including 87,000+ educators.">
-                        <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
-                      </Tooltip>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#38618C]" style={{ width: '65%' }}></div>
                       </div>
-                      <Tooltip content="Average implementation rate across TDI partner schools, measured via classroom observations and follow-up surveys. This is 6.5x the industry average.">
-                        <span className="text-xs font-semibold text-[#38618C] w-14 text-right">65%</span>
-                      </Tooltip>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">65%</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown District 360</span>
@@ -2199,26 +2193,18 @@ export default function ExampleDashboard() {
                   </div>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3">
-                      <Tooltip content="National averages based on RAND Corporation Teacher Wellbeing Survey (2025), TNTP's 'The Mirage' report, and Learning Policy Institute research.">
-                        <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
-                      </Tooltip>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '30%' }}></div>
                       </div>
-                      <Tooltip content="National average retention intent. Only 2-4 out of 10 teachers report strong intent to stay in the profession long-term. Source: Learning Policy Institute (2024).">
-                        <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">2-4/10</span>
-                      </Tooltip>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">2-4/10</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <Tooltip content="From our work with schools across 21 states (2024-2025), including 87,000+ educators.">
-                        <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
-                      </Tooltip>
+                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
                       <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
                         <div className="h-full rounded-full bg-[#38618C]" style={{ width: '60%' }}></div>
                       </div>
-                      <Tooltip content="Average retention intent across TDI partner schools. Educators in TDI partnerships report significantly higher long-term commitment.">
-                        <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
-                      </Tooltip>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown District 360</span>
@@ -3729,12 +3715,22 @@ export default function ExampleDashboard() {
                 const schoolLoggedIn = school.teachers.loggedIn + (school.paras?.loggedIn || 0);
                 const loginRate = Math.round((schoolLoggedIn / schoolTotal) * 100);
                 const isExpanded = expandedSchool === school.id;
+                const hasGoldMedal = school.medals.some(m => m.type === 'gold');
+                const goldCount = school.medals.filter(m => m.type === 'gold').length;
 
                 return (
-                  <div key={school.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  <div key={school.id} className={`bg-white rounded-xl shadow-sm overflow-hidden ${hasGoldMedal ? 'border-2 border-amber-400 ring-2 ring-amber-100' : 'border border-gray-200'}`}>
+                    {/* Gold Medal Banner */}
+                    {hasGoldMedal && (
+                      <div className="bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 px-4 py-1.5 flex items-center justify-center gap-2">
+                        <Trophy className="w-4 h-4 text-amber-800" />
+                        <span className="text-xs font-bold text-amber-900">🏆 GOLD MEDAL SCHOOL — {goldCount} Award{goldCount > 1 ? 's' : ''}</span>
+                        <Trophy className="w-4 h-4 text-amber-800" />
+                      </div>
+                    )}
                     {/* School Card Header */}
                     <button
-                      onClick={() => setExpandedSchool(isExpanded ? null : school.id)}
+                      onClick={() => handleSchoolExpand(school.id, hasGoldMedal, isExpanded)}
                       className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
                     >
                       <div className="flex items-start justify-between">
@@ -4489,34 +4485,32 @@ export default function ExampleDashboard() {
               {/* ROI Stats Grid */}
               <div className="grid md:grid-cols-4 gap-4 mb-6">
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 text-center">
-                  <Tooltip content="Cost to replace a teacher averages $15,000-$20,000 (Learning Policy Institute, 2017). With your 9.8/10 retention intent vs. 2-4/10 industry average, estimated savings assume 5-7 prevented departures.">
+                  <Tooltip content="Based on 5-7 prevented departures × $15-20K replacement cost.">
                     <p className="text-4xl font-bold text-[#4ecdc4]">$847K</p>
                   </Tooltip>
                   <p className="text-sm opacity-80 mt-1">Estimated Retention Savings</p>
                   <p className="text-xs opacity-60 mt-2">Based on reduced turnover costs</p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 text-center">
-                  <Tooltip content="Stress reduction measured via TDI baseline and follow-up surveys. Your district dropped from 8.2/10 to 6.1/10 average stress — a 25% reduction. TDI partner average improvement is 20-30%.">
+                  <Tooltip content="TDI partner average improvement: 20-30%.">
                     <p className="text-4xl font-bold">25%</p>
                   </Tooltip>
                   <p className="text-sm opacity-80 mt-1">Stress Reduction</p>
                   <p className="text-xs opacity-60 mt-2">8.2 → 6.1 avg rating</p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 text-center">
-                  <Tooltip content="Your implementation rate grew from 13% at baseline to 52% current — a 4x increase. TDI partner average is 65%. Industry average is only 10%.">
+                  <Tooltip content="TDI partner avg: 65%. Industry avg: 10%.">
                     <p className="text-4xl font-bold">4x</p>
                   </Tooltip>
                   <p className="text-sm opacity-80 mt-1">Implementation Growth</p>
                   <p className="text-xs opacity-60 mt-2">13% → 52% adoption</p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-xl p-5 text-center">
-                  <Tooltip content="Average login and engagement rate for PD platforms nationally is 40-50%. Your 87% is nearly double the industry average. Source: Digital Promise (2024).">
+                  <Tooltip content="Industry average: 40-50%. You're nearly 2x that.">
                     <p className="text-4xl font-bold">87%</p>
                   </Tooltip>
                   <p className="text-sm opacity-80 mt-1">Hub Engagement</p>
-                  <Tooltip content="The average rate at which teachers implement strategies from traditional PD is 10%. Source: TNTP 'The Mirage' (2015).">
-                    <p className="text-xs opacity-60 mt-2">vs 10% industry avg</p>
-                  </Tooltip>
+                  <p className="text-xs opacity-60 mt-2">vs 40-50% industry avg</p>
                 </div>
               </div>
 
@@ -4646,21 +4640,15 @@ export default function ExampleDashboard() {
               {/* Trust Indicators */}
               <div className="mt-8 pt-6 border-t border-white/20 grid grid-cols-3 gap-4 text-center">
                 <div>
-                  <Tooltip content="94% of TDI partner districts renew for Year 2 or Year 3. Measured across all partnerships 2022-2025.">
-                    <p className="text-2xl font-bold">94%</p>
-                  </Tooltip>
+                  <p className="text-2xl font-bold">94%</p>
                   <p className="text-xs opacity-70">Partner Renewal Rate</p>
                 </div>
                 <div>
-                  <Tooltip content="Average partnership length across TDI's partner network. Most districts complete the full 3-year BUILD-GROW-SUSTAIN cycle.">
-                    <p className="text-2xl font-bold">3yr</p>
-                  </Tooltip>
+                  <p className="text-2xl font-bold">3yr</p>
                   <p className="text-xs opacity-70">Avg Partnership Length</p>
                 </div>
                 <div>
-                  <Tooltip content="Partner satisfaction measured via annual surveys. 100% of partners report being 'satisfied' or 'very satisfied' with TDI partnership outcomes.">
-                    <p className="text-2xl font-bold">100%</p>
-                  </Tooltip>
+                  <p className="text-2xl font-bold">100%</p>
                   <p className="text-xs opacity-70">Satisfaction Score</p>
                 </div>
               </div>
