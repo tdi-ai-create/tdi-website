@@ -1088,7 +1088,7 @@ export default function ExampleDashboard() {
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div
                   onClick={() => {
-                    const el = document.getElementById('needs-attention-section');
+                    const el = document.getElementById('action-items-section');
                     if (el) scrollToElement(el);
                   }}
                   className="p-4 cursor-pointer hover:bg-gray-50 transition-all"
