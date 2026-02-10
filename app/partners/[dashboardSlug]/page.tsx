@@ -225,9 +225,11 @@ export default function PartnerDashboard() {
   const tabStartTime = useRef<number>(Date.now());
   const currentTab = useRef<string>('overview');
 
-  // Check if slug matches dashboard pattern
-  const slugMatch = dashboardSlug?.match(/^(.+)-dashboard$/);
-  const partnerSlug = slugMatch ? slugMatch[1] : null;
+  // Extract slug from URL - strip -dashboard suffix for database lookup
+  // URL: /partners/ford-district-dashboard → DB slug: ford-district
+  const partnerSlug = dashboardSlug?.endsWith('-dashboard')
+    ? dashboardSlug.slice(0, -10) // Remove "-dashboard" (10 chars)
+    : dashboardSlug;
 
   // Check TDI admin
   const isTDIAdmin = (email: string) => email.toLowerCase().endsWith('@teachersdeserveit.com');
