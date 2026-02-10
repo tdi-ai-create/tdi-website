@@ -1827,12 +1827,12 @@ export default function ExampleDashboard() {
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {[
-                  { icon: Mail, label: 'Newsletter', value: 197, stat: '32% higher strategy adoption', link: 'https://teachersdeserveit.com/newsletter' },
-                  { icon: BookOpen, label: 'Blog Readers', value: 131, stat: '2.5x more likely to try new strategies', link: 'https://teachersdeserveit.com/blog' },
-                  { icon: Headphones, label: 'Podcast', value: 78, stat: '28% higher implementation rates', link: 'https://teachersdeserveit.com/podcast' },
-                  { icon: Users, label: 'Community', value: 48, stat: '45% report feeling less isolated', link: 'https://teachersdeserveit.com/community' },
-                  { icon: FileText, label: 'Resources', value: 361, stat: '3x more classroom tools used', link: 'https://teachersdeserveit.com/resources' },
-                  { icon: GraduationCap, label: 'Courses', value: 224, stat: '65% completion vs 10% industry avg', link: 'https://teachersdeserveit.com/courses' },
+                  { icon: Mail, label: 'Newsletter', value: 197, stat: '32% higher strategy adoption', link: 'https://raehughart.substack.com' },
+                  { icon: BookOpen, label: 'Blog Readers', value: 131, stat: '2.5x more likely to try new strategies', link: 'https://raehughart.substack.com' },
+                  { icon: Headphones, label: 'Podcast', value: 78, stat: '28% higher implementation rates', link: 'https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274' },
+                  { icon: Users, label: 'Community', value: 48, stat: '45% report feeling less isolated', link: 'https://www.facebook.com/groups/tdimovement' },
+                  { icon: FileText, label: 'Resources', value: 361, stat: '3x more classroom tools used', link: 'https://tdi.thinkific.com' },
+                  { icon: GraduationCap, label: 'Courses', value: 224, stat: '65% completion vs 10% industry avg', link: 'https://tdi.thinkific.com' },
                 ].map((channel) => (
                   <a
                     key={channel.label}
