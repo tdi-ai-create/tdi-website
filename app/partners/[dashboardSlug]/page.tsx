@@ -39,6 +39,9 @@ import {
   Award,
   ArrowRight,
   MessageCircle,
+  Headphones,
+  GraduationCap,
+  ArrowUpRight,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -251,6 +254,7 @@ export default function PartnerDashboard() {
   const [toastMessage, setToastMessage] = useState('');
   const [uploadingItemId, setUploadingItemId] = useState<string | null>(null);
   const [savingItemId, setSavingItemId] = useState<string | null>(null);
+  const [expandedActionFormId, setExpandedActionFormId] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
 
   // Action item form state
@@ -687,16 +691,21 @@ export default function PartnerDashboard() {
 
   const getObservationColor = () => {
     if (!partnership) return colors.amber;
-    if (partnership.observation_days_completed === 0) return colors.amber;
-    if (partnership.observation_days_completed >= partnership.observation_days_total) return colors.teal;
+    const completed = partnership.observation_days_completed ?? 0;
+    const total = partnership.observation_days_total ?? 0;
+    if (completed === 0) return colors.amber;
+    if (completed >= total) return colors.teal;
     return colors.blueAccent;
   };
 
   const getObservationText = () => {
-    if (!partnership) return 'Not started';
-    if (partnership.observation_days_completed === 0) return 'Not started';
-    if (partnership.observation_days_completed >= partnership.observation_days_total) return 'All complete';
-    return `${partnership.observation_days_completed}/${partnership.observation_days_total} complete`;
+    if (!partnership) return 'Not yet scheduled';
+    const completed = partnership.observation_days_completed ?? 0;
+    const total = partnership.observation_days_total ?? 0;
+    if (completed === 0 && total === 0) return 'Not yet scheduled';
+    if (completed === 0) return 'Not started';
+    if (completed >= total) return 'All complete';
+    return `${completed}/${total} complete`;
   };
 
   // Tabs configuration
@@ -1154,36 +1163,23 @@ export default function PartnerDashboard() {
                 {/* Engagement Depth */}
                 <div className="flex flex-col">
                   <p className="text-sm font-semibold text-[#1e2749] mb-3">Engagement Depth</p>
-                  <div className="space-y-3 flex-1">
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Completed 1+ course</span>
-                        <span className="font-semibold text-gray-400">—</span>
-                      </div>
-                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-gray-200 rounded-full" style={{width: '0%'}} />
-                      </div>
+                  <div className="space-y-2 flex-1">
+                    <div className="flex justify-between text-xs py-1.5">
+                      <span className="text-gray-600">Completed 1+ course</span>
+                      <span className="text-gray-400 italic">Awaiting data</span>
                     </div>
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Downloaded resources</span>
-                        <span className="font-semibold text-gray-400">—</span>
-                      </div>
-                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-gray-200 rounded-full" style={{width: '0%'}} />
-                      </div>
+                    <div className="flex justify-between text-xs py-1.5">
+                      <span className="text-gray-600">Downloaded resources</span>
+                      <span className="text-gray-400 italic">Awaiting data</span>
                     </div>
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Active this month</span>
-                        <span className="font-semibold text-gray-400">—</span>
-                      </div>
-                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-gray-200 rounded-full" style={{width: '0%'}} />
-                      </div>
+                    <div className="flex justify-between text-xs py-1.5">
+                      <span className="text-gray-600">Active this month</span>
+                      <span className="text-gray-400 italic">Awaiting data</span>
                     </div>
                   </div>
-                  <p className="text-xs text-gray-400 mt-2 italic">Data populates as staff engage with Hub</p>
+                  <p className="text-xs text-gray-400 mt-3 text-center bg-gray-50 rounded-lg py-2 px-3">
+                    Data populates as staff engage with Hub
+                  </p>
                 </div>
 
                 {/* Love Notes & Sessions */}
@@ -1249,10 +1245,11 @@ export default function PartnerDashboard() {
                           const isUploading = uploadingItemId === item.id;
 
                           // Render inline action based on item title
+                          const isFormExpanded = expandedActionFormId === item.id;
                           const renderInlineAction = () => {
                             const titleLower = item.title.toLowerCase();
 
-                            // Item 1: Complete Hub Onboarding
+                            // Item 1: Complete Hub Onboarding - always show (simple button)
                             if (titleLower.includes('hub onboarding') || titleLower.includes('hub access')) {
                               return (
                                 <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -1274,7 +1271,7 @@ export default function PartnerDashboard() {
                               );
                             }
 
-                            // Item 2: Schedule Virtual Session
+                            // Item 2: Schedule Virtual Session - always show (simple link)
                             if (titleLower.includes('virtual session')) {
                               return (
                                 <div className="mt-3">
@@ -1292,8 +1289,21 @@ export default function PartnerDashboard() {
                               );
                             }
 
-                            // Item 3: Suggest TDI Champion(s)
+                            // Item 3: Suggest TDI Champion(s) - collapsible form
                             if (titleLower.includes('champion')) {
+                              if (!isFormExpanded) {
+                                return (
+                                  <div className="mt-3">
+                                    <button
+                                      onClick={() => setExpandedActionFormId(item.id)}
+                                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
+                                    >
+                                      <Plus className="w-4 h-4" />
+                                      Add Champion
+                                    </button>
+                                  </div>
+                                );
+                              }
                               return (
                                 <div className="mt-3 space-y-2">
                                   <div className="flex flex-wrap gap-2">
@@ -1319,19 +1329,25 @@ export default function PartnerDashboard() {
                                       {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                       Save
                                     </button>
+                                    <button
+                                      onClick={() => setExpandedActionFormId(null)}
+                                      className="px-3 py-2 text-gray-500 hover:text-gray-700 text-sm"
+                                    >
+                                      Cancel
+                                    </button>
                                   </div>
                                 </div>
                               );
                             }
 
-                            // Item 4: Add Hub Time to PLCs
+                            // Item 4: Add Hub Time to PLCs - confirmation button only (no Mark Complete needed)
                             if (titleLower.includes('hub time') || titleLower.includes('plc')) {
                               return (
                                 <div className="mt-3">
                                   <button
                                     onClick={() => handleSaveActionData(item.id, 'confirmation', { confirmationMessage: 'Hub time added to PLCs!' })}
                                     disabled={isSaving}
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors disabled:opacity-50"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg text-sm font-medium hover:bg-green-700 transition-colors disabled:opacity-50"
                                   >
                                     {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                                     We&apos;ve added Hub time to our PLC schedule
@@ -1340,8 +1356,21 @@ export default function PartnerDashboard() {
                               );
                             }
 
-                            // Item 5: Share Website
+                            // Item 5: Share Website - collapsible form
                             if (titleLower.includes('website')) {
+                              if (!isFormExpanded) {
+                                return (
+                                  <div className="mt-3">
+                                    <button
+                                      onClick={() => setExpandedActionFormId(item.id)}
+                                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
+                                    >
+                                      <Link2 className="w-4 h-4" />
+                                      Add Website
+                                    </button>
+                                  </div>
+                                );
+                              }
                               return (
                                 <div className="mt-3 flex flex-wrap gap-2">
                                   <div className="flex-1 min-w-[200px] flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white">
@@ -1362,12 +1391,31 @@ export default function PartnerDashboard() {
                                     {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                     Save
                                   </button>
+                                  <button
+                                    onClick={() => setExpandedActionFormId(null)}
+                                    className="px-3 py-2 text-gray-500 hover:text-gray-700 text-sm"
+                                  >
+                                    Cancel
+                                  </button>
                                 </div>
                               );
                             }
 
-                            // Item 6: Add Building Details (Districts only)
+                            // Item 6: Add Building Details (Districts only) - collapsible form
                             if (titleLower.includes('building') && partnership?.partnership_type === 'district') {
+                              if (!isFormExpanded) {
+                                return (
+                                  <div className="mt-3">
+                                    <button
+                                      onClick={() => setExpandedActionFormId(item.id)}
+                                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
+                                    >
+                                      <Building className="w-4 h-4" />
+                                      Add Buildings
+                                    </button>
+                                  </div>
+                                );
+                              }
                               return (
                                 <div className="mt-3 space-y-3">
                                   {buildings.map((building, idx) => (
@@ -1437,14 +1485,34 @@ export default function PartnerDashboard() {
                                       {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                       Save Buildings
                                     </button>
+                                    <button
+                                      onClick={() => setExpandedActionFormId(null)}
+                                      className="px-3 py-2 text-gray-500 hover:text-gray-700 text-sm"
+                                    >
+                                      Cancel
+                                    </button>
                                   </div>
                                 </div>
                               );
                             }
 
-                            // Item 7 & 8: File uploads (Baseline Survey, SIP)
+                            // Item 7 & 8: File uploads (Baseline Survey, SIP) - collapsible
                             if (titleLower.includes('survey') || titleLower.includes('improvement plan') || titleLower.includes('sip')) {
                               const folder = titleLower.includes('survey') ? 'baseline-survey' : 'sip';
+                              const buttonLabel = titleLower.includes('survey') ? 'Upload Survey' : 'Upload Plan';
+                              if (!isFormExpanded) {
+                                return (
+                                  <div className="mt-3">
+                                    <button
+                                      onClick={() => setExpandedActionFormId(item.id)}
+                                      className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
+                                    >
+                                      <Upload className="w-4 h-4" />
+                                      {buttonLabel}
+                                    </button>
+                                  </div>
+                                );
+                              }
                               return (
                                 <div className="mt-3">
                                   <label className="flex items-center justify-center gap-2 px-4 py-6 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
@@ -1467,14 +1535,22 @@ export default function PartnerDashboard() {
                                       disabled={isUploading}
                                     />
                                   </label>
-                                  <p className="text-xs text-gray-500 mt-1 text-center">
-                                    Accepted: PDF, DOCX, XLSX, CSV
-                                  </p>
+                                  <div className="flex items-center justify-between mt-2">
+                                    <p className="text-xs text-gray-500">
+                                      Accepted: PDF, DOCX, XLSX, CSV
+                                    </p>
+                                    <button
+                                      onClick={() => setExpandedActionFormId(null)}
+                                      className="text-sm text-gray-500 hover:text-gray-700"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
                                 </div>
                               );
                             }
 
-                            // Item 9: Confirm Observation Day Dates
+                            // Item 9: Confirm Observation Day Dates - always show (simple links)
                             if (titleLower.includes('observation')) {
                               return (
                                 <div className="mt-3 flex flex-wrap gap-2">
@@ -1499,7 +1575,7 @@ export default function PartnerDashboard() {
                               );
                             }
 
-                            // Item 10: Schedule Executive Impact Session
+                            // Item 10: Schedule Executive Impact Session - always show (simple link)
                             if (titleLower.includes('executive') || titleLower.includes('impact session')) {
                               return (
                                 <div className="mt-3">
@@ -1520,6 +1596,9 @@ export default function PartnerDashboard() {
                             // Default: no specific action
                             return null;
                           };
+
+                          // Check if this is the Hub Time/PLC item (no separate Mark Complete needed)
+                          const isPLCItem = item.title.toLowerCase().includes('hub time') || item.title.toLowerCase().includes('plc');
 
                           return (
                             <div
@@ -1551,15 +1630,17 @@ export default function PartnerDashboard() {
                                   {/* Inline Action */}
                                   {renderInlineAction()}
 
-                                  {/* Secondary Buttons */}
+                                  {/* Secondary Buttons - hide Mark Complete for PLC item since confirmation button serves same purpose */}
                                   <div className="flex items-center gap-3 mt-4 pt-3 border-t border-gray-200">
-                                    <button
-                                      onClick={() => handleCompleteItem(item.id)}
-                                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-green-700 border border-green-300 rounded-lg hover:bg-green-50 transition-colors"
-                                    >
-                                      <Check className="w-4 h-4" />
-                                      Mark Complete
-                                    </button>
+                                    {!isPLCItem && (
+                                      <button
+                                        onClick={() => handleCompleteItem(item.id)}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-green-700 border border-green-300 rounded-lg hover:bg-green-50 transition-colors"
+                                      >
+                                        <Check className="w-4 h-4" />
+                                        Mark Complete
+                                      </button>
+                                    )}
                                     <button
                                       onClick={() => handlePauseItem(item.id)}
                                       className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
@@ -1661,33 +1742,34 @@ export default function PartnerDashboard() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Heart className="w-5 h-5 text-[#4ecdc4]" />
-                  <h3 className="text-lg font-bold text-[#1e2749]">Join the TDI Movement</h3>
+                  <h3 className="text-lg font-bold text-[#1e2749]">District-wide Movement</h3>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {[
-                  { icon: Mail, label: 'Newsletter', value: 0, stat: '32% higher strategy adoption', link: 'https://raehughart.substack.com' },
-                  { icon: BookOpen, label: 'Blog', value: 0, stat: '2.5x more likely to try new strategies', link: 'https://raehughart.substack.com' },
-                  { icon: Star, label: 'Podcast', value: 0, stat: '28% higher implementation rates', link: 'https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274' },
-                  { icon: Users, label: 'Community', value: 0, stat: '45% report feeling less isolated', link: 'https://www.facebook.com/groups/tdimovement' },
-                  { icon: FileText, label: 'Resources', value: 0, stat: '3x more classroom tools used', link: 'https://tdi.thinkific.com' },
-                  { icon: BookOpen, label: 'Courses', value: 0, stat: '65% completion vs 10% industry avg', link: 'https://tdi.thinkific.com' },
+                  { icon: Mail, label: 'Newsletter', stat: '32% higher strategy adoption', link: 'https://raehughart.substack.com' },
+                  { icon: BookOpen, label: 'Blog', stat: '2.5x more likely to try new strategies', link: 'https://raehughart.substack.com' },
+                  { icon: Headphones, label: 'Podcast', stat: '28% higher implementation rates', link: 'https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274' },
+                  { icon: Users, label: 'Community', stat: '45% report feeling less isolated', link: 'https://www.facebook.com/groups/tdimovement' },
+                  { icon: FileText, label: 'Resources', stat: '3x more classroom tools used', link: 'https://tdi.thinkific.com' },
+                  { icon: GraduationCap, label: 'Courses', stat: '65% completion vs 10% industry avg', link: 'https://tdi.thinkific.com' },
                 ].map((channel) => (
                   <a
                     key={channel.label}
                     href={channel.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#4ecdc4]/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-transparent hover:border-[#4ecdc4]/30"
+                    className="group flex flex-col p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#4ecdc4]/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-transparent hover:border-[#4ecdc4]/30"
                   >
-                    <channel.icon className="w-4 h-4 text-gray-400 group-hover:text-[#4ecdc4] flex-shrink-0 transition-colors" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs text-gray-500 truncate">{channel.label}</p>
-                      <p className="text-xs text-[#1e2749] font-semibold mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        ↗ {channel.stat}
-                      </p>
+                    <div className="flex items-center gap-2 mb-2">
+                      <channel.icon className="w-4 h-4 text-[#4ecdc4] flex-shrink-0" />
+                      <p className="text-sm font-medium text-[#1e2749]">{channel.label}</p>
+                      <ArrowUpRight className="w-3 h-3 text-gray-400 ml-auto" />
                     </div>
+                    <p className="text-xs text-[#4ecdc4] font-medium">
+                      ↗ {channel.stat}
+                    </p>
                   </a>
                 ))}
               </div>
