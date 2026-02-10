@@ -1778,9 +1778,10 @@ export default function PartnerDashboard() {
               </p>
             </div>
 
-            {/* Phase Preview Teaser */}
+            {/* Partnership Planning Card */}
             <div
-              className="relative bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-6 text-white overflow-hidden group"
+              className="relative bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-6 text-white overflow-hidden group cursor-pointer hover:shadow-xl transition-shadow"
+              onClick={() => setActiveTab('preview')}
             >
               {/* Decorative elements */}
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
@@ -1790,29 +1791,26 @@ export default function PartnerDashboard() {
                 <div className="max-w-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs bg-[#4ecdc4] text-[#1e2749] px-3 py-1 rounded-full font-bold uppercase tracking-wide">
-                      {partnership.contract_phase === 'IGNITE' ? 'Phase 2: ACCELERATE' : partnership.contract_phase === 'ACCELERATE' ? 'Phase 3: SUSTAIN' : 'Renewal'}
+                      Planning Ahead
                     </span>
                   </div>
                   <h3 className="text-xl font-bold">
-                    {partnership.contract_phase === 'IGNITE'
-                      ? 'Coming Up: Full Implementation'
-                      : partnership.contract_phase === 'ACCELERATE'
-                      ? 'Year 3: Make the Gains Permanent'
-                      : 'Continue Your Partnership'}
+                    2026-27 Partnership Planning
                   </h3>
                   <p className="text-sm opacity-90 mt-2">
-                    {partnership.contract_phase === 'IGNITE'
-                      ? 'Once IGNITE is complete, you\'ll move into full implementation with Learning Hub access, observation days, and coaching sessions for your entire team.'
-                      : partnership.contract_phase === 'ACCELERATE'
-                      ? 'You\'ve built momentum. Now lock it in with internal coaching capacity, peer observation circles, and systems that sustain beyond the partnership.'
-                      : 'Continue building on your success with ongoing support, advanced modules, and sustainability planning.'}
+                    Whether you&apos;re deepening your current phase or ready to take the next step, your TDI partner will build a custom plan based on your school&apos;s progress and goals. Every partnership moves at its own pace.
                   </p>
                 </div>
-                <div className="flex flex-col items-center">
-                  <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center">
-                    <ArrowRight className="w-6 h-6" />
-                  </div>
-                </div>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveTab('preview');
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors text-sm font-medium whitespace-nowrap"
+                >
+                  Explore 2026-27 Options
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
             </div>
 
