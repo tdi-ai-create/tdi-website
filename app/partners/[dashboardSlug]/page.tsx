@@ -26,6 +26,8 @@ import {
   Play,
   Zap,
   TrendingUp,
+  TrendingDown,
+  CheckCircle,
   School,
   Sparkles,
   X,
@@ -2807,15 +2809,13 @@ export default function PartnerDashboard() {
 
         {/* JOURNEY TAB */}
         {activeTab === 'journey' && (
-          <div role="tabpanel" id="panel-journey" aria-labelledby="tab-journey" className="space-y-6">
+          <div role="tabpanel" id="panel-journey" aria-labelledby="tab-journey" className="space-y-8">
             {/* Partnership Goal Statement */}
-            <div className="bg-gradient-to-br from-[#FFF8E7] to-white rounded-2xl p-8 border border-[#E8B84B]/20">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 rounded-full bg-[#E8B84B]/20 flex items-center justify-center flex-shrink-0">
-                  <Quote className="w-6 h-6 text-[#E8B84B]" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xl md:text-2xl font-medium text-[#1e2749] leading-relaxed italic">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+              <div className="flex">
+                <div className="w-1 bg-[#1B2A4A] flex-shrink-0" />
+                <div className="p-6 md:p-8">
+                  <p className="text-xl md:text-2xl font-semibold text-[#1e2749] leading-relaxed">
                     &ldquo;{partnership?.partnership_type === 'district'
                       ? `Equip educators across ${organization?.name || 'your district'} with practical strategies and resources to confidently support students and each other.`
                       : `Equip the ${organization?.name || 'your school'} team with practical strategies and resources to transform classrooms and reduce burnout.`
@@ -2826,82 +2826,66 @@ export default function PartnerDashboard() {
               </div>
             </div>
 
-            {/* Implementation Equation */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-6 text-center">The TDI Equation</h2>
-              <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
-                <div className="flex flex-col items-center text-center p-4">
-                  <div className="w-16 h-16 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center mb-3">
-                    <GraduationCap className="w-8 h-8 text-[#4ecdc4]" />
-                  </div>
+            {/* The TDI Equation */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <h2 className="text-lg font-bold text-[#1e2749] mb-6 text-center">The TDI Equation</h2>
+              <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10">
+                <div className="flex flex-col items-center text-center max-w-[160px]">
+                  <GraduationCap className="w-10 h-10 text-[#1B2A4A] mb-3" />
                   <h3 className="font-semibold text-[#1e2749]">Strong Teachers</h3>
                   <p className="text-sm text-gray-500 mt-1">Practical strategies that work</p>
                 </div>
-                <ArrowRight className="w-8 h-8 text-[#E8B84B] hidden md:block" />
-                <div className="w-8 h-8 text-[#E8B84B] md:hidden rotate-90">
-                  <ArrowRight className="w-8 h-8" />
-                </div>
-                <div className="flex flex-col items-center text-center p-4">
-                  <div className="w-16 h-16 rounded-full bg-[#80a4ed]/20 flex items-center justify-center mb-3">
-                    <Heart className="w-8 h-8 text-[#80a4ed]" />
-                  </div>
+                <ArrowRight className="w-6 h-6 text-gray-300 hidden md:block" />
+                <ArrowRight className="w-6 h-6 text-gray-300 rotate-90 md:hidden" />
+                <div className="flex flex-col items-center text-center max-w-[160px]">
+                  <Heart className="w-10 h-10 text-[#1B2A4A] mb-3" />
                   <h3 className="font-semibold text-[#1e2749]">Strong Support</h3>
                   <p className="text-sm text-gray-500 mt-1">Ongoing coaching & community</p>
                 </div>
-                <ArrowRight className="w-8 h-8 text-[#E8B84B] hidden md:block" />
-                <div className="w-8 h-8 text-[#E8B84B] md:hidden rotate-90">
-                  <ArrowRight className="w-8 h-8" />
-                </div>
-                <div className="flex flex-col items-center text-center p-4">
-                  <div className="w-16 h-16 rounded-full bg-[#E8B84B]/20 flex items-center justify-center mb-3">
-                    <Star className="w-8 h-8 text-[#E8B84B]" />
-                  </div>
+                <ArrowRight className="w-6 h-6 text-gray-300 hidden md:block" />
+                <ArrowRight className="w-6 h-6 text-gray-300 rotate-90 md:hidden" />
+                <div className="flex flex-col items-center text-center max-w-[160px]">
+                  <Star className="w-10 h-10 text-[#1B2A4A] mb-3" />
                   <h3 className="font-semibold text-[#1e2749]">Student Success</h3>
                   <p className="text-sm text-gray-500 mt-1">Better outcomes for everyone</p>
                 </div>
               </div>
             </div>
 
-            {/* Phase Timeline */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-6">Your Partnership Journey</h2>
+            {/* Phase Timeline - Compact */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <h2 className="text-lg font-bold text-[#1e2749] mb-6">Your Partnership Journey</h2>
               <div className="relative">
-                {/* Timeline connector */}
-                <div className="absolute top-8 left-0 right-0 h-1 bg-gray-200 hidden md:block" style={{ left: '16.67%', right: '16.67%' }} />
+                {/* Timeline connector line */}
+                <div className="absolute top-6 left-6 right-6 h-0.5 bg-gray-200 hidden md:block" />
 
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid md:grid-cols-3 gap-4">
                   {/* IGNITE Phase */}
                   {(() => {
                     const isActive = partnership?.contract_phase === 'IGNITE';
                     const isPast = partnership?.contract_phase === 'ACCELERATE' || partnership?.contract_phase === 'SUSTAIN';
                     return (
-                      <div className={`relative ${!isActive && !isPast ? 'opacity-50' : ''}`}>
-                        <div className="flex flex-col items-center">
-                          <div
-                            className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 z-10 ${
-                              isPast ? 'bg-[#4ecdc4]' : isActive ? 'bg-[#E8B84B]' : 'bg-gray-200'
-                            }`}
-                          >
-                            {isPast ? (
-                              <Check className="w-8 h-8 text-white" />
-                            ) : (
-                              <span className="text-2xl font-bold text-white">1</span>
-                            )}
-                          </div>
-                          {isActive && (
-                            <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#4ecdc4] text-white text-xs font-bold rounded-full whitespace-nowrap">
-                              YOU ARE HERE
-                            </span>
+                      <div className="relative flex flex-col items-center">
+                        {isActive && (
+                          <span className="absolute -top-3 px-2 py-0.5 bg-[#4ecdc4] text-white text-[10px] font-bold rounded-full whitespace-nowrap z-20">
+                            YOU ARE HERE
+                          </span>
+                        )}
+                        <div
+                          className={`w-12 h-12 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm ${
+                            isPast ? 'bg-[#4ecdc4]' : isActive ? 'bg-[#1B2A4A] ring-4 ring-[#4ecdc4]/30' : 'bg-gray-200'
+                          }`}
+                        >
+                          {isPast ? (
+                            <Check className="w-6 h-6 text-white" />
+                          ) : (
+                            <span className={`text-lg font-bold ${isActive ? 'text-white' : 'text-gray-400'}`}>1</span>
                           )}
                         </div>
-                        <div className={`p-4 rounded-xl ${isActive ? 'bg-[#FFF8E7] border-2 border-[#E8B84B]' : 'bg-gray-50'}`}>
-                          <h3 className="font-bold text-[#1e2749] text-center mb-2">IGNITE</h3>
-                          <p className="text-sm text-gray-600 text-center">
-                            {isActive
-                              ? 'Foundation building, pilot group identification, baseline data collection, first observation cycle, Hub onboarding'
-                              : 'Build the foundation'}
-                          </p>
-                        </div>
+                        <h3 className={`font-bold mt-3 ${isActive ? 'text-[#1e2749]' : 'text-gray-400'}`}>IGNITE</h3>
+                        <p className={`text-sm text-center mt-1 ${isActive ? 'text-gray-600' : 'text-gray-400'}`}>
+                          Build the foundation
+                        </p>
                       </div>
                     );
                   })()}
@@ -2912,33 +2896,27 @@ export default function PartnerDashboard() {
                     const isPast = partnership?.contract_phase === 'SUSTAIN';
                     const isFuture = partnership?.contract_phase === 'IGNITE';
                     return (
-                      <div className={`relative ${isFuture ? 'opacity-50' : ''}`}>
-                        <div className="flex flex-col items-center">
-                          <div
-                            className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 z-10 ${
-                              isPast ? 'bg-[#4ecdc4]' : isActive ? 'bg-[#80a4ed]' : 'bg-gray-200'
-                            }`}
-                          >
-                            {isPast ? (
-                              <Check className="w-8 h-8 text-white" />
-                            ) : (
-                              <span className="text-2xl font-bold text-white">2</span>
-                            )}
-                          </div>
-                          {isActive && (
-                            <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#4ecdc4] text-white text-xs font-bold rounded-full whitespace-nowrap">
-                              YOU ARE HERE
-                            </span>
+                      <div className="relative flex flex-col items-center">
+                        {isActive && (
+                          <span className="absolute -top-3 px-2 py-0.5 bg-[#4ecdc4] text-white text-[10px] font-bold rounded-full whitespace-nowrap z-20">
+                            YOU ARE HERE
+                          </span>
+                        )}
+                        <div
+                          className={`w-12 h-12 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm ${
+                            isPast ? 'bg-[#4ecdc4]' : isActive ? 'bg-[#38618C] ring-4 ring-[#4ecdc4]/30' : 'bg-gray-200'
+                          }`}
+                        >
+                          {isPast ? (
+                            <Check className="w-6 h-6 text-white" />
+                          ) : (
+                            <span className={`text-lg font-bold ${isActive ? 'text-white' : isFuture ? 'text-gray-400' : 'text-white'}`}>2</span>
                           )}
                         </div>
-                        <div className={`p-4 rounded-xl ${isActive ? 'bg-[#f0f9ff] border-2 border-[#80a4ed]' : 'bg-gray-50'}`}>
-                          <h3 className="font-bold text-[#1e2749] text-center mb-2">ACCELERATE</h3>
-                          <p className="text-sm text-gray-600 text-center">
-                            {isActive
-                              ? 'Expand implementation across buildings, Growth Groups based on observation data, multiple virtual sessions, mid-year progress review'
-                              : 'Scale to full staff'}
-                          </p>
-                        </div>
+                        <h3 className={`font-bold mt-3 ${isFuture ? 'text-gray-400' : 'text-[#1e2749]'}`}>ACCELERATE</h3>
+                        <p className={`text-sm text-center mt-1 ${isFuture ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Scale to full staff
+                        </p>
                       </div>
                     );
                   })()}
@@ -2948,29 +2926,23 @@ export default function PartnerDashboard() {
                     const isActive = partnership?.contract_phase === 'SUSTAIN';
                     const isFuture = partnership?.contract_phase === 'IGNITE' || partnership?.contract_phase === 'ACCELERATE';
                     return (
-                      <div className={`relative ${isFuture ? 'opacity-50' : ''}`}>
-                        <div className="flex flex-col items-center">
-                          <div
-                            className={`w-16 h-16 rounded-full flex items-center justify-center mb-4 z-10 ${
-                              isActive ? 'bg-[#abc4ab]' : 'bg-gray-200'
-                            }`}
-                          >
-                            <span className={`text-2xl font-bold ${isActive ? 'text-white' : 'text-gray-400'}`}>3</span>
-                          </div>
-                          {isActive && (
-                            <span className="absolute -top-2 left-1/2 -translate-x-1/2 px-3 py-1 bg-[#4ecdc4] text-white text-xs font-bold rounded-full whitespace-nowrap">
-                              YOU ARE HERE
-                            </span>
-                          )}
+                      <div className="relative flex flex-col items-center">
+                        {isActive && (
+                          <span className="absolute -top-3 px-2 py-0.5 bg-[#4ecdc4] text-white text-[10px] font-bold rounded-full whitespace-nowrap z-20">
+                            YOU ARE HERE
+                          </span>
+                        )}
+                        <div
+                          className={`w-12 h-12 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm ${
+                            isActive ? 'bg-[#4ecdc4] ring-4 ring-[#4ecdc4]/30' : 'bg-gray-200'
+                          }`}
+                        >
+                          <span className={`text-lg font-bold ${isActive ? 'text-white' : 'text-gray-400'}`}>3</span>
                         </div>
-                        <div className={`p-4 rounded-xl ${isActive ? 'bg-[#f0fff4] border-2 border-[#abc4ab]' : 'bg-gray-50'}`}>
-                          <h3 className="font-bold text-[#1e2749] text-center mb-2">SUSTAIN</h3>
-                          <p className="text-sm text-gray-600 text-center">
-                            {isActive
-                              ? 'Internal coaching capacity, peer observation circles, leadership pathways for teacher-leaders, annual impact report'
-                              : 'Embed for lasting change'}
-                          </p>
-                        </div>
+                        <h3 className={`font-bold mt-3 ${isFuture ? 'text-gray-400' : 'text-[#1e2749]'}`}>SUSTAIN</h3>
+                        <p className={`text-sm text-center mt-1 ${isFuture ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Embed for lasting change
+                        </p>
                       </div>
                     );
                   })()}
@@ -2978,24 +2950,38 @@ export default function PartnerDashboard() {
               </div>
             </div>
 
-            {/* What Success Looks Like */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">What Success Looks Like</h2>
-              <ul className="space-y-3">
-                {[
-                  'Staff report increased confidence in classroom strategies',
-                  'Measurable improvement in feeling valued and supported',
-                  'Reduced stress levels compared to baseline',
-                  'Clear implementation of Hub strategies observed in classrooms',
-                ].map((target, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-[#4ecdc4]/20 flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-4 h-4 text-[#4ecdc4]" />
-                    </div>
-                    <span className="text-gray-700">{target}</span>
-                  </li>
-                ))}
-              </ul>
+            {/* What Success Looks Like - 2x2 Grid */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
+              <h2 className="text-lg font-bold text-[#1e2749] mb-4">What Success Looks Like</h2>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                  <div className="flex-shrink-0">
+                    <TrendingUp className="w-5 h-5 text-[#38618C]" />
+                  </div>
+                  <p className="text-sm text-gray-700">Staff report increased confidence in classroom strategies</p>
+                </div>
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                  <div className="flex-shrink-0">
+                    <Heart className="w-5 h-5 text-[#38618C]" />
+                  </div>
+                  <p className="text-sm text-gray-700">Measurable improvement in feeling valued and supported</p>
+                </div>
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                  <div className="flex-shrink-0">
+                    <TrendingDown className="w-5 h-5 text-[#38618C]" />
+                  </div>
+                  <p className="text-sm text-gray-700">Reduced stress levels compared to baseline</p>
+                </div>
+                <div className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                  <div className="flex-shrink-0">
+                    <CheckCircle className="w-5 h-5 text-[#38618C]" />
+                  </div>
+                  <p className="text-sm text-gray-700">Clear implementation of Hub strategies observed in classrooms</p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 text-center mt-4">
+                These targets are customized after your first planning session with TDI.
+              </p>
             </div>
           </div>
         )}
