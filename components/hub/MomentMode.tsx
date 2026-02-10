@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { X, Wind, Heart, Sparkles, BookOpen } from 'lucide-react';
 import { incrementHardDayCount } from '@/lib/hub-auth';
+import { useMomentMode } from './MomentModeContext';
 
 type MomentState = 'entry' | 'pause' | 'affirmation' | 'gentle' | 'journal';
 type JournalTab = 'private' | 'anonymous';
@@ -68,6 +69,9 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   const [timeRemaining, setTimeRemaining] = useState(300); // 5 minutes in seconds
   const [hasIncremented, setHasIncremented] = useState(false);
 
+  // Access global Moment Mode context to suppress notifications
+  const { setMomentModeActive } = useMomentMode();
+
   // Handle escape key
   const handleEscape = useCallback((e: KeyboardEvent) => {
     if (e.key === 'Escape') {
@@ -80,18 +84,25 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
       document.addEventListener('keydown', handleEscape);
       document.body.style.overflow = 'hidden';
 
+      // Signal to global context that Moment Mode is active
+      // This suppresses all toast notifications and popups
+      setMomentModeActive(true);
+
       // Increment hard day count only once per open
       if (!hasIncremented) {
         incrementHardDayCount();
         setHasIncremented(true);
       }
+    } else {
+      // Signal that Moment Mode is no longer active
+      setMomentModeActive(false);
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = '';
     };
-  }, [isOpen, handleEscape, hasIncremented]);
+  }, [isOpen, handleEscape, hasIncremented, setMomentModeActive]);
 
   // Timer for breathing exercise
   useEffect(() => {

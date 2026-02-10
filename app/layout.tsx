@@ -9,6 +9,8 @@ import { Footer } from "@/components/layout/Footer";
 import { EmailPopup } from "@/components/EmailPopup";
 import { SocialProofPopup } from "@/components/SocialProofPopup";
 import { NominatePopup } from "@/components/NominatePopup";
+import { MainSiteWrapper } from "@/components/layout/MainSiteWrapper";
+import { MomentModeProvider } from "@/components/hub/MomentModeContext";
 
 export const metadata: Metadata = {
   title: {
@@ -64,18 +66,24 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        <GoogleAnalytics />
-        <MicrosoftClarity />
-        <ScrollToTop />
-        <AnnouncementBar />
-        <Header />
-        <main className="min-h-screen">
-          {children}
-        </main>
-        <Footer />
-        <EmailPopup />
-        <SocialProofPopup />
-        <NominatePopup />
+        <MomentModeProvider>
+          <GoogleAnalytics />
+          <MicrosoftClarity />
+          <ScrollToTop />
+          <MainSiteWrapper>
+            <AnnouncementBar />
+            <Header />
+          </MainSiteWrapper>
+          <main className="min-h-screen">
+            {children}
+          </main>
+          <MainSiteWrapper>
+            <Footer />
+            <EmailPopup />
+            <SocialProofPopup />
+            <NominatePopup />
+          </MainSiteWrapper>
+        </MomentModeProvider>
       </body>
     </html>
   );

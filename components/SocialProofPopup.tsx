@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import { useMomentMode } from './hub/MomentModeContext';
 
 interface NotificationMessage {
   message: string;
@@ -57,12 +58,16 @@ export function SocialProofPopup() {
   const [isHovered, setIsHovered] = useState(false);
   const pathname = usePathname();
 
-  // Hide on internal team pages, creator portal, admin pages, and partner pages
+  // Check if Moment Mode is active (sacred space - no distractions)
+  const { isMomentModeActive } = useMomentMode();
+
+  // Hide on internal team pages, creator portal, admin pages, partner pages, and hub
   const isInternalPage = pathname?.includes('dashboard-creation') ||
     pathname?.startsWith('/creator-portal') ||
     pathname?.startsWith('/admin') ||
     pathname?.startsWith('/partner-setup') ||
-    pathname?.startsWith('/partners');
+    pathname?.startsWith('/partners') ||
+    pathname?.startsWith('/hub');
 
   const messagesRef = useRef<NotificationMessage[]>([]);
   const messageIndexRef = useRef(0);
@@ -213,8 +218,29 @@ export function SocialProofPopup() {
     };
   }, [isInternalPage]);
 
-  // Don't render on internal pages or if no message
-  if (isInternalPage || !currentMessage || !isAnimating) {
+  // Clear any active notification when Moment Mode becomes active
+  // Moment Mode is a sacred space - no distractions allowed
+  useEffect(() => {
+    if (isMomentModeActive) {
+      // Immediately hide any visible notification
+      setIsAnimating(false);
+      setCurrentMessage(null);
+      pendingBurstRef.current = false;
+
+      // Clear any pending timeouts so notifications don't queue up
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+        animationTimeoutRef.current = null;
+      }
+    }
+  }, [isMomentModeActive]);
+
+  // Don't render on internal pages, during Moment Mode, or if no message
+  if (isInternalPage || isMomentModeActive || !currentMessage || !isAnimating) {
     return null;
   }
 
