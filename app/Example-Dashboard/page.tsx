@@ -4623,15 +4623,14 @@ export default function ExampleDashboard() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-[#4ecdc4] text-[#1e2749] px-6 py-3 rounded-lg font-semibold hover:bg-[#3dbdb5] transition-colors"
+                  <span
+                    onClick={handleDisabledClick}
+                    title="This is an example dashboard"
+                    className="inline-flex items-center gap-2 bg-[#4ecdc4] text-[#1e2749] px-6 py-3 rounded-lg font-semibold opacity-60 cursor-not-allowed"
                   >
                     <Calendar className="w-5 h-5" />
                     Schedule a Call
-                  </a>
+                  </span>
                   <a
                     href="/calculator"
                     className="inline-flex items-center gap-2 border border-[#4ecdc4] text-[#1e2749] px-4 py-3 rounded-lg font-medium hover:bg-[#4ecdc4]/10 transition-colors"
@@ -4663,7 +4662,8 @@ export default function ExampleDashboard() {
 
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
                   <span
-                    className="inline-flex items-center gap-2 bg-white text-[#1e2749] px-8 py-4 rounded-xl font-bold text-lg opacity-85 cursor-default"
+                    onClick={handleDisabledClick}
+                    className="inline-flex items-center gap-2 bg-white text-[#1e2749] px-8 py-4 rounded-xl font-bold text-lg opacity-60 cursor-not-allowed"
                     title="This is an example dashboard"
                   >
                     <Calendar className="w-5 h-5" />
@@ -4873,16 +4873,16 @@ export default function ExampleDashboard() {
           <div className="bg-white rounded-xl shadow-xl px-6 py-4 flex items-center gap-4 max-w-lg border border-gray-100">
             <div className="flex-1">
               <p className="text-[#1e2749] font-medium text-sm">
-                Ready to see what your district&apos;s dashboard could look like?
+                This is a demo dashboard. Ready to see what yours could look like?
               </p>
             </div>
             <a
-              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+              href="https://www.teachersdeserveit.com/contact"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors"
             >
-              Schedule a Call →
+              Connect with Us →
             </a>
             <button
               onClick={() => setShowToast(false)}
