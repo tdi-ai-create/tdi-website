@@ -32,7 +32,7 @@ export default async function CourseDetailPage({ params }: CourseDetailPageProps
         </div>
 
         <h1
-          className="text-2xl md:text-3xl font-semibold mb-4"
+          className="text-[24px] md:text-[28px] font-bold mb-4"
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
             color: '#2B3A67',

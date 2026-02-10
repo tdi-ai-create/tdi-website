@@ -78,7 +78,7 @@ export default function HubLoginPage() {
           {/* Logo */}
           <div className="text-center mb-8">
             <h1
-              className="text-3xl font-bold mb-2"
+              className="text-[28px] font-bold mb-2"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
                 color: '#2B3A67',

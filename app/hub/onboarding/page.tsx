@@ -550,7 +550,7 @@ export default function OnboardingPage() {
                       className="font-bold"
                       style={{
                         fontFamily: "'Source Serif 4', Georgia, serif",
-                        fontSize: '36px',
+                        fontSize: '28px',
                         color: '#E8B84B',
                       }}
                     >
@@ -899,7 +899,7 @@ export default function OnboardingPage() {
             <ProgressBar currentStep={1} />
 
             <h1
-              className="text-2xl md:text-3xl font-semibold mb-2"
+              className="text-[24px] md:text-[28px] font-bold mb-2"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
                 color: '#2B3A67',
@@ -1002,7 +1002,7 @@ export default function OnboardingPage() {
             <ProgressBar currentStep={2} />
 
             <h1
-              className="text-2xl md:text-3xl font-semibold mb-2"
+              className="text-[24px] md:text-[28px] font-bold mb-2"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
                 color: '#2B3A67',
@@ -1141,7 +1141,7 @@ export default function OnboardingPage() {
             <ProgressBar currentStep={3} />
 
             <h1
-              className="text-2xl md:text-3xl font-semibold mb-2"
+              className="text-[24px] md:text-[28px] font-bold mb-2"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
                 color: '#2B3A67',
@@ -1239,7 +1239,7 @@ export default function OnboardingPage() {
             <ProgressBar currentStep={4} />
 
             <h1
-              className="text-2xl md:text-3xl font-semibold mb-2"
+              className="text-[24px] md:text-[28px] font-bold mb-2"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
                 color: '#2B3A67',
@@ -1395,7 +1395,7 @@ export default function OnboardingPage() {
           </div>
 
           <h1
-            className="text-3xl md:text-4xl font-semibold mb-6"
+            className="text-[28px] md:text-[32px] font-bold mb-6"
             style={{
               fontFamily: "'Source Serif 4', Georgia, serif",
               color: 'white',

@@ -48,13 +48,11 @@ export default function HubNavBar({ profile, userEmail }: HubNavBarProps) {
           href="/hub"
           className="flex-shrink-0 flex items-center"
         >
-          <Image
+          <img
             src="/images/logo.webp"
             alt="Teachers Deserve It"
-            width={140}
-            height={42}
-            className="h-9 w-auto brightness-0 invert"
-            priority
+            className="h-9 w-auto"
+            style={{ filter: 'brightness(0) invert(1)' }}
           />
           {/* Divider */}
           <div

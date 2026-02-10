@@ -252,7 +252,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                 style={{ backgroundColor: 'white' }}
               >
                 <span
-                  className="text-3xl font-semibold"
+                  className="text-[28px] font-semibold"
                   style={{
                     fontFamily: "'Source Serif 4', Georgia, serif",
                     color: '#2B3A67',
