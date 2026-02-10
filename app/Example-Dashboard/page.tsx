@@ -708,6 +708,15 @@ export default function ExampleDashboard() {
     return now >= dueDate;
   };
 
+  // Scroll offset for sticky header (56px) + tab bar (~50px) + breathing room
+  const SCROLL_OFFSET = 130;
+
+  // Helper function for offset-aware scrolling
+  const scrollToElement = (element: HTMLElement) => {
+    const top = element.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET;
+    window.scrollTo({ top, behavior: 'smooth' });
+  };
+
   // Navigate to a specific section (cross-tab navigation)
   const navigateToSection = (tab: string, sectionId: string) => {
     setActiveTab(tab);
@@ -715,7 +724,7 @@ export default function ExampleDashboard() {
     setTimeout(() => {
       const element = document.getElementById(sectionId);
       if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        scrollToElement(element);
       }
     }, 100);
   };
@@ -726,7 +735,7 @@ export default function ExampleDashboard() {
     setTimeout(() => {
       const tabContent = document.getElementById('tab-content-area');
       if (tabContent) {
-        tabContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        scrollToElement(tabContent);
       }
     }, 50);
   };
@@ -1056,7 +1065,8 @@ export default function ExampleDashboard() {
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                 <div
                   onClick={() => {
-                    document.getElementById('needs-attention-section')?.scrollIntoView({ behavior: 'smooth' });
+                    const el = document.getElementById('needs-attention-section');
+                    if (el) scrollToElement(el);
                   }}
                   className="p-4 cursor-pointer hover:bg-gray-50 transition-all"
                 >
