@@ -147,8 +147,9 @@ export default function ExampleDashboard() {
     // Overview
     'leading-indicators': true,
     'movement-involvement': false,
-    'building-awards': false,
-    'silver-bronze': false,
+    'building-awards': true,
+    'silver-bronze': true,
+    'full-leaderboard': false,
     'insight-rhythm': false,
     'insight-cadence': false,
     'insight-tempo-stress': false,
@@ -1163,96 +1164,213 @@ export default function ExampleDashboard() {
               </div>
             </div>
 
-            {/* Building Awards — Collapsed Accordion with 3-Column Table */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <button onClick={() => toggleSection('building-awards')}
-                className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <Trophy className="w-5 h-5 text-amber-500" />
-                  <div className="text-left">
-                    <p className="text-base font-bold text-[#1e2749]">Building Awards</p>
-                    <p className="text-xs text-gray-500">7 categories · 6 buildings ranked</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex -space-x-1"><span className="text-sm">🥇</span><span className="text-sm">🥈</span><span className="text-sm">🥉</span></div>
-                  <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${openSections['building-awards'] ? 'rotate-180' : ''}`} />
-                </div>
-              </button>
-
-              {openSections['building-awards'] && (
-                <div className="px-5 pb-5 border-t border-gray-100">
-                  {/* Column headers */}
-                  <div className="grid grid-cols-[1fr_1fr_auto] gap-x-4 text-xs text-gray-400 font-medium uppercase tracking-wide pb-2 border-b border-gray-100 mb-1 mt-4">
-                    <span>Award</span><span>School</span><span className="text-right">Result</span>
-                  </div>
-
-                  {/* GOLD WINNERS — varied across buildings */}
-                  {[
-                    { award: 'Most Engaged', school: 'Harmony Elementary', result: '95%', color: 'text-[#4ecdc4]' },
-                    { award: 'Top Learners', school: 'Crescendo Middle', result: '72%', color: 'text-[#1e2749]' },
-                    { award: 'Wellness Leader', school: 'Melody Primary', result: '5.0/10', color: 'text-green-500' },
-                    { award: 'Implementation Champ', school: 'Harmony Elementary', result: '34%', color: 'text-[#38618C]' },
-                    { award: 'Resource Champion', school: 'Rhythm Academy', result: '92', color: 'text-[#1e2749]' },
-                    { award: 'Most Likely to Stay', school: 'Cadence K-8', result: '9.8/10', color: 'text-green-500' },
-                    { award: 'Movement Leader', school: 'Crescendo Middle', result: '42', color: 'text-[#4ecdc4]' },
-                  ].map(row => (
-                    <div key={row.award} className="grid grid-cols-[1fr_1fr_auto] gap-x-4 items-center py-3 border-b border-gray-50 last:border-b-0 hover:bg-gray-50 rounded transition-colors">
-                      <div className="flex items-center gap-2">
-                        <span className="text-base">🥇</span>
-                        <span className="text-sm font-medium text-[#1e2749]">{row.award}</span>
-                      </div>
-                      <span className="text-sm text-gray-600">{row.school}</span>
-                      <span className={`text-sm font-bold ${row.color} text-right`}>{row.result}</span>
+            {/* Building Awards — Celebratory Cards with CTAs */}
+            <div className="bg-gradient-to-br from-amber-50 via-white to-green-50 rounded-2xl shadow-sm border border-amber-100 overflow-hidden">
+              <div className="p-5 border-b border-amber-100/50">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-500 rounded-xl flex items-center justify-center shadow-sm">
+                      <Trophy className="w-5 h-5 text-white" />
                     </div>
-                  ))}
+                    <div>
+                      <p className="text-lg font-bold text-[#1e2749]">🎉 Building Awards</p>
+                      <p className="text-sm text-gray-500">Celebrating excellence across 7 categories</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">🥇</span>
+                    <span className="text-xl">🥈</span>
+                    <span className="text-lg">🥉</span>
+                  </div>
+                </div>
+              </div>
 
-                  {/* Silver & Bronze — nested dropdown */}
-                  <button onClick={() => toggleSection('silver-bronze')}
-                    className="w-full flex items-center justify-center gap-2 py-3 mt-3 text-xs text-gray-400 hover:text-gray-600 transition-colors border-t border-gray-100">
-                    <span>View Silver & Bronze winners</span>
-                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openSections['silver-bronze'] ? 'rotate-180' : ''}`} />
-                  </button>
-                  {openSections['silver-bronze'] && (
-                    <div className="mt-2 space-y-3">
-                      {[
-                        { award: 'Most Engaged', silver: { s: 'Crescendo Middle', v: '91%' }, bronze: { s: 'Rhythm Academy', v: '88%' }},
-                        { award: 'Top Learners', silver: { s: 'Harmony Elementary', v: '68%' }, bronze: { s: 'Melody Primary', v: '61%' }},
-                        { award: 'Wellness Leader', silver: { s: 'Harmony Elementary', v: '5.2/10' }, bronze: { s: 'Crescendo Middle', v: '5.8/10' }},
-                        { award: 'Implementation Champ', silver: { s: 'Crescendo Middle', v: '28%' }, bronze: { s: 'Melody Primary', v: '22%' }},
-                        { award: 'Resource Champion', silver: { s: 'Crescendo Middle', v: '76' }, bronze: { s: 'Cadence K-8', v: '68' }},
-                        { award: 'Most Likely to Stay', silver: { s: 'Harmony Elementary', v: '9.5/10' }, bronze: { s: 'Melody Primary', v: '9.1/10' }},
-                        { award: 'Movement Leader', silver: { s: 'Harmony Elementary', v: '38' }, bronze: { s: 'Tempo High', v: '35' }},
-                      ].map(row => (
-                        <div key={row.award}>
-                          <p className="text-xs font-semibold text-gray-500 mb-1.5">{row.award}</p>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div className="flex items-center justify-between px-3 py-2 bg-gray-50 rounded-lg text-xs">
-                              <div className="flex items-center gap-1.5"><span>🥈</span><span className="text-gray-600">{row.silver.s}</span></div>
-                              <span className="font-semibold text-gray-700">{row.silver.v}</span>
-                            </div>
-                            <div className="flex items-center justify-between px-3 py-2 bg-orange-50/50 rounded-lg text-xs">
-                              <div className="flex items-center gap-1.5"><span>🥉</span><span className="text-gray-600">{row.bronze.s}</span></div>
-                              <span className="font-semibold text-gray-700">{row.bronze.v}</span>
-                            </div>
+              <div className="p-5 space-y-4">
+                {/* Gold Winner Cards with CTAs */}
+                {[
+                  {
+                    award: 'Most Engaged',
+                    school: 'Harmony Elementary',
+                    leader: 'Ms. Rivera',
+                    result: '95%',
+                    metric: 'Hub Login Rate',
+                    celebration: 'Highest engagement in the district! 95% of staff logged in regularly.',
+                    suggestion: 'Invite Ms. Rivera to share her engagement strategy at the next PLC.',
+                    bgColor: 'bg-teal-50',
+                    borderColor: 'border-teal-200',
+                    resultColor: 'text-[#4ecdc4]',
+                    celebrateBtn: 'Congratulate Team',
+                    suggestBtn: 'Suggest Strategy Share',
+                  },
+                  {
+                    award: 'Top Learners',
+                    school: 'Crescendo Middle',
+                    leader: 'Mr. Thompson',
+                    result: '72%',
+                    metric: 'Course Completion',
+                    celebration: 'Leading the district in course completions — 72% of staff finished at least one course.',
+                    suggestion: 'Recognize Mr. Thompson\'s PLC model that protects learning time.',
+                    bgColor: 'bg-blue-50',
+                    borderColor: 'border-blue-200',
+                    resultColor: 'text-[#38618C]',
+                    celebrateBtn: 'Send Kudos',
+                    suggestBtn: 'Share PLC Model',
+                  },
+                  {
+                    award: 'Wellness Leader',
+                    school: 'Melody Primary',
+                    leader: 'Dr. Chen',
+                    result: '5.0/10',
+                    metric: 'Lowest Stress',
+                    celebration: 'Best wellness scores in the district! Stress level 5.0/10 vs. industry 8-9/10.',
+                    suggestion: 'Dr. Chen\'s wellness initiatives could help other buildings.',
+                    bgColor: 'bg-green-50',
+                    borderColor: 'border-green-200',
+                    resultColor: 'text-green-600',
+                    celebrateBtn: 'Celebrate Wellness',
+                    suggestBtn: 'Share Wellness Tips',
+                  },
+                  {
+                    award: 'Implementation Champ',
+                    school: 'Harmony Elementary',
+                    leader: 'Ms. Rivera',
+                    result: '34%',
+                    metric: 'Strategy Use',
+                    celebration: 'Leading classroom implementation at 34% — that\'s 3.4x the industry average!',
+                    suggestion: 'Feature Harmony\'s implementation journey in the spring newsletter.',
+                    bgColor: 'bg-indigo-50',
+                    borderColor: 'border-indigo-200',
+                    resultColor: 'text-indigo-600',
+                    celebrateBtn: 'High Five',
+                    suggestBtn: 'Feature in Newsletter',
+                  },
+                  {
+                    award: 'Resource Champion',
+                    school: 'Rhythm Academy',
+                    leader: 'Mrs. Davis',
+                    result: '92',
+                    metric: 'Downloads',
+                    celebration: '92 resources downloaded and shared! Rhythm is putting tools into practice.',
+                    suggestion: 'Ask Mrs. Davis which resources had the biggest impact.',
+                    bgColor: 'bg-purple-50',
+                    borderColor: 'border-purple-200',
+                    resultColor: 'text-purple-600',
+                    celebrateBtn: 'Applaud',
+                    suggestBtn: 'Survey Top Resources',
+                  },
+                  {
+                    award: 'Most Likely to Stay',
+                    school: 'Cadence K-8',
+                    leader: 'Principal Martinez',
+                    result: '9.8/10',
+                    metric: 'Retention Intent',
+                    celebration: 'Incredible 9.8/10 retention intent — nearly 5x the industry average!',
+                    suggestion: 'Principal Martinez\'s culture work is worth studying.',
+                    bgColor: 'bg-emerald-50',
+                    borderColor: 'border-emerald-200',
+                    resultColor: 'text-emerald-600',
+                    celebrateBtn: 'Celebrate Culture',
+                    suggestBtn: 'Schedule Visit',
+                  },
+                  {
+                    award: 'Movement Leader',
+                    school: 'Crescendo Middle',
+                    leader: 'Mr. Thompson',
+                    result: '42',
+                    metric: 'Community Participation',
+                    celebration: '42 staff actively engaged in the TDI community — podcast, blog, Facebook group!',
+                    suggestion: 'Highlight Crescendo\'s community engagement at the board meeting.',
+                    bgColor: 'bg-cyan-50',
+                    borderColor: 'border-cyan-200',
+                    resultColor: 'text-cyan-600',
+                    celebrateBtn: 'Shout Out',
+                    suggestBtn: 'Present to Board',
+                  },
+                ].map((award, idx) => (
+                  <div key={award.award} className={`${award.bgColor} rounded-xl p-4 border ${award.borderColor} hover:shadow-md transition-all`}>
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <span className="text-2xl">🥇</span>
+                        <div>
+                          <p className="font-bold text-[#1e2749]">{award.award}</p>
+                          <p className="text-sm text-gray-600">{award.school} · {award.leader}</p>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className={`text-xl font-bold ${award.resultColor}`}>{award.result}</p>
+                        <p className="text-xs text-gray-500">{award.metric}</p>
+                      </div>
+                    </div>
+                    <p className="text-sm text-gray-700 mb-3">{award.celebration}</p>
+                    <p className="text-sm text-gray-600 italic mb-3">💡 {award.suggestion}</p>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={handleDisabledClick}
+                        className="px-3 py-1.5 bg-[#4ecdc4] text-white text-xs font-semibold rounded-lg flex items-center gap-1.5 opacity-80 hover:opacity-100 cursor-not-allowed"
+                        title="This is an example dashboard"
+                      >
+                        🎉 {award.celebrateBtn} →
+                      </button>
+                      <button
+                        onClick={handleDisabledClick}
+                        className="px-3 py-1.5 bg-white text-[#38618C] text-xs font-semibold rounded-lg border border-[#38618C]/30 flex items-center gap-1.5 opacity-80 hover:opacity-100 cursor-not-allowed"
+                        title="This is an example dashboard"
+                      >
+                        💡 {award.suggestBtn}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+
+                {/* Silver & Bronze — nested dropdown */}
+                <button onClick={() => toggleSection('silver-bronze')}
+                  className="w-full flex items-center justify-center gap-2 py-3 text-sm text-gray-500 hover:text-gray-700 transition-colors border-t border-amber-100/50 mt-2">
+                  <span>View Silver & Bronze winners</span>
+                  <ChevronDown className={`w-4 h-4 transition-transform ${openSections['silver-bronze'] ? 'rotate-180' : ''}`} />
+                </button>
+                {openSections['silver-bronze'] && (
+                  <div className="space-y-3 bg-white/50 rounded-xl p-4">
+                    {[
+                      { award: 'Most Engaged', silver: { s: 'Crescendo Middle', v: '91%' }, bronze: { s: 'Rhythm Academy', v: '88%' }},
+                      { award: 'Top Learners', silver: { s: 'Harmony Elementary', v: '68%' }, bronze: { s: 'Melody Primary', v: '61%' }},
+                      { award: 'Wellness Leader', silver: { s: 'Harmony Elementary', v: '5.2/10' }, bronze: { s: 'Crescendo Middle', v: '5.8/10' }},
+                      { award: 'Implementation Champ', silver: { s: 'Crescendo Middle', v: '28%' }, bronze: { s: 'Melody Primary', v: '22%' }},
+                      { award: 'Resource Champion', silver: { s: 'Crescendo Middle', v: '76' }, bronze: { s: 'Cadence K-8', v: '68' }},
+                      { award: 'Most Likely to Stay', silver: { s: 'Harmony Elementary', v: '9.5/10' }, bronze: { s: 'Melody Primary', v: '9.1/10' }},
+                      { award: 'Movement Leader', silver: { s: 'Harmony Elementary', v: '38' }, bronze: { s: 'Tempo High', v: '35' }},
+                    ].map(row => (
+                      <div key={row.award}>
+                        <p className="text-xs font-semibold text-gray-500 mb-1.5">{row.award}</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="flex items-center justify-between px-3 py-2 bg-gray-100 rounded-lg text-xs">
+                            <div className="flex items-center gap-1.5"><span>🥈</span><span className="text-gray-600">{row.silver.s}</span></div>
+                            <span className="font-semibold text-gray-700">{row.silver.v}</span>
+                          </div>
+                          <div className="flex items-center justify-between px-3 py-2 bg-orange-100/50 rounded-lg text-xs">
+                            <div className="flex items-center gap-1.5"><span>🥉</span><span className="text-gray-600">{row.bronze.s}</span></div>
+                            <span className="font-semibold text-gray-700">{row.bronze.v}</span>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
-
-                  <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-100">
-                    <p className="text-xs text-green-700"><span className="font-semibold">Every building is above the national average</span> for PD engagement. Share these wins at staff meetings and board presentations!</p>
+                      </div>
+                    ))}
                   </div>
+                )}
 
-                  {/* Data source footer */}
-                  <p className="text-xs text-gray-500 mt-4 pt-3 border-t border-gray-100">
-                    Industry data: RAND Corporation (2025), Learning Policy Institute, TNTP ·
-                    TDI data: Partner school surveys across 21 states ·
-                    District data: Hub analytics + staff surveys
+                {/* Celebration banner */}
+                <div className="p-4 bg-gradient-to-r from-green-100 to-teal-100 rounded-xl border border-green-200">
+                  <p className="text-sm text-green-800">
+                    <span className="font-bold">🌟 Every building is above the national average</span> for PD engagement.
+                    These wins are designed to be shared at staff meetings, board presentations, and community events!
                   </p>
                 </div>
-              )}
+
+                {/* Data source footer */}
+                <p className="text-xs text-gray-500 pt-3 border-t border-amber-100/50">
+                  Industry data: RAND Corporation (2025), Learning Policy Institute, TNTP ·
+                  TDI data: Partner school surveys across 21 states ·
+                  District data: Hub analytics + staff surveys
+                </p>
+              </div>
             </div>
 
             {/* Leading Indicators Preview */}
@@ -3610,13 +3728,24 @@ Here's an idea: invite Ms. Rivera to share her approach at the Spring Leadership
         {/* SCHOOLS TAB */}
         {activeTab === 'schools' && (
           <div className="space-y-6">
-            {/* Full Leaderboard — Schools Tab */}
-            <div id="full-leaderboard" className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 mb-2">
-                <Trophy className="w-6 h-6 text-amber-500" />
-                <h3 className="text-xl font-bold text-[#1e2749]">Building Awards Leaderboard</h3>
-              </div>
-              <p className="text-sm text-gray-500 mb-6">Celebrating what&apos;s working across your district. Click any category to learn more.</p>
+            {/* Full Leaderboard — Schools Tab (Collapsed Accordion) */}
+            <div id="full-leaderboard" className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+              <button
+                onClick={() => toggleSection('full-leaderboard')}
+                className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <Trophy className="w-6 h-6 text-amber-500" />
+                  <div className="text-left">
+                    <h3 className="text-lg font-bold text-[#1e2749]">Building Awards Leaderboard</h3>
+                    <p className="text-sm text-gray-500">Full breakdown with district & industry comparisons</p>
+                  </div>
+                </div>
+                <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${openSections['full-leaderboard'] ? 'rotate-180' : ''}`} />
+              </button>
+
+              {openSections['full-leaderboard'] && (
+              <div className="px-6 pb-6 border-t border-gray-100">
 
               {/* Category-by-Category Breakdown */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -3784,6 +3913,8 @@ Here's an idea: invite Ms. Rivera to share her approach at the Spring Leadership
                   it fuels the momentum that drives real change.
                 </p>
               </div>
+              </div>
+              )}
             </div>
 
             {/* District Summary Bar */}
