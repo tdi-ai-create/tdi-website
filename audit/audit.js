@@ -53,7 +53,9 @@ const PAGES = [
   // Partner Dashboards (hidden/direct link only)
   '/Example-Dashboard',
   '/stpchanel-dashboard',
+  '/asd4-dashboard',
   '/Allenwood-Dashboard',
+  '/D41-dashboard',
   '/saunemin-dashboard',
   '/wego-dashboard',
   '/tccs-dashboard',
