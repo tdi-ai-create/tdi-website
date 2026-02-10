@@ -245,6 +245,8 @@ export default function PartnerDashboard() {
 
   // UI state
   const [activeTab, setActiveTab] = useState('overview');
+  const [blueprintSubTab, setBlueprintSubTab] = useState<'approach' | 'in-person' | 'learning-hub' | 'dashboard' | 'book' | 'results' | 'contract'>('approach');
+  const [mobileExpandedBlueprint, setMobileExpandedBlueprint] = useState<string | null>('approach');
   const [showPausedItems, setShowPausedItems] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [uploadingItemId, setUploadingItemId] = useState<string | null>(null);
@@ -1917,387 +1919,663 @@ export default function PartnerDashboard() {
             role="tabpanel"
             id="panel-blueprint"
             aria-labelledby="tab-blueprint"
-            className="space-y-6"
           >
-            {/* Phase Journey - Vertical Timeline */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-2">A Phased Journey, Not a One-Time Event</h2>
-              <p className="text-sm text-gray-600 mb-6">
-                Real change takes time. Our three-phase model meets your school where you are and grows with you.
-              </p>
+            {/* Blueprint Tabs - matches How We Partner page layout */}
+            {(() => {
+              const blueprintTabs = [
+                { id: 'approach', name: 'Our Approach', icon: <Target className="w-5 h-5" /> },
+                { id: 'in-person', name: 'In-Person Support', icon: <Users className="w-5 h-5" /> },
+                { id: 'learning-hub', name: 'Learning Hub', icon: <BookOpen className="w-5 h-5" /> },
+                { id: 'dashboard', name: 'Leadership Dashboard', icon: <BarChart3 className="w-5 h-5" /> },
+                { id: 'book', name: 'The Book', icon: <FileText className="w-5 h-5" /> },
+                { id: 'results', name: 'Proven Results', icon: <TrendingUp className="w-5 h-5" /> },
+                { id: 'contract', name: 'Your Contract', icon: <Award className="w-5 h-5" /> },
+              ] as const;
 
-              {/* Vertical Timeline */}
-              <div className="py-4">
-                <div className="space-y-0">
-                  {/* Phase 1: IGNITE */}
-                  {(() => {
-                    const isActive = partnership?.contract_phase === 'IGNITE';
-                    const isPast = partnership?.contract_phase === 'ACCELERATE' || partnership?.contract_phase === 'SUSTAIN';
+              const renderBlueprintPanel = () => {
+                switch (blueprintSubTab) {
+                  case 'approach':
                     return (
-                      <div className="flex gap-4 md:gap-6">
-                        <div className="flex flex-col items-center">
-                          <div
-                            className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md ${
-                              isPast ? 'bg-[#4ecdc4] text-white' : ''
-                            }`}
-                            style={!isPast ? { backgroundColor: '#ffba06', color: '#1e2749' } : undefined}
-                          >
-                            {isPast ? <Check className="w-6 h-6" /> : '1'}
-                          </div>
-                          <div className="w-1 flex-1 mt-2" style={{ backgroundColor: isPast ? '#4ecdc4' : '#ffba06' }} />
+                      <div className="space-y-8">
+                        <div>
+                          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-[#1e2749]">
+                            A Phased Journey,<br />Not a One-Time Event
+                          </h2>
+                          <p className="text-lg text-[#1e2749]/80">
+                            Real change takes time. Our three-phase model meets your school where you are and grows with you.
+                          </p>
                         </div>
-                        <div className="flex-1 pb-8">
-                          <div
-                            className={`bg-white rounded-xl p-5 md:p-6 shadow-md ${
-                              isActive ? 'ring-2 ring-[#4ecdc4]' : ''
-                            }`}
-                            style={{ border: `2px solid ${isActive ? '#4ecdc4' : '#ffba06'}` }}
-                          >
-                            <div className="flex flex-wrap items-center gap-2 mb-2">
-                              <span
-                                className="inline-block px-3 py-1 text-xs font-bold rounded-full"
-                                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                              >
-                                Start Here
+
+                        {/* Vertical Timeline */}
+                        <div className="py-4">
+                          <div className="space-y-0">
+                            {/* Phase 1: IGNITE */}
+                            {(() => {
+                              const isActive = partnership?.contract_phase === 'IGNITE';
+                              const isPast = partnership?.contract_phase === 'ACCELERATE' || partnership?.contract_phase === 'SUSTAIN';
+                              return (
+                                <div className="flex gap-4 md:gap-6">
+                                  <div className="flex flex-col items-center">
+                                    <div
+                                      className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md ${isPast ? 'bg-[#4ecdc4] text-white' : ''}`}
+                                      style={!isPast ? { backgroundColor: '#ffba06', color: '#1e2749' } : undefined}
+                                    >
+                                      {isPast ? <Check className="w-6 h-6" /> : '1'}
+                                    </div>
+                                    <div className="w-1 flex-1 mt-2" style={{ backgroundColor: isPast ? '#4ecdc4' : '#ffba06' }} />
+                                  </div>
+                                  <div className="flex-1 pb-8">
+                                    <div
+                                      className={`bg-white rounded-xl p-5 md:p-6 shadow-md ${isActive ? 'ring-2 ring-[#4ecdc4]' : ''}`}
+                                      style={{ border: `2px solid ${isActive ? '#4ecdc4' : '#ffba06'}` }}
+                                    >
+                                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                                        <span className="inline-block px-3 py-1 text-xs font-bold rounded-full" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
+                                          Start Here
+                                        </span>
+                                        <h3 className="text-lg md:text-xl font-bold text-[#1e2749]">IGNITE</h3>
+                                        {isActive && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">YOU ARE HERE</span>}
+                                        {isPast && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4]/20 text-[#4ecdc4] text-xs font-bold rounded flex items-center gap-1"><Check className="w-3 h-3" /> Complete</span>}
+                                      </div>
+                                      <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Leadership + Pilot Group</p>
+                                      <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#fffbeb' }}>
+                                        <span className="text-xs font-medium text-[#1e2749]">Awareness</span>
+                                        <ArrowRight className="w-4 h-4" style={{ color: '#ffba06' }} />
+                                        <span className="text-xs font-bold" style={{ color: '#ffba06' }}>Buy-in</span>
+                                      </div>
+                                      <p className="text-sm mb-3 text-[#1e2749]/70">
+                                        Build buy-in with your leadership team and a pilot group of 10-25 educators. See early wins. Lay the foundation for school-wide change.
+                                      </p>
+                                      <div className="mb-3 pt-3 border-t border-gray-200">
+                                        <p className="text-xs font-bold mb-2 text-[#1e2749]">What&apos;s Included:</p>
+                                        <ul className="space-y-1">
+                                          {['2 On-Campus Observation Days', '4 Virtual Strategy Sessions', '2 Executive Impact Sessions', 'Learning Hub access for pilot group', 'Leadership Dashboard'].map((item) => (
+                                            <li key={item} className="flex items-center gap-1.5 text-xs text-[#1e2749]/70">
+                                              <Check className="w-3 h-3 flex-shrink-0" style={{ color: '#ffba06' }} />
+                                              {item}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                      <p className="text-xs text-[#1e2749]/50">Typical timeline: One semester to one year</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })()}
+
+                            {/* Phase 2: ACCELERATE */}
+                            {(() => {
+                              const isActive = partnership?.contract_phase === 'ACCELERATE';
+                              const isPast = partnership?.contract_phase === 'SUSTAIN';
+                              const isFuture = partnership?.contract_phase === 'IGNITE';
+                              return (
+                                <div className="flex gap-4 md:gap-6">
+                                  <div className="flex flex-col items-center">
+                                    <div
+                                      className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md ${isPast ? 'bg-[#4ecdc4] text-white' : isFuture ? 'bg-gray-200 text-gray-500' : ''}`}
+                                      style={!isPast && !isFuture ? { backgroundColor: '#80a4ed', color: '#ffffff' } : undefined}
+                                    >
+                                      {isPast ? <Check className="w-6 h-6" /> : '2'}
+                                    </div>
+                                    <div className="w-1 flex-1 mt-2" style={{ backgroundColor: isPast ? '#4ecdc4' : isFuture ? '#e5e7eb' : '#80a4ed' }} />
+                                  </div>
+                                  <div className="flex-1 pb-8">
+                                    <div
+                                      className={`bg-white rounded-xl p-5 md:p-6 shadow-md ${isActive ? 'ring-2 ring-[#4ecdc4]' : ''} ${isFuture ? 'opacity-75' : ''}`}
+                                      style={{ border: `2px solid ${isFuture ? '#e5e7eb' : '#80a4ed'}` }}
+                                    >
+                                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                                        <span className="inline-block px-3 py-1 text-xs font-bold rounded-full" style={{ backgroundColor: isFuture ? '#e5e7eb' : '#80a4ed', color: isFuture ? '#6b7280' : '#ffffff' }}>
+                                          Scale
+                                        </span>
+                                        <h3 className="text-lg md:text-xl font-bold text-[#1e2749]">ACCELERATE</h3>
+                                        {isActive && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">YOU ARE HERE</span>}
+                                        {isPast && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4]/20 text-[#4ecdc4] text-xs font-bold rounded flex items-center gap-1"><Check className="w-3 h-3" /> Complete</span>}
+                                      </div>
+                                      <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Full Staff</p>
+                                      <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0f9ff' }}>
+                                        <span className="text-xs font-medium text-[#1e2749]">Buy-in</span>
+                                        <ArrowRight className="w-4 h-4" style={{ color: '#80a4ed' }} />
+                                        <span className="text-xs font-bold" style={{ color: '#80a4ed' }}>Action</span>
+                                      </div>
+                                      <p className="text-sm mb-3 text-[#1e2749]/70">
+                                        Expand support to your full staff. Every teacher, para, and coach gets access. Strategies get implemented school-wide, not just talked about.
+                                      </p>
+                                      <div className="mb-3 pt-3 border-t border-gray-200">
+                                        <p className="text-xs font-bold mb-2 text-[#1e2749]">What&apos;s Included:</p>
+                                        <p className="text-xs italic mb-1.5" style={{ color: '#80a4ed' }}>Everything in IGNITE, plus:</p>
+                                        <ul className="space-y-1">
+                                          {['Learning Hub access for ALL staff', '4 Executive Impact Sessions', 'Teachers Deserve It book for every educator', 'Retention tracking tools'].map((item) => (
+                                            <li key={item} className="flex items-center gap-1.5 text-xs text-[#1e2749]/70">
+                                              <Check className="w-3 h-3 flex-shrink-0" style={{ color: '#80a4ed' }} />
+                                              {item}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                      <p className="text-xs text-[#1e2749]/50">Typical timeline: 1-3 years (many schools stay here)</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })()}
+
+                            {/* Phase 3: SUSTAIN */}
+                            {(() => {
+                              const isActive = partnership?.contract_phase === 'SUSTAIN';
+                              const isFuture = partnership?.contract_phase === 'IGNITE' || partnership?.contract_phase === 'ACCELERATE';
+                              return (
+                                <div className="flex gap-4 md:gap-6">
+                                  <div className="flex flex-col items-center">
+                                    <div
+                                      className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md ${isFuture ? 'bg-gray-200 text-gray-500' : ''}`}
+                                      style={!isFuture ? { backgroundColor: '#abc4ab', color: '#1e2749' } : undefined}
+                                    >
+                                      3
+                                    </div>
+                                  </div>
+                                  <div className="flex-1">
+                                    <div
+                                      className={`bg-white rounded-xl p-5 md:p-6 shadow-md ${isActive ? 'ring-2 ring-[#4ecdc4]' : ''} ${isFuture ? 'opacity-75' : ''}`}
+                                      style={{ border: `2px solid ${isFuture ? '#e5e7eb' : '#abc4ab'}` }}
+                                    >
+                                      <div className="flex flex-wrap items-center gap-2 mb-2">
+                                        <span className="inline-block px-3 py-1 text-xs font-bold rounded-full" style={{ backgroundColor: isFuture ? '#e5e7eb' : '#abc4ab', color: isFuture ? '#6b7280' : '#1e2749' }}>
+                                          Embed
+                                        </span>
+                                        <h3 className="text-lg md:text-xl font-bold text-[#1e2749]">SUSTAIN</h3>
+                                        {isActive && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">YOU ARE HERE</span>}
+                                      </div>
+                                      <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Embedded Systems</p>
+                                      <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0fff4' }}>
+                                        <span className="text-xs font-medium text-[#1e2749]">Action</span>
+                                        <ArrowRight className="w-4 h-4" style={{ color: '#abc4ab' }} />
+                                        <span className="text-xs font-bold" style={{ color: '#22c55e' }}>Identity</span>
+                                      </div>
+                                      <p className="text-sm mb-3 text-[#1e2749]/70">
+                                        Wellness becomes part of your school&apos;s identity. Systems sustain through staff turnover. Your school becomes a model for others.
+                                      </p>
+                                      <div className="mb-3 pt-3 border-t border-gray-200">
+                                        <p className="text-xs font-bold mb-2 text-[#1e2749]">What&apos;s Included:</p>
+                                        <p className="text-xs italic mb-1.5" style={{ color: '#abc4ab' }}>Everything in ACCELERATE, plus:</p>
+                                        <ul className="space-y-1">
+                                          {['Desi AI Assistant (24/7 support)', 'Advanced analytics', 'Ongoing partnership support'].map((item) => (
+                                            <li key={item} className="flex items-center gap-1.5 text-xs text-[#1e2749]/70">
+                                              <Check className="w-3 h-3 flex-shrink-0" style={{ color: '#abc4ab' }} />
+                                              {item}
+                                            </li>
+                                          ))}
+                                        </ul>
+                                      </div>
+                                      <p className="text-xs text-[#1e2749]/50">Typical timeline: Ongoing partnership</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </div>
+                        </div>
+
+                        <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
+                          <p className="text-sm text-[#1e2749]">
+                            <strong>Every phase</strong> includes support for teachers, paraprofessionals, instructional coaches, and administrators. We meet each role where they are.
+                          </p>
+                        </div>
+                      </div>
+                    );
+
+                  case 'in-person':
+                    return (
+                      <div className="space-y-8">
+                        <div>
+                          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-[#1e2749]">
+                            What Happens When<br />We Visit Your School
+                          </h2>
+                          <p className="text-lg text-[#1e2749]/80">
+                            Our on-campus days happen while students are in session. We are in real classrooms, watching real teaching, and giving real feedback. This is not a sit-and-get workshop in the library.
+                          </p>
+                        </div>
+
+                        <div>
+                          <h3 className="text-xl font-bold mb-4 text-[#1e2749]">What a Visit Looks Like</h3>
+                          <ul className="space-y-3">
+                            {[
+                              'We observe up to 15 classrooms per visit',
+                              'Observations are growth-focused, not evaluative',
+                              'We meet with teachers one-on-one after observations',
+                              'Leadership debrief at the end of each day',
+                            ].map((item, idx) => (
+                              <li key={idx} className="flex items-start gap-3">
+                                <Check className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#ffba06' }} />
+                                <span className="text-[#1e2749]">{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div>
+                          <h3 className="text-xl font-bold mb-3 text-[#1e2749]">Love Notes: Personalized Teacher Feedback</h3>
+                          <p className="mb-4 text-[#1e2749]/80">
+                            Every teacher we observe receives a Love Note, a personalized note highlighting specific strengths we saw in their classroom. These are not generic praise. They are detailed observations that help teachers see what they are already doing well.
+                          </p>
+
+                          <div className="relative p-6 rounded-xl shadow-lg mb-4" style={{ backgroundColor: '#fffbeb', border: '2px solid #ffba06', transform: 'rotate(-0.5deg)' }}>
+                            <div className="absolute -top-3 -left-2 w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: '#ffba06' }}>
+                              <Heart className="w-4 h-4 text-[#1e2749]" />
+                            </div>
+                            <p className="text-sm italic leading-relaxed text-[#1e2749]">
+                              &quot;During your small group rotation today, I noticed how you used proximity and a calm voice to redirect Marcus without stopping instruction. The other students did not even look up. That is classroom management mastery. The way you had materials pre-sorted for each group saved at least 3 minutes of transition time. Your students knew exactly where to go and what to grab. Keep leaning into those systems.&quot;
+                            </p>
+                          </div>
+
+                          <p className="text-sm text-[#1e2749]/70">
+                            This is what teachers tell us they remember months later. Not the PD slides. The moment someone noticed what they were doing right.
+                          </p>
+                        </div>
+                      </div>
+                    );
+
+                  case 'learning-hub':
+                    return (
+                      <div className="space-y-8">
+                        <div>
+                          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-[#1e2749]">
+                            On-Demand Support for Every Educator
+                          </h2>
+                          <p className="text-lg text-[#1e2749]/80">
+                            The Learning Hub is not about watching videos and checking boxes. It is about finding the right strategy for the challenge you are facing today and using it tomorrow.
+                          </p>
+                        </div>
+
+                        <div>
+                          <h3 className="text-xl font-bold mb-4 text-[#1e2749]">What Your Staff Gets Access To</h3>
+                          <ul className="space-y-3">
+                            {[
+                              '100+ hours of practical, classroom-ready content',
+                              'Courses for teachers, paras, instructional coaches, and admins',
+                              'Downloadable tools, templates, and resources',
+                              'New content added regularly',
+                            ].map((item, idx) => (
+                              <li key={idx} className="flex items-start gap-3">
+                                <Check className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: '#ffba06' }} />
+                                <span className="text-[#1e2749]">{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
+                          <h3 className="font-bold mb-2 text-[#1e2749]">Built for Implementation,<br />Not Consumption</h3>
+                          <p className="text-sm text-[#1e2749]/80">
+                            Most PD has a 10% implementation rate. Ours is 65%. The difference is in the design. Every course includes action steps, not just information. We measure what teachers do, not what they watch.
+                          </p>
+                        </div>
+
+                        <div>
+                          <h3 className="text-xl font-bold mb-4 text-[#1e2749]">Popular Courses</h3>
+                          <div className="flex flex-wrap gap-2">
+                            {['The Differentiation Fix', 'Calm Classrooms, Not Chaos', 'Communication that Clicks', 'Building Strong Teacher-Para Partnerships', 'Teachers Deserve their Time Back'].map((course) => (
+                              <span key={course} className="px-3 py-2 rounded-full text-sm" style={{ backgroundColor: '#f5f5f5', color: '#1e2749' }}>
+                                {course}
                               </span>
-                              <h3 className="text-lg md:text-xl font-bold text-[#1e2749]">IGNITE</h3>
-                              {isActive && (
-                                <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">
-                                  YOU ARE HERE
-                                </span>
-                              )}
-                              {isPast && (
-                                <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4]/20 text-[#4ecdc4] text-xs font-bold rounded flex items-center gap-1">
-                                  <Check className="w-3 h-3" /> Complete
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>
-                              Leadership + Pilot Group
-                            </p>
-                            <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#fffbeb' }}>
-                              <span className="text-xs font-medium text-[#1e2749]">Awareness</span>
-                              <ArrowRight className="w-4 h-4" style={{ color: '#ffba06' }} />
-                              <span className="text-xs font-bold" style={{ color: '#ffba06' }}>Buy-in</span>
-                            </div>
-                            <p className="text-sm mb-3 text-gray-600">
-                              Build buy-in with your leadership team and a pilot group of 10-25 educators. See early wins. Lay the foundation for school-wide change.
-                            </p>
-                            <div className="mb-3 pt-3 border-t border-gray-200">
-                              <p className="text-xs font-bold mb-2 text-[#1e2749]">What&apos;s Included:</p>
-                              <ul className="space-y-1">
-                                {['2 On-Campus Observation Days', '4 Virtual Strategy Sessions', '2 Executive Impact Sessions', 'Learning Hub access for pilot group', 'Leadership Dashboard'].map((item) => (
-                                  <li key={item} className="flex items-center gap-1.5 text-xs text-gray-600">
-                                    <Check className="w-3 h-3 flex-shrink-0" style={{ color: '#ffba06' }} />
-                                    {item}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                            <p className="text-xs text-gray-400">Typical timeline: One semester to one year</p>
+                            ))}
                           </div>
                         </div>
                       </div>
                     );
-                  })()}
 
-                  {/* Phase 2: ACCELERATE */}
-                  {(() => {
-                    const isActive = partnership?.contract_phase === 'ACCELERATE';
-                    const isPast = partnership?.contract_phase === 'SUSTAIN';
-                    const isFuture = partnership?.contract_phase === 'IGNITE';
+                  case 'dashboard':
                     return (
-                      <div className="flex gap-4 md:gap-6">
-                        <div className="flex flex-col items-center">
-                          <div
-                            className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md ${
-                              isPast ? 'bg-[#4ecdc4] text-white' : isFuture ? 'bg-gray-200 text-gray-500' : ''
-                            }`}
-                            style={!isPast && !isFuture ? { backgroundColor: '#80a4ed', color: '#ffffff' } : undefined}
-                          >
-                            {isPast ? <Check className="w-6 h-6" /> : '2'}
+                      <div className="space-y-8">
+                        <div>
+                          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-[#1e2749]">
+                            See Your School&apos;s Progress in Real Time
+                          </h2>
+                          <p className="text-lg text-[#1e2749]/80">
+                            As a school leader, you need to show your superintendent and board that this investment is working. The Leadership Dashboard gives you the data to do that.
+                          </p>
+                        </div>
+
+                        <div className="p-4 rounded-lg bg-[#4ecdc4]/10 border border-[#4ecdc4]">
+                          <p className="text-sm font-medium text-[#1e2749]">
+                            <Check className="w-4 h-4 inline mr-2 text-[#4ecdc4]" />
+                            You&apos;re looking at your dashboard right now! Use the tabs at the top to explore all the data available to you.
+                          </p>
+                        </div>
+
+                        <div>
+                          <h3 className="text-xl font-bold mb-4 text-center text-[#1e2749]">What You Can Track</h3>
+                          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {[
+                              { icon: <Users className="w-5 h-5" />, title: 'Staff Engagement', desc: 'Who is logging in, completing courses, using resources' },
+                              { icon: <Check className="w-5 h-5" />, title: 'Implementation Progress', desc: 'Which strategies are being used in classrooms' },
+                              { icon: <Eye className="w-5 h-5" />, title: 'Observation Insights', desc: 'Trends from on-campus visits, themes across classrooms' },
+                              { icon: <Heart className="w-5 h-5" />, title: 'Love Notes Delivered', desc: 'Personalized feedback your teachers have received' },
+                              { icon: <TrendingUp className="w-5 h-5" />, title: 'Wellness Trends', desc: 'Staff stress and satisfaction over time' },
+                              { icon: <FileText className="w-5 h-5" />, title: 'Contract Delivery', desc: 'What you purchased vs. what has been delivered' },
+                            ].map((item) => (
+                              <div key={item.title} className="p-4 rounded-lg bg-white shadow-sm border border-gray-100">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <div style={{ color: '#80a4ed' }}>{item.icon}</div>
+                                  <p className="font-semibold text-[#1e2749]">{item.title}</p>
+                                </div>
+                                <p className="text-sm text-[#1e2749]/70">{item.desc}</p>
+                              </div>
+                            ))}
                           </div>
+                        </div>
+
+                        <div className="p-4 rounded-lg" style={{ backgroundColor: '#fffbeb', border: '1px solid #ffba06' }}>
+                          <h3 className="font-bold mb-2 text-[#1e2749]">Why This Matters</h3>
+                          <p className="text-sm text-[#1e2749]/80">
+                            When renewal conversations come up, you will have the data. Not just &quot;teachers liked it&quot; but &quot;here is the measurable change we saw.&quot; That is how you justify the investment to your board.
+                          </p>
+                        </div>
+                      </div>
+                    );
+
+                  case 'book':
+                    return (
+                      <div className="space-y-8">
+                        <div>
+                          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-[#1e2749]">
+                            Teachers Deserve It:<br />The Book That Started a Movement
+                          </h2>
+                        </div>
+
+                        <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+                          <div className="flex-shrink-0">
+                            <Image
+                              src="/images/teachers-deserve-it-book.png"
+                              alt="Teachers Deserve It book cover"
+                              width={200}
+                              height={300}
+                              className="rounded-lg shadow-xl"
+                            />
+                          </div>
+                          <div className="flex-1 space-y-4">
+                            <div>
+                              <h3 className="text-lg font-bold mb-2 text-[#1e2749]">About the Book</h3>
+                              <p className="text-[#1e2749]/80">
+                                Teachers Deserve It is the book that started this whole movement. Written by Rae Hughart and Adam Welcome, it is a practical guide for educators who want to reclaim their time, rebuild their confidence, and remember why they started teaching in the first place.
+                              </p>
+                            </div>
+                            <div className="p-4 rounded-lg bg-gray-50">
+                              <h3 className="font-bold mb-2 text-[#1e2749]">What Readers Say</h3>
+                              <p className="text-sm italic text-[#1e2749]/80">
+                                &quot;This is not a book about doing more. It is about doing what matters. Small, manageable steps that add up to real change.&quot;
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div>
+                          <h3 className="text-xl font-bold mb-4 text-[#1e2749]">When Your Staff Gets the Book</h3>
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-4 p-3 rounded-lg bg-gray-50">
+                              <span className="font-bold" style={{ color: '#ffba06' }}>IGNITE</span>
+                              <span className="text-[#1e2749]/70">Not included</span>
+                            </div>
+                            <div className="flex items-center gap-4 p-3 rounded-lg" style={{ backgroundColor: '#f0f9ff' }}>
+                              <span className="font-bold" style={{ color: '#80a4ed' }}>ACCELERATE</span>
+                              <span className="text-[#1e2749]">Every educator receives a copy</span>
+                              <Check className="w-5 h-5 ml-auto text-green-500" />
+                            </div>
+                            <div className="flex items-center gap-4 p-3 rounded-lg" style={{ backgroundColor: '#f0fff4' }}>
+                              <span className="font-bold" style={{ color: '#abc4ab' }}>SUSTAIN</span>
+                              <span className="text-[#1e2749]">Every educator receives a copy</span>
+                              <Check className="w-5 h-5 ml-auto text-green-500" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+
+                  case 'results':
+                    return (
+                      <div className="space-y-8">
+                        <div>
+                          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-[#1e2749]">
+                            This is What Change<br />Looks Like
+                          </h2>
+                          <p className="text-lg text-[#1e2749]/80">
+                            We do not measure success by course completions. We measure it by what changes in your school.
+                          </p>
+                        </div>
+
+                        <div>
+                          <h3 className="text-xl font-bold mb-4 text-[#1e2749]">Verified Outcomes from<br />TDI Partner Schools</h3>
+                          <div className="rounded-xl overflow-hidden border border-gray-200">
+                            <div className="grid grid-cols-3 text-sm font-bold bg-[#1e2749] text-white">
+                              <div className="p-3 border-r border-white/20">Before TDI</div>
+                              <div className="p-3 border-r border-white/20">After TDI</div>
+                              <div className="p-3">What Changed</div>
+                            </div>
+                            {[
+                              { before: '12 hours/week', after: '6-8 hours/week', metric: 'Weekly planning time' },
+                              { before: '9 out of 10', after: '5-7 out of 10', metric: 'Staff stress levels' },
+                              { before: '2-4 out of 10', after: '5-7 out of 10', metric: 'Teacher retention intent' },
+                              { before: '10% industry avg', after: '65% with TDI', metric: 'Strategy implementation' },
+                            ].map((row, idx) => (
+                              <div key={idx} className={`grid grid-cols-3 text-sm border-b border-gray-200 ${idx % 2 ? 'bg-gray-50' : ''}`}>
+                                <div className="p-3 border-r border-gray-200 text-red-500">{row.before}</div>
+                                <div className="p-3 border-r border-gray-200 text-green-600">{row.after}</div>
+                                <div className="p-3 text-[#1e2749]">{row.metric}</div>
+                              </div>
+                            ))}
+                          </div>
+                          <p className="text-xs mt-2 text-[#1e2749]/50">
+                            Based on verified survey data from TDI partner schools after 3-4 months.
+                          </p>
+                        </div>
+
+                        <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
+                          <h3 className="font-bold mb-2 text-[#1e2749]">Results in Action, Not Boxes Checked</h3>
+                          <p className="text-sm text-[#1e2749]/80">
+                            The goal is not to complete a course. The goal is for a teacher to try a new strategy on Monday and see it work by Friday. That is what we measure. That is what we celebrate.
+                          </p>
+                        </div>
+                      </div>
+                    );
+
+                  case 'contract':
+                    return (
+                      <div className="space-y-8">
+                        <div>
+                          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-[#1e2749]">
+                            Your Partnership Contract
+                          </h2>
+                          <div className="p-4 rounded-lg bg-[#4ecdc4]/10 border border-[#4ecdc4]">
+                            <p className="text-[#1e2749]">
+                              You are currently in <strong className="text-[#4ecdc4]">{partnership?.contract_phase}</strong> phase. Here&apos;s what&apos;s included in your partnership:
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead>
+                              <tr className="border-b border-gray-200">
+                                <th className="text-left py-3 px-4 font-medium text-gray-500">Deliverable</th>
+                                <th className="text-center py-3 px-4 font-medium text-gray-500">Your Contract</th>
+                                <th className="text-center py-3 px-4 font-medium text-gray-500">Delivered</th>
+                                <th className="text-center py-3 px-4 font-medium text-gray-500">Status</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr className="border-b border-gray-100">
+                                <td className="py-3 px-4 text-[#1e2749]">Learning Hub Memberships</td>
+                                <td className="py-3 px-4 text-center font-medium">{staffStats.total}</td>
+                                <td className="py-3 px-4 text-center text-gray-600">{staffStats.hubLoggedIn} active</td>
+                                <td className="py-3 px-4 text-center">
+                                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#4ecdc4]/20 text-[#4ecdc4] rounded-full text-xs font-medium">
+                                    <Check className="w-3 h-3" /> Active
+                                  </span>
+                                </td>
+                              </tr>
+                              <tr className="border-b border-gray-100">
+                                <td className="py-3 px-4 text-[#1e2749]">On-Site Observation Days</td>
+                                <td className="py-3 px-4 text-center font-medium">{partnership?.observation_days_total ?? 0}</td>
+                                <td className="py-3 px-4 text-center text-gray-600">{partnership?.observation_days_completed ?? 0} complete</td>
+                                <td className="py-3 px-4 text-center">
+                                  {(partnership?.observation_days_completed ?? 0) > 0 ? (
+                                    <span className="inline-flex items-center px-2 py-1 bg-[#1e2749]/10 text-[#1e2749] rounded-full text-xs font-medium">In Progress</span>
+                                  ) : (
+                                    <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">Not Started</span>
+                                  )}
+                                </td>
+                              </tr>
+                              <tr className="border-b border-gray-100">
+                                <td className="py-3 px-4 text-[#1e2749]">Virtual Strategy Sessions</td>
+                                <td className="py-3 px-4 text-center font-medium">{partnership?.virtual_sessions_total ?? 0}</td>
+                                <td className="py-3 px-4 text-center text-gray-600">{virtualSessionsCompleted} complete</td>
+                                <td className="py-3 px-4 text-center">
+                                  {virtualSessionsCompleted > 0 ? (
+                                    <span className="inline-flex items-center px-2 py-1 bg-[#1e2749]/10 text-[#1e2749] rounded-full text-xs font-medium">In Progress</span>
+                                  ) : (
+                                    <span className="inline-flex items-center px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">Upcoming</span>
+                                  )}
+                                </td>
+                              </tr>
+                              <tr className="border-b border-gray-100">
+                                <td className="py-3 px-4 text-[#1e2749]">Executive Impact Sessions</td>
+                                <td className="py-3 px-4 text-center font-medium">{partnership?.executive_sessions_total ?? 0}</td>
+                                <td className="py-3 px-4 text-center text-gray-600">0 complete</td>
+                                <td className="py-3 px-4 text-center">
+                                  <span className="inline-flex items-center px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">Upcoming</span>
+                                </td>
+                              </tr>
+                              <tr className="border-b border-gray-100">
+                                <td className="py-3 px-4 text-[#1e2749]">Personalized Love Notes</td>
+                                <td className="py-3 px-4 text-center font-medium">Per observation</td>
+                                <td className="py-3 px-4 text-center text-gray-600">{loveNotes} delivered</td>
+                                <td className="py-3 px-4 text-center">
+                                  {loveNotes > 0 ? (
+                                    <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#4ecdc4]/20 text-[#4ecdc4] rounded-full text-xs font-medium"><Check className="w-3 h-3" /> Active</span>
+                                  ) : (
+                                    <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">Not Started</span>
+                                  )}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td className="py-3 px-4 text-[#1e2749]">Partnership Dashboard</td>
+                                <td className="py-3 px-4 text-center font-medium">1</td>
+                                <td className="py-3 px-4 text-center text-gray-600">1 active</td>
+                                <td className="py-3 px-4 text-center">
+                                  <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#4ecdc4]/20 text-[#4ecdc4] rounded-full text-xs font-medium"><Check className="w-3 h-3" /> Active</span>
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <div className="grid sm:grid-cols-2 gap-4">
+                          <div className="p-4 rounded-lg bg-gray-50">
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Contract Period</p>
+                            <p className="font-medium text-[#1e2749]">
+                              {partnership?.contract_start ? new Date(partnership.contract_start).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Not set'} — {partnership?.contract_end ? new Date(partnership.contract_end).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Not set'}
+                            </p>
+                          </div>
+                          <div className="p-4 rounded-lg bg-gray-50">
+                            <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Partnership Type</p>
+                            <p className="font-medium text-[#1e2749] capitalize">{partnership?.partnership_type}</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+
+                  default:
+                    return null;
+                }
+              };
+
+              return (
+                <>
+                  {/* Desktop Layout: Side Tabs + Panel */}
+                  <div className="hidden lg:flex gap-6">
+                    {/* Left Side: Vertical Tabs */}
+                    <div className="w-56 flex-shrink-0">
+                      <div className="sticky top-24 space-y-2">
+                        {blueprintTabs.map((tab) => (
+                          <button
+                            key={tab.id}
+                            onClick={() => setBlueprintSubTab(tab.id)}
+                            className={`w-full text-left p-3 rounded-xl transition-all duration-200 flex items-center gap-3 ${
+                              blueprintSubTab === tab.id ? 'shadow-lg scale-[1.02]' : 'hover:shadow-md hover:scale-[1.01]'
+                            }`}
+                            style={{
+                              backgroundColor: blueprintSubTab === tab.id ? '#ffffff' : '#f5f5f5',
+                              border: blueprintSubTab === tab.id ? '2px solid #ffba06' : '1px solid #e5e7eb',
+                              color: '#1e2749',
+                            }}
+                          >
+                            <div
+                              className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                              style={{
+                                backgroundColor: blueprintSubTab === tab.id ? '#ffba06' : '#e5e7eb',
+                                color: blueprintSubTab === tab.id ? '#1e2749' : '#6b7280',
+                              }}
+                            >
+                              {tab.icon}
+                            </div>
+                            <span className={`text-sm ${blueprintSubTab === tab.id ? 'font-bold' : 'font-medium'}`}>
+                              {tab.name}
+                            </span>
+                            {blueprintSubTab === tab.id && (
+                              <ChevronRight className="w-4 h-4 ml-auto" style={{ color: '#ffba06' }} />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Right Side: Detail Panel */}
+                    <div className="flex-1 bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+                      {renderBlueprintPanel()}
+                    </div>
+                  </div>
+
+                  {/* Mobile Layout: Accordion Style */}
+                  <div className="lg:hidden space-y-3">
+                    {blueprintTabs.map((tab) => (
+                      <div key={tab.id}>
+                        <button
+                          onClick={() => {
+                            setMobileExpandedBlueprint(mobileExpandedBlueprint === tab.id ? null : tab.id);
+                            setBlueprintSubTab(tab.id);
+                          }}
+                          className="w-full text-left p-4 rounded-xl transition-all flex items-center gap-3"
+                          style={{
+                            backgroundColor: mobileExpandedBlueprint === tab.id ? '#ffffff' : '#f5f5f5',
+                            border: mobileExpandedBlueprint === tab.id ? '2px solid #ffba06' : '1px solid #e5e7eb',
+                          }}
+                        >
                           <div
-                            className="w-1 flex-1 mt-2"
-                            style={{ backgroundColor: isPast ? '#4ecdc4' : isFuture ? '#e5e7eb' : '#80a4ed' }}
+                            className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                            style={{
+                              backgroundColor: mobileExpandedBlueprint === tab.id ? '#ffba06' : '#e5e7eb',
+                              color: mobileExpandedBlueprint === tab.id ? '#1e2749' : '#6b7280',
+                            }}
+                          >
+                            {tab.icon}
+                          </div>
+                          <span className="font-medium flex-1 text-[#1e2749]">{tab.name}</span>
+                          <ChevronDown
+                            className={`w-5 h-5 transition-transform text-[#1e2749] ${mobileExpandedBlueprint === tab.id ? 'rotate-180' : ''}`}
                           />
-                        </div>
-                        <div className="flex-1 pb-8">
-                          <div
-                            className={`bg-white rounded-xl p-5 md:p-6 shadow-md ${
-                              isActive ? 'ring-2 ring-[#4ecdc4]' : ''
-                            } ${isFuture ? 'opacity-75' : ''}`}
-                            style={{ border: `2px solid ${isFuture ? '#e5e7eb' : '#80a4ed'}` }}
-                          >
-                            <div className="flex flex-wrap items-center gap-2 mb-2">
-                              <span
-                                className="inline-block px-3 py-1 text-xs font-bold rounded-full"
-                                style={{ backgroundColor: isFuture ? '#e5e7eb' : '#80a4ed', color: isFuture ? '#6b7280' : '#ffffff' }}
-                              >
-                                Scale
-                              </span>
-                              <h3 className="text-lg md:text-xl font-bold text-[#1e2749]">ACCELERATE</h3>
-                              {isActive && (
-                                <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">
-                                  YOU ARE HERE
-                                </span>
-                              )}
-                              {isPast && (
-                                <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4]/20 text-[#4ecdc4] text-xs font-bold rounded flex items-center gap-1">
-                                  <Check className="w-3 h-3" /> Complete
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Full Staff</p>
-                            <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0f9ff' }}>
-                              <span className="text-xs font-medium text-[#1e2749]">Buy-in</span>
-                              <ArrowRight className="w-4 h-4" style={{ color: '#80a4ed' }} />
-                              <span className="text-xs font-bold" style={{ color: '#80a4ed' }}>Action</span>
-                            </div>
-                            <p className="text-sm mb-3 text-gray-600">
-                              Expand support to your full staff. Every teacher, para, and coach gets access. Strategies get implemented school-wide, not just talked about.
-                            </p>
-                            <div className="mb-3 pt-3 border-t border-gray-200">
-                              <p className="text-xs font-bold mb-2 text-[#1e2749]">What&apos;s Included:</p>
-                              <p className="text-xs italic mb-1.5" style={{ color: '#80a4ed' }}>Everything in IGNITE, plus:</p>
-                              <ul className="space-y-1">
-                                {['Learning Hub access for ALL staff', '4 Executive Impact Sessions', 'Teachers Deserve It book for every educator', 'Retention tracking tools'].map((item) => (
-                                  <li key={item} className="flex items-center gap-1.5 text-xs text-gray-600">
-                                    <Check className="w-3 h-3 flex-shrink-0" style={{ color: '#80a4ed' }} />
-                                    {item}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                            <p className="text-xs text-gray-400">Typical timeline: 1-3 years (many schools stay here)</p>
+                        </button>
+                        <div className={`overflow-hidden transition-all duration-300 ${mobileExpandedBlueprint === tab.id ? 'max-h-[5000px] opacity-100 mt-3' : 'max-h-0 opacity-0'}`}>
+                          <div className="bg-white rounded-xl p-6 shadow-md border border-gray-200">
+                            {mobileExpandedBlueprint === tab.id && renderBlueprintPanel()}
                           </div>
                         </div>
                       </div>
-                    );
-                  })()}
-
-                  {/* Phase 3: SUSTAIN */}
-                  {(() => {
-                    const isActive = partnership?.contract_phase === 'SUSTAIN';
-                    const isFuture = partnership?.contract_phase === 'IGNITE' || partnership?.contract_phase === 'ACCELERATE';
-                    return (
-                      <div className="flex gap-4 md:gap-6">
-                        <div className="flex flex-col items-center">
-                          <div
-                            className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md ${
-                              isFuture ? 'bg-gray-200 text-gray-500' : ''
-                            }`}
-                            style={!isFuture ? { backgroundColor: '#abc4ab', color: '#1e2749' } : undefined}
-                          >
-                            3
-                          </div>
-                        </div>
-                        <div className="flex-1">
-                          <div
-                            className={`bg-white rounded-xl p-5 md:p-6 shadow-md ${
-                              isActive ? 'ring-2 ring-[#4ecdc4]' : ''
-                            } ${isFuture ? 'opacity-75' : ''}`}
-                            style={{ border: `2px solid ${isFuture ? '#e5e7eb' : '#abc4ab'}` }}
-                          >
-                            <div className="flex flex-wrap items-center gap-2 mb-2">
-                              <span
-                                className="inline-block px-3 py-1 text-xs font-bold rounded-full"
-                                style={{ backgroundColor: isFuture ? '#e5e7eb' : '#abc4ab', color: isFuture ? '#6b7280' : '#1e2749' }}
-                              >
-                                Embed
-                              </span>
-                              <h3 className="text-lg md:text-xl font-bold text-[#1e2749]">SUSTAIN</h3>
-                              {isActive && (
-                                <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">
-                                  YOU ARE HERE
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Embedded Systems</p>
-                            <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0fff4' }}>
-                              <span className="text-xs font-medium text-[#1e2749]">Action</span>
-                              <ArrowRight className="w-4 h-4" style={{ color: '#abc4ab' }} />
-                              <span className="text-xs font-bold" style={{ color: '#22c55e' }}>Identity</span>
-                            </div>
-                            <p className="text-sm mb-3 text-gray-600">
-                              Wellness becomes part of your school&apos;s identity. Systems sustain through staff turnover. Your school becomes a model for others.
-                            </p>
-                            <div className="mb-3 pt-3 border-t border-gray-200">
-                              <p className="text-xs font-bold mb-2 text-[#1e2749]">What&apos;s Included:</p>
-                              <p className="text-xs italic mb-1.5" style={{ color: '#abc4ab' }}>Everything in ACCELERATE, plus:</p>
-                              <ul className="space-y-1">
-                                {['Desi AI Assistant (24/7 support)', 'Advanced analytics', 'Ongoing partnership support'].map((item) => (
-                                  <li key={item} className="flex items-center gap-1.5 text-xs text-gray-600">
-                                    <Check className="w-3 h-3 flex-shrink-0" style={{ color: '#abc4ab' }} />
-                                    {item}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                            <p className="text-xs text-gray-400">Typical timeline: Ongoing partnership</p>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-              </div>
-
-              {/* Footer Note */}
-              <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
-                <p className="text-sm text-[#1e2749]">
-                  <strong>Every phase</strong> includes support for teachers, paraprofessionals, instructional coaches, and administrators. We meet each role where they are.
-                </p>
-              </div>
-            </div>
-
-            {/* Your Partnership Includes - Dynamic Table */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Your Partnership Includes</h2>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-3 px-4 font-medium text-gray-500">Deliverable</th>
-                      <th className="text-center py-3 px-4 font-medium text-gray-500">Your Contract</th>
-                      <th className="text-center py-3 px-4 font-medium text-gray-500">Delivered</th>
-                      <th className="text-center py-3 px-4 font-medium text-gray-500">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-3 px-4 text-[#1e2749]">Learning Hub Memberships</td>
-                      <td className="py-3 px-4 text-center font-medium">{staffStats.total}</td>
-                      <td className="py-3 px-4 text-center text-gray-600">{staffStats.hubLoggedIn} active</td>
-                      <td className="py-3 px-4 text-center">
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#4ecdc4]/20 text-[#4ecdc4] rounded-full text-xs font-medium">
-                          <Check className="w-3 h-3" /> Active
-                        </span>
-                      </td>
-                    </tr>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-3 px-4 text-[#1e2749]">On-Site Observation Days</td>
-                      <td className="py-3 px-4 text-center font-medium">{partnership?.observation_days_total ?? 0}</td>
-                      <td className="py-3 px-4 text-center text-gray-600">{partnership?.observation_days_completed ?? 0} complete</td>
-                      <td className="py-3 px-4 text-center">
-                        {(partnership?.observation_days_completed ?? 0) > 0 ? (
-                          <span className="inline-flex items-center px-2 py-1 bg-[#1e2749]/10 text-[#1e2749] rounded-full text-xs font-medium">
-                            In Progress
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
-                            Not Started
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-3 px-4 text-[#1e2749]">Virtual Strategy Sessions</td>
-                      <td className="py-3 px-4 text-center font-medium">{partnership?.virtual_sessions_total ?? 0}</td>
-                      <td className="py-3 px-4 text-center text-gray-600">{virtualSessionsCompleted} complete</td>
-                      <td className="py-3 px-4 text-center">
-                        {virtualSessionsCompleted > 0 ? (
-                          <span className="inline-flex items-center px-2 py-1 bg-[#1e2749]/10 text-[#1e2749] rounded-full text-xs font-medium">
-                            In Progress
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
-                            Upcoming
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-3 px-4 text-[#1e2749]">Executive Impact Sessions</td>
-                      <td className="py-3 px-4 text-center font-medium">{partnership?.executive_sessions_total ?? 0}</td>
-                      <td className="py-3 px-4 text-center text-gray-600">0 complete</td>
-                      <td className="py-3 px-4 text-center">
-                        <span className="inline-flex items-center px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
-                          Upcoming
-                        </span>
-                      </td>
-                    </tr>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-3 px-4 text-[#1e2749]">Personalized Love Notes</td>
-                      <td className="py-3 px-4 text-center font-medium">Per observation</td>
-                      <td className="py-3 px-4 text-center text-gray-600">{loveNotes} delivered</td>
-                      <td className="py-3 px-4 text-center">
-                        {loveNotes > 0 ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#4ecdc4]/20 text-[#4ecdc4] rounded-full text-xs font-medium">
-                            <Check className="w-3 h-3" /> Active
-                          </span>
-                        ) : (
-                          <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
-                            Not Started
-                          </span>
-                        )}
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="py-3 px-4 text-[#1e2749]">Partnership Dashboard</td>
-                      <td className="py-3 px-4 text-center font-medium">1</td>
-                      <td className="py-3 px-4 text-center text-gray-600">1 active</td>
-                      <td className="py-3 px-4 text-center">
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#4ecdc4]/20 text-[#4ecdc4] rounded-full text-xs font-medium">
-                          <Check className="w-3 h-3" /> Active
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* TDI's Approach */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">TDI&apos;s Approach</h2>
-              <div className="grid sm:grid-cols-2 gap-4 mb-6">
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Award className="w-5 h-5 text-teal-600" />
+                    ))}
                   </div>
-                  <div>
-                    <p className="font-medium text-[#1e2749]">65% implementation rate</p>
-                    <p className="text-sm text-gray-500">vs 10% industry average</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Users className="w-5 h-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-[#1e2749]">Bottom-up, not top-down</p>
-                    <p className="text-sm text-gray-500">Strategies teachers actually want to use</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <Heart className="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-[#1e2749]">Ongoing support</p>
-                    <p className="text-sm text-gray-500">Love Notes, virtual sessions, observations, dashboard</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <BarChart3 className="w-5 h-5 text-amber-600" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-[#1e2749]">Measurable outcomes</p>
-                    <p className="text-sm text-gray-500">Tracked on your dashboard</p>
-                  </div>
-                </div>
-              </div>
-              <Link
-                href="/how-we-partner"
-                target="_blank"
-                className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700"
-              >
-                Learn more about how we partner
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
+                </>
+              );
+            })()}
           </div>
         )}
 

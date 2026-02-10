@@ -22,10 +22,105 @@ const ROLES: { value: Role; label: string; subtitle: string }[] = [
   { value: 'other', label: 'Something Else', subtitle: 'Tell us in settings later' },
 ];
 
+// Goal icons as inline SVGs
+const GoalIcons: Record<GoalType, React.ReactNode> = {
+  reduce_stress: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="16" cy="12" r="8" />
+      <path d="M8 12c2 0 3-1 3-3" />
+      <path d="M24 12c-2 0-3-1-3-3" />
+      <path d="M12 22c0 2 1.8 4 4 4s4-2 4-4" />
+      <path d="M10 28c1-1 3-2 6-2s5 1 6 2" />
+    </svg>
+  ),
+  save_time: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="16" cy="16" r="12" />
+      <path d="M16 8v8l5 3" />
+      <path d="M26 10l3-3" />
+      <path d="M24 8l2-2" />
+    </svg>
+  ),
+  classroom_management: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="6" width="24" height="16" rx="2" />
+      <path d="M8 26h16" />
+      <path d="M12 22v4" />
+      <path d="M20 22v4" />
+      <path d="M10 12h12" />
+      <path d="M10 16h8" />
+    </svg>
+  ),
+  find_joy: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="16" cy="16" r="6" />
+      <path d="M16 2v4" />
+      <path d="M16 26v4" />
+      <path d="M2 16h4" />
+      <path d="M26 16h4" />
+      <path d="M6 6l3 3" />
+      <path d="M23 23l3 3" />
+      <path d="M6 26l3-3" />
+      <path d="M23 9l3-3" />
+    </svg>
+  ),
+  team_growth: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 4v24" />
+      <path d="M8 12l8-8 8 8" />
+      <path d="M6 20h20" />
+    </svg>
+  ),
+  role_support: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="10" cy="10" r="4" />
+      <circle cx="22" cy="10" r="4" />
+      <path d="M4 24c0-4 2.7-7 6-7 1.5 0 2.9.5 4 1.4" />
+      <path d="M28 24c0-4-2.7-7-6-7-1.5 0-2.9.5-4 1.4" />
+      <path d="M16 18v6" />
+    </svg>
+  ),
+  stop_bringing_work_home: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 14l11-10 11 10" />
+      <path d="M7 13v11a2 2 0 002 2h14a2 2 0 002-2V13" />
+      <path d="M6 6l20 20" />
+      <path d="M26 6L6 26" />
+    </svg>
+  ),
+  feel_like_myself: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 28c-1.5-2-6-6-6-12a6 6 0 0112 0c0 6-4.5 10-6 12z" />
+      <path d="M12 16h8" />
+      <path d="M16 12v8" />
+      <circle cx="16" cy="16" r="2" />
+    </svg>
+  ),
+  make_it_to_summer: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="4" y="6" width="24" height="20" rx="2" />
+      <path d="M4 12h24" />
+      <path d="M10 4v4" />
+      <path d="M22 4v4" />
+      <circle cx="20" cy="20" r="3" />
+      <path d="M20 15v2" />
+      <path d="M23 18l-1.5 1" />
+      <path d="M17 18l1.5 1" />
+    </svg>
+  ),
+  all_of_the_above: (
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 16l6 6L26 8" />
+      <path d="M6 8l6 6" />
+      <path d="M18 20l8-8" />
+    </svg>
+  ),
+};
+
 const GOALS: { value: GoalType; label: string }[] = [
-  { value: 'reduce_stress', label: 'Manage my stress better' },
+  { value: 'reduce_stress', label: 'Manage my stress' },
   { value: 'save_time', label: 'Get my time back' },
-  { value: 'classroom_management', label: 'Improve classroom management' },
+  { value: 'classroom_management', label: 'Classroom management' },
   { value: 'find_joy', label: 'Find the joy again' },
   { value: 'team_growth', label: 'Grow as a leader' },
   { value: 'role_support', label: 'Support my team' },
@@ -253,7 +348,7 @@ export default function OnboardingPage() {
         <div className="scroll-smooth">
           {/* Section A: Hero */}
           <section
-            className="min-h-screen flex flex-col items-center justify-center p-6 text-center"
+            className="min-h-screen flex flex-col items-center justify-center p-6 text-center relative"
             style={{ backgroundColor: '#2B3A67' }}
           >
             <p
@@ -275,11 +370,11 @@ export default function OnboardingPage() {
                 lineHeight: 1.2,
               }}
             >
-              Teaching should not feel like survival.
+              Teaching shouldn't feel like survival.
             </h1>
 
             <p
-              className="max-w-md mb-12"
+              className="max-w-lg mb-10"
               style={{
                 fontFamily: "'DM Sans', sans-serif",
                 color: 'rgba(255, 255, 255, 0.7)',
@@ -287,11 +382,11 @@ export default function OnboardingPage() {
                 lineHeight: 1.6,
               }}
             >
-              We are on a mission to build a system that actually supports the educators inside it. This Hub is that system.
+              Teachers Deserve It started as a conversation about what educators actually need. The Learning Hub is where that conversation becomes action. Courses, tools, and a space built just for you.
             </p>
 
             <button
-              onClick={scrollToStory}
+              onClick={() => goToStep(1)}
               className="px-8 py-4 rounded-lg font-semibold transition-all hover:scale-105"
               style={{
                 backgroundColor: '#E8B84B',
@@ -302,27 +397,52 @@ export default function OnboardingPage() {
               Let's get started
             </button>
 
-            {/* Scroll indicator */}
-            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="rgba(255,255,255,0.5)"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+            {/* Scroll to learn more */}
+            <div className="mt-8 flex flex-col items-center">
+              <button
+                onClick={scrollToStory}
+                className="hover:underline transition-all"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '13px',
+                  color: 'rgba(255, 255, 255, 0.5)',
+                }}
               >
-                <path d="M12 5v14M5 12l7 7 7-7" />
-              </svg>
+                Or scroll to learn more about TDI
+              </button>
+              <button
+                onClick={scrollToStory}
+                className="mt-3"
+                style={{ animation: 'bobUpDown 2s ease-in-out infinite' }}
+                aria-label="Scroll down"
+              >
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="rgba(255,255,255,0.5)"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M6 9l6 6 6-6" />
+                </svg>
+              </button>
             </div>
+
+            <style jsx>{`
+              @keyframes bobUpDown {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(6px); }
+              }
+            `}</style>
           </section>
 
-          {/* Section B: The Story */}
+          {/* Section B: The Origin Story */}
           <section
             ref={storyRef}
-            className="min-h-screen flex flex-col items-center justify-center p-6 md:p-12"
+            className="py-12 md:py-16 px-6 flex flex-col items-center"
             style={{ backgroundColor: '#FAFAF8' }}
           >
             <p
@@ -336,11 +456,11 @@ export default function OnboardingPage() {
             </p>
 
             <h2
-              className="text-2xl md:text-3xl font-semibold mb-8 text-center"
+              className="font-semibold mb-8 text-center"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
                 color: '#2B3A67',
-                fontSize: '24px',
+                fontSize: '28px',
               }}
             >
               TDI was born from burnout.
@@ -352,40 +472,154 @@ export default function OnboardingPage() {
                 fontFamily: "'DM Sans', sans-serif",
                 fontSize: '15px',
                 lineHeight: 1.7,
-                color: '#374151',
+                color: '#4B5563',
               }}
             >
               <p>
-                Rae Hughart was a passionate, high-performing educator who was ready to walk away from the classroom. Not because she stopped caring. Because the system was not built to sustain the people inside it.
+                We all knew the feeling. Walking into another teacher institute day, greeted with donuts and a full agenda of sessions that had nothing to do with what you actually needed in your classroom. Hours of "someday you'll use this" and "you'll need time for outside planning."
               </p>
               <p>
-                She built Teachers Deserve It to change that. Not with more inspiration posters or one-day PD events, but with real tools, real strategies, and a real community that helps teachers reclaim their time, manage their stress, and stay in the profession long enough to make the impact they were born to make.
+                None of it helped us be better for our students on Monday.
+              </p>
+              <p>
+                That system was not built with teachers in mind. TDI was. Through books, a podcast, school partnerships, and a growing community of educators who refuse to settle. The Learning Hub is the newest piece: a place where all of those tools, strategies, and resources live in one spot, built around your goals, on your schedule.
               </p>
             </div>
           </section>
 
-          {/* Section C: What the Hub Is */}
+          {/* Section C: Impact Stats */}
           <section
-            className="py-16 md:py-24 px-6"
+            className="py-12 md:py-16 px-6"
+            style={{ backgroundColor: '#2B3A67' }}
+          >
+            <div className="max-w-4xl mx-auto">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+                {[
+                  { number: '87K+', label: 'Educators in our community' },
+                  { number: '21', label: 'States with partner schools' },
+                  { number: '65%', label: 'Implementation rate' },
+                  { number: '4.8/5', label: 'Average course rating' },
+                ].map((stat, i) => (
+                  <div key={i} className="text-center">
+                    <p
+                      className="font-bold"
+                      style={{
+                        fontFamily: "'Source Serif 4', Georgia, serif",
+                        fontSize: '36px',
+                        color: '#E8B84B',
+                      }}
+                    >
+                      {stat.number}
+                    </p>
+                    <p
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: '13px',
+                        color: 'rgba(255, 255, 255, 0.7)',
+                      }}
+                    >
+                      {stat.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+              <p
+                className="text-center italic max-w-xl mx-auto"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '14px',
+                  color: 'rgba(255, 255, 255, 0.5)',
+                }}
+              >
+                Industry average PD implementation is just 10%. Our teachers actually use what they learn because it's built for Monday morning, not someday.
+              </p>
+            </div>
+          </section>
+
+          {/* Section D: The TDI Blueprint */}
+          <section
+            className="py-12 md:py-16 px-6"
             style={{ backgroundColor: '#FAFAF8' }}
           >
-            <div className="max-w-5xl mx-auto">
+            <div className="max-w-3xl mx-auto">
               <p
-                className="text-sm tracking-widest mb-4 uppercase text-center"
+                className="text-sm tracking-widest mb-8 uppercase text-center"
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
                   color: '#E8B84B',
                 }}
               >
-                What You Get
+                The TDI Blueprint
               </p>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                  { num: '1', title: 'Respect Teachers\' Time', desc: 'PD that fits into real life, not consumes it.' },
+                  { num: '2', title: 'Deliver Real Strategies', desc: 'Practical tools that work Monday morning.' },
+                  { num: '3', title: 'Prioritize Wellness', desc: 'Sustainable teaching starts with supported teachers.' },
+                  { num: '4', title: 'Measure What Matters', desc: 'Real impact, not just attendance sheets.' },
+                ].map((item) => (
+                  <div key={item.num} className="flex gap-4 items-start">
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: '#E8B84B' }}
+                    >
+                      <span
+                        className="font-bold"
+                        style={{
+                          fontFamily: "'Source Serif 4', Georgia, serif",
+                          color: 'white',
+                        }}
+                      >
+                        {item.num}
+                      </span>
+                    </div>
+                    <div>
+                      <p
+                        className="font-bold mb-1"
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: '16px',
+                          color: '#2B3A67',
+                        }}
+                      >
+                        {item.title}
+                      </p>
+                      <p
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: '14px',
+                          color: '#6B7280',
+                        }}
+                      >
+                        {item.desc}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* Section E: What the Hub Gives You */}
+          <section
+            className="py-12 md:py-16 px-6"
+            style={{ backgroundColor: '#FFFFFF' }}
+          >
+            <div className="max-w-5xl mx-auto">
+              <p
+                className="text-sm tracking-widest mb-8 uppercase text-center"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: '#E8B84B',
+                }}
+              >
+                What The Learning Hub Gives You
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {/* Card 1: Courses */}
-                <div
-                  className="p-6 rounded-xl text-center"
-                  style={{ backgroundColor: 'white' }}
-                >
+                <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#FAFAF8' }}>
                   <div
                     className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
                     style={{ backgroundColor: '#2B3A67' }}
@@ -409,15 +643,12 @@ export default function OnboardingPage() {
                       lineHeight: 1.6,
                     }}
                   >
-                    Short, practical courses on stress management, classroom strategies, time-saving tools, and more. Every course earns PD hours.
+                    Short, practical courses on stress management, classroom strategies, time-saving tools, and more. Every course earns real PD hours.
                   </p>
                 </div>
 
                 {/* Card 2: Quick Wins */}
-                <div
-                  className="p-6 rounded-xl text-center"
-                  style={{ backgroundColor: 'white' }}
-                >
+                <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#FAFAF8' }}>
                   <div
                     className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
                     style={{ backgroundColor: '#2B3A67' }}
@@ -446,10 +677,7 @@ export default function OnboardingPage() {
                 </div>
 
                 {/* Card 3: Privacy */}
-                <div
-                  className="p-6 rounded-xl text-center"
-                  style={{ backgroundColor: 'white' }}
-                >
+                <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#FAFAF8' }}>
                   <div
                     className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
                     style={{ backgroundColor: '#2B3A67' }}
@@ -463,7 +691,7 @@ export default function OnboardingPage() {
                       color: '#2B3A67',
                     }}
                   >
-                    A space that is actually yours
+                    A space that's actually yours
                   </h3>
                   <p
                     className="text-sm"
@@ -480,24 +708,53 @@ export default function OnboardingPage() {
             </div>
           </section>
 
-          {/* Section D: The Promise */}
+          {/* Section F: Community Quote */}
           <section
-            className="py-16 md:py-24 px-6 text-center"
+            className="py-12 md:py-16 px-6 text-center"
+            style={{ backgroundColor: '#FAFAF8' }}
+          >
+            <div className="max-w-xl mx-auto">
+              <p
+                className="italic mb-6"
+                style={{
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  fontSize: '22px',
+                  color: '#2B3A67',
+                  lineHeight: 1.5,
+                }}
+              >
+                "They're done pretending burnout is a badge of honor. They're practical optimists who believe there's a smarter way to do this work. They're still here because they still believe in teaching. They just refuse to destroy themselves doing it."
+              </p>
+              <p
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '14px',
+                  color: '#E8B84B',
+                }}
+              >
+                The educators in our community share something.
+              </p>
+            </div>
+          </section>
+
+          {/* Section G: CTA */}
+          <section
+            className="py-12 md:py-16 px-6 text-center"
             style={{ backgroundColor: '#2B3A67' }}
           >
             <h2
-              className="text-2xl md:text-3xl font-semibold mb-10"
+              className="font-semibold mb-8"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
                 color: 'white',
-                fontSize: '24px',
+                fontSize: '28px',
               }}
             >
-              What we believe.
+              Ready to get started?
             </h2>
 
             <div
-              className="max-w-md mx-auto space-y-4 mb-10"
+              className="max-w-md mx-auto space-y-3 mb-10"
               style={{
                 fontFamily: "'DM Sans', sans-serif",
                 fontSize: '15px',
@@ -506,7 +763,7 @@ export default function OnboardingPage() {
               }}
             >
               <p>Teachers deserve tools that respect their time.</p>
-              <p>Teachers deserve PD that does not feel like punishment.</p>
+              <p>Teachers deserve PD that doesn't feel like punishment.</p>
               <p>Teachers deserve a system that was built for them.</p>
             </div>
 
@@ -529,7 +786,7 @@ export default function OnboardingPage() {
       {step === 1 && (
         <div
           className="min-h-screen p-6 md:p-8"
-          style={{ backgroundColor: '#FAFAF8' }}
+          style={{ backgroundColor: '#FFFFFF' }}
         >
           <div className="max-w-lg mx-auto">
             <ProgressBar currentStep={1} />
@@ -541,7 +798,7 @@ export default function OnboardingPage() {
                 color: '#2B3A67',
               }}
             >
-              What is your role?
+              What's your role?
             </h1>
 
             <p
@@ -555,8 +812,8 @@ export default function OnboardingPage() {
               className="text-center mb-8 max-w-md mx-auto"
               style={{
                 fontFamily: "'DM Sans', sans-serif",
-                fontSize: '13px',
-                color: '#9CA3AF',
+                fontSize: '15px',
+                color: '#6B7280',
                 marginTop: '4px',
               }}
             >
@@ -573,7 +830,7 @@ export default function OnboardingPage() {
                     className={`p-4 rounded-lg text-left transition-all focus:outline-none focus:ring-2 focus:ring-offset-2`}
                     style={{
                       backgroundColor: isSelected ? '#FFF8E7' : 'white',
-                      border: isSelected ? '2px solid #E8B84B' : '1px solid #E5E5E5',
+                      border: isSelected ? '2px solid #E8B84B' : '1.5px solid #E5E7EB',
                     }}
                     aria-pressed={isSelected}
                   >
@@ -618,9 +875,9 @@ export default function OnboardingPage() {
       {step === 2 && (
         <div
           className="min-h-screen p-6 md:p-8"
-          style={{ backgroundColor: '#FAFAF8' }}
+          style={{ backgroundColor: '#FFFFFF' }}
         >
-          <div className="max-w-lg mx-auto">
+          <div className="max-w-2xl mx-auto">
             <ProgressBar currentStep={2} />
 
             <h1
@@ -640,25 +897,36 @@ export default function OnboardingPage() {
               Pick as many as you want. These shape your suggestions.
             </p>
 
-            <div className="flex flex-wrap gap-3 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-8">
               {GOALS.map((goal) => {
                 const isSelected = selectedGoals.includes(goal.value);
                 return (
                   <button
                     key={goal.value}
                     onClick={() => toggleGoal(goal.value)}
-                    className="px-4 py-3 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-offset-2"
+                    className="p-4 rounded-xl transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 flex flex-col items-center text-center"
                     style={{
-                      backgroundColor: isSelected ? '#E8B84B' : '#FFFFFF',
-                      color: isSelected ? '#FFFFFF' : '#2B3A67',
-                      border: isSelected ? 'none' : '1.5px solid #D1D5DB',
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: '14px',
-                      fontWeight: 500,
+                      backgroundColor: isSelected ? '#FFF8E7' : '#FFFFFF',
+                      border: isSelected ? '2px solid #E8B84B' : '1.5px solid #E5E7EB',
+                      minHeight: '130px',
                     }}
                     aria-pressed={isSelected}
                   >
-                    {goal.label}
+                    <div
+                      className="mb-3"
+                      style={{ color: isSelected ? '#E8B84B' : '#2B3A67' }}
+                    >
+                      {GoalIcons[goal.value]}
+                    </div>
+                    <p
+                      className="font-bold text-sm"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        color: '#2B3A67',
+                      }}
+                    >
+                      {goal.label}
+                    </p>
                   </button>
                 );
               })}
@@ -671,7 +939,7 @@ export default function OnboardingPage() {
                 style={{
                   backgroundColor: 'white',
                   color: '#2B3A67',
-                  border: '1px solid #E5E5E5',
+                  border: '1.5px solid #E5E7EB',
                   fontFamily: "'DM Sans', sans-serif",
                 }}
               >
@@ -699,7 +967,7 @@ export default function OnboardingPage() {
       {step === 3 && (
         <div
           className="min-h-screen p-6 md:p-8"
-          style={{ backgroundColor: '#FAFAF8' }}
+          style={{ backgroundColor: '#FFFFFF' }}
         >
           <div className="max-w-xl mx-auto">
             <ProgressBar currentStep={3} />
@@ -743,7 +1011,7 @@ export default function OnboardingPage() {
                   style={{
                     backgroundColor: 'white',
                     color: '#2B3A67',
-                    border: '1px solid #E5E5E5',
+                    border: '1.5px solid #E5E7EB',
                     fontFamily: "'DM Sans', sans-serif",
                   }}
                 >
@@ -766,8 +1034,11 @@ export default function OnboardingPage() {
 
               <button
                 onClick={() => goToStep(4)}
-                className="text-sm text-gray-500 hover:text-gray-700"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
+                className="text-sm hover:underline"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: '#9CA3AF',
+                }}
               >
                 Skip for now
               </button>
@@ -780,7 +1051,7 @@ export default function OnboardingPage() {
       {step === 4 && (
         <div
           className="min-h-screen p-6 md:p-8"
-          style={{ backgroundColor: '#FAFAF8' }}
+          style={{ backgroundColor: '#FFFFFF' }}
         >
           <div className="max-w-lg mx-auto">
             <ProgressBar currentStep={4} />
@@ -805,7 +1076,7 @@ export default function OnboardingPage() {
             {/* Privacy callout */}
             <div
               className="p-4 rounded-lg mb-8"
-              style={{ backgroundColor: '#EEF2FF' }}
+              style={{ backgroundColor: '#F3F4F6' }}
             >
               <p
                 className="text-sm"
@@ -831,7 +1102,7 @@ export default function OnboardingPage() {
                       style={{
                         backgroundColor: isSelected ? '#E8B84B' : 'white',
                         color: isSelected ? 'white' : '#2B3A67',
-                        border: isSelected ? 'none' : '1px solid #E5E5E5',
+                        border: isSelected ? 'none' : '1.5px solid #E5E7EB',
                         fontFamily: "'DM Sans', sans-serif",
                       }}
                       aria-label={`Stress level ${num}`}
@@ -866,7 +1137,7 @@ export default function OnboardingPage() {
                   style={{
                     backgroundColor: 'white',
                     color: '#2B3A67',
-                    border: '1px solid #E5E5E5',
+                    border: '1.5px solid #E5E7EB',
                     fontFamily: "'DM Sans', sans-serif",
                   }}
                 >
@@ -889,8 +1160,11 @@ export default function OnboardingPage() {
 
               <button
                 onClick={() => goToStep(5)}
-                className="text-sm text-gray-500 hover:text-gray-700"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
+                className="text-sm hover:underline"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: '#9CA3AF',
+                }}
               >
                 Skip, take me to my Hub
               </button>
@@ -920,7 +1194,7 @@ export default function OnboardingPage() {
               color: 'white',
             }}
           >
-            You are all set.
+            You're all set.
           </h1>
 
           <p
