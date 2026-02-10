@@ -131,19 +131,38 @@ const Confetti = ({ isActive }: { isActive: boolean }) => {
 // Icon helper for data-driven components
 const iconMap: Record<string, any> = { Zap, AlertCircle, TrendingUp, Heart, Star, Sparkles };
 
+// Health status helper with actionable next steps
+const getHealthStatus = (color: string, metricType: 'hub' | 'courses' | 'stress' | 'implementation') => {
+  const isExcellent = color === '#38618C';
+  const isOnTrack = color === '#22c55e';
+  const isDeveloping = color === '#f59e0b';
+  // Needs Support is #ef4444
+
+  if (isExcellent) return { status: 'Excellent', action: null };
+  if (isOnTrack) return { status: 'On Track', action: null };
+
+  // Actionable next steps for Developing and Needs Support
+  const actions: Record<string, string> = {
+    hub: 'Focus: Priority outreach',
+    courses: 'Focus: Champion support',
+    stress: 'Prioritize burnout prevention',
+    implementation: 'Boost with coaching'
+  };
+
+  return {
+    status: isDeveloping ? 'Developing' : 'Needs Support',
+    action: actions[metricType]
+  };
+};
+
 // Reusable Mini Donut for school stats
 // Colors: Blue (#38618C) = Excellent, Green (#22c55e) = On Track, Amber (#f59e0b) = Developing, Red (#ef4444) = Needs Support
-const MiniDonut = ({ value, max, label, displayValue, color }: {
-  value: number; max: number; label: string; displayValue: string; color: string
+const MiniDonut = ({ value, max, label, displayValue, color, metricType }: {
+  value: number; max: number; label: string; displayValue: string; color: string; metricType?: 'hub' | 'courses' | 'stress' | 'implementation'
 }) => {
   const pct = Math.min((value / max) * 100, 100);
-  // Status based on color (traffic light system)
-  const getStatus = () => {
-    if (color === '#38618C') return 'Excellent';
-    if (color === '#22c55e') return 'On Track';
-    if (color === '#f59e0b') return 'Developing';
-    return 'Needs Support';
-  };
+  const health = metricType ? getHealthStatus(color, metricType) : { status: color === '#38618C' ? 'Excellent' : color === '#22c55e' ? 'On Track' : color === '#f59e0b' ? 'Developing' : 'Needs Support', action: null };
+
   return (
     <div className="flex flex-col items-center">
       <div className="relative w-16 h-16 sm:w-20 sm:h-20">
@@ -157,7 +176,10 @@ const MiniDonut = ({ value, max, label, displayValue, color }: {
         </div>
       </div>
       <p className="text-xs text-gray-500 mt-2 text-center">{label}</p>
-      <p className="text-xs font-medium mt-0.5 text-center" style={{ color }}>{getStatus()}</p>
+      <p className="text-xs font-medium mt-0.5 text-center" style={{ color }}>{health.status}</p>
+      {health.action && (
+        <p className="text-[10px] text-gray-500 mt-0.5 text-center italic">{health.action}</p>
+      )}
     </div>
   );
 };
@@ -3752,7 +3774,10 @@ export default function ExampleDashboard() {
                             {school.observationStatus === 'Complete' ? 'Obs. ✓' : school.observationStatus}
                           </span>
                           <div className="text-right">
-                            <div className={`text-lg font-bold ${loginRate >= 85 ? 'text-green-600' : loginRate >= 70 ? 'text-amber-600' : 'text-red-500'}`}>
+                            <div
+                              className="text-lg font-bold"
+                              style={{ color: loginRate >= 95 ? '#38618C' : loginRate >= 85 ? '#22c55e' : loginRate >= 75 ? '#f59e0b' : '#ef4444' }}
+                            >
                               {loginRate}%
                             </div>
                             <div className="text-xs text-gray-500">logged in</div>
@@ -3764,12 +3789,29 @@ export default function ExampleDashboard() {
                           )}
                         </div>
                       </div>
-                      {/* Progress Bar */}
-                      <div className="mt-3 bg-gray-100 rounded-full h-2 overflow-hidden">
+                      {/* 4-Dot Health Indicator */}
+                      <div className="mt-3 flex items-center gap-1.5">
                         <div
-                          className={`h-full rounded-full transition-all ${loginRate >= 85 ? 'bg-green-500' : loginRate >= 70 ? 'bg-amber-500' : 'bg-red-500'}`}
-                          style={{ width: `${loginRate}%` }}
+                          className="w-2.5 h-2.5 rounded-full"
+                          style={{ backgroundColor: loginRate >= 95 ? '#38618C' : loginRate >= 85 ? '#22c55e' : loginRate >= 75 ? '#f59e0b' : '#ef4444' }}
+                          title="Hub Logins"
                         />
+                        <div
+                          className="w-2.5 h-2.5 rounded-full"
+                          style={{ backgroundColor: school.coursesCompleted >= 70 ? '#38618C' : school.coursesCompleted >= 60 ? '#22c55e' : school.coursesCompleted >= 50 ? '#f59e0b' : '#ef4444' }}
+                          title="Courses"
+                        />
+                        <div
+                          className="w-2.5 h-2.5 rounded-full"
+                          style={{ backgroundColor: school.avgStress <= 5.5 ? '#22c55e' : school.avgStress <= 6.0 ? '#38618C' : school.avgStress <= 7.0 ? '#f59e0b' : '#ef4444' }}
+                          title="Stress"
+                        />
+                        <div
+                          className="w-2.5 h-2.5 rounded-full"
+                          style={{ backgroundColor: school.implementationRate >= 35 ? '#38618C' : school.implementationRate >= 25 ? '#22c55e' : school.implementationRate >= 15 ? '#f59e0b' : '#ef4444' }}
+                          title="Implementation"
+                        />
+                        <span className="text-[10px] text-gray-400 ml-1">Health</span>
                       </div>
                     </button>
 
@@ -3813,6 +3855,7 @@ export default function ExampleDashboard() {
                             label="Hub Logins"
                             displayValue={`${loginRate}%`}
                             color={loginRate >= 95 ? '#38618C' : loginRate >= 85 ? '#22c55e' : loginRate >= 75 ? '#f59e0b' : '#ef4444'}
+                            metricType="hub"
                           />
                           <MiniDonut
                             value={school.coursesCompleted}
@@ -3820,6 +3863,7 @@ export default function ExampleDashboard() {
                             label="Courses"
                             displayValue={`${school.coursesCompleted}%`}
                             color={school.coursesCompleted >= 70 ? '#38618C' : school.coursesCompleted >= 60 ? '#22c55e' : school.coursesCompleted >= 50 ? '#f59e0b' : '#ef4444'}
+                            metricType="courses"
                           />
                           <MiniDonut
                             value={(10 - school.avgStress) * 10}
@@ -3827,6 +3871,7 @@ export default function ExampleDashboard() {
                             label="Avg. Stress"
                             displayValue={`${school.avgStress}/10`}
                             color={school.avgStress <= 5.5 ? '#22c55e' : school.avgStress <= 6.0 ? '#38618C' : school.avgStress <= 7.0 ? '#f59e0b' : '#ef4444'}
+                            metricType="stress"
                           />
                           <MiniDonut
                             value={school.implementationRate}
@@ -3834,6 +3879,7 @@ export default function ExampleDashboard() {
                             label="Implementation"
                             displayValue={`${school.implementationRate}%`}
                             color={school.implementationRate >= 35 ? '#38618C' : school.implementationRate >= 25 ? '#22c55e' : school.implementationRate >= 15 ? '#f59e0b' : '#ef4444'}
+                            metricType="implementation"
                           />
                         </div>
 
