@@ -1,5 +1,7 @@
 'use client';
 
+import { AVATARS, getAvatarIcon } from './AvatarPicker';
+
 interface AvatarDisplayProps {
   size: 32 | 48 | 96;
   userId?: string;
@@ -15,9 +17,16 @@ export default function AvatarDisplay({
   displayName,
 }: AvatarDisplayProps) {
   const sizeClasses = {
-    32: 'w-8 h-8 text-sm',
-    48: 'w-12 h-12 text-lg',
-    96: 'w-24 h-24 text-3xl',
+    32: 'w-8 h-8',
+    48: 'w-12 h-12',
+    96: 'w-24 h-24',
+  };
+
+  // Icon sizes for each avatar size
+  const iconSizes = {
+    32: 16,
+    48: 22,
+    96: 44,
   };
 
   const getInitial = (): string => {
@@ -43,34 +52,18 @@ export default function AvatarDisplay({
     );
   }
 
-  // If we have a preset avatar ID, show a placeholder with the avatar name's first letter
-  // (Real illustrations will replace this later)
+  // If we have a preset avatar ID, show the SVG icon
   if (avatarId) {
-    const avatarColors: Record<string, string> = {
-      owl: '#8B7355',
-      'coffee-mug': '#6F4E37',
-      plant: '#228B22',
-      book: '#4169E1',
-      apple: '#DC143C',
-      pencil: '#FFD700',
-      star: '#FFD700',
-      heart: '#FF69B4',
-    };
-
-    const bgColor = avatarColors[avatarId] || '#2B3A67';
-    const initial = avatarId.charAt(0).toUpperCase();
+    const avatar = AVATARS.find((a) => a.id === avatarId);
+    const bgColor = avatar?.color || '#2B3A67';
+    const icon = getAvatarIcon(avatarId, iconSizes[size]);
 
     return (
       <div
         className={`${sizeClasses[size]} rounded-full flex items-center justify-center flex-shrink-0`}
         style={{ backgroundColor: bgColor }}
       >
-        <span
-          className="font-semibold text-white"
-          style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
-        >
-          {initial}
-        </span>
+        {icon}
       </div>
     );
   }
@@ -86,6 +79,7 @@ export default function AvatarDisplay({
         style={{
           fontFamily: "'Source Serif 4', Georgia, serif",
           color: '#E8B84B',
+          fontSize: size === 96 ? '2rem' : size === 48 ? '1.125rem' : '0.875rem',
         }}
       >
         {getInitial()}

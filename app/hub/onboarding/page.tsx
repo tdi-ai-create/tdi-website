@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Check } from 'lucide-react';
+import { Check, Play, Zap, Shield } from 'lucide-react';
 import AvatarPicker from '@/components/hub/AvatarPicker';
 import { getSupabase } from '@/lib/supabase';
 import { getCurrentUser } from '@/lib/hub-auth';
@@ -36,6 +36,7 @@ export default function OnboardingPage() {
   const [step, setStep] = useState<OnboardingStep>(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const storyRef = useRef<HTMLDivElement>(null);
 
   // Form state
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
@@ -64,7 +65,13 @@ export default function OnboardingPage() {
     setTimeout(() => {
       setStep(newStep);
       setIsTransitioning(false);
+      // Scroll to top when changing steps
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }, 150);
+  };
+
+  const scrollToStory = () => {
+    storyRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   const handleAvatarUpload = async (file: File) => {
@@ -213,55 +220,280 @@ export default function OnboardingPage() {
         isTransitioning ? 'opacity-0' : 'opacity-100'
       }`}
     >
-      {/* Step 0: Welcome */}
+      {/* Step 0: Welcome - Full scrollable experience */}
       {step === 0 && (
-        <div
-          className="min-h-screen flex flex-col items-center justify-center p-6 text-center"
-          style={{ backgroundColor: '#2B3A67' }}
-        >
-          <p
-            className="text-sm tracking-wider mb-6"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              color: '#E8B84B',
-            }}
+        <div className="scroll-smooth">
+          {/* Section A: Hero */}
+          <section
+            className="min-h-screen flex flex-col items-center justify-center p-6 text-center"
+            style={{ backgroundColor: '#2B3A67' }}
           >
-            THE TDI LEARNING HUB
-          </p>
+            <p
+              className="text-sm tracking-widest mb-6 uppercase"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: '#E8B84B',
+              }}
+            >
+              The TDI Learning Hub
+            </p>
 
-          <h1
-            className="text-3xl md:text-4xl font-semibold mb-6"
-            style={{
-              fontFamily: "'Source Serif 4', Georgia, serif",
-              color: 'white',
-            }}
-          >
-            Welcome. You belong here.
-          </h1>
+            <h1
+              className="text-3xl md:text-4xl font-semibold mb-6 max-w-lg"
+              style={{
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                color: 'white',
+                fontSize: '36px',
+                lineHeight: 1.2,
+              }}
+            >
+              Teaching should not feel like survival.
+            </h1>
 
-          <p
-            className="max-w-md mb-12"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              color: 'rgba(255, 255, 255, 0.7)',
-              fontSize: '16px',
-              lineHeight: 1.6,
-            }}
-          >
-            This is your space. No grades. No evaluations. No one watching over your shoulder. Just tools built by teachers who get it.
-          </p>
+            <p
+              className="max-w-md mb-12"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: 'rgba(255, 255, 255, 0.7)',
+                fontSize: '16px',
+                lineHeight: 1.6,
+              }}
+            >
+              We are on a mission to build a system that actually supports the educators inside it. This Hub is that system.
+            </p>
 
-          <button
-            onClick={() => goToStep(1)}
-            className="px-8 py-4 rounded-lg font-semibold transition-all hover:scale-105"
-            style={{
-              backgroundColor: '#E8B84B',
-              color: '#2B3A67',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
+            <button
+              onClick={scrollToStory}
+              className="px-8 py-4 rounded-lg font-semibold transition-all hover:scale-105"
+              style={{
+                backgroundColor: '#E8B84B',
+                color: '#2B3A67',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              Let's get started
+            </button>
+
+            {/* Scroll indicator */}
+            <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="rgba(255,255,255,0.5)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M12 5v14M5 12l7 7 7-7" />
+              </svg>
+            </div>
+          </section>
+
+          {/* Section B: The Story */}
+          <section
+            ref={storyRef}
+            className="min-h-screen flex flex-col items-center justify-center p-6 md:p-12"
+            style={{ backgroundColor: '#FAFAF8' }}
           >
-            Let's get started
-          </button>
+            <p
+              className="text-sm tracking-widest mb-4 uppercase"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: '#E8B84B',
+              }}
+            >
+              How It Started
+            </p>
+
+            <h2
+              className="text-2xl md:text-3xl font-semibold mb-8 text-center"
+              style={{
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                color: '#2B3A67',
+                fontSize: '24px',
+              }}
+            >
+              TDI was born from burnout.
+            </h2>
+
+            <div
+              className="max-w-xl text-center space-y-6"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '15px',
+                lineHeight: 1.7,
+                color: '#374151',
+              }}
+            >
+              <p>
+                Rae Hughart was a passionate, high-performing educator who was ready to walk away from the classroom. Not because she stopped caring. Because the system was not built to sustain the people inside it.
+              </p>
+              <p>
+                She built Teachers Deserve It to change that. Not with more inspiration posters or one-day PD events, but with real tools, real strategies, and a real community that helps teachers reclaim their time, manage their stress, and stay in the profession long enough to make the impact they were born to make.
+              </p>
+            </div>
+          </section>
+
+          {/* Section C: What the Hub Is */}
+          <section
+            className="py-16 md:py-24 px-6"
+            style={{ backgroundColor: '#FAFAF8' }}
+          >
+            <div className="max-w-5xl mx-auto">
+              <p
+                className="text-sm tracking-widest mb-4 uppercase text-center"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: '#E8B84B',
+                }}
+              >
+                What You Get
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-10">
+                {/* Card 1: Courses */}
+                <div
+                  className="p-6 rounded-xl text-center"
+                  style={{ backgroundColor: 'white' }}
+                >
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+                    style={{ backgroundColor: '#2B3A67' }}
+                  >
+                    <Play size={20} color="white" fill="white" />
+                  </div>
+                  <h3
+                    className="text-lg font-semibold mb-2"
+                    style={{
+                      fontFamily: "'Source Serif 4', Georgia, serif",
+                      color: '#2B3A67',
+                    }}
+                  >
+                    Courses built by teachers, for teachers
+                  </h3>
+                  <p
+                    className="text-sm"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      color: '#6B7280',
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    Short, practical courses on stress management, classroom strategies, time-saving tools, and more. Every course earns PD hours.
+                  </p>
+                </div>
+
+                {/* Card 2: Quick Wins */}
+                <div
+                  className="p-6 rounded-xl text-center"
+                  style={{ backgroundColor: 'white' }}
+                >
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+                    style={{ backgroundColor: '#2B3A67' }}
+                  >
+                    <Zap size={20} color="white" />
+                  </div>
+                  <h3
+                    className="text-lg font-semibold mb-2"
+                    style={{
+                      fontFamily: "'Source Serif 4', Georgia, serif",
+                      color: '#2B3A67',
+                    }}
+                  >
+                    Quick Wins for busy days
+                  </h3>
+                  <p
+                    className="text-sm"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      color: '#6B7280',
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    3-5 minute tools you can use right now. No prep. No commitment. Just something that actually helps.
+                  </p>
+                </div>
+
+                {/* Card 3: Privacy */}
+                <div
+                  className="p-6 rounded-xl text-center"
+                  style={{ backgroundColor: 'white' }}
+                >
+                  <div
+                    className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4"
+                    style={{ backgroundColor: '#2B3A67' }}
+                  >
+                    <Shield size={20} color="white" />
+                  </div>
+                  <h3
+                    className="text-lg font-semibold mb-2"
+                    style={{
+                      fontFamily: "'Source Serif 4', Georgia, serif",
+                      color: '#2B3A67',
+                    }}
+                  >
+                    A space that is actually yours
+                  </h3>
+                  <p
+                    className="text-sm"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      color: '#6B7280',
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    No one sees your data. No one watches your progress. This is professional development without the surveillance.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* Section D: The Promise */}
+          <section
+            className="py-16 md:py-24 px-6 text-center"
+            style={{ backgroundColor: '#2B3A67' }}
+          >
+            <h2
+              className="text-2xl md:text-3xl font-semibold mb-10"
+              style={{
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                color: 'white',
+                fontSize: '24px',
+              }}
+            >
+              What we believe.
+            </h2>
+
+            <div
+              className="max-w-md mx-auto space-y-4 mb-10"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '15px',
+                color: 'rgba(255, 255, 255, 0.8)',
+                lineHeight: 1.6,
+              }}
+            >
+              <p>Teachers deserve tools that respect their time.</p>
+              <p>Teachers deserve PD that does not feel like punishment.</p>
+              <p>Teachers deserve a system that was built for them.</p>
+            </div>
+
+            <button
+              onClick={() => goToStep(1)}
+              className="px-8 py-4 rounded-lg font-semibold transition-all hover:scale-105"
+              style={{
+                backgroundColor: '#E8B84B',
+                color: '#2B3A67',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              I'm ready. Let's go.
+            </button>
+          </section>
         </div>
       )}
 
@@ -281,7 +513,7 @@ export default function OnboardingPage() {
                 color: '#2B3A67',
               }}
             >
-              What's your role?
+              What is your role?
             </h1>
 
             <p
@@ -648,7 +880,7 @@ export default function OnboardingPage() {
               color: 'white',
             }}
           >
-            You're all set.
+            You are all set.
           </h1>
 
           <p
