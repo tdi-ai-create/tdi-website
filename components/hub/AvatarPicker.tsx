@@ -374,7 +374,6 @@ export default function AvatarPicker({
                 }`}
                 style={{
                   backgroundColor: avatar.color,
-                  ringColor: isSelected ? '#E8B84B' : undefined,
                 }}
               >
                 {getAvatarIcon(avatar.id, iconSize)}

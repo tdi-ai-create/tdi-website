@@ -38,6 +38,7 @@ import {
   Target,
   Award,
   ArrowRight,
+  MessageCircle,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -1754,12 +1755,12 @@ export default function PartnerDashboard() {
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Your TDI Team</h2>
               <div className="flex flex-col sm:flex-row items-start gap-6">
-                <div className="w-24 h-24 bg-gray-200 rounded-full overflow-hidden flex-shrink-0">
+                <div className="w-28 h-28 bg-gray-200 rounded-full overflow-hidden flex-shrink-0 shadow-md">
                   <Image
                     src="/images/rae-headshot.webp"
                     alt="Rae Hughart"
-                    width={96}
-                    height={96}
+                    width={112}
+                    height={112}
                     className="w-full h-full object-cover"
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
@@ -1788,23 +1789,37 @@ export default function PartnerDashboard() {
                         847-721-5503
                       </a>
                     </div>
+                    <div className="flex items-center gap-2">
+                      <MessageCircle className="w-4 h-4 text-gray-400" />
+                      <span className="text-sm text-gray-600">Also available by text!</span>
+                    </div>
                   </div>
-                  <a
-                    href="https://calendly.com/teachersdeserveit"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-[#FFBA06] text-[#1e2749] rounded-lg font-medium hover:bg-[#e5a805] transition-colors"
-                  >
-                    <Calendar className="w-4 h-4" />
-                    Schedule a Call
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-3 mt-5">
+                    <a
+                      href="https://calendly.com/teachersdeserveit"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FFBA06] text-[#1e2749] rounded-lg font-medium hover:bg-[#e5a805] transition-colors"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Schedule a Call
+                      <ExternalLink className="w-3 h-3" />
+                    </a>
+                    <a
+                      href="mailto:hello@teachersdeserveit.com"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-[#1e2749] text-[#1e2749] rounded-lg font-medium hover:bg-[#1e2749]/5 transition-colors"
+                    >
+                      <Mail className="w-4 h-4" />
+                      Send an Email
+                    </a>
+                  </div>
                 </div>
               </div>
               <div className="mt-6 p-4 bg-[#1e2749]/5 rounded-lg">
                 <p className="text-sm text-gray-600">
                   <strong className="text-[#1e2749]">Your TDI partner is with you every step of the way.</strong>{' '}
-                  Reach out anytime — we mean it.
+                  Reach out anytime — call, text, or email. We mean it.
                 </p>
               </div>
             </div>
@@ -1838,6 +1853,23 @@ export default function PartnerDashboard() {
               <div className="grid sm:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Partnership Type</p>
+                    <p className="font-medium text-[#1e2749] capitalize">{partnership.partnership_type}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Current Phase</p>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="px-3 py-1 rounded-full text-sm font-medium"
+                        style={{ backgroundColor: colors.teal + '20', color: colors.teal }}
+                      >
+                        {partnership.contract_phase}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Contract Period</p>
                     <p className="font-medium text-[#1e2749]">
                       {partnership.contract_start
@@ -1856,23 +1888,6 @@ export default function PartnerDashboard() {
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Partnership Type</p>
-                    <p className="font-medium text-[#1e2749] capitalize">{partnership.partnership_type}</p>
-                  </div>
-                </div>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Current Phase</p>
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="px-3 py-1 rounded-full text-sm font-medium"
-                        style={{ backgroundColor: colors.teal + '20', color: colors.teal }}
-                      >
-                        {partnership.contract_phase}
-                      </span>
-                    </div>
-                  </div>
-                  <div>
                     <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Location</p>
                     <p className="font-medium text-[#1e2749]">
                       {organization?.address_city}, {organization?.address_state}
@@ -1880,18 +1895,18 @@ export default function PartnerDashboard() {
                   </div>
                 </div>
               </div>
-              {partnership.contract_end && (
-                <div className="mt-6 pt-4 border-t border-gray-100">
-                  <p className="text-sm text-gray-500">
-                    <strong>Renewal Date:</strong>{' '}
-                    {new Date(partnership.contract_end).toLocaleDateString('en-US', {
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
-                  </p>
-                </div>
-              )}
+              <div className="mt-6 pt-4 border-t border-gray-100">
+                <p className="text-sm text-gray-500">
+                  <strong>Dashboard Active Since:</strong>{' '}
+                  {partnership.contract_start
+                    ? new Date(partnership.contract_start).toLocaleDateString('en-US', {
+                        month: 'long',
+                        day: 'numeric',
+                        year: 'numeric',
+                      })
+                    : 'Recently'}
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -1904,83 +1919,239 @@ export default function PartnerDashboard() {
             aria-labelledby="tab-blueprint"
             className="space-y-6"
           >
-            {/* Phase Model */}
+            {/* Phase Journey - Vertical Timeline */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-6">Your Partnership Journey</h2>
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-2">A Phased Journey, Not a One-Time Event</h2>
+              <p className="text-sm text-gray-600 mb-6">
+                Real change takes time. Our three-phase model meets your school where you are and grows with you.
+              </p>
 
-              {/* Phase Timeline */}
-              <div className="relative mb-8">
-                <div className="absolute top-6 left-0 right-0 h-1 bg-gray-200 rounded-full" />
-                <div className="relative flex justify-between">
-                  {[
-                    { phase: 'IGNITE', label: 'Phase 1', number: 1 },
-                    { phase: 'ACCELERATE', label: 'Phase 2', number: 2 },
-                    { phase: 'SUSTAIN', label: 'Phase 3', number: 3 },
-                  ].map((p, idx) => {
-                    const isActive = partnership?.contract_phase === p.phase;
-                    const isPast = (
-                      (partnership?.contract_phase === 'ACCELERATE' && p.phase === 'IGNITE') ||
-                      (partnership?.contract_phase === 'SUSTAIN' && (p.phase === 'IGNITE' || p.phase === 'ACCELERATE'))
-                    );
-
+              {/* Vertical Timeline */}
+              <div className="py-4">
+                <div className="space-y-0">
+                  {/* Phase 1: IGNITE */}
+                  {(() => {
+                    const isActive = partnership?.contract_phase === 'IGNITE';
+                    const isPast = partnership?.contract_phase === 'ACCELERATE' || partnership?.contract_phase === 'SUSTAIN';
                     return (
-                      <div key={p.phase} className="flex flex-col items-center">
-                        <div
-                          className={`w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold z-10 transition-all ${
-                            isActive
-                              ? 'bg-[#1e2749] text-white ring-4 ring-[#1e2749]/20'
-                              : isPast
-                              ? 'bg-[#4ecdc4] text-white'
-                              : 'bg-gray-200 text-gray-500'
-                          }`}
-                        >
-                          {isPast ? <Check className="w-6 h-6" /> : p.number}
+                      <div className="flex gap-4 md:gap-6">
+                        <div className="flex flex-col items-center">
+                          <div
+                            className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md ${
+                              isPast ? 'bg-[#4ecdc4] text-white' : ''
+                            }`}
+                            style={!isPast ? { backgroundColor: '#ffba06', color: '#1e2749' } : undefined}
+                          >
+                            {isPast ? <Check className="w-6 h-6" /> : '1'}
+                          </div>
+                          <div className="w-1 flex-1 mt-2" style={{ backgroundColor: isPast ? '#4ecdc4' : '#ffba06' }} />
                         </div>
-                        <span className={`mt-2 text-sm font-medium ${isActive ? 'text-[#1e2749]' : 'text-gray-500'}`}>
-                          {p.phase}
-                        </span>
-                        {isActive && (
-                          <span className="text-xs text-[#4ecdc4] font-medium">Current</span>
-                        )}
+                        <div className="flex-1 pb-8">
+                          <div
+                            className={`bg-white rounded-xl p-5 md:p-6 shadow-md ${
+                              isActive ? 'ring-2 ring-[#4ecdc4]' : ''
+                            }`}
+                            style={{ border: `2px solid ${isActive ? '#4ecdc4' : '#ffba06'}` }}
+                          >
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <span
+                                className="inline-block px-3 py-1 text-xs font-bold rounded-full"
+                                style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                              >
+                                Start Here
+                              </span>
+                              <h3 className="text-lg md:text-xl font-bold text-[#1e2749]">IGNITE</h3>
+                              {isActive && (
+                                <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">
+                                  YOU ARE HERE
+                                </span>
+                              )}
+                              {isPast && (
+                                <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4]/20 text-[#4ecdc4] text-xs font-bold rounded flex items-center gap-1">
+                                  <Check className="w-3 h-3" /> Complete
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>
+                              Leadership + Pilot Group
+                            </p>
+                            <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#fffbeb' }}>
+                              <span className="text-xs font-medium text-[#1e2749]">Awareness</span>
+                              <ArrowRight className="w-4 h-4" style={{ color: '#ffba06' }} />
+                              <span className="text-xs font-bold" style={{ color: '#ffba06' }}>Buy-in</span>
+                            </div>
+                            <p className="text-sm mb-3 text-gray-600">
+                              Build buy-in with your leadership team and a pilot group of 10-25 educators. See early wins. Lay the foundation for school-wide change.
+                            </p>
+                            <div className="mb-3 pt-3 border-t border-gray-200">
+                              <p className="text-xs font-bold mb-2 text-[#1e2749]">What&apos;s Included:</p>
+                              <ul className="space-y-1">
+                                {['2 On-Campus Observation Days', '4 Virtual Strategy Sessions', '2 Executive Impact Sessions', 'Learning Hub access for pilot group', 'Leadership Dashboard'].map((item) => (
+                                  <li key={item} className="flex items-center gap-1.5 text-xs text-gray-600">
+                                    <Check className="w-3 h-3 flex-shrink-0" style={{ color: '#ffba06' }} />
+                                    {item}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                            <p className="text-xs text-gray-400">Typical timeline: One semester to one year</p>
+                          </div>
+                        </div>
                       </div>
                     );
-                  })}
+                  })()}
+
+                  {/* Phase 2: ACCELERATE */}
+                  {(() => {
+                    const isActive = partnership?.contract_phase === 'ACCELERATE';
+                    const isPast = partnership?.contract_phase === 'SUSTAIN';
+                    const isFuture = partnership?.contract_phase === 'IGNITE';
+                    return (
+                      <div className="flex gap-4 md:gap-6">
+                        <div className="flex flex-col items-center">
+                          <div
+                            className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md ${
+                              isPast ? 'bg-[#4ecdc4] text-white' : isFuture ? 'bg-gray-200 text-gray-500' : ''
+                            }`}
+                            style={!isPast && !isFuture ? { backgroundColor: '#80a4ed', color: '#ffffff' } : undefined}
+                          >
+                            {isPast ? <Check className="w-6 h-6" /> : '2'}
+                          </div>
+                          <div
+                            className="w-1 flex-1 mt-2"
+                            style={{ backgroundColor: isPast ? '#4ecdc4' : isFuture ? '#e5e7eb' : '#80a4ed' }}
+                          />
+                        </div>
+                        <div className="flex-1 pb-8">
+                          <div
+                            className={`bg-white rounded-xl p-5 md:p-6 shadow-md ${
+                              isActive ? 'ring-2 ring-[#4ecdc4]' : ''
+                            } ${isFuture ? 'opacity-75' : ''}`}
+                            style={{ border: `2px solid ${isFuture ? '#e5e7eb' : '#80a4ed'}` }}
+                          >
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <span
+                                className="inline-block px-3 py-1 text-xs font-bold rounded-full"
+                                style={{ backgroundColor: isFuture ? '#e5e7eb' : '#80a4ed', color: isFuture ? '#6b7280' : '#ffffff' }}
+                              >
+                                Scale
+                              </span>
+                              <h3 className="text-lg md:text-xl font-bold text-[#1e2749]">ACCELERATE</h3>
+                              {isActive && (
+                                <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">
+                                  YOU ARE HERE
+                                </span>
+                              )}
+                              {isPast && (
+                                <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4]/20 text-[#4ecdc4] text-xs font-bold rounded flex items-center gap-1">
+                                  <Check className="w-3 h-3" /> Complete
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Full Staff</p>
+                            <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0f9ff' }}>
+                              <span className="text-xs font-medium text-[#1e2749]">Buy-in</span>
+                              <ArrowRight className="w-4 h-4" style={{ color: '#80a4ed' }} />
+                              <span className="text-xs font-bold" style={{ color: '#80a4ed' }}>Action</span>
+                            </div>
+                            <p className="text-sm mb-3 text-gray-600">
+                              Expand support to your full staff. Every teacher, para, and coach gets access. Strategies get implemented school-wide, not just talked about.
+                            </p>
+                            <div className="mb-3 pt-3 border-t border-gray-200">
+                              <p className="text-xs font-bold mb-2 text-[#1e2749]">What&apos;s Included:</p>
+                              <p className="text-xs italic mb-1.5" style={{ color: '#80a4ed' }}>Everything in IGNITE, plus:</p>
+                              <ul className="space-y-1">
+                                {['Learning Hub access for ALL staff', '4 Executive Impact Sessions', 'Teachers Deserve It book for every educator', 'Retention tracking tools'].map((item) => (
+                                  <li key={item} className="flex items-center gap-1.5 text-xs text-gray-600">
+                                    <Check className="w-3 h-3 flex-shrink-0" style={{ color: '#80a4ed' }} />
+                                    {item}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                            <p className="text-xs text-gray-400">Typical timeline: 1-3 years (many schools stay here)</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Phase 3: SUSTAIN */}
+                  {(() => {
+                    const isActive = partnership?.contract_phase === 'SUSTAIN';
+                    const isFuture = partnership?.contract_phase === 'IGNITE' || partnership?.contract_phase === 'ACCELERATE';
+                    return (
+                      <div className="flex gap-4 md:gap-6">
+                        <div className="flex flex-col items-center">
+                          <div
+                            className={`w-12 h-12 md:w-14 md:h-14 rounded-full flex items-center justify-center text-xl font-bold flex-shrink-0 shadow-md ${
+                              isFuture ? 'bg-gray-200 text-gray-500' : ''
+                            }`}
+                            style={!isFuture ? { backgroundColor: '#abc4ab', color: '#1e2749' } : undefined}
+                          >
+                            3
+                          </div>
+                        </div>
+                        <div className="flex-1">
+                          <div
+                            className={`bg-white rounded-xl p-5 md:p-6 shadow-md ${
+                              isActive ? 'ring-2 ring-[#4ecdc4]' : ''
+                            } ${isFuture ? 'opacity-75' : ''}`}
+                            style={{ border: `2px solid ${isFuture ? '#e5e7eb' : '#abc4ab'}` }}
+                          >
+                            <div className="flex flex-wrap items-center gap-2 mb-2">
+                              <span
+                                className="inline-block px-3 py-1 text-xs font-bold rounded-full"
+                                style={{ backgroundColor: isFuture ? '#e5e7eb' : '#abc4ab', color: isFuture ? '#6b7280' : '#1e2749' }}
+                              >
+                                Embed
+                              </span>
+                              <h3 className="text-lg md:text-xl font-bold text-[#1e2749]">SUSTAIN</h3>
+                              {isActive && (
+                                <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">
+                                  YOU ARE HERE
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Embedded Systems</p>
+                            <div className="inline-flex items-center gap-2 mb-3 py-2 px-3 rounded-lg" style={{ backgroundColor: '#f0fff4' }}>
+                              <span className="text-xs font-medium text-[#1e2749]">Action</span>
+                              <ArrowRight className="w-4 h-4" style={{ color: '#abc4ab' }} />
+                              <span className="text-xs font-bold" style={{ color: '#22c55e' }}>Identity</span>
+                            </div>
+                            <p className="text-sm mb-3 text-gray-600">
+                              Wellness becomes part of your school&apos;s identity. Systems sustain through staff turnover. Your school becomes a model for others.
+                            </p>
+                            <div className="mb-3 pt-3 border-t border-gray-200">
+                              <p className="text-xs font-bold mb-2 text-[#1e2749]">What&apos;s Included:</p>
+                              <p className="text-xs italic mb-1.5" style={{ color: '#abc4ab' }}>Everything in ACCELERATE, plus:</p>
+                              <ul className="space-y-1">
+                                {['Desi AI Assistant (24/7 support)', 'Advanced analytics', 'Ongoing partnership support'].map((item) => (
+                                  <li key={item} className="flex items-center gap-1.5 text-xs text-gray-600">
+                                    <Check className="w-3 h-3 flex-shrink-0" style={{ color: '#abc4ab' }} />
+                                    {item}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                            <p className="text-xs text-gray-400">Typical timeline: Ongoing partnership</p>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 
-              {/* Phase Descriptions */}
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className={`p-4 rounded-lg border-2 ${partnership?.contract_phase === 'IGNITE' ? 'border-[#1e2749] bg-[#1e2749]/5' : 'border-gray-100 bg-gray-50'}`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Zap className="w-5 h-5 text-amber-500" />
-                    <h3 className="font-semibold text-[#1e2749]">IGNITE</h3>
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    Foundation building. Hub onboarding, baseline data collection, first observation cycle, initial virtual sessions. Your team is getting started with TDI strategies.
-                  </p>
-                </div>
-                <div className={`p-4 rounded-lg border-2 ${partnership?.contract_phase === 'ACCELERATE' ? 'border-[#1e2749] bg-[#1e2749]/5' : 'border-gray-100 bg-gray-50'}`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <TrendingUp className="w-5 h-5 text-blue-500" />
-                    <h3 className="font-semibold text-[#1e2749]">ACCELERATE</h3>
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    Expanding implementation. Growth Groups based on observation data, multiple observation cycles, deeper Hub engagement, mid-year progress review.
-                  </p>
-                </div>
-                <div className={`p-4 rounded-lg border-2 ${partnership?.contract_phase === 'SUSTAIN' ? 'border-[#1e2749] bg-[#1e2749]/5' : 'border-gray-100 bg-gray-50'}`}>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className="w-5 h-5 text-teal-500" />
-                    <h3 className="font-semibold text-[#1e2749]">SUSTAIN</h3>
-                  </div>
-                  <p className="text-sm text-gray-600">
-                    Building internal capacity. Peer observation circles, teacher-leader pathways, annual impact report, long-term sustainability planning.
-                  </p>
-                </div>
+              {/* Footer Note */}
+              <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
+                <p className="text-sm text-[#1e2749]">
+                  <strong>Every phase</strong> includes support for teachers, paraprofessionals, instructional coaches, and administrators. We meet each role where they are.
+                </p>
               </div>
             </div>
 
-            {/* Contract Deliverables */}
+            {/* Your Partnership Includes - Dynamic Table */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Your Partnership Includes</h2>
               <div className="overflow-x-auto">
@@ -1988,7 +2159,8 @@ export default function PartnerDashboard() {
                   <thead>
                     <tr className="border-b border-gray-200">
                       <th className="text-left py-3 px-4 font-medium text-gray-500">Deliverable</th>
-                      <th className="text-center py-3 px-4 font-medium text-gray-500">Included</th>
+                      <th className="text-center py-3 px-4 font-medium text-gray-500">Your Contract</th>
+                      <th className="text-center py-3 px-4 font-medium text-gray-500">Delivered</th>
                       <th className="text-center py-3 px-4 font-medium text-gray-500">Status</th>
                     </tr>
                   </thead>
@@ -1996,8 +2168,9 @@ export default function PartnerDashboard() {
                     <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 text-[#1e2749]">Learning Hub Memberships</td>
                       <td className="py-3 px-4 text-center font-medium">{staffStats.total}</td>
+                      <td className="py-3 px-4 text-center text-gray-600">{staffStats.hubLoggedIn} active</td>
                       <td className="py-3 px-4 text-center">
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#4ecdc4]/20 text-[#4ecdc4] rounded-full text-xs font-medium">
                           <Check className="w-3 h-3" /> Active
                         </span>
                       </td>
@@ -2005,36 +2178,67 @@ export default function PartnerDashboard() {
                     <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 text-[#1e2749]">On-Site Observation Days</td>
                       <td className="py-3 px-4 text-center font-medium">{partnership?.observation_days_total ?? 0}</td>
+                      <td className="py-3 px-4 text-center text-gray-600">{partnership?.observation_days_completed ?? 0} complete</td>
                       <td className="py-3 px-4 text-center">
-                        <span className="text-gray-600">{partnership?.observation_days_completed ?? 0} Complete</span>
+                        {(partnership?.observation_days_completed ?? 0) > 0 ? (
+                          <span className="inline-flex items-center px-2 py-1 bg-[#1e2749]/10 text-[#1e2749] rounded-full text-xs font-medium">
+                            In Progress
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
+                            Not Started
+                          </span>
+                        )}
                       </td>
                     </tr>
                     <tr className="border-b border-gray-100">
-                      <td className="py-3 px-4 text-[#1e2749]">Virtual Sessions</td>
-                      <td className="py-3 px-4 text-center font-medium">{partnership?.virtual_sessions_total || 0}</td>
+                      <td className="py-3 px-4 text-[#1e2749]">Virtual Strategy Sessions</td>
+                      <td className="py-3 px-4 text-center font-medium">{partnership?.virtual_sessions_total ?? 0}</td>
+                      <td className="py-3 px-4 text-center text-gray-600">{virtualSessionsCompleted} complete</td>
                       <td className="py-3 px-4 text-center">
-                        <span className="text-gray-600">{virtualSessionsCompleted} Complete</span>
+                        {virtualSessionsCompleted > 0 ? (
+                          <span className="inline-flex items-center px-2 py-1 bg-[#1e2749]/10 text-[#1e2749] rounded-full text-xs font-medium">
+                            In Progress
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+                            Upcoming
+                          </span>
+                        )}
                       </td>
                     </tr>
                     <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 text-[#1e2749]">Executive Impact Sessions</td>
-                      <td className="py-3 px-4 text-center font-medium">{partnership?.executive_sessions_total || 0}</td>
+                      <td className="py-3 px-4 text-center font-medium">{partnership?.executive_sessions_total ?? 0}</td>
+                      <td className="py-3 px-4 text-center text-gray-600">0 complete</td>
                       <td className="py-3 px-4 text-center">
-                        <span className="text-gray-600">0 Complete</span>
+                        <span className="inline-flex items-center px-2 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">
+                          Upcoming
+                        </span>
                       </td>
                     </tr>
                     <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 text-[#1e2749]">Personalized Love Notes</td>
                       <td className="py-3 px-4 text-center font-medium">Per observation</td>
+                      <td className="py-3 px-4 text-center text-gray-600">{loveNotes} delivered</td>
                       <td className="py-3 px-4 text-center">
-                        <span className="text-gray-600">{loveNotes} Delivered</span>
+                        {loveNotes > 0 ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#4ecdc4]/20 text-[#4ecdc4] rounded-full text-xs font-medium">
+                            <Check className="w-3 h-3" /> Active
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-xs font-medium">
+                            Not Started
+                          </span>
+                        )}
                       </td>
                     </tr>
                     <tr>
                       <td className="py-3 px-4 text-[#1e2749]">Partnership Dashboard</td>
                       <td className="py-3 px-4 text-center font-medium">1</td>
+                      <td className="py-3 px-4 text-center text-gray-600">1 active</td>
                       <td className="py-3 px-4 text-center">
-                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#4ecdc4]/20 text-[#4ecdc4] rounded-full text-xs font-medium">
                           <Check className="w-3 h-3" /> Active
                         </span>
                       </td>
@@ -2044,9 +2248,9 @@ export default function PartnerDashboard() {
               </div>
             </div>
 
-            {/* TDI Approach */}
+            {/* TDI's Approach */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Our Approach</h2>
+              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">TDI&apos;s Approach</h2>
               <div className="grid sm:grid-cols-2 gap-4 mb-6">
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -2054,7 +2258,7 @@ export default function PartnerDashboard() {
                   </div>
                   <div>
                     <p className="font-medium text-[#1e2749]">65% implementation rate</p>
-                    <p className="text-sm text-gray-500">vs 10% industry average — because we don&apos;t do one-and-done PD</p>
+                    <p className="text-sm text-gray-500">vs 10% industry average</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -2063,7 +2267,7 @@ export default function PartnerDashboard() {
                   </div>
                   <div>
                     <p className="font-medium text-[#1e2749]">Bottom-up, not top-down</p>
-                    <p className="text-sm text-gray-500">We equip teachers with strategies they actually want to use</p>
+                    <p className="text-sm text-gray-500">Strategies teachers actually want to use</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -2072,7 +2276,7 @@ export default function PartnerDashboard() {
                   </div>
                   <div>
                     <p className="font-medium text-[#1e2749]">Ongoing support</p>
-                    <p className="text-sm text-gray-500">Personalized Love Notes, virtual sessions, observations, and your dashboard</p>
+                    <p className="text-sm text-gray-500">Love Notes, virtual sessions, observations, dashboard</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -2081,12 +2285,13 @@ export default function PartnerDashboard() {
                   </div>
                   <div>
                     <p className="font-medium text-[#1e2749]">Measurable outcomes</p>
-                    <p className="text-sm text-gray-500">Stress reduction, planning time savings, retention improvement</p>
+                    <p className="text-sm text-gray-500">Tracked on your dashboard</p>
                   </div>
                 </div>
               </div>
               <Link
                 href="/how-we-partner"
+                target="_blank"
                 className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700"
               >
                 Learn more about how we partner
