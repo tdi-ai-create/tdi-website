@@ -324,9 +324,10 @@ export default function OnboardingPage() {
 
               {/* Main name */}
               <h1
-                className="text-[44px] md:text-[64px] font-bold"
+                className="text-[44px] md:text-[64px]"
                 style={{
-                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: 800,
                   color: 'white',
                   letterSpacing: '0.04em',
                   lineHeight: 1,
