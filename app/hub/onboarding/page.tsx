@@ -21,7 +21,9 @@ import {
   Lightbulb,
   Compass,
   CheckCheck,
+  ArrowLeft,
 } from 'lucide-react';
+import Link from 'next/link';
 import AvatarPicker from '@/components/hub/AvatarPicker';
 import { getSupabase } from '@/lib/supabase';
 import { getCurrentUser } from '@/lib/hub-auth';
@@ -295,6 +297,22 @@ export default function OnboardingPage() {
             className="min-h-screen flex flex-col items-center justify-center p-6 text-center relative"
             style={{ backgroundColor: '#2B3A67' }}
           >
+            {/* Back to main site link */}
+            <Link
+              href="/"
+              className="absolute top-4 left-5 inline-flex items-center gap-1.5 transition-opacity"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '13px',
+                color: 'rgba(255, 255, 255, 0.6)',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = 'rgba(255, 255, 255, 0.9)')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)')}
+            >
+              <ArrowLeft size={14} />
+              Back to TeachersDeserveIt.com
+            </Link>
+
             {/* Logo lockup */}
             <div className="flex flex-col items-center">
               {/* Branded label */}
@@ -860,10 +878,24 @@ export default function OnboardingPage() {
       {/* Step 1: Pick Your Role */}
       {step === 1 && (
         <div
-          className="min-h-screen p-6 md:p-8"
+          className="min-h-screen p-6 md:p-8 relative"
           style={{ backgroundColor: '#FFFFFF' }}
         >
-          <div className="max-w-lg mx-auto">
+          {/* Back to main site link */}
+          <Link
+            href="/"
+            className="absolute top-4 left-5 inline-flex items-center gap-1.5 transition-colors hover:text-[#2B3A67]"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '13px',
+              color: '#9CA3AF',
+            }}
+          >
+            <ArrowLeft size={14} />
+            Back to TeachersDeserveIt.com
+          </Link>
+
+          <div className="max-w-lg mx-auto pt-8">
             <ProgressBar currentStep={1} />
 
             <h1
@@ -949,10 +981,24 @@ export default function OnboardingPage() {
       {/* Step 2: Pick Your Goals */}
       {step === 2 && (
         <div
-          className="min-h-screen p-6 md:p-8"
+          className="min-h-screen p-6 md:p-8 relative"
           style={{ backgroundColor: '#FFFFFF' }}
         >
-          <div className="max-w-2xl mx-auto">
+          {/* Back to main site link */}
+          <Link
+            href="/"
+            className="absolute top-4 left-5 inline-flex items-center gap-1.5 transition-colors hover:text-[#2B3A67]"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '13px',
+              color: '#9CA3AF',
+            }}
+          >
+            <ArrowLeft size={14} />
+            Back to TeachersDeserveIt.com
+          </Link>
+
+          <div className="max-w-2xl mx-auto pt-8">
             <ProgressBar currentStep={2} />
 
             <h1
@@ -1074,10 +1120,24 @@ export default function OnboardingPage() {
       {/* Step 3: Pick Your Avatar */}
       {step === 3 && (
         <div
-          className="min-h-screen p-6 md:p-8"
+          className="min-h-screen p-6 md:p-8 relative"
           style={{ backgroundColor: '#FFFFFF' }}
         >
-          <div className="max-w-xl mx-auto">
+          {/* Back to main site link */}
+          <Link
+            href="/"
+            className="absolute top-4 left-5 inline-flex items-center gap-1.5 transition-colors hover:text-[#2B3A67]"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '13px',
+              color: '#9CA3AF',
+            }}
+          >
+            <ArrowLeft size={14} />
+            Back to TeachersDeserveIt.com
+          </Link>
+
+          <div className="max-w-xl mx-auto pt-8">
             <ProgressBar currentStep={3} />
 
             <h1
@@ -1158,10 +1218,24 @@ export default function OnboardingPage() {
       {/* Step 4: Quick Check-In */}
       {step === 4 && (
         <div
-          className="min-h-screen p-6 md:p-8"
+          className="min-h-screen p-6 md:p-8 relative"
           style={{ backgroundColor: '#FFFFFF' }}
         >
-          <div className="max-w-lg mx-auto">
+          {/* Back to main site link */}
+          <Link
+            href="/"
+            className="absolute top-4 left-5 inline-flex items-center gap-1.5 transition-colors hover:text-[#2B3A67]"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '13px',
+              color: '#9CA3AF',
+            }}
+          >
+            <ArrowLeft size={14} />
+            Back to TeachersDeserveIt.com
+          </Link>
+
+          <div className="max-w-lg mx-auto pt-8">
             <ProgressBar currentStep={4} />
 
             <h1
@@ -1202,15 +1276,40 @@ export default function OnboardingPage() {
               <div className="flex gap-2 justify-between">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => {
                   const isSelected = stressScore === num;
+                  // Color gradient based on stress level
+                  const getButtonColors = (n: number, selected: boolean) => {
+                    if (n <= 2) {
+                      return selected
+                        ? { bg: '#16A34A', text: 'white' }
+                        : { bg: '#DCFCE7', text: '#16A34A' };
+                    } else if (n <= 4) {
+                      return selected
+                        ? { bg: '#A16207', text: 'white' }
+                        : { bg: '#FEF9C3', text: '#A16207' };
+                    } else if (n <= 6) {
+                      return selected
+                        ? { bg: '#D97706', text: 'white' }
+                        : { bg: '#FFF8E7', text: '#D97706' };
+                    } else if (n <= 8) {
+                      return selected
+                        ? { bg: '#EA580C', text: 'white' }
+                        : { bg: '#FEE2E2', text: '#EA580C' };
+                    } else {
+                      return selected
+                        ? { bg: '#DC2626', text: 'white' }
+                        : { bg: '#FEE2E2', text: '#DC2626' };
+                    }
+                  };
+                  const colors = getButtonColors(num, isSelected);
                   return (
                     <button
                       key={num}
                       onClick={() => setStressScore(num)}
                       className="w-10 h-10 rounded-lg font-semibold transition-all focus:outline-none focus:ring-2 focus:ring-offset-2"
                       style={{
-                        backgroundColor: isSelected ? '#E8B84B' : 'white',
-                        color: isSelected ? 'white' : '#2B3A67',
-                        border: isSelected ? 'none' : '1.5px solid #E5E7EB',
+                        backgroundColor: colors.bg,
+                        color: colors.text,
+                        border: isSelected ? 'none' : '1.5px solid transparent',
                         fontFamily: "'DM Sans', sans-serif",
                       }}
                       aria-label={`Stress level ${num}`}
