@@ -3,6 +3,7 @@
 import { usePathname } from 'next/navigation';
 import HubAuthGuard from '@/components/hub/HubAuthGuard';
 import HubNavBar from '@/components/hub/HubNavBar';
+import HubFooter from '@/components/hub/HubFooter';
 import { useHub } from '@/components/hub/HubContext';
 
 // Routes that should NOT show the Hub nav bar
@@ -16,15 +17,16 @@ function HubLayoutInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div
-      className="min-h-screen"
+      className="min-h-screen flex flex-col"
       style={{ backgroundColor: '#FAFAF8' }}
     >
       {showNav && (
         <HubNavBar profile={profile} userEmail={user?.email} />
       )}
-      <main className={showNav ? 'pt-[60px]' : ''}>
+      <main className={`flex-1 ${showNav ? 'pt-[60px]' : ''}`}>
         {children}
       </main>
+      {showNav && <HubFooter />}
     </div>
   );
 }
