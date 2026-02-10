@@ -11,7 +11,7 @@ type OnboardingStep = 0 | 1 | 2 | 3 | 4 | 5;
 
 type Role = 'classroom_teacher' | 'para' | 'coach' | 'school_leader' | 'district_staff' | 'other';
 
-type GoalType = 'reduce_stress' | 'save_time' | 'classroom_management' | 'find_joy' | 'team_growth' | 'role_support';
+type GoalType = 'reduce_stress' | 'save_time' | 'classroom_management' | 'find_joy' | 'team_growth' | 'role_support' | 'stop_bringing_work_home' | 'feel_like_myself' | 'make_it_to_summer' | 'all_of_the_above';
 
 const ROLES: { value: Role; label: string; subtitle: string }[] = [
   { value: 'classroom_teacher', label: 'Classroom Teacher', subtitle: 'Any grade, any subject' },
@@ -29,7 +29,14 @@ const GOALS: { value: GoalType; label: string }[] = [
   { value: 'find_joy', label: 'Find the joy again' },
   { value: 'team_growth', label: 'Grow as a leader' },
   { value: 'role_support', label: 'Support my team' },
+  { value: 'stop_bringing_work_home', label: 'Stop bringing work home' },
+  { value: 'feel_like_myself', label: 'Feel like myself again' },
+  { value: 'make_it_to_summer', label: 'Make it to summer' },
+  { value: 'all_of_the_above', label: 'Honestly? All of the above' },
 ];
+
+// All goals except "all_of_the_above" for the select-all behavior
+const ALL_INDIVIDUAL_GOALS: GoalType[] = GOALS.filter(g => g.value !== 'all_of_the_above').map(g => g.value);
 
 export default function OnboardingPage() {
   const router = useRouter();
@@ -185,11 +192,32 @@ export default function OnboardingPage() {
   };
 
   const toggleGoal = (goal: GoalType) => {
-    setSelectedGoals((prev) =>
-      prev.includes(goal)
-        ? prev.filter((g) => g !== goal)
-        : [...prev, goal]
-    );
+    setSelectedGoals((prev) => {
+      // Special handling for "All of the above"
+      if (goal === 'all_of_the_above') {
+        // If already selected, deselect all
+        if (prev.includes('all_of_the_above')) {
+          return [];
+        }
+        // Select all goals including "all_of_the_above"
+        return [...ALL_INDIVIDUAL_GOALS, 'all_of_the_above'];
+      }
+
+      // For individual goals
+      if (prev.includes(goal)) {
+        // Deselecting an individual goal also deselects "all_of_the_above"
+        return prev.filter((g) => g !== goal && g !== 'all_of_the_above');
+      } else {
+        // Selecting an individual goal
+        const newGoals = [...prev, goal];
+        // Check if all individual goals are now selected
+        const allIndividualSelected = ALL_INDIVIDUAL_GOALS.every((g) => newGoals.includes(g));
+        if (allIndividualSelected) {
+          return [...newGoals, 'all_of_the_above'];
+        }
+        return newGoals;
+      }
+    });
   };
 
   // Progress bar component
@@ -517,10 +545,22 @@ export default function OnboardingPage() {
             </h1>
 
             <p
-              className="text-gray-500 mb-8"
+              className="text-gray-500 mb-1"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
               This helps us suggest the right stuff. You can change it later.
+            </p>
+
+            <p
+              className="text-center mb-8 max-w-md mx-auto"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '13px',
+                color: '#9CA3AF',
+                marginTop: '4px',
+              }}
+            >
+              Wear multiple hats? Pick the one that fits most days. You can update this anytime in Settings.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-8">
@@ -609,9 +649,9 @@ export default function OnboardingPage() {
                     onClick={() => toggleGoal(goal.value)}
                     className="px-4 py-3 rounded-full transition-all focus:outline-none focus:ring-2 focus:ring-offset-2"
                     style={{
-                      backgroundColor: isSelected ? '#E8B84B' : 'white',
-                      color: isSelected ? 'white' : '#2B3A67',
-                      border: isSelected ? '2px solid #E8B84B' : '1px solid #E5E5E5',
+                      backgroundColor: isSelected ? '#E8B84B' : '#FFFFFF',
+                      color: isSelected ? '#FFFFFF' : '#2B3A67',
+                      border: isSelected ? 'none' : '1.5px solid #D1D5DB',
                       fontFamily: "'DM Sans', sans-serif",
                       fontSize: '14px',
                       fontWeight: 500,
