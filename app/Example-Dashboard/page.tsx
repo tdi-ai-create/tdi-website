@@ -1822,20 +1822,29 @@ export default function ExampleDashboard() {
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                 {[
-                  { icon: Mail, label: 'Newsletter', value: 197 },
-                  { icon: BookOpen, label: 'Blog Readers', value: 131 },
-                  { icon: Headphones, label: 'Podcast', value: 78 },
-                  { icon: Users, label: 'Community', value: 48 },
-                  { icon: FileText, label: 'Resources', value: 361 },
-                  { icon: GraduationCap, label: 'Courses', value: 224 },
+                  { icon: Mail, label: 'Newsletter', value: 197, stat: '32% higher strategy adoption', link: 'https://teachersdeserveit.com/newsletter' },
+                  { icon: BookOpen, label: 'Blog Readers', value: 131, stat: '2.5x more likely to try new strategies', link: 'https://teachersdeserveit.com/blog' },
+                  { icon: Headphones, label: 'Podcast', value: 78, stat: '28% higher implementation rates', link: 'https://teachersdeserveit.com/podcast' },
+                  { icon: Users, label: 'Community', value: 48, stat: '45% report feeling less isolated', link: 'https://teachersdeserveit.com/community' },
+                  { icon: FileText, label: 'Resources', value: 361, stat: '3x more classroom tools used', link: 'https://teachersdeserveit.com/resources' },
+                  { icon: GraduationCap, label: 'Courses', value: 224, stat: '65% completion vs 10% industry avg', link: 'https://teachersdeserveit.com/courses' },
                 ].map((channel) => (
-                  <div key={channel.label} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                    <channel.icon className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                    <div className="min-w-0">
+                  <a
+                    key={channel.label}
+                    href={channel.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#4ecdc4]/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-transparent hover:border-[#4ecdc4]/30"
+                  >
+                    <channel.icon className="w-4 h-4 text-gray-400 group-hover:text-[#4ecdc4] flex-shrink-0 transition-colors" />
+                    <div className="min-w-0 flex-1">
                       <p className="text-sm font-bold text-[#1e2749]">{channel.value}</p>
                       <p className="text-xs text-gray-500 truncate">{channel.label}</p>
+                      <p className="text-[10px] text-[#4ecdc4] font-medium mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        ↗ {channel.stat}
+                      </p>
                     </div>
-                  </div>
+                  </a>
                 ))}
               </div>
             </div>
