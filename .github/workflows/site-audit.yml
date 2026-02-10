@@ -1,0 +1,51 @@
+name: TDI Site Audit
+
+on:
+  # Run after successful Vercel deployment
+  deployment_status:
+  # Run weekly on Mondays at 8am CST (14:00 UTC)
+  schedule:
+    - cron: '0 14 * * 1'
+  # Manual trigger
+  workflow_dispatch:
+
+jobs:
+  audit:
+    # Only run on successful deployments, scheduled runs, or manual triggers
+    if: github.event.deployment_status.state == 'success' || github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: ./audit
+        run: |
+          npm install
+          npx playwright install chromium --with-deps
+
+      - name: Run Site Audit
+        working-directory: ./audit
+        run: npm run audit:ci
+        continue-on-error: true
+        id: audit
+
+      - name: Upload Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tdi-audit-report-${{ github.run_number }}
+          path: ./audit/reports/
+          retention-days: 30
+
+      - name: Check audit result
+        if: steps.audit.outcome == 'failure'
+        run: |
+          echo "Site audit found critical errors. Check the uploaded report for details."
+          exit 1
