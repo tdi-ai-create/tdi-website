@@ -78,9 +78,10 @@ export default function HubLoginPage() {
           {/* Logo */}
           <div className="text-center mb-8">
             <h1
-              className="text-[28px] font-bold mb-2"
+              className="font-bold mb-2"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: '28px',
                 color: '#2B3A67',
               }}
             >
@@ -99,9 +100,10 @@ export default function HubLoginPage() {
             {!isSent ? (
               <>
                 <h2
-                  className="text-xl font-semibold mb-6 text-center"
+                  className="font-semibold mb-6 text-center"
                   style={{
                     fontFamily: "'Source Serif 4', Georgia, serif",
+                    fontSize: '18px',
                     color: '#2B3A67',
                   }}
                 >
@@ -175,9 +177,10 @@ export default function HubLoginPage() {
                 </div>
 
                 <h2
-                  className="text-xl font-semibold mb-4"
+                  className="font-semibold mb-4"
                   style={{
                     fontFamily: "'Source Serif 4', Georgia, serif",
+                    fontSize: '18px',
                     color: '#2B3A67',
                   }}
                 >

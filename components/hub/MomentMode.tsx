@@ -168,9 +168,10 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
         {state === 'entry' && (
           <div className="text-center">
             <h2
-              className="text-2xl font-semibold mb-4"
+              className="font-semibold mb-4"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: '24px',
                 color: '#2B3A67',
               }}
             >
@@ -334,9 +335,10 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
             </button>
 
             <h3
-              className="text-xl font-semibold mb-6"
+              className="font-semibold mb-6"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: '18px',
                 color: '#2B3A67',
               }}
             >
@@ -396,9 +398,10 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
             </button>
 
             <h3
-              className="text-xl font-semibold mb-6"
+              className="font-semibold mb-6"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: '18px',
                 color: '#2B3A67',
               }}
             >

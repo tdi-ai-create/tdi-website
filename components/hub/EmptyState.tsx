@@ -31,9 +31,10 @@ export default function EmptyState({
         <Icon size={32} style={{ color: '#2B3A67' }} />
       </div>
       <h3
-        className="text-xl font-semibold mb-3"
+        className="font-semibold mb-3"
         style={{
           fontFamily: "'Source Serif 4', Georgia, serif",
+          fontSize: '18px',
           color: '#2B3A67',
         }}
       >

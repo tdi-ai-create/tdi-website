@@ -179,9 +179,10 @@ export default function NotificationSettingsPage() {
       {/* Header */}
       <div className="mb-8">
         <h1
-          className="text-[24px] md:text-[28px] font-bold mb-2"
+          className="font-bold mb-2"
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
+            fontSize: '28px',
             color: '#2B3A67',
           }}
         >

@@ -89,9 +89,10 @@ export default function CourseCard({
 
         {/* Title */}
         <h3
-          className="text-base font-bold mb-2 line-clamp-2"
+          className="font-bold mb-2 line-clamp-2"
           style={{
             fontFamily: "'DM Sans', sans-serif",
+            fontSize: '16px',
             color: '#2B3A67',
           }}
         >

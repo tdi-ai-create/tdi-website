@@ -159,9 +159,10 @@ export default function RequestCenterPage() {
       {/* Header */}
       <div className="mb-8">
         <h1
-          className="text-[24px] md:text-[28px] font-bold mb-2"
+          className="font-bold mb-2"
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
+            fontSize: '28px',
             color: '#2B3A67',
           }}
         >
@@ -188,9 +189,10 @@ export default function RequestCenterPage() {
             <CheckCircle size={32} className="text-green-600" />
           </div>
           <h2
-            className="text-[18px] font-semibold mb-2"
+            className="font-semibold mb-2"
             style={{
               fontFamily: "'Source Serif 4', Georgia, serif",
+              fontSize: '18px',
               color: '#2B3A67',
             }}
           >
@@ -452,9 +454,10 @@ export default function RequestCenterPage() {
       {!isLoadingPrevious && previousRequests.length > 0 && (
         <div className="mt-12">
           <h2
-            className="text-[18px] font-semibold mb-4"
+            className="font-semibold mb-4"
             style={{
               fontFamily: "'Source Serif 4', Georgia, serif",
+              fontSize: '18px',
               color: '#2B3A67',
             }}
           >
@@ -505,6 +508,7 @@ export default function RequestCenterPage() {
                       className="font-medium truncate"
                       style={{
                         fontFamily: "'DM Sans', sans-serif",
+                        fontSize: '16px',
                         color: '#2B3A67',
                       }}
                     >

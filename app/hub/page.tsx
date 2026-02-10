@@ -299,8 +299,8 @@ export default function HubDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1
-              className="text-2xl md:text-[28px] font-semibold text-white mb-2"
-              style={{ fontFamily: "'Source Serif 4', Georgia, serif" }}
+              className="font-semibold text-white mb-2"
+              style={{ fontFamily: "'Source Serif 4', Georgia, serif", fontSize: '28px' }}
             >
               Welcome back, {firstName}
             </h1>
@@ -345,9 +345,10 @@ export default function HubDashboard() {
                 <BookOpen size={20} style={{ color: '#E8B84B' }} />
               </div>
               <h2
-                className="text-lg font-semibold"
+                className="font-semibold"
                 style={{
                   fontFamily: "'Source Serif 4', Georgia, serif",
+                  fontSize: '18px',
                   color: '#2B3A67',
                 }}
               >
@@ -375,9 +376,10 @@ export default function HubDashboard() {
                           {enrollment.course?.category || 'Course'}
                         </span>
                         <h3
-                          className="font-bold text-base"
+                          className="font-bold"
                           style={{
                             fontFamily: "'DM Sans', sans-serif",
+                            fontSize: '16px',
                             color: '#2B3A67',
                           }}
                         >
@@ -455,9 +457,10 @@ export default function HubDashboard() {
                 <Zap size={20} style={{ color: '#E8B84B' }} />
               </div>
               <h2
-                className="text-lg font-semibold"
+                className="font-semibold"
                 style={{
                   fontFamily: "'Source Serif 4', Georgia, serif",
+                  fontSize: '18px',
                   color: '#2B3A67',
                 }}
               >
@@ -471,9 +474,10 @@ export default function HubDashboard() {
                 style={{ borderLeft: '4px solid #E8B84B', backgroundColor: '#FAFAF8' }}
               >
                 <h3
-                  className="font-bold text-base mb-2"
+                  className="font-bold mb-2"
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '16px',
                     color: '#2B3A67',
                   }}
                 >
@@ -593,9 +597,10 @@ export default function HubDashboard() {
             <div className="flex items-center gap-2 mb-4">
               <Sparkles size={18} style={{ color: '#E8B84B' }} />
               <h3
-                className="font-bold text-[15px]"
+                className="font-bold"
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '15px',
                   color: '#2B3A67',
                 }}
               >

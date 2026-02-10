@@ -116,9 +116,10 @@ export default function CertificatesPage() {
       {/* Header */}
       <div className="mb-8">
         <h1
-          className="text-[24px] md:text-[28px] font-bold mb-2"
+          className="font-bold mb-2"
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
+            fontSize: '28px',
             color: '#2B3A67',
           }}
         >
@@ -153,9 +154,10 @@ export default function CertificatesPage() {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <h3
-                    className="text-[16px] font-semibold mb-1"
+                    className="font-semibold mb-1"
                     style={{
                       fontFamily: "'DM Sans', sans-serif",
+                      fontSize: '16px',
                       color: '#2B3A67',
                     }}
                   >

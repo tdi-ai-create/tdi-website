@@ -342,10 +342,10 @@ export default function OnboardingPage() {
 
               {/* Main name */}
               <h1
-                className="text-[44px] md:text-[64px]"
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
                   fontWeight: 800,
+                  fontSize: '44px',
                   color: 'white',
                   letterSpacing: '0.04em',
                   lineHeight: 1,
@@ -690,9 +690,10 @@ export default function OnboardingPage() {
                     <Play size={20} color="white" fill="white" />
                   </div>
                   <h3
-                    className="text-lg font-semibold mb-2"
+                    className="font-semibold mb-2"
                     style={{
                       fontFamily: "'Source Serif 4', Georgia, serif",
+                      fontSize: '18px',
                       color: '#2B3A67',
                     }}
                   >
@@ -726,9 +727,10 @@ export default function OnboardingPage() {
                     <Zap size={20} color="white" />
                   </div>
                   <h3
-                    className="text-lg font-semibold mb-2"
+                    className="font-semibold mb-2"
                     style={{
                       fontFamily: "'Source Serif 4', Georgia, serif",
+                      fontSize: '18px',
                       color: '#2B3A67',
                     }}
                   >
@@ -762,9 +764,10 @@ export default function OnboardingPage() {
                     <Shield size={20} color="white" />
                   </div>
                   <h3
-                    className="text-lg font-semibold mb-2"
+                    className="font-semibold mb-2"
                     style={{
                       fontFamily: "'Source Serif 4', Georgia, serif",
+                      fontSize: '18px',
                       color: '#2B3A67',
                     }}
                   >
@@ -899,9 +902,10 @@ export default function OnboardingPage() {
             <ProgressBar currentStep={1} />
 
             <h1
-              className="text-[24px] md:text-[28px] font-bold mb-2"
+              className="font-bold mb-2"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: '28px',
                 color: '#2B3A67',
               }}
             >
@@ -1002,9 +1006,10 @@ export default function OnboardingPage() {
             <ProgressBar currentStep={2} />
 
             <h1
-              className="text-[24px] md:text-[28px] font-bold mb-2"
+              className="font-bold mb-2"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: '28px',
                 color: '#2B3A67',
               }}
             >
@@ -1141,9 +1146,10 @@ export default function OnboardingPage() {
             <ProgressBar currentStep={3} />
 
             <h1
-              className="text-[24px] md:text-[28px] font-bold mb-2"
+              className="font-bold mb-2"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: '28px',
                 color: '#2B3A67',
               }}
             >
@@ -1239,9 +1245,10 @@ export default function OnboardingPage() {
             <ProgressBar currentStep={4} />
 
             <h1
-              className="text-[24px] md:text-[28px] font-bold mb-2"
+              className="font-bold mb-2"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: '28px',
                 color: '#2B3A67',
               }}
             >
@@ -1395,9 +1402,10 @@ export default function OnboardingPage() {
           </div>
 
           <h1
-            className="text-[28px] md:text-[32px] font-bold mb-6"
+            className="font-bold mb-6"
             style={{
               fontFamily: "'Source Serif 4', Georgia, serif",
+              fontSize: '28px',
               color: 'white',
             }}
           >

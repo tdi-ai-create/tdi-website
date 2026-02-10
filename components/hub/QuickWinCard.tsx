@@ -73,9 +73,10 @@ export default function QuickWinCard({ quickWin }: QuickWinCardProps) {
 
       {/* Title */}
       <h3
-        className="text-base font-bold mb-2"
+        className="font-bold mb-2"
         style={{
           fontFamily: "'DM Sans', sans-serif",
+          fontSize: '16px',
           color: '#2B3A67',
         }}
       >
