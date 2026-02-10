@@ -344,20 +344,20 @@ export default function ExampleDashboard() {
   // District Schools Data - 255 total staff (187 teachers + 68 paras)
   const districtSchools = [
     {
-      id: 'motown-elc',
-      name: 'Motown Early Learning Center',
-      grades: 'PreK-K',
+      id: 'melody-primary',
+      name: 'Melody Primary',
+      grades: 'PreK-2',
       teachers: { total: 16, loggedIn: 15 },
       paras: { total: 14, loggedIn: 9 },
       coursesCompleted: 61,
-      avgStress: 6.1,
+      avgStress: 5.0, // GOLD Wellness Leader - lowest stress is best
       implementationRate: 22,
       observationStatus: 'Scheduled April',
       champion: 'Mrs. Patel',
-      tdiNote: 'Strong early childhood focus. Staff particularly engaged with SEL content.',
+      tdiNote: 'Lowest stress scores in the district! Staff wellness initiatives are a model for others.',
       medals: [
+        { type: 'gold', category: 'Wellness Leader' },
         { type: 'bronze', category: 'Top Learners' },
-        { type: 'bronze', category: 'Wellness Leader' },
         { type: 'bronze', category: 'Implementation' },
         { type: 'bronze', category: 'Retention' },
       ],
@@ -385,20 +385,19 @@ export default function ExampleDashboard() {
       grades: 'K-5',
       teachers: { total: 45, loggedIn: 42 },
       paras: { total: 20, loggedIn: 15 },
-      coursesCompleted: 72,
-      avgStress: 5.2,
-      implementationRate: 34,
+      coursesCompleted: 68, // SILVER Top Learners
+      avgStress: 5.2, // SILVER Wellness Leader
+      implementationRate: 34, // GOLD Implementation
       observationStatus: 'Complete',
       champion: 'Ms. Rivera',
-      tdiNote: 'Leading the district in implementation. Ms. Rivera\'s PLC structure is a model we\'d love to share with other buildings.',
+      tdiNote: 'Most medals in the district (2 golds, 4 silvers). Ms. Rivera\'s PLC structure is a model we\'d love to share with other buildings.',
       medals: [
         { type: 'gold', category: 'Most Engaged' },
-        { type: 'gold', category: 'Top Learners' },
-        { type: 'gold', category: 'Wellness Leader' },
         { type: 'gold', category: 'Implementation' },
-        { type: 'gold', category: 'Resource Champion' },
-        { type: 'gold', category: 'Retention' },
-        { type: 'gold', category: 'Movement Leader' },
+        { type: 'silver', category: 'Top Learners' },
+        { type: 'silver', category: 'Wellness Leader' },
+        { type: 'silver', category: 'Retention' },
+        { type: 'silver', category: 'Movement Leader' },
       ],
       teacherCourses: ['The Differentiation Fix', 'Small Group Mastery', 'Time Management for Teachers'],
       paraCourses: ['Building Strong Teacher-Para Partnerships', 'Small-Group & One-on-One Instruction', 'De-Escalation Strategies'],
@@ -421,15 +420,18 @@ export default function ExampleDashboard() {
       id: 'rhythm-academy',
       name: 'Rhythm Academy',
       grades: 'K-8',
-      teachers: { total: 32, loggedIn: 30 },
+      teachers: { total: 32, loggedIn: 28 }, // 88% = BRONZE Most Engaged
       paras: null,
       coursesCompleted: 58,
       avgStress: 6.4,
       implementationRate: 19,
       observationStatus: 'Scheduled April',
-      champion: null,
-      tdiNote: null,
-      medals: [],
+      champion: 'Ms. Thompson',
+      tdiNote: 'Resource Champion! Staff are downloading and using more materials than any other building.',
+      medals: [
+        { type: 'gold', category: 'Resource Champion' },
+        { type: 'bronze', category: 'Most Engaged' },
+      ],
       teacherCourses: ['Student Engagement Strategies', 'Formative Assessment Toolkit', 'Collaborative Planning'],
       paraCourses: null,
       teacherStaff: [
@@ -442,21 +444,24 @@ export default function ExampleDashboard() {
       paraStaff: null
     },
     {
-      id: 'motown-middle',
-      name: 'Motown Middle School',
+      id: 'crescendo-middle',
+      name: 'Crescendo Middle',
       grades: '6-8',
-      teachers: { total: 28, loggedIn: 26 },
+      teachers: { total: 28, loggedIn: 26 }, // 91% = SILVER Most Engaged
       paras: { total: 10, loggedIn: 7 },
-      coursesCompleted: 65,
-      avgStress: 5.8,
-      implementationRate: 28,
+      coursesCompleted: 72, // GOLD Top Learners
+      avgStress: 5.8, // BRONZE Wellness Leader
+      implementationRate: 28, // SILVER Implementation
       observationStatus: 'Complete',
       champion: 'Mr. Okafor',
-      tdiNote: 'Strong middle school team. Excellent advisory period implementation.',
+      tdiNote: 'Leading in course completion and movement engagement. Strong middle school team (2 golds, 3 silvers, 1 bronze).',
       medals: [
-        { type: 'bronze', category: 'Resource Champion' },
-        { type: 'bronze', category: 'Movement Leader' },
-        { type: 'bronze', category: 'Most Engaged' },
+        { type: 'gold', category: 'Top Learners' },
+        { type: 'gold', category: 'Movement Leader' },
+        { type: 'silver', category: 'Most Engaged' },
+        { type: 'silver', category: 'Implementation' },
+        { type: 'silver', category: 'Resource Champion' },
+        { type: 'bronze', category: 'Wellness Leader' },
       ],
       teacherCourses: ['Classroom Management Reset', 'Student Voice & Choice', 'Advisory Period Design'],
       paraCourses: ['Supporting Students Through Their Daily Schedule', 'Behavior Support in Transitions'],
@@ -475,8 +480,8 @@ export default function ExampleDashboard() {
       ]
     },
     {
-      id: 'crescendo-hs',
-      name: 'Crescendo High School',
+      id: 'tempo-high',
+      name: 'Tempo High',
       grades: '9-12',
       teachers: { total: 52, loggedIn: 47 },
       paras: { total: 16, loggedIn: 13 },
@@ -485,15 +490,9 @@ export default function ExampleDashboard() {
       implementationRate: 14,
       observationStatus: 'Not yet scheduled',
       champion: 'Coach Williams',
-      tdiNote: null,
+      tdiNote: 'Growing momentum! Movement engagement improving each month.',
       medals: [
-        { type: 'silver', category: 'Most Engaged' },
-        { type: 'silver', category: 'Top Learners' },
-        { type: 'silver', category: 'Wellness Leader' },
-        { type: 'silver', category: 'Implementation' },
-        { type: 'silver', category: 'Resource Champion' },
-        { type: 'silver', category: 'Retention' },
-        { type: 'silver', category: 'Movement Leader' },
+        { type: 'bronze', category: 'Movement Leader' },
       ],
       teacherCourses: ['Engagement in Large Classes', 'Student-Led Conferences', 'Reducing Grading Load'],
       paraCourses: ['Supporting Students with IEPs', 'Study Skills Coaching', 'Communication that Clicks'],
@@ -513,9 +512,9 @@ export default function ExampleDashboard() {
       paraStaffOverflow: 4
     },
     {
-      id: 'bridges-alt',
-      name: 'Bridges Alternative Program',
-      grades: '7-12',
+      id: 'cadence-k8',
+      name: 'Cadence K-8',
+      grades: 'K-8',
       teachers: { total: 14, loggedIn: 12 },
       paras: { total: 8, loggedIn: 7 },
       coursesCompleted: 55,
@@ -523,8 +522,11 @@ export default function ExampleDashboard() {
       implementationRate: 17,
       observationStatus: 'Scheduled May',
       champion: 'Dr. Nguyen',
-      tdiNote: 'Trauma-informed practices showing early positive impact.',
-      medals: [],
+      tdiNote: 'Highest retention intent in the district! Staff love working here.',
+      medals: [
+        { type: 'gold', category: 'Retention' },
+        { type: 'bronze', category: 'Resource Champion' },
+      ],
       teacherCourses: ['Trauma-Informed Practices', 'Restorative Conversations', 'Flexible Scheduling'],
       paraCourses: ['De-Escalation Strategies', 'Building Trust with Students'],
       teacherStaff: [
@@ -1283,15 +1285,16 @@ export default function ExampleDashboard() {
                     staffInfo: '40 staff · K-5 · Champion: Ms. Rivera',
                     medals: [
                       { type: '🥇', award: 'Most Engaged', value: '95%' },
-                      { type: '🥇', award: 'Implementation Champ', value: '34%' },
+                      { type: '🥇', award: 'Implementation', value: '34%' },
                       { type: '🥈', award: 'Top Learners', value: '68%' },
                       { type: '🥈', award: 'Wellness Leader', value: '5.2/10' },
-                      { type: '🥈', award: 'Most Likely to Stay', value: '9.5/10' },
+                      { type: '🥈', award: 'Retention', value: '9.5/10' },
+                      { type: '🥈', award: 'Movement Leader', value: '38' },
                     ],
                     insightType: 'celebrate',
                     bgColor: 'bg-green-50',
                     borderColor: 'border-green-100',
-                    insightText: "Harmony is leading the district with 2 golds and 3 silvers. Ms. Rivera's PLC structure gives teachers protected time to engage with Hub content — it's clearly working.",
+                    insightText: "Harmony is leading the district with 2 golds and 4 silvers. Ms. Rivera's PLC structure gives teachers protected time to engage with Hub content — it's clearly working.",
                     ctaButtons: [
                       { label: "🎉 Congratulate Harmony's Team", style: 'bg-green-500 text-white hover:bg-green-600' },
                       { label: '☕ Send Ms. Rivera a Coffee', style: 'bg-white text-green-600 border border-green-200 hover:bg-green-50' },
@@ -1304,24 +1307,26 @@ export default function ExampleDashboard() {
                   {
                     id: 'spotlight-crescendo',
                     school: 'Crescendo Middle',
-                    staffInfo: '45 staff · 6-8 · Champion: Mr. Chen',
+                    staffInfo: '38 staff · 6-8 · Champion: Mr. Okafor',
                     medals: [
                       { type: '🥇', award: 'Top Learners', value: '72%' },
                       { type: '🥇', award: 'Movement Leader', value: '42' },
                       { type: '🥈', award: 'Most Engaged', value: '91%' },
-                      { type: '🥉', award: 'Implementation Champ', value: '28%' },
+                      { type: '🥈', award: 'Implementation', value: '28%' },
+                      { type: '🥈', award: 'Resource Champion', value: '76' },
+                      { type: '🥉', award: 'Wellness Leader', value: '5.8/10' },
                     ],
                     insightType: 'praise',
                     bgColor: 'bg-blue-50',
                     borderColor: 'border-blue-100',
-                    insightText: "Crescendo is solid across the board — 2 golds and strong engagement. Mr. Chen's team is the highest course-completing group in the district. Keep the momentum going.",
+                    insightText: "Crescendo is solid across the board — 2 golds, 3 silvers, and 1 bronze. Mr. Okafor's team is the highest course-completing group in the district. Keep the momentum going.",
                     ctaButtons: [],
                     links: [],
                   },
                   {
                     id: 'spotlight-melody',
                     school: 'Melody Primary',
-                    staffInfo: '40 staff · PK-3 · Champion: Dr. Patel',
+                    staffInfo: '30 staff · PreK-2 · Champion: Mrs. Patel',
                     medals: [
                       { type: '🥇', award: 'Wellness Leader', value: '5.0/10' },
                       { type: '🥉', award: 'Top Learners', value: '61%' },
@@ -1331,7 +1336,7 @@ export default function ExampleDashboard() {
                     insightType: 'celebrate',
                     bgColor: 'bg-green-50',
                     borderColor: 'border-green-100',
-                    insightText: "Melody has the lowest stress in the district at 5.0/10 — something is working here. Dr. Patel's approach to staff wellness is worth exploring and sharing with other buildings.",
+                    insightText: "Melody has the lowest stress in the district at 5.0/10 — something is working here. Mrs. Patel's approach to staff wellness is worth exploring and sharing with other buildings.",
                     ctaButtons: [
                       { label: "🌟 Spotlight Melody's Wellness Approach", style: 'bg-green-500 text-white hover:bg-green-600' },
                     ],
@@ -3662,7 +3667,7 @@ export default function ExampleDashboard() {
                             </span>
                           </td>
                           <td className="py-3 text-center">
-                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${school.avgStress <= 5.5 ? 'bg-green-50 text-green-600' : school.avgStress <= 6.5 ? 'bg-blue-50 text-blue-600' : 'bg-amber-50 text-amber-600'}`}>
+                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${school.avgStress <= 5.5 ? 'bg-green-50 text-green-600' : school.avgStress <= 6.0 ? 'bg-blue-50 text-blue-600' : school.avgStress <= 7.0 ? 'bg-amber-50 text-amber-600' : 'bg-red-50 text-red-600'}`}>
                               {school.avgStress}/10
                             </span>
                           </td>
@@ -3811,7 +3816,7 @@ export default function ExampleDashboard() {
                             max={100}
                             label="Avg. Stress"
                             displayValue={`${school.avgStress}/10`}
-                            color={school.avgStress <= 5.0 ? '#38618C' : school.avgStress <= 6.0 ? '#22c55e' : school.avgStress <= 7.0 ? '#f59e0b' : '#ef4444'}
+                            color={school.avgStress <= 5.5 ? '#22c55e' : school.avgStress <= 6.0 ? '#38618C' : school.avgStress <= 7.0 ? '#f59e0b' : '#ef4444'}
                           />
                           <MiniDonut
                             value={school.implementationRate}
