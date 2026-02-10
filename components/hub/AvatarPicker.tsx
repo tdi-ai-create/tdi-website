@@ -205,30 +205,30 @@ export default function AvatarPicker({
                     backgroundColor: avatar.color,
                   }}
                 >
-                  {IconComponent && <IconComponent size={32} strokeWidth={1.5} color={avatar.iconColor} />}
+                  {IconComponent && <IconComponent size={40} strokeWidth={1.5} color={avatar.iconColor} />}
                 </div>
 
                 {/* Text content */}
                 <div className="text-left flex-1">
-                  {/* Personality as headline */}
+                  {/* Avatar name as headline */}
                   <p
-                    className="text-xl font-bold leading-tight"
+                    className="text-[18px] font-bold leading-tight"
                     style={{
                       fontFamily: "'Source Serif 4', Georgia, serif",
                       color: '#2B3A67',
                     }}
                   >
-                    {avatar.personality}
+                    {avatar.name}
                   </p>
-                  {/* Avatar name below */}
+                  {/* Personality tagline below */}
                   <p
-                    className="text-[13px] mt-1"
+                    className="text-[14px] italic mt-1"
                     style={{
                       fontFamily: "'DM Sans', sans-serif",
-                      color: '#9CA3AF',
+                      color: '#6B7280',
                     }}
                   >
-                    {avatar.name}
+                    {avatar.personality}
                   </p>
                 </div>
               </button>
