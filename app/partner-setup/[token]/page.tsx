@@ -1,18 +1,21 @@
 'use client';
 
 import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams, useParams } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
-  Mail,
   Loader2,
-  CheckCircle,
   AlertCircle,
   Building2,
   School,
   ArrowRight,
   Sparkles,
+  Check,
+  X,
+  Eye,
+  EyeOff,
+  Lock,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -27,17 +30,24 @@ interface Partnership {
   status: string;
 }
 
-type PageState = 'loading' | 'invalid' | 'valid' | 'magic_link_sent' | 'creating_account' | 'error';
+type PageState = 'loading' | 'invalid' | 'welcome' | 'create_account' | 'creating' | 'error';
 
 function PartnerSetupContent() {
   const router = useRouter();
   const params = useParams();
-  const searchParams = useSearchParams();
   const token = params.token as string;
 
   const [pageState, setPageState] = useState<PageState>('loading');
   const [partnership, setPartnership] = useState<Partnership | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
+
+  // Form state
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   // Load partnership by token
   useEffect(() => {
@@ -48,7 +58,8 @@ function PartnerSetupContent() {
 
         if (data.success && data.partnership) {
           setPartnership(data.partnership);
-          setPageState('valid');
+          setEmail(data.partnership.contact_email);
+          setPageState('welcome');
         } else {
           setPageState('invalid');
         }
@@ -63,90 +74,109 @@ function PartnerSetupContent() {
     }
   }, [token]);
 
-  // Handle magic link callback
-  useEffect(() => {
-    const handleAuthCallback = async () => {
-      const error = searchParams.get('error');
-      const errorDescription = searchParams.get('error_description');
+  // Password validation
+  const isPasswordValid = password.length >= 8;
+  const doPasswordsMatch = password === confirmPassword && confirmPassword.length > 0;
 
-      if (error) {
-        setPageState('error');
-        setErrorMessage(errorDescription || 'Authentication failed');
-        return;
-      }
+  const handleCreateAccount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFieldErrors({});
+    setErrorMessage('');
 
-      // Check for auth params
-      const hasAuthParams = window.location.hash.includes('access_token') ||
-                           searchParams.get('code') !== null;
+    // Validate
+    const errors: Record<string, string> = {};
 
-      if (!hasAuthParams) return;
+    if (!email) {
+      errors.email = 'Email is required';
+    }
 
-      setPageState('creating_account');
+    if (password.length < 8) {
+      errors.password = 'Password must be at least 8 characters';
+    }
 
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
+    if (password !== confirmPassword) {
+      errors.confirmPassword = 'Passwords do not match';
+    }
 
-        if (session?.user) {
-          // Create partnership user and accept invite
-          const response = await fetch(`/api/partner-setup/${token}/accept`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              user_id: session.user.id,
-              email: session.user.email,
-            }),
-          });
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
 
-          const data = await response.json();
-
-          if (data.success) {
-            // Redirect to intake wizard
-            router.push(`/partner-setup/${token}/intake`);
-          } else {
-            setPageState('error');
-            setErrorMessage(data.error || 'Failed to accept invite');
-          }
-        }
-      } catch (error) {
-        console.error('Error in auth callback:', error);
-        setPageState('error');
-        setErrorMessage('Something went wrong. Please try again.');
-      }
-    };
-
-    handleAuthCallback();
-  }, [searchParams, token, router]);
-
-  const handleSendMagicLink = async () => {
-    if (!partnership) return;
-
-    setPageState('loading');
+    setPageState('creating');
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email: partnership.contact_email,
+      // Sign up with Supabase
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
         options: {
-          emailRedirectTo: `${window.location.origin}/partner-setup/${token}`,
+          data: {
+            partnership_token: token,
+          },
         },
       });
 
-      if (error) throw error;
+      if (signUpError) {
+        if (signUpError.message.includes('already registered')) {
+          setFieldErrors({
+            email: 'This email already has an account. Try logging in instead.',
+          });
+          setPageState('create_account');
+          return;
+        }
+        throw signUpError;
+      }
 
-      setPageState('magic_link_sent');
-    } catch (error) {
-      console.error('Error sending magic link:', error);
+      if (!signUpData.user) {
+        throw new Error('Failed to create account');
+      }
+
+      // Sign in immediately after signup
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) {
+        throw signInError;
+      }
+
+      // Accept the invite via API
+      const response = await fetch(`/api/partner-setup/${token}/accept`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user_id: signUpData.user.id,
+          email,
+          password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Redirect to intake wizard
+        router.push(`/partner-setup/${token}/intake`);
+      } else {
+        setPageState('error');
+        setErrorMessage(data.error || 'Failed to complete setup');
+      }
+    } catch (error: unknown) {
+      console.error('Error creating account:', error);
       setPageState('error');
-      setErrorMessage('Failed to send login link. Please try again.');
+      const errorMsg = error instanceof Error ? error.message : 'Something went wrong. Please try again or contact hello@teachersdeserveit.com';
+      setErrorMessage(errorMsg);
     }
   };
 
   // Loading state
   if (pageState === 'loading') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-[#80a4ed] mx-auto mb-4" />
-          <p className="text-gray-600">Loading your invitation...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-white mx-auto mb-4" />
+          <p className="text-white/80">Loading your invitation...</p>
         </div>
       </div>
     );
@@ -155,8 +185,8 @@ function PartnerSetupContent() {
   // Invalid token state
   if (pageState === 'invalid') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-8 h-8 text-red-600" />
           </div>
@@ -166,7 +196,7 @@ function PartnerSetupContent() {
           </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 bg-[#1e2749] text-white px-6 py-3 rounded-lg hover:bg-[#2a3459] transition-colors"
+            className="inline-flex items-center gap-2 bg-[#1e2749] text-white px-6 py-3 rounded-xl hover:bg-[#2a3459] transition-colors"
           >
             Return Home
           </Link>
@@ -178,16 +208,16 @@ function PartnerSetupContent() {
   // Error state
   if (pageState === 'error') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
+      <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4">
+        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertCircle className="w-8 h-8 text-red-600" />
           </div>
           <h1 className="text-2xl font-bold text-[#1e2749] mb-2">Something Went Wrong</h1>
           <p className="text-gray-600 mb-6">{errorMessage}</p>
           <button
-            onClick={() => setPageState('valid')}
-            className="inline-flex items-center gap-2 bg-[#1e2749] text-white px-6 py-3 rounded-lg hover:bg-[#2a3459] transition-colors"
+            onClick={() => setPageState('create_account')}
+            className="inline-flex items-center gap-2 bg-[#1e2749] text-white px-6 py-3 rounded-xl hover:bg-[#2a3459] transition-colors"
           >
             Try Again
           </button>
@@ -197,38 +227,78 @@ function PartnerSetupContent() {
   }
 
   // Creating account state
-  if (pageState === 'creating_account') {
+  if (pageState === 'creating') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-[#80a4ed] mx-auto mb-4" />
-          <p className="text-gray-600">Setting up your account...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-white mx-auto mb-4" />
+          <p className="text-white/80">Creating your account...</p>
         </div>
       </div>
     );
   }
 
-  // Magic link sent state
-  if (pageState === 'magic_link_sent') {
+  // Welcome screen
+  if (pageState === 'welcome') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center px-4">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-8 h-8 text-green-600" />
+      <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4 py-8">
+        <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+          {/* Logo */}
+          <div className="pt-8 px-8">
+            <Image
+              src="/images/logo.webp"
+              alt="Teachers Deserve It"
+              width={160}
+              height={48}
+              className="h-12 w-auto mx-auto"
+            />
+          </div>
+
+          {/* Content */}
+          <div className="p-8">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center gap-2 text-[#ffba06] mb-3">
+                <Sparkles className="w-5 h-5" />
+                <span className="text-sm font-semibold uppercase tracking-wide">Partnership Invitation</span>
+              </div>
+              <h1 className="text-2xl font-bold text-[#1e2749] mb-2">
+                Welcome to Your TDI Partnership!
+              </h1>
+              <p className="text-gray-600">
+                You just made one of the best decisions for your team. We&apos;re excited to walk alongside you - let&apos;s get your partnership space set up so your educators can start exploring right away.
+              </p>
             </div>
-            <h2 className="text-xl font-semibold text-[#1e2749] mb-2">
-              Check your email!
-            </h2>
-            <p className="text-gray-600 text-sm mb-6">
-              We sent a magic link to <strong className="text-[#1e2749]">{partnership?.contact_email}</strong>.
-              <br />Click the link in your email to continue setup.
-            </p>
+
+            {/* Partnership Info */}
+            <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl mb-6">
+              <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
+                partnership?.partnership_type === 'district'
+                  ? 'bg-purple-100 text-purple-600'
+                  : 'bg-blue-100 text-blue-600'
+              }`}>
+                {partnership?.partnership_type === 'district' ? (
+                  <Building2 className="w-6 h-6" />
+                ) : (
+                  <School className="w-6 h-6" />
+                )}
+              </div>
+              <div>
+                <p className="font-medium text-[#1e2749]">
+                  {partnership?.contact_name}
+                </p>
+                <p className="text-sm text-gray-600 capitalize">
+                  {partnership?.partnership_type} Partnership - {partnership?.contract_phase}
+                </p>
+              </div>
+            </div>
+
+            {/* CTA */}
             <button
-              onClick={() => setPageState('valid')}
-              className="text-[#80a4ed] hover:text-[#1e2749] text-sm font-medium transition-colors"
+              onClick={() => setPageState('create_account')}
+              className="w-full bg-[#1e2749] text-white py-3.5 px-6 rounded-xl font-semibold hover:bg-[#2a3459] transition-colors flex items-center justify-center gap-2"
             >
-              Didn&apos;t receive it? Try again
+              Let&apos;s Get Started
+              <ArrowRight className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -236,123 +306,182 @@ function PartnerSetupContent() {
     );
   }
 
-  // Valid token - show welcome screen
+  // Create account screen
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-100">
-        <div className="container-wide py-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4 py-8">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+        {/* Logo */}
+        <div className="pt-8 px-8">
           <Image
             src="/images/logo.webp"
             alt="Teachers Deserve It"
             width={160}
             height={48}
-            className="h-12 w-auto"
+            className="h-12 w-auto mx-auto"
           />
         </div>
-      </header>
 
-      <main className="container-wide py-12 px-4">
-        <div className="max-w-2xl mx-auto">
-          {/* Welcome Card */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
-            {/* Card Header */}
-            <div className="bg-[#1e2749] px-8 py-6 text-white">
-              <div className="flex items-center gap-2 mb-2">
-                <Sparkles className="w-5 h-5 text-[#ffba06]" />
-                <span className="text-sm font-medium text-[#ffba06]">Partnership Invitation</span>
-              </div>
-              <h1 className="text-2xl font-bold">
-                Welcome, {partnership?.contact_name}!
-              </h1>
-              <p className="text-white/80 mt-1">
-                You&apos;ve been invited to join the TDI Partner Portal.
-              </p>
+        {/* Progress */}
+        <div className="px-8 pt-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-gray-500">Step 1 of 4</span>
+            <span className="text-sm text-gray-500">25%</span>
+          </div>
+          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div className="h-full w-1/4 bg-[#4ecdc4] rounded-full" />
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="p-8">
+          <div className="text-center mb-6">
+            <div className="w-12 h-12 bg-[#1e2749]/10 rounded-full flex items-center justify-center mx-auto mb-3">
+              <Lock className="w-6 h-6 text-[#1e2749]" />
             </div>
-
-            {/* Card Body */}
-            <div className="p-8">
-              {/* Partnership Info */}
-              <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl mb-6">
-                <div className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
-                  partnership?.partnership_type === 'district'
-                    ? 'bg-purple-100 text-purple-600'
-                    : 'bg-blue-100 text-blue-600'
-                }`}>
-                  {partnership?.partnership_type === 'district' ? (
-                    <Building2 className="w-6 h-6" />
-                  ) : (
-                    <School className="w-6 h-6" />
-                  )}
-                </div>
-                <div>
-                  <p className="font-medium text-[#1e2749] capitalize">
-                    {partnership?.partnership_type} Partnership
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Contract Phase: <span className="font-medium">{partnership?.contract_phase}</span>
-                  </p>
-                </div>
-              </div>
-
-              {/* What to Expect */}
-              <div className="mb-8">
-                <h3 className="font-semibold text-[#1e2749] mb-3">What happens next?</h3>
-                <ol className="space-y-3">
-                  <li className="flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-[#80a4ed] text-white text-sm flex items-center justify-center flex-shrink-0">1</span>
-                    <span className="text-gray-600">Verify your email with a magic link</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-gray-200 text-gray-600 text-sm flex items-center justify-center flex-shrink-0">2</span>
-                    <span className="text-gray-600">Complete your organization profile</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-gray-200 text-gray-600 text-sm flex items-center justify-center flex-shrink-0">3</span>
-                    <span className="text-gray-600">Upload your staff roster</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <span className="w-6 h-6 rounded-full bg-gray-200 text-gray-600 text-sm flex items-center justify-center flex-shrink-0">4</span>
-                    <span className="text-gray-600">Access your partnership dashboard</span>
-                  </li>
-                </ol>
-              </div>
-
-              {/* CTA */}
-              <button
-                onClick={handleSendMagicLink}
-                className="w-full bg-[#1e2749] text-white py-4 px-6 rounded-xl font-medium hover:bg-[#2a3459] transition-colors flex items-center justify-center gap-2"
-              >
-                <Mail className="w-5 h-5" />
-                Get Started - Send Magic Link
-                <ArrowRight className="w-5 h-5" />
-              </button>
-
-              <p className="text-center text-sm text-gray-500 mt-4">
-                We&apos;ll send a login link to <strong>{partnership?.contact_email}</strong>
-              </p>
-            </div>
+            <h1 className="text-xl font-bold text-[#1e2749] mb-1">
+              Create Your Account
+            </h1>
+            <p className="text-sm text-gray-600">
+              Set up your login credentials to access your dashboard
+            </p>
           </div>
 
-          {/* Help Text */}
-          <p className="text-center text-sm text-gray-500 mt-6">
-            Questions? Contact us at{' '}
-            <a href="mailto:hello@teachersdeserveit.com" className="text-[#80a4ed] hover:text-[#1e2749]">
-              hello@teachersdeserveit.com
-            </a>
-          </p>
+          <form onSubmit={handleCreateAccount} className="space-y-4">
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none transition-colors ${
+                  fieldErrors.email ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                }`}
+              />
+              {fieldErrors.email && (
+                <p className="text-sm text-red-500 mt-1 flex items-center gap-1">
+                  {fieldErrors.email}
+                  {fieldErrors.email.includes('logging in') && (
+                    <Link href="/partners/login" className="underline font-medium">
+                      Log in here
+                    </Link>
+                  )}
+                </p>
+              )}
+            </div>
+
+            {/* Password */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Create Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={`w-full px-4 py-3 pr-12 border rounded-xl focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none transition-colors ${
+                    fieldErrors.password ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              {fieldErrors.password ? (
+                <p className="text-sm text-red-500 mt-1">{fieldErrors.password}</p>
+              ) : (
+                <p className={`text-sm mt-1 flex items-center gap-1 ${
+                  password.length > 0
+                    ? isPasswordValid ? 'text-green-600' : 'text-red-500'
+                    : 'text-gray-500'
+                }`}>
+                  {password.length > 0 && (
+                    isPasswordValid
+                      ? <Check className="w-4 h-4" />
+                      : <X className="w-4 h-4" />
+                  )}
+                  At least 8 characters
+                </p>
+              )}
+            </div>
+
+            {/* Confirm Password */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className={`w-full px-4 py-3 pr-12 border rounded-xl focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none transition-colors ${
+                    fieldErrors.confirmPassword ? 'border-red-300 bg-red-50' : 'border-gray-200'
+                  }`}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              {fieldErrors.confirmPassword ? (
+                <p className="text-sm text-red-500 mt-1">{fieldErrors.confirmPassword}</p>
+              ) : confirmPassword.length > 0 && (
+                <p className={`text-sm mt-1 flex items-center gap-1 ${
+                  doPasswordsMatch ? 'text-green-600' : 'text-red-500'
+                }`}>
+                  {doPasswordsMatch ? <Check className="w-4 h-4" /> : <X className="w-4 h-4" />}
+                  {doPasswordsMatch ? 'Passwords match' : 'Passwords do not match'}
+                </p>
+              )}
+            </div>
+
+            {/* Info note */}
+            <div className="bg-blue-50 border border-blue-100 rounded-xl p-4">
+              <p className="text-sm text-blue-700">
+                This will be your login for your Partnership Dashboard - and eventually your Learning Hub access too.
+              </p>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={!isPasswordValid || !doPasswordsMatch}
+              className="w-full bg-[#1e2749] text-white py-3.5 px-6 rounded-xl font-semibold hover:bg-[#2a3459] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Create Account
+            </button>
+          </form>
+
+          {/* Back link */}
+          <button
+            onClick={() => setPageState('welcome')}
+            className="w-full text-center text-sm text-gray-500 hover:text-[#1e2749] mt-4"
+          >
+            &larr; Back
+          </button>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
 
 function LoadingFallback() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center">
       <div className="text-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#80a4ed] mx-auto mb-4" />
-        <p className="text-gray-600">Loading...</p>
+        <Loader2 className="w-8 h-8 animate-spin text-white mx-auto mb-4" />
+        <p className="text-white/80">Loading...</p>
       </div>
     </div>
   );
