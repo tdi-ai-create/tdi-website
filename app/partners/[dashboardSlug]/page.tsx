@@ -269,6 +269,8 @@ export default function PartnerDashboard() {
   const [copiedLink, setCopiedLink] = useState(false);
   const [snoozePickerItemId, setSnoozePickerItemId] = useState<string | null>(null);
   const [recentlyResurfacedIds, setRecentlyResurfacedIds] = useState<string[]>([]);
+  const [hoveredEquationCard, setHoveredEquationCard] = useState<number | null>(null);
+  const [activeMilestoneTooltip, setActiveMilestoneTooltip] = useState<string | null>(null);
 
   // Action item form state
   const [championName, setChampionName] = useState('');
@@ -2809,81 +2811,236 @@ export default function PartnerDashboard() {
 
         {/* JOURNEY TAB */}
         {activeTab === 'journey' && (
-          <div role="tabpanel" id="panel-journey" aria-labelledby="tab-journey" className="space-y-8">
+          <div role="tabpanel" id="panel-journey" aria-labelledby="tab-journey" className="space-y-6">
             {/* Partnership Goal Statement */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-              <div className="flex">
-                <div className="w-1 bg-[#1B2A4A] flex-shrink-0" />
-                <div className="p-6 md:p-8">
-                  <p className="text-xl md:text-2xl font-semibold text-[#1e2749] leading-relaxed">
-                    &ldquo;{partnership?.partnership_type === 'district'
-                      ? `Equip educators across ${organization?.name || 'your district'} with practical strategies and resources to confidently support students and each other.`
-                      : `Equip the ${organization?.name || 'your school'} team with practical strategies and resources to transform classrooms and reduce burnout.`
-                    }&rdquo;
-                  </p>
-                  <p className="text-sm text-gray-500 mt-4">— Your Partnership Goal</p>
+            <div
+              className="relative bg-gradient-to-r from-slate-50 to-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5"
+            >
+              {/* Decorative quote mark */}
+              <span className="absolute top-4 left-6 text-6xl text-[#E8B84B] opacity-30 font-serif leading-none select-none">&ldquo;</span>
+              {/* Yellow heart accent */}
+              <div className="absolute top-4 right-6">
+                <Heart className="w-6 h-6 text-[#E8B84B] fill-[#E8B84B]/20" />
+              </div>
+              <div className="p-6 md:p-8 pt-12 md:pt-10">
+                <p className="text-lg text-[#1e2749] leading-relaxed font-medium">
+                  {partnership?.partnership_type === 'district'
+                    ? `Equip educators across ${organization?.name || 'your district'} with practical strategies and resources to confidently support students and each other.`
+                    : `Equip the ${organization?.name || 'your school'} team with practical strategies and resources to transform classrooms and reduce burnout.`
+                  }
+                </p>
+                <p className="text-sm text-gray-500 mt-4">— Your Partnership Goal</p>
+              </div>
+            </div>
+
+            {/* The TDI Equation - Interactive Cards */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
+              <h2 className="text-xl font-bold text-[#1e2749] mb-6 text-center">The TDI Equation</h2>
+              <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-6">
+                {/* Strong Teachers Card */}
+                <div
+                  className={`relative rounded-xl p-6 cursor-default transition-all duration-300 ease-in-out w-full md:w-48 ${
+                    hoveredEquationCard === 0
+                      ? 'bg-[#1B2A4A] shadow-xl scale-105'
+                      : 'bg-gray-50 hover:shadow-md'
+                  }`}
+                  onMouseEnter={() => setHoveredEquationCard(0)}
+                  onMouseLeave={() => setHoveredEquationCard(null)}
+                >
+                  <div className="flex flex-col items-center text-center">
+                    <GraduationCap className={`w-10 h-10 mb-3 transition-colors duration-300 ${
+                      hoveredEquationCard === 0 ? 'text-white' : 'text-[#1B2A4A]'
+                    }`} />
+                    <h3 className={`font-semibold transition-colors duration-300 ${
+                      hoveredEquationCard === 0 ? 'text-white' : 'text-[#1e2749]'
+                    }`}>Strong Teachers</h3>
+                    <p className={`text-sm mt-2 transition-all duration-300 ${
+                      hoveredEquationCard === 0
+                        ? 'text-gray-300 opacity-100 max-h-20'
+                        : 'text-gray-500 opacity-100 max-h-6 overflow-hidden'
+                    }`}>
+                      {hoveredEquationCard === 0
+                        ? 'Practical strategies from the Learning Hub, tailored to your classrooms and tested by real educators.'
+                        : 'Practical strategies that work'}
+                    </p>
+                  </div>
+                </div>
+
+                <ArrowRight className="w-6 h-6 text-gray-300 hidden md:block flex-shrink-0" />
+                <ArrowRight className="w-6 h-6 text-gray-300 rotate-90 md:hidden" />
+
+                {/* Strong Support Card */}
+                <div
+                  className={`relative rounded-xl p-6 cursor-default transition-all duration-300 ease-in-out w-full md:w-48 ${
+                    hoveredEquationCard === 1
+                      ? 'bg-[#1B2A4A] shadow-xl scale-105'
+                      : 'bg-gray-50 hover:shadow-md'
+                  }`}
+                  onMouseEnter={() => setHoveredEquationCard(1)}
+                  onMouseLeave={() => setHoveredEquationCard(null)}
+                >
+                  <div className="flex flex-col items-center text-center">
+                    <Heart className={`w-10 h-10 mb-3 transition-colors duration-300 ${
+                      hoveredEquationCard === 1 ? 'text-white' : 'text-[#1B2A4A]'
+                    }`} />
+                    <h3 className={`font-semibold transition-colors duration-300 ${
+                      hoveredEquationCard === 1 ? 'text-white' : 'text-[#1e2749]'
+                    }`}>Strong Support</h3>
+                    <p className={`text-sm mt-2 transition-all duration-300 ${
+                      hoveredEquationCard === 1
+                        ? 'text-gray-300 opacity-100 max-h-20'
+                        : 'text-gray-500 opacity-100 max-h-6 overflow-hidden'
+                    }`}>
+                      {hoveredEquationCard === 1
+                        ? 'Ongoing coaching, Love Notes, observation feedback, and a community of 87,000+ educators.'
+                        : 'Ongoing coaching & community'}
+                    </p>
+                  </div>
+                </div>
+
+                <ArrowRight className="w-6 h-6 text-gray-300 hidden md:block flex-shrink-0" />
+                <ArrowRight className="w-6 h-6 text-gray-300 rotate-90 md:hidden" />
+
+                {/* Student Success Card */}
+                <div
+                  className={`relative rounded-xl p-6 cursor-default transition-all duration-300 ease-in-out w-full md:w-48 ${
+                    hoveredEquationCard === 2
+                      ? 'bg-[#1B2A4A] shadow-xl scale-105'
+                      : 'bg-gray-50 hover:shadow-md'
+                  }`}
+                  onMouseEnter={() => setHoveredEquationCard(2)}
+                  onMouseLeave={() => setHoveredEquationCard(null)}
+                >
+                  <div className="flex flex-col items-center text-center">
+                    <Star className={`w-10 h-10 mb-3 transition-colors duration-300 ${
+                      hoveredEquationCard === 2 ? 'text-white' : 'text-[#1B2A4A]'
+                    }`} />
+                    <h3 className={`font-semibold transition-colors duration-300 ${
+                      hoveredEquationCard === 2 ? 'text-white' : 'text-[#1e2749]'
+                    }`}>Student Success</h3>
+                    <p className={`text-sm mt-2 transition-all duration-300 ${
+                      hoveredEquationCard === 2
+                        ? 'text-gray-300 opacity-100 max-h-20'
+                        : 'text-gray-500 opacity-100 max-h-6 overflow-hidden'
+                    }`}>
+                      {hoveredEquationCard === 2
+                        ? 'When teachers thrive, students thrive. Better engagement, stronger relationships, measurable growth.'
+                        : 'Better outcomes for everyone'}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* The TDI Equation */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-bold text-[#1e2749] mb-6 text-center">The TDI Equation</h2>
-              <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10">
-                <div className="flex flex-col items-center text-center max-w-[160px]">
-                  <GraduationCap className="w-10 h-10 text-[#1B2A4A] mb-3" />
-                  <h3 className="font-semibold text-[#1e2749]">Strong Teachers</h3>
-                  <p className="text-sm text-gray-500 mt-1">Practical strategies that work</p>
-                </div>
-                <ArrowRight className="w-6 h-6 text-gray-300 hidden md:block" />
-                <ArrowRight className="w-6 h-6 text-gray-300 rotate-90 md:hidden" />
-                <div className="flex flex-col items-center text-center max-w-[160px]">
-                  <Heart className="w-10 h-10 text-[#1B2A4A] mb-3" />
-                  <h3 className="font-semibold text-[#1e2749]">Strong Support</h3>
-                  <p className="text-sm text-gray-500 mt-1">Ongoing coaching & community</p>
-                </div>
-                <ArrowRight className="w-6 h-6 text-gray-300 hidden md:block" />
-                <ArrowRight className="w-6 h-6 text-gray-300 rotate-90 md:hidden" />
-                <div className="flex flex-col items-center text-center max-w-[160px]">
-                  <Star className="w-10 h-10 text-[#1B2A4A] mb-3" />
-                  <h3 className="font-semibold text-[#1e2749]">Student Success</h3>
-                  <p className="text-sm text-gray-500 mt-1">Better outcomes for everyone</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Phase Timeline - Compact */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-bold text-[#1e2749] mb-6">Your Partnership Journey</h2>
+            {/* Phase Timeline with Milestones */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
+              <h2 className="text-xl font-bold text-[#1e2749] mb-8">Your Partnership Journey</h2>
               <div className="relative">
-                {/* Timeline connector line */}
-                <div className="absolute top-6 left-6 right-6 h-0.5 bg-gray-200 hidden md:block" />
+                {/* Timeline connector line - desktop only */}
+                <div className="absolute top-6 left-[16.67%] right-[16.67%] h-0.5 bg-gray-200 hidden md:block" />
 
-                <div className="grid md:grid-cols-3 gap-4">
+                {/* Milestone dots on the line - between IGNITE and ACCELERATE */}
+                {(() => {
+                  const phase = partnership?.contract_phase;
+                  const isPhase2OrLater = phase === 'ACCELERATE' || phase === 'SUSTAIN';
+                  const isPhase3 = phase === 'SUSTAIN';
+
+                  // Milestones between IGNITE and ACCELERATE
+                  const phase1Milestones = [
+                    { id: 'hub', label: 'Hub onboarding', position: 28 },
+                    { id: 'obs1', label: 'First observation day', position: 38 },
+                    { id: 'survey', label: 'Baseline survey collected', position: 48 },
+                  ];
+
+                  // Milestones between ACCELERATE and SUSTAIN
+                  const phase2Milestones = [
+                    { id: 'growth', label: 'Growth Groups formed', position: 61 },
+                    { id: 'midyear', label: 'Mid-year progress review', position: 72 },
+                    { id: 'coaching', label: 'Internal coaching capacity', position: 83 },
+                  ];
+
+                  return (
+                    <>
+                      {/* Phase 1 milestones */}
+                      {phase1Milestones.map((m) => (
+                        <div
+                          key={m.id}
+                          className="absolute top-[22px] hidden md:block z-10"
+                          style={{ left: `${m.position}%` }}
+                        >
+                          <div
+                            className="relative cursor-pointer"
+                            onClick={() => setActiveMilestoneTooltip(activeMilestoneTooltip === m.id ? null : m.id)}
+                          >
+                            <div className={`w-3 h-3 rounded-full border-2 ${
+                              isPhase2OrLater
+                                ? 'bg-[#4ecdc4] border-[#4ecdc4]'
+                                : 'bg-white border-gray-300'
+                            }`} />
+                            {activeMilestoneTooltip === m.id && (
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-[#1B2A4A] text-white text-xs rounded-lg whitespace-nowrap shadow-lg">
+                                {isPhase2OrLater ? '✓ ' : ''}{m.label}
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1B2A4A]" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+
+                      {/* Phase 2 milestones */}
+                      {phase2Milestones.map((m) => (
+                        <div
+                          key={m.id}
+                          className="absolute top-[22px] hidden md:block z-10"
+                          style={{ left: `${m.position}%` }}
+                        >
+                          <div
+                            className="relative cursor-pointer"
+                            onClick={() => setActiveMilestoneTooltip(activeMilestoneTooltip === m.id ? null : m.id)}
+                          >
+                            <div className={`w-3 h-3 rounded-full border-2 ${
+                              isPhase3
+                                ? 'bg-[#4ecdc4] border-[#4ecdc4]'
+                                : 'bg-white border-gray-300'
+                            }`} />
+                            {activeMilestoneTooltip === m.id && (
+                              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-[#1B2A4A] text-white text-xs rounded-lg whitespace-nowrap shadow-lg">
+                                {isPhase3 ? '✓ ' : '○ '}{m.label}
+                                <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#1B2A4A]" />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </>
+                  );
+                })()}
+
+                <div className="grid md:grid-cols-3 gap-6">
                   {/* IGNITE Phase */}
                   {(() => {
                     const isActive = partnership?.contract_phase === 'IGNITE';
                     const isPast = partnership?.contract_phase === 'ACCELERATE' || partnership?.contract_phase === 'SUSTAIN';
                     return (
-                      <div className="relative flex flex-col items-center">
+                      <div className="relative flex flex-col items-center group">
                         {isActive && (
-                          <span className="absolute -top-3 px-2 py-0.5 bg-[#4ecdc4] text-white text-[10px] font-bold rounded-full whitespace-nowrap z-20">
+                          <span className="absolute -top-4 px-2.5 py-1 bg-[#4ecdc4] text-white text-[10px] font-bold rounded-full whitespace-nowrap z-20 shadow-sm">
                             YOU ARE HERE
                           </span>
                         )}
                         <div
-                          className={`w-12 h-12 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm ${
-                            isPast ? 'bg-[#4ecdc4]' : isActive ? 'bg-[#1B2A4A] ring-4 ring-[#4ecdc4]/30' : 'bg-gray-200'
+                          className={`w-14 h-14 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-md transition-all duration-300 group-hover:scale-110 ${
+                            isPast ? 'bg-[#4ecdc4]' : isActive ? 'bg-[#1B2A4A] ring-4 ring-[#4ecdc4]/40 animate-[pulse_3s_ease-in-out_infinite]' : 'bg-gray-200'
                           }`}
                         >
                           {isPast ? (
-                            <Check className="w-6 h-6 text-white" />
+                            <Check className="w-7 h-7 text-white" />
                           ) : (
-                            <span className={`text-lg font-bold ${isActive ? 'text-white' : 'text-gray-400'}`}>1</span>
+                            <span className={`text-xl font-bold ${isActive ? 'text-white' : 'text-gray-400'}`}>1</span>
                           )}
                         </div>
-                        <h3 className={`font-bold mt-3 ${isActive ? 'text-[#1e2749]' : 'text-gray-400'}`}>IGNITE</h3>
-                        <p className={`text-sm text-center mt-1 ${isActive ? 'text-gray-600' : 'text-gray-400'}`}>
+                        <h3 className={`font-bold mt-3 text-sm ${isPast || isActive ? 'text-[#1e2749]' : 'text-gray-400'}`}>IGNITE</h3>
+                        <p className={`text-xs text-center mt-1 ${isPast || isActive ? 'text-gray-600' : 'text-gray-400'}`}>
                           Build the foundation
                         </p>
                       </div>
@@ -2896,25 +3053,25 @@ export default function PartnerDashboard() {
                     const isPast = partnership?.contract_phase === 'SUSTAIN';
                     const isFuture = partnership?.contract_phase === 'IGNITE';
                     return (
-                      <div className="relative flex flex-col items-center">
+                      <div className="relative flex flex-col items-center group">
                         {isActive && (
-                          <span className="absolute -top-3 px-2 py-0.5 bg-[#4ecdc4] text-white text-[10px] font-bold rounded-full whitespace-nowrap z-20">
+                          <span className="absolute -top-4 px-2.5 py-1 bg-[#4ecdc4] text-white text-[10px] font-bold rounded-full whitespace-nowrap z-20 shadow-sm">
                             YOU ARE HERE
                           </span>
                         )}
                         <div
-                          className={`w-12 h-12 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm ${
-                            isPast ? 'bg-[#4ecdc4]' : isActive ? 'bg-[#38618C] ring-4 ring-[#4ecdc4]/30' : 'bg-gray-200'
+                          className={`w-14 h-14 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-md transition-all duration-300 group-hover:scale-110 ${
+                            isPast ? 'bg-[#4ecdc4]' : isActive ? 'bg-[#38618C] ring-4 ring-[#4ecdc4]/40 animate-[pulse_3s_ease-in-out_infinite]' : 'bg-gray-200'
                           }`}
                         >
                           {isPast ? (
-                            <Check className="w-6 h-6 text-white" />
+                            <Check className="w-7 h-7 text-white" />
                           ) : (
-                            <span className={`text-lg font-bold ${isActive ? 'text-white' : isFuture ? 'text-gray-400' : 'text-white'}`}>2</span>
+                            <span className={`text-xl font-bold ${isActive || isPast ? 'text-white' : 'text-gray-400'}`}>2</span>
                           )}
                         </div>
-                        <h3 className={`font-bold mt-3 ${isFuture ? 'text-gray-400' : 'text-[#1e2749]'}`}>ACCELERATE</h3>
-                        <p className={`text-sm text-center mt-1 ${isFuture ? 'text-gray-400' : 'text-gray-600'}`}>
+                        <h3 className={`font-bold mt-3 text-sm ${isFuture ? 'text-gray-400' : 'text-[#1e2749]'}`}>ACCELERATE</h3>
+                        <p className={`text-xs text-center mt-1 ${isFuture ? 'text-gray-400' : 'text-gray-600'}`}>
                           Scale to full staff
                         </p>
                       </div>
@@ -2926,21 +3083,21 @@ export default function PartnerDashboard() {
                     const isActive = partnership?.contract_phase === 'SUSTAIN';
                     const isFuture = partnership?.contract_phase === 'IGNITE' || partnership?.contract_phase === 'ACCELERATE';
                     return (
-                      <div className="relative flex flex-col items-center">
+                      <div className="relative flex flex-col items-center group">
                         {isActive && (
-                          <span className="absolute -top-3 px-2 py-0.5 bg-[#4ecdc4] text-white text-[10px] font-bold rounded-full whitespace-nowrap z-20">
+                          <span className="absolute -top-4 px-2.5 py-1 bg-[#4ecdc4] text-white text-[10px] font-bold rounded-full whitespace-nowrap z-20 shadow-sm">
                             YOU ARE HERE
                           </span>
                         )}
                         <div
-                          className={`w-12 h-12 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-sm ${
-                            isActive ? 'bg-[#4ecdc4] ring-4 ring-[#4ecdc4]/30' : 'bg-gray-200'
+                          className={`w-14 h-14 rounded-full flex items-center justify-center z-10 border-4 border-white shadow-md transition-all duration-300 group-hover:scale-110 ${
+                            isActive ? 'bg-[#4ecdc4] ring-4 ring-[#4ecdc4]/40 animate-[pulse_3s_ease-in-out_infinite]' : 'bg-gray-200'
                           }`}
                         >
-                          <span className={`text-lg font-bold ${isActive ? 'text-white' : 'text-gray-400'}`}>3</span>
+                          <span className={`text-xl font-bold ${isActive ? 'text-white' : 'text-gray-400'}`}>3</span>
                         </div>
-                        <h3 className={`font-bold mt-3 ${isFuture ? 'text-gray-400' : 'text-[#1e2749]'}`}>SUSTAIN</h3>
-                        <p className={`text-sm text-center mt-1 ${isFuture ? 'text-gray-400' : 'text-gray-600'}`}>
+                        <h3 className={`font-bold mt-3 text-sm ${isFuture ? 'text-gray-400' : 'text-[#1e2749]'}`}>SUSTAIN</h3>
+                        <p className={`text-xs text-center mt-1 ${isFuture ? 'text-gray-400' : 'text-gray-600'}`}>
                           Embed for lasting change
                         </p>
                       </div>
@@ -2948,40 +3105,99 @@ export default function PartnerDashboard() {
                   })()}
                 </div>
               </div>
-            </div>
 
-            {/* What Success Looks Like - 2x2 Grid */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-bold text-[#1e2749] mb-4">What Success Looks Like</h2>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
-                  <div className="flex-shrink-0">
-                    <TrendingUp className="w-5 h-5 text-[#38618C]" />
-                  </div>
-                  <p className="text-sm text-gray-700">Staff report increased confidence in classroom strategies</p>
-                </div>
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
-                  <div className="flex-shrink-0">
-                    <Heart className="w-5 h-5 text-[#38618C]" />
-                  </div>
-                  <p className="text-sm text-gray-700">Measurable improvement in feeling valued and supported</p>
-                </div>
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
-                  <div className="flex-shrink-0">
-                    <TrendingDown className="w-5 h-5 text-[#38618C]" />
-                  </div>
-                  <p className="text-sm text-gray-700">Reduced stress levels compared to baseline</p>
-                </div>
-                <div className="flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100">
-                  <div className="flex-shrink-0">
-                    <CheckCircle className="w-5 h-5 text-[#38618C]" />
-                  </div>
-                  <p className="text-sm text-gray-700">Clear implementation of Hub strategies observed in classrooms</p>
+              {/* Mobile milestone list */}
+              <div className="md:hidden mt-6 pt-4 border-t border-gray-100">
+                <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Milestones</p>
+                <div className="space-y-1.5">
+                  {[
+                    { done: (partnership?.contract_phase === 'ACCELERATE' || partnership?.contract_phase === 'SUSTAIN'), label: 'Hub onboarding' },
+                    { done: (partnership?.contract_phase === 'ACCELERATE' || partnership?.contract_phase === 'SUSTAIN'), label: 'First observation day' },
+                    { done: (partnership?.contract_phase === 'ACCELERATE' || partnership?.contract_phase === 'SUSTAIN'), label: 'Baseline survey collected' },
+                    { done: partnership?.contract_phase === 'SUSTAIN', label: 'Growth Groups formed' },
+                    { done: partnership?.contract_phase === 'SUSTAIN', label: 'Mid-year progress review' },
+                    { done: false, label: 'Internal coaching capacity' },
+                  ].map((m, i) => (
+                    <div key={i} className="flex items-center gap-2 text-xs">
+                      <span className={m.done ? 'text-[#4ecdc4]' : 'text-gray-300'}>
+                        {m.done ? '✓' : '○'}
+                      </span>
+                      <span className={m.done ? 'text-gray-700' : 'text-gray-400'}>{m.label}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <p className="text-xs text-gray-500 text-center mt-4">
-                These targets are customized after your first planning session with TDI.
+            </div>
+
+            {/* Your TDI Impact So Far */}
+            <div className="bg-gradient-to-br from-[#1B2A4A] via-[#2a3f6e] to-[#38618C] rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+              <h2 className="text-xl font-bold mb-4">Your TDI Impact So Far</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
+                  <div className="text-3xl font-bold">{staffStats.total || 1}</div>
+                  <div className="text-xs text-gray-300 mt-1">Staff enrolled</div>
+                </div>
+                <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
+                  <div className="text-3xl font-bold">{partnership?.observation_days_completed || 0}</div>
+                  <div className="text-xs text-gray-300 mt-1">Observation days</div>
+                </div>
+                <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
+                  <div className="text-3xl font-bold">0</div>
+                  <div className="text-xs text-gray-300 mt-1">Love Notes sent</div>
+                </div>
+                <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
+                  <div className="text-3xl font-bold">0</div>
+                  <div className="text-xs text-gray-300 mt-1">Courses started</div>
+                </div>
+              </div>
+              <p className="text-xs text-gray-300 text-center mt-4">
+                These numbers grow as your partnership progresses. Check the Progress tab for details.
               </p>
+            </div>
+
+            {/* What Success Looks Like - with Progress Tracking */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
+              <h2 className="text-xl font-bold text-[#1e2749] mb-4">What Success Looks Like</h2>
+              <div className="grid sm:grid-cols-2 gap-4">
+                {[
+                  { icon: TrendingUp, text: 'Staff report increased confidence in classroom strategies' },
+                  { icon: Heart, text: 'Measurable improvement in feeling valued and supported' },
+                  { icon: TrendingDown, text: 'Reduced stress levels compared to baseline' },
+                  { icon: CheckCircle, text: 'Clear implementation of Hub strategies observed in classrooms' },
+                ].map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="relative flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-[#4ecdc4] hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group"
+                  >
+                    {/* Status indicator */}
+                    <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-gray-300" />
+                      <span className="text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">Baseline pending</span>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <item.icon className="w-5 h-5 text-[#38618C]" />
+                    </div>
+                    <p className="text-sm text-gray-700 pr-16">{item.text}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-gray-500 text-center mt-4">
+                Your TDI partner updates these as data comes in. No action needed from you.
+              </p>
+
+              {/* CTA Card */}
+              <div className="mt-6 bg-gradient-to-r from-[#1B2A4A] to-[#2a3f6e] rounded-xl p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p className="text-sm text-center sm:text-left">Want to set custom goals? Let&apos;s talk about it in your next session.</p>
+                <a
+                  href="https://calendly.com/raehughart/tdi-partner-session"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#1B2A4A] text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap"
+                >
+                  Schedule Session
+                  <ArrowRight className="w-4 h-4" />
+                </a>
+              </div>
             </div>
           </div>
         )}

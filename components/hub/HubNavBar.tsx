@@ -43,10 +43,10 @@ export default function HubNavBar({ profile, userEmail }: HubNavBarProps) {
         className="fixed top-0 left-0 right-0 z-40 h-[60px] flex items-center px-4 md:px-6"
         style={{ backgroundColor: '#2B3A67' }}
       >
-        {/* Logo */}
+        {/* Logo + Learning Hub Label */}
         <Link
           href="/hub"
-          className="flex-shrink-0"
+          className="flex-shrink-0 flex items-center"
         >
           <Image
             src="/images/logo.webp"
@@ -57,6 +57,30 @@ export default function HubNavBar({ profile, userEmail }: HubNavBarProps) {
             style={{ filter: 'brightness(0) invert(1)' }}
             priority
           />
+          {/* Divider */}
+          <div
+            className="hidden min-[400px]:block"
+            style={{
+              width: '1px',
+              height: '24px',
+              backgroundColor: 'rgba(255, 255, 255, 0.2)',
+              margin: '0 12px',
+            }}
+          />
+          {/* Learning Hub Label */}
+          <span
+            className="hidden min-[400px]:block"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '11px',
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              color: '#E8B84B',
+              letterSpacing: '0.1em',
+            }}
+          >
+            LEARNING HUB
+          </span>
         </Link>
 
         {/* Desktop Nav Links */}
