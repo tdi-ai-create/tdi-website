@@ -3766,23 +3766,31 @@ export default function ExampleDashboard() {
                     {/* Expanded Content */}
                     {isExpanded && (
                       <div className="border-t border-gray-100 p-4 bg-gray-50">
-                        {/* School Medals */}
+                        {/* Awards Strip */}
                         {school.medals && school.medals.length > 0 ? (
-                          <div className="flex flex-wrap gap-2 mb-4">
-                            {school.medals.map((medal: { type: string; category: string }, idx: number) => (
-                              <span key={idx} className={`text-xs px-2.5 py-1 rounded-full font-medium ${
-                                medal.type === 'gold' ? 'bg-amber-50 text-amber-700' :
-                                medal.type === 'silver' ? 'bg-gray-100 text-gray-600' :
-                                'bg-orange-50 text-orange-600'
-                              }`}>
-                                {medal.type === 'gold' ? '🥇' : medal.type === 'silver' ? '🥈' : '🥉'} {medal.category}
-                              </span>
-                            ))}
+                          <div className="bg-gradient-to-r from-amber-50 to-white rounded-lg p-3 mb-4 border border-amber-100">
+                            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Awards</p>
+                            <div className="flex flex-wrap gap-2">
+                              {school.medals.map((medal: { type: string; category: string }, idx: number) => (
+                                <span key={idx} className={
+                                  medal.type === 'gold'
+                                    ? 'inline-flex items-center gap-1.5 text-sm px-3 py-1.5 bg-amber-100 text-amber-800 rounded-full font-semibold'
+                                    : medal.type === 'silver'
+                                    ? 'inline-flex items-center gap-1.5 text-xs px-2.5 py-1 bg-gray-100 text-gray-700 rounded-full font-medium'
+                                    : 'inline-flex items-center gap-1.5 text-xs px-2.5 py-1 bg-orange-50 text-orange-700 rounded-full font-medium'
+                                }>
+                                  {medal.type === 'gold' ? '🥇' : medal.type === 'silver' ? '🥈' : '🥉'} {medal.category}
+                                </span>
+                              ))}
+                              {!hasGoldMedal && (
+                                <span className="text-xs text-gray-400 italic ml-2">📈 On the rise — building momentum!</span>
+                              )}
+                            </div>
                           </div>
                         ) : (
-                          <div className="mb-4 p-2 bg-blue-50 rounded-lg">
+                          <div className="bg-blue-50 rounded-lg p-3 mb-4 border border-blue-100">
                             <p className="text-xs text-blue-600">
-                              📈 Growing in all areas — on track to earn awards as engagement deepens this spring
+                              📈 Growing in all areas — on track to earn awards as engagement deepens
                             </p>
                           </div>
                         )}
