@@ -2176,7 +2176,7 @@ export default function PartnerDashboard() {
                     return (
                       <div className="space-y-8">
                         <div>
-                          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-[#1e2749]">
+                          <h2 className="text-lg font-bold mb-3 text-[#1e2749]">
                             A Phased Journey,<br />Not a One-Time Event
                           </h2>
                           <p className="text-lg text-[#1e2749]/80">
@@ -2367,7 +2367,7 @@ export default function PartnerDashboard() {
                     return (
                       <div className="space-y-8">
                         <div>
-                          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-[#1e2749]">
+                          <h2 className="text-lg font-bold mb-3 text-[#1e2749]">
                             What Happens When<br />We Visit Your School
                           </h2>
                           <p className="text-lg text-[#1e2749]/80">
@@ -2418,7 +2418,7 @@ export default function PartnerDashboard() {
                     return (
                       <div className="space-y-8">
                         <div>
-                          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-[#1e2749]">
+                          <h2 className="text-lg font-bold mb-3 text-[#1e2749]">
                             On-Demand Support for Every Educator
                           </h2>
                           <p className="text-lg text-[#1e2749]/80">
@@ -2467,7 +2467,7 @@ export default function PartnerDashboard() {
                     return (
                       <div className="space-y-8">
                         <div>
-                          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-[#1e2749]">
+                          <h2 className="text-lg font-bold mb-3 text-[#1e2749]">
                             See Your School&apos;s Progress in Real Time
                           </h2>
                           <p className="text-lg text-[#1e2749]/80">
@@ -2517,7 +2517,7 @@ export default function PartnerDashboard() {
                     return (
                       <div className="space-y-8">
                         <div>
-                          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-[#1e2749]">
+                          <h2 className="text-lg font-bold mb-3 text-[#1e2749]">
                             Teachers Deserve It:<br />The Book That Started a Movement
                           </h2>
                         </div>
@@ -2574,7 +2574,7 @@ export default function PartnerDashboard() {
                     return (
                       <div className="space-y-8">
                         <div>
-                          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-[#1e2749]">
+                          <h2 className="text-lg font-bold mb-3 text-[#1e2749]">
                             This is What Change<br />Looks Like
                           </h2>
                           <p className="text-lg text-[#1e2749]/80">
@@ -2621,7 +2621,7 @@ export default function PartnerDashboard() {
                     return (
                       <div className="space-y-8">
                         <div>
-                          <h2 className="text-2xl md:text-3xl font-bold mb-3 text-[#1e2749]">
+                          <h2 className="text-lg font-bold mb-3 text-[#1e2749]">
                             Your Partnership Contract
                           </h2>
                           <div className="p-4 rounded-lg bg-[#4ecdc4]/10 border border-[#4ecdc4]">

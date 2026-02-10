@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import SymbolAnimation from '@/components/SymbolAnimation';
 
 export default function AboutPage() {
   return (
@@ -647,74 +648,56 @@ export default function AboutPage() {
       {/* The Story Behind the Symbol */}
       <section id="symbol" className="py-24" style={{ backgroundColor: '#faf3e0' }}>
         <div className="container-default">
-          <div className="max-w-2xl mx-auto">
-            {/* TDI Symbol */}
-            <svg viewBox="0 0 300 280" fill="none" className="w-48 h-48 mx-auto mb-8">
-              <path
-                d="M 95 125
-                   C 95 125 103 195 110 210
-                   C 117 225 123 218 132 190
-                   C 141 162 147 138 150 132
-                   C 153 138 159 162 168 190
-                   C 177 218 183 225 190 210
-                   C 197 195 205 125 205 115
-                   C 205 105 208 75 200 55
-                   C 190 35 165 25 150 24
-                   C 120 22 85 35 68 65
-                   C 50 95 52 140 62 170
-                   C 72 200 100 225 135 235
-                   C 170 245 210 230 235 205
-                   C 255 180 258 145 250 115
-                   C 242 85 222 62 205 52"
-                stroke="#1e3a5f" strokeWidth="6.5" strokeLinecap="round" strokeLinejoin="round"
-                fill="none" />
-              {/* Subtle ink pooling at overlap */}
-              <path d="M 212 58 C 208 56 206 58 205 65 C 204 72 205 85 205 95"
-                stroke="#1e3a5f" strokeWidth="6" strokeLinecap="round" fill="none" opacity="0.2" />
-            </svg>
-
+          <div className="max-w-5xl mx-auto">
             {/* Heading */}
             <h2
-              className="text-2xl md:text-3xl font-bold text-center mb-10"
+              className="text-2xl md:text-3xl font-bold text-center mb-12"
               style={{ color: '#1e3a5f' }}
             >
               The Story Behind the Symbol
             </h2>
 
-            {/* Body copy */}
-            <div
-              className="space-y-6"
-              style={{ color: '#1e3a5f', fontSize: '17px', lineHeight: '1.8' }}
-            >
-              <p>If you've been a teacher, you know the mark.</p>
+            <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
+              {/* Animation - left side on desktop, top on mobile */}
+              <div className="w-48 h-48 md:w-64 md:h-64 flex-shrink-0">
+                <SymbolAnimation />
+              </div>
 
-              <p>
-                Not a grade. Not a checkmark. That quick little W a teacher leaves on student work, the one that says "yes, you got it." Students know it instantly. It's not formal. It's human. It's the fastest way to say "I see your knowledge."
-              </p>
+              {/* Text - right side on desktop, below on mobile */}
+              <div
+                className="flex-1 space-y-6"
+                style={{ color: '#1e3a5f', fontSize: '17px', lineHeight: '1.8' }}
+              >
+                <p>If you've been a teacher, you know the mark.</p>
 
-              <p>That's where our symbol starts. The approval mark.</p>
+                <p>
+                  Not a grade. Not a checkmark. That quick little W a teacher leaves on student work, the one that says "yes, you got it." Students know it instantly. It's not formal. It's human. It's the fastest way to say "I see your knowledge."
+                </p>
 
-              <p>
-                But it doesn't stop there. The pen keeps moving. The final upstroke of the W climbs up and becomes a circle, sweeping around the whole thing. One continuous stroke that never lifts off the paper.
-              </p>
+                <p>That's where our symbol starts. The approval mark.</p>
 
-              <p>
-                The circle is the embrace. It's protection. Attention. "I circled back to you." The way a teacher wraps care around a student.
-              </p>
+                <p>
+                  But it doesn't stop there. The pen keeps moving. The final upstroke of the W climbs up and becomes a circle, sweeping around the whole thing. One continuous stroke that never lifts off the paper.
+                </p>
 
-              <p>One stroke says two things: I see you. I've got you.</p>
+                <p>
+                  The circle is the embrace. It's protection. Attention. "I circled back to you." The way a teacher wraps care around a student.
+                </p>
 
-              <p>
-                You'll notice this symbol when you enter our portals: the Creators Studio, the Leadership Dashboard, the Learning Hub. A line enters the screen, forms the mark, holds for just a moment, then unravels and carries you in. The symbol was never meant to be permanent. It was always just one line passing through. The same line that wrote "I see you" becomes the line that takes you where you need to go.
-              </p>
+                <p>One stroke says two things: I see you. I've got you.</p>
 
-              <p>
-                That felt right for what we do. We're not here to sit on a shelf. We're here to move through your practice and leave something behind that matters.
-              </p>
+                <p>
+                  You'll notice this symbol when you enter our portals: the Creators Studio, the Leadership Dashboard, the Learning Hub. A line enters the screen, forms the mark, holds for just a moment, then unravels and carries you in. The symbol was never meant to be permanent. It was always just one line passing through. The same line that wrote "I see you" becomes the line that takes you where you need to go.
+                </p>
 
-              <p>
-                One stroke. It draws on, it holds, it unravels. The mark that says "I see you" then becomes the line that takes you there.
-              </p>
+                <p>
+                  That felt right for what we do. We're not here to sit on a shelf. We're here to move through your practice and leave something behind that matters.
+                </p>
+
+                <p>
+                  One stroke. It draws on, it holds, it unravels. The mark that says "I see you" then becomes the line that takes you there.
+                </p>
+              </div>
             </div>
           </div>
         </div>
