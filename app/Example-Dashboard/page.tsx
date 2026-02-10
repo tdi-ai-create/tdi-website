@@ -904,21 +904,15 @@ export default function ExampleDashboard() {
                   onClick={() => navigateToSection('implementation', 'progress-hub-engagement')}
                   className="p-4 cursor-pointer hover:bg-gray-50 transition-all"
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <Users className="w-4 h-4 text-[#38618C]" />
-                        <Tooltip content="Total staff with active Learning Hub accounts across all buildings in your district.">
-                          <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
-                        </Tooltip>
-                      </div>
-                      <div className="text-2xl font-bold text-[#1e2749]">255</div>
-                      <div className="text-xs text-[#38618C] font-medium">across 6 schools</div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Users className="w-4 h-4 text-[#38618C]" />
+                      <Tooltip content="Total staff with active Learning Hub accounts across all buildings in your district.">
+                        <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
+                      </Tooltip>
                     </div>
-                    {/* Mini visual */}
-                    <div className="w-12 h-12 rounded-full bg-[#38618C]/10 flex items-center justify-center">
-                      <School className="w-6 h-6 text-[#38618C]" />
-                    </div>
+                    <div className="text-2xl font-bold text-[#1e2749]">255</div>
+                    <div className="text-xs text-[#38618C] font-medium">across 6 schools</div>
                   </div>
                 </div>
                 <button
@@ -988,20 +982,15 @@ export default function ExampleDashboard() {
                   }}
                   className="p-4 cursor-pointer hover:bg-gray-50 transition-all"
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <AlertCircle className="w-4 h-4 text-amber-500" />
-                        <Tooltip content="Action items that need scheduling or completion to stay on track. Click to jump to details below.">
-                          <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
-                        </Tooltip>
-                      </div>
-                      <div className="text-2xl font-bold text-amber-500">4</div>
-                      <div className="text-xs text-amber-600 font-medium">Items pending</div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <AlertCircle className="w-4 h-4 text-amber-500" />
+                      <Tooltip content="Action items that need scheduling or completion to stay on track. Click to jump to details below.">
+                        <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
+                      </Tooltip>
                     </div>
-                    <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
-                      <span className="text-lg">⚡</span>
-                    </div>
+                    <div className="text-2xl font-bold text-amber-500">4</div>
+                    <div className="text-xs text-amber-600 font-medium">Items pending</div>
                   </div>
                 </div>
                 <button
