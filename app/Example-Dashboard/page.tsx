@@ -1810,7 +1810,7 @@ export default function ExampleDashboard() {
               )}
             </div>
 
-            {/* District-wide Movement — Collapsed with Stacked Bar */}
+            {/* District-wide Movement */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
@@ -1820,42 +1820,24 @@ export default function ExampleDashboard() {
                 <span className="text-xs text-gray-400">Updated Feb 7, 2026</span>
               </div>
 
-              {/* HEADLINE */}
-              <div className="mb-4">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-[#1e2749]">585</span>
-                  <span className="text-sm text-gray-500">total touchpoints across your district</span>
-                </div>
-              </div>
-
-              {/* DETAIL: Expandable breakdown */}
-              <button
-                onClick={() => toggleSection('movement-detail')}
-                className="w-full flex items-center justify-between py-2 text-xs text-gray-500 hover:text-gray-700 transition-colors border-t border-gray-100">
-                <span>View channel breakdown</span>
-                <ChevronDown className={`w-4 h-4 transition-transform ${openSections['movement-detail'] ? 'rotate-180' : ''}`} />
-              </button>
-
-              {openSections['movement-detail'] && (
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 pt-3">
-                  {[
-                    { icon: Mail, label: 'Newsletter', value: 197 },
-                    { icon: BookOpen, label: 'Blog Readers', value: 131 },
-                    { icon: Headphones, label: 'Podcast', value: 78 },
-                    { icon: Users, label: 'Community', value: 48 },
-                    { icon: FileText, label: 'Resources', value: 361 },
-                    { icon: GraduationCap, label: 'Courses', value: 224 },
-                  ].map((channel) => (
-                    <div key={channel.label} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                      <channel.icon className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold text-[#1e2749]">{channel.value}</p>
-                        <p className="text-xs text-gray-500 truncate">{channel.label}</p>
-                      </div>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {[
+                  { icon: Mail, label: 'Newsletter', value: 197 },
+                  { icon: BookOpen, label: 'Blog Readers', value: 131 },
+                  { icon: Headphones, label: 'Podcast', value: 78 },
+                  { icon: Users, label: 'Community', value: 48 },
+                  { icon: FileText, label: 'Resources', value: 361 },
+                  { icon: GraduationCap, label: 'Courses', value: 224 },
+                ].map((channel) => (
+                  <div key={channel.label} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                    <channel.icon className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                    <div className="min-w-0">
+                      <p className="text-sm font-bold text-[#1e2749]">{channel.value}</p>
+                      <p className="text-xs text-gray-500 truncate">{channel.label}</p>
                     </div>
-                  ))}
-                </div>
-              )}
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* 2026-27 Teaser - Enhanced */}
