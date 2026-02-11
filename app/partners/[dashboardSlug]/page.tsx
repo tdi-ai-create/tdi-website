@@ -1315,7 +1315,7 @@ export default function PartnerDashboard() {
                         <Heart className="w-5 h-5 text-pink-500" />
                       </div>
                       <div>
-                        <span className="text-lg font-bold text-[#1e2749]">{loveNotes}</span>
+                        <span className="text-base font-bold text-[#1e2749]">{loveNotes}</span>
                         <p className="text-xs text-gray-500">Love Notes sent</p>
                       </div>
                     </div>
@@ -1324,7 +1324,7 @@ export default function PartnerDashboard() {
                         <Calendar className="w-5 h-5 text-purple-600" />
                       </div>
                       <div>
-                        <span className="text-lg font-bold text-[#1e2749]">{virtualSessionsCompleted} of {partnership.virtual_sessions_total || 4}</span>
+                        <span className="text-base font-bold text-[#1e2749]">{virtualSessionsCompleted} of {partnership.virtual_sessions_total || 4}</span>
                         <p className="text-xs text-gray-500">Virtual sessions</p>
                       </div>
                     </div>
@@ -3260,8 +3260,8 @@ export default function PartnerDashboard() {
                       <BannerIcon className="w-6 h-6" />
                     </div>
                     <div>
-                      <h2 className="font-bold text-lg">{banner.title}</h2>
-                      <p className="text-white/90">{banner.message}</p>
+                      <h2 className="text-base font-bold uppercase tracking-wide">{banner.title}</h2>
+                      <p className="text-sm text-white/90">{banner.message}</p>
                     </div>
                   </div>
                 </div>
@@ -3422,7 +3422,7 @@ export default function PartnerDashboard() {
                       <BookOpen className="w-4 h-4 text-[#4ecdc4]" />
                       <span className="text-xs text-gray-500">{course.time}</span>
                     </div>
-                    <h3 className="font-medium text-[#1e2749] group-hover:text-[#4ecdc4] transition-colors">
+                    <h3 className="text-sm font-semibold text-[#1e2749] group-hover:text-[#4ecdc4] transition-colors">
                       {course.title}
                     </h3>
                     <p className="text-sm text-gray-500 mt-1">{course.desc}</p>
@@ -3655,7 +3655,7 @@ export default function PartnerDashboard() {
 
             {/* Board Presentation Offer */}
             <div className="bg-[#FFF8E7] rounded-2xl p-6 border border-[#E8B84B]/30">
-              <h2 className="text-lg font-bold text-[#1e2749] mb-2">NEED HELP MAKING THE CASE?</h2>
+              <h2 className="text-base font-bold text-[#1e2749] mb-2">NEED HELP MAKING THE CASE?</h2>
               <p className="text-gray-700 mb-4">
                 We&apos;ll help you build a board presentation with your actual impact data, cost analysis, and recommended next steps. Your success is our pitch.
               </p>
