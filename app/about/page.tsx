@@ -663,23 +663,23 @@ export default function AboutPage() {
             {/* Text — RIGHT side on desktop, below on mobile */}
             <div className="flex-1 space-y-5" style={{ color: '#1e3a5f', fontSize: '16px', lineHeight: '1.85' }}>
               <p>
-                When I was teaching 6th grade, I ran a mastery learning classroom. Thirty-six students working through content at their own pace, all active at the same time. I needed a fast way to check off their work — to initial that I'd seen it, that they were good to move on.
+                When I was teaching 6th grade, I ran a mastery learning classroom. Thirty-six students working through content at their own pace, all active at the same time. I needed a fast way to check off their work. To initial that I'd seen it, that they were good to move on.
               </p>
 
               <p>
-                So I'd scribble a quick lowercase h. Hughart. Just my last name, fast and messy, on paper after paper after paper.
+                So I'd scribble a quick lowercase h. Hughart. My last name, fast and messy, on paper after paper after paper.
               </p>
 
               <p>
-                Year over year, it got messier. The h turned into something that barely looked like a letter anymore. But my students always knew exactly what it was. That little scribble meant "I see you. You got it. Keep going."
+                Year over year, it got messier. The h barely looked like a letter anymore. But my students always knew exactly what it was. That little scribble meant I see you. You got it. Keep going.
               </p>
 
               <p>
-                It became the mark that showed up on their progress, their accomplishments, their journey. Not a grade. Not a checkmark. Just a quick, human sign-off that said I was paying attention.
+                It showed up everywhere. On their progress checks, their accomplishments, their big moments and their small ones. Not a grade. Not a checkmark. Just a quick, human sign-off that said I was paying attention and I wasn't going anywhere.
               </p>
 
               <p>
-                That's where our symbol comes from. The h — my messy, real, teacher shorthand — with a circle swept around it. One continuous stroke that never lifts off the paper. The circle is the embrace. Protection. "I circled back to you." The way a teacher wraps care around a student.
+                That's where our symbol comes from. My messy, real, teacher shorthand with a circle swept around it. One continuous stroke that never lifts off the paper. The circle is the part that says I've got you. I circled back. The way a teacher wraps care around a student without making a big deal about it.
               </p>
 
               <p>
@@ -687,7 +687,7 @@ export default function AboutPage() {
               </p>
 
               <p>
-                You'll notice this symbol when you enter our portals — the Creators Studio, the Leadership Dashboard, the Learning Hub. A line enters the screen, forms the mark, holds for just a moment, then unravels and carries you in. It was always just one line passing through — the same line that wrote "I see you" becomes the line that takes you where you need to go.
+                You'll notice this mark when you enter our portals. The Creators Studio, the Leadership Dashboard, the Learning Hub. A line enters the screen, forms the mark, holds for just a moment, then unravels and carries you in. It was always just one line passing through. The same line that wrote "I see you" becomes the line that takes you where you need to go.
               </p>
 
               <p>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Loader2, CheckCircle, AlertCircle, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -23,23 +23,26 @@ async function checkEmailExists(email: string): Promise<{ exists: boolean; type:
 
 type LoginState = 'idle' | 'loading' | 'sent' | 'error' | 'not_found';
 
-function CreatorPortalLoginContent() {
-  const router = useRouter();
+interface CreatorPortalLoginContentProps {
+  onPendingRedirect: (url: string) => void;
+}
+
+function CreatorPortalLoginContent({ onPendingRedirect }: CreatorPortalLoginContentProps) {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [loginState, setLoginState] = useState<LoginState>('idle');
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Check if user is already logged in and valid
+  // Check if user is already logged in and valid - queue redirect instead of navigating
   useEffect(() => {
     const checkSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user?.email) {
         const { type: userType } = await checkEmailExists(session.user.email);
         if (userType === 'admin') {
-          router.push('/admin/creators');
+          onPendingRedirect('/admin/creators');
         } else if (userType === 'creator') {
-          router.push('/creator-portal/dashboard');
+          onPendingRedirect('/creator-portal/dashboard');
         } else {
           // User has a session but isn't in our system - sign them out silently
           await supabase.auth.signOut();
@@ -47,7 +50,7 @@ function CreatorPortalLoginContent() {
       }
     };
     checkSession();
-  }, [router]);
+  }, [onPendingRedirect]);
 
   // Handle magic link callback - only process if coming from a magic link redirect
   useEffect(() => {
@@ -75,9 +78,9 @@ function CreatorPortalLoginContent() {
       if (session?.user?.email) {
         const { type: userType } = await checkEmailExists(session.user.email);
         if (userType === 'admin') {
-          router.push('/admin/creators');
+          onPendingRedirect('/admin/creators');
         } else if (userType === 'creator') {
-          router.push('/creator-portal/dashboard');
+          onPendingRedirect('/creator-portal/dashboard');
         } else {
           // User authenticated but not in our system - sign them out
           await supabase.auth.signOut();
@@ -87,7 +90,7 @@ function CreatorPortalLoginContent() {
     };
 
     handleAuthCallback();
-  }, [searchParams, router]);
+  }, [searchParams, onPendingRedirect]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -269,8 +272,11 @@ function LoadingFallback() {
 }
 
 export default function CreatorPortalPage() {
+  const router = useRouter();
   const [animationComplete, setAnimationComplete] = useState(false);
   const [timerDone, setTimerDone] = useState(false);
+  const [pendingRedirect, setPendingRedirect] = useState<string | null>(null);
+  const hasRedirectedRef = useRef(false);
 
   // Hard minimum timer as backup
   useEffect(() => {
@@ -279,6 +285,19 @@ export default function CreatorPortalPage() {
   }, []);
 
   const showPage = animationComplete && timerDone;
+
+  // Execute pending redirect ONLY after animation gates open
+  useEffect(() => {
+    if (showPage && pendingRedirect && !hasRedirectedRef.current) {
+      hasRedirectedRef.current = true;
+      router.push(pendingRedirect);
+    }
+  }, [showPage, pendingRedirect, router]);
+
+  // Callback for child component to queue a redirect
+  const handlePendingRedirect = (url: string) => {
+    setPendingRedirect(url);
+  };
 
   return (
     <>
@@ -310,7 +329,7 @@ export default function CreatorPortalPage() {
         transition: 'opacity 300ms ease-in',
       }}>
         <Suspense fallback={<LoadingFallback />}>
-          <CreatorPortalLoginContent />
+          <CreatorPortalLoginContent onPendingRedirect={handlePendingRedirect} />
         </Suspense>
       </div>
     </>

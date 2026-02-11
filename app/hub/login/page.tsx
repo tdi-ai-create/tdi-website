@@ -5,17 +5,23 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getSupabase } from '@/lib/supabase';
 import { getCurrentUser } from '@/lib/hub-auth';
-import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle } from 'lucide-react';
+
+type AuthView = 'main' | 'signup' | 'forgot' | 'magic';
 
 export default function HubLoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const returnUrl = searchParams.get('returnUrl') || '/hub';
 
+  const [view, setView] = useState<AuthView>('main');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isSent, setIsSent] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
 
   // Check if already logged in
   useEffect(() => {
@@ -28,10 +34,138 @@ export default function HubLoginPage() {
     checkAuth();
   }, [router, returnUrl]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const clearErrors = () => {
+    setError('');
+    setFieldErrors({});
+  };
+
+  const resetForm = () => {
+    setEmail('');
+    setPassword('');
+    setConfirmPassword('');
+    clearErrors();
+    setSuccessMessage('');
+  };
+
+  const handleGoogleSignIn = async () => {
+    setIsLoading(true);
+    clearErrors();
+
+    try {
+      const supabase = getSupabase();
+      const { error: authError } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin + '/hub',
+        },
+      });
+
+      if (authError) {
+        setError(authError.message);
+      }
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError('');
+    clearErrors();
+
+    try {
+      const supabase = getSupabase();
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) {
+        if (authError.message.includes('Invalid login credentials')) {
+          setError('Invalid email or password');
+        } else {
+          setError(authError.message);
+        }
+        return;
+      }
+
+      router.push(decodeURIComponent(returnUrl));
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    clearErrors();
+
+    // Validate passwords match
+    if (password !== confirmPassword) {
+      setFieldErrors({ confirmPassword: "Passwords don't match" });
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const supabase = getSupabase();
+      const { error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: window.location.origin + '/hub',
+        },
+      });
+
+      if (authError) {
+        if (authError.message.includes('already registered')) {
+          setFieldErrors({ email: 'Email already registered' });
+        } else {
+          setError(authError.message);
+        }
+        return;
+      }
+
+      setSuccessMessage('Check your email to confirm your account.');
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    clearErrors();
+
+    try {
+      const supabase = getSupabase();
+      const { error: authError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/hub/settings/profile',
+      });
+
+      if (authError) {
+        setError(authError.message);
+        return;
+      }
+
+      setSuccessMessage('Check your email for a reset link.');
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleMagicLink = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+    clearErrors();
 
     try {
       const supabase = getSupabase();
@@ -47,13 +181,28 @@ export default function HubLoginPage() {
         return;
       }
 
-      setIsSent(true);
-    } catch (err) {
+      setSuccessMessage('Check your email for a magic link.');
+    } catch {
       setError('Something went wrong. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
+
+  const switchView = (newView: AuthView) => {
+    resetForm();
+    setView(newView);
+  };
+
+  // Google logo SVG
+  const GoogleLogo = () => (
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+      <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+      <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+      <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+    </svg>
+  );
 
   return (
     <div
@@ -74,22 +223,25 @@ export default function HubLoginPage() {
 
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          {/* Logo */}
+        <div className="w-full max-w-[420px]">
+          {/* Header */}
           <div className="text-center mb-8">
             <h1
               className="font-bold mb-2"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
-                fontSize: '28px',
+                fontSize: '24px',
                 color: '#2B3A67',
               }}
             >
               TDI Learning Hub
             </h1>
             <p
-              className="text-gray-600"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '14px',
+                color: '#6B7280',
+              }}
             >
               Professional development that fits your life
             </p>
@@ -97,132 +249,459 @@ export default function HubLoginPage() {
 
           {/* Card */}
           <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-            {!isSent ? (
-              <>
-                <h2
-                  className="font-semibold mb-6 text-center"
-                  style={{
-                    fontFamily: "'Source Serif 4', Georgia, serif",
-                    fontSize: '18px',
-                    color: '#2B3A67',
-                  }}
-                >
-                  Sign in to your Hub
-                </h2>
-
-                <form onSubmit={handleSubmit}>
-                  <div className="mb-6">
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium mb-2"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        color: '#2B3A67',
-                      }}
-                    >
-                      Email address
-                    </label>
-                    <div className="relative">
-                      <Mail
-                        className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                        size={20}
-                      />
-                      <input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="you@school.edu"
-                        required
-                        className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
-                        style={{ fontFamily: "'DM Sans', sans-serif" }}
-                      />
-                    </div>
-                  </div>
-
-                  {error && (
-                    <div
-                      className="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm"
-                      style={{ fontFamily: "'DM Sans', sans-serif" }}
-                    >
-                      {error}
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={isLoading || !email}
-                    className="w-full hub-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {isLoading ? 'Sending...' : 'Send magic link'}
-                  </button>
-                </form>
-
-                <p
-                  className="mt-6 text-center text-sm text-gray-500"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  We will send you a secure link to sign in.
-                  <br />
-                  No password needed.
-                </p>
-              </>
-            ) : (
+            {successMessage ? (
+              /* Success State */
               <div className="text-center py-4">
                 <div
                   className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center"
-                  style={{ backgroundColor: '#FFF8E7' }}
+                  style={{ backgroundColor: '#D1FAE5' }}
                 >
-                  <CheckCircle size={32} style={{ color: '#E8B84B' }} />
+                  <CheckCircle size={32} className="text-green-600" />
                 </div>
 
-                <h2
-                  className="font-semibold mb-4"
-                  style={{
-                    fontFamily: "'Source Serif 4', Georgia, serif",
-                    fontSize: '18px',
-                    color: '#2B3A67',
-                  }}
-                >
-                  Check your email
-                </h2>
-
                 <p
-                  className="text-gray-600 mb-6"
+                  className="text-gray-700 mb-6"
                   style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
-                  We sent a magic link to
-                  <br />
-                  <strong>{email}</strong>
-                </p>
-
-                <p
-                  className="text-sm text-gray-500"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  Click the link in your email to sign in.
-                  <br />
-                  The link will expire in 1 hour.
+                  {successMessage}
                 </p>
 
                 <button
-                  onClick={() => {
-                    setIsSent(false);
-                    setEmail('');
-                  }}
-                  className="mt-6 text-sm hover:underline"
+                  onClick={() => switchView('main')}
+                  className="text-sm hover:underline"
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
                     color: '#2B3A67',
                   }}
                 >
-                  Use a different email
+                  Back to sign in
+                </button>
+              </div>
+            ) : view === 'main' || view === 'signup' ? (
+              /* Main Sign In / Sign Up View */
+              <>
+                {/* Google Sign In */}
+                <button
+                  onClick={handleGoogleSignIn}
+                  disabled={isLoading}
+                  className="w-full flex items-center justify-center gap-3 px-4 rounded-lg border transition-colors disabled:opacity-50"
+                  style={{
+                    height: '48px',
+                    borderRadius: '8px',
+                    backgroundColor: 'white',
+                    borderColor: '#E5E7EB',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F9FAFB')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'white')}
+                >
+                  <GoogleLogo />
+                  <span
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: '15px',
+                      color: '#374151',
+                    }}
+                  >
+                    Continue with Google
+                  </span>
+                </button>
+
+                {/* Divider */}
+                <div className="relative my-6">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t" style={{ borderColor: '#E5E7EB' }} />
+                  </div>
+                  <div className="relative flex justify-center">
+                    <span
+                      className="px-3"
+                      style={{
+                        backgroundColor: 'white',
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: '12px',
+                        color: '#9CA3AF',
+                      }}
+                    >
+                      or sign in with email
+                    </span>
+                  </div>
+                </div>
+
+                {/* Email/Password Form */}
+                <form onSubmit={view === 'signup' ? handleSignUp : handleSignIn}>
+                  {/* Email Field */}
+                  <div className="mb-4">
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium mb-1.5"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        color: '#374151',
+                      }}
+                    >
+                      Email address
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@school.edu"
+                      required
+                      className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        borderColor: fieldErrors.email ? '#DC2626' : '#E5E7EB',
+                      }}
+                    />
+                    {fieldErrors.email && (
+                      <p
+                        className="mt-1"
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: '13px',
+                          color: '#DC2626',
+                        }}
+                      >
+                        {fieldErrors.email}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Password Field */}
+                  <div className="mb-4">
+                    <label
+                      htmlFor="password"
+                      className="block text-sm font-medium mb-1.5"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        color: '#374151',
+                      }}
+                    >
+                      Password
+                    </label>
+                    <input
+                      id="password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Your password"
+                      required
+                      className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        borderColor: fieldErrors.password ? '#DC2626' : '#E5E7EB',
+                      }}
+                    />
+                    {fieldErrors.password && (
+                      <p
+                        className="mt-1"
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: '13px',
+                          color: '#DC2626',
+                        }}
+                      >
+                        {fieldErrors.password}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Confirm Password (Sign Up only) */}
+                  {view === 'signup' && (
+                    <div className="mb-4">
+                      <label
+                        htmlFor="confirmPassword"
+                        className="block text-sm font-medium mb-1.5"
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          color: '#374151',
+                        }}
+                      >
+                        Confirm password
+                      </label>
+                      <input
+                        id="confirmPassword"
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Confirm your password"
+                        required
+                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          borderColor: fieldErrors.confirmPassword ? '#DC2626' : '#E5E7EB',
+                        }}
+                      />
+                      {fieldErrors.confirmPassword && (
+                        <p
+                          className="mt-1"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: '13px',
+                            color: '#DC2626',
+                          }}
+                        >
+                          {fieldErrors.confirmPassword}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* General Error */}
+                  {error && (
+                    <p
+                      className="mb-4"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: '13px',
+                        color: '#DC2626',
+                      }}
+                    >
+                      {error}
+                    </p>
+                  )}
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={isLoading || !email || !password || (view === 'signup' && !confirmPassword)}
+                    className="w-full font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      height: '44px',
+                      backgroundColor: '#E8B84B',
+                      color: '#2B3A67',
+                      fontFamily: "'DM Sans', sans-serif",
+                    }}
+                  >
+                    {isLoading ? 'Please wait...' : view === 'signup' ? 'Create account' : 'Sign in'}
+                  </button>
+                </form>
+
+                {/* Links */}
+                <div className="flex justify-between mt-4">
+                  <button
+                    onClick={() => switchView(view === 'signup' ? 'main' : 'signup')}
+                    className="text-left hover:text-[#2B3A67] transition-colors"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: '13px',
+                      color: '#6B7280',
+                    }}
+                  >
+                    {view === 'signup' ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+                  </button>
+                  {view === 'main' && (
+                    <button
+                      onClick={() => switchView('forgot')}
+                      className="hover:text-[#2B3A67] transition-colors"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: '13px',
+                        color: '#6B7280',
+                      }}
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+              </>
+            ) : view === 'forgot' ? (
+              /* Forgot Password View */
+              <>
+                <h2
+                  className="font-semibold mb-2 text-center"
+                  style={{
+                    fontFamily: "'Source Serif 4', Georgia, serif",
+                    fontSize: '18px',
+                    color: '#2B3A67',
+                  }}
+                >
+                  Reset your password
+                </h2>
+                <p
+                  className="text-center mb-6"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '14px',
+                    color: '#6B7280',
+                  }}
+                >
+                  Enter your email and we'll send you a reset link.
+                </p>
+
+                <form onSubmit={handleForgotPassword}>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="resetEmail"
+                      className="block text-sm font-medium mb-1.5"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        color: '#374151',
+                      }}
+                    >
+                      Email address
+                    </label>
+                    <input
+                      id="resetEmail"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@school.edu"
+                      required
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
+                      style={{ fontFamily: "'DM Sans', sans-serif" }}
+                    />
+                  </div>
+
+                  {error && (
+                    <p
+                      className="mb-4"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: '13px',
+                        color: '#DC2626',
+                      }}
+                    >
+                      {error}
+                    </p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isLoading || !email}
+                    className="w-full font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      height: '44px',
+                      backgroundColor: '#E8B84B',
+                      color: '#2B3A67',
+                      fontFamily: "'DM Sans', sans-serif",
+                    }}
+                  >
+                    {isLoading ? 'Sending...' : 'Send reset link'}
+                  </button>
+                </form>
+
+                <button
+                  onClick={() => switchView('main')}
+                  className="w-full mt-4 text-center hover:underline"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '13px',
+                    color: '#6B7280',
+                  }}
+                >
+                  Back to sign in
+                </button>
+              </>
+            ) : view === 'magic' ? (
+              /* Magic Link View */
+              <>
+                <h2
+                  className="font-semibold mb-2 text-center"
+                  style={{
+                    fontFamily: "'Source Serif 4', Georgia, serif",
+                    fontSize: '18px',
+                    color: '#2B3A67',
+                  }}
+                >
+                  Sign in with magic link
+                </h2>
+                <p
+                  className="text-center mb-6"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '14px',
+                    color: '#6B7280',
+                  }}
+                >
+                  We'll email you a secure link to sign in. No password needed.
+                </p>
+
+                <form onSubmit={handleMagicLink}>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="magicEmail"
+                      className="block text-sm font-medium mb-1.5"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        color: '#374151',
+                      }}
+                    >
+                      Email address
+                    </label>
+                    <input
+                      id="magicEmail"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="you@school.edu"
+                      required
+                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
+                      style={{ fontFamily: "'DM Sans', sans-serif" }}
+                    />
+                  </div>
+
+                  {error && (
+                    <p
+                      className="mb-4"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: '13px',
+                        color: '#DC2626',
+                      }}
+                    >
+                      {error}
+                    </p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={isLoading || !email}
+                    className="w-full font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      height: '44px',
+                      backgroundColor: '#E8B84B',
+                      color: '#2B3A67',
+                      fontFamily: "'DM Sans', sans-serif",
+                    }}
+                  >
+                    {isLoading ? 'Sending...' : 'Send magic link'}
+                  </button>
+                </form>
+
+                <button
+                  onClick={() => switchView('main')}
+                  className="w-full mt-4 text-center hover:underline"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '13px',
+                    color: '#6B7280',
+                  }}
+                >
+                  Back to sign in
+                </button>
+              </>
+            ) : null}
+
+            {/* Magic Link Tertiary Option (only on main/signup view) */}
+            {!successMessage && (view === 'main' || view === 'signup') && (
+              <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+                <button
+                  onClick={() => switchView('magic')}
+                  className="hover:underline transition-colors"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '13px',
+                    color: '#9CA3AF',
+                  }}
+                >
+                  Prefer no password? Send me a magic link
                 </button>
               </div>
             )}
           </div>
 
-          {/* Footer text */}
+          {/* Terms Footer */}
           <p
             className="mt-8 text-center text-sm text-gray-400"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
