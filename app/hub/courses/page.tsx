@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useHub } from '@/components/hub/HubContext';
 import CourseCard from '@/components/hub/CourseCard';
 import EmptyState from '@/components/hub/EmptyState';
 import { getSupabase } from '@/lib/supabase';
+import { enrollInCourse } from '@/lib/hooks/useEnrollment';
 import { Search, BookOpen } from 'lucide-react';
 
 // Filter categories
@@ -38,6 +40,7 @@ interface Enrollment {
 }
 
 export default function CourseCatalogPage() {
+  const router = useRouter();
   const { user } = useHub();
   const [courses, setCourses] = useState<Course[]>([]);
   const [enrollments, setEnrollments] = useState<Record<string, Enrollment>>({});
@@ -92,25 +95,27 @@ export default function CourseCatalogPage() {
     if (!user?.id || isEnrolling) return;
 
     setIsEnrolling(courseId);
-    const supabase = getSupabase();
 
     try {
-      const { data, error } = await supabase
-        .from('hub_enrollments')
-        .insert({
-          user_id: user.id,
-          course_id: courseId,
-          status: 'active',
-          progress_percentage: 0,
-        })
-        .select()
-        .single();
+      // Use the enrollment function that also creates lesson progress records
+      const result = await enrollInCourse(courseId, user.id);
 
-      if (!error && data) {
+      if (result.success) {
+        // Update local state
         setEnrollments((prev) => ({
           ...prev,
-          [courseId]: data,
+          [courseId]: {
+            course_id: courseId,
+            status: 'active',
+            progress_percentage: 0,
+          },
         }));
+
+        // Find the course slug and redirect to course detail page
+        const course = courses.find((c) => c.id === courseId);
+        if (course) {
+          router.push(`/hub/courses/${course.slug}`);
+        }
       }
     } catch (error) {
       console.error('Error enrolling:', error);
