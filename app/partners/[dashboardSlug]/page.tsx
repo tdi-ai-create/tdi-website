@@ -928,7 +928,7 @@ export default function PartnerDashboard() {
 
         <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold">
+            <h1 className="text-3xl md:text-4xl font-bold">
               {organization?.name || partnership.contact_name}
             </h1>
             <p className="text-white/70 text-sm mt-1">
@@ -1952,7 +1952,7 @@ export default function PartnerDashboard() {
                       Planning Ahead
                     </span>
                   </div>
-                  <h3 className="text-xl font-bold">
+                  <h3 className="text-lg font-bold">
                     2026-27 Partnership Planning
                   </h3>
                   <p className="text-sm opacity-90 mt-2">
@@ -2008,7 +2008,7 @@ export default function PartnerDashboard() {
                   />
                 </div>
                 <div className="flex-1">
-                  <p className="text-xl font-semibold text-[#1e2749]">Rae Hughart</p>
+                  <p className="text-base font-semibold text-[#1e2749]">Rae Hughart</p>
                   <p className="text-gray-500">Founder & CEO</p>
                   <div className="mt-4 space-y-2">
                     <div className="flex items-center gap-2">
@@ -3441,21 +3441,21 @@ export default function PartnerDashboard() {
               <h2 className="text-lg font-semibold text-[#1e2749] mb-4">District Overview</h2>
               <div className="grid sm:grid-cols-4 gap-4">
                 <div className="p-4 bg-gray-50 rounded-xl text-center">
-                  <p className="text-3xl font-bold text-[#1e2749]">{apiBuildings.length}</p>
+                  <p className="text-2xl font-bold text-[#1e2749]">{apiBuildings.length}</p>
                   <p className="text-sm text-gray-500">Buildings</p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded-xl text-center">
-                  <p className="text-3xl font-bold text-[#1e2749]">{staffStats.total}</p>
+                  <p className="text-2xl font-bold text-[#1e2749]">{staffStats.total}</p>
                   <p className="text-sm text-gray-500">Total Staff</p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded-xl text-center">
-                  <p className="text-3xl font-bold text-[#1e2749]">
+                  <p className="text-2xl font-bold text-[#1e2749]">
                     {staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0}%
                   </p>
                   <p className="text-sm text-gray-500">Avg Hub Login</p>
                 </div>
                 <div className="p-4 bg-gray-50 rounded-xl text-center">
-                  <p className="text-3xl font-bold text-[#1e2749]">—</p>
+                  <p className="text-2xl font-bold text-[#1e2749]">—</p>
                   <p className="text-sm text-gray-500">Need Attention</p>
                 </div>
               </div>
@@ -3552,7 +3552,7 @@ export default function PartnerDashboard() {
           <div role="tabpanel" id="panel-preview" aria-labelledby="tab-preview" className="space-y-6">
             {/* Headline */}
             <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
-              <h1 className="text-2xl md:text-3xl font-bold text-[#1e2749] mb-2">
+              <h1 className="text-lg font-bold text-[#1e2749] mb-2">
                 Continue Building on {organization?.name || 'Your'}&apos;s Momentum
               </h1>
               <p className="text-gray-600">
@@ -3600,7 +3600,7 @@ export default function PartnerDashboard() {
 
             {/* ROI / Impact Summary */}
             <div className="bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-8 text-white">
-              <h2 className="text-xl font-bold mb-6">Your Impact Summary</h2>
+              <h2 className="text-lg font-bold mb-6">Your Impact Summary</h2>
               {(() => {
                 const daysSinceStart = partnership?.contract_start
                   ? Math.floor((Date.now() - new Date(partnership.contract_start).getTime()) / (1000 * 60 * 60 * 24))
