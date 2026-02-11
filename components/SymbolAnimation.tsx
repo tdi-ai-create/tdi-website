@@ -337,6 +337,7 @@ export default function SymbolAnimation() {
       <canvas
         ref={canvasRef}
         className="w-full h-full"
+        style={{ transform: 'rotate(-8deg)' }}
       />
     </div>
   );

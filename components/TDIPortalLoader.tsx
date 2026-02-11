@@ -110,6 +110,11 @@ export default function TDIPortalLoader({ portal, onComplete }: TDIPortalLoaderP
   const mountTimeRef = useRef<number>(Date.now());
   const hasCompletedRef = useRef<boolean>(false);
 
+  // Store onComplete in a ref so it doesn't cause useEffect to re-run
+  // when the parent re-renders (which would reset the animation!)
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
   useEffect(() => {
     const canvas = canvasRef.current;
     const svg = svgRef.current;
@@ -366,6 +371,7 @@ export default function TDIPortalLoader({ portal, onComplete }: TDIPortalLoaderP
       <canvas
         ref={canvasRef}
         className="absolute inset-0"
+        style={{ transform: 'rotate(-8deg)' }}
       />
 
       {/* Story text at bottom */}

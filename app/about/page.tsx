@@ -650,7 +650,7 @@ export default function AboutPage() {
         <div className="max-w-5xl mx-auto px-6">
 
           <h2 className="text-2xl md:text-3xl font-bold mb-12" style={{ color: '#1e3a5f' }}>
-            The Story Behind the Symbol
+            The Story Behind Our Symbol
           </h2>
 
           <div className="flex flex-col md:flex-row items-start gap-10 md:gap-16">
