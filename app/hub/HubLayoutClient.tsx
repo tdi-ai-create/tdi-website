@@ -67,6 +67,15 @@ export default function HubLayoutClient({
     );
   }
 
+  // For admin pages, go through auth guard but let admin layout handle nav/footer
+  if (pathname.startsWith('/hub/admin')) {
+    return (
+      <HubAuthGuard>
+        {children}
+      </HubAuthGuard>
+    );
+  }
+
   // All other routes go through auth guard
   return (
     <HubAuthGuard>

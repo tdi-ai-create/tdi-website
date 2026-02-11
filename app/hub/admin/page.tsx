@@ -267,7 +267,7 @@ export default function AdminDashboardPage() {
             color: '#2B3A67',
           }}
         >
-          Admin Dashboard
+          Teachers Deserve It Admin Dashboard
         </h1>
         <p
           className="text-gray-500"
