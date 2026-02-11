@@ -30,6 +30,7 @@ import {
   CheckCircle,
   School,
   Sparkles,
+  Sprout,
   X,
   ExternalLink,
   Copy,
@@ -51,6 +52,7 @@ import {
   CalendarDays,
   Pencil,
   ThumbsUp,
+  HelpCircle,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getMetricStatus, statusColors, statusShapes, statusLabels, formatMetricValue, getMetricDescription } from '@/lib/metric-thresholds';
@@ -101,7 +103,7 @@ interface ActionItem {
   description: string;
   category: string;
   priority: 'high' | 'medium' | 'low';
-  status: 'pending' | 'completed' | 'paused';
+  status: 'pending' | 'in_progress' | 'completed' | 'paused';
   sort_order: number;
   evidence_file_path?: string;
   completed_at?: string;
@@ -259,6 +261,43 @@ const Toast = ({ message, onClose }: { message: string; onClose: () => void }) =
   );
 };
 
+// Tooltip component
+const Tooltip = ({
+  id,
+  text,
+  activeTooltip,
+  setActiveTooltip,
+  children,
+}: {
+  id: string;
+  text: string;
+  activeTooltip: string | null;
+  setActiveTooltip: (id: string | null) => void;
+  children: React.ReactNode;
+}) => {
+  return (
+    <div className="relative inline-flex items-center gap-1">
+      {children}
+      <button
+        type="button"
+        onMouseEnter={() => setActiveTooltip(id)}
+        onMouseLeave={() => setActiveTooltip(null)}
+        onClick={() => setActiveTooltip(activeTooltip === id ? null : id)}
+        className="text-gray-400 hover:text-gray-600 cursor-help"
+        aria-label="More info"
+      >
+        <HelpCircle className="w-3.5 h-3.5" />
+      </button>
+      {activeTooltip === id && (
+        <div className="absolute z-50 bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-[#1B2A4A] text-white text-xs rounded-lg shadow-lg max-w-xs text-center whitespace-normal">
+          {text}
+          <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-[#1B2A4A] rotate-45 -mt-1" />
+        </div>
+      )}
+    </div>
+  );
+};
+
 export default function PartnerDashboard() {
   const router = useRouter();
   const params = useParams();
@@ -294,6 +333,8 @@ export default function PartnerDashboard() {
   const [uploadingItemId, setUploadingItemId] = useState<string | null>(null);
   const [savingItemId, setSavingItemId] = useState<string | null>(null);
   const [expandedActionFormId, setExpandedActionFormId] = useState<string | null>(null);
+  const [highlightedActionId, setHighlightedActionId] = useState<string | null>(null);
+  const [activeTooltip, setActiveTooltip] = useState<string | null>(null);
   const [copiedLink, setCopiedLink] = useState(false);
   const [snoozePickerItemId, setSnoozePickerItemId] = useState<string | null>(null);
   const [recentlyResurfacedIds, setRecentlyResurfacedIds] = useState<string[]>([]);
@@ -689,6 +730,65 @@ export default function PartnerDashboard() {
     }
   };
 
+  // Navigate to and highlight an action item by title keywords
+  const navigateToActionItem = async (titleKeywords: string) => {
+    const item = actionItems.find(i =>
+      i.title.toLowerCase().includes(titleKeywords.toLowerCase())
+    );
+
+    if (!item) return null;
+
+    // If pending, mark as in_progress
+    if (item.status === 'pending' && partnership?.id && userId) {
+      try {
+        const response = await fetch('/api/partners/action-items', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            itemId: item.id,
+            status: 'in_progress',
+            userId,
+            partnershipId: partnership.id,
+          }),
+        });
+
+        if (response.ok) {
+          setActionItems(prev =>
+            prev.map(i =>
+              i.id === item.id ? { ...i, status: 'in_progress' } : i
+            )
+          );
+        }
+      } catch (error) {
+        console.error('Error updating action item:', error);
+      }
+    }
+
+    // Navigate to overview tab and scroll to action items section
+    setActiveTab('overview');
+
+    // Small delay to allow tab change, then scroll and highlight
+    setTimeout(() => {
+      const element = document.getElementById(`action-item-${item.id}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setHighlightedActionId(item.id);
+        // Remove highlight after 2 seconds
+        setTimeout(() => setHighlightedActionId(null), 2000);
+      }
+    }, 100);
+
+    return item;
+  };
+
+  // Helper to check action item status by title keywords
+  const getActionItemStatus = (titleKeywords: string) => {
+    const item = actionItems.find(i =>
+      i.title.toLowerCase().includes(titleKeywords.toLowerCase())
+    );
+    return item?.status || null;
+  };
+
   const handleFileUpload = async (itemId: string, file: File, folder?: string) => {
     if (!partnership?.id || !userId) return;
 
@@ -871,7 +971,7 @@ export default function PartnerDashboard() {
     { id: 'progress', label: 'Progress', icon: Users },
     ...(partnership?.partnership_type === 'district' ? [{ id: 'schools', label: 'Schools', icon: School }] : []),
     { id: 'blueprint', label: 'Blueprint', icon: Star },
-    { id: 'preview', label: '2026-27 Preview', icon: Sparkles },
+    { id: 'preview', label: 'Growth Plan', icon: Sprout },
     { id: 'team', label: 'Team', icon: User },
   ];
 
@@ -921,7 +1021,7 @@ export default function PartnerDashboard() {
                   Log In
                 </Link>
                 <a
-                  href="mailto:hello@teachersdeserveit.com"
+                  href="mailto:Rae@TeachersDeserveIt.com"
                   className="block w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
                   Contact TDI
@@ -963,7 +1063,7 @@ export default function PartnerDashboard() {
               </span>
             </div>
             <a
-              href="https://calendly.com/teachersdeserveit"
+              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#FFBA06] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#e5a805] transition-colors"
@@ -1549,7 +1649,7 @@ export default function PartnerDashboard() {
                               return (
                                 <div className="mt-3">
                                   <a
-                                    href="https://calendly.com/teachersdeserveit"
+                                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
@@ -1769,10 +1869,31 @@ export default function PartnerDashboard() {
                               );
                             }
 
-                            // Item 7 & 8: File uploads (Baseline Survey, SIP) - collapsible
-                            if (titleLower.includes('survey') || titleLower.includes('improvement plan') || titleLower.includes('sip')) {
-                              const folder = titleLower.includes('survey') ? 'baseline-survey' : 'sip';
-                              const buttonLabel = titleLower.includes('survey') ? 'Upload Survey' : 'Upload Plan';
+                            // Item 7: Baseline Survey - TDI sends this, no file upload needed
+                            if (titleLower.includes('survey') && titleLower.includes('baseline')) {
+                              return (
+                                <div className="mt-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                  <p className="text-sm text-gray-700 mb-3">
+                                    TDI will send your team a brief wellness survey. We&apos;ll handle the setup and share results with you on this dashboard.
+                                  </p>
+                                  <a
+                                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
+                                  >
+                                    <Calendar className="w-4 h-4" />
+                                    Schedule Survey Setup Call
+                                    <ArrowRight className="w-3 h-3" />
+                                  </a>
+                                </div>
+                              );
+                            }
+
+                            // Item 8: File uploads (SIP, PD Calendar) - collapsible
+                            if (titleLower.includes('improvement plan') || titleLower.includes('sip') || titleLower.includes('pd calendar')) {
+                              const folder = titleLower.includes('sip') || titleLower.includes('improvement') ? 'sip' : 'pd-calendar';
+                              const buttonLabel = titleLower.includes('sip') || titleLower.includes('improvement') ? 'Upload Plan' : 'Upload Calendar';
                               if (!isFormExpanded) {
                                 return (
                                   <div className="mt-3">
@@ -1828,7 +1949,7 @@ export default function PartnerDashboard() {
                               return (
                                 <div className="mt-3 flex flex-wrap gap-2">
                                   <a
-                                    href="https://calendly.com/teachersdeserveit"
+                                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-partnership-school-clone"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
@@ -1838,7 +1959,7 @@ export default function PartnerDashboard() {
                                     <ExternalLink className="w-3 h-3" />
                                   </a>
                                   <a
-                                    href="mailto:hello@teachersdeserveit.com?subject=Observation Day Scheduling"
+                                    href="mailto:Rae@TeachersDeserveIt.com?subject=Observation Day Scheduling"
                                     className="inline-flex items-center gap-2 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors"
                                   >
                                     <Mail className="w-4 h-4" />
@@ -1853,7 +1974,7 @@ export default function PartnerDashboard() {
                               return (
                                 <div className="mt-3">
                                   <a
-                                    href="https://calendly.com/teachersdeserveit"
+                                    href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
@@ -1876,7 +1997,12 @@ export default function PartnerDashboard() {
                           return (
                             <div
                               key={item.id}
-                              className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100/50 transition-colors"
+                              id={`action-item-${item.id}`}
+                              className={`p-4 bg-gray-50 rounded-lg hover:bg-gray-100/50 transition-all duration-300 ${
+                                highlightedActionId === item.id
+                                  ? 'ring-2 ring-[#FFBA06] ring-offset-2 bg-yellow-50'
+                                  : ''
+                              }`}
                             >
                               <div className="flex items-start gap-3">
                                 <div
@@ -2033,12 +2159,38 @@ export default function PartnerDashboard() {
                     We&apos;d suggest each building designate a TDI Champion.
                   </p>
                   <div className="flex flex-wrap gap-2 mt-3">
-                    <button className="text-xs px-3 py-1.5 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors">
-                      Add Hub time to PLC agenda
-                    </button>
-                    <button className="text-xs px-3 py-1.5 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors">
-                      Designate building TDI Champions
-                    </button>
+                    {getActionItemStatus('hub time') === 'completed' ? (
+                      <span className="text-xs px-3 py-1.5 bg-green-100 text-green-700 rounded-lg border border-green-200 flex items-center gap-1">
+                        <Check className="w-3 h-3" /> Completed
+                      </span>
+                    ) : getActionItemStatus('hub time') === 'in_progress' ? (
+                      <span className="text-xs px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg border border-blue-200 flex items-center gap-1">
+                        <Check className="w-3 h-3" /> Already on your list
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => navigateToActionItem('hub time')}
+                        className="text-xs px-3 py-1.5 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors"
+                      >
+                        Add Hub time to PLC agenda
+                      </button>
+                    )}
+                    {getActionItemStatus('champion') === 'completed' ? (
+                      <span className="text-xs px-3 py-1.5 bg-green-100 text-green-700 rounded-lg border border-green-200 flex items-center gap-1">
+                        <Check className="w-3 h-3" /> Completed
+                      </span>
+                    ) : getActionItemStatus('champion') === 'in_progress' ? (
+                      <span className="text-xs px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg border border-blue-200 flex items-center gap-1">
+                        <Check className="w-3 h-3" /> Already on your list
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => navigateToActionItem('champion')}
+                        className="text-xs px-3 py-1.5 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors"
+                      >
+                        Designate building TDI Champions
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -2163,10 +2315,10 @@ export default function PartnerDashboard() {
                     <div className="flex items-center gap-2">
                       <Mail className="w-4 h-4 text-gray-400" />
                       <a
-                        href="mailto:hello@teachersdeserveit.com"
+                        href="mailto:Rae@TeachersDeserveIt.com"
                         className="text-blue-600 hover:underline"
                       >
-                        hello@teachersdeserveit.com
+                        Rae@TeachersDeserveIt.com
                       </a>
                     </div>
                     <div className="flex items-center gap-2">
@@ -2186,7 +2338,7 @@ export default function PartnerDashboard() {
                   {/* Action Buttons */}
                   <div className="flex flex-wrap gap-3 mt-5">
                     <a
-                      href="https://calendly.com/teachersdeserveit"
+                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FFBA06] text-[#1e2749] rounded-lg font-medium hover:bg-[#e5a805] transition-colors"
@@ -2196,7 +2348,7 @@ export default function PartnerDashboard() {
                       <ExternalLink className="w-3 h-3" />
                     </a>
                     <a
-                      href="mailto:hello@teachersdeserveit.com"
+                      href="mailto:Rae@TeachersDeserveIt.com"
                       className="inline-flex items-center gap-2 px-5 py-2.5 border-2 border-[#1e2749] text-[#1e2749] rounded-lg font-medium hover:bg-[#1e2749]/5 transition-colors"
                     >
                       <Mail className="w-4 h-4" />
@@ -2970,21 +3122,37 @@ export default function PartnerDashboard() {
         {activeTab === 'journey' && (
           <div role="tabpanel" id="panel-journey" aria-labelledby="tab-journey" className="space-y-4 md:space-y-6">
             {/* Partnership Goal Statement */}
-            <div id="partnership-goal" className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
-              <div className="flex">
-                <div className="w-1 bg-[#1B2A4A] flex-shrink-0" />
-                <div className="p-4 md:p-8">
-                  <p className="text-base md:text-lg text-[#1e2749] leading-relaxed font-medium">
-                    &ldquo;{organization?.partnership_goal ||
-                      (partnership?.partnership_type === 'district'
-                        ? `Equip educators across ${organization?.name || 'your district'} with practical strategies and resources to confidently support students and each other.`
-                        : `Equip the ${organization?.name || 'your school'} team with practical strategies and resources to transform classrooms and reduce burnout.`)
-                    }&rdquo;
-                  </p>
-                  <p className="text-sm text-gray-500 mt-4">— Your Partnership Goal</p>
+            {organization?.partnership_goal ? (
+              <div id="partnership-goal" className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                <div className="flex">
+                  <div className="w-1 bg-[#1B2A4A] flex-shrink-0" />
+                  <div className="p-4 md:p-8">
+                    <p className="text-base md:text-lg text-[#1e2749] leading-relaxed font-medium">
+                      &ldquo;{organization.partnership_goal}&rdquo;
+                    </p>
+                    <p className="text-sm text-gray-500 mt-4">— Your Partnership Goal</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div id="partnership-goal" className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+                <div className="p-4 md:p-8">
+                  <h3 className="text-lg font-bold text-[#1e2749] mb-2">Your Partnership Goal</h3>
+                  <p className="text-gray-600">
+                    This will be personalized after your first planning session with TDI. Together, we&apos;ll define what success looks like for your team.
+                  </p>
+                  <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                    <p className="text-xs uppercase tracking-wider text-gray-500 mb-3">Example goals from other partnerships:</p>
+                    <ul className="space-y-2">
+                      <li className="text-sm text-gray-500 italic">&ldquo;Equip educators with practical strategies to confidently support students and each other.&rdquo;</li>
+                      <li className="text-sm text-gray-500 italic">&ldquo;Reduce teacher burnout through sustainable, classroom-tested approaches.&rdquo;</li>
+                      <li className="text-sm text-gray-500 italic">&ldquo;Build internal coaching capacity that outlasts the partnership.&rdquo;</li>
+                    </ul>
+                    <p className="text-xs text-gray-400 mt-4">Your TDI partner will customize this based on your {partnership?.partnership_type === 'district' ? 'district' : 'school'}&apos;s unique needs and priorities.</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* The TDI Equation - Interactive Cards with Smooth Expansion */}
             <div className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-200">
@@ -3359,7 +3527,7 @@ export default function PartnerDashboard() {
               <div className="mt-6 bg-gradient-to-r from-[#1B2A4A] to-[#2a3f6e] rounded-xl p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p className="text-sm text-center sm:text-left">Want to set custom goals? Let&apos;s talk about it in your next session.</p>
                 <a
-                  href="https://calendly.com/raehughart/tdi-partner-session"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#1B2A4A] text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap"
@@ -3742,20 +3910,85 @@ export default function PartnerDashboard() {
           </div>
         )}
 
-        {/* 2026-27 PREVIEW TAB */}
+        {/* GROWTH PLAN TAB (formerly 2026-27 Preview) */}
         {activeTab === 'preview' && (
           <div role="tabpanel" id="panel-preview" aria-labelledby="tab-preview" className="space-y-4 md:space-y-6">
-            {/* Headline */}
-            <div className="bg-white rounded-2xl p-4 md:p-8 shadow-sm border border-gray-100 text-center">
-              <h1 className="text-base md:text-lg font-bold text-gray-900 mb-2">
-                Continue Building on {organization?.name || 'Your'}&apos;s Momentum
-              </h1>
-              <p className="text-sm md:text-base text-gray-600">
-                {partnership?.partnership_type === 'district'
-                  ? `Your ${apiBuildings.length || ''} building${apiBuildings.length !== 1 ? 's have' : ' has'} established a strong foundation. Here's how Year 2 takes it further.`
-                  : "Your team has established a strong foundation. Here's how Year 2 takes it further."}
-              </p>
-            </div>
+            {(() => {
+              // Check if partnership is new (less than 3 months old OR no metric snapshots)
+              const daysSinceStart = partnership?.contract_start
+                ? Math.floor((Date.now() - new Date(partnership.contract_start).getTime()) / (1000 * 60 * 60 * 24))
+                : 0;
+              const isNewPartnership = daysSinceStart < 90 || metricSnapshots.length === 0;
+
+              if (isNewPartnership) {
+                return (
+                  <>
+                    {/* Unbuilt State for New Partnerships */}
+                    <div className="bg-white rounded-2xl p-6 md:p-10 shadow-sm border border-gray-100 text-center">
+                      <div className="w-16 h-16 bg-[#4ecdc4]/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Sprout className="w-8 h-8 text-[#4ecdc4]" />
+                      </div>
+                      <h1 className="text-xl md:text-2xl font-bold text-[#1e2749] mb-2">Your Growth Plan</h1>
+                      <h2 className="text-base md:text-lg text-gray-600 mb-4">Building Your Foundation First</h2>
+                      <p className="text-gray-500 max-w-xl mx-auto">
+                        Once your partnership is underway and we&apos;ve collected baseline data, this space will transform into your personalized growth plan — including impact metrics, recommended next steps, and resources to share with your leadership team.
+                      </p>
+                    </div>
+
+                    {/* Preview of What's Coming */}
+                    <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                      <p className="text-sm font-medium text-gray-500 mb-4 text-center">What&apos;s coming to your Growth Plan:</p>
+                      <div className="grid sm:grid-cols-2 gap-3 max-w-lg mx-auto">
+                        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 opacity-60">
+                          <BarChart3 className="w-5 h-5 text-gray-400" />
+                          <span className="text-sm text-gray-500">Impact metrics with before/after comparisons</span>
+                        </div>
+                        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 opacity-60">
+                          <Target className="w-5 h-5 text-gray-400" />
+                          <span className="text-sm text-gray-500">Personalized recommendations for Year 2</span>
+                        </div>
+                        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 opacity-60">
+                          <FileText className="w-5 h-5 text-gray-400" />
+                          <span className="text-sm text-gray-500">Board presentation resources</span>
+                        </div>
+                        <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 opacity-60">
+                          <TrendingUp className="w-5 h-5 text-gray-400" />
+                          <span className="text-sm text-gray-500">ROI analysis with your actual data</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* CTA */}
+                    <div className="text-center">
+                      <p className="text-gray-600 mb-4">Questions about what&apos;s ahead?</p>
+                      <a
+                        href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-[#1e2749] text-white rounded-lg font-medium hover:bg-[#2a3459] transition-colors"
+                      >
+                        Schedule a Call with Rae
+                        <ArrowRight className="w-4 h-4" />
+                      </a>
+                    </div>
+                  </>
+                );
+              }
+
+              // Has data - show the full Growth Plan content
+              return (
+                <>
+                  {/* Headline */}
+                  <div className="bg-white rounded-2xl p-4 md:p-8 shadow-sm border border-gray-100 text-center">
+                    <h1 className="text-base md:text-lg font-bold text-gray-900 mb-2">
+                      Your Growth Plan: Building on {organization?.name || 'Your'}&apos;s Momentum
+                    </h1>
+                    <p className="text-sm md:text-base text-gray-600">
+                      {partnership?.partnership_type === 'district'
+                        ? `Your ${apiBuildings.length || ''} building${apiBuildings.length !== 1 ? 's have' : ' has'} established a strong foundation. Here's how Year 2 takes it further.`
+                        : "Your team has established a strong foundation. Here's how Year 2 takes it further."}
+                    </p>
+                  </div>
 
             {/* Proposed Year 2 Timeline */}
             <div className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
@@ -3922,7 +4155,7 @@ export default function PartnerDashboard() {
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <a
-                  href="https://calendly.com/teachersdeserveit"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg text-sm font-medium hover:bg-[#1e2749]/5 transition-colors inline-flex items-center gap-2"
@@ -3939,6 +4172,9 @@ export default function PartnerDashboard() {
                 &ldquo;Your TDI partner will build a custom Year 2 plan based on your specific needs, goals, and budget. Every partnership is different — because every {partnership?.partnership_type === 'district' ? 'district' : 'school'} is different.&rdquo;
               </p>
             </div>
+                </>
+              );
+            })()}
           </div>
         )}
       </main>

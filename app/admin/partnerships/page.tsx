@@ -388,7 +388,79 @@ export default function AdminPartnershipsPage() {
     (filterStatus !== 'all' ? 1 : 0) +
     (filterPhase !== 'all' ? 1 : 0);
 
-  // Access Denied state
+  // Login form for unauthenticated users
+  if (showLoginForm) {
+    return (
+      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
+        <div className="bg-white rounded-2xl shadow-lg max-w-md w-full mx-4 p-8">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-[#1e2749] rounded-full flex items-center justify-center mx-auto mb-4">
+              <Lock className="w-8 h-8 text-white" />
+            </div>
+            <h1 className="text-xl font-semibold text-[#1e2749] mb-2">TDI Admin Login</h1>
+            <p className="text-gray-600 text-sm">
+              Sign in with your @teachersdeserveit.com email
+            </p>
+          </div>
+
+          <form onSubmit={handleAdminLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                required
+                value={loginEmail}
+                onChange={(e) => setLoginEmail(e.target.value)}
+                placeholder="you@teachersdeserveit.com"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <input
+                type="password"
+                required
+                value={loginPassword}
+                onChange={(e) => setLoginPassword(e.target.value)}
+                placeholder="••••••••"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
+              />
+            </div>
+
+            {loginError && (
+              <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700 text-sm">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                {loginError}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isLoggingIn}
+              className="w-full bg-[#1e2749] text-white px-4 py-3 rounded-lg hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {isLoggingIn ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Signing in...
+                </>
+              ) : (
+                'Sign In'
+              )}
+            </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <Link href="/" className="text-sm text-gray-500 hover:text-[#1e2749]">
+              Return to main site
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Access Denied state (logged in but not TDI email)
   if (accessDenied) {
     return (
       <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
@@ -398,14 +470,26 @@ export default function AdminPartnershipsPage() {
           </div>
           <h1 className="text-xl font-semibold text-[#1e2749] mb-2">Access Denied</h1>
           <p className="text-gray-600 mb-6">
-            This page is only accessible to TDI team members.
+            This page is only accessible to TDI team members (@teachersdeserveit.com).
           </p>
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 bg-[#1e2749] text-white px-6 py-3 rounded-lg hover:bg-[#2a3459] transition-colors"
-          >
-            Return Home
-          </Link>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut();
+                setAccessDenied(false);
+                setShowLoginForm(true);
+              }}
+              className="inline-flex items-center justify-center gap-2 bg-[#1e2749] text-white px-6 py-3 rounded-lg hover:bg-[#2a3459] transition-colors"
+            >
+              Sign in with TDI account
+            </button>
+            <Link
+              href="/"
+              className="text-sm text-gray-500 hover:text-[#1e2749]"
+            >
+              Return to main site
+            </Link>
+          </div>
         </div>
       </div>
     );
