@@ -1291,16 +1291,16 @@ export default function OnboardingPage() {
                         : { bg: '#DCFCE7', text: '#16A34A' };
                     } else if (n <= 4) {
                       return selected
-                        ? { bg: '#A16207', text: 'white' }
-                        : { bg: '#FEF9C3', text: '#A16207' };
+                        ? { bg: '#E8B84B', text: '#2B3A67' }
+                        : { bg: '#FFF8E7', text: '#2B3A67' };
                     } else if (n <= 6) {
                       return selected
-                        ? { bg: '#D97706', text: 'white' }
-                        : { bg: '#FFF8E7', text: '#D97706' };
+                        ? { bg: '#F59E0B', text: 'white' }
+                        : { bg: '#FEF3C7', text: '#B45309' };
                     } else if (n <= 8) {
                       return selected
                         ? { bg: '#EA580C', text: 'white' }
-                        : { bg: '#FEE2E2', text: '#EA580C' };
+                        : { bg: '#FFEDD5', text: '#EA580C' };
                     } else {
                       return selected
                         ? { bg: '#DC2626', text: 'white' }

@@ -476,8 +476,8 @@ export default function RequestCenterPage() {
                       <span
                         className="text-xs font-medium px-2 py-0.5 rounded"
                         style={{
-                          backgroundColor: '#E8B84B20',
-                          color: '#B8860B',
+                          backgroundColor: '#FFF8E7',
+                          color: '#2B3A67',
                           fontFamily: "'DM Sans', sans-serif",
                         }}
                       >

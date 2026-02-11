@@ -181,7 +181,7 @@ export default function QuickWinsPage() {
         >
           <EmptyState
             icon={Zap}
-            iconBgColor="#FEF3C7"
+            iconBgColor="#FFF8E7"
             title="Quick Wins are on the way."
             description="3-5 minute tools for busy teachers. No prep required."
           />

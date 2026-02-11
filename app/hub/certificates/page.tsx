@@ -251,7 +251,7 @@ export default function CertificatesPage() {
         >
           <EmptyState
             icon={Award}
-            iconBgColor="#FEF3C7"
+            iconBgColor="#FFF8E7"
             title="No certificates yet."
             description="Complete a course to earn your first PD certificate. Your school can verify it anytime."
             buttonText="Browse Courses"

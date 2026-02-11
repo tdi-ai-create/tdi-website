@@ -99,6 +99,9 @@ function generateEntryPath(
   return points;
 }
 
+// Hard minimum display time: 3400ms animation + 500ms fade + 300ms buffer
+const MINIMUM_DISPLAY_TIME = 4200;
+
 export default function TDIPortalLoader({ portal, onComplete, canComplete = true }: TDIPortalLoaderProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -108,6 +111,7 @@ export default function TDIPortalLoader({ portal, onComplete, canComplete = true
   const animationRef = useRef<number | null>(null);
   const startTimeRef = useRef<number | null>(null);
   const hasTriggeredFade = useRef(false);
+  const mountTime = useRef(Date.now());
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -322,13 +326,22 @@ export default function TDIPortalLoader({ portal, onComplete, canComplete = true
   }, [portal]);
 
   // Trigger fade and onComplete when both animation is finished AND canComplete is true
+  // Enforces hard minimum display time before fading
   useEffect(() => {
     if (animationFinished && canComplete && !hasTriggeredFade.current) {
       hasTriggeredFade.current = true;
-      setIsFading(true);
+
+      // Calculate remaining time to meet minimum display requirement
+      const elapsed = Date.now() - mountTime.current;
+      const remaining = Math.max(0, MINIMUM_DISPLAY_TIME - elapsed - 500); // -500 for fade duration
+
+      // Wait for remaining time, THEN fade, THEN call onComplete
       setTimeout(() => {
-        onComplete();
-      }, 500);
+        setIsFading(true);
+        setTimeout(() => {
+          onComplete();
+        }, 500); // fade duration
+      }, remaining);
     }
   }, [animationFinished, canComplete, onComplete]);
 
