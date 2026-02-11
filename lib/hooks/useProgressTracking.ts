@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { getSupabase } from '@/lib/supabase';
+import { createCertificate } from '@/lib/certificate';
 
 export type LessonStatus = 'not_started' | 'in_progress' | 'completed';
 
@@ -20,10 +21,17 @@ export interface CourseProgress {
   lessonProgress: Map<string, LessonProgress>;
 }
 
+export interface CertificateInfo {
+  verificationCode: string;
+  pdHours: number;
+}
+
 interface UseProgressTrackingReturn {
   progress: CourseProgress;
   isLoading: boolean;
   error: string | null;
+  certificateEarned: CertificateInfo | null;
+  clearCertificateEarned: () => void;
   toggleLessonComplete: (lessonId: string) => Promise<boolean>;
   markLessonStatus: (lessonId: string, status: LessonStatus) => Promise<boolean>;
   refetch: () => Promise<void>;
@@ -42,6 +50,9 @@ export function useProgressTracking(
   });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [certificateEarned, setCertificateEarned] = useState<CertificateInfo | null>(null);
+
+  const clearCertificateEarned = () => setCertificateEarned(null);
 
   const fetchProgress = useCallback(async () => {
     if (!courseId || !userId) {
@@ -145,6 +156,17 @@ export function useProgressTracking(
       .update(updateData)
       .eq('course_id', courseId)
       .eq('user_id', userId);
+
+    // Auto-generate certificate when course is completed
+    if (isComplete) {
+      const result = await createCertificate(userId, courseId);
+      if (result.success && result.verificationCode && result.pdHours) {
+        setCertificateEarned({
+          verificationCode: result.verificationCode,
+          pdHours: result.pdHours,
+        });
+      }
+    }
   };
 
   const markLessonStatus = async (lessonId: string, status: LessonStatus): Promise<boolean> => {
@@ -236,6 +258,8 @@ export function useProgressTracking(
     progress,
     isLoading,
     error,
+    certificateEarned,
+    clearCertificateEarned,
     toggleLessonComplete,
     markLessonStatus,
     refetch: fetchProgress,

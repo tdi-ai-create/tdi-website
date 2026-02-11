@@ -113,6 +113,19 @@ interface MetricSnapshot {
   recorded_at: string;
 }
 
+interface TimelineEvent {
+  id: string;
+  action: string;
+  details: {
+    title?: string;
+    description?: string;
+    event_date?: string;
+    building_id?: string;
+    [key: string]: unknown;
+  };
+  created_at: string;
+}
+
 interface StaffStats {
   total: number;
   hubLoggedIn: number;
@@ -257,6 +270,7 @@ export default function PartnerDashboard() {
   const [staffStats, setStaffStats] = useState<StaffStats>({ total: 0, hubLoggedIn: 0 });
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
   const [apiBuildings, setApiBuildings] = useState<Building[]>([]);
+  const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
 
   // UI state
   const [activeTab, setActiveTab] = useState('overview');
@@ -387,6 +401,7 @@ export default function PartnerDashboard() {
           setStaffStats(data.staffStats || { total: 0, hubLoggedIn: 0 });
           setMetricSnapshots(data.metricSnapshots || []);
           setApiBuildings(data.buildings || []);
+          setTimelineEvents(data.timelineEvents || []);
         }
       }
     } catch (error) {
@@ -3371,8 +3386,39 @@ export default function PartnerDashboard() {
                   </div>
                 )}
 
-                {/* Virtual Sessions */}
-                {virtualSessionsCompleted > 0 && (
+                {/* Dynamic Timeline Events from Database */}
+                {timelineEvents.map((event) => {
+                  const eventColors: Record<string, string> = {
+                    observation_day_completed: '#4ecdc4',
+                    virtual_session_completed: '#E8B84B',
+                    executive_session_completed: '#80a4ed',
+                    survey_completed: '#22c55e',
+                    milestone_reached: '#f59e0b',
+                    pd_hours_awarded: '#8b5cf6',
+                    custom_event: '#6b7280',
+                  };
+                  const eventDate = event.details?.event_date
+                    ? new Date(event.details.event_date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+                    : new Date(event.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                  return (
+                    <div key={event.id} className="relative">
+                      <div
+                        className="absolute -left-5 w-4 h-4 rounded-full border-2 border-white"
+                        style={{ backgroundColor: eventColors[event.action] || '#6b7280' }}
+                      />
+                      <div>
+                        <p className="font-medium text-[#1e2749]">{event.details?.title || event.action.replace(/_/g, ' ')}</p>
+                        <p className="text-sm text-gray-500">{eventDate}</p>
+                        {event.details?.description && (
+                          <p className="text-sm text-gray-400 mt-1">{event.details.description}</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Fallback: Virtual Sessions (if no timeline events for sessions) */}
+                {virtualSessionsCompleted > 0 && !timelineEvents.some(e => e.action === 'virtual_session_completed') && (
                   <div className="relative">
                     <div className="absolute -left-5 w-4 h-4 rounded-full bg-[#E8B84B] border-2 border-white" />
                     <div>
@@ -3382,8 +3428,8 @@ export default function PartnerDashboard() {
                   </div>
                 )}
 
-                {/* Observations */}
-                {(partnership?.observation_days_completed ?? 0) > 0 && (
+                {/* Fallback: Observations (if no timeline events for observations) */}
+                {(partnership?.observation_days_completed ?? 0) > 0 && !timelineEvents.some(e => e.action === 'observation_day_completed') && (
                   <div className="relative">
                     <div className="absolute -left-5 w-4 h-4 rounded-full bg-[#4ecdc4] border-2 border-white" />
                     <div>

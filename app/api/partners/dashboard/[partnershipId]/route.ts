@@ -93,6 +93,23 @@ export async function GET(
       .order('created_at', { ascending: false })
       .limit(10);
 
+    // Get timeline events (activity_log entries marked as timeline events)
+    const timelineEventTypes = [
+      'observation_day_completed',
+      'virtual_session_completed',
+      'executive_session_completed',
+      'survey_completed',
+      'milestone_reached',
+      'pd_hours_awarded',
+      'custom_event',
+    ];
+    const { data: timelineEvents } = await supabase
+      .from('activity_log')
+      .select('*')
+      .eq('partnership_id', partnershipId)
+      .in('action', timelineEventTypes)
+      .order('created_at', { ascending: false });
+
     return NextResponse.json({
       success: true,
       organization,
@@ -101,6 +118,7 @@ export async function GET(
       metricSnapshots: Object.values(latestMetrics),
       buildings: buildings || [],
       activityLog: activityLog || [],
+      timelineEvents: timelineEvents || [],
     });
   } catch (error) {
     console.error('Error getting dashboard data:', error);

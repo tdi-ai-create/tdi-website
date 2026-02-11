@@ -609,7 +609,11 @@ export default function AdminPartnershipsPage() {
                   </tr>
                 ) : (
                   filteredPartnerships.map((partnership) => (
-                    <tr key={partnership.id} className="hover:bg-gray-50 transition-colors">
+                    <tr
+                      key={partnership.id}
+                      className="hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={() => router.push(`/admin/partnerships/${partnership.id}`)}
+                    >
                       {/* Organization */}
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
@@ -676,11 +680,22 @@ export default function AdminPartnershipsPage() {
                       </td>
 
                       {/* Actions */}
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
                         <div className="flex items-center gap-2">
+                          <Link
+                            href={`/admin/partnerships/${partnership.id}`}
+                            className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                            title="View details"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            View
+                          </Link>
                           {partnership.status === 'invited' && (
                             <button
-                              onClick={() => copyInviteLink(partnership.invite_token, partnership.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                copyInviteLink(partnership.invite_token, partnership.id);
+                              }}
                               className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors ${
                                 copiedId === partnership.id
                                   ? 'bg-green-100 text-green-700'
@@ -712,7 +727,10 @@ export default function AdminPartnershipsPage() {
                             </Link>
                           )}
                           <button
-                            onClick={() => openDeleteModal(partnership)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openDeleteModal(partnership);
+                            }}
                             className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded text-red-600 hover:bg-red-50 transition-colors"
                             title="Delete partnership"
                           >
