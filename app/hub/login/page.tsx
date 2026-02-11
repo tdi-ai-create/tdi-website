@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { getSupabase } from '@/lib/supabase';
 import { getCurrentUser } from '@/lib/hub-auth';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
+import TDIPortalLoader from '@/components/TDIPortalLoader';
 
 type AuthView = 'main' | 'signup' | 'forgot' | 'magic';
 
@@ -14,6 +15,14 @@ export default function HubLoginPage() {
   const searchParams = useSearchParams();
   const returnUrl = searchParams.get('returnUrl') || '/hub';
 
+  // Animation gate states
+  const [animationComplete, setAnimationComplete] = useState(false);
+  const [timerDone, setTimerDone] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const hasRedirectedRef = useRef(false);
+
+  // Form states
   const [view, setView] = useState<AuthView>('main');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -23,16 +32,34 @@ export default function HubLoginPage() {
   const [error, setError] = useState('');
   const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string; confirmPassword?: string }>({});
 
-  // Check if already logged in
+  // Hard timer backup (4.5 seconds)
+  useEffect(() => {
+    const timer = setTimeout(() => setTimerDone(true), 4500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Check if already logged in - redirect WITHOUT animation if authenticated
   useEffect(() => {
     async function checkAuth() {
       const user = await getCurrentUser();
       if (user) {
-        router.push(decodeURIComponent(returnUrl));
+        setIsAuthenticated(true);
+        // Redirect immediately without waiting for animation
+        if (!hasRedirectedRef.current) {
+          hasRedirectedRef.current = true;
+          router.push(decodeURIComponent(returnUrl));
+        }
       }
+      setAuthChecked(true);
     }
     checkAuth();
   }, [router, returnUrl]);
+
+  // Gate: show page only when animation complete AND timer done AND not authenticated
+  const showPage = animationComplete && timerDone && authChecked && !isAuthenticated;
+
+  // Don't show animation if user is authenticated (they'll be redirected)
+  const showAnimation = !animationComplete && authChecked && !isAuthenticated;
 
   const clearErrors = () => {
     setError('');
@@ -205,518 +232,551 @@ export default function HubLoginPage() {
   );
 
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ backgroundColor: '#FAFAF8' }}
-    >
-      {/* Header */}
-      <header className="p-4">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
+    <>
+      {/* TDI Portal Loader - only show for unauthenticated users */}
+      {showAnimation && (
+        <TDIPortalLoader
+          portal="hub"
+          onComplete={() => setAnimationComplete(true)}
+        />
+      )}
+
+      {/* Backup colored div to cover any gap during transition */}
+      {!showPage && animationComplete && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9998,
+            background: 'linear-gradient(135deg, #2a9d8f, #1f7a6e)',
+            transition: 'opacity 500ms ease-out',
+            opacity: timerDone ? 0 : 1,
+          }}
+        />
+      )}
+
+      {/* Main page content - hidden until animation complete */}
+      <div
+        style={{
+          visibility: showPage ? 'visible' : 'hidden',
+          opacity: showPage ? 1 : 0,
+          transition: 'opacity 300ms ease-in',
+        }}
+      >
+        <div
+          className="min-h-screen flex flex-col"
+          style={{ backgroundColor: '#FAFAF8' }}
         >
-          <ArrowLeft size={20} />
-          Back to site
-        </Link>
-      </header>
-
-      {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-[420px]">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1
-              className="font-bold mb-2"
-              style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                fontSize: '24px',
-                color: '#2B3A67',
-              }}
+          <header className="p-4">
+            <Link
+              href="/"
+              className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 transition-colors"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              TDI Learning Hub
-            </h1>
-            <p
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '14px',
-                color: '#6B7280',
-              }}
-            >
-              Professional development that fits your life
-            </p>
-          </div>
+              <ArrowLeft size={20} />
+              Back to site
+            </Link>
+          </header>
 
-          {/* Card */}
-          <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-            {successMessage ? (
-              /* Success State */
-              <div className="text-center py-4">
-                <div
-                  className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center"
-                  style={{ backgroundColor: '#D1FAE5' }}
-                >
-                  <CheckCircle size={32} className="text-green-600" />
-                </div>
-
-                <p
-                  className="text-gray-700 mb-6"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  {successMessage}
-                </p>
-
-                <button
-                  onClick={() => switchView('main')}
-                  className="text-sm hover:underline"
+          {/* Main Content */}
+          <main className="flex-1 flex items-center justify-center p-4">
+            <div className="w-full max-w-[420px]">
+              {/* Header */}
+              <div className="text-center mb-8">
+                <h1
+                  className="font-bold mb-2"
                   style={{
-                    fontFamily: "'DM Sans', sans-serif",
+                    fontFamily: "'Source Serif 4', Georgia, serif",
+                    fontSize: '24px',
                     color: '#2B3A67',
                   }}
                 >
-                  Back to sign in
-                </button>
-              </div>
-            ) : view === 'main' || view === 'signup' ? (
-              /* Main Sign In / Sign Up View */
-              <>
-                {/* Google Sign In */}
-                <button
-                  onClick={handleGoogleSignIn}
-                  disabled={isLoading}
-                  className="w-full flex items-center justify-center gap-3 px-4 rounded-lg border transition-colors disabled:opacity-50"
+                  TDI Learning Hub
+                </h1>
+                <p
                   style={{
-                    height: '48px',
-                    borderRadius: '8px',
-                    backgroundColor: 'white',
-                    borderColor: '#E5E7EB',
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '14px',
+                    color: '#6B7280',
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F9FAFB')}
-                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'white')}
                 >
-                  <GoogleLogo />
-                  <span
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: '15px',
-                      color: '#374151',
-                    }}
-                  >
-                    Continue with Google
-                  </span>
-                </button>
+                  Professional development that fits your life
+                </p>
+              </div>
 
-                {/* Divider */}
-                <div className="relative my-6">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t" style={{ borderColor: '#E5E7EB' }} />
-                  </div>
-                  <div className="relative flex justify-center">
-                    <span
-                      className="px-3"
+              {/* Card */}
+              <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
+                {successMessage ? (
+                  /* Success State */
+                  <div className="text-center py-4">
+                    <div
+                      className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center"
+                      style={{ backgroundColor: '#D1FAE5' }}
+                    >
+                      <CheckCircle size={32} className="text-green-600" />
+                    </div>
+
+                    <p
+                      className="text-gray-700 mb-6"
+                      style={{ fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                      {successMessage}
+                    </p>
+
+                    <button
+                      onClick={() => switchView('main')}
+                      className="text-sm hover:underline"
                       style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        color: '#2B3A67',
+                      }}
+                    >
+                      Back to sign in
+                    </button>
+                  </div>
+                ) : view === 'main' || view === 'signup' ? (
+                  /* Main Sign In / Sign Up View */
+                  <>
+                    {/* Google Sign In */}
+                    <button
+                      onClick={handleGoogleSignIn}
+                      disabled={isLoading}
+                      className="w-full flex items-center justify-center gap-3 px-4 rounded-lg border transition-colors disabled:opacity-50"
+                      style={{
+                        height: '48px',
+                        borderRadius: '8px',
                         backgroundColor: 'white',
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: '12px',
-                        color: '#9CA3AF',
+                        borderColor: '#E5E7EB',
                       }}
+                      onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = '#F9FAFB')}
+                      onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'white')}
                     >
-                      or sign in with email
-                    </span>
-                  </div>
-                </div>
-
-                {/* Email/Password Form */}
-                <form onSubmit={view === 'signup' ? handleSignUp : handleSignIn}>
-                  {/* Email Field */}
-                  <div className="mb-4">
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium mb-1.5"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        color: '#374151',
-                      }}
-                    >
-                      Email address
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@school.edu"
-                      required
-                      className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        borderColor: fieldErrors.email ? '#DC2626' : '#E5E7EB',
-                      }}
-                    />
-                    {fieldErrors.email && (
-                      <p
-                        className="mt-1"
+                      <GoogleLogo />
+                      <span
                         style={{
                           fontFamily: "'DM Sans', sans-serif",
-                          fontSize: '13px',
-                          color: '#DC2626',
-                        }}
-                      >
-                        {fieldErrors.email}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Password Field */}
-                  <div className="mb-4">
-                    <label
-                      htmlFor="password"
-                      className="block text-sm font-medium mb-1.5"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        color: '#374151',
-                      }}
-                    >
-                      Password
-                    </label>
-                    <input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Your password"
-                      required
-                      className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        borderColor: fieldErrors.password ? '#DC2626' : '#E5E7EB',
-                      }}
-                    />
-                    {fieldErrors.password && (
-                      <p
-                        className="mt-1"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: '13px',
-                          color: '#DC2626',
-                        }}
-                      >
-                        {fieldErrors.password}
-                      </p>
-                    )}
-                  </div>
-
-                  {/* Confirm Password (Sign Up only) */}
-                  {view === 'signup' && (
-                    <div className="mb-4">
-                      <label
-                        htmlFor="confirmPassword"
-                        className="block text-sm font-medium mb-1.5"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: '15px',
                           color: '#374151',
                         }}
                       >
-                        Confirm password
-                      </label>
-                      <input
-                        id="confirmPassword"
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm your password"
-                        required
-                        className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          borderColor: fieldErrors.confirmPassword ? '#DC2626' : '#E5E7EB',
-                        }}
-                      />
-                      {fieldErrors.confirmPassword && (
+                        Continue with Google
+                      </span>
+                    </button>
+
+                    {/* Divider */}
+                    <div className="relative my-6">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t" style={{ borderColor: '#E5E7EB' }} />
+                      </div>
+                      <div className="relative flex justify-center">
+                        <span
+                          className="px-3"
+                          style={{
+                            backgroundColor: 'white',
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: '12px',
+                            color: '#9CA3AF',
+                          }}
+                        >
+                          or sign in with email
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Email/Password Form */}
+                    <form onSubmit={view === 'signup' ? handleSignUp : handleSignIn}>
+                      {/* Email Field */}
+                      <div className="mb-4">
+                        <label
+                          htmlFor="email"
+                          className="block text-sm font-medium mb-1.5"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            color: '#374151',
+                          }}
+                        >
+                          Email address
+                        </label>
+                        <input
+                          id="email"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="you@school.edu"
+                          required
+                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            borderColor: fieldErrors.email ? '#DC2626' : '#E5E7EB',
+                          }}
+                        />
+                        {fieldErrors.email && (
+                          <p
+                            className="mt-1"
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              fontSize: '13px',
+                              color: '#DC2626',
+                            }}
+                          >
+                            {fieldErrors.email}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Password Field */}
+                      <div className="mb-4">
+                        <label
+                          htmlFor="password"
+                          className="block text-sm font-medium mb-1.5"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            color: '#374151',
+                          }}
+                        >
+                          Password
+                        </label>
+                        <input
+                          id="password"
+                          type="password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Your password"
+                          required
+                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            borderColor: fieldErrors.password ? '#DC2626' : '#E5E7EB',
+                          }}
+                        />
+                        {fieldErrors.password && (
+                          <p
+                            className="mt-1"
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              fontSize: '13px',
+                              color: '#DC2626',
+                            }}
+                          >
+                            {fieldErrors.password}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Confirm Password (Sign Up only) */}
+                      {view === 'signup' && (
+                        <div className="mb-4">
+                          <label
+                            htmlFor="confirmPassword"
+                            className="block text-sm font-medium mb-1.5"
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              color: '#374151',
+                            }}
+                          >
+                            Confirm password
+                          </label>
+                          <input
+                            id="confirmPassword"
+                            type="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Confirm your password"
+                            required
+                            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              borderColor: fieldErrors.confirmPassword ? '#DC2626' : '#E5E7EB',
+                            }}
+                          />
+                          {fieldErrors.confirmPassword && (
+                            <p
+                              className="mt-1"
+                              style={{
+                                fontFamily: "'DM Sans', sans-serif",
+                                fontSize: '13px',
+                                color: '#DC2626',
+                              }}
+                            >
+                              {fieldErrors.confirmPassword}
+                            </p>
+                          )}
+                        </div>
+                      )}
+
+                      {/* General Error */}
+                      {error && (
                         <p
-                          className="mt-1"
+                          className="mb-4"
                           style={{
                             fontFamily: "'DM Sans', sans-serif",
                             fontSize: '13px',
                             color: '#DC2626',
                           }}
                         >
-                          {fieldErrors.confirmPassword}
+                          {error}
                         </p>
                       )}
-                    </div>
-                  )}
 
-                  {/* General Error */}
-                  {error && (
-                    <p
-                      className="mb-4"
+                      {/* Submit Button */}
+                      <button
+                        type="submit"
+                        disabled={isLoading || !email || !password || (view === 'signup' && !confirmPassword)}
+                        className="w-full font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{
+                          height: '44px',
+                          backgroundColor: '#E8B84B',
+                          color: '#2B3A67',
+                          fontFamily: "'DM Sans', sans-serif",
+                        }}
+                      >
+                        {isLoading ? 'Please wait...' : view === 'signup' ? 'Create account' : 'Sign in'}
+                      </button>
+                    </form>
+
+                    {/* Links */}
+                    <div className="flex justify-between mt-4">
+                      <button
+                        onClick={() => switchView(view === 'signup' ? 'main' : 'signup')}
+                        className="text-left hover:text-[#2B3A67] transition-colors"
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: '13px',
+                          color: '#6B7280',
+                        }}
+                      >
+                        {view === 'signup' ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+                      </button>
+                      {view === 'main' && (
+                        <button
+                          onClick={() => switchView('forgot')}
+                          className="hover:text-[#2B3A67] transition-colors"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: '13px',
+                            color: '#6B7280',
+                          }}
+                        >
+                          Forgot password?
+                        </button>
+                      )}
+                    </div>
+                  </>
+                ) : view === 'forgot' ? (
+                  /* Forgot Password View */
+                  <>
+                    <h2
+                      className="font-semibold mb-2 text-center"
                       style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: '13px',
-                        color: '#DC2626',
+                        fontFamily: "'Source Serif 4', Georgia, serif",
+                        fontSize: '18px',
+                        color: '#2B3A67',
                       }}
                     >
-                      {error}
+                      Reset your password
+                    </h2>
+                    <p
+                      className="text-center mb-6"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: '14px',
+                        color: '#6B7280',
+                      }}
+                    >
+                      Enter your email and we'll send you a reset link.
                     </p>
-                  )}
 
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    disabled={isLoading || !email || !password || (view === 'signup' && !confirmPassword)}
-                    className="w-full font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                      height: '44px',
-                      backgroundColor: '#E8B84B',
-                      color: '#2B3A67',
-                      fontFamily: "'DM Sans', sans-serif",
-                    }}
-                  >
-                    {isLoading ? 'Please wait...' : view === 'signup' ? 'Create account' : 'Sign in'}
-                  </button>
-                </form>
+                    <form onSubmit={handleForgotPassword}>
+                      <div className="mb-4">
+                        <label
+                          htmlFor="resetEmail"
+                          className="block text-sm font-medium mb-1.5"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            color: '#374151',
+                          }}
+                        >
+                          Email address
+                        </label>
+                        <input
+                          id="resetEmail"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="you@school.edu"
+                          required
+                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
+                          style={{ fontFamily: "'DM Sans', sans-serif" }}
+                        />
+                      </div>
 
-                {/* Links */}
-                <div className="flex justify-between mt-4">
-                  <button
-                    onClick={() => switchView(view === 'signup' ? 'main' : 'signup')}
-                    className="text-left hover:text-[#2B3A67] transition-colors"
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: '13px',
-                      color: '#6B7280',
-                    }}
-                  >
-                    {view === 'signup' ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
-                  </button>
-                  {view === 'main' && (
+                      {error && (
+                        <p
+                          className="mb-4"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: '13px',
+                            color: '#DC2626',
+                          }}
+                        >
+                          {error}
+                        </p>
+                      )}
+
+                      <button
+                        type="submit"
+                        disabled={isLoading || !email}
+                        className="w-full font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{
+                          height: '44px',
+                          backgroundColor: '#E8B84B',
+                          color: '#2B3A67',
+                          fontFamily: "'DM Sans', sans-serif",
+                        }}
+                      >
+                        {isLoading ? 'Sending...' : 'Send reset link'}
+                      </button>
+                    </form>
+
                     <button
-                      onClick={() => switchView('forgot')}
-                      className="hover:text-[#2B3A67] transition-colors"
+                      onClick={() => switchView('main')}
+                      className="w-full mt-4 text-center hover:underline"
                       style={{
                         fontFamily: "'DM Sans', sans-serif",
                         fontSize: '13px',
                         color: '#6B7280',
                       }}
                     >
-                      Forgot password?
+                      Back to sign in
                     </button>
-                  )}
-                </div>
-              </>
-            ) : view === 'forgot' ? (
-              /* Forgot Password View */
-              <>
-                <h2
-                  className="font-semibold mb-2 text-center"
-                  style={{
-                    fontFamily: "'Source Serif 4', Georgia, serif",
-                    fontSize: '18px',
-                    color: '#2B3A67',
-                  }}
-                >
-                  Reset your password
-                </h2>
-                <p
-                  className="text-center mb-6"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '14px',
-                    color: '#6B7280',
-                  }}
-                >
-                  Enter your email and we'll send you a reset link.
-                </p>
-
-                <form onSubmit={handleForgotPassword}>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="resetEmail"
-                      className="block text-sm font-medium mb-1.5"
+                  </>
+                ) : view === 'magic' ? (
+                  /* Magic Link View */
+                  <>
+                    <h2
+                      className="font-semibold mb-2 text-center"
                       style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        color: '#374151',
+                        fontFamily: "'Source Serif 4', Georgia, serif",
+                        fontSize: '18px',
+                        color: '#2B3A67',
                       }}
                     >
-                      Email address
-                    </label>
-                    <input
-                      id="resetEmail"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@school.edu"
-                      required
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
-                      style={{ fontFamily: "'DM Sans', sans-serif" }}
-                    />
-                  </div>
-
-                  {error && (
+                      Sign in with magic link
+                    </h2>
                     <p
-                      className="mb-4"
+                      className="text-center mb-6"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: '14px',
+                        color: '#6B7280',
+                      }}
+                    >
+                      We'll email you a secure link to sign in. No password needed.
+                    </p>
+
+                    <form onSubmit={handleMagicLink}>
+                      <div className="mb-4">
+                        <label
+                          htmlFor="magicEmail"
+                          className="block text-sm font-medium mb-1.5"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            color: '#374151',
+                          }}
+                        >
+                          Email address
+                        </label>
+                        <input
+                          id="magicEmail"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="you@school.edu"
+                          required
+                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
+                          style={{ fontFamily: "'DM Sans', sans-serif" }}
+                        />
+                      </div>
+
+                      {error && (
+                        <p
+                          className="mb-4"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: '13px',
+                            color: '#DC2626',
+                          }}
+                        >
+                          {error}
+                        </p>
+                      )}
+
+                      <button
+                        type="submit"
+                        disabled={isLoading || !email}
+                        className="w-full font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{
+                          height: '44px',
+                          backgroundColor: '#E8B84B',
+                          color: '#2B3A67',
+                          fontFamily: "'DM Sans', sans-serif",
+                        }}
+                      >
+                        {isLoading ? 'Sending...' : 'Send magic link'}
+                      </button>
+                    </form>
+
+                    <button
+                      onClick={() => switchView('main')}
+                      className="w-full mt-4 text-center hover:underline"
                       style={{
                         fontFamily: "'DM Sans', sans-serif",
                         fontSize: '13px',
-                        color: '#DC2626',
+                        color: '#6B7280',
                       }}
                     >
-                      {error}
-                    </p>
-                  )}
+                      Back to sign in
+                    </button>
+                  </>
+                ) : null}
 
-                  <button
-                    type="submit"
-                    disabled={isLoading || !email}
-                    className="w-full font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                      height: '44px',
-                      backgroundColor: '#E8B84B',
-                      color: '#2B3A67',
-                      fontFamily: "'DM Sans', sans-serif",
-                    }}
-                  >
-                    {isLoading ? 'Sending...' : 'Send reset link'}
-                  </button>
-                </form>
-
-                <button
-                  onClick={() => switchView('main')}
-                  className="w-full mt-4 text-center hover:underline"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '13px',
-                    color: '#6B7280',
-                  }}
-                >
-                  Back to sign in
-                </button>
-              </>
-            ) : view === 'magic' ? (
-              /* Magic Link View */
-              <>
-                <h2
-                  className="font-semibold mb-2 text-center"
-                  style={{
-                    fontFamily: "'Source Serif 4', Georgia, serif",
-                    fontSize: '18px',
-                    color: '#2B3A67',
-                  }}
-                >
-                  Sign in with magic link
-                </h2>
-                <p
-                  className="text-center mb-6"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '14px',
-                    color: '#6B7280',
-                  }}
-                >
-                  We'll email you a secure link to sign in. No password needed.
-                </p>
-
-                <form onSubmit={handleMagicLink}>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="magicEmail"
-                      className="block text-sm font-medium mb-1.5"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        color: '#374151',
-                      }}
-                    >
-                      Email address
-                    </label>
-                    <input
-                      id="magicEmail"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="you@school.edu"
-                      required
-                      className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
-                      style={{ fontFamily: "'DM Sans', sans-serif" }}
-                    />
-                  </div>
-
-                  {error && (
-                    <p
-                      className="mb-4"
+                {/* Magic Link Tertiary Option (only on main/signup view) */}
+                {!successMessage && (view === 'main' || view === 'signup') && (
+                  <div className="mt-6 pt-6 border-t border-gray-100 text-center">
+                    <button
+                      onClick={() => switchView('magic')}
+                      className="hover:underline transition-colors"
                       style={{
                         fontFamily: "'DM Sans', sans-serif",
                         fontSize: '13px',
-                        color: '#DC2626',
+                        color: '#9CA3AF',
                       }}
                     >
-                      {error}
-                    </p>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={isLoading || !email}
-                    className="w-full font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    style={{
-                      height: '44px',
-                      backgroundColor: '#E8B84B',
-                      color: '#2B3A67',
-                      fontFamily: "'DM Sans', sans-serif",
-                    }}
-                  >
-                    {isLoading ? 'Sending...' : 'Send magic link'}
-                  </button>
-                </form>
-
-                <button
-                  onClick={() => switchView('main')}
-                  className="w-full mt-4 text-center hover:underline"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '13px',
-                    color: '#6B7280',
-                  }}
-                >
-                  Back to sign in
-                </button>
-              </>
-            ) : null}
-
-            {/* Magic Link Tertiary Option (only on main/signup view) */}
-            {!successMessage && (view === 'main' || view === 'signup') && (
-              <div className="mt-6 pt-6 border-t border-gray-100 text-center">
-                <button
-                  onClick={() => switchView('magic')}
-                  className="hover:underline transition-colors"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '13px',
-                    color: '#9CA3AF',
-                  }}
-                >
-                  Prefer no password? Send me a magic link
-                </button>
+                      Prefer no password? Send me a magic link
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
 
-          {/* Terms Footer */}
-          <p
-            className="mt-8 text-center text-sm text-gray-400"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          >
-            By signing in, you agree to our{' '}
-            <Link href="/terms" className="underline hover:text-gray-600">
-              Terms
-            </Link>{' '}
-            and{' '}
-            <Link href="/privacy" className="underline hover:text-gray-600">
-              Privacy Policy
-            </Link>
-          </p>
+              {/* Terms Footer */}
+              <p
+                className="mt-8 text-center text-sm text-gray-400"
+                style={{ fontFamily: "'DM Sans', sans-serif" }}
+              >
+                By signing in, you agree to our{' '}
+                <Link href="/terms" className="underline hover:text-gray-600">
+                  Terms
+                </Link>{' '}
+                and{' '}
+                <Link href="/privacy" className="underline hover:text-gray-600">
+                  Privacy Policy
+                </Link>
+              </p>
+            </div>
+          </main>
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }
