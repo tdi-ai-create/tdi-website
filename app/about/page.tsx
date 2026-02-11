@@ -646,59 +646,59 @@ export default function AboutPage() {
       </section>
 
       {/* The Story Behind the Symbol */}
-      <section id="symbol" className="py-24" style={{ backgroundColor: '#faf3e0' }}>
-        <div className="container-default">
-          <div className="max-w-5xl mx-auto">
-            {/* Heading */}
-            <h2
-              className="text-2xl md:text-3xl font-bold text-center mb-12"
-              style={{ color: '#1e3a5f' }}
-            >
-              The Story Behind the Symbol
-            </h2>
+      <section id="symbol" className="py-16 md:py-24" style={{ backgroundColor: '#faf3e0' }}>
+        <div className="max-w-4xl mx-auto px-6">
+          {/* Heading */}
+          <h2
+            className="text-2xl md:text-3xl font-bold text-center mb-4"
+            style={{ color: '#1e3a5f' }}
+          >
+            The Story Behind the Symbol
+          </h2>
 
-            <div className="flex flex-col md:flex-row items-center gap-12 md:gap-16">
-              {/* Animation - left side on desktop, top on mobile */}
-              <div className="w-48 h-48 md:w-64 md:h-64 flex-shrink-0">
-                <SymbolAnimation />
-              </div>
-
-              {/* Text - right side on desktop, below on mobile */}
-              <div
-                className="flex-1 space-y-6"
-                style={{ color: '#1e3a5f', fontSize: '17px', lineHeight: '1.8' }}
-              >
-                <p>If you've been a teacher, you know the mark.</p>
-
-                <p>
-                  Not a grade. Not a checkmark. That quick little W a teacher leaves on student work, the one that says "yes, you got it." Students know it instantly. It's not formal. It's human. It's the fastest way to say "I see your knowledge."
-                </p>
-
-                <p>That's where our symbol starts. The approval mark.</p>
-
-                <p>
-                  But it doesn't stop there. The pen keeps moving. The final upstroke of the W climbs up and becomes a circle, sweeping around the whole thing. One continuous stroke that never lifts off the paper.
-                </p>
-
-                <p>
-                  The circle is the embrace. It's protection. Attention. "I circled back to you." The way a teacher wraps care around a student.
-                </p>
-
-                <p>One stroke says two things: I see you. I've got you.</p>
-
-                <p>
-                  You'll notice this symbol when you enter our portals: the Creators Studio, the Leadership Dashboard, the Learning Hub. A line enters the screen, forms the mark, holds for just a moment, then unravels and carries you in. The symbol was never meant to be permanent. It was always just one line passing through. The same line that wrote "I see you" becomes the line that takes you where you need to go.
-                </p>
-
-                <p>
-                  That felt right for what we do. We're not here to sit on a shelf. We're here to move through your practice and leave something behind that matters.
-                </p>
-
-                <p>
-                  One stroke. It draws on, it holds, it unravels. The mark that says "I see you" then becomes the line that takes you there.
-                </p>
-              </div>
+          {/* Animation - centered, prominent */}
+          <div className="flex justify-center mb-10">
+            <div className="w-56 h-56 md:w-72 md:h-72">
+              <SymbolAnimation />
             </div>
+          </div>
+
+          {/* Story text */}
+          <div
+            className="max-w-2xl mx-auto space-y-5"
+            style={{ color: '#1e3a5f', fontSize: '16px', lineHeight: '1.85' }}
+          >
+            <p>If you've been a teacher, you know the mark.</p>
+
+            <p>
+              Not a grade. Not a checkmark. That quick little initial a teacher leaves on student work — the one that says "yes, you got it." Students know it instantly. It's not formal. It's human. It's the fastest way to say "I see your knowledge."
+            </p>
+
+            <p>
+              That's where our symbol starts. The H — my last name, Hughart — the approval mark I left on thousands of papers. Quick, confident, real.
+            </p>
+
+            <p>
+              But it doesn't stop there. The pen keeps moving. The final upstroke of the H climbs up and becomes a circle — sweeping around the whole thing. One continuous stroke that never lifts off the paper.
+            </p>
+
+            <p>
+              The circle is the embrace. It's protection. Attention. "I circled back to you." The way a teacher wraps care around a student.
+            </p>
+
+            <p>One stroke says two things: I see you. I've got you.</p>
+
+            <p>
+              You'll notice this symbol when you enter our portals — the Creators Studio, the Leadership Dashboard, the Learning Hub. A line enters the screen, forms the mark, holds for just a moment, then unravels and carries you in. The symbol was never meant to be permanent. It was always just one line passing through — the same line that wrote "I see you" becomes the line that takes you where you need to go.
+            </p>
+
+            <p>
+              That felt right for what we do. We're not here to sit on a shelf. We're here to move through your practice and leave something behind that matters.
+            </p>
+
+            <p>
+              One stroke. It draws on, it holds, it unravels. The mark that says "I see you" — then becomes the line that takes you there.
+            </p>
           </div>
         </div>
       </section>

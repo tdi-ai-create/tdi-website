@@ -33,7 +33,7 @@ export default function SymbolAnimation() {
   const startTimeRef = useRef<number | null>(null);
   const isVisibleRef = useRef(true);
   const pointsRef = useRef<{ x: number; y: number }[]>([]);
-  const scaleInfoRef = useRef<{ scale: number; offsetX: number; offsetY: number } | null>(null);
+  const symbolCenterRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -68,7 +68,7 @@ export default function SymbolAnimation() {
       const bbox = pathElement.getBBox();
 
       // Calculate scale to fit canvas with padding
-      const padding = 0.15; // 15% padding on each side
+      const padding = 0.15;
       const availableWidth = width * (1 - padding * 2);
       const availableHeight = height * (1 - padding * 2);
       const scale = Math.min(availableWidth / bbox.width, availableHeight / bbox.height);
@@ -79,8 +79,8 @@ export default function SymbolAnimation() {
       const offsetX = centerX - (bbox.x + bbox.width / 2) * scale;
       const offsetY = centerY - (bbox.y + bbox.height / 2) * scale;
 
-      // Store scale info for line width calculation
-      scaleInfoRef.current = { scale, offsetX, offsetY };
+      // Store symbol center for scale transforms
+      symbolCenterRef.current = { x: centerX, y: centerY };
 
       // Sample points from the SVG path
       for (let i = 0; i < symbolPointCount; i++) {
@@ -98,14 +98,15 @@ export default function SymbolAnimation() {
 
     let canvasSize = setupCanvas();
 
-    // Animation duration in milliseconds (5 seconds per cycle)
-    const animationDuration = 5000;
+    // Animation duration in milliseconds (6 seconds per cycle)
+    const animationDuration = 6000;
 
-    // Animation phases
-    const drawPhaseEnd = 0.60;   // 0-60%: drawing
-    const holdPhaseEnd = 0.75;   // 60-75%: hold
-    const fadePhaseEnd = 0.90;   // 75-90%: fade out
-    // 90-100%: pause (blank canvas)
+    // Animation phases (total = 100%)
+    const drawPhaseEnd = 0.50;    // 0-50%: draw on with lift
+    const stampPhaseEnd = 0.58;   // 50-58%: stamp down
+    const restPhaseEnd = 0.90;    // 58-90%: rest as static
+    const fadePhaseEnd = 0.97;    // 90-97%: fade out
+    // 97-100%: pause (blank canvas)
 
     const animate = (timestamp: number) => {
       if (!isVisibleRef.current) {
@@ -123,31 +124,64 @@ export default function SymbolAnimation() {
       const { width, height } = canvasSize;
       const points = pointsRef.current;
       const totalPoints = points.length;
+      const center = symbolCenterRef.current;
 
       // Clear canvas
       ctx.clearRect(0, 0, width, height);
 
-      // During pause phase (90-100%), don't draw anything
+      // During pause phase (97-100%), don't draw anything
       if (rawProgress >= fadePhaseEnd) {
         animationRef.current = requestAnimationFrame(animate);
         return;
       }
 
-      // Calculate how much of the symbol to draw and opacity
-      let drawProgress: number;
+      // Calculate line width proportional to canvas size
+      const baseLineWidth = (width / 200) * 3.5;
+
+      // Calculate animation state based on phase
+      let drawProgress = 1;
       let opacity = 1;
+      let shadowOffsetY = 0;
+      let shadowBlur = 0;
+      let scaleFactor = 1;
+      let showPenTip = false;
 
       if (rawProgress <= drawPhaseEnd) {
-        // Drawing phase: progressively reveal the symbol
+        // Phase 1: Draw on with lift effect
         const phaseProgress = rawProgress / drawPhaseEnd;
         drawProgress = easeInOut(phaseProgress);
-      } else if (rawProgress <= holdPhaseEnd) {
-        // Hold phase: full symbol visible
+        showPenTip = true;
+
+        // Growing shadow and scale as it "lifts off the page"
+        shadowOffsetY = phaseProgress * 6;
+        shadowBlur = phaseProgress * 12;
+        scaleFactor = 1 + phaseProgress * 0.03; // 1.0 to 1.03
+
+      } else if (rawProgress <= stampPhaseEnd) {
+        // Phase 2: Stamp down
+        const phaseProgress = (rawProgress - drawPhaseEnd) / (stampPhaseEnd - drawPhaseEnd);
         drawProgress = 1;
+
+        // Quick snap down of shadow
+        shadowOffsetY = 6 * (1 - phaseProgress);
+        shadowBlur = 12 * (1 - phaseProgress);
+
+        // Bounce effect: 1.03 -> 0.98 -> 1.0
+        const bounce = 1.0 - 0.03 * Math.sin(phaseProgress * Math.PI) * (1 - phaseProgress * 0.5);
+        scaleFactor = 1.03 * (1 - phaseProgress) + bounce * phaseProgress;
+
+      } else if (rawProgress <= restPhaseEnd) {
+        // Phase 3: Rest as static image
+        drawProgress = 1;
+        // No shadow, no scale, just the mark
+        shadowOffsetY = 0;
+        shadowBlur = 0;
+        scaleFactor = 1;
+
       } else {
-        // Fade phase: full symbol fading out
+        // Phase 4: Fade out
         drawProgress = 1;
-        const fadeProgress = (rawProgress - holdPhaseEnd) / (fadePhaseEnd - holdPhaseEnd);
+        const fadeProgress = (rawProgress - restPhaseEnd) / (fadePhaseEnd - restPhaseEnd);
         opacity = 1 - easeInOut(fadeProgress);
       }
 
@@ -158,8 +192,51 @@ export default function SymbolAnimation() {
         return;
       }
 
-      // Calculate line width proportional to canvas size (3-4px at 200px wide)
-      const baseLineWidth = (width / 200) * 3.5;
+      // Helper function to draw the symbol path
+      const drawSymbolPath = () => {
+        ctx.beginPath();
+        ctx.moveTo(points[0].x, points[0].y);
+
+        for (let i = 1; i <= endIndex; i++) {
+          const curr = points[i];
+          const next = points[Math.min(i + 1, endIndex)];
+
+          const cpx = curr.x;
+          const cpy = curr.y;
+          const endx = (curr.x + next.x) / 2;
+          const endy = (curr.y + next.y) / 2;
+
+          if (i === endIndex) {
+            ctx.lineTo(curr.x, curr.y);
+          } else {
+            ctx.quadraticCurveTo(cpx, cpy, endx, endy);
+          }
+        }
+      };
+
+      // Apply scale transform centered on symbol
+      ctx.save();
+      ctx.translate(center.x, center.y);
+      ctx.scale(scaleFactor, scaleFactor);
+      ctx.translate(-center.x, -center.y);
+
+      // Draw drop shadow (lift effect)
+      if (shadowBlur > 0 || shadowOffsetY > 0) {
+        ctx.save();
+        ctx.globalAlpha = opacity * 0.15;
+        ctx.strokeStyle = 'rgba(30, 58, 95, 1)';
+        ctx.lineWidth = baseLineWidth;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.shadowColor = 'rgba(30, 58, 95, 0.15)';
+        ctx.shadowBlur = shadowBlur;
+        ctx.shadowOffsetY = shadowOffsetY;
+        ctx.shadowOffsetX = 0;
+
+        drawSymbolPath();
+        ctx.stroke();
+        ctx.restore();
+      }
 
       // Draw subtle glow (behind main line)
       ctx.save();
@@ -169,25 +246,7 @@ export default function SymbolAnimation() {
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
-      ctx.beginPath();
-      ctx.moveTo(points[0].x, points[0].y);
-
-      for (let i = 1; i <= endIndex; i++) {
-        const curr = points[i];
-        const next = points[Math.min(i + 1, endIndex)];
-
-        const cpx = curr.x;
-        const cpy = curr.y;
-        const endx = (curr.x + next.x) / 2;
-        const endy = (curr.y + next.y) / 2;
-
-        if (i === endIndex) {
-          ctx.lineTo(curr.x, curr.y);
-        } else {
-          ctx.quadraticCurveTo(cpx, cpy, endx, endy);
-        }
-      }
-
+      drawSymbolPath();
       ctx.stroke();
       ctx.restore();
 
@@ -199,30 +258,12 @@ export default function SymbolAnimation() {
       ctx.lineCap = 'round';
       ctx.lineJoin = 'round';
 
-      ctx.beginPath();
-      ctx.moveTo(points[0].x, points[0].y);
-
-      for (let i = 1; i <= endIndex; i++) {
-        const curr = points[i];
-        const next = points[Math.min(i + 1, endIndex)];
-
-        const cpx = curr.x;
-        const cpy = curr.y;
-        const endx = (curr.x + next.x) / 2;
-        const endy = (curr.y + next.y) / 2;
-
-        if (i === endIndex) {
-          ctx.lineTo(curr.x, curr.y);
-        } else {
-          ctx.quadraticCurveTo(cpx, cpy, endx, endy);
-        }
-      }
-
+      drawSymbolPath();
       ctx.stroke();
       ctx.restore();
 
       // Draw pen tip dot during draw-on phase only
-      if (rawProgress <= drawPhaseEnd && endIndex > 0) {
+      if (showPenTip && endIndex > 0) {
         const tipPoint = points[endIndex];
         ctx.save();
         ctx.globalAlpha = opacity;
@@ -233,6 +274,9 @@ export default function SymbolAnimation() {
         ctx.restore();
       }
 
+      // Restore from scale transform
+      ctx.restore();
+
       animationRef.current = requestAnimationFrame(animate);
     };
 
@@ -242,7 +286,7 @@ export default function SymbolAnimation() {
         entries.forEach((entry) => {
           isVisibleRef.current = entry.isIntersecting;
           if (entry.isIntersecting && !animationRef.current) {
-            startTimeRef.current = null; // Reset timing when becoming visible
+            startTimeRef.current = null;
             animationRef.current = requestAnimationFrame(animate);
           }
         });
