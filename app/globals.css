@@ -812,3 +812,65 @@ label {
 .dashboard-content .dark-card h2 {
   color: white !important;
 }
+
+/* ========================================
+   WCAG 2.1 AA Accessibility
+   ======================================== */
+
+/* Reduced motion preference - respect user's system settings */
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-content *,
+  .dashboard-hero *,
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Skip to main content link - visible only on focus */
+.skip-to-content {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  z-index: 9999;
+}
+
+.skip-to-content:focus {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  width: auto;
+  height: auto;
+  padding: 1rem 1.5rem;
+  background: #1B2A4A;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  outline: 2px solid #FFBA06;
+  outline-offset: 2px;
+}
+
+/* Focus ring for interactive elements */
+.focus-visible-ring:focus-visible {
+  outline: 2px solid #FFBA06;
+  outline-offset: 2px;
+}
+
+/* Ensure focus is visible on all interactive elements */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="tab"]:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid #FFBA06;
+  outline-offset: 2px;
+}

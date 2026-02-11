@@ -29,11 +29,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { slug, userId, userEmail } = body;
 
-    console.log('=== AUTH-CHECK API ===');
-    console.log('Slug:', slug);
-    console.log('UserID:', userId);
-    console.log('UserEmail:', userEmail);
-
     if (!slug) {
       return NextResponse.json(
         { success: false, error: 'Slug required' },
@@ -57,10 +52,7 @@ export async function POST(request: NextRequest) {
       .eq('slug', slug)
       .single();
 
-    console.log('Partnership query result:', partnership?.id, 'error:', pError?.message);
-
     if (pError || !partnership) {
-      console.log('Partnership not found for slug:', slug);
       return NextResponse.json(
         { success: false, error: 'Partnership not found', code: pError?.code },
         { status: 404 }
@@ -69,18 +61,15 @@ export async function POST(request: NextRequest) {
 
     // Check authorization
     const isAdmin = userEmail ? isTDIAdmin(userEmail) : false;
-    console.log('Is TDI Admin:', isAdmin);
 
     if (!isAdmin) {
       // Check if user is linked to this partnership
-      const { data: puData, error: puError } = await supabase
+      const { data: puData } = await supabase
         .from('partnership_users')
         .select('id, role')
         .eq('partnership_id', partnership.id)
         .eq('user_id', userId)
         .maybeSingle();
-
-      console.log('Partnership user link:', puData, 'error:', puError?.message);
 
       if (!puData) {
         return NextResponse.json(
@@ -89,8 +78,6 @@ export async function POST(request: NextRequest) {
         );
       }
     }
-
-    console.log('=== AUTH-CHECK SUCCESS ===');
 
     return NextResponse.json({
       success: true,

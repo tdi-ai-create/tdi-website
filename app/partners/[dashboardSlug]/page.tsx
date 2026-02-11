@@ -248,8 +248,12 @@ const Toast = ({ message, onClose }: { message: string; onClose: () => void }) =
   }, [onClose]);
 
   return (
-    <div className="fixed bottom-4 right-4 bg-[#1e2749] text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50 animate-in slide-in-from-bottom-5">
-      <Check className="w-5 h-5 text-teal-400" />
+    <div
+      role="status"
+      aria-live="polite"
+      className="fixed bottom-4 right-4 bg-[#1e2749] text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-2 z-50 animate-in slide-in-from-bottom-5"
+    >
+      <Check className="w-5 h-5 text-teal-400" aria-hidden="true" />
       {message}
     </div>
   );
@@ -500,35 +504,23 @@ export default function PartnerDashboard() {
   useEffect(() => {
     const checkAuthAndLoad = async () => {
       try {
-        // Debug logging
-        console.log('=== DASHBOARD DEBUG START ===');
-        console.log('1. Raw slug from URL:', dashboardSlug);
-        console.log('2. Cleaned slug (partnerSlug):', partnerSlug);
-
         // Check if this is a valid dashboard URL
         if (!partnerSlug) {
-          console.log('3. FAILED: partnerSlug is falsy');
           setErrorMessage('Invalid dashboard URL');
           setIsLoading(false);
           return;
         }
 
         // Check auth
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        console.log('4. Session check - error:', sessionError);
-        console.log('5. Session exists:', !!session);
-        console.log('6. User email:', session?.user?.email);
-        console.log('7. User ID:', session?.user?.id);
+        const { data: { session } } = await supabase.auth.getSession();
 
         if (!session?.user) {
-          console.log('8. REDIRECT: No session, going to login');
           router.push('/partners/login');
           return;
         }
 
         setUserId(session.user.id);
         setUserEmail(session.user.email || null);
-        console.log('9. Calling auth-check API...');
 
         // Use API route to look up partnership (bypasses RLS)
         const authResponse = await fetch('/api/partners/auth-check', {
@@ -542,12 +534,8 @@ export default function PartnerDashboard() {
         });
 
         const authData = await authResponse.json();
-        console.log('10. Auth-check response:', authData);
 
         if (!authData.success) {
-          console.log('11. FAILED:', authData.error);
-          console.log('=== DASHBOARD DEBUG END (FAILED) ===');
-
           if (authResponse.status === 404) {
             setErrorMessage('Partnership not found');
           } else if (authResponse.status === 403) {
@@ -559,15 +547,11 @@ export default function PartnerDashboard() {
           return;
         }
 
-        console.log('12. SUCCESS - User authorized, partnership ID:', authData.partnership.id);
         setPartnership(authData.partnership);
         setIsAuthorized(true);
 
         // Load additional data
-        console.log('13. Loading additional dashboard data...');
         await loadDashboardData(authData.partnership.id);
-        console.log('14. Dashboard data loaded');
-        console.log('=== DASHBOARD DEBUG END (SUCCESS) ===');
 
         // Log activity
         await fetch('/api/partners/log-activity', {
@@ -948,13 +932,21 @@ export default function PartnerDashboard() {
         ) : (
           /* Main Dashboard Content */
           <div className="min-h-screen bg-gray-50">
+      {/* Skip to main content - accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:p-4 focus:bg-white focus:text-[#1B2A4A] focus:font-semibold focus:rounded-lg focus:shadow-lg focus:top-2 focus:left-2"
+      >
+        Skip to main content
+      </a>
+
       {/* Toast */}
       {toastMessage && (
         <Toast message={toastMessage} onClose={() => setToastMessage('')} />
       )}
 
       {/* Navigation */}
-      <nav className="bg-[#1e2749] sticky top-0 z-50 shadow-lg">
+      <nav className="bg-[#1e2749] sticky top-0 z-50 shadow-lg" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-14">
             <div className="flex items-center gap-3">
@@ -1045,7 +1037,7 @@ export default function PartnerDashboard() {
       </div>
 
       {/* Tab Content */}
-      <div className="dashboard-content max-w-5xl mx-auto px-3 md:px-4 py-4 md:py-8">
+      <main id="main-content" className="dashboard-content max-w-5xl mx-auto px-3 md:px-4 py-4 md:py-8" role="main">
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div
@@ -3949,7 +3941,7 @@ export default function PartnerDashboard() {
             </div>
           </div>
         )}
-      </div>
+      </main>
     </div>
         )}
       </div>

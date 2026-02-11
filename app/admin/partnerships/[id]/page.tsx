@@ -28,6 +28,10 @@ import {
   Activity,
   FileText,
   ClipboardList,
+  Mail,
+  Copy,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import {
@@ -36,6 +40,12 @@ import {
   statusLabels,
   formatMetricValue,
 } from '@/lib/metric-thresholds';
+import {
+  REMINDER_TEMPLATES,
+  replaceVariables,
+  type ReminderType,
+  type ReminderVariables,
+} from '@/lib/reminder-templates';
 
 // Types
 interface Partnership {
@@ -219,6 +229,7 @@ export default function PartnershipDetailPage() {
   const [showMetricsModal, setShowMetricsModal] = useState(false);
   const [showTimelineModal, setShowTimelineModal] = useState(false);
   const [showActionItemModal, setShowActionItemModal] = useState(false);
+  const [showReminderModal, setShowReminderModal] = useState(false);
 
   // Modal form state
   const [metricsForm, setMetricsForm] = useState({
@@ -244,6 +255,23 @@ export default function PartnershipDetailPage() {
     priority: 'medium',
     due_date: '',
   });
+
+  const [reminderForm, setReminderForm] = useState({
+    reminder_type: 'action_item_nudge' as ReminderType,
+    recipient_email: '',
+    subject: '',
+    body: '',
+  });
+  const [showReminderPreview, setShowReminderPreview] = useState(false);
+  const [reminderCopied, setReminderCopied] = useState(false);
+  const [reminderHistory, setReminderHistory] = useState<Array<{
+    id: string;
+    reminder_type: string;
+    subject: string;
+    status: string;
+    created_at: string;
+  }>>([]);
+  const [showReminderHistory, setShowReminderHistory] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -706,7 +734,7 @@ export default function PartnershipDetailPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-3 mb-6">
           <Link
             href={`/admin/partnerships/${partnershipId}/surveys`}
             className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 p-4 hover:border-[#80a4ed] transition-colors"
@@ -772,6 +800,36 @@ export default function PartnershipDetailPage() {
             <div className="text-left">
               <p className="font-medium text-[#1e2749]">Edit Partnership</p>
               <p className="text-xs text-gray-500">Update details</p>
+            </div>
+          </button>
+
+          <button
+            onClick={() => {
+              // Pre-fill recipient email and load template
+              const variables: ReminderVariables = {
+                contact_name: partnership.contact_name.split(' ')[0],
+                dashboard_url: `https://www.teachersdeserveit.com/partners/${partnership.slug}-dashboard`,
+                pending_count: Math.round(staffCount * 0.3), // Estimate ~30% not logged in
+                remaining_count: (partnership.virtual_sessions_total || 4) - (partnership.virtual_sessions_used || 0),
+                booking_link: 'https://calendly.com/teachersdeserveit',
+              };
+              const template = REMINDER_TEMPLATES.action_item_nudge;
+              setReminderForm({
+                reminder_type: 'action_item_nudge',
+                recipient_email: partnership.contact_email,
+                subject: replaceVariables(template.subject, variables),
+                body: replaceVariables(template.body, variables),
+              });
+              setShowReminderModal(true);
+            }}
+            className="flex items-center gap-3 bg-white rounded-xl border border-gray-200 p-4 hover:border-[#80a4ed] transition-colors"
+          >
+            <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
+              <Mail className="w-5 h-5 text-pink-600" />
+            </div>
+            <div className="text-left">
+              <p className="font-medium text-[#1e2749]">Send Reminder</p>
+              <p className="text-xs text-gray-500">Email partner</p>
             </div>
           </button>
         </div>
@@ -1616,6 +1674,210 @@ export default function PartnershipDetailPage() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Send Reminder Modal */}
+      {showReminderModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-100 sticky top-0 bg-white">
+              <h2 className="text-xl font-semibold text-[#1e2749]">Send Reminder</h2>
+              <button
+                onClick={() => {
+                  setShowReminderModal(false);
+                  setReminderCopied(false);
+                  setShowReminderPreview(false);
+                }}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Template</label>
+                <select
+                  value={reminderForm.reminder_type}
+                  onChange={(e) => {
+                    const type = e.target.value as ReminderType;
+                    const variables: ReminderVariables = {
+                      contact_name: partnership.contact_name.split(' ')[0],
+                      dashboard_url: `https://www.teachersdeserveit.com/partners/${partnership.slug}-dashboard`,
+                      pending_count: Math.round(staffCount * 0.3), // Estimate ~30% not logged in
+                      remaining_count: (partnership.virtual_sessions_total || 4) - (partnership.virtual_sessions_used || 0),
+                      booking_link: 'https://calendly.com/teachersdeserveit',
+                    };
+                    const template = REMINDER_TEMPLATES[type];
+                    setReminderForm({
+                      reminder_type: type,
+                      recipient_email: reminderForm.recipient_email,
+                      subject: replaceVariables(template.subject, variables),
+                      body: replaceVariables(template.body, variables),
+                    });
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
+                >
+                  <option value="action_item_nudge">Action Item Nudge</option>
+                  <option value="hub_login_reminder">Hub Login Reminder</option>
+                  <option value="session_reminder">Session Reminder</option>
+                  <option value="custom">Custom Message</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Recipient Email *</label>
+                <input
+                  type="email"
+                  required
+                  value={reminderForm.recipient_email}
+                  onChange={(e) => setReminderForm({ ...reminderForm, recipient_email: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Subject *</label>
+                <input
+                  type="text"
+                  required
+                  value={reminderForm.subject}
+                  onChange={(e) => setReminderForm({ ...reminderForm, subject: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Message *</label>
+                <textarea
+                  required
+                  rows={8}
+                  value={reminderForm.body}
+                  onChange={(e) => setReminderForm({ ...reminderForm, body: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none resize-none font-mono text-sm"
+                />
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowReminderPreview(!showReminderPreview)}
+                className="flex items-center gap-2 text-sm text-[#80a4ed] hover:underline"
+              >
+                {showReminderPreview ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                {showReminderPreview ? 'Hide Preview' : 'Show Preview'}
+              </button>
+
+              {showReminderPreview && (
+                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                  <p className="text-sm font-medium text-gray-700 mb-2">Subject: {reminderForm.subject}</p>
+                  <div className="text-sm text-gray-600 whitespace-pre-wrap">{reminderForm.body}</div>
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-4 border-t border-gray-100">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowReminderModal(false);
+                    setReminderCopied(false);
+                    setShowReminderPreview(false);
+                  }}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const textToCopy = `Subject: ${reminderForm.subject}\n\n${reminderForm.body}`;
+                    await navigator.clipboard.writeText(textToCopy);
+                    setReminderCopied(true);
+
+                    // Log the reminder
+                    try {
+                      await fetch('/api/admin/reminders', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'x-user-email': userEmail || '',
+                        },
+                        body: JSON.stringify({
+                          partnership_id: partnershipId,
+                          reminder_type: reminderForm.reminder_type,
+                          subject: reminderForm.subject,
+                          body: reminderForm.body,
+                          recipient_email: reminderForm.recipient_email,
+                          status: 'sent',
+                        }),
+                      });
+                    } catch (error) {
+                      console.error('Failed to log reminder:', error);
+                    }
+
+                    setTimeout(() => setReminderCopied(false), 3000);
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 bg-white border border-[#1e2749] text-[#1e2749] px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <Copy className="w-4 h-4" />
+                  {reminderCopied ? 'Copied!' : 'Copy to Clipboard'}
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    // For V1, just log and close - no actual email sending
+                    setIsSubmitting(true);
+                    try {
+                      const response = await fetch('/api/admin/reminders', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'x-user-email': userEmail || '',
+                        },
+                        body: JSON.stringify({
+                          partnership_id: partnershipId,
+                          reminder_type: reminderForm.reminder_type,
+                          subject: reminderForm.subject,
+                          body: reminderForm.body,
+                          recipient_email: reminderForm.recipient_email,
+                          status: 'sent',
+                        }),
+                      });
+
+                      if (response.ok) {
+                        setShowReminderModal(false);
+                        setReminderCopied(false);
+                        setShowReminderPreview(false);
+                        // Could add a success toast here
+                      }
+                    } catch (error) {
+                      console.error('Failed to save reminder:', error);
+                    } finally {
+                      setIsSubmitting(false);
+                    }
+                  }}
+                  disabled={isSubmitting || !reminderForm.subject || !reminderForm.body || !reminderForm.recipient_email}
+                  className="flex-1 bg-[#1e2749] text-white px-4 py-2 rounded-lg hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Mail className="w-4 h-4" />
+                      Log & Close
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <p className="text-xs text-gray-500 text-center">
+                V1: Copy the message and send manually via your preferred email client. The reminder will be logged for records.
+              </p>
+            </div>
           </div>
         </div>
       )}
