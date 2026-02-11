@@ -79,182 +79,42 @@ export default function AboutPage() {
 
         {/* Content */}
         <div className="relative z-10 container-default">
-          <div className="max-w-6xl mx-auto">
+          <div className="max-w-3xl">
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            {/* The Story */}
+            <div className="text-left">
+              <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: '#ffffff' }}>
+                How It Started
+              </h2>
 
-              {/* Left: The Story */}
-              <div className="text-left">
-                <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: '#ffffff' }}>
-                  How It Started
-                </h2>
+              <div className="space-y-4" style={{ color: '#ffffff' }}>
+                <p className="text-xl font-semibold" style={{ color: '#ffba06' }}>
+                  Teachers Deserve It was born from burnout.
+                </p>
 
-                <div className="space-y-4" style={{ color: '#ffffff' }}>
-                  <p className="text-xl font-semibold" style={{ color: '#ffba06' }}>
-                    Teachers Deserve It was born from burnout.
-                  </p>
+                <p style={{ opacity: 0.85 }}>
+                  We all knew the feeling... Walking into another teacher institute day (or teacher work day) and you're greeted with donuts. As you settle into the auditorium for sessions, you're not surprised to see a full agenda, with limited breaks, and a 45-minute lunch. The topics? Ones that have nothing to do with what you actually needed in your classrooms. Hours of "someday you'll use this" and "you'll need time for outside planning."
+                </p>
 
-                  <p style={{ opacity: 0.85 }}>
-                    We all knew the feeling... Walking into another teacher institute day (or teacher work day) and you're greeted with donuts. As you settle into the auditorium for sessions, you're not surprised to see a full agenda, with limited breaks, and a 45-minute lunch. The topics? Ones that have nothing to do with what you actually needed in your classrooms. Hours of "someday you'll use this" and "you'll need time for outside planning."
-                  </p>
+                <p className="font-semibold" style={{ opacity: 0.9 }}>
+                  None of it helped us be better for our students on Monday.
+                </p>
 
-                  <p className="font-semibold" style={{ opacity: 0.9 }}>
-                    None of it helped us be better for our students on Monday.
-                  </p>
+                <p style={{ opacity: 0.85 }}>
+                  That system was not built with teachers in mind. TDI was - with teachers at its core, in every decision we make, building a movement that's changing education from the inside out.
+                </p>
 
-                  <p style={{ opacity: 0.85 }}>
-                    That system was not built with teachers in mind. TDI was - with teachers at its core, in every decision we make, building a movement that's changing education from the inside out.
-                  </p>
-
-                  <p style={{ opacity: 0.85 }}>
-                    School leaders noticed too. Principals started asking: how do we bring this to our whole building? How do we keep our best teachers from leaving?
-                  </p>
-                </div>
+                <p style={{ opacity: 0.85 }}>
+                  School leaders noticed too. Principals started asking: how do we bring this to our whole building? How do we keep our best teachers from leaving?
+                </p>
               </div>
-
-              {/* Right: The Blueprint */}
-              <div className="text-left">
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
-                  <h3 className="text-xl font-bold mb-6" style={{ color: '#ffba06' }}>
-                    The TDI Blueprint
-                  </h3>
-                  <div className="space-y-4">
-                    <div className="flex items-start gap-4">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: '#ffba06' }}
-                      >
-                        <span className="font-bold" style={{ color: '#1e2749' }}>1</span>
-                      </div>
-                      <div>
-                        <p className="font-semibold" style={{ color: '#ffffff' }}>Respect Teachers' Time</p>
-                        <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>PD that fits into real life, not consumes it</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-4">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: '#ffba06' }}
-                      >
-                        <span className="font-bold" style={{ color: '#1e2749' }}>2</span>
-                      </div>
-                      <div>
-                        <p className="font-semibold" style={{ color: '#ffffff' }}>Deliver Real Strategies</p>
-                        <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>Practical tools that work Monday morning</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-4">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: '#ffba06' }}
-                      >
-                        <span className="font-bold" style={{ color: '#1e2749' }}>3</span>
-                      </div>
-                      <div>
-                        <p className="font-semibold" style={{ color: '#ffffff' }}>Prioritize Wellness</p>
-                        <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>Sustainable teaching starts with supported teachers</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-4">
-                      <div
-                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-                        style={{ backgroundColor: '#ffba06' }}
-                      >
-                        <span className="font-bold" style={{ color: '#1e2749' }}>4</span>
-                      </div>
-                      <div>
-                        <p className="font-semibold" style={{ color: '#ffffff' }}>Measure What Matters</p>
-                        <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>Real impact, not just attendance sheets</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Admin Outcomes */}
-                  <div className="mt-6 pt-6 border-t border-white/20">
-                    <p className="text-sm font-semibold mb-3" style={{ color: '#ffba06' }}>Built for District Success:</p>
-                    <div className="flex flex-wrap gap-2">
-                      <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Staff Retention</span>
-                      <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Culture Building</span>
-                      <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Measurable ROI</span>
-                      <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Scalable PD</span>
-                      <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Teacher Morale</span>
-                    </div>
-                  </div>
-
-                  <p className="text-sm italic mt-4" style={{ color: '#ffffff', opacity: 0.8 }}>
-                    We stand behind our work with a 30-day turnaround guarantee on custom requests for partner schools.
-                  </p>
-                </div>
-              </div>
-
             </div>
 
           </div>
         </div>
       </section>
 
-      {/* TEDx Video */}
-      <section className="py-12" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="container-default">
-          <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-6">
-              <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: '#ffba06' }}>
-                Watch Rae's Story
-              </p>
-              <h3 className="text-xl font-bold mt-2" style={{ color: '#1e2749' }}>
-                TEDx Talk: Why Teachers Deserve Better
-              </h3>
-            </div>
-            <div className="relative w-full rounded-xl overflow-hidden shadow-lg" style={{ paddingBottom: '56.25%' }}>
-              <iframe
-                className="absolute top-0 left-0 w-full h-full"
-                src="https://www.youtube.com/embed/OLzaa7Hv3mo"
-                title="Rae Hughart TEDx Talk"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-            </div>
-            <p className="text-center text-sm mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
-              This talk has inspired thousands of educators to rethink professional development.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Our Impact Section */}
-      <section className="py-16" style={{ backgroundColor: '#ffba06' }}>
-        <div className="container-default">
-          <h2 className="text-2xl md:text-3xl font-bold text-center mb-10" style={{ color: '#1e2749' }}>
-            Our Impact So Far
-          </h2>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>87,000+</p>
-              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Educators in Our Community</p>
-            </div>
-            <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>21</p>
-              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>States with Partner Schools</p>
-            </div>
-            <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>65%</p>
-              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Implementation Rate</p>
-            </div>
-            <div>
-              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>4.8/5</p>
-              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Average Course Rating</p>
-            </div>
-          </div>
-
-          <p className="text-center text-sm mt-8 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
-            Industry average PD implementation is just 10%.<br />Our teachers actually use what they learn because<br />it's built for Monday morning, not "someday."
-          </p>
-        </div>
-      </section>
-
-      {/* Meet Rae Section */}
+      {/* Meet Rae Section + TEDx Talk */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
@@ -363,20 +223,196 @@ export default function AboutPage() {
             </div>
           </div>
 
+          {/* TEDx Video - within Meet the Founder section */}
+          <div className="max-w-3xl mx-auto mt-16 pt-12 border-t border-gray-200">
+            <div className="text-center mb-6">
+              <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: '#ffba06' }}>
+                Watch Rae's Story
+              </p>
+              <h3 className="text-xl font-bold mt-2" style={{ color: '#1e2749' }}>
+                TEDx Talk: Why Teachers Deserve Better
+              </h3>
+            </div>
+            <div className="relative w-full rounded-xl overflow-hidden shadow-lg" style={{ paddingBottom: '56.25%' }}>
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src="https://www.youtube.com/embed/OLzaa7Hv3mo"
+                title="Rae Hughart TEDx Talk"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            <p className="text-center text-sm mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
+              This talk has inspired thousands of educators to rethink professional development.
+            </p>
+          </div>
+
         </div>
       </section>
 
-      {/* Our Community */}
+      {/* The Story Behind the Symbol */}
+      <section id="symbol" className="py-16 md:py-24" style={{ background: '#faf3e0' }}>
+        <div className="max-w-5xl mx-auto px-6">
+
+          <h2 className="text-2xl md:text-3xl font-bold mb-12" style={{ color: '#1e3a5f' }}>
+            The Story Behind Our Symbol
+          </h2>
+
+          <div className="flex flex-col md:flex-row items-start gap-10 md:gap-16">
+
+            {/* Animation — LEFT side on desktop, top on mobile */}
+            <div className="w-48 h-48 md:w-64 md:h-64 flex-shrink-0 mx-auto md:mx-0 md:sticky md:top-32">
+              <SymbolAnimation />
+            </div>
+
+            {/* Text — RIGHT side on desktop, below on mobile */}
+            <div className="flex-1 space-y-5" style={{ color: '#1e3a5f', fontSize: '16px', lineHeight: '1.85' }}>
+              <p>
+                When I was teaching 6th grade, I ran a mastery learning classroom. Thirty-six students working through content at their own pace, all active at the same time. I needed a fast way to check off their work. To initial that I'd seen it, that they were good to move on.
+              </p>
+
+              <p>
+                So I'd scribble a quick lowercase h. Hughart. My last name, fast and messy, on paper after paper after paper.
+              </p>
+
+              <p>
+                Year over year, it got messier. The h barely looked like a letter anymore. But my students always knew exactly what it was. That little scribble meant I see you. You got it. Keep going.
+              </p>
+
+              <p>
+                It showed up everywhere. On their progress checks, their accomplishments, their big moments and their small ones. Not a grade. Not a checkmark. Just a quick, human sign-off that said I was paying attention and I wasn't going anywhere.
+              </p>
+
+              <p>
+                That's where our symbol comes from. My messy, real, teacher shorthand with a circle swept around it. One continuous stroke that never lifts off the paper. The circle is the part that says I've got you. I circled back. The way a teacher wraps care around a student without making a big deal about it.
+              </p>
+
+              <p>
+                One stroke says two things: I see you. I've got you.
+              </p>
+
+              <p>
+                You'll notice this mark when you enter our portals. The Creators Studio, the Leadership Dashboard, the Learning Hub. A line enters the screen, forms the mark, holds for just a moment, then unravels and carries you in. It was always just one line passing through. The same line that wrote "I see you" becomes the line that takes you where you need to go.
+              </p>
+
+              <p>
+                That felt right for what we do. We're not here to sit on a shelf. We're here to move through your practice and leave something behind that matters.
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </section>
+
+      {/* The TDI Blueprint */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: '#ffba06' }}>
-              The educators in our community share something.
-            </h2>
-            <p className="text-lg md:text-xl" style={{ color: '#ffffff', opacity: 0.9 }}>
-              They're done pretending burnout is a badge of honor. They're practical optimists who believe there's a smarter way to do this work. They're still here because they still believe in teaching. They just refuse to destroy themselves doing it.
-            </p>
+          <div className="max-w-3xl mx-auto">
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
+              <h3 className="text-xl font-bold mb-6" style={{ color: '#ffba06' }}>
+                The TDI Blueprint
+              </h3>
+              <div className="space-y-4">
+                <div className="flex items-start gap-4">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: '#ffba06' }}
+                  >
+                    <span className="font-bold" style={{ color: '#1e2749' }}>1</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold" style={{ color: '#ffffff' }}>Respect Teachers' Time</p>
+                    <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>PD that fits into real life, not consumes it</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: '#ffba06' }}
+                  >
+                    <span className="font-bold" style={{ color: '#1e2749' }}>2</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold" style={{ color: '#ffffff' }}>Deliver Real Strategies</p>
+                    <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>Practical tools that work Monday morning</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: '#ffba06' }}
+                  >
+                    <span className="font-bold" style={{ color: '#1e2749' }}>3</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold" style={{ color: '#ffffff' }}>Prioritize Wellness</p>
+                    <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>Sustainable teaching starts with supported teachers</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div
+                    className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                    style={{ backgroundColor: '#ffba06' }}
+                  >
+                    <span className="font-bold" style={{ color: '#1e2749' }}>4</span>
+                  </div>
+                  <div>
+                    <p className="font-semibold" style={{ color: '#ffffff' }}>Measure What Matters</p>
+                    <p className="text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>Real impact, not just attendance sheets</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Admin Outcomes */}
+              <div className="mt-6 pt-6 border-t border-white/20">
+                <p className="text-sm font-semibold mb-3" style={{ color: '#ffba06' }}>Built for District Success:</p>
+                <div className="flex flex-wrap gap-2">
+                  <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Staff Retention</span>
+                  <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Culture Building</span>
+                  <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Measurable ROI</span>
+                  <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Scalable PD</span>
+                  <span className="px-3 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'rgba(255,186,6,0.2)', color: '#ffba06' }}>Teacher Morale</span>
+                </div>
+              </div>
+
+              <p className="text-sm italic mt-4" style={{ color: '#ffffff', opacity: 0.8 }}>
+                We stand behind our work with a 30-day turnaround guarantee on custom requests for partner schools.
+              </p>
+            </div>
           </div>
+        </div>
+      </section>
+
+      {/* Our Impact Section */}
+      <section className="py-16" style={{ backgroundColor: '#ffba06' }}>
+        <div className="container-default">
+          <h2 className="text-2xl md:text-3xl font-bold text-center mb-10" style={{ color: '#1e2749' }}>
+            Our Impact So Far
+          </h2>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>87,000+</p>
+              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Educators in Our Community</p>
+            </div>
+            <div>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>21</p>
+              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>States with Partner Schools</p>
+            </div>
+            <div>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>65%</p>
+              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Implementation Rate</p>
+            </div>
+            <div>
+              <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>4.8/5</p>
+              <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Average Course Rating</p>
+            </div>
+          </div>
+
+          <p className="text-center text-sm mt-8 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
+            Industry average PD implementation is just 10%.<br />Our teachers actually use what they learn because<br />it's built for Monday morning, not "someday."
+          </p>
         </div>
       </section>
 
@@ -645,67 +681,27 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* The Story Behind the Symbol */}
-      <section id="symbol" className="py-16 md:py-24" style={{ background: '#faf3e0' }}>
-        <div className="max-w-5xl mx-auto px-6">
-
-          <h2 className="text-2xl md:text-3xl font-bold mb-12" style={{ color: '#1e3a5f' }}>
-            The Story Behind Our Symbol
-          </h2>
-
-          <div className="flex flex-col md:flex-row items-start gap-10 md:gap-16">
-
-            {/* Animation — LEFT side on desktop, top on mobile */}
-            <div className="w-48 h-48 md:w-64 md:h-64 flex-shrink-0 mx-auto md:mx-0 md:sticky md:top-32">
-              <SymbolAnimation />
-            </div>
-
-            {/* Text — RIGHT side on desktop, below on mobile */}
-            <div className="flex-1 space-y-5" style={{ color: '#1e3a5f', fontSize: '16px', lineHeight: '1.85' }}>
-              <p>
-                When I was teaching 6th grade, I ran a mastery learning classroom. Thirty-six students working through content at their own pace, all active at the same time. I needed a fast way to check off their work. To initial that I'd seen it, that they were good to move on.
-              </p>
-
-              <p>
-                So I'd scribble a quick lowercase h. Hughart. My last name, fast and messy, on paper after paper after paper.
-              </p>
-
-              <p>
-                Year over year, it got messier. The h barely looked like a letter anymore. But my students always knew exactly what it was. That little scribble meant I see you. You got it. Keep going.
-              </p>
-
-              <p>
-                It showed up everywhere. On their progress checks, their accomplishments, their big moments and their small ones. Not a grade. Not a checkmark. Just a quick, human sign-off that said I was paying attention and I wasn't going anywhere.
-              </p>
-
-              <p>
-                That's where our symbol comes from. My messy, real, teacher shorthand with a circle swept around it. One continuous stroke that never lifts off the paper. The circle is the part that says I've got you. I circled back. The way a teacher wraps care around a student without making a big deal about it.
-              </p>
-
-              <p>
-                One stroke says two things: I see you. I've got you.
-              </p>
-
-              <p>
-                You'll notice this mark when you enter our portals. The Creators Studio, the Leadership Dashboard, the Learning Hub. A line enters the screen, forms the mark, holds for just a moment, then unravels and carries you in. It was always just one line passing through. The same line that wrote "I see you" becomes the line that takes you where you need to go.
-              </p>
-
-              <p>
-                That felt right for what we do. We're not here to sit on a shelf. We're here to move through your practice and leave something behind that matters.
-              </p>
-            </div>
-
+      {/* Our Community */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
+        <div className="container-default">
+          <div className="max-w-3xl mx-auto text-center">
+            <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: '#ffba06' }}>
+              The educators in our community share something.
+            </h2>
+            <p className="text-lg md:text-xl" style={{ color: '#ffffff', opacity: 0.9 }}>
+              They're done pretending burnout is a badge of honor. They're practical optimists who believe there's a smarter way to do this work. They're still here because they still believe in teaching. They just refuse to destroy themselves doing it.
+            </p>
           </div>
         </div>
       </section>
 
       {/* General CTA Section */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#ffffff' }}>
+          <h2 className="text-2xl md:text-3xl font-bold mb-4" style={{ color: '#1e2749' }}>
             Ready to See What TDI Can Do for You?
           </h2>
-          <p className="max-w-2xl mx-auto mb-8" style={{ color: '#ffffff', opacity: 0.8 }}>
+          <p className="max-w-2xl mx-auto mb-8" style={{ color: '#1e2749', opacity: 0.8 }}>
             Whether you're a teacher looking for strategies that actually work, or a leader who wants PD your team will thank you for, we're here to help.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -719,7 +715,7 @@ export default function AboutPage() {
             <a
               href="/for-schools"
               className="inline-flex items-center justify-center px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover-lift"
-              style={{ borderColor: '#ffffff', color: '#ffffff' }}
+              style={{ borderColor: '#1e2749', color: '#1e2749' }}
             >
               Explore School Partnerships
             </a>
