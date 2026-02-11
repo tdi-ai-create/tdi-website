@@ -82,6 +82,9 @@ interface Organization {
   address_city: string;
   address_state: string;
   website?: string;
+  partnership_goal?: string | null;
+  success_targets?: string[] | null;
+  curated_courses?: string[] | null;
 }
 
 interface BuildingInput {
@@ -2866,9 +2869,10 @@ export default function PartnerDashboard() {
                 <div className="w-1 bg-[#1B2A4A] flex-shrink-0" />
                 <div className="p-6 md:p-8">
                   <p className="text-lg text-[#1e2749] leading-relaxed font-medium">
-                    &ldquo;{partnership?.partnership_type === 'district'
-                      ? `Equip educators across ${organization?.name || 'your district'} with practical strategies and resources to confidently support students and each other.`
-                      : `Equip the ${organization?.name || 'your school'} team with practical strategies and resources to transform classrooms and reduce burnout.`
+                    &ldquo;{organization?.partnership_goal ||
+                      (partnership?.partnership_type === 'district'
+                        ? `Equip educators across ${organization?.name || 'your district'} with practical strategies and resources to confidently support students and each other.`
+                        : `Equip the ${organization?.name || 'your school'} team with practical strategies and resources to transform classrooms and reduce burnout.`)
                     }&rdquo;
                   </p>
                   <p className="text-sm text-gray-500 mt-4">— Your Partnership Goal</p>
@@ -3205,27 +3209,41 @@ export default function PartnerDashboard() {
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
               <h2 className="text-lg font-bold text-gray-900 mb-4">What Success Looks Like</h2>
               <div className="grid sm:grid-cols-2 gap-4">
-                {[
-                  { icon: TrendingUp, text: 'Staff report increased confidence in classroom strategies' },
-                  { icon: ThumbsUp, text: 'Measurable improvement in feeling valued and supported' },
-                  { icon: TrendingDown, text: 'Reduced stress levels compared to baseline' },
-                  { icon: CheckCircle, text: 'Clear implementation of Hub strategies observed in classrooms' },
-                ].map((item, idx) => (
-                  <div
-                    key={idx}
-                    className="relative flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-[#4ecdc4] hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group"
-                  >
-                    {/* Status indicator */}
-                    <div className="absolute top-3 right-3 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-gray-300" />
-                      <span className="text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">Baseline pending</span>
+                {(() => {
+                  // Default success targets with icons
+                  const defaultTargets = [
+                    { icon: TrendingUp, text: 'Staff report increased confidence in classroom strategies' },
+                    { icon: ThumbsUp, text: 'Measurable improvement in feeling valued and supported' },
+                    { icon: TrendingDown, text: 'Reduced stress levels compared to baseline' },
+                    { icon: CheckCircle, text: 'Clear implementation of Hub strategies observed in classrooms' },
+                  ];
+
+                  // Use custom targets if available, with cycling icons
+                  const cycleIcons = [TrendingUp, ThumbsUp, TrendingDown, CheckCircle, Target, Zap];
+                  const targets = organization?.success_targets && organization.success_targets.length > 0
+                    ? organization.success_targets.map((text, idx) => ({
+                        icon: cycleIcons[idx % cycleIcons.length],
+                        text,
+                      }))
+                    : defaultTargets;
+
+                  return targets.map((item, idx) => (
+                    <div
+                      key={idx}
+                      className="relative flex items-start gap-3 p-4 rounded-xl bg-gray-50 border border-gray-100 hover:border-[#4ecdc4] hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 group"
+                    >
+                      {/* Status indicator */}
+                      <div className="absolute top-3 right-3 flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-gray-300" />
+                        <span className="text-[10px] text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity">Baseline pending</span>
+                      </div>
+                      <div className="flex-shrink-0">
+                        <item.icon className="w-5 h-5 text-[#38618C]" />
+                      </div>
+                      <p className="text-sm text-gray-700 pr-16">{item.text}</p>
                     </div>
-                    <div className="flex-shrink-0">
-                      <item.icon className="w-5 h-5 text-[#38618C]" />
-                    </div>
-                    <p className="text-sm text-gray-700 pr-16">{item.text}</p>
-                  </div>
-                ))}
+                  ));
+                })()}
               </div>
               <p className="text-xs text-gray-500 text-center mt-4">
                 Your TDI partner updates these as data comes in. No action needed from you.

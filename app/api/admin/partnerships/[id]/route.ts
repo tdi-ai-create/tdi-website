@@ -147,33 +147,60 @@ export async function PUT(
     // Separate partnership fields from organization fields
     const {
       org_name,
+      org_partnership_goal,
+      org_success_targets,
       ...partnershipFields
     } = body;
 
-    // Update partnership
-    const { data: updatedPartnership, error: pError } = await supabase
-      .from('partnerships')
-      .update({
-        ...partnershipFields,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', partnershipId)
-      .select()
-      .single();
+    // Only update partnership if there are partnership-specific fields
+    let updatedPartnership = null;
+    if (Object.keys(partnershipFields).length > 0) {
+      const { data, error: pError } = await supabase
+        .from('partnerships')
+        .update({
+          ...partnershipFields,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', partnershipId)
+        .select()
+        .single();
 
-    if (pError) {
-      console.error('Error updating partnership:', pError);
-      return NextResponse.json(
-        { success: false, error: 'Failed to update partnership' },
-        { status: 500 }
-      );
+      if (pError) {
+        console.error('Error updating partnership:', pError);
+        return NextResponse.json(
+          { success: false, error: 'Failed to update partnership' },
+          { status: 500 }
+        );
+      }
+      updatedPartnership = data;
+    } else {
+      // Fetch current partnership if no updates
+      const { data } = await supabase
+        .from('partnerships')
+        .select('*')
+        .eq('id', partnershipId)
+        .single();
+      updatedPartnership = data;
     }
 
-    // Update organization name if provided
+    // Build organization update object
+    const orgUpdateFields: Record<string, unknown> = {};
     if (org_name !== undefined) {
+      orgUpdateFields.name = org_name;
+    }
+    if (org_partnership_goal !== undefined) {
+      orgUpdateFields.partnership_goal = org_partnership_goal;
+    }
+    if (org_success_targets !== undefined) {
+      orgUpdateFields.success_targets = org_success_targets;
+    }
+
+    // Update organization if there are fields to update
+    if (Object.keys(orgUpdateFields).length > 0) {
+      orgUpdateFields.updated_at = new Date().toISOString();
       await supabase
         .from('organizations')
-        .update({ name: org_name, updated_at: new Date().toISOString() })
+        .update(orgUpdateFields)
         .eq('partnership_id', partnershipId);
     }
 
