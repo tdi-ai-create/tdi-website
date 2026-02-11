@@ -296,6 +296,27 @@ export default function PartnerDashboard() {
   const [hoveredEquationCard, setHoveredEquationCard] = useState<number | null>(null);
   const [activeMilestoneTooltip, setActiveMilestoneTooltip] = useState<string | null>(null);
 
+  // Cross-tab navigation helper
+  const navigateToTab = (tab: string, sectionId?: string) => {
+    setActiveTab(tab);
+    if (sectionId) {
+      // Wait for tab content to render, then scroll
+      setTimeout(() => {
+        const el = document.getElementById(sectionId);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
+    } else {
+      // Scroll to top of tab content
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Scroll to section in current tab
+  const scrollToSection = (sectionId: string) => {
+    const el = document.getElementById(sectionId);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   // Action item form state
   const [championName, setChampionName] = useState('');
   const [championEmail, setChampionEmail] = useState('');
@@ -963,25 +984,25 @@ export default function PartnerDashboard() {
       </nav>
 
       {/* Hero */}
-      <section className="dashboard-hero relative text-white py-8 px-4 overflow-hidden">
+      <section className="dashboard-hero relative text-white py-4 md:py-8 px-4 overflow-hidden">
         <div
           className="absolute inset-0"
           style={{ background: 'linear-gradient(135deg, #1B2A4A, #38618C)' }}
         />
 
-        <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-3 md:gap-4">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold">
+            <h1 className="text-2xl md:text-4xl font-bold">
               {organization?.name || partnership.contact_name}
             </h1>
-            <p className="text-white/70 text-sm mt-1">
+            <p className="text-white/70 text-xs md:text-sm mt-1">
               {organization?.address_city}, {organization?.address_state} |{' '}
               {partnership.partnership_type === 'district' ? 'District' : 'School'} Partnership
             </p>
           </div>
           <div className="flex items-center gap-3">
             <div
-              className="px-4 py-2 rounded-lg text-sm font-medium"
+              className="px-3 py-1.5 md:px-4 md:py-2 rounded-lg text-xs md:text-sm font-medium"
               style={{
                 backgroundColor: 'rgba(78, 205, 196, 0.2)',
                 borderColor: colors.teal,
@@ -1000,8 +1021,8 @@ export default function PartnerDashboard() {
         role="tablist"
         aria-label="Dashboard sections"
       >
-        <div className="max-w-5xl mx-auto px-4 py-3">
-          <div className="flex flex-wrap justify-center gap-2">
+        <div className="max-w-5xl mx-auto px-4 py-2 md:py-3">
+          <div className="flex overflow-x-auto scrollbar-hide snap-x snap-mandatory gap-1.5 md:gap-2 md:flex-wrap md:justify-center pb-1 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -1009,14 +1030,14 @@ export default function PartnerDashboard() {
                 aria-selected={activeTab === tab.id}
                 aria-controls={`panel-${tab.id}`}
                 onClick={() => handleTabChange(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
+                className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 text-sm font-medium rounded-lg transition-all whitespace-nowrap snap-start flex-shrink-0 ${
                   activeTab === tab.id
                     ? 'bg-[#1e2749] text-white'
                     : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
                 }`}
               >
                 <tab.icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="hidden md:inline">{tab.label}</span>
               </button>
             ))}
           </div>
@@ -1024,7 +1045,7 @@ export default function PartnerDashboard() {
       </div>
 
       {/* Tab Content */}
-      <div className="dashboard-content max-w-5xl mx-auto px-4 py-8">
+      <div className="dashboard-content max-w-5xl mx-auto px-3 md:px-4 py-4 md:py-8">
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div
@@ -1034,13 +1055,21 @@ export default function PartnerDashboard() {
             className="space-y-6"
           >
             {/* Stat Cards */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div id="stat-cards" className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
               {/* Staff Enrolled */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <Users className="w-4 h-4 text-[#38618C]" />
-                    <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
+              <div
+                onClick={() => partnership.partnership_type === 'district' ? navigateToTab('schools', 'buildings-list') : undefined}
+                className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group ${partnership.partnership_type === 'district' ? 'cursor-pointer hover:shadow-md hover:border-[#80a4ed] transition-all' : ''}`}
+              >
+                <div className="p-3 md:p-4">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-[#38618C]" />
+                      <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
+                    </div>
+                    {partnership.partnership_type === 'district' && (
+                      <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#80a4ed] transition-colors opacity-0 group-hover:opacity-100" />
+                    )}
                   </div>
                   <div className="stat-number text-[#1e2749]">{staffStats.total}</div>
                   <div className="text-xs text-[#38618C] font-medium">
@@ -1052,8 +1081,11 @@ export default function PartnerDashboard() {
               </div>
 
               {/* Observations */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="p-4">
+              <div
+                onClick={() => navigateToTab('blueprint', 'contract-deliverables')}
+                className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md hover:border-[#80a4ed] transition-all group"
+              >
+                <div className="p-3 md:p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
@@ -1069,7 +1101,7 @@ export default function PartnerDashboard() {
                     </div>
                     {/* Mini progress bar */}
                     {partnership.observation_days_total > 0 && (
-                      <div className="w-16">
+                      <div className="w-16 hidden sm:block">
                         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-[#4ecdc4] rounded-full"
@@ -1082,18 +1114,27 @@ export default function PartnerDashboard() {
                       </div>
                     )}
                   </div>
-                  <div className="text-xs font-medium mt-1" style={{ color: getObservationColor() }}>
-                    {getObservationText()}
+                  <div className="flex items-center justify-between mt-1">
+                    <div className="text-xs font-medium" style={{ color: getObservationColor() }}>
+                      {getObservationText()}
+                    </div>
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#80a4ed] transition-colors opacity-0 group-hover:opacity-100" />
                   </div>
                 </div>
               </div>
 
               {/* Needs Attention */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="p-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <AlertCircle className="w-4 h-4 text-amber-500" />
-                    <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
+              <div
+                onClick={() => scrollToSection('action-items')}
+                className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md hover:border-[#80a4ed] transition-all group"
+              >
+                <div className="p-3 md:p-4">
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-amber-500" />
+                      <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
+                    </div>
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#80a4ed] transition-colors opacity-0 group-hover:opacity-100" />
                   </div>
                   <div className="stat-number text-amber-500">
                     {pendingItems.length}
@@ -1105,8 +1146,11 @@ export default function PartnerDashboard() {
               </div>
 
               {/* Current Phase */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div className="p-4">
+              <div
+                onClick={() => navigateToTab('journey', 'phase-timeline')}
+                className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-md hover:border-[#80a4ed] transition-all group"
+              >
+                <div className="p-3 md:p-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <div className="flex items-center gap-2 mb-1">
@@ -1133,8 +1177,11 @@ export default function PartnerDashboard() {
                       style={{ width: `${partnership.contract_phase === 'IGNITE' ? 33 : partnership.contract_phase === 'ACCELERATE' ? 66 : 100}%` }}
                     />
                   </div>
-                  <div className="text-xs text-gray-400 mt-1">
-                    Phase {partnership.contract_phase === 'IGNITE' ? '1' : partnership.contract_phase === 'ACCELERATE' ? '2' : '3'} of 3 · {partnership.contract_phase === 'IGNITE' ? '33' : partnership.contract_phase === 'ACCELERATE' ? '66' : '100'}%
+                  <div className="flex items-center justify-between mt-1">
+                    <span className="text-xs text-gray-400">
+                      Phase {partnership.contract_phase === 'IGNITE' ? '1' : partnership.contract_phase === 'ACCELERATE' ? '2' : '3'} of 3
+                    </span>
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#80a4ed] transition-colors opacity-0 group-hover:opacity-100" />
                   </div>
                 </div>
               </div>
@@ -1153,12 +1200,18 @@ export default function PartnerDashboard() {
               const avgRetention = getLatestMetric('avg_retention_intent');
 
               return (
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div id="leading-indicators" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
                       <BarChart3 className="w-5 h-5 text-[#4ecdc4]" />
                       <h3 className="text-lg font-bold text-gray-900">Leading Indicators</h3>
                     </div>
+                    <button
+                      onClick={() => navigateToTab('preview', 'roi-summary')}
+                      className="text-xs text-[#4ecdc4] font-medium hover:underline flex items-center gap-1"
+                    >
+                      View Impact <ArrowRight className="w-3 h-3" />
+                    </button>
                   </div>
 
                   <div className="space-y-4">
@@ -1301,10 +1354,18 @@ export default function PartnerDashboard() {
 
             {/* Building Spotlight */}
             {partnership.partnership_type === 'district' && (
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <div className="flex items-center gap-2 mb-4">
-                  <Award className="w-5 h-5 text-amber-500" />
-                  <h3 className="text-lg font-bold text-gray-900">Building Spotlight</h3>
+              <div id="building-spotlight" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Award className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
+                    <h3 className="text-base md:text-lg font-bold text-gray-900">Building Spotlight</h3>
+                  </div>
+                  <button
+                    onClick={() => navigateToTab('schools', 'buildings-list')}
+                    className="text-xs text-[#4ecdc4] font-medium hover:underline flex items-center gap-1"
+                  >
+                    View All <ArrowRight className="w-3 h-3" />
+                  </button>
                 </div>
 
                 {apiBuildings.length === 0 ? (
@@ -1345,18 +1406,24 @@ export default function PartnerDashboard() {
             )}
 
             {/* Hub Engagement */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-6">
+            <div id="hub-engagement" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+              <div className="flex items-center justify-between mb-4 md:mb-6">
                 <div className="flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-[#4ecdc4]" />
                   <h3 className="text-lg font-bold text-gray-900">Hub Engagement</h3>
                 </div>
+                <button
+                  onClick={() => navigateToTab('progress', 'hub-engagement-detail')}
+                  className="text-xs text-[#4ecdc4] font-medium hover:underline flex items-center gap-1"
+                >
+                  View Details <ArrowRight className="w-3 h-3" />
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
                 {/* Donut Chart - Login Rate */}
                 <div className="flex flex-col items-center">
-                  <div className="relative w-36 h-36">
+                  <div className="relative w-28 h-28 md:w-36 md:h-36">
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                       <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
                       <circle cx="18" cy="18" r="15.915" fill="none" stroke="#4ecdc4" strokeWidth="3"
@@ -1429,10 +1496,10 @@ export default function PartnerDashboard() {
             </div>
 
             {/* Action Items */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div id="action-items" className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-gray-900">Next Steps Together</h2>
-                <span className="text-sm text-gray-500">
+                <h2 className="text-base md:text-lg font-bold text-gray-900">Next Steps Together</h2>
+                <span className="text-xs md:text-sm text-gray-500">
                   {pendingItems.length} item{pendingItems.length !== 1 ? 's' : ''} remaining
                 </span>
               </div>
@@ -1986,36 +2053,36 @@ export default function PartnerDashboard() {
             </div>
 
             {/* District-wide Movement */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+            <div id="district-movement" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Heart className="w-5 h-5 text-[#4ecdc4]" />
-                  <h3 className="text-lg font-bold text-gray-900">District-wide Movement</h3>
+                  <h3 className="text-base md:text-lg font-bold text-gray-900">District-wide Movement</h3>
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
                 {[
-                  { icon: Mail, label: 'Newsletter', stat: '32% higher strategy adoption', link: 'https://raehughart.substack.com' },
-                  { icon: BookOpen, label: 'Blog', stat: '2.5x more likely to try new strategies', link: 'https://raehughart.substack.com' },
-                  { icon: Headphones, label: 'Podcast', stat: '28% higher implementation rates', link: 'https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274' },
-                  { icon: Users, label: 'Community', stat: '45% report feeling less isolated', link: 'https://www.facebook.com/groups/tdimovement' },
-                  { icon: FileText, label: 'Resources', stat: '3x more classroom tools used', link: 'https://tdi.thinkific.com' },
-                  { icon: GraduationCap, label: 'Courses', stat: '65% completion vs 10% industry avg', link: 'https://tdi.thinkific.com' },
+                  { icon: Mail, label: 'Newsletter', stat: '32% higher adoption', link: 'https://raehughart.substack.com' },
+                  { icon: BookOpen, label: 'Blog', stat: '2.5x more strategies', link: 'https://raehughart.substack.com' },
+                  { icon: Headphones, label: 'Podcast', stat: '28% higher rates', link: 'https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274' },
+                  { icon: Users, label: 'Community', stat: '45% less isolated', link: 'https://www.facebook.com/groups/tdimovement' },
+                  { icon: FileText, label: 'Resources', stat: '3x more tools used', link: 'https://tdi.thinkific.com' },
+                  { icon: GraduationCap, label: 'Courses', stat: '65% vs 10% avg', link: 'https://tdi.thinkific.com' },
                 ].map((channel) => (
                   <a
                     key={channel.label}
                     href={channel.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex flex-col p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#4ecdc4]/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-transparent hover:border-[#4ecdc4]/30"
+                    className="group flex flex-col p-2 md:p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#4ecdc4]/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-transparent hover:border-[#4ecdc4]/30"
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <channel.icon className="w-4 h-4 text-[#4ecdc4] flex-shrink-0" />
-                      <p className="text-sm font-medium text-[#1e2749]">{channel.label}</p>
-                      <ArrowUpRight className="w-3 h-3 text-gray-400 ml-auto" />
+                    <div className="flex items-center gap-1.5 md:gap-2 mb-1 md:mb-2">
+                      <channel.icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-[#4ecdc4] flex-shrink-0" />
+                      <p className="text-xs md:text-sm font-medium text-[#1e2749]">{channel.label}</p>
+                      <ArrowUpRight className="w-3 h-3 text-gray-400 ml-auto hidden md:block" />
                     </div>
-                    <p className="text-xs text-[#4ecdc4] font-medium">
+                    <p className="text-[10px] md:text-xs text-[#4ecdc4] font-medium">
                       ↗ {channel.stat}
                     </p>
                   </a>
@@ -2709,7 +2776,7 @@ export default function PartnerDashboard() {
 
                   case 'contract':
                     return (
-                      <div className="space-y-8">
+                      <div id="contract-deliverables" className="space-y-8">
                         <div>
                           <h2 className="text-lg font-bold text-gray-900 mb-3">
                             Your Partnership Contract
@@ -2859,7 +2926,7 @@ export default function PartnerDashboard() {
                     </div>
 
                     {/* Right Side: Detail Panel */}
-                    <div className="flex-1 bg-white rounded-2xl p-8 shadow-lg border border-gray-200">
+                    <div className="flex-1 bg-white rounded-2xl p-6 md:p-8 shadow-lg border border-gray-200">
                       {renderBlueprintPanel()}
                     </div>
                   </div>
@@ -2909,13 +2976,13 @@ export default function PartnerDashboard() {
 
         {/* JOURNEY TAB */}
         {activeTab === 'journey' && (
-          <div role="tabpanel" id="panel-journey" aria-labelledby="tab-journey" className="space-y-6">
+          <div role="tabpanel" id="panel-journey" aria-labelledby="tab-journey" className="space-y-4 md:space-y-6">
             {/* Partnership Goal Statement */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+            <div id="partnership-goal" className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5">
               <div className="flex">
                 <div className="w-1 bg-[#1B2A4A] flex-shrink-0" />
-                <div className="p-6 md:p-8">
-                  <p className="text-lg text-[#1e2749] leading-relaxed font-medium">
+                <div className="p-4 md:p-8">
+                  <p className="text-base md:text-lg text-[#1e2749] leading-relaxed font-medium">
                     &ldquo;{organization?.partnership_goal ||
                       (partnership?.partnership_type === 'district'
                         ? `Equip educators across ${organization?.name || 'your district'} with practical strategies and resources to confidently support students and each other.`
@@ -2928,8 +2995,8 @@ export default function PartnerDashboard() {
             </div>
 
             {/* The TDI Equation - Interactive Cards with Smooth Expansion */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-bold text-gray-900 mb-6 text-center">The TDI Equation</h2>
+            <div className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-200">
+              <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4 md:mb-6 text-center">The TDI Equation</h2>
               <div className="flex flex-col md:flex-row items-stretch gap-3">
                 {/* Strong Teachers Card */}
                 <div
@@ -3030,8 +3097,8 @@ export default function PartnerDashboard() {
             </div>
 
             {/* Phase Timeline with Milestones */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
-              <h2 className="text-lg font-bold text-gray-900 mb-8">Your Partnership Journey</h2>
+            <div id="phase-timeline" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
+              <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4 md:mb-8">Your Partnership Journey</h2>
               <div className="relative">
                 {/* Timeline connector line - desktop only */}
                 <div className="absolute top-6 left-[16.67%] right-[16.67%] h-0.5 bg-gray-200 hidden md:block" />
@@ -3315,7 +3382,7 @@ export default function PartnerDashboard() {
 
         {/* PROGRESS TAB */}
         {activeTab === 'progress' && (
-          <div role="tabpanel" id="panel-progress" aria-labelledby="tab-progress" className="space-y-6">
+          <div role="tabpanel" id="panel-progress" aria-labelledby="tab-progress" className="space-y-4 md:space-y-6">
             {/* Status Banner */}
             {(() => {
               const daysSinceStart = partnership?.contract_start
@@ -3357,16 +3424,16 @@ export default function PartnerDashboard() {
               const BannerIcon = banner.icon;
               return (
                 <div
-                  className="status-banner rounded-2xl p-6 text-white"
+                  className="status-banner rounded-2xl p-4 md:p-6 text-white"
                   style={{ backgroundColor: banner.color }}
                 >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                      <BannerIcon className="w-6 h-6" />
+                  <div className="flex items-center gap-3 md:gap-4">
+                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                      <BannerIcon className="w-5 h-5 md:w-6 md:h-6" />
                     </div>
                     <div>
-                      <h2 className="text-base font-bold uppercase tracking-wide">{banner.title}</h2>
-                      <p className="text-sm text-white/90">{banner.message}</p>
+                      <h2 className="text-sm md:text-base font-bold uppercase tracking-wide">{banner.title}</h2>
+                      <p className="text-xs md:text-sm text-white/90">{banner.message}</p>
                     </div>
                   </div>
                 </div>
@@ -3374,8 +3441,8 @@ export default function PartnerDashboard() {
             })()}
 
             {/* Observation Day Highlights */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Observation Day Highlights</h2>
+            <div id="observation-highlights" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+              <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Observation Day Highlights</h2>
               {(partnership?.observation_days_completed ?? 0) === 0 ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -3406,8 +3473,8 @@ export default function PartnerDashboard() {
             </div>
 
             {/* Hub Engagement Breakdown */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Hub Engagement</h2>
+            <div id="hub-engagement-detail" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+              <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Hub Engagement</h2>
               {staffStats.hubLoggedIn === 0 ? (
                 <div className="text-center py-6">
                   <p className="text-gray-500">
@@ -3435,8 +3502,8 @@ export default function PartnerDashboard() {
             </div>
 
             {/* Support Delivered Timeline */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Support Delivered</h2>
+            <div id="support-timeline" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+              <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Support Delivered</h2>
               <div className="relative pl-8 space-y-6">
                 {/* Timeline line */}
                 <div className="absolute left-3 top-2 bottom-2 w-0.5 bg-gray-200" />
@@ -3571,35 +3638,35 @@ export default function PartnerDashboard() {
 
         {/* SCHOOLS TAB (District Only) */}
         {activeTab === 'schools' && partnership?.partnership_type === 'district' && (
-          <div role="tabpanel" id="panel-schools" aria-labelledby="tab-schools" className="space-y-6">
+          <div role="tabpanel" id="panel-schools" aria-labelledby="tab-schools" className="space-y-4 md:space-y-6">
             {/* Schools Overview */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">District Overview</h2>
-              <div className="grid sm:grid-cols-4 gap-4">
-                <div className="p-4 bg-gray-50 rounded-xl text-center">
-                  <p className="text-2xl font-bold text-[#1e2749]">{apiBuildings.length}</p>
-                  <p className="text-sm text-gray-500">Buildings</p>
+            <div className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+              <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">District Overview</h2>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-4">
+                <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
+                  <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{apiBuildings.length}</p>
+                  <p className="text-xs md:text-sm text-gray-500">Buildings</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl text-center">
-                  <p className="text-2xl font-bold text-[#1e2749]">{staffStats.total}</p>
-                  <p className="text-sm text-gray-500">Total Staff</p>
+                <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
+                  <p className="text-xl md:text-2xl font-bold text-[#1e2749]">{staffStats.total}</p>
+                  <p className="text-xs md:text-sm text-gray-500">Total Staff</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl text-center">
-                  <p className="text-2xl font-bold text-[#1e2749]">
+                <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
+                  <p className="text-xl md:text-2xl font-bold text-[#1e2749]">
                     {staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0}%
                   </p>
-                  <p className="text-sm text-gray-500">Avg Hub Login</p>
+                  <p className="text-xs md:text-sm text-gray-500">Avg Hub Login</p>
                 </div>
-                <div className="p-4 bg-gray-50 rounded-xl text-center">
-                  <p className="text-2xl font-bold text-[#1e2749]">—</p>
-                  <p className="text-sm text-gray-500">Need Attention</p>
+                <div className="p-3 md:p-4 bg-gray-50 rounded-xl text-center">
+                  <p className="text-xl md:text-2xl font-bold text-[#1e2749]">—</p>
+                  <p className="text-xs md:text-sm text-gray-500">Need Attention</p>
                 </div>
               </div>
             </div>
 
             {/* Building Cards */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900 mb-4">Buildings</h2>
+            <div id="buildings-list" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+              <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Buildings</h2>
               {apiBuildings.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -3685,13 +3752,13 @@ export default function PartnerDashboard() {
 
         {/* 2026-27 PREVIEW TAB */}
         {activeTab === 'preview' && (
-          <div role="tabpanel" id="panel-preview" aria-labelledby="tab-preview" className="space-y-6">
+          <div role="tabpanel" id="panel-preview" aria-labelledby="tab-preview" className="space-y-4 md:space-y-6">
             {/* Headline */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
-              <h1 className="text-lg font-bold text-gray-900 mb-2">
+            <div className="bg-white rounded-2xl p-4 md:p-8 shadow-sm border border-gray-100 text-center">
+              <h1 className="text-base md:text-lg font-bold text-gray-900 mb-2">
                 Continue Building on {organization?.name || 'Your'}&apos;s Momentum
               </h1>
-              <p className="text-gray-600">
+              <p className="text-sm md:text-base text-gray-600">
                 {partnership?.partnership_type === 'district'
                   ? `Your ${apiBuildings.length || ''} building${apiBuildings.length !== 1 ? 's have' : ' has'} established a strong foundation. Here's how Year 2 takes it further.`
                   : "Your team has established a strong foundation. Here's how Year 2 takes it further."}
@@ -3699,33 +3766,33 @@ export default function PartnerDashboard() {
             </div>
 
             {/* Proposed Year 2 Timeline */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-bold text-gray-900 mb-6">Proposed 2026-27 Timeline</h2>
-              <p className="text-sm text-gray-500 mb-6 italic">
+            <div className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+              <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4 md:mb-6">Proposed 2026-27 Timeline</h2>
+              <p className="text-xs md:text-sm text-gray-500 mb-4 md:mb-6 italic">
                 This proposed timeline will be customized based on your partnership progress.
               </p>
-              <div className="relative pl-8 space-y-4">
+              <div className="relative pl-6 md:pl-8 space-y-3 md:space-y-4">
                 {/* Timeline line */}
-                <div className="absolute left-3 top-2 bottom-2 w-0.5 bg-gray-200" />
+                <div className="absolute left-2 md:left-3 top-2 bottom-2 w-0.5 bg-gray-200" />
 
                 {[
-                  { month: 'August', event: 'Leadership Planning Session', icon: Users },
-                  { month: 'September', event: 'On-Site Kickoff (full team)', icon: Rocket },
-                  { month: 'October', event: 'Virtual Session: Advanced strategies', icon: BookOpen },
-                  { month: 'November', event: 'Observation Day: Expanded groups', icon: Eye },
-                  { month: 'January', event: 'Mid-Year Check-in + Growth Group refresh', icon: TrendingUp },
-                  { month: 'March', event: 'Observation Day: Full implementation', icon: Eye },
+                  { month: 'Aug', event: 'Leadership Planning Session', icon: Users },
+                  { month: 'Sep', event: 'On-Site Kickoff (full team)', icon: Rocket },
+                  { month: 'Oct', event: 'Virtual Session: Advanced strategies', icon: BookOpen },
+                  { month: 'Nov', event: 'Observation Day: Expanded groups', icon: Eye },
+                  { month: 'Jan', event: 'Mid-Year Check-in + Growth Group refresh', icon: TrendingUp },
+                  { month: 'Mar', event: 'Observation Day: Full implementation', icon: Eye },
                   { month: 'May', event: 'Executive Impact Session: Annual results + Year 3', icon: Award },
                 ].map((item, idx) => {
                   const ItemIcon = item.icon;
                   return (
-                    <div key={idx} className="relative flex items-start gap-4">
-                      <div className="absolute -left-5 w-4 h-4 rounded-full bg-[#80a4ed] border-2 border-white" />
-                      <div className="flex-1 flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
-                        <ItemIcon className="w-5 h-5 text-[#80a4ed] flex-shrink-0" />
-                        <div>
-                          <span className="font-medium text-[#1e2749]">{item.month}</span>
-                          <span className="text-gray-500 ml-2">— {item.event}</span>
+                    <div key={idx} className="relative flex items-start gap-3 md:gap-4">
+                      <div className="absolute -left-4 md:-left-5 w-3 h-3 md:w-4 md:h-4 rounded-full bg-[#80a4ed] border-2 border-white" />
+                      <div className="flex-1 flex items-center gap-2 md:gap-3 p-2 md:p-3 bg-gray-50 rounded-lg">
+                        <ItemIcon className="w-4 h-4 md:w-5 md:h-5 text-[#80a4ed] flex-shrink-0" />
+                        <div className="min-w-0">
+                          <span className="font-medium text-[#1e2749] text-sm md:text-base">{item.month}</span>
+                          <span className="text-gray-500 ml-1 md:ml-2 text-xs md:text-sm">— {item.event}</span>
                         </div>
                       </div>
                     </div>
@@ -3735,8 +3802,8 @@ export default function PartnerDashboard() {
             </div>
 
             {/* ROI / Impact Summary */}
-            <div className="dark-card bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-8 text-white">
-              <h2 className="text-lg font-bold text-white mb-6">Your Impact Summary</h2>
+            <div id="roi-summary" className="dark-card bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-4 md:p-8 text-white">
+              <h2 className="text-base md:text-lg font-bold text-white mb-4 md:mb-6">Your Impact Summary</h2>
               {(() => {
                 const daysSinceStart = partnership?.contract_start
                   ? Math.floor((Date.now() - new Date(partnership.contract_start).getTime()) / (1000 * 60 * 60 * 24))
@@ -3775,71 +3842,71 @@ export default function PartnerDashboard() {
                 return (
                   <>
                     {isEarly && (
-                      <div className="mb-6 px-3 py-2 bg-white/10 rounded-lg inline-block">
-                        <span className="text-sm font-medium">Your impact data will populate here as your partnership progresses</span>
+                      <div className="mb-4 md:mb-6 px-3 py-2 bg-white/10 rounded-lg inline-block">
+                        <span className="text-xs md:text-sm font-medium">Your impact data will populate here as your partnership progresses</span>
                       </div>
                     )}
-                    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                       <div>
-                        <p className="text-white/70 text-sm mb-1">Educators Supported</p>
-                        <p className="text-2xl font-bold">
+                        <p className="text-white/70 text-xs md:text-sm mb-1">Educators Supported</p>
+                        <p className="text-xl md:text-2xl font-bold">
                           {staffStats.total > 0 ? staffStats.total : '—'}
                           {partnership?.partnership_type === 'district' && apiBuildings.length > 0 && (
-                            <span className="text-lg font-normal text-white/70"> across {apiBuildings.length} buildings</span>
+                            <span className="text-sm md:text-lg font-normal text-white/70 block md:inline"> ({apiBuildings.length} bldgs)</span>
                           )}
                         </p>
                       </div>
                       <div>
-                        <p className="text-white/70 text-sm mb-1">Hub Engagement</p>
-                        <p className="text-2xl font-bold">
+                        <p className="text-white/70 text-xs md:text-sm mb-1">Hub Engagement</p>
+                        <p className="text-xl md:text-2xl font-bold">
                           {staffStats.total > 0 ? `${Math.round((staffStats.hubLoggedIn / staffStats.total) * 100)}%` : '—'}
-                          <span className="text-lg font-normal text-white/70"> (vs 10% industry avg)</span>
+                          <span className="text-sm md:text-lg font-normal text-white/70 hidden md:inline"> (vs 10% avg)</span>
                         </p>
                       </div>
                       <div>
-                        <p className="text-white/70 text-sm mb-1">Love Notes Delivered</p>
-                        <p className="text-2xl font-bold">{loveNotes > 0 ? loveNotes : '—'}</p>
+                        <p className="text-white/70 text-xs md:text-sm mb-1">Love Notes</p>
+                        <p className="text-xl md:text-2xl font-bold">{loveNotes > 0 ? loveNotes : '—'}</p>
                       </div>
                       <div>
-                        <p className="text-white/70 text-sm mb-1">Educator Stress</p>
+                        <p className="text-white/70 text-xs md:text-sm mb-1">Educator Stress</p>
                         {stressData ? (
                           stressData.hasChange ? (
-                            <p className={`text-2xl font-bold ${formatChange(stressData.earliest, stressData.latest, true).improved ? 'text-[#4ecdc4]' : 'text-red-300'}`}>
+                            <p className={`text-xl md:text-2xl font-bold ${formatChange(stressData.earliest, stressData.latest, true).improved ? 'text-[#4ecdc4]' : 'text-red-300'}`}>
                               {formatChange(stressData.earliest, stressData.latest, true).text}
                             </p>
                           ) : (
-                            <p className="text-2xl font-bold">{stressData.latest.toFixed(1)}/10</p>
+                            <p className="text-xl md:text-2xl font-bold">{stressData.latest.toFixed(1)}/10</p>
                           )
                         ) : (
-                          <p className="text-2xl font-bold">—</p>
+                          <p className="text-xl md:text-2xl font-bold">—</p>
                         )}
                       </div>
                       <div>
-                        <p className="text-white/70 text-sm mb-1">Planning Time</p>
+                        <p className="text-white/70 text-xs md:text-sm mb-1">Planning Time</p>
                         {planningData ? (
                           planningData.hasChange ? (
-                            <p className={`text-2xl font-bold ${formatChange(planningData.earliest, planningData.latest, false).improved ? 'text-[#4ecdc4]' : 'text-red-300'}`}>
+                            <p className={`text-xl md:text-2xl font-bold ${formatChange(planningData.earliest, planningData.latest, false).improved ? 'text-[#4ecdc4]' : 'text-red-300'}`}>
                               {formatChange(planningData.earliest, planningData.latest, false).text} hrs
                             </p>
                           ) : (
-                            <p className="text-2xl font-bold">{planningData.latest.toFixed(1)} hrs/wk</p>
+                            <p className="text-xl md:text-2xl font-bold">{planningData.latest.toFixed(1)} hrs/wk</p>
                           )
                         ) : (
-                          <p className="text-2xl font-bold">—</p>
+                          <p className="text-xl md:text-2xl font-bold">—</p>
                         )}
                       </div>
                       <div>
-                        <p className="text-white/70 text-sm mb-1">Retention Intent</p>
+                        <p className="text-white/70 text-xs md:text-sm mb-1">Retention Intent</p>
                         {retentionData ? (
                           retentionData.hasChange ? (
-                            <p className={`text-2xl font-bold ${formatChange(retentionData.earliest, retentionData.latest, false).improved ? 'text-[#4ecdc4]' : 'text-red-300'}`}>
+                            <p className={`text-xl md:text-2xl font-bold ${formatChange(retentionData.earliest, retentionData.latest, false).improved ? 'text-[#4ecdc4]' : 'text-red-300'}`}>
                               {formatChange(retentionData.earliest, retentionData.latest, false).text}
                             </p>
                           ) : (
-                            <p className="text-2xl font-bold">{retentionData.latest.toFixed(1)}/10</p>
+                            <p className="text-xl md:text-2xl font-bold">{retentionData.latest.toFixed(1)}/10</p>
                           )
                         ) : (
-                          <p className="text-2xl font-bold">—</p>
+                          <p className="text-xl md:text-2xl font-bold">—</p>
                         )}
                       </div>
                     </div>
