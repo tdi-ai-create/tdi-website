@@ -14,11 +14,16 @@ import {
   Mail,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+import TDIPortalLoader from '@/components/TDIPortalLoader';
 
 type PageState = 'idle' | 'loading' | 'error' | 'forgot_password' | 'reset_sent';
 
 function PartnerLoginContent() {
   const router = useRouter();
+
+  // TDI Loading screen state
+  const [animationComplete, setAnimationComplete] = useState(false);
+  const [timerDone, setTimerDone] = useState(false);
 
   const [pageState, setPageState] = useState<PageState>('idle');
   const [email, setEmail] = useState('');
@@ -26,6 +31,15 @@ function PartnerLoginContent() {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [failedAttempts, setFailedAttempts] = useState(0);
+
+  // Hard timer for loading screen (runs once on mount, never resets)
+  useEffect(() => {
+    const timer = setTimeout(() => setTimerDone(true), 4500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Gate: both must be true before showing page
+  const showPage = animationComplete && timerDone;
 
   // Check if already logged in
   useEffect(() => {
@@ -121,223 +135,247 @@ function PartnerLoginContent() {
     }
   };
 
-  // Reset sent confirmation
-  if (pageState === 'reset_sent') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4">
-        <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-8 h-8 text-green-600" />
-          </div>
-          <h1 className="text-xl font-bold text-[#1e2749] mb-2">Check Your Email</h1>
-          <p className="text-gray-600 mb-6">
-            If an account exists with <strong>{email}</strong>, you&apos;ll receive a password reset link.
-          </p>
-          <button
-            onClick={() => {
-              setPageState('idle');
-              setEmail('');
-            }}
-            className="text-[#80a4ed] hover:text-[#1e2749] font-medium"
-          >
-            Back to login
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Forgot password form
-  if (pageState === 'forgot_password') {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4 py-8">
-        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-          {/* Logo */}
-          <div className="pt-8 px-8">
-            <Image
-              src="/images/logo.webp"
-              alt="Teachers Deserve It"
-              width={160}
-              height={48}
-              className="h-12 w-auto mx-auto"
-            />
-          </div>
-
-          {/* Content */}
-          <div className="p-8">
-            <div className="text-center mb-6">
-              <div className="w-12 h-12 bg-[#1e2749]/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Mail className="w-6 h-6 text-[#1e2749]" />
-              </div>
-              <h1 className="text-xl font-bold text-[#1e2749] mb-1">
-                Reset Password
-              </h1>
-              <p className="text-sm text-gray-600">
-                Enter your email and we&apos;ll send you a reset link
-              </p>
-            </div>
-
-            <form onSubmit={handleForgotPassword} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={!email}
-                className="w-full bg-[#1e2749] text-white py-3.5 px-6 rounded-xl font-semibold hover:bg-[#2a3459] transition-colors disabled:opacity-50"
-              >
-                Send Reset Link
-              </button>
-            </form>
-
-            <button
-              onClick={() => setPageState('idle')}
-              className="w-full text-center text-sm text-gray-500 hover:text-[#1e2749] mt-4"
-            >
-              &larr; Back to login
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4 py-8">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-        {/* Logo */}
-        <div className="pt-8 px-8">
-          <Image
-            src="/images/logo.webp"
-            alt="Teachers Deserve It"
-            width={160}
-            height={48}
-            className="h-12 w-auto mx-auto"
-          />
-        </div>
+    <>
+      {/* LOADER — shows until animation completes */}
+      {!animationComplete && (
+        <TDIPortalLoader
+          portal="leadership"
+          onComplete={() => setAnimationComplete(true)}
+        />
+      )}
 
-        {/* Content */}
-        <div className="p-8">
-          <div className="text-center mb-6">
-            <h1 className="text-xl font-bold text-[#1e2749] mb-1">
-              Welcome Back
-            </h1>
-            <p className="text-sm text-gray-600">
-              Log in to your TDI Partnership Dashboard
-            </p>
-          </div>
+      {/* BACKUP — covers gap if animation unmounts but timer isn't done */}
+      {!showPage && animationComplete && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 9998,
+          background: 'linear-gradient(135deg, #1e3a5f, #2c5a8f)',
+          transition: 'opacity 500ms ease-out',
+          opacity: timerDone ? 0 : 1,
+        }} />
+      )}
 
-          {/* Error message */}
-          {pageState === 'error' && errorMessage && (
-            <div className="mb-4 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-              <div>
-                <p className="text-sm text-red-700">{errorMessage}</p>
-                {failedAttempts >= 3 && (
-                  <p className="text-sm text-red-600 mt-1">
-                    Having trouble? Contact{' '}
-                    <a href="mailto:hello@teachersdeserveit.com" className="underline">
-                      hello@teachersdeserveit.com
-                    </a>{' '}
-                    or use &quot;Forgot Password&quot; above.
-                  </p>
-                )}
+      {/* PAGE CONTENT — hidden until gate opens */}
+      <div style={{
+        visibility: showPage ? 'visible' : 'hidden',
+        opacity: showPage ? 1 : 0,
+        transition: 'opacity 300ms ease-in',
+      }}>
+        {/* Reset sent confirmation */}
+        {pageState === 'reset_sent' ? (
+          <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4">
+            <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="w-8 h-8 text-green-600" />
               </div>
+              <h1 className="text-xl font-bold text-[#1e2749] mb-2">Check Your Email</h1>
+              <p className="text-gray-600 mb-6">
+                If an account exists with <strong>{email}</strong>, you&apos;ll receive a password reset link.
+              </p>
+              <button
+                onClick={() => {
+                  setPageState('idle');
+                  setEmail('');
+                }}
+                className="text-[#80a4ed] hover:text-[#1e2749] font-medium"
+              >
+                Back to login
+              </button>
             </div>
-          )}
-
-          <form onSubmit={handleLogin} className="space-y-4">
-            {/* Email */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
-              />
-            </div>
-
-            {/* Password */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
+          </div>
+        ) : pageState === 'forgot_password' ? (
+          /* Forgot password form */
+          <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4 py-8">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+              {/* Logo */}
+              <div className="pt-8 px-8">
+                <Image
+                  src="/images/logo.webp"
+                  alt="Teachers Deserve It"
+                  width={160}
+                  height={48}
+                  className="h-12 w-auto mx-auto"
                 />
+              </div>
+
+              {/* Content */}
+              <div className="p-8">
+                <div className="text-center mb-6">
+                  <div className="w-12 h-12 bg-[#1e2749]/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Mail className="w-6 h-6 text-[#1e2749]" />
+                  </div>
+                  <h1 className="text-xl font-bold text-[#1e2749] mb-1">
+                    Reset Password
+                  </h1>
+                  <p className="text-sm text-gray-600">
+                    Enter your email and we&apos;ll send you a reset link
+                  </p>
+                </div>
+
+                <form onSubmit={handleForgotPassword} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={!email}
+                    className="w-full bg-[#1e2749] text-white py-3.5 px-6 rounded-xl font-semibold hover:bg-[#2a3459] transition-colors disabled:opacity-50"
+                  >
+                    Send Reset Link
+                  </button>
+                </form>
+
                 <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  onClick={() => setPageState('idle')}
+                  className="w-full text-center text-sm text-gray-500 hover:text-[#1e2749] mt-4"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  &larr; Back to login
                 </button>
               </div>
             </div>
+          </div>
+        ) : (
+          /* Main login form */
+          <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4 py-8">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+              {/* Logo */}
+              <div className="pt-8 px-8">
+                <Image
+                  src="/images/logo.webp"
+                  alt="Teachers Deserve It"
+                  width={160}
+                  height={48}
+                  className="h-12 w-auto mx-auto"
+                />
+              </div>
 
-            {/* Forgot password link */}
-            <div className="text-right">
-              <button
-                type="button"
-                onClick={() => setPageState('forgot_password')}
-                className="text-sm text-[#80a4ed] hover:text-[#1e2749] font-medium"
-              >
-                Forgot Password?
-              </button>
+              {/* Content */}
+              <div className="p-8">
+                <div className="text-center mb-6">
+                  <h1 className="text-xl font-bold text-[#1e2749] mb-1">
+                    Welcome Back
+                  </h1>
+                  <p className="text-sm text-gray-600">
+                    Log in to your TDI Partnership Dashboard
+                  </p>
+                </div>
+
+                {/* Error message */}
+                {pageState === 'error' && errorMessage && (
+                  <div className="mb-4 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <p className="text-sm text-red-700">{errorMessage}</p>
+                      {failedAttempts >= 3 && (
+                        <p className="text-sm text-red-600 mt-1">
+                          Having trouble? Contact{' '}
+                          <a href="mailto:hello@teachersdeserveit.com" className="underline">
+                            hello@teachersdeserveit.com
+                          </a>{' '}
+                          or use &quot;Forgot Password&quot; above.
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                <form onSubmit={handleLogin} className="space-y-4">
+                  {/* Email */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email
+                    </label>
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
+                    />
+                  </div>
+
+                  {/* Password */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="w-full px-4 py-3 pr-12 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Forgot password link */}
+                  <div className="text-right">
+                    <button
+                      type="button"
+                      onClick={() => setPageState('forgot_password')}
+                      className="text-sm text-[#80a4ed] hover:text-[#1e2749] font-medium"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
+
+                  {/* Submit */}
+                  <button
+                    type="submit"
+                    disabled={pageState === 'loading' || !email || !password}
+                    className="w-full bg-[#1e2749] text-white py-3.5 px-6 rounded-xl font-semibold hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {pageState === 'loading' ? (
+                      <>
+                        <Loader2 className="w-5 h-5 animate-spin" />
+                        Logging in...
+                      </>
+                    ) : (
+                      <>
+                        <LogIn className="w-5 h-5" />
+                        Log In
+                      </>
+                    )}
+                  </button>
+                </form>
+
+                {/* Help text */}
+                <p className="text-center text-sm text-gray-500 mt-6">
+                  Don&apos;t have an account? Contact{' '}
+                  <a
+                    href="mailto:hello@teachersdeserveit.com"
+                    className="text-[#80a4ed] hover:text-[#1e2749] font-medium"
+                  >
+                    hello@teachersdeserveit.com
+                  </a>
+                </p>
+              </div>
             </div>
-
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={pageState === 'loading' || !email || !password}
-              className="w-full bg-[#1e2749] text-white py-3.5 px-6 rounded-xl font-semibold hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {pageState === 'loading' ? (
-                <>
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  Logging in...
-                </>
-              ) : (
-                <>
-                  <LogIn className="w-5 h-5" />
-                  Log In
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Help text */}
-          <p className="text-center text-sm text-gray-500 mt-6">
-            Don&apos;t have an account? Contact{' '}
-            <a
-              href="mailto:hello@teachersdeserveit.com"
-              className="text-[#80a4ed] hover:text-[#1e2749] font-medium"
-            >
-              hello@teachersdeserveit.com
-            </a>
-          </p>
-        </div>
+          </div>
+        )}
       </div>
-    </div>
+    </>
   );
 }
 

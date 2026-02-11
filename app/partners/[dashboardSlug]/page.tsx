@@ -54,6 +54,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { getMetricStatus, statusColors, statusShapes, statusLabels, formatMetricValue, getMetricDescription } from '@/lib/metric-thresholds';
+import TDIPortalLoader from '@/components/TDIPortalLoader';
 
 // Types
 interface Partnership {
@@ -256,6 +257,11 @@ export default function PartnerDashboard() {
   const params = useParams();
   const dashboardSlug = params.dashboardSlug as string;
 
+  // TDI Loading screen state
+  const [animationComplete, setAnimationComplete] = useState(false);
+  const [timerDone, setTimerDone] = useState(false);
+  const [dataReady, setDataReady] = useState(false);
+
   // State
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthorized, setIsAuthorized] = useState(false);
@@ -298,6 +304,15 @@ export default function PartnerDashboard() {
   // View tracking refs
   const tabStartTime = useRef<number>(Date.now());
   const currentTab = useRef<string>('overview');
+
+  // Hard timer for loading screen (runs once on mount, never resets)
+  useEffect(() => {
+    const timer = setTimeout(() => setTimerDone(true), 4500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Triple gate: ALL THREE must be true before showing dashboard
+  const showDashboard = animationComplete && timerDone && dataReady;
 
   // Extract slug from URL - strip -dashboard suffix for database lookup
   // URL: /partners/ford-district-dashboard → DB slug: ford-district
@@ -545,6 +560,7 @@ export default function PartnerDashboard() {
         setErrorMessage('Failed to load dashboard');
       } finally {
         setIsLoading(false);
+        setDataReady(true); // Always mark data as ready (even on error) so loader completes
       }
     };
 

@@ -35,6 +35,16 @@ export function Footer() {
               <p className="text-sm mb-4" style={{ color: 'white', opacity: 0.7 }}>
                 PD that respects your time, strategies that actually work, and a community that gets it.
               </p>
+              {/* Animated symbol below tagline */}
+              <Link
+                href="/about#symbol"
+                className="inline-block mt-2"
+                aria-label="The story behind the TDI symbol"
+              >
+                <div className="w-[100px] h-[100px] md:w-[120px] md:h-[120px]">
+                  <FooterSymbol />
+                </div>
+              </Link>
             </div>
 
             {/* Quick Links */}
@@ -178,46 +188,28 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Bottom Bar with Large Animated Symbol */}
+      {/* Bottom Bar */}
       <div className="border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-        <div className="px-4 md:px-8 lg:px-16 py-6 md:py-8">
-          <div className="max-w-7xl mx-auto">
-            {/* Large symbol + copyright row */}
-            <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-6">
-
-              {/* Large animated mark — left side */}
-              <Link
-                href="/about#symbol"
-                className="block flex-shrink-0"
-                style={{ width: 140, height: 140 }}
-                aria-label="The story behind the TDI symbol"
-              >
-                <FooterSymbol />
+        <div className="px-4 md:px-8 lg:px-16 py-4 md:py-6">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+            <p className="text-sm" style={{ color: 'white', opacity: 0.5 }}>
+              © 2026 Teachers Deserve It. All rights reserved.
+            </p>
+            <div className="flex flex-wrap justify-center md:justify-end gap-4 md:gap-6">
+              <Link href="/privacy" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
+                Privacy Policy
               </Link>
-
-              {/* Copyright + legal — right side */}
-              <div className="text-center md:text-right flex-1">
-                <p className="text-sm" style={{ color: 'white', opacity: 0.5 }}>
-                  © 2026 Teachers Deserve It. All rights reserved.
-                </p>
-                <div className="flex flex-wrap justify-center md:justify-end gap-4 md:gap-6 mt-2">
-                  <Link href="/privacy" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
-                    Privacy Policy
-                  </Link>
-                  <Link href="/terms" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
-                    Terms of Service
-                  </Link>
-                  <Link href="/security" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
-                    Security
-                  </Link>
-                </div>
-                <p className="text-sm mt-4" style={{ color: '#ffffff', opacity: 0.7 }}>
-                  TDI is committed to accessibility. We strive to ensure our website is usable by all educators, including those using assistive technologies.
-                </p>
-              </div>
-
+              <Link href="/terms" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
+                Terms of Service
+              </Link>
+              <Link href="/security" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
+                Security
+              </Link>
             </div>
           </div>
+          <p className="text-sm mt-4 text-center" style={{ color: '#ffffff', opacity: 0.7 }}>
+            TDI is committed to accessibility. We strive to ensure our website is usable by all educators, including those using assistive technologies.
+          </p>
         </div>
       </div>
     </footer>

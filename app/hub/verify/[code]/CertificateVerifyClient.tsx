@@ -2,20 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { getSupabase } from '@/lib/supabase';
-import { CheckCircle, XCircle, Award, Calendar, Clock, User } from 'lucide-react';
+import { getCertificateByCode, formatCertificateDate } from '@/lib/certificate';
+import { Award, CheckCircle, XCircle, Download } from 'lucide-react';
 
 interface CertificateData {
   id: string;
   verification_code: string;
   pd_hours: number;
   issued_at: string;
-  user: {
-    display_name: string | null;
-  } | null;
-  course: {
-    title: string;
-  } | null;
+  certificate_url: string | null;
+  user_name: string;
+  course_title: string;
+  course_category: string;
 }
 
 interface CertificateVerifyClientProps {
@@ -23,51 +21,28 @@ interface CertificateVerifyClientProps {
 }
 
 export default function CertificateVerifyClient({ code }: CertificateVerifyClientProps) {
-  const [isLoading, setIsLoading] = useState(true);
   const [certificate, setCertificate] = useState<CertificateData | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
     async function verifyCertificate() {
+      if (!code) {
+        setNotFound(true);
+        setIsLoading(false);
+        return;
+      }
+
       try {
-        const supabase = getSupabase();
-
-        const { data, error: queryError } = await supabase
-          .from('hub_certificates')
-          .select(`
-            id,
-            verification_code,
-            pd_hours,
-            issued_at,
-            user:hub_profiles!hub_certificates_user_id_fkey (
-              display_name
-            ),
-            course:hub_courses!hub_certificates_course_id_fkey (
-              title
-            )
-          `)
-          .eq('verification_code', code)
-          .single();
-
-        if (queryError || !data) {
-          setError('Certificate not found');
-          setCertificate(null);
+        const data = await getCertificateByCode(code);
+        if (data) {
+          setCertificate(data);
         } else {
-          // Handle Supabase join results (returns arrays for joined tables)
-          const certData: CertificateData = {
-            id: data.id,
-            verification_code: data.verification_code,
-            pd_hours: data.pd_hours,
-            issued_at: data.issued_at,
-            user: Array.isArray(data.user) ? data.user[0] : data.user,
-            course: Array.isArray(data.course) ? data.course[0] : data.course,
-          };
-          setCertificate(certData);
-          setError(null);
+          setNotFound(true);
         }
-      } catch (err) {
-        console.error('Verification error:', err);
-        setError('Unable to verify certificate. Please try again.');
+      } catch (error) {
+        console.error('Error verifying certificate:', error);
+        setNotFound(true);
       } finally {
         setIsLoading(false);
       }
@@ -76,234 +51,232 @@ export default function CertificateVerifyClient({ code }: CertificateVerifyClien
     verifyCertificate();
   }, [code]);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
+  // Loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#FAFAF8' }}>
+        <div className="text-center">
+          <div className="w-16 h-16 rounded-full bg-gray-100 animate-pulse mx-auto mb-4" />
+          <p className="text-gray-500" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+            Verifying certificate...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
-  return (
-    <div
-      className="min-h-screen flex flex-col items-center justify-center p-4"
-      style={{ backgroundColor: '#FAFAF8' }}
-    >
-      <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <Link
-            href="/"
-            className="text-2xl font-bold"
+  // Not found state
+  if (notFound || !certificate) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: '#FAFAF8' }}>
+        <div className="max-w-md w-full text-center">
+          <div
+            className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6"
+            style={{ backgroundColor: '#FEE2E2' }}
+          >
+            <XCircle size={40} style={{ color: '#DC2626' }} />
+          </div>
+          <h1
+            className="font-bold mb-3"
             style={{
               fontFamily: "'Source Serif 4', Georgia, serif",
+              fontSize: '24px',
               color: '#2B3A67',
             }}
           >
-            TDI Learning Hub
-          </Link>
+            Certificate Not Found
+          </h1>
           <p
-            className="text-gray-500 mt-1"
+            className="text-gray-500 mb-6"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            Certificate Verification
+            We couldn&apos;t find a certificate with the code <span className="font-mono font-medium">{code}</span>.
+            Please check the verification code and try again.
+          </p>
+          <Link
+            href="/hub"
+            className="inline-block px-6 py-3 rounded-lg font-medium transition-colors"
+            style={{
+              backgroundColor: '#E8B84B',
+              color: '#2B3A67',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            Go to Learning Hub
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Valid certificate
+  return (
+    <div className="min-h-screen py-12 px-4" style={{ backgroundColor: '#FAFAF8' }}>
+      <div className="max-w-2xl mx-auto">
+        {/* Verification Badge */}
+        <div className="text-center mb-8">
+          <div
+            className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4"
+            style={{ backgroundColor: '#D1FAE5' }}
+          >
+            <CheckCircle size={40} style={{ color: '#059669' }} />
+          </div>
+          <h1
+            className="font-bold mb-2"
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontSize: '28px',
+              color: '#2B3A67',
+            }}
+          >
+            Certificate Verified
+          </h1>
+          <p
+            className="text-gray-500"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            This is an authentic certificate issued by The Teacher Development Initiative.
           </p>
         </div>
 
-        {/* Content Card */}
-        <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100">
-          {isLoading ? (
-            <div className="text-center py-8">
+        {/* Certificate Card */}
+        <div
+          className="bg-white rounded-xl shadow-sm overflow-hidden"
+          style={{ border: '1px solid #E5E5E5' }}
+        >
+          {/* Gold Banner */}
+          <div
+            className="h-2"
+            style={{ backgroundColor: '#E8B84B' }}
+          />
+
+          <div className="p-8">
+            {/* Award Icon */}
+            <div className="text-center mb-6">
               <div
-                className="w-12 h-12 rounded-full mx-auto mb-4 animate-pulse"
-                style={{ backgroundColor: '#E8B84B' }}
-              />
-              <p
-                className="text-gray-500"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
+                className="w-16 h-16 rounded-full flex items-center justify-center mx-auto"
+                style={{ backgroundColor: '#FFF8E7' }}
               >
-                Verifying certificate...
-              </p>
-            </div>
-          ) : error ? (
-            <div className="text-center py-8">
-              <div
-                className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center"
-                style={{ backgroundColor: '#FEE2E2' }}
-              >
-                <XCircle size={32} className="text-red-500" />
+                <Award size={32} style={{ color: '#E8B84B' }} />
               </div>
-              <h2
-                className="font-semibold mb-3"
-                style={{
-                  fontFamily: "'Source Serif 4', Georgia, serif",
-                  fontSize: '18px',
-                  color: '#2B3A67',
-                }}
-              >
-                Certificate not found
-              </h2>
-              <p
-                className="text-gray-600 mb-6"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
-              >
-                We could not find a certificate with this verification code. Please check the code and try again.
-              </p>
-              <p
-                className="text-sm text-gray-400"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
-              >
-                Code entered: <span className="font-mono">{code}</span>
-              </p>
             </div>
-          ) : certificate ? (
-            <div>
-              {/* Verified Badge */}
-              <div className="text-center mb-8">
-                <div
-                  className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
-                  style={{ backgroundColor: '#D1FAE5' }}
+
+            {/* Certificate Details */}
+            <div className="text-center space-y-4">
+              <div>
+                <p
+                  className="text-sm text-gray-500 mb-1"
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
                 >
-                  <CheckCircle size={32} className="text-green-600" />
-                </div>
+                  This certifies that
+                </p>
                 <h2
-                  className="font-semibold"
+                  className="font-bold"
                   style={{
                     fontFamily: "'Source Serif 4', Georgia, serif",
+                    fontSize: '24px',
+                    color: '#2B3A67',
+                  }}
+                >
+                  {certificate.user_name}
+                </h2>
+              </div>
+
+              <div>
+                <p
+                  className="text-sm text-gray-500 mb-1"
+                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                >
+                  has successfully completed
+                </p>
+                <h3
+                  className="font-semibold"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
                     fontSize: '18px',
                     color: '#2B3A67',
                   }}
                 >
-                  Certificate Verified
-                </h2>
+                  {certificate.course_title}
+                </h3>
               </div>
 
-              {/* Certificate Details */}
-              <div className="space-y-4">
-                <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50">
-                  <User size={20} className="text-gray-400 mt-0.5" />
-                  <div>
-                    <p
-                      className="text-sm text-gray-500"
-                      style={{ fontFamily: "'DM Sans', sans-serif" }}
-                    >
-                      Issued to
-                    </p>
-                    <p
-                      className="font-medium"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        color: '#2B3A67',
-                      }}
-                    >
-                      {certificate.user?.display_name || 'Teacher'}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50">
-                  <Award size={20} className="text-gray-400 mt-0.5" />
-                  <div>
-                    <p
-                      className="text-sm text-gray-500"
-                      style={{ fontFamily: "'DM Sans', sans-serif" }}
-                    >
-                      Course completed
-                    </p>
-                    <p
-                      className="font-medium"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        color: '#2B3A67',
-                      }}
-                    >
-                      {certificate.course?.title || 'Course'}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-4">
-                  <div className="flex-1 flex items-start gap-3 p-4 rounded-lg bg-gray-50">
-                    <Clock size={20} className="text-gray-400 mt-0.5" />
-                    <div>
-                      <p
-                        className="text-sm text-gray-500"
-                        style={{ fontFamily: "'DM Sans', sans-serif" }}
-                      >
-                        PD Hours
-                      </p>
-                      <p
-                        className="font-medium"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          color: '#2B3A67',
-                        }}
-                      >
-                        {certificate.pd_hours}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex-1 flex items-start gap-3 p-4 rounded-lg bg-gray-50">
-                    <Calendar size={20} className="text-gray-400 mt-0.5" />
-                    <div>
-                      <p
-                        className="text-sm text-gray-500"
-                        style={{ fontFamily: "'DM Sans', sans-serif" }}
-                      >
-                        Issued
-                      </p>
-                      <p
-                        className="font-medium"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          color: '#2B3A67',
-                        }}
-                      >
-                        {formatDate(certificate.issued_at)}
-                      </p>
-                    </div>
-                  </div>
-                </div>
+              {/* PD Hours Badge */}
+              <div className="pt-2">
+                <span
+                  className="inline-block text-sm font-semibold px-4 py-2 rounded-full"
+                  style={{
+                    backgroundColor: '#E8B84B',
+                    color: '#2B3A67',
+                    fontFamily: "'DM Sans', sans-serif",
+                  }}
+                >
+                  {certificate.pd_hours} Professional Development Hour{certificate.pd_hours !== 1 ? 's' : ''}
+                </span>
               </div>
+
+              {/* Issue Date */}
+              <p
+                className="text-sm text-gray-500 pt-2"
+                style={{ fontFamily: "'DM Sans', sans-serif" }}
+              >
+                Issued on {formatCertificateDate(certificate.issued_at)}
+              </p>
 
               {/* Verification Code */}
-              <div className="mt-6 pt-6 border-t border-gray-100 text-center">
-                <p
-                  className="text-sm text-gray-500"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
-                >
-                  Verification code
-                </p>
-                <p
-                  className="font-mono text-lg"
-                  style={{ color: '#2B3A67' }}
-                >
-                  {certificate.verification_code}
-                </p>
-              </div>
+              <p
+                className="text-xs text-gray-400 font-mono pt-4"
+              >
+                Verification Code: {certificate.verification_code}
+              </p>
             </div>
-          ) : null}
+          </div>
+
+          {/* Footer Actions */}
+          <div
+            className="px-8 py-4 flex justify-center"
+            style={{ backgroundColor: '#FAFAF8', borderTop: '1px solid #E5E5E5' }}
+          >
+            <a
+              href={`/api/hub/certificate/${certificate.verification_code}`}
+              download={`TDI-Certificate-${certificate.verification_code}.pdf`}
+              className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+              style={{
+                backgroundColor: '#E8B84B',
+                color: '#2B3A67',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              <Download size={16} />
+              Download Certificate
+            </a>
+          </div>
         </div>
 
-        {/* Footer */}
-        <div className="mt-8 text-center">
+        {/* TDI Branding */}
+        <div className="text-center mt-8">
           <p
             className="text-sm text-gray-400"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            Issued by TDI Learning Hub
+            Verified by
           </p>
-          <Link
-            href="/"
-            className="text-sm hover:underline"
+          <p
+            className="font-bold mt-1"
             style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontSize: '16px',
               color: '#2B3A67',
             }}
           >
-            teachersdeserveit.com
-          </Link>
+            The Teacher Development Initiative
+          </p>
+          <p
+            className="text-xs text-gray-400 mt-1"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            tdi.education
+          </p>
         </div>
       </div>
     </div>
