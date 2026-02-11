@@ -6,6 +6,8 @@ import { useHub } from '@/components/hub/HubContext';
 import AvatarDisplay from '@/components/hub/AvatarDisplay';
 import EmptyState from '@/components/hub/EmptyState';
 import { getSupabase } from '@/lib/supabase';
+import { checkTrackerEligibility, type TrackerEligibility } from '@/lib/hub/transformation';
+import { getRecommendations, hasCompletedOnboarding, type RecommendedCourse } from '@/lib/hub/recommendations';
 import {
   BookOpen,
   Zap,
@@ -13,7 +15,10 @@ import {
   ArrowRight,
   Clock,
   Sparkles,
+  Lock,
+  TrendingUp,
 } from 'lucide-react';
+import ShareMenu from '@/components/hub/ShareMenu';
 
 // Daily motivational messages - picks based on day of week
 const DAILY_MESSAGES = [
@@ -26,8 +31,16 @@ const DAILY_MESSAGES = [
   'You deserve this time.',
 ];
 
-// Default TDI tip when no tips in database
-const DEFAULT_TIP = 'Take one thing off your plate today. Not because you have to. Because you can.';
+// Fallback TDI tips when no tips in database
+const FALLBACK_TIPS = [
+  'Take one thing off your plate today. Not because you have to. Because you can.',
+  'You became a teacher to make a difference. You already are.',
+  'Rest is not a reward. It is a requirement.',
+  'The best lesson you can teach today is that you matter too.',
+  'Progress over perfection. Every single time.',
+  'Your students do not need you to be perfect. They need you to be present.',
+  'Five minutes of silence can change your entire afternoon.',
+];
 
 // Check-in response messages
 const CHECKIN_RESPONSES: Record<number, string> = {
@@ -62,20 +75,18 @@ interface QuickWin {
   course_slug?: string;
 }
 
-interface TDITip {
-  id: string;
-  tip_text: string;
-}
-
 export default function HubDashboard() {
   const { profile, user } = useHub();
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [quickWin, setQuickWin] = useState<QuickWin | null>(null);
-  const [tip, setTip] = useState<string>(DEFAULT_TIP);
+  const [tip, setTip] = useState<string>(FALLBACK_TIPS[0]);
   const [certificateCount, setCertificateCount] = useState<number>(0);
   const [todayCheckIn, setTodayCheckIn] = useState<number | null>(null);
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [trackerEligibility, setTrackerEligibility] = useState<TrackerEligibility | null>(null);
+  const [recommendations, setRecommendations] = useState<RecommendedCourse[]>([]);
+  const [showRecommendations, setShowRecommendations] = useState(false);
 
   const firstName = profile?.display_name?.split(' ')[0] || user?.email?.split('@')[0] || 'Teacher';
   const dailyMessage = DAILY_MESSAGES[new Date().getDay()];
@@ -178,16 +189,35 @@ export default function HubDashboard() {
         // Fetch TDI tip - pick based on date
         const { data: tipData } = await supabase
           .from('hub_tdi_tips')
-          .select('id, tip_text')
+          .select('id, content')
           .eq('approval_status', 'approved')
           .order('created_at', { ascending: true });
 
+        const dayOfYear = Math.floor(
+          (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
+        );
+
         if (tipData && tipData.length > 0) {
-          const dayOfYear = Math.floor(
-            (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
-          );
           const tipIndex = dayOfYear % tipData.length;
-          setTip(tipData[tipIndex].tip_text);
+          setTip(tipData[tipIndex].content);
+        } else {
+          // Use fallback tips
+          const tipIndex = dayOfYear % FALLBACK_TIPS.length;
+          setTip(FALLBACK_TIPS[tipIndex]);
+        }
+
+        // Check tracker eligibility
+        const eligibility = await checkTrackerEligibility(user.id);
+        setTrackerEligibility(eligibility);
+
+        // Get recommendations if onboarding completed
+        const onboardingDone = await hasCompletedOnboarding(user.id);
+        if (onboardingDone) {
+          const recs = await getRecommendations(user.id);
+          if (recs.courses.length > 0) {
+            setRecommendations(recs.courses);
+            setShowRecommendations(true);
+          }
         }
 
         // Fetch certificate count
@@ -447,6 +477,81 @@ export default function HubDashboard() {
             )}
           </div>
 
+          {/* Recommended for You Section */}
+          {showRecommendations && recommendations.length > 0 && (
+            <div className="hub-card">
+              <div className="flex items-center gap-3 mb-4">
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center"
+                  style={{ backgroundColor: '#FFF8E7' }}
+                >
+                  <Sparkles size={20} style={{ color: '#E8B84B' }} />
+                </div>
+                <h2
+                  className="font-semibold"
+                  style={{
+                    fontFamily: "'Source Serif 4', Georgia, serif",
+                    fontSize: '18px',
+                    color: '#2B3A67',
+                  }}
+                >
+                  Recommended for You
+                </h2>
+              </div>
+
+              <div className="space-y-3">
+                {recommendations.map((course) => (
+                  <Link
+                    key={course.id}
+                    href={`/hub/courses/${course.slug}`}
+                    className="block p-4 rounded-lg border border-gray-100 bg-white hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <span
+                          className="inline-block text-[11px] font-medium px-2 py-0.5 rounded mb-2"
+                          style={{
+                            backgroundColor: '#E8B84B20',
+                            color: '#B45309',
+                            fontFamily: "'DM Sans', sans-serif",
+                          }}
+                        >
+                          {course.category}
+                        </span>
+                        <h3
+                          className="font-bold line-clamp-1"
+                          style={{
+                            fontFamily: "'DM Sans', sans-serif",
+                            fontSize: '15px',
+                            color: '#2B3A67',
+                          }}
+                        >
+                          {course.title}
+                        </h3>
+                        <p
+                          className="text-xs text-gray-500 mt-1"
+                          style={{ fontFamily: "'DM Sans', sans-serif" }}
+                        >
+                          {course.reason}
+                        </p>
+                      </div>
+                      <span
+                        className="text-[11px] font-medium px-2 py-1 rounded flex-shrink-0"
+                        style={{
+                          backgroundColor: '#E8B84B',
+                          color: '#2B3A67',
+                          fontFamily: "'DM Sans', sans-serif",
+                        }}
+                      >
+                        {course.pd_hours} PD
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Got 5 Minutes Section */}
           <div className="hub-card">
             <div className="flex items-center gap-3 mb-4">
@@ -543,12 +648,12 @@ export default function HubDashboard() {
             >
               {tip}
             </p>
-            <button
-              className="text-sm text-gray-400 hover:text-gray-600 transition-colors"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
-            >
-              Share this tip
-            </button>
+            <ShareMenu
+              type="tip"
+              text={tip}
+              buttonVariant="ghost"
+              buttonSize="sm"
+            />
           </div>
 
           {/* Certificates Widget */}
@@ -656,6 +761,134 @@ export default function HubDashboard() {
               </>
             )}
           </div>
+
+          {/* Transformation Tracker Teaser - shown when not eligible */}
+          {trackerEligibility && !trackerEligibility.isEligible && (
+            <div
+              className="hub-card"
+              style={{ backgroundColor: '#FAFAF8', border: '1px dashed #E5E5E5' }}
+            >
+              <div className="flex items-center gap-3 mb-3">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: '#E5E5E5' }}
+                >
+                  <Lock size={18} style={{ color: '#9CA3AF' }} />
+                </div>
+                <h3
+                  className="font-bold"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '15px',
+                    color: '#6B7280',
+                  }}
+                >
+                  Your Transformation Tracker
+                </h3>
+              </div>
+              <p
+                className="text-sm text-gray-500 mb-4"
+                style={{ fontFamily: "'DM Sans', sans-serif" }}
+              >
+                Complete 1 course and 2 check-ins to unlock your growth dashboard.
+              </p>
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <span
+                    className="text-xs text-gray-500"
+                    style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    Courses
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${Math.min(100, (trackerEligibility.completedCourses / trackerEligibility.requiredCourses) * 100)}%`,
+                          backgroundColor: trackerEligibility.completedCourses >= trackerEligibility.requiredCourses ? '#10B981' : '#E8B84B',
+                        }}
+                      />
+                    </div>
+                    <span
+                      className="text-xs font-medium"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        color: trackerEligibility.completedCourses >= trackerEligibility.requiredCourses ? '#10B981' : '#6B7280',
+                      }}
+                    >
+                      {trackerEligibility.completedCourses}/{trackerEligibility.requiredCourses}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span
+                    className="text-xs text-gray-500"
+                    style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    Check-ins
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full"
+                        style={{
+                          width: `${Math.min(100, (trackerEligibility.totalAssessments / trackerEligibility.requiredAssessments) * 100)}%`,
+                          backgroundColor: trackerEligibility.totalAssessments >= trackerEligibility.requiredAssessments ? '#10B981' : '#E8B84B',
+                        }}
+                      />
+                    </div>
+                    <span
+                      className="text-xs font-medium"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        color: trackerEligibility.totalAssessments >= trackerEligibility.requiredAssessments ? '#10B981' : '#6B7280',
+                      }}
+                    >
+                      {trackerEligibility.totalAssessments}/{trackerEligibility.requiredAssessments}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Transformation Tracker Link - shown when eligible */}
+          {trackerEligibility && trackerEligibility.isEligible && (
+            <Link
+              href="/hub/transformation"
+              className="hub-card block hover:shadow-md transition-shadow"
+              style={{ borderLeft: '4px solid #E8B84B' }}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-10 h-10 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: '#FFF8E7' }}
+                >
+                  <TrendingUp size={18} style={{ color: '#E8B84B' }} />
+                </div>
+                <div>
+                  <h3
+                    className="font-bold"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: '15px',
+                      color: '#2B3A67',
+                    }}
+                  >
+                    Your Growth Journey
+                  </h3>
+                  <p
+                    className="text-sm text-gray-500"
+                    style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  >
+                    View your progress and milestones
+                  </p>
+                </div>
+                <ArrowRight size={16} className="ml-auto text-gray-400" />
+              </div>
+            </Link>
+          )}
         </div>
       </div>
     </div>

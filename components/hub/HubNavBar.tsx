@@ -1,21 +1,31 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, Heart } from 'lucide-react';
+import { Menu, Heart, Shield, Building } from 'lucide-react';
 import AvatarDisplay from './AvatarDisplay';
 import HubMobileNav from './HubMobileNav';
 import MomentMode from './MomentMode';
+import { checkTrackerEligibility } from '@/lib/hub/transformation';
+import { isAdmin } from '@/lib/hub/admin';
+import { isChampion } from '@/lib/hub/champion';
 import type { HubProfile } from '@/lib/hub-auth';
 
 interface HubNavBarProps {
   profile: HubProfile | null;
   userEmail?: string;
+  userId?: string;
 }
 
-const NAV_ITEMS = [
+interface NavItem {
+  href: string;
+  label: string;
+  exact: boolean;
+}
+
+const BASE_NAV_ITEMS: NavItem[] = [
   { href: '/hub', label: 'Dashboard', exact: true },
   { href: '/hub/courses', label: 'Courses', exact: false },
   { href: '/hub/quick-wins', label: 'Quick Wins', exact: false },
@@ -23,10 +33,51 @@ const NAV_ITEMS = [
   { href: '/hub/settings', label: 'Settings', exact: false },
 ];
 
-export default function HubNavBar({ profile, userEmail }: HubNavBarProps) {
+export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps) {
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [momentModeOpen, setMomentModeOpen] = useState(false);
+  const [trackerEligible, setTrackerEligible] = useState(false);
+  const [isUserAdmin, setIsUserAdmin] = useState(false);
+  const [isUserChampion, setIsUserChampion] = useState(false);
+
+  // Check tracker eligibility, admin status, and champion status
+  useEffect(() => {
+    async function checkUserStatus() {
+      if (!userId) return;
+      try {
+        const [trackerResult, adminResult, championResult] = await Promise.all([
+          checkTrackerEligibility(userId),
+          isAdmin(userId, userEmail),
+          isChampion(userId),
+        ]);
+        setTrackerEligible(trackerResult.isEligible);
+        setIsUserAdmin(adminResult);
+        setIsUserChampion(championResult);
+      } catch (error) {
+        console.error('Error checking user status:', error);
+      }
+    }
+    checkUserStatus();
+  }, [userId, userEmail]);
+
+  // Build nav items with conditional "My Growth", "School", and "Admin"
+  const navItems = useMemo(() => {
+    const items = [...BASE_NAV_ITEMS];
+    if (trackerEligible) {
+      // Insert "My Growth" after Dashboard
+      items.splice(1, 0, { href: '/hub/transformation', label: 'My Growth', exact: false });
+    }
+    if (isUserChampion) {
+      // Add "School" after Settings
+      items.push({ href: '/hub/champion', label: 'School', exact: false });
+    }
+    if (isUserAdmin) {
+      // Add "Admin" at the end (after Settings/School)
+      items.push({ href: '/hub/admin', label: 'Admin', exact: false });
+    }
+    return items;
+  }, [trackerEligible, isUserChampion, isUserAdmin]);
 
   const isActive = (href: string, exact: boolean) => {
     if (exact) {
@@ -85,8 +136,10 @@ export default function HubNavBar({ profile, userEmail }: HubNavBarProps) {
 
         {/* Desktop Nav Links */}
         <div className="hidden md:flex items-center justify-center flex-1 gap-1">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const active = isActive(item.href, item.exact);
+            const isAdminLink = item.href === '/hub/admin';
+            const isSchoolLink = item.href === '/hub/champion';
             return (
               <Link
                 key={item.href}
@@ -95,6 +148,9 @@ export default function HubNavBar({ profile, userEmail }: HubNavBarProps) {
                 style={{
                   color: active ? '#FFFFFF' : 'rgba(255, 255, 255, 0.8)',
                   borderBottomColor: active ? '#E8B84B' : 'transparent',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
                 }}
                 onMouseEnter={(e) => {
                   if (!active) e.currentTarget.style.color = '#FFFFFF';
@@ -103,6 +159,8 @@ export default function HubNavBar({ profile, userEmail }: HubNavBarProps) {
                   if (!active) e.currentTarget.style.color = 'rgba(255, 255, 255, 0.8)';
                 }}
               >
+                {isSchoolLink && <Building size={14} />}
+                {isAdminLink && <Shield size={14} />}
                 {item.label}
               </Link>
             );
@@ -164,7 +222,7 @@ export default function HubNavBar({ profile, userEmail }: HubNavBarProps) {
         onClose={() => setMobileNavOpen(false)}
         profile={profile}
         userEmail={userEmail}
-        navItems={NAV_ITEMS}
+        navItems={navItems}
         onMomentMode={() => {
           setMobileNavOpen(false);
           setMomentModeOpen(true);

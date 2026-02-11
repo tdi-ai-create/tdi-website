@@ -107,8 +107,8 @@ export default function AvatarPicker({
     setUploadError(null);
 
     // Validate file type
-    if (!['image/jpeg', 'image/png'].includes(file.type)) {
-      setUploadError('Please upload a JPG or PNG image');
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setUploadError('Please upload a JPG, PNG, or WebP image');
       return;
     }
 
@@ -241,7 +241,7 @@ export default function AvatarPicker({
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png"
+            accept="image/jpeg,image/png,image/webp"
             onChange={handleFileChange}
             className="hidden"
             aria-label="Upload your own photo"
@@ -355,7 +355,7 @@ export default function AvatarPicker({
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/jpeg,image/png"
+          accept="image/jpeg,image/png,image/webp"
           onChange={handleFileChange}
           className="hidden"
           aria-label="Upload your own photo"

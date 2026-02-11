@@ -82,6 +82,7 @@ export default function ProfileSettingsPage() {
   const [selectedAvatarId, setSelectedAvatarId] = useState<string | null>(null);
   const [uploadedAvatarUrl, setUploadedAvatarUrl] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [savedField, setSavedField] = useState<string | null>(null);
 
@@ -146,28 +147,37 @@ export default function ProfileSettingsPage() {
   const handleAvatarFileSelect = async (file: File) => {
     if (!user?.id) return;
 
+    setIsUploading(true);
     const supabase = getSupabase();
 
-    // Upload to Supabase Storage
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-    const filePath = `avatars/${fileName}`;
+    try {
+      // Upload to Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const filePath = `${user.id}/avatar.${fileExt}`;
 
-    const { error: uploadError } = await supabase.storage
-      .from('hub-uploads')
-      .upload(filePath, file);
+      // Delete any existing avatar for this user first
+      await supabase.storage
+        .from('hub-avatars')
+        .remove([`${user.id}/avatar.jpg`, `${user.id}/avatar.png`, `${user.id}/avatar.webp`]);
 
-    if (uploadError) {
-      console.error('Error uploading avatar:', uploadError);
-      return;
+      const { error: uploadError } = await supabase.storage
+        .from('hub-avatars')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) {
+        console.error('Error uploading avatar:', uploadError);
+        return;
+      }
+
+      const { data: publicUrl } = supabase.storage
+        .from('hub-avatars')
+        .getPublicUrl(filePath);
+
+      setUploadedAvatarUrl(publicUrl.publicUrl);
+      setSelectedAvatarId(null);
+    } finally {
+      setIsUploading(false);
     }
-
-    const { data: publicUrl } = supabase.storage
-      .from('hub-uploads')
-      .getPublicUrl(filePath);
-
-    setUploadedAvatarUrl(publicUrl.publicUrl);
-    setSelectedAvatarId(null);
   };
 
   const handleSaveAvatar = async () => {
@@ -367,6 +377,7 @@ export default function ProfileSettingsPage() {
               onUpload={handleAvatarUpload}
               onClearUpload={handleAvatarClear}
               size="settings"
+              isUploading={isUploading}
               onFileSelect={handleAvatarFileSelect}
             />
           </div>

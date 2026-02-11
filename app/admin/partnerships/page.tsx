@@ -22,6 +22,7 @@ import {
   Filter,
   AlertCircle,
   Trash2,
+  Lock,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -138,6 +139,13 @@ export default function AdminPartnershipsPage() {
   const [deleteError, setDeleteError] = useState('');
   const [deleteSuccess, setDeleteSuccess] = useState('');
 
+  // Login state for unauthenticated users
+  const [showLoginForm, setShowLoginForm] = useState(false);
+  const [loginEmail, setLoginEmail] = useState('');
+  const [loginPassword, setLoginPassword] = useState('');
+  const [loginError, setLoginError] = useState('');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+
   const loadPartnerships = useCallback(async (email: string) => {
     try {
       const response = await fetch('/api/admin/partnerships', {
@@ -166,7 +174,9 @@ export default function AdminPartnershipsPage() {
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session?.user?.email) {
-        router.push('/creator-portal');
+        // No session - show login form instead of redirecting
+        setShowLoginForm(true);
+        setIsLoading(false);
         return;
       }
 
@@ -183,6 +193,43 @@ export default function AdminPartnershipsPage() {
 
     checkAuth();
   }, [router, loadPartnerships]);
+
+  // Handle login for admin panel
+  const handleAdminLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoggingIn(true);
+    setLoginError('');
+
+    try {
+      // Check if email is TDI domain before attempting login
+      if (!loginEmail.toLowerCase().endsWith('@teachersdeserveit.com')) {
+        setLoginError('This admin panel is only for TDI team members.');
+        setIsLoggingIn(false);
+        return;
+      }
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: loginEmail,
+        password: loginPassword,
+      });
+
+      if (error) {
+        setLoginError(error.message);
+        setIsLoggingIn(false);
+        return;
+      }
+
+      if (data.session) {
+        setShowLoginForm(false);
+        setUserEmail(data.session.user.email || null);
+        await loadPartnerships(data.session.user.email || '');
+      }
+    } catch {
+      setLoginError('Login failed. Please try again.');
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
 
   // Filter partnerships
   useEffect(() => {

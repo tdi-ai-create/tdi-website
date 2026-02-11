@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { X, Heart } from 'lucide-react';
+import { X, Heart, Shield, Building } from 'lucide-react';
 import AvatarDisplay from './AvatarDisplay';
 import type { HubProfile } from '@/lib/hub-auth';
 
@@ -100,27 +100,33 @@ export default function HubMobileNav({
 
       {/* Nav Links */}
       <nav className="px-4 py-6">
-        {navItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={onClose}
-            className={`block py-4 px-4 text-lg rounded-lg transition-colors ${
-              isActive(item.href, item.exact)
-                ? 'bg-white/10 text-white'
-                : 'text-white/80 hover:bg-white/5 hover:text-white'
-            }`}
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          >
-            {item.label}
-            {isActive(item.href, item.exact) && (
-              <span
-                className="ml-2 inline-block w-2 h-2 rounded-full"
-                style={{ backgroundColor: '#E8B84B' }}
-              />
-            )}
-          </Link>
-        ))}
+        {navItems.map((item) => {
+          const isAdminLink = item.href === '/hub/admin';
+          const isSchoolLink = item.href === '/hub/champion';
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onClose}
+              className={`flex items-center gap-2 py-4 px-4 text-lg rounded-lg transition-colors ${
+                isActive(item.href, item.exact)
+                  ? 'bg-white/10 text-white'
+                  : 'text-white/80 hover:bg-white/5 hover:text-white'
+              }`}
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {isSchoolLink && <Building size={18} />}
+              {isAdminLink && <Shield size={18} />}
+              {item.label}
+              {isActive(item.href, item.exact) && (
+                <span
+                  className="ml-2 inline-block w-2 h-2 rounded-full"
+                  style={{ backgroundColor: '#E8B84B' }}
+                />
+              )}
+            </Link>
+          );
+        })}
       </nav>
 
       {/* Moment Mode Button - Bottom */}

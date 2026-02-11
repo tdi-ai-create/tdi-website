@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useHub } from '@/components/hub/HubContext';
 import EmptyState from '@/components/hub/EmptyState';
 import { getSupabase } from '@/lib/supabase';
-import { Award, Download, Link as LinkIcon, ExternalLink, Check } from 'lucide-react';
+import { Award, Download, ExternalLink } from 'lucide-react';
+import ShareMenu from '@/components/hub/ShareMenu';
 
 interface Certificate {
   id: string;
@@ -24,7 +25,6 @@ export default function CertificatesPage() {
   const { user } = useHub();
   const [certificates, setCertificates] = useState<Certificate[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadCertificates() {
@@ -75,13 +75,6 @@ export default function CertificatesPage() {
       day: 'numeric',
       year: 'numeric',
     });
-  };
-
-  const handleCopyVerification = async (code: string) => {
-    const verificationUrl = `${window.location.origin}/hub/verify/${code}`;
-    await navigator.clipboard.writeText(verificationUrl);
-    setCopiedCode(code);
-    setTimeout(() => setCopiedCode(null), 2000);
   };
 
   // Loading skeleton
@@ -206,27 +199,15 @@ export default function CertificatesPage() {
                       Download PDF
                     </a>
 
-                    <button
-                      onClick={() => handleCopyVerification(cert.verification_code)}
-                      className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg border-2 transition-colors"
-                      style={{
-                        borderColor: '#E5E5E5',
-                        color: '#2B3A67',
-                        fontFamily: "'DM Sans', sans-serif",
-                      }}
-                    >
-                      {copiedCode === cert.verification_code ? (
-                        <>
-                          <Check size={16} className="text-green-600" />
-                          Copied
-                        </>
-                      ) : (
-                        <>
-                          <LinkIcon size={16} />
-                          Share
-                        </>
-                      )}
-                    </button>
+                    <ShareMenu
+                      type="certificate"
+                      text={`PD Certificate for ${cert.course.title}`}
+                      url={`https://www.teachersdeserveit.com/hub/verify/${cert.verification_code}`}
+                      courseTitle={cert.course.title}
+                      pdHours={cert.pd_hours}
+                      buttonVariant="secondary"
+                      buttonSize="md"
+                    />
 
                     <Link
                       href={`/hub/verify/${cert.verification_code}`}

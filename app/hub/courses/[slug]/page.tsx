@@ -22,6 +22,10 @@ import {
   CheckCircle,
   Award,
   Infinity,
+  HelpCircle,
+  PenLine,
+  CheckSquare,
+  Flag,
 } from 'lucide-react';
 
 // Category colors
@@ -40,7 +44,7 @@ interface Lesson {
   title: string;
   description: string | null;
   estimated_minutes: number;
-  content_type: 'video' | 'audio' | 'read' | 'activity' | 'download';
+  content_type: 'video' | 'audio' | 'read' | 'activity' | 'download' | 'quiz' | 'reflection' | 'action_step' | 'checkpoint';
   is_free_preview: boolean;
   is_quick_win: boolean;
   sort_order: number;
@@ -228,6 +232,14 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
       case 'read':
       case 'download':
         return <FileText size={14} />;
+      case 'quiz':
+        return <HelpCircle size={14} />;
+      case 'reflection':
+        return <PenLine size={14} />;
+      case 'action_step':
+        return <CheckSquare size={14} />;
+      case 'checkpoint':
+        return <Flag size={14} />;
       default:
         return <BookOpen size={14} />;
     }

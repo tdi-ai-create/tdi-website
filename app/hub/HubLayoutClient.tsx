@@ -21,7 +21,7 @@ function HubLayoutInner({ children }: { children: React.ReactNode }) {
       style={{ backgroundColor: '#FAFAF8' }}
     >
       {showNav && (
-        <HubNavBar profile={profile} userEmail={user?.email} />
+        <HubNavBar profile={profile} userEmail={user?.email} userId={user?.id} />
       )}
       <main className={`flex-1 ${showNav ? 'pt-[60px]' : ''}`}>
         {children}

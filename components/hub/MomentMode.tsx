@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { X, Wind, Heart, Sparkles, BookOpen } from 'lucide-react';
+import { X, Wind, Heart, Sparkles, BookOpen, Download } from 'lucide-react';
 import { incrementHardDayCount } from '@/lib/hub-auth';
 import { useMomentMode } from './MomentModeContext';
 
@@ -345,38 +345,48 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
               Gentle tools for right now
             </h3>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               {GENTLE_TOOLS.map((tool, index) => (
                 <button
                   key={index}
                   className="w-full text-left p-4 rounded-lg border border-gray-200 hover:border-[#E8B84B] hover:bg-[#FFF8E7] transition-all"
                 >
-                  <div className="flex items-start justify-between">
-                    <div>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex-1 min-w-0">
                       <p
-                        className="font-medium"
+                        className="font-semibold leading-tight"
                         style={{
                           fontFamily: "'DM Sans', sans-serif",
+                          fontSize: '15px',
                           color: '#2B3A67',
                         }}
                       >
                         {tool.title}
                       </p>
                       <p
-                        className="text-sm text-gray-500 mt-1"
-                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                        className="text-gray-500 mt-0.5 truncate"
+                        style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: '13px',
+                        }}
                       >
                         {tool.description}
                       </p>
                     </div>
                     <span
-                      className="text-xs px-2 py-1 rounded"
+                      className="flex-shrink-0 inline-flex items-center gap-1"
                       style={{
-                        backgroundColor: tool.type === 'quick-win' ? '#E8B84B' : '#2B3A67',
-                        color: tool.type === 'quick-win' ? '#2B3A67' : 'white',
+                        backgroundColor: '#FFF8E7',
+                        color: '#E8B84B',
                         fontFamily: "'DM Sans', sans-serif",
+                        fontSize: '11px',
+                        fontWeight: 600,
+                        padding: '4px 10px',
+                        borderRadius: '12px',
+                        border: '1px solid #E8B84B',
                       }}
                     >
+                      {tool.type === 'download' && <Download size={12} />}
                       {tool.type === 'quick-win' ? 'Quick Win' : 'Download'}
                     </span>
                   </div>

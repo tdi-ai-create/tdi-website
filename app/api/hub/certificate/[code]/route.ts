@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { jsPDF } from 'jspdf';
 import { getCertificateByCode, formatCertificateDate } from '@/lib/certificate';
 
 export async function GET(
@@ -17,6 +16,26 @@ export async function GET(
 
     if (!certificate) {
       return NextResponse.json({ error: 'Certificate not found' }, { status: 404 });
+    }
+
+    // Dynamically import jsPDF to handle case where it's not installed
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let jsPDF: any;
+    try {
+      const jspdfModule = await import('jspdf');
+      jsPDF = jspdfModule.jsPDF;
+    } catch {
+      // jspdf not installed - return certificate data as JSON instead
+      return NextResponse.json({
+        message: 'PDF generation requires jspdf package. Run: npm install jspdf',
+        certificate: {
+          user_name: certificate.user_name,
+          course_title: certificate.course_title,
+          pd_hours: certificate.pd_hours,
+          issued_at: certificate.issued_at,
+          verification_code: certificate.verification_code,
+        },
+      }, { status: 200 });
     }
 
     // Create PDF in landscape letter size (11 x 8.5 inches)
