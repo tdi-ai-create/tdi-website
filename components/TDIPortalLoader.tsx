@@ -328,8 +328,9 @@ export default function TDIPortalLoader({ portal, onComplete }: TDIPortalLoaderP
       setTimeout(() => {
         setIsFading(true);
         setTimeout(() => {
-          if (onComplete) onComplete();
-        }, 500); // fade duration
+          // Use ref to avoid stale closure
+          if (onCompleteRef.current) onCompleteRef.current();
+        }, 600); // fade duration + buffer
       }, waitMore);
     }
 
@@ -341,7 +342,7 @@ export default function TDIPortalLoader({ portal, onComplete }: TDIPortalLoaderP
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [portal, onComplete]);
+  }, [portal]); // Note: onComplete removed - using ref instead to prevent animation reset
 
   return (
     <div
