@@ -34,15 +34,24 @@ function SearchParamsHandler({
 export default function CreatorDashboardPage() {
   const router = useRouter();
   const [dashboardData, setDashboardData] = useState<CreatorDashboardData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [animDone, setAnimDone] = useState(false);
 
-  // Show loader until both data is ready AND animation is complete
-  const showLoader = isLoading || !animDone;
+  // NEW: Three independent gates — ALL must be true to show dashboard
+  const [animationComplete, setAnimationComplete] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
+  const [timerDone, setTimerDone] = useState(false);
+
+  // NEW: Hard minimum timer as backup — even if everything else fails,
+  // this guarantees the loader shows for at least 4.5 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTimerDone(true);
+    }, 4500);
+    return () => clearTimeout(timer);
+  }, []); // runs once on mount, never resets
 
   // Callback for when agreement is signed
   const handleAgreementSigned = () => {
@@ -61,7 +70,7 @@ export default function CreatorDashboardPage() {
         if (sessionError) {
           console.error('[Dashboard] Session error:', sessionError);
           setError(`Session error: ${sessionError.message}`);
-          setIsLoading(false);
+          setDataLoaded(true);
           return;
         }
 
@@ -95,17 +104,17 @@ export default function CreatorDashboardPage() {
           }
 
           setError(data.error || `API error: ${response.status}`);
-          setIsLoading(false);
+          setDataLoaded(true);
           return;
         }
 
         setDashboardData(data);
-        setIsLoading(false);
+        setDataLoaded(true);
 
       } catch (err) {
         console.error('[Dashboard] Unexpected error:', err);
         setError(err instanceof Error ? err.message : 'Unexpected error loading dashboard');
-        setIsLoading(false);
+        setDataLoaded(true);
       }
     };
 
@@ -186,202 +195,219 @@ export default function CreatorDashboardPage() {
     }
   };
 
-  if (error) {
-    return (
-      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="w-8 h-8 text-red-500" />
-          </div>
-          <h2 className="text-xl font-semibold text-[#1e2749] mb-2">Unable to Load Dashboard</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
-          <div className="space-y-2">
-            <button
-              onClick={() => window.location.reload()}
-              className="w-full px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3459] transition-colors"
-            >
-              Try Again
-            </button>
-            <button
-              onClick={handleSignOut}
-              className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Sign Out
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (!dashboardData && !isLoading) {
-    return (
-      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-gray-600">No dashboard data available.</p>
-          <button
-            onClick={handleSignOut}
-            className="mt-4 px-4 py-2 text-[#80a4ed] hover:text-[#1e2749]"
-          >
-            Sign Out
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // THE GATE: dashboard is only visible when ALL THREE are true
+  const showDashboard = animationComplete && dataLoaded && timerDone;
 
   return (
     <>
-      {showLoader && (
+      {/* LOADER: shows until animation calls onComplete */}
+      {!animationComplete && (
         <TDIPortalLoader
           portal="creators"
-          onComplete={() => setAnimDone(true)}
-          canComplete={!isLoading}
+          onComplete={() => setAnimationComplete(true)}
         />
       )}
-      <div className="min-h-screen bg-[#f5f5f5]">
-      {/* Handle search params with Suspense boundary */}
-      <Suspense fallback={null}>
-        <SearchParamsHandler onAgreementSigned={handleAgreementSigned} />
-      </Suspense>
 
-      {/* Studio Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="container-wide py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Image
-              src="/images/logo.webp"
-              alt="Teachers Deserve It"
-              width={120}
-              height={36}
-              className="h-9 w-auto"
-            />
-            <div className="hidden sm:flex items-center">
-              <span className="text-gray-300 mx-2">|</span>
-              <span className="text-[#ffba06] font-semibold text-sm uppercase tracking-wide">
-                Creator Studio
-              </span>
-            </div>
-          </div>
-
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#1e2749] transition-colors"
-          >
-            <LogOut className="w-4 h-4" />
-            Sign Out
-          </button>
-        </div>
-      </header>
-
-      {/* Success Message */}
-      {successMessage && (
-        <div className="bg-green-50 border-b border-green-200">
-          <div className="container-wide py-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600" />
-              <p className="text-sm text-green-800">{successMessage}</p>
-            </div>
-            <button
-              onClick={() => setSuccessMessage(null)}
-              className="text-green-600 hover:text-green-800"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
+      {/* BACKUP: if the animation component somehow unmounts early or glitches,
+          show a plain gold screen until the timer finishes */}
+      {!showDashboard && animationComplete && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 9998,
+          background: 'linear-gradient(135deg, #ffba06, #e5a800)',
+          transition: 'opacity 500ms ease-out',
+          opacity: timerDone && dataLoaded ? 0 : 1,
+          pointerEvents: 'none',
+        }} />
       )}
 
-      {/* Main content */}
-      {dashboardData && (
-        <main className="container-wide py-8">
-          {/* Dashboard header with progress */}
-          <CreatorDashboardHeader
-            creator={dashboardData.creator}
-            completedMilestones={dashboardData.completedMilestones}
-            totalMilestones={dashboardData.totalMilestones}
-            progressPercentage={dashboardData.progressPercentage}
-          />
-
-          {/* Content grid */}
-          <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main content - Phase progress */}
-            <div className="lg:col-span-2">
-              <h2 className="text-xl font-semibold text-[#1e2749] mb-4">
-                Your Progress
-              </h2>
-              <PhaseProgress
-                phases={dashboardData.phases}
-                creatorId={dashboardData.creator.id}
-                onMarkComplete={handleMarkComplete}
-                onRefresh={refreshDashboard}
-                isLoading={isSaving}
-                teamNotes={dashboardData.notes.filter(n => n.visible_to_creator).map(n => n.content).join('\n\n')}
-                creatorName={dashboardData.creator.name}
-                contentPath={dashboardData.contentPath || dashboardData.creator.content_path}
-                creator={{
-                  google_doc_link: dashboardData.creator.google_doc_link,
-                  drive_folder_link: dashboardData.creator.drive_folder_link,
-                  marketing_doc_link: dashboardData.creator.marketing_doc_link,
-                  course_url: dashboardData.creator.course_url,
-                  discount_code: dashboardData.creator.discount_code,
-                  wants_video_editing: dashboardData.creator.wants_video_editing,
-                  wants_download_design: dashboardData.creator.wants_download_design,
-                  content_path: dashboardData.creator.content_path,
-                }}
-              />
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              <CourseDetailsPanel creator={dashboardData.creator} />
-              <NotesPanel notes={dashboardData.notes} />
-
-              {/* TDI Contact Card */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <h3 className="text-lg font-semibold text-[#1e2749] mb-4">
-                  Need Help?
-                </h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Questions about your course? Reach out anytime!
-                </p>
-                <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-[#80a4ed]/20 rounded-full flex items-center justify-center flex-shrink-0">
-                    <User className="w-5 h-5 text-[#80a4ed]" />
-                  </div>
-                  <div>
-                    <p className="font-medium text-[#1e2749]">Rachel Patragas</p>
-                    <p className="text-sm text-gray-500">Director of Creative Solutions</p>
-                    <a
-                      href="mailto:rachel@teachersdeserveit.com"
-                      className="inline-flex items-center gap-1.5 text-sm text-[#80a4ed] hover:text-[#1e2749] mt-2 transition-colors"
-                    >
-                      <Mail className="w-4 h-4" />
-                      rachel@teachersdeserveit.com
-                    </a>
-                  </div>
-                </div>
+      {/* DASHBOARD: completely hidden until gate opens */}
+      <div style={{
+        visibility: showDashboard ? 'visible' : 'hidden',
+        opacity: showDashboard ? 1 : 0,
+        transition: 'opacity 300ms ease-in',
+      }}>
+        {error ? (
+          <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
+            <div className="text-center max-w-md mx-auto p-6">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="w-8 h-8 text-red-500" />
+              </div>
+              <h2 className="text-xl font-semibold text-[#1e2749] mb-2">Unable to Load Dashboard</h2>
+              <p className="text-gray-600 mb-4">{error}</p>
+              <div className="space-y-2">
+                <button
+                  onClick={() => window.location.reload()}
+                  className="w-full px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3459] transition-colors"
+                >
+                  Try Again
+                </button>
+                <button
+                  onClick={handleSignOut}
+                  className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Sign Out
+                </button>
               </div>
             </div>
           </div>
-        </main>
-      )}
+        ) : !dashboardData ? (
+          <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
+            <div className="text-center">
+              <p className="text-gray-600">No dashboard data available.</p>
+              <button
+                onClick={handleSignOut}
+                className="mt-4 px-4 py-2 text-[#80a4ed] hover:text-[#1e2749]"
+              >
+                Sign Out
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="min-h-screen bg-[#f5f5f5]">
+            {/* Handle search params with Suspense boundary */}
+            <Suspense fallback={null}>
+              <SearchParamsHandler onAgreementSigned={handleAgreementSigned} />
+            </Suspense>
 
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-12 py-6">
-        <div className="container-wide text-center text-sm text-gray-500">
-          <p>
-            Questions? Reach out to{' '}
-            <a
-              href="mailto:rachel@teachersdeserveit.com"
-              className="text-[#80a4ed] hover:text-[#1e2749]"
-            >
-              rachel@teachersdeserveit.com
-            </a>
-          </p>
-        </div>
-      </footer>
-    </div>
+            {/* Studio Header */}
+            <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+              <div className="container-wide py-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Image
+                    src="/images/logo.webp"
+                    alt="Teachers Deserve It"
+                    width={120}
+                    height={36}
+                    className="h-9 w-auto"
+                  />
+                  <div className="hidden sm:flex items-center">
+                    <span className="text-gray-300 mx-2">|</span>
+                    <span className="text-[#ffba06] font-semibold text-sm uppercase tracking-wide">
+                      Creator Studio
+                    </span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2 text-sm text-gray-600 hover:text-[#1e2749] transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </button>
+              </div>
+            </header>
+
+            {/* Success Message */}
+            {successMessage && (
+              <div className="bg-green-50 border-b border-green-200">
+                <div className="container-wide py-3 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <p className="text-sm text-green-800">{successMessage}</p>
+                  </div>
+                  <button
+                    onClick={() => setSuccessMessage(null)}
+                    className="text-green-600 hover:text-green-800"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Main content */}
+            <main className="container-wide py-8">
+              {/* Dashboard header with progress */}
+              <CreatorDashboardHeader
+                creator={dashboardData.creator}
+                completedMilestones={dashboardData.completedMilestones}
+                totalMilestones={dashboardData.totalMilestones}
+                progressPercentage={dashboardData.progressPercentage}
+              />
+
+              {/* Content grid */}
+              <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-8">
+                {/* Main content - Phase progress */}
+                <div className="lg:col-span-2">
+                  <h2 className="text-xl font-semibold text-[#1e2749] mb-4">
+                    Your Progress
+                  </h2>
+                  <PhaseProgress
+                    phases={dashboardData.phases}
+                    creatorId={dashboardData.creator.id}
+                    onMarkComplete={handleMarkComplete}
+                    onRefresh={refreshDashboard}
+                    isLoading={isSaving}
+                    teamNotes={dashboardData.notes.filter(n => n.visible_to_creator).map(n => n.content).join('\n\n')}
+                    creatorName={dashboardData.creator.name}
+                    contentPath={dashboardData.contentPath || dashboardData.creator.content_path}
+                    creator={{
+                      google_doc_link: dashboardData.creator.google_doc_link,
+                      drive_folder_link: dashboardData.creator.drive_folder_link,
+                      marketing_doc_link: dashboardData.creator.marketing_doc_link,
+                      course_url: dashboardData.creator.course_url,
+                      discount_code: dashboardData.creator.discount_code,
+                      wants_video_editing: dashboardData.creator.wants_video_editing,
+                      wants_download_design: dashboardData.creator.wants_download_design,
+                      content_path: dashboardData.creator.content_path,
+                    }}
+                  />
+                </div>
+
+                {/* Sidebar */}
+                <div className="space-y-6">
+                  <CourseDetailsPanel creator={dashboardData.creator} />
+                  <NotesPanel notes={dashboardData.notes} />
+
+                  {/* TDI Contact Card */}
+                  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <h3 className="text-lg font-semibold text-[#1e2749] mb-4">
+                      Need Help?
+                    </h3>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Questions about your course? Reach out anytime!
+                    </p>
+                    <div className="flex items-start gap-3">
+                      <div className="w-10 h-10 bg-[#80a4ed]/20 rounded-full flex items-center justify-center flex-shrink-0">
+                        <User className="w-5 h-5 text-[#80a4ed]" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-[#1e2749]">Rachel Patragas</p>
+                        <p className="text-sm text-gray-500">Director of Creative Solutions</p>
+                        <a
+                          href="mailto:rachel@teachersdeserveit.com"
+                          className="inline-flex items-center gap-1.5 text-sm text-[#80a4ed] hover:text-[#1e2749] mt-2 transition-colors"
+                        >
+                          <Mail className="w-4 h-4" />
+                          rachel@teachersdeserveit.com
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </main>
+
+            {/* Footer */}
+            <footer className="bg-white border-t border-gray-200 mt-12 py-6">
+              <div className="container-wide text-center text-sm text-gray-500">
+                <p>
+                  Questions? Reach out to{' '}
+                  <a
+                    href="mailto:rachel@teachersdeserveit.com"
+                    className="text-[#80a4ed] hover:text-[#1e2749]"
+                  >
+                    rachel@teachersdeserveit.com
+                  </a>
+                </p>
+              </div>
+            </footer>
+          </div>
+        )}
+      </div>
     </>
   );
 }

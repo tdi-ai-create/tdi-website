@@ -7,8 +7,6 @@ type PortalType = 'creators' | 'leadership' | 'hub';
 interface TDIPortalLoaderProps {
   portal: PortalType;
   onComplete: () => void;
-  /** If false, animation will hold after completing until this becomes true. Defaults to true. */
-  canComplete?: boolean;
 }
 
 const PORTAL_BACKGROUNDS: Record<PortalType, string> = {
@@ -99,19 +97,18 @@ function generateEntryPath(
   return points;
 }
 
-// Hard minimum display time: 3400ms animation + 500ms fade + 300ms buffer
-const MINIMUM_DISPLAY_TIME = 4200;
+// MINIMUM time the loader must be visible (animation + fade + buffer)
+const MINIMUM_MS = 4500;
 
-export default function TDIPortalLoader({ portal, onComplete, canComplete = true }: TDIPortalLoaderProps) {
+export default function TDIPortalLoader({ portal, onComplete }: TDIPortalLoaderProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const pathRef = useRef<SVGPathElement>(null);
   const [isFading, setIsFading] = useState(false);
-  const [animationFinished, setAnimationFinished] = useState(false);
   const animationRef = useRef<number | null>(null);
   const startTimeRef = useRef<number | null>(null);
-  const hasTriggeredFade = useRef(false);
-  const mountTime = useRef(Date.now());
+  const mountTimeRef = useRef<number>(Date.now());
+  const hasCompletedRef = useRef<boolean>(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -306,14 +303,30 @@ export default function TDIPortalLoader({ portal, onComplete, canComplete = true
         ctx.restore();
       }
 
-      // Continue animation or mark as finished
+      // Continue animation or trigger completion
       if (rawProgress < 1) {
         animationRef.current = requestAnimationFrame(animate);
       } else {
-        // Animation complete - mark as finished but don't fade yet
-        setAnimationFinished(true);
+        // Animation complete - trigger the completion handler
+        handleAnimationEnd();
       }
     };
+
+    // This function is called when the canvas animation loop finishes (rawProgress >= 1)
+    function handleAnimationEnd() {
+      if (hasCompletedRef.current) return; // prevent double-fire
+      hasCompletedRef.current = true;
+
+      const elapsed = Date.now() - mountTimeRef.current;
+      const waitMore = Math.max(0, MINIMUM_MS - 500 - elapsed); // subtract fade duration
+
+      setTimeout(() => {
+        setIsFading(true);
+        setTimeout(() => {
+          if (onComplete) onComplete();
+        }, 500); // fade duration
+      }, waitMore);
+    }
 
     animationRef.current = requestAnimationFrame(animate);
 
@@ -323,34 +336,16 @@ export default function TDIPortalLoader({ portal, onComplete, canComplete = true
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [portal]);
-
-  // Trigger fade and onComplete when both animation is finished AND canComplete is true
-  // Enforces hard minimum display time before fading
-  useEffect(() => {
-    if (animationFinished && canComplete && !hasTriggeredFade.current) {
-      hasTriggeredFade.current = true;
-
-      // Calculate remaining time to meet minimum display requirement
-      const elapsed = Date.now() - mountTime.current;
-      const remaining = Math.max(0, MINIMUM_DISPLAY_TIME - elapsed - 500); // -500 for fade duration
-
-      // Wait for remaining time, THEN fade, THEN call onComplete
-      setTimeout(() => {
-        setIsFading(true);
-        setTimeout(() => {
-          onComplete();
-        }, 500); // fade duration
-      }, remaining);
-    }
-  }, [animationFinished, canComplete, onComplete]);
+  }, [portal, onComplete]);
 
   return (
     <div
-      className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center transition-opacity duration-500 ${
-        isFading ? 'opacity-0' : 'opacity-100'
-      }`}
-      style={{ background: PORTAL_BACKGROUNDS[portal] }}
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
+      style={{
+        background: PORTAL_BACKGROUNDS[portal],
+        transition: 'opacity 500ms ease-out',
+        opacity: isFading ? 0 : 1,
+      }}
     >
       {/* Hidden SVG for path sampling */}
       <svg

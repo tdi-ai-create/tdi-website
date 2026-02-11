@@ -269,19 +269,50 @@ function LoadingFallback() {
 }
 
 export default function CreatorPortalPage() {
-  const [showLoader, setShowLoader] = useState(true);
+  const [animationComplete, setAnimationComplete] = useState(false);
+  const [timerDone, setTimerDone] = useState(false);
+
+  // Hard minimum timer as backup
+  useEffect(() => {
+    const timer = setTimeout(() => setTimerDone(true), 4500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const showPage = animationComplete && timerDone;
 
   return (
     <>
-      {showLoader && (
+      {/* LOADER: shows until animation calls onComplete */}
+      {!animationComplete && (
         <TDIPortalLoader
           portal="creators"
-          onComplete={() => setShowLoader(false)}
+          onComplete={() => setAnimationComplete(true)}
         />
       )}
-      <Suspense fallback={<LoadingFallback />}>
-        <CreatorPortalLoginContent />
-      </Suspense>
+
+      {/* BACKUP: plain gold screen if animation ends early but timer hasn't */}
+      {!showPage && animationComplete && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 9998,
+          background: 'linear-gradient(135deg, #ffba06, #e5a800)',
+          transition: 'opacity 500ms ease-out',
+          opacity: timerDone ? 0 : 1,
+          pointerEvents: 'none',
+        }} />
+      )}
+
+      {/* PAGE: hidden until both gates pass */}
+      <div style={{
+        visibility: showPage ? 'visible' : 'hidden',
+        opacity: showPage ? 1 : 0,
+        transition: 'opacity 300ms ease-in',
+      }}>
+        <Suspense fallback={<LoadingFallback />}>
+          <CreatorPortalLoginContent />
+        </Suspense>
+      </div>
     </>
   );
 }
