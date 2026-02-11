@@ -1273,7 +1273,7 @@ export default function PartnerDashboard() {
                         strokeDasharray={`${hubLoginPct}, 100`} strokeLinecap="round" />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-3xl font-bold text-[#1e2749]">{hubLoginPct}%</span>
+                      <span className="text-2xl font-bold text-[#1e2749]">{hubLoginPct}%</span>
                       <span className="text-xs text-gray-500">logged in</span>
                     </div>
                   </div>
@@ -1315,7 +1315,7 @@ export default function PartnerDashboard() {
                         <Heart className="w-5 h-5 text-pink-500" />
                       </div>
                       <div>
-                        <span className="text-xl font-bold text-[#1e2749]">{loveNotes}</span>
+                        <span className="text-lg font-bold text-[#1e2749]">{loveNotes}</span>
                         <p className="text-xs text-gray-500">Love Notes sent</p>
                       </div>
                     </div>
@@ -1324,7 +1324,7 @@ export default function PartnerDashboard() {
                         <Calendar className="w-5 h-5 text-purple-600" />
                       </div>
                       <div>
-                        <span className="text-xl font-bold text-[#1e2749]">{virtualSessionsCompleted} of {partnership.virtual_sessions_total || 4}</span>
+                        <span className="text-lg font-bold text-[#1e2749]">{virtualSessionsCompleted} of {partnership.virtual_sessions_total || 4}</span>
                         <p className="text-xs text-gray-500">Virtual sessions</p>
                       </div>
                     </div>
@@ -2211,7 +2211,7 @@ export default function PartnerDashboard() {
                                         <span className="inline-block px-3 py-1 text-xs font-bold rounded-full" style={{ backgroundColor: '#ffba06', color: '#1e2749' }}>
                                           Start Here
                                         </span>
-                                        <h3 className="text-lg md:text-xl font-bold text-[#1e2749]">IGNITE</h3>
+                                        <h3 className="text-base font-bold text-[#1e2749]">IGNITE</h3>
                                         {isActive && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">YOU ARE HERE</span>}
                                         {isPast && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4]/20 text-[#4ecdc4] text-xs font-bold rounded flex items-center gap-1"><Check className="w-3 h-3" /> Complete</span>}
                                       </div>
@@ -2267,7 +2267,7 @@ export default function PartnerDashboard() {
                                         <span className="inline-block px-3 py-1 text-xs font-bold rounded-full" style={{ backgroundColor: isFuture ? '#e5e7eb' : '#80a4ed', color: isFuture ? '#6b7280' : '#ffffff' }}>
                                           Scale
                                         </span>
-                                        <h3 className="text-lg md:text-xl font-bold text-[#1e2749]">ACCELERATE</h3>
+                                        <h3 className="text-base font-bold text-[#1e2749]">ACCELERATE</h3>
                                         {isActive && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">YOU ARE HERE</span>}
                                         {isPast && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4]/20 text-[#4ecdc4] text-xs font-bold rounded flex items-center gap-1"><Check className="w-3 h-3" /> Complete</span>}
                                       </div>
@@ -2322,7 +2322,7 @@ export default function PartnerDashboard() {
                                         <span className="inline-block px-3 py-1 text-xs font-bold rounded-full" style={{ backgroundColor: isFuture ? '#e5e7eb' : '#abc4ab', color: isFuture ? '#6b7280' : '#1e2749' }}>
                                           Embed
                                         </span>
-                                        <h3 className="text-lg md:text-xl font-bold text-[#1e2749]">SUSTAIN</h3>
+                                        <h3 className="text-base font-bold text-[#1e2749]">SUSTAIN</h3>
                                         {isActive && <span className="ml-auto px-2 py-0.5 bg-[#4ecdc4] text-white text-xs font-bold rounded">YOU ARE HERE</span>}
                                       </div>
                                       <p className="text-sm font-medium mb-3" style={{ color: '#80a4ed' }}>Embedded Systems</p>
@@ -2376,7 +2376,7 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div>
-                          <h3 className="text-xl font-bold mb-4 text-[#1e2749]">What a Visit Looks Like</h3>
+                          <h3 className="text-base font-bold mb-4 text-[#1e2749]">What a Visit Looks Like</h3>
                           <ul className="space-y-3">
                             {[
                               'We observe up to 15 classrooms per visit',
@@ -2393,7 +2393,7 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div>
-                          <h3 className="text-xl font-bold mb-3 text-[#1e2749]">Love Notes: Personalized Teacher Feedback</h3>
+                          <h3 className="text-base font-bold mb-3 text-[#1e2749]">Love Notes: Personalized Teacher Feedback</h3>
                           <p className="mb-4 text-[#1e2749]/80">
                             Every teacher we observe receives a Love Note, a personalized note highlighting specific strengths we saw in their classroom. These are not generic praise. They are detailed observations that help teachers see what they are already doing well.
                           </p>
@@ -2427,7 +2427,7 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div>
-                          <h3 className="text-xl font-bold mb-4 text-[#1e2749]">What Your Staff Gets Access To</h3>
+                          <h3 className="text-base font-bold mb-4 text-[#1e2749]">What Your Staff Gets Access To</h3>
                           <ul className="space-y-3">
                             {[
                               '100+ hours of practical, classroom-ready content',
@@ -2451,7 +2451,7 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div>
-                          <h3 className="text-xl font-bold mb-4 text-[#1e2749]">Popular Courses</h3>
+                          <h3 className="text-base font-bold mb-4 text-[#1e2749]">Popular Courses</h3>
                           <div className="flex flex-wrap gap-2">
                             {['The Differentiation Fix', 'Calm Classrooms, Not Chaos', 'Communication that Clicks', 'Building Strong Teacher-Para Partnerships', 'Teachers Deserve their Time Back'].map((course) => (
                               <span key={course} className="px-3 py-2 rounded-full text-sm" style={{ backgroundColor: '#f5f5f5', color: '#1e2749' }}>
@@ -2483,7 +2483,7 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div>
-                          <h3 className="text-xl font-bold mb-4 text-center text-[#1e2749]">What You Can Track</h3>
+                          <h3 className="text-base font-bold mb-4 text-center text-[#1e2749]">What You Can Track</h3>
                           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {[
                               { icon: <Users className="w-5 h-5" />, title: 'Staff Engagement', desc: 'Who is logging in, completing courses, using resources' },
@@ -2549,7 +2549,7 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div>
-                          <h3 className="text-xl font-bold mb-4 text-[#1e2749]">When Your Staff Gets the Book</h3>
+                          <h3 className="text-base font-bold mb-4 text-[#1e2749]">When Your Staff Gets the Book</h3>
                           <div className="space-y-3">
                             <div className="flex items-center gap-4 p-3 rounded-lg bg-gray-50">
                               <span className="font-bold" style={{ color: '#ffba06' }}>IGNITE</span>
@@ -2583,7 +2583,7 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div>
-                          <h3 className="text-xl font-bold mb-4 text-[#1e2749]">Verified Outcomes from<br />TDI Partner Schools</h3>
+                          <h3 className="text-base font-bold mb-4 text-[#1e2749]">Verified Outcomes from<br />TDI Partner Schools</h3>
                           <div className="rounded-xl overflow-hidden border border-gray-200">
                             <div className="grid grid-cols-3 text-sm font-bold bg-[#1e2749] text-white">
                               <div className="p-3 border-r border-white/20">Before TDI</div>
@@ -2838,7 +2838,7 @@ export default function PartnerDashboard() {
 
             {/* The TDI Equation - Interactive Cards with Smooth Expansion */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-xl font-bold text-[#1e2749] mb-6 text-center">The TDI Equation</h2>
+              <h2 className="text-lg font-bold text-[#1e2749] mb-6 text-center">The TDI Equation</h2>
               <div className="flex flex-col md:flex-row items-stretch gap-3">
                 {/* Strong Teachers Card */}
                 <div
@@ -2940,7 +2940,7 @@ export default function PartnerDashboard() {
 
             {/* Phase Timeline with Milestones */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
-              <h2 className="text-xl font-bold text-[#1e2749] mb-8">Your Partnership Journey</h2>
+              <h2 className="text-lg font-bold text-[#1e2749] mb-8">Your Partnership Journey</h2>
               <div className="relative">
                 {/* Timeline connector line - desktop only */}
                 <div className="absolute top-6 left-[16.67%] right-[16.67%] h-0.5 bg-gray-200 hidden md:block" />
@@ -3137,22 +3137,22 @@ export default function PartnerDashboard() {
 
             {/* Your TDI Impact So Far */}
             <div className="bg-gradient-to-br from-[#1B2A4A] via-[#2a3f6e] to-[#38618C] rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
-              <h2 className="text-xl font-bold mb-4">Your TDI Impact So Far</h2>
+              <h2 className="text-lg font-bold mb-4">Your TDI Impact So Far</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
-                  <div className="text-3xl font-bold">{staffStats.total || 1}</div>
+                  <div className="text-2xl font-bold">{staffStats.total || 1}</div>
                   <div className="text-xs text-gray-300 mt-1">Staff enrolled</div>
                 </div>
                 <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
-                  <div className="text-3xl font-bold">{partnership?.observation_days_completed || 0}</div>
+                  <div className="text-2xl font-bold">{partnership?.observation_days_completed || 0}</div>
                   <div className="text-xs text-gray-300 mt-1">Observation days</div>
                 </div>
                 <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
-                  <div className="text-3xl font-bold">0</div>
+                  <div className="text-2xl font-bold">0</div>
                   <div className="text-xs text-gray-300 mt-1">Love Notes sent</div>
                 </div>
                 <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
-                  <div className="text-3xl font-bold">0</div>
+                  <div className="text-2xl font-bold">0</div>
                   <div className="text-xs text-gray-300 mt-1">Courses started</div>
                 </div>
               </div>
@@ -3163,7 +3163,7 @@ export default function PartnerDashboard() {
 
             {/* What Success Looks Like - with Progress Tracking */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
-              <h2 className="text-xl font-bold text-[#1e2749] mb-4">What Success Looks Like</h2>
+              <h2 className="text-lg font-bold text-[#1e2749] mb-4">What Success Looks Like</h2>
               <div className="grid sm:grid-cols-2 gap-4">
                 {[
                   { icon: TrendingUp, text: 'Staff report increased confidence in classroom strategies' },
@@ -3312,17 +3312,17 @@ export default function PartnerDashboard() {
               ) : (
                 <div className="grid sm:grid-cols-3 gap-4">
                   <div className="p-4 bg-gray-50 rounded-xl text-center">
-                    <p className="text-3xl font-bold text-[#1e2749]">{staffStats.hubLoggedIn}</p>
+                    <p className="text-2xl font-bold text-[#1e2749]">{staffStats.hubLoggedIn}</p>
                     <p className="text-sm text-gray-500">Staff Logged In</p>
                   </div>
                   <div className="p-4 bg-gray-50 rounded-xl text-center">
-                    <p className="text-3xl font-bold text-[#1e2749]">
+                    <p className="text-2xl font-bold text-[#1e2749]">
                       {staffStats.total > 0 ? Math.round((staffStats.hubLoggedIn / staffStats.total) * 100) : 0}%
                     </p>
                     <p className="text-sm text-gray-500">Login Rate</p>
                   </div>
                   <div className="p-4 bg-gray-50 rounded-xl text-center">
-                    <p className="text-3xl font-bold text-[#1e2749]">{loveNotes}</p>
+                    <p className="text-2xl font-bold text-[#1e2749]">{loveNotes}</p>
                     <p className="text-sm text-gray-500">Love Notes Sent</p>
                   </div>
                 </div>
