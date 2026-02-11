@@ -699,7 +699,7 @@ export default function PartnershipDetailPage() {
             <div className="flex flex-wrap gap-2">
               {partnership.slug && partnership.status === 'active' && (
                 <Link
-                  href={`/${partnership.slug}-dashboard`}
+                  href={`/partners/${partnership.slug}-dashboard`}
                   target="_blank"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-[#80a4ed]/10 text-[#1e2749] rounded-lg hover:bg-[#80a4ed]/20 transition-colors"
                 >

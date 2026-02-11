@@ -849,7 +849,7 @@ export default function AdminPartnershipsPage() {
                           )}
                           {partnership.slug && partnership.status === 'active' && (
                             <Link
-                              href={`/${partnership.slug}-dashboard`}
+                              href={`/partners/${partnership.slug}-dashboard`}
                               className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded bg-[#80a4ed]/10 text-[#1e2749] hover:bg-[#80a4ed]/20 transition-colors"
                               title="View dashboard"
                             >
