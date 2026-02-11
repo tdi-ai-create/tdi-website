@@ -867,54 +867,63 @@ export default function PartnerDashboard() {
     { id: 'team', label: 'Team', icon: User },
   ];
 
-  // Loading state
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-[#80a4ed] mx-auto mb-4" />
-          <p className="text-gray-600">Loading your dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Not a dashboard URL (let Next.js handle 404)
-  if (!partnerSlug) {
-    return null;
-  }
-
-  // Access denied
-  if (!isAuthorized || !partnership) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
-        <div className="text-center max-w-md">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="w-8 h-8 text-red-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-[#1e2749] mb-2">Access Denied</h1>
-          <p className="text-gray-600 mb-6">{errorMessage || 'You do not have access to this dashboard.'}</p>
-          <div className="space-y-3">
-            <Link
-              href="/partners/login"
-              className="block w-full bg-[#1e2749] text-white py-3 rounded-lg hover:bg-[#2a3459] transition-colors"
-            >
-              Log In
-            </Link>
-            <a
-              href="mailto:hello@teachersdeserveit.com"
-              className="block w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Contact TDI
-            </a>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
+      {/* LOADER — shows until animation completes */}
+      {!animationComplete && (
+        <TDIPortalLoader
+          portal="leadership"
+          onComplete={() => setAnimationComplete(true)}
+        />
+      )}
+
+      {/* BACKUP — covers gap if animation unmounts but timer/data aren't done */}
+      {!showDashboard && animationComplete && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          zIndex: 9998,
+          background: 'linear-gradient(135deg, #1e3a5f, #2c5a8f)',
+          transition: 'opacity 500ms ease-out',
+          opacity: timerDone && dataReady ? 0 : 1,
+        }} />
+      )}
+
+      {/* DASHBOARD — completely hidden until ALL three gates pass */}
+      <div style={{
+        visibility: showDashboard ? 'visible' : 'hidden',
+        opacity: showDashboard ? 1 : 0,
+        transition: 'opacity 300ms ease-in',
+      }}>
+        {/* Not a dashboard URL (let Next.js handle 404) */}
+        {!partnerSlug ? null : !isAuthorized || !partnership ? (
+          /* Access denied */
+          <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+            <div className="text-center max-w-md">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="w-8 h-8 text-red-600" />
+              </div>
+              <h1 className="text-2xl font-bold text-[#1e2749] mb-2">Access Denied</h1>
+              <p className="text-gray-600 mb-6">{errorMessage || 'You do not have access to this dashboard.'}</p>
+              <div className="space-y-3">
+                <Link
+                  href="/partners/login"
+                  className="block w-full bg-[#1e2749] text-white py-3 rounded-lg hover:bg-[#2a3459] transition-colors"
+                >
+                  Log In
+                </Link>
+                <a
+                  href="mailto:hello@teachersdeserveit.com"
+                  className="block w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Contact TDI
+                </a>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Main Dashboard Content */
+          <div className="min-h-screen bg-gray-50">
       {/* Toast */}
       {toastMessage && (
         <Toast message={toastMessage} onClose={() => setToastMessage('')} />
@@ -3751,5 +3760,8 @@ export default function PartnerDashboard() {
         )}
       </div>
     </div>
+        )}
+      </div>
+    </>
   );
 }
