@@ -752,3 +752,63 @@ label {
 .animate-fade-in-overlay {
   animation: fadeInOverlay 0.2s ease-out forwards;
 }
+
+/* ============================================
+   PARTNER DASHBOARD — TYPOGRAPHY OVERRIDES
+   Forces consistent heading sizes across all tabs
+   ============================================ */
+
+/* All h2 headings inside dashboard content = section headings */
+.dashboard-content h2 {
+  font-size: 1.125rem !important;  /* text-lg = 18px */
+  font-weight: 700 !important;
+  line-height: 1.75rem !important;
+  color: #111827 !important;  /* gray-900 */
+}
+
+/* All h3 headings inside dashboard content = card titles */
+.dashboard-content h3 {
+  font-size: 1rem !important;  /* text-base = 16px */
+  font-weight: 600 !important;
+  line-height: 1.5rem !important;
+  color: #111827 !important;
+}
+
+/* All h4 headings inside dashboard content = sub-labels */
+.dashboard-content h4 {
+  font-size: 0.875rem !important;  /* text-sm = 14px */
+  font-weight: 600 !important;
+  line-height: 1.25rem !important;
+}
+
+/* Exception: The hero section district name */
+.dashboard-hero h1 {
+  font-size: 1.875rem !important;  /* text-3xl */
+  font-weight: 700 !important;
+  color: white !important;
+}
+@media (min-width: 768px) {
+  .dashboard-hero h1 {
+    font-size: 2.25rem !important;  /* md:text-4xl */
+  }
+}
+
+/* Exception: Stat card numbers — these should stay large */
+.stat-number {
+  font-size: 1.5rem !important;  /* text-2xl */
+  font-weight: 700 !important;
+}
+
+/* Status banner heading on colored background */
+.dashboard-content .status-banner h2 {
+  font-size: 1rem !important;  /* text-base */
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  color: white !important;
+}
+
+/* White text headings on dark backgrounds */
+.dashboard-content .dark-card h2 {
+  color: white !important;
+}

@@ -920,7 +920,7 @@ export default function PartnerDashboard() {
       </nav>
 
       {/* Hero */}
-      <section className="relative text-white py-8 px-4 overflow-hidden">
+      <section className="dashboard-hero relative text-white py-8 px-4 overflow-hidden">
         <div
           className="absolute inset-0"
           style={{ background: 'linear-gradient(135deg, #1B2A4A, #38618C)' }}
@@ -981,7 +981,7 @@ export default function PartnerDashboard() {
       </div>
 
       {/* Tab Content */}
-      <div className="max-w-5xl mx-auto px-4 py-8">
+      <div className="dashboard-content max-w-5xl mx-auto px-4 py-8">
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
           <div
@@ -999,7 +999,7 @@ export default function PartnerDashboard() {
                     <Users className="w-4 h-4 text-[#38618C]" />
                     <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
                   </div>
-                  <div className="text-2xl font-bold text-[#1e2749]">{staffStats.total}</div>
+                  <div className="stat-number text-[#1e2749]">{staffStats.total}</div>
                   <div className="text-xs text-[#38618C] font-medium">
                     {partnership.partnership_type === 'district' && apiBuildings.length > 0
                       ? `across ${apiBuildings.length} school${apiBuildings.length > 1 ? 's' : ''}`
@@ -1017,7 +1017,7 @@ export default function PartnerDashboard() {
                         <Eye className="w-4 h-4 text-[#38618C]" />
                         <span className="text-xs text-gray-500 uppercase">Observations</span>
                       </div>
-                      <div className="text-2xl font-bold text-[#1e2749]">
+                      <div className="stat-number text-[#1e2749]">
                         {partnership.observation_days_completed ?? 0}
                         <span className="text-lg font-normal text-gray-400">
                           /{partnership.observation_days_total ?? 0}
@@ -1052,7 +1052,7 @@ export default function PartnerDashboard() {
                     <AlertCircle className="w-4 h-4 text-amber-500" />
                     <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
                   </div>
-                  <div className="text-2xl font-bold text-amber-500">
+                  <div className="stat-number text-amber-500">
                     {pendingItems.length}
                   </div>
                   <div className="text-xs text-amber-600 font-medium">
@@ -1070,7 +1070,7 @@ export default function PartnerDashboard() {
                         <TrendingUp className="w-4 h-4 text-[#38618C]" />
                         <span className="text-xs text-gray-500 uppercase">Current Phase</span>
                       </div>
-                      <div className="text-2xl font-bold text-[#1e2749]">
+                      <div className="stat-number text-[#1e2749]">
                         Phase {partnership.contract_phase === 'IGNITE' ? '1' : partnership.contract_phase === 'ACCELERATE' ? '2' : '3'}
                       </div>
                       <div className="text-xs text-[#38618C] font-medium">
@@ -3136,7 +3136,7 @@ export default function PartnerDashboard() {
             </div>
 
             {/* Your TDI Impact So Far */}
-            <div className="bg-gradient-to-br from-[#1B2A4A] via-[#2a3f6e] to-[#38618C] rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
+            <div className="dark-card bg-gradient-to-br from-[#1B2A4A] via-[#2a3f6e] to-[#38618C] rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
               <h2 className="text-lg font-bold text-white mb-4">Your TDI Impact So Far</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
@@ -3252,7 +3252,7 @@ export default function PartnerDashboard() {
               const BannerIcon = banner.icon;
               return (
                 <div
-                  className="rounded-2xl p-6 text-white"
+                  className="status-banner rounded-2xl p-6 text-white"
                   style={{ backgroundColor: banner.color }}
                 >
                   <div className="flex items-center gap-4">
@@ -3599,7 +3599,7 @@ export default function PartnerDashboard() {
             </div>
 
             {/* ROI / Impact Summary */}
-            <div className="bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-8 text-white">
+            <div className="dark-card bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-8 text-white">
               <h2 className="text-lg font-bold text-white mb-6">Your Impact Summary</h2>
               {(() => {
                 const daysSinceStart = partnership?.contract_start
