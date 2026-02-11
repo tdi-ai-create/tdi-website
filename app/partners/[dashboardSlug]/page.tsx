@@ -1102,7 +1102,7 @@ export default function PartnerDashboard() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <BarChart3 className="w-5 h-5 text-[#4ecdc4]" />
-                  <h3 className="text-base font-bold text-[#1e2749]">Leading Indicators</h3>
+                  <h3 className="text-lg font-bold text-gray-900">Leading Indicators</h3>
                 </div>
               </div>
 
@@ -1214,7 +1214,7 @@ export default function PartnerDashboard() {
               <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
                 <div className="flex items-center gap-2 mb-4">
                   <Award className="w-5 h-5 text-amber-500" />
-                  <h3 className="text-base font-bold text-[#1e2749]">Building Spotlight</h3>
+                  <h3 className="text-lg font-bold text-gray-900">Building Spotlight</h3>
                 </div>
 
                 {apiBuildings.length === 0 ? (
@@ -1259,7 +1259,7 @@ export default function PartnerDashboard() {
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-[#4ecdc4]" />
-                  <h3 className="text-base font-bold text-[#1e2749]">Hub Engagement</h3>
+                  <h3 className="text-lg font-bold text-gray-900">Hub Engagement</h3>
                 </div>
               </div>
 
@@ -1341,7 +1341,7 @@ export default function PartnerDashboard() {
             {/* Action Items */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-[#1e2749]">Next Steps Together</h2>
+                <h2 className="text-lg font-bold text-gray-900">Next Steps Together</h2>
                 <span className="text-sm text-gray-500">
                   {pendingItems.length} item{pendingItems.length !== 1 ? 's' : ''} remaining
                 </span>
@@ -1900,7 +1900,7 @@ export default function PartnerDashboard() {
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                   <Heart className="w-5 h-5 text-[#4ecdc4]" />
-                  <h3 className="text-lg font-bold text-[#1e2749]">District-wide Movement</h3>
+                  <h3 className="text-lg font-bold text-gray-900">District-wide Movement</h3>
                 </div>
               </div>
 
@@ -1993,7 +1993,7 @@ export default function PartnerDashboard() {
           >
             {/* TDI Team */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Your TDI Team</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Your TDI Team</h2>
               <div className="flex flex-col sm:flex-row items-start gap-6">
                 <div className="w-28 h-28 bg-gray-200 rounded-full overflow-hidden flex-shrink-0 shadow-md">
                   <Image
@@ -2066,7 +2066,7 @@ export default function PartnerDashboard() {
 
             {/* Your Team (Partnership Contact) */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Your Team</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Your Team</h2>
               <div className="flex items-start gap-4">
                 <div className="w-14 h-14 bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-full flex items-center justify-center text-white font-bold text-xl">
                   {partnership.contact_name.charAt(0).toUpperCase()}
@@ -2089,7 +2089,7 @@ export default function PartnerDashboard() {
 
             {/* Partnership Details */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Partnership Details</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Partnership Details</h2>
               <div className="grid sm:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
@@ -2176,7 +2176,7 @@ export default function PartnerDashboard() {
                     return (
                       <div className="space-y-8">
                         <div>
-                          <h2 className="text-lg font-bold mb-3 text-[#1e2749]">
+                          <h2 className="text-lg font-bold text-gray-900 mb-3">
                             A Phased Journey,<br />Not a One-Time Event
                           </h2>
                           <p className="text-lg text-[#1e2749]/80">
@@ -2367,7 +2367,7 @@ export default function PartnerDashboard() {
                     return (
                       <div className="space-y-8">
                         <div>
-                          <h2 className="text-lg font-bold mb-3 text-[#1e2749]">
+                          <h2 className="text-lg font-bold text-gray-900 mb-3">
                             What Happens When<br />We Visit Your School
                           </h2>
                           <p className="text-lg text-[#1e2749]/80">
@@ -2376,7 +2376,7 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div>
-                          <h3 className="text-base font-bold mb-4 text-[#1e2749]">What a Visit Looks Like</h3>
+                          <h3 className="text-base font-bold text-gray-900 mb-4">What a Visit Looks Like</h3>
                           <ul className="space-y-3">
                             {[
                               'We observe up to 15 classrooms per visit',
@@ -2393,7 +2393,7 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div>
-                          <h3 className="text-base font-bold mb-3 text-[#1e2749]">Love Notes: Personalized Teacher Feedback</h3>
+                          <h3 className="text-base font-bold text-gray-900 mb-3">Love Notes: Personalized Teacher Feedback</h3>
                           <p className="mb-4 text-[#1e2749]/80">
                             Every teacher we observe receives a Love Note, a personalized note highlighting specific strengths we saw in their classroom. These are not generic praise. They are detailed observations that help teachers see what they are already doing well.
                           </p>
@@ -2418,7 +2418,7 @@ export default function PartnerDashboard() {
                     return (
                       <div className="space-y-8">
                         <div>
-                          <h2 className="text-lg font-bold mb-3 text-[#1e2749]">
+                          <h2 className="text-lg font-bold text-gray-900 mb-3">
                             On-Demand Support for Every Educator
                           </h2>
                           <p className="text-lg text-[#1e2749]/80">
@@ -2427,7 +2427,7 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div>
-                          <h3 className="text-base font-bold mb-4 text-[#1e2749]">What Your Staff Gets Access To</h3>
+                          <h3 className="text-base font-bold text-gray-900 mb-4">What Your Staff Gets Access To</h3>
                           <ul className="space-y-3">
                             {[
                               '100+ hours of practical, classroom-ready content',
@@ -2444,14 +2444,14 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
-                          <h3 className="font-bold mb-2 text-[#1e2749]">Built for Implementation,<br />Not Consumption</h3>
+                          <h3 className="font-bold text-gray-900 mb-2">Built for Implementation,<br />Not Consumption</h3>
                           <p className="text-sm text-[#1e2749]/80">
                             Most PD has a 10% implementation rate. Ours is 65%. The difference is in the design. Every course includes action steps, not just information. We measure what teachers do, not what they watch.
                           </p>
                         </div>
 
                         <div>
-                          <h3 className="text-base font-bold mb-4 text-[#1e2749]">Popular Courses</h3>
+                          <h3 className="text-base font-bold text-gray-900 mb-4">Popular Courses</h3>
                           <div className="flex flex-wrap gap-2">
                             {['The Differentiation Fix', 'Calm Classrooms, Not Chaos', 'Communication that Clicks', 'Building Strong Teacher-Para Partnerships', 'Teachers Deserve their Time Back'].map((course) => (
                               <span key={course} className="px-3 py-2 rounded-full text-sm" style={{ backgroundColor: '#f5f5f5', color: '#1e2749' }}>
@@ -2467,7 +2467,7 @@ export default function PartnerDashboard() {
                     return (
                       <div className="space-y-8">
                         <div>
-                          <h2 className="text-lg font-bold mb-3 text-[#1e2749]">
+                          <h2 className="text-lg font-bold text-gray-900 mb-3">
                             See Your School&apos;s Progress in Real Time
                           </h2>
                           <p className="text-lg text-[#1e2749]/80">
@@ -2483,7 +2483,7 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div>
-                          <h3 className="text-base font-bold mb-4 text-center text-[#1e2749]">What You Can Track</h3>
+                          <h3 className="text-base font-bold text-gray-900 mb-4 text-center">What You Can Track</h3>
                           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                             {[
                               { icon: <Users className="w-5 h-5" />, title: 'Staff Engagement', desc: 'Who is logging in, completing courses, using resources' },
@@ -2505,7 +2505,7 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div className="p-4 rounded-lg" style={{ backgroundColor: '#fffbeb', border: '1px solid #ffba06' }}>
-                          <h3 className="font-bold mb-2 text-[#1e2749]">Why This Matters</h3>
+                          <h3 className="font-bold text-gray-900 mb-2">Why This Matters</h3>
                           <p className="text-sm text-[#1e2749]/80">
                             When renewal conversations come up, you will have the data. Not just &quot;teachers liked it&quot; but &quot;here is the measurable change we saw.&quot; That is how you justify the investment to your board.
                           </p>
@@ -2517,7 +2517,7 @@ export default function PartnerDashboard() {
                     return (
                       <div className="space-y-8">
                         <div>
-                          <h2 className="text-lg font-bold mb-3 text-[#1e2749]">
+                          <h2 className="text-lg font-bold text-gray-900 mb-3">
                             Teachers Deserve It:<br />The Book That Started a Movement
                           </h2>
                         </div>
@@ -2534,13 +2534,13 @@ export default function PartnerDashboard() {
                           </div>
                           <div className="flex-1 space-y-4">
                             <div>
-                              <h3 className="text-lg font-bold mb-2 text-[#1e2749]">About the Book</h3>
+                              <h3 className="text-lg font-bold text-gray-900 mb-2">About the Book</h3>
                               <p className="text-[#1e2749]/80">
                                 Teachers Deserve It is the book that started this whole movement. Written by Rae Hughart and Adam Welcome, it is a practical guide for educators who want to reclaim their time, rebuild their confidence, and remember why they started teaching in the first place.
                               </p>
                             </div>
                             <div className="p-4 rounded-lg bg-gray-50">
-                              <h3 className="font-bold mb-2 text-[#1e2749]">What Readers Say</h3>
+                              <h3 className="font-bold text-gray-900 mb-2">What Readers Say</h3>
                               <p className="text-sm italic text-[#1e2749]/80">
                                 &quot;This is not a book about doing more. It is about doing what matters. Small, manageable steps that add up to real change.&quot;
                               </p>
@@ -2549,7 +2549,7 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div>
-                          <h3 className="text-base font-bold mb-4 text-[#1e2749]">When Your Staff Gets the Book</h3>
+                          <h3 className="text-base font-bold text-gray-900 mb-4">When Your Staff Gets the Book</h3>
                           <div className="space-y-3">
                             <div className="flex items-center gap-4 p-3 rounded-lg bg-gray-50">
                               <span className="font-bold" style={{ color: '#ffba06' }}>IGNITE</span>
@@ -2574,7 +2574,7 @@ export default function PartnerDashboard() {
                     return (
                       <div className="space-y-8">
                         <div>
-                          <h2 className="text-lg font-bold mb-3 text-[#1e2749]">
+                          <h2 className="text-lg font-bold text-gray-900 mb-3">
                             This is What Change<br />Looks Like
                           </h2>
                           <p className="text-lg text-[#1e2749]/80">
@@ -2583,7 +2583,7 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div>
-                          <h3 className="text-base font-bold mb-4 text-[#1e2749]">Verified Outcomes from<br />TDI Partner Schools</h3>
+                          <h3 className="text-base font-bold text-gray-900 mb-4">Verified Outcomes from<br />TDI Partner Schools</h3>
                           <div className="rounded-xl overflow-hidden border border-gray-200">
                             <div className="grid grid-cols-3 text-sm font-bold bg-[#1e2749] text-white">
                               <div className="p-3 border-r border-white/20">Before TDI</div>
@@ -2609,7 +2609,7 @@ export default function PartnerDashboard() {
                         </div>
 
                         <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
-                          <h3 className="font-bold mb-2 text-[#1e2749]">Results in Action, Not Boxes Checked</h3>
+                          <h3 className="font-bold text-gray-900 mb-2">Results in Action, Not Boxes Checked</h3>
                           <p className="text-sm text-[#1e2749]/80">
                             The goal is not to complete a course. The goal is for a teacher to try a new strategy on Monday and see it work by Friday. That is what we measure. That is what we celebrate.
                           </p>
@@ -2621,7 +2621,7 @@ export default function PartnerDashboard() {
                     return (
                       <div className="space-y-8">
                         <div>
-                          <h2 className="text-lg font-bold mb-3 text-[#1e2749]">
+                          <h2 className="text-lg font-bold text-gray-900 mb-3">
                             Your Partnership Contract
                           </h2>
                           <div className="p-4 rounded-lg bg-[#4ecdc4]/10 border border-[#4ecdc4]">
@@ -2838,7 +2838,7 @@ export default function PartnerDashboard() {
 
             {/* The TDI Equation - Interactive Cards with Smooth Expansion */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-              <h2 className="text-lg font-bold text-[#1e2749] mb-6 text-center">The TDI Equation</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-6 text-center">The TDI Equation</h2>
               <div className="flex flex-col md:flex-row items-stretch gap-3">
                 {/* Strong Teachers Card */}
                 <div
@@ -2940,7 +2940,7 @@ export default function PartnerDashboard() {
 
             {/* Phase Timeline with Milestones */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
-              <h2 className="text-lg font-bold text-[#1e2749] mb-8">Your Partnership Journey</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-8">Your Partnership Journey</h2>
               <div className="relative">
                 {/* Timeline connector line - desktop only */}
                 <div className="absolute top-6 left-[16.67%] right-[16.67%] h-0.5 bg-gray-200 hidden md:block" />
@@ -3137,7 +3137,7 @@ export default function PartnerDashboard() {
 
             {/* Your TDI Impact So Far */}
             <div className="bg-gradient-to-br from-[#1B2A4A] via-[#2a3f6e] to-[#38618C] rounded-2xl p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-0.5">
-              <h2 className="text-lg font-bold mb-4">Your TDI Impact So Far</h2>
+              <h2 className="text-lg font-bold text-white mb-4">Your TDI Impact So Far</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="bg-white/10 rounded-xl p-4 text-center backdrop-blur-sm">
                   <div className="text-2xl font-bold">{staffStats.total || 1}</div>
@@ -3163,7 +3163,7 @@ export default function PartnerDashboard() {
 
             {/* What Success Looks Like - with Progress Tracking */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
-              <h2 className="text-lg font-bold text-[#1e2749] mb-4">What Success Looks Like</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">What Success Looks Like</h2>
               <div className="grid sm:grid-cols-2 gap-4">
                 {[
                   { icon: TrendingUp, text: 'Staff report increased confidence in classroom strategies' },
@@ -3270,7 +3270,7 @@ export default function PartnerDashboard() {
 
             {/* Observation Day Highlights */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Observation Day Highlights</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Observation Day Highlights</h2>
               {(partnership?.observation_days_completed ?? 0) === 0 ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -3302,7 +3302,7 @@ export default function PartnerDashboard() {
 
             {/* Hub Engagement Breakdown */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Hub Engagement</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Hub Engagement</h2>
               {staffStats.hubLoggedIn === 0 ? (
                 <div className="text-center py-6">
                   <p className="text-gray-500">
@@ -3331,7 +3331,7 @@ export default function PartnerDashboard() {
 
             {/* Support Delivered Timeline */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Support Delivered</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Support Delivered</h2>
               <div className="relative pl-8 space-y-6">
                 {/* Timeline line */}
                 <div className="absolute left-3 top-2 bottom-2 w-0.5 bg-gray-200" />
@@ -3397,7 +3397,7 @@ export default function PartnerDashboard() {
 
             {/* Curated Starting Points */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Recommended Starting Points</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Recommended Starting Points</h2>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {(partnership?.partnership_type === 'district'
                   ? [
@@ -3438,7 +3438,7 @@ export default function PartnerDashboard() {
           <div role="tabpanel" id="panel-schools" aria-labelledby="tab-schools" className="space-y-6">
             {/* Schools Overview */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">District Overview</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">District Overview</h2>
               <div className="grid sm:grid-cols-4 gap-4">
                 <div className="p-4 bg-gray-50 rounded-xl text-center">
                   <p className="text-2xl font-bold text-[#1e2749]">{apiBuildings.length}</p>
@@ -3463,7 +3463,7 @@ export default function PartnerDashboard() {
 
             {/* Building Cards */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-4">Buildings</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-4">Buildings</h2>
               {apiBuildings.length === 0 ? (
                 <div className="text-center py-8">
                   <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -3552,7 +3552,7 @@ export default function PartnerDashboard() {
           <div role="tabpanel" id="panel-preview" aria-labelledby="tab-preview" className="space-y-6">
             {/* Headline */}
             <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 text-center">
-              <h1 className="text-lg font-bold text-[#1e2749] mb-2">
+              <h1 className="text-lg font-bold text-gray-900 mb-2">
                 Continue Building on {organization?.name || 'Your'}&apos;s Momentum
               </h1>
               <p className="text-gray-600">
@@ -3564,7 +3564,7 @@ export default function PartnerDashboard() {
 
             {/* Proposed Year 2 Timeline */}
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <h2 className="text-lg font-semibold text-[#1e2749] mb-6">Proposed 2026-27 Timeline</h2>
+              <h2 className="text-lg font-bold text-gray-900 mb-6">Proposed 2026-27 Timeline</h2>
               <p className="text-sm text-gray-500 mb-6 italic">
                 This proposed timeline will be customized based on your partnership progress.
               </p>
@@ -3600,7 +3600,7 @@ export default function PartnerDashboard() {
 
             {/* ROI / Impact Summary */}
             <div className="bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-8 text-white">
-              <h2 className="text-lg font-bold mb-6">Your Impact Summary</h2>
+              <h2 className="text-lg font-bold text-white mb-6">Your Impact Summary</h2>
               {(() => {
                 const daysSinceStart = partnership?.contract_start
                   ? Math.floor((Date.now() - new Date(partnership.contract_start).getTime()) / (1000 * 60 * 60 * 24))
@@ -3655,7 +3655,7 @@ export default function PartnerDashboard() {
 
             {/* Board Presentation Offer */}
             <div className="bg-[#FFF8E7] rounded-2xl p-6 border border-[#E8B84B]/30">
-              <h2 className="text-base font-bold text-[#1e2749] mb-2">NEED HELP MAKING THE CASE?</h2>
+              <h2 className="text-base font-bold text-gray-900 mb-2">NEED HELP MAKING THE CASE?</h2>
               <p className="text-gray-700 mb-4">
                 We&apos;ll help you build a board presentation with your actual impact data, cost analysis, and recommended next steps. Your success is our pitch.
               </p>
