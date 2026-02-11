@@ -1141,116 +1141,163 @@ export default function PartnerDashboard() {
             </div>
 
             {/* Leading Indicators */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-[#4ecdc4]" />
-                  <h3 className="text-lg font-bold text-gray-900">Leading Indicators</h3>
-                </div>
-              </div>
+            {(() => {
+              // Get latest metrics from snapshots
+              const getLatestMetric = (name: string) => {
+                const matching = metricSnapshots.filter(m => m.metric_name === name);
+                return matching.length > 0 ? matching[0].metric_value : null;
+              };
 
-              <div className="space-y-4">
-                {/* Teacher Stress */}
-                <div className="rounded-lg p-3 -mx-3">
-                  <div className="flex items-center flex-wrap gap-2 mb-2">
-                    <span className="text-sm font-semibold text-[#1e2749]">Teacher Stress</span>
-                    <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">↓ Lower is better</span>
+              const avgStress = getLatestMetric('avg_stress');
+              const avgImplementation = getLatestMetric('avg_implementation_confidence') || getLatestMetric('implementation_pct');
+              const avgRetention = getLatestMetric('avg_retention_intent');
+
+              return (
+                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <BarChart3 className="w-5 h-5 text-[#4ecdc4]" />
+                      <h3 className="text-lg font-bold text-gray-900">Leading Indicators</h3>
+                    </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-4 text-xs">
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">Industry</span>
-                        <span className="text-red-400 font-medium">8-9/10</span>
+
+                  <div className="space-y-4">
+                    {/* Teacher Stress */}
+                    <div className="rounded-lg p-3 -mx-3">
+                      <div className="flex items-center flex-wrap gap-2 mb-2">
+                        <span className="text-sm font-semibold text-[#1e2749]">Teacher Stress</span>
+                        <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">↓ Lower is better</span>
                       </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: '87%'}} /></div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">TDI Partners</span>
-                        <span className="text-[#1e2749] font-medium">5-7/10</span>
+                      <div className="grid grid-cols-3 gap-4 text-xs">
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-gray-500">Industry</span>
+                            <span className="text-red-400 font-medium">8-9/10</span>
+                          </div>
+                          <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: '87%'}} /></div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-gray-500">TDI Partners</span>
+                            <span className="text-[#1e2749] font-medium">5-7/10</span>
+                          </div>
+                          <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '60%'}} /></div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-gray-500">Your Data</span>
+                            {avgStress !== null ? (
+                              <span className={`font-medium ${avgStress <= 5 ? 'text-[#4ecdc4]' : avgStress <= 7 ? 'text-[#E8B84B]' : 'text-red-500'}`}>
+                                {avgStress.toFixed(1)}/10
+                              </span>
+                            ) : (
+                              <span className="text-gray-400 font-medium italic">Pending</span>
+                            )}
+                          </div>
+                          <div className="h-1.5 bg-gray-100 rounded-full">
+                            <div
+                              className={`h-full rounded-full ${avgStress !== null ? (avgStress <= 5 ? 'bg-[#4ecdc4]' : avgStress <= 7 ? 'bg-[#E8B84B]' : 'bg-red-400') : 'bg-gray-200'}`}
+                              style={{width: avgStress !== null ? `${(avgStress / 10) * 100}%` : '0%'}}
+                            />
+                          </div>
+                          {avgStress === null && <p className="text-[10px] text-gray-400 mt-1">Collecting after baseline survey</p>}
+                        </div>
                       </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '60%'}} /></div>
                     </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">Your Data</span>
-                        <span className="text-gray-400 font-medium italic">Pending</span>
+
+                    {/* Strategy Implementation */}
+                    <div className="rounded-lg p-3 -mx-3">
+                      <div className="flex items-center flex-wrap gap-2 mb-2">
+                        <span className="text-sm font-semibold text-[#1e2749]">Strategy Implementation</span>
+                        <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">↑ Higher is better</span>
                       </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-gray-200 rounded-full" style={{width: '0%'}} /></div>
-                      <p className="text-[10px] text-gray-400 mt-1">Collecting after baseline survey</p>
+                      <div className="grid grid-cols-3 gap-4 text-xs">
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-gray-500">Industry</span>
+                            <span className="text-red-400 font-medium">10%</span>
+                          </div>
+                          <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: '10%'}} /></div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-gray-500">TDI Partners</span>
+                            <span className="text-[#1e2749] font-medium">65%</span>
+                          </div>
+                          <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '65%'}} /></div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-gray-500">Your Data</span>
+                            {avgImplementation !== null ? (
+                              <span className={`font-medium ${avgImplementation >= 7 ? 'text-[#4ecdc4]' : avgImplementation >= 5 ? 'text-[#E8B84B]' : 'text-red-500'}`}>
+                                {avgImplementation <= 10 ? `${avgImplementation.toFixed(1)}/10` : `${avgImplementation.toFixed(0)}%`}
+                              </span>
+                            ) : (
+                              <span className="text-gray-400 font-medium italic">Pending</span>
+                            )}
+                          </div>
+                          <div className="h-1.5 bg-gray-100 rounded-full">
+                            <div
+                              className={`h-full rounded-full ${avgImplementation !== null ? (avgImplementation >= 7 || avgImplementation >= 70 ? 'bg-[#4ecdc4]' : avgImplementation >= 5 || avgImplementation >= 50 ? 'bg-[#E8B84B]' : 'bg-red-400') : 'bg-gray-200'}`}
+                              style={{width: avgImplementation !== null ? `${avgImplementation <= 10 ? (avgImplementation / 10) * 100 : avgImplementation}%` : '0%'}}
+                            />
+                          </div>
+                          {avgImplementation === null && <p className="text-[10px] text-gray-400 mt-1">Collecting after first observation</p>}
+                        </div>
+                      </div>
                     </div>
+
+                    {/* Retention Intent */}
+                    <div className="rounded-lg p-3 -mx-3">
+                      <div className="flex items-center flex-wrap gap-2 mb-2">
+                        <span className="text-sm font-semibold text-[#1e2749]">Retention Intent</span>
+                        <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">↑ Higher is better</span>
+                      </div>
+                      <div className="grid grid-cols-3 gap-4 text-xs">
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-gray-500">Industry</span>
+                            <span className="text-red-400 font-medium">2-4/10</span>
+                          </div>
+                          <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: '30%'}} /></div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-gray-500">TDI Partners</span>
+                            <span className="text-[#1e2749] font-medium">5-7/10</span>
+                          </div>
+                          <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '60%'}} /></div>
+                        </div>
+                        <div>
+                          <div className="flex justify-between mb-1">
+                            <span className="text-gray-500">Your Data</span>
+                            {avgRetention !== null ? (
+                              <span className={`font-medium ${avgRetention >= 7 ? 'text-[#4ecdc4]' : avgRetention >= 5 ? 'text-[#E8B84B]' : 'text-red-500'}`}>
+                                {avgRetention.toFixed(1)}/10
+                              </span>
+                            ) : (
+                              <span className="text-gray-400 font-medium italic">Pending</span>
+                            )}
+                          </div>
+                          <div className="h-1.5 bg-gray-100 rounded-full">
+                            <div
+                              className={`h-full rounded-full ${avgRetention !== null ? (avgRetention >= 7 ? 'bg-[#4ecdc4]' : avgRetention >= 5 ? 'bg-[#E8B84B]' : 'bg-red-400') : 'bg-gray-200'}`}
+                              style={{width: avgRetention !== null ? `${(avgRetention / 10) * 100}%` : '0%'}}
+                            />
+                          </div>
+                          {avgRetention === null && <p className="text-[10px] text-gray-400 mt-1">Collecting after baseline survey</p>}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-gray-100">
+                    <p className="text-xs text-gray-500">Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys</p>
                   </div>
                 </div>
-
-                {/* Strategy Implementation */}
-                <div className="rounded-lg p-3 -mx-3">
-                  <div className="flex items-center flex-wrap gap-2 mb-2">
-                    <span className="text-sm font-semibold text-[#1e2749]">Strategy Implementation</span>
-                    <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">↑ Higher is better</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 text-xs">
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">Industry</span>
-                        <span className="text-red-400 font-medium">10%</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: '10%'}} /></div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">TDI Partners</span>
-                        <span className="text-[#1e2749] font-medium">65%</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '65%'}} /></div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">Your Data</span>
-                        <span className="text-gray-400 font-medium italic">Pending</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-gray-200 rounded-full" style={{width: '0%'}} /></div>
-                      <p className="text-[10px] text-gray-400 mt-1">Collecting after first observation</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Retention Intent */}
-                <div className="rounded-lg p-3 -mx-3">
-                  <div className="flex items-center flex-wrap gap-2 mb-2">
-                    <span className="text-sm font-semibold text-[#1e2749]">Retention Intent</span>
-                    <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">↑ Higher is better</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 text-xs">
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">Industry</span>
-                        <span className="text-red-400 font-medium">2-4/10</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: '30%'}} /></div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">TDI Partners</span>
-                        <span className="text-[#1e2749] font-medium">5-7/10</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '60%'}} /></div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">Your Data</span>
-                        <span className="text-gray-400 font-medium italic">Pending</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-gray-200 rounded-full" style={{width: '0%'}} /></div>
-                      <p className="text-[10px] text-gray-400 mt-1">Collecting after baseline survey</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <p className="text-xs text-gray-500">Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys</p>
-              </div>
-            </div>
+              );
+            })()}
 
             {/* Building Spotlight */}
             {partnership.partnership_type === 'district' && (
@@ -3694,13 +3741,42 @@ export default function PartnerDashboard() {
                 const daysSinceStart = partnership?.contract_start
                   ? Math.floor((Date.now() - new Date(partnership.contract_start).getTime()) / (1000 * 60 * 60 * 24))
                   : 0;
-                const isEarly = daysSinceStart < 90;
+
+                // Get metrics for change comparison
+                const getMetricValues = (name: string) => {
+                  const matching = metricSnapshots
+                    .filter(m => m.metric_name === name)
+                    .sort((a, b) => new Date(a.recorded_at).getTime() - new Date(b.recorded_at).getTime());
+                  if (matching.length === 0) return null;
+                  const earliest = matching[0].metric_value;
+                  const latest = matching[matching.length - 1].metric_value;
+                  const hasChange = matching.length > 1 && earliest !== latest;
+                  return { earliest, latest, hasChange };
+                };
+
+                const stressData = getMetricValues('avg_stress');
+                const planningData = getMetricValues('avg_planning_hours');
+                const retentionData = getMetricValues('avg_retention_intent');
+
+                const hasAnyData = stressData || planningData || retentionData;
+                const isEarly = daysSinceStart < 90 && !hasAnyData;
+
+                // Helper to format change
+                const formatChange = (earliest: number, latest: number, isLowerBetter: boolean) => {
+                  const pctChange = ((latest - earliest) / earliest) * 100;
+                  const improved = isLowerBetter ? pctChange < 0 : pctChange > 0;
+                  const arrow = pctChange > 0 ? '↑' : pctChange < 0 ? '↓' : '';
+                  return {
+                    text: `${earliest.toFixed(1)} → ${latest.toFixed(1)} (${arrow}${Math.abs(pctChange).toFixed(0)}%)`,
+                    improved,
+                  };
+                };
 
                 return (
                   <>
                     {isEarly && (
                       <div className="mb-6 px-3 py-2 bg-white/10 rounded-lg inline-block">
-                        <span className="text-sm font-medium">Example Data — Your metrics will populate as your partnership progresses</span>
+                        <span className="text-sm font-medium">Your impact data will populate here as your partnership progresses</span>
                       </div>
                     )}
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -3726,15 +3802,45 @@ export default function PartnerDashboard() {
                       </div>
                       <div>
                         <p className="text-white/70 text-sm mb-1">Educator Stress</p>
-                        <p className="text-2xl font-bold">—</p>
+                        {stressData ? (
+                          stressData.hasChange ? (
+                            <p className={`text-2xl font-bold ${formatChange(stressData.earliest, stressData.latest, true).improved ? 'text-[#4ecdc4]' : 'text-red-300'}`}>
+                              {formatChange(stressData.earliest, stressData.latest, true).text}
+                            </p>
+                          ) : (
+                            <p className="text-2xl font-bold">{stressData.latest.toFixed(1)}/10</p>
+                          )
+                        ) : (
+                          <p className="text-2xl font-bold">—</p>
+                        )}
                       </div>
                       <div>
                         <p className="text-white/70 text-sm mb-1">Planning Time</p>
-                        <p className="text-2xl font-bold">—</p>
+                        {planningData ? (
+                          planningData.hasChange ? (
+                            <p className={`text-2xl font-bold ${formatChange(planningData.earliest, planningData.latest, false).improved ? 'text-[#4ecdc4]' : 'text-red-300'}`}>
+                              {formatChange(planningData.earliest, planningData.latest, false).text} hrs
+                            </p>
+                          ) : (
+                            <p className="text-2xl font-bold">{planningData.latest.toFixed(1)} hrs/wk</p>
+                          )
+                        ) : (
+                          <p className="text-2xl font-bold">—</p>
+                        )}
                       </div>
                       <div>
                         <p className="text-white/70 text-sm mb-1">Retention Intent</p>
-                        <p className="text-2xl font-bold">—</p>
+                        {retentionData ? (
+                          retentionData.hasChange ? (
+                            <p className={`text-2xl font-bold ${formatChange(retentionData.earliest, retentionData.latest, false).improved ? 'text-[#4ecdc4]' : 'text-red-300'}`}>
+                              {formatChange(retentionData.earliest, retentionData.latest, false).text}
+                            </p>
+                          ) : (
+                            <p className="text-2xl font-bold">{retentionData.latest.toFixed(1)}/10</p>
+                          )
+                        ) : (
+                          <p className="text-2xl font-bold">—</p>
+                        )}
                       </div>
                     </div>
                   </>
