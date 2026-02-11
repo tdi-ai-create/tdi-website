@@ -646,59 +646,55 @@ export default function AboutPage() {
       </section>
 
       {/* The Story Behind the Symbol */}
-      <section id="symbol" className="py-16 md:py-24" style={{ backgroundColor: '#faf3e0' }}>
-        <div className="max-w-4xl mx-auto px-6">
-          {/* Heading */}
-          <h2
-            className="text-2xl md:text-3xl font-bold text-center mb-4"
-            style={{ color: '#1e3a5f' }}
-          >
+      <section id="symbol" className="py-16 md:py-24" style={{ background: '#faf3e0' }}>
+        <div className="max-w-5xl mx-auto px-6">
+
+          <h2 className="text-2xl md:text-3xl font-bold mb-12" style={{ color: '#1e3a5f' }}>
             The Story Behind the Symbol
           </h2>
 
-          {/* Animation - centered, prominent */}
-          <div className="flex justify-center mb-10">
-            <div className="w-56 h-56 md:w-72 md:h-72">
+          <div className="flex flex-col md:flex-row items-start gap-10 md:gap-16">
+
+            {/* Animation — LEFT side on desktop, top on mobile */}
+            <div className="w-48 h-48 md:w-64 md:h-64 flex-shrink-0 mx-auto md:mx-0 md:sticky md:top-32">
               <SymbolAnimation />
             </div>
-          </div>
 
-          {/* Story text */}
-          <div
-            className="max-w-2xl mx-auto space-y-5"
-            style={{ color: '#1e3a5f', fontSize: '16px', lineHeight: '1.85' }}
-          >
-            <p>If you've been a teacher, you know the mark.</p>
+            {/* Text — RIGHT side on desktop, below on mobile */}
+            <div className="flex-1 space-y-5" style={{ color: '#1e3a5f', fontSize: '16px', lineHeight: '1.85' }}>
+              <p>
+                When I was teaching 6th grade, I ran a mastery learning classroom. Thirty-six students working through content at their own pace, all active at the same time. I needed a fast way to check off their work — to initial that I'd seen it, that they were good to move on.
+              </p>
 
-            <p>
-              Not a grade. Not a checkmark. That quick little initial a teacher leaves on student work — the one that says "yes, you got it." Students know it instantly. It's not formal. It's human. It's the fastest way to say "I see your knowledge."
-            </p>
+              <p>
+                So I'd scribble a quick lowercase h. Hughart. Just my last name, fast and messy, on paper after paper after paper.
+              </p>
 
-            <p>
-              That's where our symbol starts. The H — my last name, Hughart — the approval mark I left on thousands of papers. Quick, confident, real.
-            </p>
+              <p>
+                Year over year, it got messier. The h turned into something that barely looked like a letter anymore. But my students always knew exactly what it was. That little scribble meant "I see you. You got it. Keep going."
+              </p>
 
-            <p>
-              But it doesn't stop there. The pen keeps moving. The final upstroke of the H climbs up and becomes a circle — sweeping around the whole thing. One continuous stroke that never lifts off the paper.
-            </p>
+              <p>
+                It became the mark that showed up on their progress, their accomplishments, their journey. Not a grade. Not a checkmark. Just a quick, human sign-off that said I was paying attention.
+              </p>
 
-            <p>
-              The circle is the embrace. It's protection. Attention. "I circled back to you." The way a teacher wraps care around a student.
-            </p>
+              <p>
+                That's where our symbol comes from. The h — my messy, real, teacher shorthand — with a circle swept around it. One continuous stroke that never lifts off the paper. The circle is the embrace. Protection. "I circled back to you." The way a teacher wraps care around a student.
+              </p>
 
-            <p>One stroke says two things: I see you. I've got you.</p>
+              <p>
+                One stroke says two things: I see you. I've got you.
+              </p>
 
-            <p>
-              You'll notice this symbol when you enter our portals — the Creators Studio, the Leadership Dashboard, the Learning Hub. A line enters the screen, forms the mark, holds for just a moment, then unravels and carries you in. The symbol was never meant to be permanent. It was always just one line passing through — the same line that wrote "I see you" becomes the line that takes you where you need to go.
-            </p>
+              <p>
+                You'll notice this symbol when you enter our portals — the Creators Studio, the Leadership Dashboard, the Learning Hub. A line enters the screen, forms the mark, holds for just a moment, then unravels and carries you in. It was always just one line passing through — the same line that wrote "I see you" becomes the line that takes you where you need to go.
+              </p>
 
-            <p>
-              That felt right for what we do. We're not here to sit on a shelf. We're here to move through your practice and leave something behind that matters.
-            </p>
+              <p>
+                That felt right for what we do. We're not here to sit on a shelf. We're here to move through your practice and leave something behind that matters.
+              </p>
+            </div>
 
-            <p>
-              One stroke. It draws on, it holds, it unravels. The mark that says "I see you" — then becomes the line that takes you there.
-            </p>
           </div>
         </div>
       </section>

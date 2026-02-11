@@ -374,7 +374,7 @@ export default function TDIPortalLoader({ portal, onComplete }: TDIPortalLoaderP
           className="text-sm max-w-md mx-auto leading-relaxed"
           style={{ color: 'rgba(255, 255, 255, 0.35)' }}
         >
-          The quick mark a teacher leaves on student work. An H that says &ldquo;I see you&rdquo; wrapped in a circle that says &ldquo;I&rsquo;ve got you.&rdquo; One stroke. Never lifts.
+          The quick scribble a teacher leaves on student work. An h that says &ldquo;I see you&rdquo; wrapped in a circle that says &ldquo;I&rsquo;ve got you.&rdquo; One stroke. Never lifts.
         </p>
         <a
           href="/about#symbol"
