@@ -193,9 +193,8 @@ export default function CertificatesPage() {
                   {/* Actions */}
                   <div className="flex flex-wrap items-center gap-3">
                     <a
-                      href={cert.certificate_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href={`/api/hub/certificate/${cert.verification_code}`}
+                      download={`TDI-Certificate-${cert.verification_code}.pdf`}
                       className="inline-flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg transition-colors"
                       style={{
                         backgroundColor: '#E8B84B',

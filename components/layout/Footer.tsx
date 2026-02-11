@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
+import FooterSymbol from '@/components/FooterSymbol';
 
 export function Footer() {
   const pathname = usePathname();
@@ -178,46 +178,46 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Bottom Bar */}
+      {/* Bottom Bar with Large Animated Symbol */}
       <div className="border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
-        <div className="px-4 md:px-8 lg:px-16 py-4 md:py-6">
-          <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
-            <div className="flex items-center gap-4">
-              {/* Rae's sign-off mark */}
-              <a
+        <div className="px-4 md:px-8 lg:px-16 py-6 md:py-8">
+          <div className="max-w-7xl mx-auto">
+            {/* Large symbol + copyright row */}
+            <div className="flex flex-col md:flex-row items-center md:items-end justify-between gap-6">
+
+              {/* Large animated mark — left side */}
+              <Link
                 href="/about#symbol"
-                className="inline-block"
-                style={{ opacity: 0.3, transition: 'opacity 0.3s ease' }}
-                onMouseOver={(e) => e.currentTarget.style.opacity = '0.5'}
-                onMouseOut={(e) => e.currentTarget.style.opacity = '0.3'}
+                className="block flex-shrink-0"
+                style={{ width: 140, height: 140 }}
+                aria-label="The story behind the TDI symbol"
               >
-                <Image
-                  src="/images/tdi-mark-blue.png"
-                  alt="The TDI mark"
-                  width={48}
-                  height={48}
-                  className="object-contain"
-                />
-              </a>
-              <p className="text-sm" style={{ color: 'white', opacity: 0.5 }}>
-                © 2026 Teachers Deserve It. All rights reserved.
-              </p>
-            </div>
-            <div className="flex flex-wrap justify-center md:justify-end gap-4 md:gap-6">
-              <Link href="/privacy" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
-                Privacy Policy
+                <FooterSymbol />
               </Link>
-              <Link href="/terms" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
-                Terms of Service
-              </Link>
-              <Link href="/security" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
-                Security
-              </Link>
+
+              {/* Copyright + legal — right side */}
+              <div className="text-center md:text-right flex-1">
+                <p className="text-sm" style={{ color: 'white', opacity: 0.5 }}>
+                  © 2026 Teachers Deserve It. All rights reserved.
+                </p>
+                <div className="flex flex-wrap justify-center md:justify-end gap-4 md:gap-6 mt-2">
+                  <Link href="/privacy" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
+                    Privacy Policy
+                  </Link>
+                  <Link href="/terms" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
+                    Terms of Service
+                  </Link>
+                  <Link href="/security" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
+                    Security
+                  </Link>
+                </div>
+                <p className="text-sm mt-4" style={{ color: '#ffffff', opacity: 0.7 }}>
+                  TDI is committed to accessibility. We strive to ensure our website is usable by all educators, including those using assistive technologies.
+                </p>
+              </div>
+
             </div>
           </div>
-          <p className="text-sm mt-4 text-center" style={{ color: '#ffffff', opacity: 0.7 }}>
-            TDI is committed to accessibility. We strive to ensure our website is usable by all educators, including those using assistive technologies.
-          </p>
         </div>
       </div>
     </footer>
