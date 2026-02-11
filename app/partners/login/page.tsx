@@ -162,10 +162,12 @@ function PartnerLoginContent() {
         visibility: showPage ? 'visible' : 'hidden',
         opacity: showPage ? 1 : 0,
         transition: 'opacity 300ms ease-in',
-      }}>
+      }}
+      className="min-h-screen flex flex-col"
+      >
         {/* Reset sent confirmation */}
         {pageState === 'reset_sent' ? (
-          <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4">
+          <div className="flex-1 bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4">
             <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-md w-full text-center">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle className="w-8 h-8 text-green-600" />
@@ -187,7 +189,7 @@ function PartnerLoginContent() {
           </div>
         ) : pageState === 'forgot_password' ? (
           /* Forgot password form */
-          <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4 py-8">
+          <div className="flex-1 bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4 py-8">
             <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
               {/* Logo */}
               <div className="pt-8 px-8">
@@ -248,7 +250,7 @@ function PartnerLoginContent() {
           </div>
         ) : (
           /* Main login form */
-          <div className="min-h-screen bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4 py-8">
+          <div className="flex-1 bg-gradient-to-br from-[#1B2A4A] to-[#38618C] flex items-center justify-center px-4 py-8">
             <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
               {/* Logo */}
               <div className="pt-8 px-8">
@@ -374,6 +376,58 @@ function PartnerLoginContent() {
             </div>
           </div>
         )}
+
+        {/* Footer */}
+        <footer className="bg-[#1e2749] text-gray-300">
+          <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+              {/* Brand */}
+              <div>
+                <h3 className="text-white font-bold text-lg mb-2">Teachers Deserve It</h3>
+                <p className="text-sm opacity-70">PD that respects your time, strategies that actually work, and a community that gets it.</p>
+              </div>
+
+              {/* Quick Links */}
+              <div>
+                <h4 className="text-white font-semibold mb-3">Quick Links</h4>
+                <ul className="space-y-2 text-sm">
+                  <li><a href="https://www.teachersdeserveit.com" className="hover:text-white transition-colors">Home</a></li>
+                  <li><a href="https://www.teachersdeserveit.com/for-schools" className="hover:text-white transition-colors">For Schools</a></li>
+                  <li><a href="https://www.teachersdeserveit.com/how-we-partner" className="hover:text-white transition-colors">How We Partner</a></li>
+                  <li><a href="https://www.teachersdeserveit.com/about" className="hover:text-white transition-colors">About</a></li>
+                </ul>
+              </div>
+
+              {/* Resources */}
+              <div>
+                <h4 className="text-white font-semibold mb-3">Resources</h4>
+                <ul className="space-y-2 text-sm">
+                  <li><a href="https://www.teachersdeserveit.com/funding" className="hover:text-white transition-colors">Funding Options</a></li>
+                  <li><a href="https://www.teachersdeserveit.com/free-pd-plan" className="hover:text-white transition-colors">Free PD Plan</a></li>
+                  <li><a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Blog</a></li>
+                  <li><a href="https://www.teachersdeserveit.com/contact" className="hover:text-white transition-colors">Contact</a></li>
+                </ul>
+              </div>
+
+              {/* Contact */}
+              <div>
+                <h4 className="text-white font-semibold mb-3">Your TDI Partner</h4>
+                <p className="text-sm">Rae Hughart</p>
+                <p className="text-sm">Rae@TeachersDeserveIt.com</p>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-600 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center text-sm">
+              <p className="opacity-50">© 2026 Teachers Deserve It. All rights reserved.</p>
+              <div className="flex gap-6 mt-4 md:mt-0">
+                <a href="https://www.teachersdeserveit.com/privacy" className="hover:text-white transition-colors opacity-50 hover:opacity-100">Privacy Policy</a>
+                <a href="https://www.teachersdeserveit.com/terms" className="hover:text-white transition-colors opacity-50 hover:opacity-100">Terms of Service</a>
+              </div>
+            </div>
+
+            <p className="text-xs text-gray-500 mt-4 text-center">TDI is committed to accessibility. We strive to ensure our website is usable by all educators, including those using assistive technologies.</p>
+          </div>
+        </footer>
       </div>
     </>
   );
