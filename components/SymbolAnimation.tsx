@@ -24,6 +24,114 @@ function easeInOut(t: number): number {
   return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
+// Seeded random for consistent texture per point (no flickering)
+function seededRandom(seed: number): number {
+  const x = Math.sin(seed * 127.1 + seed * 311.7) * 43758.5453;
+  return x - Math.floor(x);
+}
+
+// Draw a single chalk point as a cluster of semi-transparent dots
+function drawChalkPoint(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  lineWidth: number,
+  color: string,
+  pointIndex: number,
+  globalOpacity: number
+) {
+  const numDots = 10;
+  const scatter = lineWidth * 0.55;
+
+  for (let i = 0; i < numDots; i++) {
+    const seed = pointIndex * numDots + i;
+    const angle = seededRandom(seed) * Math.PI * 2;
+    const dist = seededRandom(seed + 1000) * scatter;
+    const dx = Math.cos(angle) * dist;
+    const dy = Math.sin(angle) * dist;
+
+    const dotSize = 0.4 + seededRandom(seed + 2000) * 1.0;
+    const dotOpacity = (0.2 + seededRandom(seed + 3000) * 0.5) * globalOpacity;
+
+    ctx.beginPath();
+    ctx.arc(x + dx, y + dy, dotSize, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.globalAlpha = dotOpacity;
+    ctx.fill();
+  }
+}
+
+// Draw chalk line along path points
+function drawChalkLine(
+  ctx: CanvasRenderingContext2D,
+  points: { x: number; y: number }[],
+  fromIndex: number,
+  toIndex: number,
+  lineWidth: number,
+  color: string,
+  globalOpacity: number
+) {
+  // First pass: main chalk texture at each point
+  for (let i = fromIndex; i <= toIndex; i++) {
+    drawChalkPoint(ctx, points[i].x, points[i].y, lineWidth, color, i, globalOpacity);
+  }
+
+  // Second pass: fewer, slightly larger dots for body/density
+  for (let i = fromIndex; i <= toIndex; i += 2) {
+    const numDots = 5;
+    const scatter = lineWidth * 0.35;
+    for (let j = 0; j < numDots; j++) {
+      const seed = i * 100 + j + 50000;
+      const angle = seededRandom(seed) * Math.PI * 2;
+      const dist = seededRandom(seed + 1000) * scatter;
+
+      ctx.beginPath();
+      ctx.arc(
+        points[i].x + Math.cos(angle) * dist,
+        points[i].y + Math.sin(angle) * dist,
+        0.6 + seededRandom(seed + 2000) * 0.7,
+        0,
+        Math.PI * 2
+      );
+      ctx.fillStyle = color;
+      ctx.globalAlpha = (0.4 + seededRandom(seed + 3000) * 0.35) * globalOpacity;
+      ctx.fill();
+    }
+  }
+
+  ctx.globalAlpha = 1.0;
+}
+
+// Draw textured pen tip (small cluster instead of clean circle)
+function drawChalkTip(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  size: number,
+  color: string,
+  globalOpacity: number
+) {
+  const numDots = 8;
+  for (let i = 0; i < numDots; i++) {
+    const seed = 99999 + i;
+    const angle = seededRandom(seed) * Math.PI * 2;
+    const dist = seededRandom(seed + 1000) * size * 0.5;
+
+    ctx.beginPath();
+    ctx.arc(
+      x + Math.cos(angle) * dist,
+      y + Math.sin(angle) * dist,
+      0.5 + seededRandom(seed + 2000) * 0.8,
+      0,
+      Math.PI * 2
+    );
+    ctx.fillStyle = color;
+    ctx.globalAlpha = (0.5 + seededRandom(seed + 3000) * 0.4) * globalOpacity;
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1.0;
+}
+
 export default function SymbolAnimation() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -108,6 +216,8 @@ export default function SymbolAnimation() {
     const fadePhaseEnd = 0.97;    // 90-97%: fade out
     // 97-100%: pause (blank canvas)
 
+    const chalkColor = '#1e3a5f';
+
     const animate = (timestamp: number) => {
       if (!isVisibleRef.current) {
         animationRef.current = requestAnimationFrame(animate);
@@ -135,8 +245,8 @@ export default function SymbolAnimation() {
         return;
       }
 
-      // Calculate line width proportional to canvas size
-      const baseLineWidth = (width / 200) * 3.5;
+      // Calculate line width proportional to canvas size (slightly thicker for chalk)
+      const baseLineWidth = (width / 200) * 4.5;
 
       // Calculate animation state based on phase
       let drawProgress = 1;
@@ -155,7 +265,7 @@ export default function SymbolAnimation() {
         // Growing shadow and scale as it "lifts off the page"
         shadowOffsetY = phaseProgress * 6;
         shadowBlur = phaseProgress * 12;
-        scaleFactor = 1 + phaseProgress * 0.03; // 1.0 to 1.03
+        scaleFactor = 1 + phaseProgress * 0.03;
 
       } else if (rawProgress <= stampPhaseEnd) {
         // Phase 2: Stamp down
@@ -173,7 +283,6 @@ export default function SymbolAnimation() {
       } else if (rawProgress <= restPhaseEnd) {
         // Phase 3: Rest as static image
         drawProgress = 1;
-        // No shadow, no scale, just the mark
         shadowOffsetY = 0;
         shadowBlur = 0;
         scaleFactor = 1;
@@ -192,86 +301,32 @@ export default function SymbolAnimation() {
         return;
       }
 
-      // Helper function to draw the symbol path
-      const drawSymbolPath = () => {
-        ctx.beginPath();
-        ctx.moveTo(points[0].x, points[0].y);
-
-        for (let i = 1; i <= endIndex; i++) {
-          const curr = points[i];
-          const next = points[Math.min(i + 1, endIndex)];
-
-          const cpx = curr.x;
-          const cpy = curr.y;
-          const endx = (curr.x + next.x) / 2;
-          const endy = (curr.y + next.y) / 2;
-
-          if (i === endIndex) {
-            ctx.lineTo(curr.x, curr.y);
-          } else {
-            ctx.quadraticCurveTo(cpx, cpy, endx, endy);
-          }
-        }
-      };
-
       // Apply scale transform centered on symbol
       ctx.save();
       ctx.translate(center.x, center.y);
       ctx.scale(scaleFactor, scaleFactor);
       ctx.translate(-center.x, -center.y);
 
-      // Draw drop shadow (lift effect)
+      // Draw drop shadow for lift effect (subtle, under the chalk)
       if (shadowBlur > 0 || shadowOffsetY > 0) {
         ctx.save();
-        ctx.globalAlpha = opacity * 0.15;
-        ctx.strokeStyle = 'rgba(30, 58, 95, 1)';
-        ctx.lineWidth = baseLineWidth;
-        ctx.lineCap = 'round';
-        ctx.lineJoin = 'round';
-        ctx.shadowColor = 'rgba(30, 58, 95, 0.15)';
+        ctx.shadowColor = 'rgba(30, 58, 95, 0.12)';
         ctx.shadowBlur = shadowBlur;
         ctx.shadowOffsetY = shadowOffsetY;
         ctx.shadowOffsetX = 0;
 
-        drawSymbolPath();
-        ctx.stroke();
+        // Draw a faint version of the chalk for shadow
+        drawChalkLine(ctx, points, 0, endIndex, baseLineWidth, chalkColor, opacity * 0.08);
         ctx.restore();
       }
 
-      // Draw subtle glow (behind main line)
-      ctx.save();
-      ctx.globalAlpha = opacity * 0.05;
-      ctx.strokeStyle = '#1e3a5f';
-      ctx.lineWidth = baseLineWidth * 2.5;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
+      // Draw the main chalk line
+      drawChalkLine(ctx, points, 0, endIndex, baseLineWidth, chalkColor, opacity);
 
-      drawSymbolPath();
-      ctx.stroke();
-      ctx.restore();
-
-      // Draw main line
-      ctx.save();
-      ctx.globalAlpha = opacity;
-      ctx.strokeStyle = '#1e3a5f';
-      ctx.lineWidth = baseLineWidth;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
-
-      drawSymbolPath();
-      ctx.stroke();
-      ctx.restore();
-
-      // Draw pen tip dot during draw-on phase only
+      // Draw textured pen tip during draw-on phase only
       if (showPenTip && endIndex > 0) {
         const tipPoint = points[endIndex];
-        ctx.save();
-        ctx.globalAlpha = opacity;
-        ctx.fillStyle = '#1e3a5f';
-        ctx.beginPath();
-        ctx.arc(tipPoint.x, tipPoint.y, baseLineWidth * 0.6, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
+        drawChalkTip(ctx, tipPoint.x, tipPoint.y, baseLineWidth * 0.8, chalkColor, opacity);
       }
 
       // Restore from scale transform
