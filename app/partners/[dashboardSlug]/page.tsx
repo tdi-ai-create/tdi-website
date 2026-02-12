@@ -3332,23 +3332,29 @@ export default function PartnerDashboard() {
                     onMouseLeave={() => setHoveredEquationCard(null)}
                   >
                     <div className="flex flex-col items-center text-center gap-2">
-                      <BookOpen className={`w-7 h-7 transition-colors duration-500 ${
-                        hoveredEquationCard === 0 ? 'text-white' : 'text-[#1B2A4A]'
-                      }`} />
-                      <h3 className={`text-sm font-semibold transition-colors duration-500 ${
-                        hoveredEquationCard === 0 ? 'text-white' : 'text-[#1B2A4A]'
-                      }`}>Strong Teachers</h3>
-                      <p className={`text-xs transition-colors duration-500 ${
-                        hoveredEquationCard === 0 ? 'text-white/70' : 'text-gray-500'
-                      }`}>Practical strategies</p>
+                      <BookOpen
+                        className="w-7 h-7 transition-colors duration-500"
+                        style={{ color: hoveredEquationCard === 0 ? '#ffffff' : '#1B2A4A' }}
+                      />
+                      <h3
+                        className="text-sm font-semibold transition-colors duration-500"
+                        style={{ color: hoveredEquationCard === 0 ? '#ffffff' : '#1B2A4A' }}
+                      >Strong Teachers</h3>
+                      <p
+                        className="text-xs transition-colors duration-500"
+                        style={{ color: hoveredEquationCard === 0 ? 'rgba(255,255,255,0.7)' : '#6B7280' }}
+                      >Practical strategies</p>
                       {/* Desktop: show on hover */}
-                      <p className={`text-xs mt-2 leading-relaxed transition-all duration-500 ease-in-out overflow-hidden hidden md:block ${
-                        hoveredEquationCard === 0 ? 'max-h-40 opacity-100 text-white/70' : 'max-h-0 opacity-0 text-gray-500'
-                      }`}>
+                      <p
+                        className={`text-xs mt-2 leading-relaxed transition-all duration-500 ease-in-out overflow-hidden hidden md:block ${
+                          hoveredEquationCard === 0 ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+                        }`}
+                        style={{ color: hoveredEquationCard === 0 ? 'rgba(255,255,255,0.7)' : '#6B7280' }}
+                      >
                         Practical strategies from the Learning Hub, tailored to your classrooms and tested by real educators.
                       </p>
                       {/* Mobile: always show */}
-                      <p className="text-xs text-gray-500 mt-2 leading-relaxed md:hidden">
+                      <p className="text-xs mt-2 leading-relaxed md:hidden" style={{ color: '#6B7280' }}>
                         Practical strategies from the Learning Hub, tailored to your classrooms and tested by real educators.
                       </p>
                     </div>
@@ -3371,23 +3377,29 @@ export default function PartnerDashboard() {
                     onMouseLeave={() => setHoveredEquationCard(null)}
                   >
                     <div className="flex flex-col items-center text-center gap-2">
-                      <Users className={`w-7 h-7 transition-colors duration-500 ${
-                        hoveredEquationCard === 1 ? 'text-white' : 'text-[#1B2A4A]'
-                      }`} />
-                      <h3 className={`text-sm font-semibold transition-colors duration-500 ${
-                        hoveredEquationCard === 1 ? 'text-white' : 'text-[#1B2A4A]'
-                      }`}>Strong Support</h3>
-                      <p className={`text-xs transition-colors duration-500 ${
-                        hoveredEquationCard === 1 ? 'text-white/70' : 'text-gray-500'
-                      }`}>Coaching & community</p>
+                      <Users
+                        className="w-7 h-7 transition-colors duration-500"
+                        style={{ color: hoveredEquationCard === 1 ? '#ffffff' : '#1B2A4A' }}
+                      />
+                      <h3
+                        className="text-sm font-semibold transition-colors duration-500"
+                        style={{ color: hoveredEquationCard === 1 ? '#ffffff' : '#1B2A4A' }}
+                      >Strong Support</h3>
+                      <p
+                        className="text-xs transition-colors duration-500"
+                        style={{ color: hoveredEquationCard === 1 ? 'rgba(255,255,255,0.7)' : '#6B7280' }}
+                      >Coaching & community</p>
                       {/* Desktop: show on hover */}
-                      <p className={`text-xs mt-2 leading-relaxed transition-all duration-500 ease-in-out overflow-hidden hidden md:block ${
-                        hoveredEquationCard === 1 ? 'max-h-40 opacity-100 text-white/70' : 'max-h-0 opacity-0 text-gray-500'
-                      }`}>
+                      <p
+                        className={`text-xs mt-2 leading-relaxed transition-all duration-500 ease-in-out overflow-hidden hidden md:block ${
+                          hoveredEquationCard === 1 ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+                        }`}
+                        style={{ color: hoveredEquationCard === 1 ? 'rgba(255,255,255,0.7)' : '#6B7280' }}
+                      >
                         Ongoing coaching, Love Notes, observation feedback, and a community of 87,000+ educators.
                       </p>
                       {/* Mobile: always show */}
-                      <p className="text-xs text-gray-500 mt-2 leading-relaxed md:hidden">
+                      <p className="text-xs mt-2 leading-relaxed md:hidden" style={{ color: '#6B7280' }}>
                         Ongoing coaching, Love Notes, observation feedback, and a community of 87,000+ educators.
                       </p>
                     </div>
@@ -3410,23 +3422,29 @@ export default function PartnerDashboard() {
                     onMouseLeave={() => setHoveredEquationCard(null)}
                   >
                     <div className="flex flex-col items-center text-center gap-2">
-                      <TrendingUp className={`w-7 h-7 transition-colors duration-500 ${
-                        hoveredEquationCard === 2 ? 'text-white' : 'text-[#1B2A4A]'
-                      }`} />
-                      <h3 className={`text-sm font-semibold transition-colors duration-500 ${
-                        hoveredEquationCard === 2 ? 'text-white' : 'text-[#1B2A4A]'
-                      }`}>Student Success</h3>
-                      <p className={`text-xs transition-colors duration-500 ${
-                        hoveredEquationCard === 2 ? 'text-white/70' : 'text-gray-500'
-                      }`}>Better outcomes</p>
+                      <TrendingUp
+                        className="w-7 h-7 transition-colors duration-500"
+                        style={{ color: hoveredEquationCard === 2 ? '#ffffff' : '#1B2A4A' }}
+                      />
+                      <h3
+                        className="text-sm font-semibold transition-colors duration-500"
+                        style={{ color: hoveredEquationCard === 2 ? '#ffffff' : '#1B2A4A' }}
+                      >Student Success</h3>
+                      <p
+                        className="text-xs transition-colors duration-500"
+                        style={{ color: hoveredEquationCard === 2 ? 'rgba(255,255,255,0.7)' : '#6B7280' }}
+                      >Better outcomes</p>
                       {/* Desktop: show on hover */}
-                      <p className={`text-xs mt-2 leading-relaxed transition-all duration-500 ease-in-out overflow-hidden hidden md:block ${
-                        hoveredEquationCard === 2 ? 'max-h-40 opacity-100 text-white/70' : 'max-h-0 opacity-0 text-gray-500'
-                      }`}>
+                      <p
+                        className={`text-xs mt-2 leading-relaxed transition-all duration-500 ease-in-out overflow-hidden hidden md:block ${
+                          hoveredEquationCard === 2 ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+                        }`}
+                        style={{ color: hoveredEquationCard === 2 ? 'rgba(255,255,255,0.7)' : '#6B7280' }}
+                      >
                         When teachers thrive, students thrive. Better engagement, stronger relationships, measurable growth.
                       </p>
                       {/* Mobile: always show */}
-                      <p className="text-xs text-gray-500 mt-2 leading-relaxed md:hidden">
+                      <p className="text-xs mt-2 leading-relaxed md:hidden" style={{ color: '#6B7280' }}>
                         When teachers thrive, students thrive. Better engagement, stronger relationships, measurable growth.
                       </p>
                     </div>
