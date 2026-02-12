@@ -874,7 +874,7 @@ export default function SurveyEntryPage() {
                     {staffMembers.map((staff) => (
                       <option key={staff.id} value={staff.id}>
                         {staff.first_name} {staff.last_name}
-                        {staff.building?.name ? ` — ${staff.building.name}` : ''}
+                        {staff.building?.name ? ` - ${staff.building.name}` : ''}
                         {respondedStaffIds.has(staff.id) ? ' ✓' : ''}
                       </option>
                     ))}

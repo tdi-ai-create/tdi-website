@@ -55,23 +55,23 @@ export default function AdminGuidePage() {
               <ul className="space-y-2 text-sm">
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-yellow-500"></span>
-                  <strong>Invited</strong> — Link sent, waiting for partner setup
+                  <strong>Invited</strong> - Link sent, waiting for partner setup
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                  <strong>Setup in Progress</strong> — Partner started onboarding
+                  <strong>Setup in Progress</strong> - Partner started onboarding
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                  <strong>Active</strong> — Partnership is live
+                  <strong>Active</strong> - Partnership is live
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-gray-400"></span>
-                  <strong>Paused</strong> — Temporarily on hold
+                  <strong>Paused</strong> - Temporarily on hold
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-purple-500"></span>
-                  <strong>Completed</strong> — Contract fulfilled
+                  <strong>Completed</strong> - Contract fulfilled
                 </li>
               </ul>
             </div>
@@ -80,19 +80,19 @@ export default function AdminGuidePage() {
               <ul className="space-y-2 text-sm">
                 <li className="flex items-center gap-2">
                   <span className="text-[#4ecdc4]">●</span>
-                  <strong>Green</strong> — On track
+                  <strong>Green</strong> - On track
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-[#FFBA06]">●</span>
-                  <strong>Yellow</strong> — Needs attention
+                  <strong>Yellow</strong> - Needs attention
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-[#FF6B6B]">●</span>
-                  <strong>Red</strong> — Action required
+                  <strong>Red</strong> - Action required
                 </li>
                 <li className="flex items-center gap-2">
                   <span className="text-gray-400">○</span>
-                  <strong>Gray</strong> — No data yet
+                  <strong>Gray</strong> - No data yet
                 </li>
               </ul>
             </div>

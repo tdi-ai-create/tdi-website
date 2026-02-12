@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
+import FooterSymbol from '@/components/FooterSymbol';
 import {
   Calendar,
   Users,
@@ -308,7 +309,7 @@ const ExamplePreview = ({ children, message }: { children: React.ReactNode; mess
           <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
         </svg>
         <span className="text-sm font-medium text-[#92400e]">
-          {message || "This is an example — your data will appear here as your partnership progresses."}
+          {message || "This is an example - your data will appear here as your partnership progresses."}
         </span>
       </div>
       {/* Example content with slight opacity to reinforce "not real" */}
@@ -1470,7 +1471,7 @@ export default function PartnerDashboard() {
               );
 
               return hasNoSurveyData ? (
-                <ExamplePreview message="Example from a real TDI district — your indicators will appear after your baseline survey.">
+                <ExamplePreview message="Example from a real TDI district - your indicators will appear after your baseline survey.">
                   {indicatorsContent}
                 </ExamplePreview>
               ) : indicatorsContent;
@@ -1479,7 +1480,7 @@ export default function PartnerDashboard() {
             {/* Building Spotlight */}
             {partnership.partnership_type === 'district' && (
               apiBuildings.length === 0 ? (
-                <ExamplePreview message="Example from a TDI district with 6 buildings — your buildings will appear here after onboarding.">
+                <ExamplePreview message="Example from a TDI district with 6 buildings - your buildings will appear here after onboarding.">
                   <div id="building-spotlight" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center gap-2">
@@ -1568,7 +1569,7 @@ export default function PartnerDashboard() {
 
             {/* Hub Engagement */}
             {hubLoginPct === 0 ? (
-              <ExamplePreview message="Example — your Hub engagement data appears once staff begin logging in.">
+              <ExamplePreview message="Example - your Hub engagement data appears once staff begin logging in.">
                 <div id="hub-engagement" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
                   <div className="flex items-center justify-between mb-4 md:mb-6">
                     <div className="flex items-center gap-2">
@@ -2519,7 +2520,7 @@ export default function PartnerDashboard() {
               <div className="mt-6 p-4 bg-[#1e2749]/5 rounded-lg">
                 <p className="text-sm text-gray-600">
                   <strong className="text-[#1e2749]">Your TDI partner is with you every step of the way.</strong>{' '}
-                  Reach out anytime — call, text, or email. We mean it.
+                  Reach out anytime - call, text, or email. We mean it.
                 </p>
               </div>
             </div>
@@ -2578,7 +2579,7 @@ export default function PartnerDashboard() {
                             year: 'numeric',
                           })
                         : 'Not set'}{' '}
-                      —{' '}
+                      -{' '}
                       {partnership.contract_end
                         ? new Date(partnership.contract_end).toLocaleDateString('en-US', {
                             month: 'long',
@@ -3172,7 +3173,7 @@ export default function PartnerDashboard() {
                           <div className="p-4 rounded-lg bg-gray-50">
                             <p className="text-xs text-gray-500 uppercase tracking-wider mb-1">Contract Period</p>
                             <p className="font-medium text-[#1e2749]">
-                              {partnership?.contract_start ? new Date(partnership.contract_start).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Not set'} — {partnership?.contract_end ? new Date(partnership.contract_end).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Not set'}
+                              {partnership?.contract_start ? new Date(partnership.contract_start).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Not set'} - {partnership?.contract_end ? new Date(partnership.contract_end).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Not set'}
                             </p>
                           </div>
                           <div className="p-4 rounded-lg bg-gray-50">
@@ -3289,7 +3290,7 @@ export default function PartnerDashboard() {
                     <p className="text-base md:text-lg text-[#1e2749] leading-relaxed font-medium">
                       &ldquo;{organization.partnership_goal}&rdquo;
                     </p>
-                    <p className="text-sm text-gray-500 mt-4">— Your Partnership Goal</p>
+                    <p className="text-sm text-gray-500 mt-4">- Your Partnership Goal</p>
                   </div>
                 </div>
               </div>
@@ -3707,7 +3708,7 @@ export default function PartnerDashboard() {
 
             {/* Observation Day Highlights */}
             {(partnership?.observation_days_completed ?? 0) === 0 ? (
-              <ExamplePreview message="Example — your observation highlights will appear after your first on-site visit.">
+              <ExamplePreview message="Example - your observation highlights will appear after your first on-site visit.">
                 <div id="observation-highlights" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
                   <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Observation Day Highlights</h2>
                   <div className="space-y-6">
@@ -3716,7 +3717,7 @@ export default function PartnerDashboard() {
                       <div className="flex items-center gap-2 mb-2">
                         <Calendar className="w-4 h-4 text-[#4ecdc4]" />
                         <span className="font-semibold text-[#1e2749]">Observation Day 1</span>
-                        <span className="text-sm text-gray-500">— October 15, 2025</span>
+                        <span className="text-sm text-gray-500">- October 15, 2025</span>
                       </div>
                       <p className="text-sm text-gray-600 mb-2">Visited 4 buildings, 22 classrooms observed</p>
                       <div className="flex flex-wrap gap-2 mb-2">
@@ -3730,7 +3731,7 @@ export default function PartnerDashboard() {
                       <div className="flex items-center gap-2 mb-2">
                         <Calendar className="w-4 h-4 text-[#80a4ed]" />
                         <span className="font-semibold text-[#1e2749]">Observation Day 2</span>
-                        <span className="text-sm text-gray-500">— January 22, 2026</span>
+                        <span className="text-sm text-gray-500">- January 22, 2026</span>
                       </div>
                       <p className="text-sm text-gray-600 mb-2">Visited 3 buildings, 18 classrooms observed</p>
                       <p className="text-xs text-gray-500">Focus: Differentiation strategies</p>
@@ -3745,20 +3746,20 @@ export default function PartnerDashboard() {
                       </div>
                       <div>
                         <p style={{ color: '#1B2A4A' }} className="text-sm font-semibold">Love Note</p>
-                        <p style={{ color: '#9ca3af' }} className="text-xs">From Observation Day 1 — October 15, 2025</p>
+                        <p style={{ color: '#9ca3af' }} className="text-xs">From Observation Day 1 - October 15, 2025</p>
                       </div>
                     </div>
                     <div className="bg-[#FFBA06]/5 rounded-lg p-3" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
                       <p style={{ color: '#374151' }} className="text-sm italic leading-relaxed">
-                        "Ms. Rivera — Your students were so engaged during the collaborative learning activity today. The way you structured the peer feedback protocol gave every student a voice. Three other teachers asked about your approach after the walkthrough. You're making a real impact at Harmony Elementary."
+                        "Ms. Rivera - Your students were so engaged during the collaborative learning activity today. The way you structured the peer feedback protocol gave every student a voice. Three other teachers asked about your approach after the walkthrough. You're making a real impact at Harmony Elementary."
                       </p>
-                      <p style={{ color: '#9ca3af' }} className="text-xs mt-2">— Rae Hughart, TDI Partner</p>
+                      <p style={{ color: '#9ca3af' }} className="text-xs mt-2">- Rae Hughart, TDI Partner</p>
                     </div>
                   </div>
 
                   {/* Note about Love Notes */}
                   <p style={{ color: '#6b7280' }} className="text-xs mt-3 italic">
-                    Love Notes are personalized feedback sent directly to educators after observation days — celebrating what's working and encouraging growth.
+                    Love Notes are personalized feedback sent directly to educators after observation days - celebrating what's working and encouraging growth.
                   </p>
                 </div>
               </ExamplePreview>
@@ -3779,7 +3780,7 @@ export default function PartnerDashboard() {
 
             {/* Hub Engagement Breakdown */}
             {staffStats.hubLoggedIn === 0 ? (
-              <ExamplePreview message="Example — your Hub engagement details appear once staff begin exploring courses.">
+              <ExamplePreview message="Example - your Hub engagement details appear once staff begin exploring courses.">
                 <div id="hub-engagement-detail" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
                   <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Hub Engagement</h2>
                   <div className="grid sm:grid-cols-3 gap-4">
@@ -3985,7 +3986,7 @@ export default function PartnerDashboard() {
 
             {/* Building Cards */}
             {apiBuildings.length === 0 ? (
-              <ExamplePreview message="Example from a real TDI district — your Schools tab will show this level of detail for every building, including teacher vs. para breakdowns, individual engagement tracking, awards, and personalized TDI notes.">
+              <ExamplePreview message="Example from a real TDI district - your Schools tab will show this level of detail for every building, including teacher vs. para breakdowns, individual engagement tracking, awards, and personalized TDI notes.">
                 <div id="buildings-list" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
                   <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Buildings</h2>
                   <div className="space-y-4">
@@ -4306,7 +4307,7 @@ export default function PartnerDashboard() {
                       <h1 className="text-xl md:text-2xl font-bold text-[#1e2749] mb-2">Your Growth Plan</h1>
                       <h2 className="text-base md:text-lg text-gray-600 mb-4">Building Your Foundation First</h2>
                       <p className="text-gray-500 max-w-xl mx-auto">
-                        Once your partnership is underway and we&apos;ve collected baseline data, this space will transform into your personalized growth plan — including impact metrics, recommended next steps, and resources to share with your leadership team.
+                        Once your partnership is underway and we&apos;ve collected baseline data, this space will transform into your personalized growth plan - including impact metrics, recommended next steps, and resources to share with your leadership team.
                       </p>
                     </div>
 
@@ -4392,7 +4393,7 @@ export default function PartnerDashboard() {
                         <ItemIcon className="w-4 h-4 md:w-5 md:h-5 text-[#80a4ed] flex-shrink-0" />
                         <div className="min-w-0">
                           <span className="font-medium text-[#1e2749] text-sm md:text-base">{item.month}</span>
-                          <span className="text-gray-500 ml-1 md:ml-2 text-xs md:text-sm">— {item.event}</span>
+                          <span className="text-gray-500 ml-1 md:ml-2 text-xs md:text-sm">- {item.event}</span>
                         </div>
                       </div>
                     </div>
@@ -4436,7 +4437,7 @@ export default function PartnerDashboard() {
               // Show example preview when no metric data exists
               if (!hasAnyMetricData) {
                 return (
-                  <ExamplePreview message="Example impact data from a mature TDI partnership — your metrics will populate over time.">
+                  <ExamplePreview message="Example impact data from a mature TDI partnership - your metrics will populate over time.">
                     <div id="roi-summary" className="dark-card bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-4 md:p-8 text-white">
                       <h2 className="text-base md:text-lg font-bold text-white mb-4 md:mb-6">Your Impact Summary</h2>
                       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
@@ -4570,7 +4571,7 @@ export default function PartnerDashboard() {
             {/* Closing Statement */}
             <div className="text-center py-6">
               <p className="text-gray-600 italic max-w-2xl mx-auto">
-                &ldquo;Your TDI partner will build a custom Year 2 plan based on your specific needs, goals, and budget. Every partnership is different — because every {partnership?.partnership_type === 'district' ? 'district' : 'school'} is different.&rdquo;
+                &ldquo;Your TDI partner will build a custom Year 2 plan based on your specific needs, goals, and budget. Every partnership is different - because every {partnership?.partnership_type === 'district' ? 'district' : 'school'} is different.&rdquo;
               </p>
             </div>
                 </>
@@ -4580,55 +4581,196 @@ export default function PartnerDashboard() {
         )}
       </main>
 
-      {/* Footer */}
-      <footer className="bg-[#1e2749] text-gray-300 mt-12">
-        <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Brand */}
-            <div>
-              <h3 className="text-white font-bold text-lg mb-2">Teachers Deserve It</h3>
-              <p className="text-sm opacity-70">PD that respects your time, strategies that actually work, and a community that gets it.</p>
-            </div>
+      {/* Footer - Matches Main Site */}
+      <footer style={{ backgroundColor: '#1e2749' }}>
+        {/* Main Footer */}
+        <div className="px-4 md:px-8 lg:px-16 py-12 md:py-16">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12">
+              {/* Brand - Full width on mobile */}
+              <div className="sm:col-span-2 lg:col-span-1">
+                <h3 className="text-xl font-bold mb-4 whitespace-nowrap" style={{ color: '#ffffff' }}>
+                  Teachers Deserve It
+                </h3>
+                <p className="text-sm mb-4" style={{ color: 'white', opacity: 0.7 }}>
+                  PD that respects your time, strategies that actually work, and a community that gets it.
+                </p>
+                {/* Animated symbol below tagline */}
+                <Link
+                  href="/about#symbol"
+                  className="inline-block mt-2"
+                  aria-label="The story behind the TDI symbol"
+                >
+                  <div className="w-[100px] h-[100px] md:w-[120px] md:h-[120px]">
+                    <FooterSymbol />
+                  </div>
+                </Link>
+              </div>
 
-            {/* Quick Links */}
-            <div>
-              <h4 className="text-white font-semibold mb-3">Quick Links</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="https://www.teachersdeserveit.com" className="hover:text-white transition-colors">Home</a></li>
-                <li><a href="https://www.teachersdeserveit.com/for-schools" className="hover:text-white transition-colors">For Schools</a></li>
-                <li><a href="https://www.teachersdeserveit.com/how-we-partner" className="hover:text-white transition-colors">How We Partner</a></li>
-                <li><a href="https://www.teachersdeserveit.com/about" className="hover:text-white transition-colors">About</a></li>
-              </ul>
-            </div>
+              {/* Quick Links */}
+              <div>
+                <h4 className="font-semibold mb-4" style={{ color: 'white' }}>Quick Links</h4>
+                <ul className="space-y-2">
+                  <li>
+                    <Link href="/join" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      Join the Movement
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/for-schools" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      For Schools
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/how-we-partner" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      How We Partner
+                    </Link>
+                  </li>
+                  <li>
+                    <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      Learning Hub
+                    </a>
+                  </li>
+                  <li>
+                    <Link href="/about" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      About
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/contact" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      Contact
+                    </Link>
+                  </li>
+                  <li>
+                    <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      Blog
+                    </a>
+                  </li>
+                  <li>
+                    <a href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      Podcast
+                    </a>
+                  </li>
+                  <li>
+                    <Link href="/faq" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      FAQ
+                    </Link>
+                  </li>
+                </ul>
+              </div>
 
-            {/* Resources */}
-            <div>
-              <h4 className="text-white font-semibold mb-3">Resources</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="https://www.teachersdeserveit.com/funding" className="hover:text-white transition-colors">Funding Options</a></li>
-                <li><a href="https://www.teachersdeserveit.com/free-pd-plan" className="hover:text-white transition-colors">Free PD Plan</a></li>
-                <li><a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Blog</a></li>
-                <li><a href="https://www.teachersdeserveit.com/contact" className="hover:text-white transition-colors">Contact</a></li>
-              </ul>
-            </div>
+              {/* Resources */}
+              <div>
+                <h4 className="font-semibold mb-4" style={{ color: 'white' }}>Resources</h4>
+                <ul className="space-y-2">
+                  <li>
+                    <Link href="/funding" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      Funding Options
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/pd-diagnostic" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      PD Diagnostic
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/calculator" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      Impact Calculator
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/free-pd-plan" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      Free PD Plan
+                    </Link>
+                  </li>
+                  <li>
+                    <a href="https://www.facebook.com/groups/tdimovement" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      Free FB Community
+                    </a>
+                  </li>
+                  <li>
+                    <Link href="/create-with-us" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      Become a Creator
+                    </Link>
+                  </li>
+                  <li>
+                    <a href="https://us.shaklee.com/en_US/raehughart/storefront" target="_blank" rel="noopener noreferrer" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.7 }}>
+                      Health Check
+                    </a>
+                  </li>
+                </ul>
+              </div>
 
-            {/* Contact */}
-            <div>
-              <h4 className="text-white font-semibold mb-3">Your TDI Partner</h4>
-              <p className="text-sm">Rae Hughart</p>
-              <p className="text-sm">Rae@TeachersDeserveIt.com</p>
+              {/* Stay Connected */}
+              <div>
+                <h4 className="font-bold text-lg mb-2" style={{ color: '#ffffff' }}>Stay Connected</h4>
+                <p className="text-sm mb-4" style={{ color: '#ffba06' }}>
+                  Join 87,000+ educators who decided<br />they deserved better.
+                </p>
+                <form
+                  action="https://formsubmit.co/Olivia@teachersdeserveit.com"
+                  method="POST"
+                  className="space-y-3"
+                >
+                  {/* FormSubmit.co configuration */}
+                  <input type="hidden" name="_subject" value="New Email Signup from TDI Website" />
+                  <input type="hidden" name="_captcha" value="false" />
+                  <input type="hidden" name="_template" value="table" />
+                  <input type="hidden" name="_next" value="https://teachersdeserveit.vercel.app/?signup=success" />
+
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Your email"
+                    required
+                    className="w-full px-4 py-3 rounded-lg text-gray-900"
+                    style={{ backgroundColor: '#ffffff' }}
+                  />
+                  <button
+                    type="submit"
+                    className="w-full px-4 py-3 rounded-lg font-bold transition-all"
+                    style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                  >
+                    Join the Movement
+                  </button>
+                </form>
+                <p className="text-sm mt-4" style={{ color: '#ffffff', opacity: 0.6 }}>
+                  Questions? <a href="mailto:hello@teachersdeserveit.com" className="underline hover:opacity-80">Email us</a>
+                </p>
+                <p className="text-xs mt-2 flex items-center gap-2" style={{ color: '#ffffff', opacity: 0.5 }}>
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                  </svg>
+                  Your data is secure. We never sell your information.
+                </p>
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="border-t border-gray-600 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center text-sm">
-            <p className="opacity-50">© 2026 Teachers Deserve It. All rights reserved.</p>
-            <div className="flex gap-6 mt-4 md:mt-0">
-              <a href="https://www.teachersdeserveit.com/privacy" className="hover:text-white transition-colors opacity-50 hover:opacity-100">Privacy Policy</a>
-              <a href="https://www.teachersdeserveit.com/terms" className="hover:text-white transition-colors opacity-50 hover:opacity-100">Terms of Service</a>
+        {/* Bottom Bar */}
+        <div className="border-t" style={{ borderColor: 'rgba(255,255,255,0.1)' }}>
+          <div className="px-4 md:px-8 lg:px-16 py-4 md:py-6">
+            <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
+              <p className="text-sm" style={{ color: 'white', opacity: 0.5 }}>
+                © 2026 Teachers Deserve It. All rights reserved.
+              </p>
+              <div className="flex flex-wrap justify-center md:justify-end gap-4 md:gap-6">
+                <Link href="/privacy" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
+                  Privacy Policy
+                </Link>
+                <Link href="/terms" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
+                  Terms of Service
+                </Link>
+                <Link href="/security" className="text-sm hover:underline" style={{ color: 'white', opacity: 0.5 }}>
+                  Security
+                </Link>
+              </div>
             </div>
+            <p className="text-sm mt-4 text-center" style={{ color: '#ffffff', opacity: 0.7 }}>
+              TDI is committed to accessibility. We strive to ensure our website is usable by all educators, including those using assistive technologies.
+            </p>
           </div>
-
-          <p className="text-xs text-gray-500 mt-4 text-center">TDI is committed to accessibility. We strive to ensure our website is usable by all educators, including those using assistive technologies.</p>
         </div>
       </footer>
     </div>
