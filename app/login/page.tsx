@@ -70,8 +70,10 @@ export default function LoginPage() {
             </a>
 
             {/* Card 2: Leadership Dashboard */}
-            <Link
+            <a
               href="/partners/login"
+              target="_blank"
+              rel="noopener noreferrer"
               className="bg-white rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 ease-in-out cursor-pointer border-t-4 border-[#1B2A4A] p-6 md:p-8 flex flex-col"
             >
               <div className="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center mb-5">
@@ -86,11 +88,13 @@ export default function LoginPage() {
               <div className="w-full bg-[#1B2A4A] text-white py-2.5 rounded-lg font-semibold text-sm text-center hover:bg-[#2c3e5f] transition-colors">
                 Go to Dashboard &rarr;
               </div>
-            </Link>
+            </a>
 
             {/* Card 3: Creator Portal */}
-            <Link
+            <a
               href="/creator-portal"
+              target="_blank"
+              rel="noopener noreferrer"
               className="bg-white rounded-xl shadow-md hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 ease-in-out cursor-pointer border-t-4 border-[#FFBA06] p-6 md:p-8 flex flex-col"
             >
               <div className="w-14 h-14 rounded-full bg-amber-50 flex items-center justify-center mb-5">
@@ -105,12 +109,14 @@ export default function LoginPage() {
               <div className="w-full bg-[#FFBA06] text-[#1B2A4A] py-2.5 rounded-lg font-semibold text-sm text-center hover:bg-[#e5a805] transition-colors">
                 Go to Creator Portal &rarr;
               </div>
-            </Link>
+            </a>
           </div>
 
           {/* Admin Bar */}
-          <Link
-            href="/admin/login"
+          <a
+            href="/tdi-admin"
+            target="_blank"
+            rel="noopener noreferrer"
             className="mt-10 w-full border border-gray-200 rounded-lg py-3 px-6 flex items-center justify-between hover:border-gray-300 transition-colors duration-200"
           >
             <div className="flex items-center gap-2 text-gray-400">
@@ -120,7 +126,7 @@ export default function LoginPage() {
             <span className="text-gray-400 text-sm font-medium hover:text-gray-600 transition-colors">
               Administrative Login &rarr;
             </span>
-          </Link>
+          </a>
 
           {/* Help Text */}
           <div className="mt-8 text-center">
