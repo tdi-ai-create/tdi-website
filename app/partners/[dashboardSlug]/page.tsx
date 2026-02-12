@@ -3323,7 +3323,7 @@ export default function PartnerDashboard() {
                   <div
                     className={`rounded-xl p-5 cursor-pointer transition-all duration-500 ease-in-out border ${
                       hoveredEquationCard === 0
-                        ? 'md:flex-[1.3] bg-[#1B2A4A] shadow-lg border-[#1B2A4A]'
+                        ? 'md:flex-[1.3] bg-[#1B2A4A] shadow-lg border-[#1B2A4A] text-white'
                         : hoveredEquationCard !== null
                           ? 'md:flex-[0.85] bg-white shadow-sm border-gray-100'
                           : 'md:flex-1 bg-white shadow-sm border-gray-100'
@@ -3336,14 +3336,14 @@ export default function PartnerDashboard() {
                         hoveredEquationCard === 0 ? 'text-white' : 'text-[#1B2A4A]'
                       }`} />
                       <h3 className={`text-sm font-semibold transition-colors duration-500 ${
-                        hoveredEquationCard === 0 ? 'text-white' : 'text-[#1e2749]'
+                        hoveredEquationCard === 0 ? 'text-white' : 'text-[#1B2A4A]'
                       }`}>Strong Teachers</h3>
                       <p className={`text-xs transition-colors duration-500 ${
-                        hoveredEquationCard === 0 ? 'text-gray-300' : 'text-gray-500'
+                        hoveredEquationCard === 0 ? 'text-white/70' : 'text-gray-500'
                       }`}>Practical strategies</p>
                       {/* Desktop: show on hover */}
-                      <p className={`text-xs text-gray-300 mt-2 leading-relaxed transition-all duration-500 ease-in-out overflow-hidden hidden md:block ${
-                        hoveredEquationCard === 0 ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+                      <p className={`text-xs mt-2 leading-relaxed transition-all duration-500 ease-in-out overflow-hidden hidden md:block ${
+                        hoveredEquationCard === 0 ? 'max-h-40 opacity-100 text-white/70' : 'max-h-0 opacity-0 text-gray-500'
                       }`}>
                         Practical strategies from the Learning Hub, tailored to your classrooms and tested by real educators.
                       </p>
@@ -3362,7 +3362,7 @@ export default function PartnerDashboard() {
                   <div
                     className={`rounded-xl p-5 cursor-pointer transition-all duration-500 ease-in-out border ${
                       hoveredEquationCard === 1
-                        ? 'md:flex-[1.3] bg-[#1B2A4A] shadow-lg border-[#1B2A4A]'
+                        ? 'md:flex-[1.3] bg-[#1B2A4A] shadow-lg border-[#1B2A4A] text-white'
                         : hoveredEquationCard !== null
                           ? 'md:flex-[0.85] bg-white shadow-sm border-gray-100'
                           : 'md:flex-1 bg-white shadow-sm border-gray-100'
@@ -3375,14 +3375,14 @@ export default function PartnerDashboard() {
                         hoveredEquationCard === 1 ? 'text-white' : 'text-[#1B2A4A]'
                       }`} />
                       <h3 className={`text-sm font-semibold transition-colors duration-500 ${
-                        hoveredEquationCard === 1 ? 'text-white' : 'text-[#1e2749]'
+                        hoveredEquationCard === 1 ? 'text-white' : 'text-[#1B2A4A]'
                       }`}>Strong Support</h3>
                       <p className={`text-xs transition-colors duration-500 ${
-                        hoveredEquationCard === 1 ? 'text-gray-300' : 'text-gray-500'
+                        hoveredEquationCard === 1 ? 'text-white/70' : 'text-gray-500'
                       }`}>Coaching & community</p>
                       {/* Desktop: show on hover */}
-                      <p className={`text-xs text-gray-300 mt-2 leading-relaxed transition-all duration-500 ease-in-out overflow-hidden hidden md:block ${
-                        hoveredEquationCard === 1 ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+                      <p className={`text-xs mt-2 leading-relaxed transition-all duration-500 ease-in-out overflow-hidden hidden md:block ${
+                        hoveredEquationCard === 1 ? 'max-h-40 opacity-100 text-white/70' : 'max-h-0 opacity-0 text-gray-500'
                       }`}>
                         Ongoing coaching, Love Notes, observation feedback, and a community of 87,000+ educators.
                       </p>
@@ -3401,7 +3401,7 @@ export default function PartnerDashboard() {
                   <div
                     className={`rounded-xl p-5 cursor-pointer transition-all duration-500 ease-in-out border ${
                       hoveredEquationCard === 2
-                        ? 'md:flex-[1.3] bg-[#1B2A4A] shadow-lg border-[#1B2A4A]'
+                        ? 'md:flex-[1.3] bg-[#1B2A4A] shadow-lg border-[#1B2A4A] text-white'
                         : hoveredEquationCard !== null
                           ? 'md:flex-[0.85] bg-white shadow-sm border-gray-100'
                           : 'md:flex-1 bg-white shadow-sm border-gray-100'
@@ -3414,14 +3414,14 @@ export default function PartnerDashboard() {
                         hoveredEquationCard === 2 ? 'text-white' : 'text-[#1B2A4A]'
                       }`} />
                       <h3 className={`text-sm font-semibold transition-colors duration-500 ${
-                        hoveredEquationCard === 2 ? 'text-white' : 'text-[#1e2749]'
+                        hoveredEquationCard === 2 ? 'text-white' : 'text-[#1B2A4A]'
                       }`}>Student Success</h3>
                       <p className={`text-xs transition-colors duration-500 ${
-                        hoveredEquationCard === 2 ? 'text-gray-300' : 'text-gray-500'
+                        hoveredEquationCard === 2 ? 'text-white/70' : 'text-gray-500'
                       }`}>Better outcomes</p>
                       {/* Desktop: show on hover */}
-                      <p className={`text-xs text-gray-300 mt-2 leading-relaxed transition-all duration-500 ease-in-out overflow-hidden hidden md:block ${
-                        hoveredEquationCard === 2 ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+                      <p className={`text-xs mt-2 leading-relaxed transition-all duration-500 ease-in-out overflow-hidden hidden md:block ${
+                        hoveredEquationCard === 2 ? 'max-h-40 opacity-100 text-white/70' : 'max-h-0 opacity-0 text-gray-500'
                       }`}>
                         When teachers thrive, students thrive. Better engagement, stronger relationships, measurable growth.
                       </p>
