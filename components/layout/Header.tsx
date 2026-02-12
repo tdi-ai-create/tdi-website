@@ -13,12 +13,14 @@ export function Header() {
   // Hide on admin pages (has its own header)
   // Hide on partner setup and login pages (focused onboarding experience)
   // Hide on hub pages (Hub has its own navigation)
+  // Hide on /login page (clean focused login experience)
   if (
     pathname?.startsWith('/creator-portal/dashboard') ||
     pathname?.startsWith('/admin') ||
     pathname?.startsWith('/partner-setup') ||
     pathname?.startsWith('/partners') ||
-    pathname?.startsWith('/hub')
+    pathname?.startsWith('/hub') ||
+    pathname === '/login'
   ) {
     return null;
   }
@@ -44,17 +46,25 @@ export function Header() {
     <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
       <div className="container-wide">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center">
-            <Image
-              src="/images/logo.webp"
-              alt="Teachers Deserve It"
-              width={160}
-              height={48}
-              className="h-12 w-auto"
-              priority
-            />
-          </Link>
+          {/* Logo + Login Button */}
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center">
+              <Image
+                src="/images/logo.webp"
+                alt="Teachers Deserve It"
+                width={160}
+                height={48}
+                className="h-12 w-auto"
+                priority
+              />
+            </Link>
+            <Link
+              href="/login"
+              className="hidden md:inline-flex px-4 py-1.5 text-[13px] font-medium text-white bg-[#1B2A4A] rounded-md hover:bg-[#2c3e5f] transition-colors"
+            >
+              Login
+            </Link>
+          </div>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-6">
@@ -112,6 +122,14 @@ export function Header() {
         {mobileMenuOpen && (
           <nav className="md:hidden py-4 border-t border-gray-100">
             <div className="flex flex-col gap-4">
+              {/* Login button - first in mobile menu */}
+              <Link
+                href="/login"
+                className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-[#1B2A4A] rounded-md hover:bg-[#2c3e5f] transition-colors w-fit"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Login
+              </Link>
               {navLinks.map((link) => (
                 link.external ? (
                   <a
