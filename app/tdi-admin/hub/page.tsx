@@ -10,8 +10,6 @@ import {
   Award,
   Clock,
   TrendingUp,
-  Settings,
-  PenTool,
   ChevronRight,
   BarChart3,
   FileText,
@@ -19,6 +17,7 @@ import {
   Mail,
   Download,
   GraduationCap,
+  Clapperboard,
 } from 'lucide-react';
 
 interface StatCardProps {
@@ -233,7 +232,7 @@ export default function HubAdminPage() {
       <div className="grid md:grid-cols-2 gap-6">
         <SectionCard
           title="Operations"
-          description="Manage accounts, enrollments, reports, and analytics."
+          description="Accounts, enrollments, reports, analytics"
           features={[
             'View and manage enrollments',
             'Export reports and data',
@@ -243,22 +242,22 @@ export default function HubAdminPage() {
             'Certificate management',
           ]}
           href="/tdi-admin/hub/operations"
-          icon={Settings}
+          icon={BarChart3}
           color="#2B3A67"
         />
         <SectionCard
           title="Production"
-          description="Create and manage courses, content, and Quick Wins."
+          description="Courses, content, Quick Wins, media"
           features={[
             'Create and edit courses',
             'Manage lessons and modules',
             'Publish/unpublish content',
-            'Manage TDI Tips',
             'Manage Quick Wins',
             'Upload videos and resources',
+            'Content calendar',
           ]}
           href="/tdi-admin/hub/production"
-          icon={PenTool}
+          icon={Clapperboard}
           color="#E8B84B"
         />
       </div>
