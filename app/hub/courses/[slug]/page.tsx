@@ -728,127 +728,6 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             )}
           </div>
 
-          {/* About the Author Section */}
-          <div className="hub-card mt-6">
-            <h2
-              className="font-semibold mb-6"
-              style={{
-                fontFamily: "'Source Serif 4', Georgia, serif",
-                fontSize: '20px',
-                color: '#2B3A67',
-              }}
-            >
-              Meet Your Instructor
-            </h2>
-
-            <div className="flex gap-5">
-              {/* Author Avatar */}
-              <div className="flex-shrink-0">
-                {course.author_avatar_url ? (
-                  <img
-                    src={course.author_avatar_url}
-                    alt={course.author_name || 'Instructor'}
-                    className="w-20 h-20 rounded-full object-cover"
-                  />
-                ) : (
-                  <div
-                    className="w-20 h-20 rounded-full flex items-center justify-center"
-                    style={{ backgroundColor: '#E5E7EB' }}
-                  >
-                    <User size={32} style={{ color: '#9CA3AF' }} />
-                  </div>
-                )}
-              </div>
-
-              {/* Author Info */}
-              <div className="flex-1 min-w-0">
-                <h3
-                  className="font-semibold mb-1"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '16px',
-                    color: '#2B3A67',
-                  }}
-                >
-                  {course.author_name || 'Teachers Deserve It Team'}
-                </h3>
-                <p
-                  className="mb-3"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '14px',
-                    color: '#6B7280',
-                  }}
-                >
-                  {course.author_name
-                    ? 'Educator, Author & Course Creator'
-                    : 'Educators who believe every teacher deserves support'}
-                </p>
-                <p
-                  className="mb-4 line-clamp-3"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    fontSize: '14px',
-                    color: '#4B5563',
-                  }}
-                >
-                  {course.author_bio ||
-                    'Built by educators who believe every teacher deserves support, growth, and a community that gets it. Our courses are practical, teacher-tested, and designed to fit into your real life.'}
-                </p>
-
-                {/* Links row */}
-                <div className="flex flex-wrap items-center gap-4">
-                  <a
-                    href="https://teachersdeserveit.com/blog"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 transition-colors hover:opacity-80"
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: '13px',
-                      color: '#2B3A67',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = '#E8B84B')}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = '#2B3A67')}
-                  >
-                    <ExternalLink size={14} />
-                    TDI Blog
-                  </a>
-                  <a
-                    href="https://teachersdeserveit.com/podcast"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 transition-colors hover:opacity-80"
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: '13px',
-                      color: '#2B3A67',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = '#E8B84B')}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = '#2B3A67')}
-                  >
-                    <Headphones size={14} />
-                    TDI Podcast
-                  </a>
-                  <a
-                    href="mailto:hello@teachersdeserveit.com"
-                    className="inline-flex items-center gap-1.5 transition-colors hover:opacity-80"
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: '13px',
-                      color: '#2B3A67',
-                    }}
-                    onMouseEnter={(e) => (e.currentTarget.style.color = '#E8B84B')}
-                    onMouseLeave={(e) => (e.currentTarget.style.color = '#2B3A67')}
-                  >
-                    <Mail size={14} />
-                    Email
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
           {/* More from this instructor */}
           {authorCourses.length > 0 && (
             <div className="mt-8">
@@ -960,6 +839,131 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                 Lifetime access
               </li>
             </ul>
+          </div>
+
+          {/* Meet Your Instructor - Sidebar version */}
+          <div className="hub-card">
+            <h3
+              className="font-semibold mb-4"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '16px',
+                color: '#2B3A67',
+              }}
+            >
+              Meet Your Instructor
+            </h3>
+
+            <div className="flex gap-3">
+              {/* Author Avatar - 60px for sidebar */}
+              <div className="flex-shrink-0">
+                {course.author_avatar_url ? (
+                  <img
+                    src={course.author_avatar_url}
+                    alt={course.author_name || 'Instructor'}
+                    className="w-[60px] h-[60px] rounded-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-[60px] h-[60px] rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: '#E5E7EB' }}
+                  >
+                    <User size={24} style={{ color: '#9CA3AF' }} />
+                  </div>
+                )}
+              </div>
+
+              {/* Author Info - Compact for sidebar */}
+              <div className="flex-1 min-w-0">
+                <h4
+                  className="font-semibold mb-0.5"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '15px',
+                    color: '#2B3A67',
+                  }}
+                >
+                  {course.author_name || 'Teachers Deserve It Team'}
+                </h4>
+                <p
+                  className="mb-2"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '12px',
+                    color: '#6B7280',
+                  }}
+                >
+                  {course.author_name
+                    ? 'Educator & Course Creator'
+                    : 'Educators supporting teachers'}
+                </p>
+              </div>
+            </div>
+
+            {/* Bio - Compact */}
+            <p
+              className="mt-3 mb-3 line-clamp-3"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '13px',
+                color: '#4B5563',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+              }}
+            >
+              {course.author_bio ||
+                'Built by educators who believe every teacher deserves support, growth, and a community that gets it.'}
+            </p>
+
+            {/* Links row - Compact, wrapping */}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+              <a
+                href="https://teachersdeserveit.com/blog"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 transition-colors hover:opacity-80"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '12px',
+                  color: '#2B3A67',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#E8B84B')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#2B3A67')}
+              >
+                <ExternalLink size={12} />
+                Blog
+              </a>
+              <a
+                href="https://teachersdeserveit.com/podcast"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 transition-colors hover:opacity-80"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '12px',
+                  color: '#2B3A67',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#E8B84B')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#2B3A67')}
+              >
+                <Headphones size={12} />
+                Podcast
+              </a>
+              <a
+                href="mailto:hello@teachersdeserveit.com"
+                className="inline-flex items-center gap-1 transition-colors hover:opacity-80"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '12px',
+                  color: '#2B3A67',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#E8B84B')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = '#2B3A67')}
+              >
+                <Mail size={12} />
+                Email
+              </a>
+            </div>
           </div>
 
           {/* Enroll CTA (sidebar on desktop) */}
