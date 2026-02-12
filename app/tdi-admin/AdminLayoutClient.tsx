@@ -415,43 +415,64 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
       return;
     }
 
+    let isMounted = true;
+
+    // Timeout fallback - redirect to login after 3 seconds no matter what
+    const timeoutId = setTimeout(() => {
+      if (isMounted && isLoading) {
+        console.log('[TDI Admin] Auth timeout - redirecting to login');
+        router.replace('/tdi-admin/login');
+      }
+    }, 3000);
+
     async function checkAuth() {
       try {
-        // Get session first to ensure it's loaded
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        console.log('[TDI Admin Layout] Session check:', { session: session ? 'exists' : 'null', sessionError });
+        // Get user with a race against timeout
+        const userPromise = supabase.auth.getUser();
+        const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500));
 
-        // Then get user
-        const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
-        console.log('[TDI Admin Layout] User check:', {
-          user: currentUser ? { id: currentUser.id, email: currentUser.email } : 'null',
-          userError
-        });
+        const result = await Promise.race([userPromise, timeoutPromise]);
 
-        if (!currentUser) {
-          console.log('[TDI Admin Layout] No user found, redirecting to login');
-          router.push('/tdi-admin/login');
+        if (!isMounted) return;
+
+        // Timeout or error - redirect to login
+        if (!result || 'error' in result === false) {
+          router.replace('/tdi-admin/login');
           return;
         }
 
-        console.log('[TDI Admin Layout] Setting user:', { id: currentUser.id, email: currentUser.email });
+        const { data: { user: currentUser }, error: userError } = result;
+
+        // No user or error - redirect to login
+        if (!currentUser || userError) {
+          router.replace('/tdi-admin/login');
+          return;
+        }
+
         setUser(currentUser);
+        setIsLoading(false);
       } catch (err) {
-        console.error('[TDI Admin Layout] Auth check error:', err);
-        router.push('/tdi-admin/login');
+        console.error('[TDI Admin] Auth check error:', err);
+        if (isMounted) {
+          router.replace('/tdi-admin/login');
+        }
       }
-      setIsLoading(false);
     }
 
     checkAuth();
-  }, [isLoginPage, router, supabase.auth]);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(timeoutId);
+    };
+  }, [isLoginPage, router, supabase.auth, isLoading]);
 
   // Login page renders without layout wrapper
   if (isLoginPage) {
     return <>{children}</>;
   }
 
-  // Show loading while checking auth
+  // Show loading while checking auth (max 3 seconds due to timeout)
   if (isLoading) {
     return <LoadingState />;
   }

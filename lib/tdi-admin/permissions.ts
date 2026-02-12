@@ -84,11 +84,18 @@ export const LEADERSHIP_PERMISSIONS = [
  */
 export async function checkTeamAccess(userId: string, email: string): Promise<TeamMember | null> {
   try {
+    // AbortController for fetch timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+
     const response = await fetch('/api/tdi-admin/check-access', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, email }),
+      signal: controller.signal,
     });
+
+    clearTimeout(timeoutId);
 
     if (!response.ok) {
       return null;
@@ -97,7 +104,7 @@ export async function checkTeamAccess(userId: string, email: string): Promise<Te
     const result = await response.json();
     return result.member as TeamMember || null;
   } catch (error) {
-    console.error('[TDI Admin] Error checking access:', error);
+    // Timeout or network error - return null
     return null;
   }
 }

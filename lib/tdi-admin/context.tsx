@@ -46,10 +46,19 @@ export function TDIAdminProvider({ children, userId, userEmail }: TDIAdminProvid
       return;
     }
 
-    setIsLoading(true);
-    const member = await checkTeamAccess(userId, userEmail);
-    setTeamMember(member);
-    setIsLoading(false);
+    try {
+      // Race between the actual check and a 2.5s timeout
+      const checkPromise = checkTeamAccess(userId, userEmail);
+      const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500));
+
+      const member = await Promise.race([checkPromise, timeoutPromise]);
+      setTeamMember(member);
+    } catch (error) {
+      console.error('[TDI Admin Context] Error loading team member:', error);
+      setTeamMember(null);
+    } finally {
+      setIsLoading(false);
+    }
   }, [userId, userEmail]);
 
   useEffect(() => {
