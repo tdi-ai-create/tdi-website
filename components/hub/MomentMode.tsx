@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { X, Wind, Heart, Sparkles, BookOpen, Download, UserCircle, Send, Heart as HeartIcon } from 'lucide-react';
+import { X, Wind, Heart, Sparkles, BookOpen, Download, UserCircle, Send, Heart as HeartIcon, Clock } from 'lucide-react';
 import { incrementHardDayCount } from '@/lib/hub-auth';
 import { useMomentMode } from './MomentModeContext';
 import { useHub } from './HubContext';
@@ -269,19 +269,20 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 animate-fade-in-overlay"
-      style={{ backgroundColor: 'rgba(43, 58, 103, 0.95)' }}
+      className="fixed inset-0 flex flex-col items-center justify-center p-4 animate-fade-in-overlay"
+      style={{ backgroundColor: '#FAFAF8', zIndex: 9999 }}
     >
       {/* Global Timer Display - Top Center */}
       {!showTimerNudge && (
         <div
-          className="absolute top-4 left-1/2 -translate-x-1/2"
+          className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5"
           style={{
             fontFamily: "'DM Sans', sans-serif",
             fontSize: '14px',
-            color: 'rgba(255, 255, 255, 0.6)',
+            color: '#9CA3AF',
           }}
         >
+          <Clock size={14} />
           {formatTime(globalTimer)} remaining
         </div>
       )}
@@ -333,10 +334,11 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
       {/* Close Button */}
       <button
         onClick={handleClose}
-        className="absolute top-4 right-4 p-2 text-white/70 hover:text-white transition-colors"
+        className="absolute top-4 right-4 p-2 transition-colors"
+        style={{ color: '#9CA3AF' }}
         aria-label="Close Moment Mode"
       >
-        <X size={24} />
+        <X size={24} className="hover:text-gray-600" />
       </button>
 
       {/* Content Card */}
@@ -358,17 +360,16 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
               Moment Mode.
             </h2>
             <p
-              className="text-gray-600 mb-6"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
+              className="text-gray-600 mb-4 leading-relaxed"
+              style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '15px' }}
             >
-              Take a breath. This is a space just for you.
-              Choose what feels right.
+              Research shows that just 3 minutes of intentional pause can lower cortisol and reset your nervous system. This is your time. No one is tracking this. No one is watching. Choose what feels right, and when your 3 minutes are up, we will gently invite you back.
             </p>
             <p
               className="text-sm text-gray-400 mb-8"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
-              Nothing is tracked individually. This is a sacred space.
+              This is a sacred space built by Teachers Deserve It because you deserve to pause without guilt.
             </p>
 
             <div className="space-y-3">
