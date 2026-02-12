@@ -8,11 +8,18 @@ import { TDIAdminProvider, useTDIAdmin } from '@/lib/tdi-admin/context';
 import { BookOpen, Palette, Building2, Users, LogOut, ShieldAlert } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
+// Portal accent colors
+const PORTAL_COLORS = {
+  hub: { accent: '#5BBEC4', light: '#E8F6F7', bg15: 'rgba(91, 190, 196, 0.15)', border30: 'rgba(91, 190, 196, 0.3)' },
+  creators: { accent: '#9B7CB8', light: '#F3EDF8', bg15: 'rgba(155, 124, 184, 0.15)', border30: 'rgba(155, 124, 184, 0.3)' },
+  leadership: { accent: '#E8927C', light: '#FDF0ED', bg15: 'rgba(232, 146, 124, 0.15)', border30: 'rgba(232, 146, 124, 0.3)' },
+};
+
 // Navigation tabs configuration
 const PORTAL_TABS = [
-  { id: 'hub', label: 'Learning Hub', icon: BookOpen, href: '/tdi-admin/hub', section: 'learning_hub', accent: '#5BBEC4' },
-  { id: 'creators', label: 'Creator Studio', icon: Palette, href: '/tdi-admin/creators', section: 'creator_studio', accent: '#9B7CB8' },
-  { id: 'leadership', label: 'Lead Dashboard', icon: Building2, href: '/tdi-admin/leadership', section: 'leadership', accent: '#E8927C' },
+  { id: 'hub', label: 'Learning Hub', icon: BookOpen, href: '/tdi-admin/hub', section: 'learning_hub', colors: PORTAL_COLORS.hub },
+  { id: 'creators', label: 'Creator Studio', icon: Palette, href: '/tdi-admin/creators', section: 'creator_studio', colors: PORTAL_COLORS.creators },
+  { id: 'leadership', label: 'Lead Dashboard', icon: Building2, href: '/tdi-admin/leadership', section: 'leadership', colors: PORTAL_COLORS.leadership },
 ];
 
 function AdminNavbar({ user }: { user: User }) {
@@ -37,7 +44,7 @@ function AdminNavbar({ user }: { user: User }) {
   // Get accent color for current portal section
   const getActiveAccent = () => {
     const activeTabConfig = PORTAL_TABS.find(t => t.id === activeTab);
-    return activeTabConfig?.accent || '#5BBEC4';
+    return activeTabConfig?.colors.accent || '#5BBEC4';
   };
 
   return (
@@ -86,9 +93,9 @@ function AdminNavbar({ user }: { user: User }) {
                   href={tab.href}
                   className="flex items-center gap-2 px-4 py-2 rounded-[20px] font-medium transition-all"
                   style={{
-                    backgroundColor: isActive ? `${tab.accent}26` : 'transparent', // 15% opacity
-                    color: isActive ? tab.accent : 'white',
-                    border: isActive ? `1px solid ${tab.accent}4D` : '1px solid transparent', // 30% opacity
+                    backgroundColor: isActive ? tab.colors.bg15 : 'transparent',
+                    color: isActive ? tab.colors.accent : 'white',
+                    border: isActive ? `1px solid ${tab.colors.border30}` : '1px solid transparent',
                     fontFamily: "'DM Sans', sans-serif",
                     fontSize: '14px',
                     height: '36px',
@@ -164,9 +171,9 @@ function AdminNavbar({ user }: { user: User }) {
                 href={tab.href}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg font-medium whitespace-nowrap"
                 style={{
-                  backgroundColor: isActive ? `${tab.accent}26` : 'transparent',
-                  color: isActive ? tab.accent : 'white',
-                  border: isActive ? `1px solid ${tab.accent}4D` : '1px solid transparent',
+                  backgroundColor: isActive ? tab.colors.bg15 : 'transparent',
+                  color: isActive ? tab.colors.accent : 'white',
+                  border: isActive ? `1px solid ${tab.colors.border30}` : '1px solid transparent',
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: '13px',
                 }}
