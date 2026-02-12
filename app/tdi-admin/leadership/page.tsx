@@ -302,7 +302,7 @@ export default function LeadershipDashboardPage() {
               color: '#6B7280',
             }}
           >
-            You don&apos;t have permission to access the Leadership Dashboard.
+            You don&apos;t have permission to access the Lead Dashboard.
             Contact your administrator to request access.
           </p>
           <Link
@@ -330,10 +330,10 @@ export default function LeadershipDashboardPage() {
           style={{
             fontFamily: "'Source Serif 4', Georgia, serif",
             fontSize: '28px',
-            color: '#2B3A67',
+            color: '#1a1a2e',
           }}
         >
-          Leadership Dashboard
+          Lead Dashboard
         </h1>
         <p
           className="text-gray-500"

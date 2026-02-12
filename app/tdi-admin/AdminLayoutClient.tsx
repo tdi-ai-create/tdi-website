@@ -5,14 +5,14 @@ import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { getSupabase } from '@/lib/supabase';
 import { TDIAdminProvider, useTDIAdmin } from '@/lib/tdi-admin/context';
-import { BookOpen, Palette, Building2, Users, ExternalLink, LogOut, ShieldAlert } from 'lucide-react';
+import { BookOpen, Palette, Building2, Users, LogOut, ShieldAlert } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
 
 // Navigation tabs configuration
 const PORTAL_TABS = [
-  { id: 'hub', label: 'Learning Hub', icon: BookOpen, href: '/tdi-admin/hub', section: 'learning_hub' },
-  { id: 'creators', label: 'Creator Studio', icon: Palette, href: '/tdi-admin/creators', section: 'creator_studio' },
-  { id: 'leadership', label: 'Leadership', icon: Building2, href: '/tdi-admin/leadership', section: 'leadership' },
+  { id: 'hub', label: 'Learning Hub', icon: BookOpen, href: '/tdi-admin/hub', section: 'learning_hub', accent: '#5BBEC4' },
+  { id: 'creators', label: 'Creator Studio', icon: Palette, href: '/tdi-admin/creators', section: 'creator_studio', accent: '#9B7CB8' },
+  { id: 'leadership', label: 'Lead Dashboard', icon: Building2, href: '/tdi-admin/leadership', section: 'leadership', accent: '#E8927C' },
 ];
 
 function AdminNavbar({ user }: { user: User }) {
@@ -34,10 +34,16 @@ function AdminNavbar({ user }: { user: User }) {
     router.push('/tdi-admin/login');
   };
 
+  // Get accent color for current portal section
+  const getActiveAccent = () => {
+    const activeTabConfig = PORTAL_TABS.find(t => t.id === activeTab);
+    return activeTabConfig?.accent || '#5BBEC4';
+  };
+
   return (
     <header
       className="sticky top-0 z-50"
-      style={{ backgroundColor: '#2B3A67' }}
+      style={{ backgroundColor: '#1a1a2e' }}
     >
       <div className="max-w-[1400px] mx-auto px-4 md:px-6">
         <div className="flex items-center justify-between h-16">
@@ -80,8 +86,9 @@ function AdminNavbar({ user }: { user: User }) {
                   href={tab.href}
                   className="flex items-center gap-2 px-4 py-2 rounded-[20px] font-medium transition-all"
                   style={{
-                    backgroundColor: isActive ? '#E8B84B' : 'transparent',
-                    color: isActive ? '#2B3A67' : 'white',
+                    backgroundColor: isActive ? `${tab.accent}26` : 'transparent', // 15% opacity
+                    color: isActive ? tab.accent : 'white',
+                    border: isActive ? `1px solid ${tab.accent}4D` : '1px solid transparent', // 30% opacity
                     fontFamily: "'DM Sans', sans-serif",
                     fontSize: '14px',
                     height: '36px',
@@ -112,24 +119,11 @@ function AdminNavbar({ user }: { user: User }) {
               </Link>
             )}
 
-            {/* View as Teacher link */}
-            <Link
-              href="/hub"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                fontSize: '13px',
-              }}
-            >
-              <ExternalLink size={14} />
-              <span className="hidden lg:inline">View as Teacher</span>
-            </Link>
-
             {/* User info */}
             <div className="flex items-center gap-2 pl-3 border-l border-white/20">
               <div
                 className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium"
-                style={{ backgroundColor: '#E8B84B', color: '#2B3A67' }}
+                style={{ backgroundColor: getActiveAccent(), color: '#1a1a2e' }}
               >
                 {teamMember?.display_name?.charAt(0) || user?.email?.charAt(0) || 'U'}
               </div>
@@ -154,7 +148,7 @@ function AdminNavbar({ user }: { user: User }) {
       {/* Mobile Tab Bar */}
       <div
         className="md:hidden border-t border-white/10 px-2 py-2 overflow-x-auto"
-        style={{ backgroundColor: '#2B3A67' }}
+        style={{ backgroundColor: '#1a1a2e' }}
       >
         <div className="flex gap-2">
           {PORTAL_TABS.map((tab) => {
@@ -170,8 +164,9 @@ function AdminNavbar({ user }: { user: User }) {
                 href={tab.href}
                 className="flex items-center gap-2 px-3 py-2 rounded-lg font-medium whitespace-nowrap"
                 style={{
-                  backgroundColor: isActive ? '#E8B84B' : 'transparent',
-                  color: isActive ? '#2B3A67' : 'white',
+                  backgroundColor: isActive ? `${tab.accent}26` : 'transparent',
+                  color: isActive ? tab.accent : 'white',
+                  border: isActive ? `1px solid ${tab.accent}4D` : '1px solid transparent',
                   fontFamily: "'DM Sans', sans-serif",
                   fontSize: '13px',
                 }}
@@ -191,7 +186,7 @@ function MinimalAdminHeader() {
   return (
     <header
       className="sticky top-0 z-50"
-      style={{ backgroundColor: '#2B3A67' }}
+      style={{ backgroundColor: '#1a1a2e' }}
     >
       <div className="max-w-[1400px] mx-auto px-4 md:px-6">
         <div className="flex items-center h-16">
@@ -377,7 +372,7 @@ function AdminLayoutContent({ children, user }: { children: React.ReactNode; use
       <footer
         className="border-t py-6 text-center"
         style={{
-          backgroundColor: '#2B3A67',
+          backgroundColor: '#1a1a2e',
           borderColor: 'rgba(255,255,255,0.1)',
         }}
       >

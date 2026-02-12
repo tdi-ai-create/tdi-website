@@ -573,9 +573,9 @@ export default function TeamManagementPage() {
                 onToggleAll={(selectAll) => toggleAllInSection('creator_studio', CREATOR_STUDIO_PERMISSIONS, selectAll)}
               />
 
-              {/* Leadership Section */}
+              {/* Lead Dashboard Section */}
               <PermissionSection
-                title="Leadership"
+                title="Lead Dashboard"
                 sectionKey="leadership"
                 permissions={LEADERSHIP_PERMISSIONS}
                 currentPermissions={editPermissions.leadership || {}}
