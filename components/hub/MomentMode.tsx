@@ -9,6 +9,7 @@ import { getSupabase } from '@/lib/supabase';
 
 type MomentState = 'entry' | 'pause' | 'affirmation' | 'gentle' | 'journal';
 type JournalTab = 'private' | 'anonymous';
+type BreathPhase = 'inhale' | 'hold1' | 'exhale' | 'hold2' | 'complete';
 
 interface MomentModeProps {
   isOpen: boolean;
@@ -72,19 +73,28 @@ const GENTLE_TOOLS = [
   },
 ];
 
+// Box breathing constants
+const BREATH_DURATION = 4; // 4 seconds per phase
+const TOTAL_CYCLES = 6; // 6 cycles of box breathing
+
 export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   const { user } = useHub();
   const [state, setState] = useState<MomentState>('entry');
   const [journalTab, setJournalTab] = useState<JournalTab>('private');
   const [privateJournal, setPrivateJournal] = useState('');
   const [anonymousVent, setAnonymousVent] = useState('');
-  const [breathingTimeRemaining, setBreathingTimeRemaining] = useState(300); // 5 minutes for breathing
   const [hasIncremented, setHasIncremented] = useState(false);
 
   // 3-minute global timer
   const [globalTimer, setGlobalTimer] = useState(180); // 3 minutes in seconds
   const [showTimerNudge, setShowTimerNudge] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Box breathing state
+  const [breathPhase, setBreathPhase] = useState<BreathPhase>('inhale');
+  const [breathCycle, setBreathCycle] = useState(1);
+  const [phaseTimer, setPhaseTimer] = useState(BREATH_DURATION);
+  const breathingRef = useRef<NodeJS.Timeout | null>(null);
 
   // Affirmation state
   const [affirmations, setAffirmations] = useState<string[]>(FALLBACK_AFFIRMATIONS);
@@ -171,24 +181,48 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
     };
   }, [isOpen, handleEscape, hasIncremented, setMomentModeActive]);
 
-  // Timer for breathing exercise
+  // Box breathing timer
   useEffect(() => {
-    let interval: NodeJS.Timeout;
-
-    if (state === 'pause' && breathingTimeRemaining > 0) {
-      interval = setInterval(() => {
-        setBreathingTimeRemaining((prev) => prev - 1);
+    if (state === 'pause' && breathPhase !== 'complete') {
+      breathingRef.current = setInterval(() => {
+        setPhaseTimer((prev) => {
+          if (prev <= 1) {
+            // Move to next phase
+            setBreathPhase((currentPhase) => {
+              if (currentPhase === 'inhale') return 'hold1';
+              if (currentPhase === 'hold1') return 'exhale';
+              if (currentPhase === 'exhale') return 'hold2';
+              if (currentPhase === 'hold2') {
+                // End of cycle
+                setBreathCycle((currentCycle) => {
+                  if (currentCycle >= TOTAL_CYCLES) {
+                    return currentCycle; // Stay at max
+                  }
+                  return currentCycle + 1;
+                });
+                // Check if we completed all cycles
+                if (breathCycle >= TOTAL_CYCLES) {
+                  return 'complete';
+                }
+                return 'inhale';
+              }
+              return currentPhase;
+            });
+            return BREATH_DURATION;
+          }
+          return prev - 1;
+        });
       }, 1000);
     }
 
     return () => {
-      if (interval) clearInterval(interval);
+      if (breathingRef.current) clearInterval(breathingRef.current);
     };
-  }, [state, breathingTimeRemaining]);
+  }, [state, breathPhase, breathCycle]);
 
   const handleClose = () => {
     setState('entry');
-    setBreathingTimeRemaining(300);
+    resetBreathing();
     setHasIncremented(false);
     setShowTimerNudge(false);
     setNoteText('');
@@ -196,6 +230,13 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
     setShowNoteForm(false);
     if (timerRef.current) clearInterval(timerRef.current);
     onClose();
+  };
+
+  const resetBreathing = () => {
+    setBreathPhase('inhale');
+    setBreathCycle(1);
+    setPhaseTimer(BREATH_DURATION);
+    if (breathingRef.current) clearInterval(breathingRef.current);
   };
 
   const handleNeedMoreTime = () => {
@@ -261,13 +302,34 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
     alert('Your message has been received. Take care of yourself.');
   };
 
+  const getBreathPhaseText = (): string => {
+    switch (breathPhase) {
+      case 'inhale':
+        return 'Breathe in...';
+      case 'hold1':
+        return 'Hold...';
+      case 'exhale':
+        return 'Breathe out...';
+      case 'hold2':
+        return 'Hold...';
+      case 'complete':
+        return '';
+      default:
+        return '';
+    }
+  };
+
+  const isCircleExpanded = breathPhase === 'inhale' || breathPhase === 'hold1';
+
   if (!isOpen) return null;
 
   return (
     <div
       className="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen flex flex-col items-center justify-center p-4 animate-fade-in-overlay overflow-hidden"
       style={{
-        background: 'linear-gradient(135deg, #2B3A67 0%, #1a2744 100%)',
+        backgroundColor: 'rgba(43, 58, 103, 0.85)',
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
         zIndex: 9999,
       }}
     >
@@ -380,7 +442,10 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
 
             <div className="space-y-3">
               <button
-                onClick={() => setState('pause')}
+                onClick={() => {
+                  resetBreathing();
+                  setState('pause');
+                }}
                 className="w-full flex items-center justify-center gap-3 p-4 rounded-lg transition-all hover:bg-white/20"
                 style={{
                   fontFamily: "'DM Sans', sans-serif",
@@ -438,11 +503,14 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
           </div>
         )}
 
-        {/* Breathing/Pause State */}
+        {/* Breathing/Pause State - Box Breathing */}
         {state === 'pause' && (
           <div className="text-center">
             <button
-              onClick={() => setState('entry')}
+              onClick={() => {
+                resetBreathing();
+                setState('entry');
+              }}
               className="text-sm mb-6 transition-colors hover:opacity-80"
               style={{
                 fontFamily: "'DM Sans', sans-serif",
@@ -452,60 +520,106 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
               ← Back
             </button>
 
-            <div className="relative w-48 h-48 mx-auto mb-8">
-              {/* Breathing circle */}
-              <div
-                className="absolute inset-0 rounded-full animate-breathe"
-                style={{ backgroundColor: '#E8B84B' }}
-              />
-              <div
-                className="absolute inset-4 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: '#2B3A67' }}
-              >
-                <span
-                  className="text-[28px] font-semibold"
+            {breathPhase !== 'complete' ? (
+              <>
+                {/* Breathing Circle */}
+                <div className="relative mx-auto mb-6" style={{ width: '180px', height: '180px' }}>
+                  <div
+                    className="absolute top-1/2 left-1/2 rounded-full flex items-center justify-center transition-all duration-1000 ease-in-out"
+                    style={{
+                      width: isCircleExpanded ? '180px' : '120px',
+                      height: isCircleExpanded ? '180px' : '120px',
+                      transform: 'translate(-50%, -50%)',
+                      border: '2px solid white',
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    }}
+                  >
+                    <span
+                      className="text-center px-4"
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: '16px',
+                        color: 'white',
+                      }}
+                    >
+                      {getBreathPhaseText()}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Cycle Counter */}
+                <p
+                  className="mb-6"
                   style={{
-                    fontFamily: "'Source Serif 4', Georgia, serif",
-                    color: 'white',
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '14px',
+                    color: 'rgba(255, 255, 255, 0.6)',
                   }}
                 >
-                  {formatTime(breathingTimeRemaining)}
-                </span>
-              </div>
-            </div>
+                  Breath {breathCycle} of {TOTAL_CYCLES}
+                </p>
 
-            <p
-              className="mb-2"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                color: 'rgba(255, 255, 255, 0.8)',
-              }}
-            >
-              Breathe in as it grows. Breathe out as it shrinks.
-            </p>
-            <p
-              className="text-sm"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                color: 'rgba(255, 255, 255, 0.5)',
-              }}
-            >
-              Take your time. There is no rush.
-            </p>
+                <p
+                  className="mb-2"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    color: 'rgba(255, 255, 255, 0.8)',
+                  }}
+                >
+                  Box breathing: 4 seconds each phase
+                </p>
+                <p
+                  className="text-sm"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    color: 'rgba(255, 255, 255, 0.5)',
+                  }}
+                >
+                  In → Hold → Out → Hold
+                </p>
+              </>
+            ) : (
+              <>
+                {/* Completion State */}
+                <div
+                  className="mb-8 p-6 rounded-xl"
+                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
+                >
+                  <p
+                    className="text-xl mb-2"
+                    style={{
+                      fontFamily: "'Source Serif 4', Georgia, serif",
+                      color: 'white',
+                    }}
+                  >
+                    Well done.
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: '15px',
+                      color: 'rgba(255, 255, 255, 0.8)',
+                    }}
+                  >
+                    Take one more breath on your own.
+                  </p>
+                </div>
 
-            {breathingTimeRemaining === 0 && (
-              <button
-                onClick={() => setBreathingTimeRemaining(300)}
-                className="mt-6 px-6 py-3 rounded-lg font-medium transition-all hover:bg-white/20"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  backgroundColor: 'transparent',
-                  border: '1px solid white',
-                  color: 'white',
-                }}
-              >
-                Start again
-              </button>
+                <button
+                  onClick={() => {
+                    resetBreathing();
+                    setState('entry');
+                  }}
+                  className="px-8 py-3 rounded-lg font-medium transition-all hover:bg-white/20"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    backgroundColor: '#E8B84B',
+                    color: '#2B3A67',
+                  }}
+                >
+                  Done
+                </button>
+              </>
             )}
           </div>
         )}
