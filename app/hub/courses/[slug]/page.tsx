@@ -26,7 +26,11 @@ import {
   PenLine,
   CheckSquare,
   Flag,
+  User,
+  ExternalLink,
+  Mail,
 } from 'lucide-react';
+import CourseCard from '@/components/hub/CourseCard';
 
 // Category colors
 const CATEGORY_COLORS: Record<string, string> = {
@@ -69,6 +73,20 @@ interface Course {
   difficulty: string;
   thumbnail_url: string | null;
   is_published: boolean;
+  author_name: string | null;
+  author_bio: string | null;
+  author_avatar_url: string | null;
+}
+
+interface RelatedCourse {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  category: string;
+  pd_hours: number;
+  estimated_minutes: number;
+  thumbnail_url?: string;
 }
 
 interface CourseDetailPageProps {
@@ -84,6 +102,8 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   const [course, setCourse] = useState<Course | null>(null);
   const [modules, setModules] = useState<Module[]>([]);
   const [expandedModules, setExpandedModules] = useState<Set<string>>(new Set());
+  const [relatedCourses, setRelatedCourses] = useState<RelatedCourse[]>([]);
+  const [authorCourses, setAuthorCourses] = useState<RelatedCourse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
@@ -98,12 +118,15 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
 
       try {
         // Fetch course
+        console.log('[CourseDetail] Fetching course with slug:', slug);
         const { data: courseData, error: courseError } = await supabase
           .from('hub_courses')
           .select('*')
           .eq('slug', slug)
           .eq('is_published', true)
           .single();
+
+        console.log('[CourseDetail] Course result:', { courseData, courseError });
 
         if (courseError || !courseData) {
           console.error('Error fetching course:', courseError);
@@ -115,18 +138,24 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
         setCourse(courseData);
 
         // Fetch modules with lessons
-        const { data: modulesData } = await supabase
+        console.log('[CourseDetail] Fetching modules for course_id:', courseData.id);
+        const { data: modulesData, error: modulesError } = await supabase
           .from('hub_modules')
           .select('id, title, sort_order')
           .eq('course_id', courseData.id)
           .order('sort_order', { ascending: true });
 
+        console.log('[CourseDetail] Modules result:', { modulesData, modulesError });
+
         // Fetch lessons
-        const { data: lessonsData } = await supabase
+        console.log('[CourseDetail] Fetching lessons for course_id:', courseData.id);
+        const { data: lessonsData, error: lessonsError } = await supabase
           .from('hub_lessons')
           .select('id, slug, title, description, estimated_minutes, content_type, is_free_preview, is_quick_win, sort_order, module_id')
           .eq('course_id', courseData.id)
           .order('sort_order', { ascending: true });
+
+        console.log('[CourseDetail] Lessons result:', { lessonsData, lessonsError, count: lessonsData?.length });
 
         // Group lessons by module
         const moduleMap = new Map<string, Module>();
@@ -170,10 +199,47 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           }
         }
 
+        console.log('[CourseDetail] Final modules:', finalModules);
         setModules(finalModules);
 
         // Expand all modules by default
         setExpandedModules(new Set(finalModules.map((m) => m.id)));
+
+        // Fetch related courses (same category, different course)
+        const { data: relatedData } = await supabase
+          .from('hub_courses')
+          .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url')
+          .eq('category', courseData.category)
+          .eq('is_published', true)
+          .neq('id', courseData.id)
+          .limit(3);
+
+        if (relatedData) {
+          // Convert null thumbnail_url to undefined for type compatibility
+          setRelatedCourses(relatedData.map(c => ({
+            ...c,
+            thumbnail_url: c.thumbnail_url || undefined,
+          })));
+        }
+
+        // Fetch other courses by same author (if author exists)
+        if (courseData.author_name) {
+          const { data: authorData } = await supabase
+            .from('hub_courses')
+            .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url')
+            .eq('author_name', courseData.author_name)
+            .eq('is_published', true)
+            .neq('id', courseData.id)
+            .limit(3);
+
+          if (authorData) {
+            // Convert null thumbnail_url to undefined for type compatibility
+            setAuthorCourses(authorData.map(c => ({
+              ...c,
+              thumbnail_url: c.thumbnail_url || undefined,
+            })));
+          }
+        }
       } catch (error) {
         console.error('Error loading course:', error);
       } finally {
@@ -531,7 +597,7 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
                 className="text-gray-500 text-center py-8"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
               >
-                No lessons available yet.
+                No lessons available yet. Check console for debug info.
               </p>
             ) : (
               <div className="space-y-4">
@@ -661,6 +727,177 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
               </div>
             )}
           </div>
+
+          {/* About the Author Section */}
+          <div className="hub-card mt-6">
+            <h2
+              className="font-semibold mb-6"
+              style={{
+                fontFamily: "'Source Serif 4', Georgia, serif",
+                fontSize: '20px',
+                color: '#2B3A67',
+              }}
+            >
+              Meet Your Instructor
+            </h2>
+
+            <div className="flex gap-5">
+              {/* Author Avatar */}
+              <div className="flex-shrink-0">
+                {course.author_avatar_url ? (
+                  <img
+                    src={course.author_avatar_url}
+                    alt={course.author_name || 'Instructor'}
+                    className="w-20 h-20 rounded-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-20 h-20 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: '#E5E7EB' }}
+                  >
+                    <User size={32} style={{ color: '#9CA3AF' }} />
+                  </div>
+                )}
+              </div>
+
+              {/* Author Info */}
+              <div className="flex-1 min-w-0">
+                <h3
+                  className="font-semibold mb-1"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '16px',
+                    color: '#2B3A67',
+                  }}
+                >
+                  {course.author_name || 'Teachers Deserve It Team'}
+                </h3>
+                <p
+                  className="mb-3"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '14px',
+                    color: '#6B7280',
+                  }}
+                >
+                  {course.author_name
+                    ? 'Educator, Author & Course Creator'
+                    : 'Educators who believe every teacher deserves support'}
+                </p>
+                <p
+                  className="mb-4 line-clamp-3"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '14px',
+                    color: '#4B5563',
+                  }}
+                >
+                  {course.author_bio ||
+                    'Built by educators who believe every teacher deserves support, growth, and a community that gets it. Our courses are practical, teacher-tested, and designed to fit into your real life.'}
+                </p>
+
+                {/* Links row */}
+                <div className="flex flex-wrap items-center gap-4">
+                  <a
+                    href="https://teachersdeserveit.com/blog"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 transition-colors hover:opacity-80"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: '13px',
+                      color: '#2B3A67',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#E8B84B')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = '#2B3A67')}
+                  >
+                    <ExternalLink size={14} />
+                    TDI Blog
+                  </a>
+                  <a
+                    href="https://teachersdeserveit.com/podcast"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 transition-colors hover:opacity-80"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: '13px',
+                      color: '#2B3A67',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#E8B84B')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = '#2B3A67')}
+                  >
+                    <Headphones size={14} />
+                    TDI Podcast
+                  </a>
+                  <a
+                    href="mailto:hello@teachersdeserveit.com"
+                    className="inline-flex items-center gap-1.5 transition-colors hover:opacity-80"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: '13px',
+                      color: '#2B3A67',
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.color = '#E8B84B')}
+                    onMouseLeave={(e) => (e.currentTarget.style.color = '#2B3A67')}
+                  >
+                    <Mail size={14} />
+                    Email
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* More from this instructor */}
+          {authorCourses.length > 0 && (
+            <div className="mt-8">
+              <h2
+                className="font-semibold mb-4"
+                style={{
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  fontSize: '20px',
+                  color: '#2B3A67',
+                }}
+              >
+                More from this instructor
+              </h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {authorCourses.map((c) => (
+                  <CourseCard
+                    key={c.id}
+                    course={c}
+                    enrollment={null}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Related courses */}
+          {relatedCourses.length > 0 && (
+            <div className="mt-8">
+              <h2
+                className="font-semibold mb-4"
+                style={{
+                  fontFamily: "'Source Serif 4', Georgia, serif",
+                  fontSize: '20px',
+                  color: '#2B3A67',
+                }}
+              >
+                Related Courses
+              </h2>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {relatedCourses.map((c) => (
+                  <CourseCard
+                    key={c.id}
+                    course={c}
+                    enrollment={null}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
