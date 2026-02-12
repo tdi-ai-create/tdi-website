@@ -345,29 +345,38 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
               Gentle tools for right now
             </h3>
 
-            <div className="space-y-2">
+            <div>
               {GENTLE_TOOLS.map((tool, index) => (
                 <button
                   key={index}
-                  className="w-full text-left p-4 rounded-lg border border-gray-200 hover:border-[#E8B84B] hover:bg-[#FFF8E7] transition-all"
+                  className="w-full text-left hover:border-[#E8B84B] hover:bg-[#FFF8E7] transition-all"
+                  style={{
+                    padding: '12px 16px',
+                    border: '1px solid #E5E7EB',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
+                  }}
                 >
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex-1 min-w-0">
                       <p
-                        className="font-semibold leading-tight"
                         style={{
                           fontFamily: "'DM Sans', sans-serif",
                           fontSize: '15px',
+                          fontWeight: 600,
                           color: '#2B3A67',
+                          lineHeight: '1.3',
                         }}
                       >
                         {tool.title}
                       </p>
                       <p
-                        className="text-gray-500 mt-0.5 truncate"
+                        className="truncate"
                         style={{
                           fontFamily: "'DM Sans', sans-serif",
                           fontSize: '13px',
+                          color: '#6B7280',
+                          marginTop: '2px',
                         }}
                       >
                         {tool.description}
