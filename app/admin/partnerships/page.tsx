@@ -22,6 +22,8 @@ import {
   Filter,
   AlertCircle,
   Trash2,
+  Sparkles,
+  ArrowRight,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -443,6 +445,30 @@ export default function AdminPartnershipsPage() {
       </header>
 
       <main className="container-wide py-8">
+        {/* Migration Banner */}
+        <Link
+          href="/tdi-admin/leadership"
+          className="flex items-center justify-between p-4 mb-6 rounded-xl border-2 border-amber-400 bg-amber-50 hover:bg-amber-100 transition-colors group"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-amber-600" />
+            </div>
+            <div>
+              <p className="font-semibold text-[#1e2749]">
+                New Leadership Dashboard Available
+              </p>
+              <p className="text-sm text-gray-600">
+                Access all partnership features in the unified TDI Admin Portal
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-amber-600 group-hover:translate-x-1 transition-transform">
+            <span className="text-sm font-medium hidden sm:inline">Try it now</span>
+            <ArrowRight className="w-5 h-5" />
+          </div>
+        </Link>
+
         {/* Page header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
