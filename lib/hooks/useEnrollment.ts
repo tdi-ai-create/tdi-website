@@ -63,12 +63,16 @@ export function useEnrollment(courseId: string | null, userId: string | null): U
   }, [fetchEnrollment]);
 
   const enroll = async (): Promise<boolean> => {
+    console.log('[Enrollment] Starting enrollment...', { courseId, userId });
+
     if (!courseId || !userId) {
+      console.error('[Enrollment] Missing course or user information', { courseId, userId });
       setError('Missing course or user information');
       return false;
     }
 
     if (enrollment) {
+      console.log('[Enrollment] Already enrolled');
       // Already enrolled
       return true;
     }
@@ -79,6 +83,7 @@ export function useEnrollment(courseId: string | null, userId: string | null): U
     const supabase = getSupabase();
 
     try {
+      console.log('[Enrollment] Step 1: Creating enrollment record...');
       // Step 1: Create the enrollment
       const { data: newEnrollment, error: enrollError } = await supabase
         .from('hub_enrollments')
@@ -92,13 +97,17 @@ export function useEnrollment(courseId: string | null, userId: string | null): U
         .select()
         .single();
 
+      console.log('[Enrollment] Insert result:', { newEnrollment, enrollError });
+
       if (enrollError) {
         // Check if it's a duplicate key error (already enrolled)
         if (enrollError.code === '23505') {
+          console.log('[Enrollment] Duplicate - already enrolled, fetching existing...');
           // Fetch existing enrollment
           await fetchEnrollment();
           return true;
         }
+        console.error('[Enrollment] Insert error:', enrollError);
         throw enrollError;
       }
 
@@ -156,23 +165,29 @@ export function useEnrollment(courseId: string | null, userId: string | null): U
 
 // Standalone function for use outside of React components
 export async function enrollInCourse(courseId: string, userId: string): Promise<{ success: boolean; error?: string }> {
+  console.log('[enrollInCourse] Starting...', { courseId, userId });
   const supabase = getSupabase();
 
   try {
     // Check if already enrolled
-    const { data: existing } = await supabase
+    console.log('[enrollInCourse] Checking if already enrolled...');
+    const { data: existing, error: checkError } = await supabase
       .from('hub_enrollments')
       .select('id')
       .eq('course_id', courseId)
       .eq('user_id', userId)
       .single();
 
+    console.log('[enrollInCourse] Check result:', { existing, checkError });
+
     if (existing) {
+      console.log('[enrollInCourse] Already enrolled, returning success');
       return { success: true };
     }
 
     // Create enrollment
-    const { error: enrollError } = await supabase
+    console.log('[enrollInCourse] Creating enrollment...');
+    const { data: insertData, error: enrollError } = await supabase
       .from('hub_enrollments')
       .insert({
         user_id: userId,
@@ -180,21 +195,29 @@ export async function enrollInCourse(courseId: string, userId: string): Promise<
         enrolled_at: new Date().toISOString(),
         status: 'active',
         progress_pct: 0,
-      });
+      })
+      .select();
+
+    console.log('[enrollInCourse] Insert result:', { insertData, enrollError });
 
     if (enrollError) {
       if (enrollError.code === '23505') {
+        console.log('[enrollInCourse] Duplicate key - already enrolled');
         // Already enrolled
         return { success: true };
       }
+      console.error('[enrollInCourse] Enrollment insert error:', enrollError);
       throw enrollError;
     }
 
     // Get lessons and create progress records
-    const { data: lessons } = await supabase
+    console.log('[enrollInCourse] Getting lessons for progress records...');
+    const { data: lessons, error: lessonsError } = await supabase
       .from('hub_lessons')
       .select('id')
       .eq('course_id', courseId);
+
+    console.log('[enrollInCourse] Lessons result:', { lessons, lessonsError });
 
     if (lessons && lessons.length > 0) {
       const progressRecords = lessons.map((lesson) => ({
@@ -204,12 +227,15 @@ export async function enrollInCourse(courseId: string, userId: string): Promise<
         progress_pct: 0,
       }));
 
-      await supabase.from('hub_lesson_progress').insert(progressRecords);
+      console.log('[enrollInCourse] Creating progress records:', progressRecords.length);
+      const { error: progressError } = await supabase.from('hub_lesson_progress').insert(progressRecords);
+      console.log('[enrollInCourse] Progress insert result:', { progressError });
     }
 
+    console.log('[enrollInCourse] Success!');
     return { success: true };
   } catch (err) {
-    console.error('Error enrolling:', err);
+    console.error('[enrollInCourse] Error:', err);
     return { success: false, error: 'Failed to enroll' };
   }
 }

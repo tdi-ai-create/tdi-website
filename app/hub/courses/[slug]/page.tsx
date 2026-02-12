@@ -185,9 +185,11 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   }, [slug]);
 
   const handleEnroll = async () => {
+    console.log('[CourseDetailPage] handleEnroll called');
     const success = await enroll();
+    console.log('[CourseDetailPage] enroll result:', success);
     if (success) {
-      showToast('Successfully enrolled!', 'success');
+      showToast('You are enrolled! 🎉', 'success');
     } else {
       showToast('Failed to enroll. Please try again.', 'error');
     }

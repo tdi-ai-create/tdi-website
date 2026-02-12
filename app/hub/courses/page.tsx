@@ -7,7 +7,7 @@ import CourseCard from '@/components/hub/CourseCard';
 import EmptyState from '@/components/hub/EmptyState';
 import { getSupabase } from '@/lib/supabase';
 import { enrollInCourse } from '@/lib/hooks/useEnrollment';
-import { Search, BookOpen } from 'lucide-react';
+import { Search, BookOpen, CheckCircle, AlertCircle } from 'lucide-react';
 
 // Filter categories
 const FILTER_CATEGORIES = [
@@ -48,6 +48,12 @@ export default function CourseCatalogPage() {
   const [activeFilter, setActiveFilter] = useState('All');
   const [isLoading, setIsLoading] = useState(true);
   const [isEnrolling, setIsEnrolling] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
+
+  const showToast = (message: string, type: 'success' | 'error') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  };
 
   useEffect(() => {
     async function loadCourses() {
@@ -92,13 +98,26 @@ export default function CourseCatalogPage() {
   }, [user?.id]);
 
   const handleEnroll = async (courseId: string) => {
-    if (!user?.id || isEnrolling) return;
+    console.log('[CourseCatalogPage] handleEnroll called', { courseId, userId: user?.id });
+
+    if (!user?.id) {
+      console.log('[CourseCatalogPage] No user, redirecting to login');
+      router.push('/hub/login');
+      return;
+    }
+
+    if (isEnrolling) {
+      console.log('[CourseCatalogPage] Already enrolling, skipping');
+      return;
+    }
 
     setIsEnrolling(courseId);
 
     try {
       // Use the enrollment function that also creates lesson progress records
+      console.log('[CourseCatalogPage] Calling enrollInCourse...');
       const result = await enrollInCourse(courseId, user.id);
+      console.log('[CourseCatalogPage] enrollInCourse result:', result);
 
       if (result.success) {
         // Update local state
@@ -111,14 +130,21 @@ export default function CourseCatalogPage() {
           },
         }));
 
+        showToast('You are enrolled! 🎉', 'success');
+
         // Find the course slug and redirect to course detail page
         const course = courses.find((c) => c.id === courseId);
         if (course) {
+          console.log('[CourseCatalogPage] Redirecting to course detail page...');
           router.push(`/hub/courses/${course.slug}`);
         }
+      } else {
+        console.error('[CourseCatalogPage] Enrollment failed:', result.error);
+        showToast(result.error || 'Failed to enroll. Please try again.', 'error');
       }
     } catch (error) {
-      console.error('Error enrolling:', error);
+      console.error('[CourseCatalogPage] Error enrolling:', error);
+      showToast('Failed to enroll. Please try again.', 'error');
     } finally {
       setIsEnrolling(null);
     }
@@ -183,6 +209,21 @@ export default function CourseCatalogPage() {
 
   return (
     <div className="p-4 md:p-8 max-w-6xl mx-auto">
+      {/* Toast notification */}
+      {toast && (
+        <div
+          className="fixed top-4 right-4 z-50 px-4 py-3 rounded-lg shadow-lg flex items-center gap-2"
+          style={{
+            backgroundColor: toast.type === 'success' ? '#10B981' : '#EF4444',
+            color: 'white',
+            fontFamily: "'DM Sans', sans-serif",
+          }}
+        >
+          {toast.type === 'success' ? <CheckCircle size={18} /> : <AlertCircle size={18} />}
+          {toast.message}
+        </div>
+      )}
+
       {/* Header */}
       <div className="mb-8">
         <h1
