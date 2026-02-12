@@ -22,7 +22,6 @@ import {
   Filter,
   AlertCircle,
   Trash2,
-  Lock,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
@@ -139,12 +138,8 @@ export default function AdminPartnershipsPage() {
   const [deleteError, setDeleteError] = useState('');
   const [deleteSuccess, setDeleteSuccess] = useState('');
 
-  // Login state for unauthenticated users
-  const [showLoginForm, setShowLoginForm] = useState(false);
-  const [loginEmail, setLoginEmail] = useState('');
-  const [loginPassword, setLoginPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
-  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  // Current user email for access denied state
+  const [currentUserEmail, setCurrentUserEmail] = useState<string | null>(null);
 
   const loadPartnerships = useCallback(async (email: string) => {
     try {
@@ -174,14 +169,14 @@ export default function AdminPartnershipsPage() {
       const { data: { session } } = await supabase.auth.getSession();
 
       if (!session?.user?.email) {
-        // No session - show login form instead of redirecting
-        setShowLoginForm(true);
-        setIsLoading(false);
+        // No session - redirect to admin login page
+        router.push('/admin/login');
         return;
       }
 
       const isAdmin = await checkTDIAdmin(session.user.email);
       if (!isAdmin) {
+        setCurrentUserEmail(session.user.email);
         setAccessDenied(true);
         setIsLoading(false);
         return;
@@ -193,43 +188,6 @@ export default function AdminPartnershipsPage() {
 
     checkAuth();
   }, [router, loadPartnerships]);
-
-  // Handle login for admin panel
-  const handleAdminLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoggingIn(true);
-    setLoginError('');
-
-    try {
-      // Check if email is TDI domain before attempting login
-      if (!loginEmail.toLowerCase().endsWith('@teachersdeserveit.com')) {
-        setLoginError('This admin panel is only for TDI team members.');
-        setIsLoggingIn(false);
-        return;
-      }
-
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: loginEmail,
-        password: loginPassword,
-      });
-
-      if (error) {
-        setLoginError(error.message);
-        setIsLoggingIn(false);
-        return;
-      }
-
-      if (data.session) {
-        setShowLoginForm(false);
-        setUserEmail(data.session.user.email || null);
-        await loadPartnerships(data.session.user.email || '');
-      }
-    } catch {
-      setLoginError('Login failed. Please try again.');
-    } finally {
-      setIsLoggingIn(false);
-    }
-  };
 
   // Filter partnerships
   useEffect(() => {
@@ -388,101 +346,46 @@ export default function AdminPartnershipsPage() {
     (filterStatus !== 'all' ? 1 : 0) +
     (filterPhase !== 'all' ? 1 : 0);
 
-  // Login form for unauthenticated users
-  if (showLoginForm) {
-    return (
-      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-        <div className="bg-white rounded-2xl shadow-lg max-w-md w-full mx-4 p-8">
-          <div className="text-center mb-6">
-            <div className="w-16 h-16 bg-[#1e2749] rounded-full flex items-center justify-center mx-auto mb-4">
-              <Lock className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-xl font-semibold text-[#1e2749] mb-2">TDI Admin Login</h1>
-            <p className="text-gray-600 text-sm">
-              Sign in with your @teachersdeserveit.com email
-            </p>
-          </div>
-
-          <form onSubmit={handleAdminLogin} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-              <input
-                type="email"
-                required
-                value={loginEmail}
-                onChange={(e) => setLoginEmail(e.target.value)}
-                placeholder="you@teachersdeserveit.com"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Password</label>
-              <input
-                type="password"
-                required
-                value={loginPassword}
-                onChange={(e) => setLoginPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent outline-none"
-              />
-            </div>
-
-            {loginError && (
-              <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700 text-sm">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                {loginError}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={isLoggingIn}
-              className="w-full bg-[#1e2749] text-white px-4 py-3 rounded-lg hover:bg-[#2a3459] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {isLoggingIn ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Signing in...
-                </>
-              ) : (
-                'Sign In'
-              )}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <Link href="/" className="text-sm text-gray-500 hover:text-[#1e2749]">
-              Return to main site
-            </Link>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   // Access Denied state (logged in but not TDI email)
   if (accessDenied) {
     return (
-      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center">
-        <div className="text-center max-w-md mx-auto p-6">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <AlertCircle className="w-8 h-8 text-red-600" />
+      <div className="min-h-screen bg-[#f5f5f5] flex items-center justify-center px-4">
+        <div className="bg-white rounded-2xl shadow-lg max-w-md w-full p-8">
+          <div className="text-center mb-6">
+            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <AlertCircle className="w-8 h-8 text-yellow-600" />
+            </div>
+            <h1 className="text-xl font-semibold text-[#1e2749] mb-2">Access Denied</h1>
+            {currentUserEmail && (
+              <p className="text-gray-600 text-sm mb-2">
+                You&apos;re signed in as <strong className="text-[#1e2749]">{currentUserEmail}</strong>
+              </p>
+            )}
+            <p className="text-gray-500 text-sm">
+              This area requires a <strong>@teachersdeserveit.com</strong> account.
+            </p>
           </div>
-          <h1 className="text-xl font-semibold text-[#1e2749] mb-2">Access Denied</h1>
-          <p className="text-gray-600 mb-6">
-            This page is only accessible to TDI team members (@teachersdeserveit.com).
-          </p>
-          <div className="flex flex-col gap-3">
+          <div className="space-y-3">
             <button
               onClick={async () => {
                 await supabase.auth.signOut();
-                setAccessDenied(false);
-                setShowLoginForm(true);
+                router.push('/admin/login');
               }}
-              className="inline-flex items-center justify-center gap-2 bg-[#1e2749] text-white px-6 py-3 rounded-lg hover:bg-[#2a3459] transition-colors"
+              className="w-full inline-flex items-center justify-center gap-2 bg-[#1e2749] text-white px-6 py-3 rounded-lg hover:bg-[#2a3459] transition-colors"
             >
-              Sign in with TDI account
+              Switch Account
             </button>
+            <button
+              onClick={async () => {
+                await supabase.auth.signOut();
+                router.push('/');
+              }}
+              className="w-full inline-flex items-center justify-center gap-2 border border-gray-300 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Sign Out
+            </button>
+          </div>
+          <div className="mt-6 text-center">
             <Link
               href="/"
               className="text-sm text-gray-500 hover:text-[#1e2749]"
