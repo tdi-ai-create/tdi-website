@@ -23,6 +23,8 @@ import {
   ChevronDown,
   ChevronUp,
   HelpCircle,
+  ArrowRight,
+  Sparkles,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { isAdmin, createCreator } from '@/lib/creator-portal-data';
@@ -413,6 +415,27 @@ export default function AdminCreatorsPage() {
       </header>
 
       <main className="container-wide py-8">
+        {/* Migration Banner */}
+        <div className="mb-6 bg-gradient-to-r from-[#2B3A67] to-[#3d5280] rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3 text-white">
+            <div className="w-10 h-10 rounded-full bg-[#E8B84B] flex items-center justify-center flex-shrink-0">
+              <Sparkles className="w-5 h-5 text-[#2B3A67]" />
+            </div>
+            <div>
+              <p className="font-semibold">New TDI Admin Portal Available!</p>
+              <p className="text-white/70 text-sm">Creator Studio has moved to the unified admin portal.</p>
+            </div>
+          </div>
+          <Link
+            href="/tdi-admin/creators"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap"
+            style={{ backgroundColor: '#E8B84B', color: '#2B3A67' }}
+          >
+            Go to New Portal
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
         {/* Page header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div>
