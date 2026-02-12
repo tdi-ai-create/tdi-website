@@ -184,24 +184,6 @@ export default function CreateWithUsPage() {
 
   return (
     <main className="min-h-screen overflow-x-hidden">
-      {/* Creator Portal Banner - Yellow for visibility */}
-      <div className="bg-[#ffba06] w-full">
-        <div className="max-w-6xl mx-auto px-6 py-3 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 text-center">
-          <span className="text-[#1e2749] text-sm font-medium">
-            Already a TDI Creator?
-          </span>
-          <Link
-            href="/creator-portal"
-            className="text-[#1e2749] hover:underline text-sm font-semibold transition-all inline-flex items-center gap-1"
-          >
-            Access your Creator Portal
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </Link>
-        </div>
-      </div>
-
       {/* Hero Section */}
       <section className="relative py-20 md:py-28 overflow-hidden">
         <div className="absolute inset-0">
@@ -238,6 +220,21 @@ export default function CreateWithUsPage() {
           </a>
         </div>
       </section>
+
+      {/* Subtle login link for existing creators */}
+      <div className="bg-white py-4">
+        <p className="text-center text-gray-500 text-sm">
+          Already a creator?{' '}
+          <a
+            href="/creator-portal"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#1B2A4A] font-medium hover:underline"
+          >
+            Log in to your Creator Portal →
+          </a>
+        </p>
+      </div>
 
       {/* How It Works Timeline - Horizontal Layout */}
       <section className="py-16 md:py-20 bg-gray-50 overflow-hidden">
