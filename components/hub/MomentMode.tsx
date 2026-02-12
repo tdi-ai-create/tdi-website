@@ -193,6 +193,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
     setShowTimerNudge(false);
     setNoteText('');
     setNoteSent(false);
+    setShowNoteForm(false);
     if (timerRef.current) clearInterval(timerRef.current);
     onClose();
   };
@@ -256,28 +257,19 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   };
 
   const handleAnonymousSubmit = () => {
-    // In a real implementation, this would send to a secure endpoint
-    // For now, just clear and show confirmation
     setAnonymousVent('');
     alert('Your message has been received. Take care of yourself.');
   };
 
   if (!isOpen) return null;
 
-  // Get background color at 10% opacity for speech bubble
-  const getBubbleBgColor = (color: string) => {
-    return color + '1A'; // hex with 10% opacity
-  };
-
-  // Get background color at 15% opacity for icon circle
-  const getIconBgColor = (color: string) => {
-    return color + '26'; // hex with 15% opacity
-  };
-
   return (
     <div
       className="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen flex flex-col items-center justify-center p-4 animate-fade-in-overlay overflow-hidden"
-      style={{ backgroundColor: '#FAFAF8', zIndex: 9999 }}
+      style={{
+        background: 'linear-gradient(135deg, #2B3A67 0%, #1a2744 100%)',
+        zIndex: 9999,
+      }}
     >
       {/* Global Timer Display - Top Center */}
       {!showTimerNudge && (
@@ -286,7 +278,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
           style={{
             fontFamily: "'DM Sans', sans-serif",
             fontSize: '14px',
-            color: '#9CA3AF',
+            color: 'rgba(255, 255, 255, 0.6)',
           }}
         >
           <Clock size={14} />
@@ -294,7 +286,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
         </div>
       )}
 
-      {/* Timer Nudge Card - Top */}
+      {/* Timer Nudge Card - Top (stays white as a popup) */}
       {showTimerNudge && (
         <div
           className="absolute top-4 left-1/2 -translate-x-1/2 bg-white rounded-lg shadow-lg p-4 text-center max-w-sm mx-4"
@@ -338,19 +330,19 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
         </div>
       )}
 
-      {/* Close Button */}
+      {/* Close Button - White */}
       <button
         onClick={handleClose}
-        className="absolute top-4 right-4 p-2 transition-colors"
-        style={{ color: '#9CA3AF' }}
+        className="absolute top-4 right-4 p-2 transition-colors hover:opacity-80"
+        style={{ color: 'white' }}
         aria-label="Close Moment Mode"
       >
-        <X size={24} className="hover:text-gray-600" />
+        <X size={24} />
       </button>
 
-      {/* Content Card */}
+      {/* Content Area - No Card, Direct on Gradient */}
       <div
-        className="w-full max-w-md bg-white rounded-xl p-8 shadow-2xl"
+        className="w-full max-w-md text-center"
         style={{ maxHeight: '90vh', overflowY: 'auto' }}
       >
         {/* Entry State */}
@@ -360,21 +352,28 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
               className="font-semibold mb-4"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
-                fontSize: '24px',
-                color: '#2B3A67',
+                fontSize: '28px',
+                color: 'white',
               }}
             >
               Moment Mode.
             </h2>
             <p
-              className="text-gray-600 mb-4 leading-relaxed"
-              style={{ fontFamily: "'DM Sans', sans-serif", fontSize: '15px' }}
+              className="mb-4 leading-relaxed"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                fontSize: '15px',
+                color: 'rgba(255, 255, 255, 0.8)',
+              }}
             >
               Research shows that just 3 minutes of intentional pause can lower cortisol and reset your nervous system. This is your time. No one is tracking this. No one is watching. Choose what feels right, and when your 3 minutes are up, we will gently invite you back.
             </p>
             <p
-              className="text-sm text-gray-400 mb-8"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
+              className="text-sm mb-8"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: 'rgba(255, 255, 255, 0.5)',
+              }}
             >
               This is a sacred space built by Teachers Deserve It because you deserve to pause without guilt.
             </p>
@@ -382,38 +381,58 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
             <div className="space-y-3">
               <button
                 onClick={() => setState('pause')}
-                className="w-full flex items-center justify-center gap-3 p-4 rounded-lg border-2 border-gray-200 hover:border-[#E8B84B] hover:bg-[#FFF8E7] transition-all"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
+                className="w-full flex items-center justify-center gap-3 p-4 rounded-lg transition-all hover:bg-white/20"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: 'white',
+                }}
               >
-                <Wind size={20} style={{ color: '#2B3A67' }} />
-                <span style={{ color: '#2B3A67' }}>Breathing exercise</span>
+                <Wind size={20} />
+                <span>Breathing exercise</span>
               </button>
 
               <button
                 onClick={() => setState('affirmation')}
-                className="w-full flex items-center justify-center gap-3 p-4 rounded-lg border-2 border-gray-200 hover:border-[#E8B84B] hover:bg-[#FFF8E7] transition-all"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
+                className="w-full flex items-center justify-center gap-3 p-4 rounded-lg transition-all hover:bg-white/20"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: 'white',
+                }}
               >
-                <Heart size={20} style={{ color: '#2B3A67' }} />
-                <span style={{ color: '#2B3A67' }}>Show me an affirmation</span>
+                <Heart size={20} />
+                <span>Show me an affirmation</span>
               </button>
 
               <button
                 onClick={() => setState('gentle')}
-                className="w-full flex items-center justify-center gap-3 p-4 rounded-lg border-2 border-gray-200 hover:border-[#E8B84B] hover:bg-[#FFF8E7] transition-all"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
+                className="w-full flex items-center justify-center gap-3 p-4 rounded-lg transition-all hover:bg-white/20"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: 'white',
+                }}
               >
-                <Sparkles size={20} style={{ color: '#2B3A67' }} />
-                <span style={{ color: '#2B3A67' }}>Gentle tools</span>
+                <Sparkles size={20} />
+                <span>Gentle tools</span>
               </button>
 
               <button
                 onClick={() => setState('journal')}
-                className="w-full flex items-center justify-center gap-3 p-4 rounded-lg border-2 border-gray-200 hover:border-[#E8B84B] hover:bg-[#FFF8E7] transition-all"
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
+                className="w-full flex items-center justify-center gap-3 p-4 rounded-lg transition-all hover:bg-white/20"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  color: 'white',
+                }}
               >
-                <BookOpen size={20} style={{ color: '#2B3A67' }} />
-                <span style={{ color: '#2B3A67' }}>Write it out</span>
+                <BookOpen size={20} />
+                <span>Write it out</span>
               </button>
             </div>
           </div>
@@ -424,10 +443,13 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
           <div className="text-center">
             <button
               onClick={() => setState('entry')}
-              className="text-sm text-gray-400 hover:text-gray-600 mb-6"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
+              className="text-sm mb-6 transition-colors hover:opacity-80"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: 'rgba(255, 255, 255, 0.6)',
+              }}
             >
-              Back
+              ← Back
             </button>
 
             <div className="relative w-48 h-48 mx-auto mb-8">
@@ -438,13 +460,13 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
               />
               <div
                 className="absolute inset-4 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: 'white' }}
+                style={{ backgroundColor: '#2B3A67' }}
               >
                 <span
                   className="text-[28px] font-semibold"
                   style={{
                     fontFamily: "'Source Serif 4', Georgia, serif",
-                    color: '#2B3A67',
+                    color: 'white',
                   }}
                 >
                   {formatTime(breathingTimeRemaining)}
@@ -453,14 +475,20 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
             </div>
 
             <p
-              className="text-gray-600 mb-2"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
+              className="mb-2"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: 'rgba(255, 255, 255, 0.8)',
+              }}
             >
               Breathe in as it grows. Breathe out as it shrinks.
             </p>
             <p
-              className="text-sm text-gray-400"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
+              className="text-sm"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: 'rgba(255, 255, 255, 0.5)',
+              }}
             >
               Take your time. There is no rush.
             </p>
@@ -468,7 +496,13 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
             {breathingTimeRemaining === 0 && (
               <button
                 onClick={() => setBreathingTimeRemaining(300)}
-                className="mt-6 hub-btn-primary"
+                className="mt-6 px-6 py-3 rounded-lg font-medium transition-all hover:bg-white/20"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  backgroundColor: 'transparent',
+                  border: '1px solid white',
+                  color: 'white',
+                }}
               >
                 Start again
               </button>
@@ -476,15 +510,18 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
           </div>
         )}
 
-        {/* Affirmation State - Updated with person icons */}
+        {/* Affirmation State */}
         {state === 'affirmation' && (
           <div>
             <button
               onClick={() => setState('entry')}
-              className="text-sm text-gray-400 hover:text-gray-600 mb-6 block"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
+              className="text-sm mb-6 block transition-colors hover:opacity-80"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: 'rgba(255, 255, 255, 0.6)',
+              }}
             >
-              Back
+              ← Back
             </button>
 
             {/* Affirmation with Person Icon */}
@@ -493,19 +530,19 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
               className={`flex items-start gap-4 mb-6 ${affirmationSide === 'right' ? 'flex-row-reverse' : ''}`}
               style={{ animation: 'fadeIn 0.3s ease-out' }}
             >
-              {/* Person Icon in Colored Circle - background at 15% opacity, icon at full color */}
+              {/* Person Icon in Colored Circle */}
               <div
                 className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: getIconBgColor(affirmationColor) }}
+                style={{ backgroundColor: affirmationColor }}
               >
-                <UserCircle size={24} style={{ color: affirmationColor }} />
+                <UserCircle size={24} style={{ color: 'white' }} />
               </div>
 
-              {/* Speech Bubble */}
+              {/* Speech Bubble - White at 15% opacity */}
               <div
-                className="flex-1 p-4 rounded-xl"
+                className="flex-1 p-4 rounded-xl text-left"
                 style={{
-                  backgroundColor: getBubbleBgColor(affirmationColor),
+                  backgroundColor: 'rgba(255, 255, 255, 0.15)',
                   borderRadius: '12px',
                 }}
               >
@@ -513,7 +550,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                   className="text-lg leading-relaxed"
                   style={{
                     fontFamily: "'Source Serif 4', Georgia, serif",
-                    color: '#2B3A67',
+                    color: 'white',
                   }}
                 >
                   {affirmations[affirmationIndex]}
@@ -523,13 +560,22 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
 
             <button
               onClick={cycleAffirmation}
-              className="w-full hub-btn-secondary mb-8"
+              className="w-full mb-8 px-6 py-3 rounded-lg font-medium transition-all hover:bg-white/10"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                backgroundColor: 'transparent',
+                border: '1px solid white',
+                color: 'white',
+              }}
             >
               Next affirmation
             </button>
 
             {/* Note to Team Section */}
-            <div className="border-t border-gray-100 pt-6">
+            <div
+              className="pt-6"
+              style={{ borderTop: '1px solid rgba(255, 255, 255, 0.2)' }}
+            >
               {noteSent ? (
                 <div className="text-center py-4">
                   <div className="flex items-center justify-center gap-2 mb-2">
@@ -538,7 +584,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                       style={{
                         fontFamily: "'DM Sans', sans-serif",
                         fontSize: '14px',
-                        color: '#6B7280',
+                        color: 'rgba(255, 255, 255, 0.8)',
                       }}
                     >
                       Sent. Someone from our team will read this.
@@ -551,14 +597,14 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
                     fontSize: '13px',
-                    color: '#9CA3AF',
+                    color: 'rgba(255, 255, 255, 0.5)',
                   }}
                 >
                   Need to talk?{' '}
                   <button
                     onClick={() => setShowNoteForm(true)}
-                    className="underline hover:text-gray-600 transition-colors"
-                    style={{ color: '#9CA3AF' }}
+                    className="underline transition-colors hover:opacity-80"
+                    style={{ color: 'rgba(255, 255, 255, 0.5)' }}
                   >
                     Click here
                   </button>{' '}
@@ -570,24 +616,32 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                     value={noteText}
                     onChange={(e) => setNoteText(e.target.value.slice(0, 500))}
                     placeholder="What's on your mind?"
-                    className="w-full h-20 p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:border-[#E8B84B] text-sm"
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
+                    className="w-full h-20 p-3 rounded-lg resize-none focus:outline-none text-sm"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      border: '1px solid rgba(255, 255, 255, 0.2)',
+                      color: 'white',
+                    }}
                     autoFocus
                   />
                   <div className="flex justify-between items-center">
                     <span
                       className="text-xs"
-                      style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}
+                      style={{
+                        color: 'rgba(255, 255, 255, 0.4)',
+                        fontFamily: "'DM Sans', sans-serif",
+                      }}
                     >
                       {noteText.length}/500
                     </span>
                     <button
                       onClick={handleSubmitNote}
                       disabled={!noteText.trim() || isSubmittingNote}
-                      className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:bg-white/10"
                       style={{
-                        border: '1px solid #D1D5DB',
-                        color: '#6B7280',
+                        border: '1px solid rgba(255, 255, 255, 0.5)',
+                        color: 'white',
                         fontFamily: "'DM Sans', sans-serif",
                       }}
                     >
@@ -606,18 +660,21 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
           <div>
             <button
               onClick={() => setState('entry')}
-              className="text-sm text-gray-400 hover:text-gray-600 mb-4"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
+              className="text-sm mb-4 transition-colors hover:opacity-80"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: 'rgba(255, 255, 255, 0.6)',
+              }}
             >
-              Back
+              ← Back
             </button>
 
             <h3
               className="font-semibold mb-6"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
-                fontSize: '18px',
-                color: '#2B3A67',
+                fontSize: '20px',
+                color: 'white',
               }}
             >
               Gentle tools for right now
@@ -627,10 +684,11 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
               {GENTLE_TOOLS.map((tool, index) => (
                 <button
                   key={index}
-                  className="w-full text-left hover:border-[#E8B84B] hover:bg-[#FFF8E7] transition-all"
+                  className="w-full text-left transition-all hover:bg-white/20"
                   style={{
                     padding: '12px 16px',
-                    border: '1px solid #E5E7EB',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
                     borderRadius: '8px',
                     marginBottom: '8px',
                   }}
@@ -642,7 +700,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                           fontFamily: "'DM Sans', sans-serif",
                           fontSize: '15px',
                           fontWeight: 600,
-                          color: '#2B3A67',
+                          color: 'white',
                           lineHeight: '1.3',
                         }}
                       >
@@ -653,7 +711,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                         style={{
                           fontFamily: "'DM Sans', sans-serif",
                           fontSize: '13px',
-                          color: '#6B7280',
+                          color: 'rgba(255, 255, 255, 0.6)',
                           marginTop: '2px',
                         }}
                       >
@@ -663,7 +721,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                     <span
                       className="flex-shrink-0 inline-flex items-center gap-1"
                       style={{
-                        backgroundColor: '#FFF8E7',
+                        backgroundColor: 'rgba(232, 184, 75, 0.2)',
                         color: '#E8B84B',
                         fontFamily: "'DM Sans', sans-serif",
                         fontSize: '11px',
@@ -688,44 +746,50 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
           <div>
             <button
               onClick={() => setState('entry')}
-              className="text-sm text-gray-400 hover:text-gray-600 mb-4"
-              style={{ fontFamily: "'DM Sans', sans-serif" }}
+              className="text-sm mb-4 transition-colors hover:opacity-80"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: 'rgba(255, 255, 255, 0.6)',
+              }}
             >
-              Back
+              ← Back
             </button>
 
             <h3
               className="font-semibold mb-6"
               style={{
                 fontFamily: "'Source Serif 4', Georgia, serif",
-                fontSize: '18px',
-                color: '#2B3A67',
+                fontSize: '20px',
+                color: 'white',
               }}
             >
               Write it out
             </h3>
 
             {/* Tabs */}
-            <div className="flex border-b border-gray-200 mb-6">
+            <div
+              className="flex mb-6"
+              style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.2)' }}
+            >
               <button
                 onClick={() => setJournalTab('private')}
-                className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  journalTab === 'private'
-                    ? 'border-[#E8B84B] text-[#2B3A67]'
-                    : 'border-transparent text-gray-400 hover:text-gray-600'
-                }`}
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
+                className="flex-1 py-3 text-sm font-medium transition-colors"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: journalTab === 'private' ? 'white' : 'rgba(255, 255, 255, 0.5)',
+                  borderBottom: journalTab === 'private' ? '2px solid #E8B84B' : '2px solid transparent',
+                }}
               >
                 Private journal
               </button>
               <button
                 onClick={() => setJournalTab('anonymous')}
-                className={`flex-1 py-3 text-sm font-medium border-b-2 transition-colors ${
-                  journalTab === 'anonymous'
-                    ? 'border-[#E8B84B] text-[#2B3A67]'
-                    : 'border-transparent text-gray-400 hover:text-gray-600'
-                }`}
-                style={{ fontFamily: "'DM Sans', sans-serif" }}
+                className="flex-1 py-3 text-sm font-medium transition-colors"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: journalTab === 'anonymous' ? 'white' : 'rgba(255, 255, 255, 0.5)',
+                  borderBottom: journalTab === 'anonymous' ? '2px solid #E8B84B' : '2px solid transparent',
+                }}
               >
                 Anonymous vent
               </button>
@@ -734,8 +798,11 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
             {journalTab === 'private' && (
               <div>
                 <p
-                  className="text-sm text-gray-500 mb-4"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  className="text-sm mb-4"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    color: 'rgba(255, 255, 255, 0.6)',
+                  }}
                 >
                   This stays on your device only. Nothing is saved to the cloud.
                 </p>
@@ -743,8 +810,13 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                   value={privateJournal}
                   onChange={(e) => setPrivateJournal(e.target.value)}
                   placeholder="Write whatever you need to get out..."
-                  className="w-full h-40 p-4 border border-gray-200 rounded-lg resize-none focus:outline-none focus:border-[#E8B84B]"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  className="w-full h-40 p-4 rounded-lg resize-none focus:outline-none"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    color: 'white',
+                  }}
                 />
               </div>
             )}
@@ -752,8 +824,11 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
             {journalTab === 'anonymous' && (
               <div>
                 <p
-                  className="text-sm text-gray-500 mb-4"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  className="text-sm mb-4"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    color: 'rgba(255, 255, 255, 0.6)',
+                  }}
                 >
                   Send an anonymous message. No name, no tracking, just release.
                 </p>
@@ -761,13 +836,23 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                   value={anonymousVent}
                   onChange={(e) => setAnonymousVent(e.target.value)}
                   placeholder="Let it out..."
-                  className="w-full h-40 p-4 border border-gray-200 rounded-lg resize-none focus:outline-none focus:border-[#E8B84B] mb-4"
-                  style={{ fontFamily: "'DM Sans', sans-serif" }}
+                  className="w-full h-40 p-4 rounded-lg resize-none focus:outline-none mb-4"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    color: 'white',
+                  }}
                 />
                 <button
                   onClick={handleAnonymousSubmit}
                   disabled={!anonymousVent.trim()}
-                  className="w-full hub-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-3 rounded-lg font-medium transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    backgroundColor: '#E8B84B',
+                    color: '#2B3A67',
+                  }}
                 >
                   Send anonymously
                 </button>
@@ -777,7 +862,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
         )}
       </div>
 
-      {/* Animation keyframes */}
+      {/* Animation keyframes and placeholder styling */}
       <style jsx>{`
         @keyframes fadeIn {
           from {
@@ -788,6 +873,9 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+        textarea::placeholder {
+          color: rgba(255, 255, 255, 0.4);
         }
       `}</style>
     </div>
