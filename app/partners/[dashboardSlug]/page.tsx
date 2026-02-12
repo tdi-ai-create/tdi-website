@@ -3985,164 +3985,227 @@ export default function PartnerDashboard() {
 
             {/* Building Cards */}
             {apiBuildings.length === 0 ? (
-              <ExamplePreview message="Example from a TDI district — your building data will show teacher and paraprofessional breakdowns, engagement metrics, and wellness indicators once staff are onboarded.">
+              <ExamplePreview message="Example from a real TDI district — your Schools tab will show this level of detail for every building, including teacher vs. para breakdowns, individual engagement tracking, awards, and personalized TDI notes.">
                 <div id="buildings-list" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
                   <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Buildings</h2>
                   <div className="space-y-4">
-                    {/* Harmony Elementary — Expanded Example */}
+                    {/* ===== HARMONY ELEMENTARY — EXPANDED EXAMPLE ===== */}
                     <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
-                      {/* Header */}
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
+
+                      {/* Header Row */}
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 mb-4">
+                        <div className="flex items-center gap-3 flex-wrap">
                           <h3 style={{ color: '#1B2A4A' }} className="text-base font-semibold">Harmony Elementary</h3>
-                          <p style={{ color: '#6b7280' }} className="text-xs">40 staff · K-5 · Champion: Ms. Rivera</p>
+                          <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-600">K-5</span>
+                          <span style={{ color: '#14b8a6' }} className="text-xs font-medium">Champion: Ms. Rivera</span>
                         </div>
-                        {/* 4-dot health indicators */}
-                        <div className="flex gap-2">
-                          <div className="flex flex-col items-center">
-                            <div className="w-3 h-3 rounded-full bg-teal-500" />
-                            <span style={{ color: '#9ca3af' }} className="text-[10px] mt-1">Hub</span>
-                          </div>
-                          <div className="flex flex-col items-center">
-                            <div className="w-3 h-3 rounded-full bg-teal-500" />
-                            <span style={{ color: '#9ca3af' }} className="text-[10px] mt-1">Courses</span>
-                          </div>
-                          <div className="flex flex-col items-center">
-                            <div className="w-3 h-3 rounded-full bg-[#FFBA06]" />
-                            <span style={{ color: '#9ca3af' }} className="text-[10px] mt-1">Stress</span>
-                          </div>
-                          <div className="flex flex-col items-center">
-                            <div className="w-3 h-3 rounded-full bg-teal-500" />
-                            <span style={{ color: '#9ca3af' }} className="text-[10px] mt-1">Impl.</span>
+                        <div className="flex items-center gap-3">
+                          <span style={{ color: '#14b8a6' }} className="text-xs font-medium">Obs. ✓</span>
+                          <div className="text-right">
+                            <span style={{ color: '#14b8a6' }} className="text-xl font-bold">88%</span>
+                            <p style={{ color: '#6b7280' }} className="text-[10px]">logged in</p>
                           </div>
                         </div>
                       </div>
 
-                      {/* Staff Breakdown — Teacher vs Para */}
-                      <div className="grid grid-cols-2 gap-4 mb-4">
-                        {/* Teachers */}
-                        <div className="bg-gray-50 rounded-lg p-3">
-                          <p style={{ color: '#1B2A4A' }} className="text-xs font-semibold mb-2">Teachers (28)</p>
-                          <div className="space-y-2">
-                            <div className="flex justify-between items-center">
-                              <span style={{ color: '#6b7280' }} className="text-xs">Hub Logins</span>
-                              <span style={{ color: '#1B2A4A' }} className="text-xs font-semibold">96%</span>
+                      {/* Subtitle */}
+                      <p style={{ color: '#6b7280' }} className="text-xs mb-3">45 Teachers · 20 Paras</p>
+
+                      {/* Health Dots */}
+                      <div className="flex items-center gap-1.5 mb-4">
+                        <div className="w-3 h-3 rounded-full bg-teal-500" />
+                        <div className="w-3 h-3 rounded-full bg-teal-500" />
+                        <div className="w-3 h-3 rounded-full bg-teal-500" />
+                        <div className="w-3 h-3 rounded-full bg-teal-500" />
+                        <span style={{ color: '#9ca3af' }} className="text-xs ml-1">Health</span>
+                      </div>
+
+                      {/* Awards */}
+                      <div className="bg-gray-50 rounded-lg p-3 mb-4">
+                        <p style={{ color: '#6b7280' }} className="text-[10px] font-semibold uppercase tracking-wide mb-2">Awards</p>
+                        <div className="flex flex-wrap gap-2">
+                          <span className="px-2 py-1 bg-[#FFBA06]/10 border border-[#FFBA06]/30 rounded-full text-xs font-medium" style={{ color: '#92400e' }}>🥇 Most Engaged</span>
+                          <span className="px-2 py-1 bg-[#FFBA06]/10 border border-[#FFBA06]/30 rounded-full text-xs font-medium" style={{ color: '#92400e' }}>🥇 Implementation</span>
+                          <span className="px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600">🥈 Top Learners</span>
+                          <span className="px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600">🥈 Wellness Leader</span>
+                          <span className="px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600">🥈 Retention</span>
+                          <span className="px-2 py-1 bg-gray-100 rounded-full text-xs text-gray-600">🥈 Movement Leader</span>
+                        </div>
+                      </div>
+
+                      {/* 4 Donut Charts Row */}
+                      <div className="grid grid-cols-4 gap-3 mb-4">
+                        {[
+                          { label: 'Hub Logins', value: '88%', pct: 88, status: 'On Track' },
+                          { label: 'Courses', value: '68%', pct: 68, status: 'On Track' },
+                          { label: 'Avg. Stress', value: '5.2/10', pct: 52, status: 'On Track' },
+                          { label: 'Implementation', value: '34%', pct: 34, status: 'On Track' },
+                        ].map((item, i) => (
+                          <div key={i} className="text-center">
+                            <div className="relative w-14 h-14 md:w-16 md:h-16 mx-auto mb-1">
+                              <svg viewBox="0 0 36 36" className="w-full h-full">
+                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                                <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#14b8a6" strokeWidth="3" strokeDasharray={`${item.pct}, 100`} />
+                              </svg>
+                              <span style={{ color: '#14b8a6' }} className="absolute inset-0 flex items-center justify-center text-xs font-bold">{item.value}</span>
                             </div>
-                            <div className="w-full bg-gray-200 rounded-full h-1.5">
-                              <div className="bg-teal-500 h-1.5 rounded-full" style={{ width: '96%' }} />
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span style={{ color: '#6b7280' }} className="text-xs">Avg. Courses</span>
-                              <span style={{ color: '#1B2A4A' }} className="text-xs font-semibold">3.4</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-1.5">
-                              <div className="bg-teal-500 h-1.5 rounded-full" style={{ width: '68%' }} />
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span style={{ color: '#6b7280' }} className="text-xs">Avg. Stress</span>
-                              <span style={{ color: '#1B2A4A' }} className="text-xs font-semibold">5.4/10</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-1.5">
-                              <div className="bg-teal-500 h-1.5 rounded-full" style={{ width: '46%' }} />
-                            </div>
+                            <p style={{ color: '#6b7280' }} className="text-[10px]">{item.label}</p>
+                            <p style={{ color: '#14b8a6' }} className="text-[10px] font-medium">{item.status}</p>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Observation Day Status */}
+                      <div className="mb-4">
+                        <p style={{ color: '#14b8a6' }} className="text-xs font-medium">
+                          Observation Day: Completed ✓ - Personalized feedback delivered, follow-up coaching scheduled
+                        </p>
+                      </div>
+
+                      {/* TDI Note */}
+                      <div className="bg-gray-50 rounded-lg p-3 mb-5">
+                        <p style={{ color: '#374151' }} className="text-xs">
+                          <span className="font-semibold">TDI Note:</span> Most medals in the district (2 golds, 4 silvers). Ms. Rivera's PLC structure is a model we'd love to share with other buildings.
+                        </p>
+                      </div>
+
+                      {/* Teacher vs Para Split */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                        {/* Teachers Column */}
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-sm">👩‍🏫</span>
+                            <h4 style={{ color: '#1B2A4A' }} className="text-sm font-bold">Teachers</h4>
+                          </div>
+                          <p style={{ color: '#6b7280' }} className="text-xs mb-2">42/45 logged in (93%)</p>
+                          <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+                            <div className="bg-[#1B2A4A] h-2 rounded-full" style={{ width: '93%' }} />
+                          </div>
+
+                          {/* Teacher Donuts */}
+                          <div className="grid grid-cols-4 gap-2 mb-3">
+                            {[
+                              { label: 'Logins', value: '100%', pct: 100 },
+                              { label: 'Courses', value: '78%', pct: 78 },
+                              { label: 'Stress', value: '4.8', pct: 48 },
+                              { label: 'Impl.', value: '38%', pct: 38 },
+                            ].map((item, i) => (
+                              <div key={i} className="text-center">
+                                <div className="relative w-10 h-10 mx-auto mb-0.5">
+                                  <svg viewBox="0 0 36 36" className="w-full h-full">
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" strokeWidth="3.5" />
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#14b8a6" strokeWidth="3.5" strokeDasharray={`${item.pct}, 100`} />
+                                  </svg>
+                                  <span style={{ color: '#1B2A4A' }} className="absolute inset-0 flex items-center justify-center text-[9px] font-bold">{item.value}</span>
+                                </div>
+                                <p style={{ color: '#9ca3af' }} className="text-[9px]">{item.label}</p>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* What Teachers Are Exploring */}
+                          <p style={{ color: '#6b7280' }} className="text-[10px] font-medium mb-1">What Teachers Are Exploring:</p>
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            <span className="px-2 py-0.5 bg-gray-100 rounded text-[10px] text-gray-600">The Differentiation Fix</span>
+                            <span className="px-2 py-0.5 bg-gray-100 rounded text-[10px] text-gray-600">Small Group Mastery</span>
+                            <span className="px-2 py-0.5 bg-gray-100 rounded text-[10px] text-gray-600">Time Management</span>
+                          </div>
+
+                          {/* Teacher Names with Status Dots */}
+                          <div className="flex flex-wrap gap-x-2 gap-y-1">
+                            {['Emily W.', 'Robert J.', 'Michelle P.', 'Kevin D.', 'Patricia A.', 'Brian M.', 'Jessica L.'].map((name, i) => (
+                              <span key={i} className="flex items-center gap-1 text-[10px]" style={{ color: '#6b7280' }}>
+                                <span className="w-1.5 h-1.5 rounded-full bg-teal-500 inline-block" />
+                                {name}
+                              </span>
+                            ))}
+                            <span className="text-[10px]" style={{ color: '#9ca3af' }}>+35 more</span>
                           </div>
                         </div>
 
-                        {/* Paras */}
-                        <div className="bg-gray-50 rounded-lg p-3">
-                          <p style={{ color: '#1B2A4A' }} className="text-xs font-semibold mb-2">Paraprofessionals (12)</p>
-                          <div className="space-y-2">
-                            <div className="flex justify-between items-center">
-                              <span style={{ color: '#6b7280' }} className="text-xs">Hub Logins</span>
-                              <span style={{ color: '#1B2A4A' }} className="text-xs font-semibold">92%</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-1.5">
-                              <div className="bg-teal-500 h-1.5 rounded-full" style={{ width: '92%' }} />
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span style={{ color: '#6b7280' }} className="text-xs">Avg. Courses</span>
-                              <span style={{ color: '#1B2A4A' }} className="text-xs font-semibold">2.1</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-1.5">
-                              <div className="bg-[#FFBA06] h-1.5 rounded-full" style={{ width: '42%' }} />
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span style={{ color: '#6b7280' }} className="text-xs">Avg. Stress</span>
-                              <span style={{ color: '#1B2A4A' }} className="text-xs font-semibold">6.8/10</span>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-1.5">
-                              <div className="bg-[#FFBA06] h-1.5 rounded-full" style={{ width: '68%' }} />
-                            </div>
+                        {/* Paras Column */}
+                        <div>
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-sm">🤝</span>
+                            <h4 style={{ color: '#14b8a6' }} className="text-sm font-bold">Paras</h4>
+                          </div>
+                          <p style={{ color: '#6b7280' }} className="text-xs mb-2">15/20 logged in (75%)</p>
+                          <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+                            <div className="bg-teal-500 h-2 rounded-full" style={{ width: '75%' }} />
+                          </div>
+
+                          {/* Para Donuts */}
+                          <div className="grid grid-cols-4 gap-2 mb-3">
+                            {[
+                              { label: 'Logins', value: '85%', pct: 85 },
+                              { label: 'Courses', value: '58%', pct: 58 },
+                              { label: 'Stress', value: '5.9', pct: 59 },
+                              { label: 'Impl.', value: '26%', pct: 26 },
+                            ].map((item, i) => (
+                              <div key={i} className="text-center">
+                                <div className="relative w-10 h-10 mx-auto mb-0.5">
+                                  <svg viewBox="0 0 36 36" className="w-full h-full">
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" strokeWidth="3.5" />
+                                    <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#14b8a6" strokeWidth="3.5" strokeDasharray={`${item.pct}, 100`} />
+                                  </svg>
+                                  <span style={{ color: '#1B2A4A' }} className="absolute inset-0 flex items-center justify-center text-[9px] font-bold">{item.value}</span>
+                                </div>
+                                <p style={{ color: '#9ca3af' }} className="text-[9px]">{item.label}</p>
+                              </div>
+                            ))}
+                          </div>
+
+                          {/* What Paras Are Exploring */}
+                          <p style={{ color: '#6b7280' }} className="text-[10px] font-medium mb-1">What Paras Are Exploring:</p>
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            <span className="px-2 py-0.5 bg-teal-50 rounded text-[10px] text-teal-700">Teacher-Para Partnerships</span>
+                            <span className="px-2 py-0.5 bg-teal-50 rounded text-[10px] text-teal-700">Small-Group Instruction</span>
+                            <span className="px-2 py-0.5 bg-teal-50 rounded text-[10px] text-teal-700">De-Escalation</span>
+                          </div>
+
+                          {/* Para Names with Status Dots */}
+                          <div className="flex flex-wrap gap-x-2 gap-y-1">
+                            {['Carmen S.', 'Jose M.', 'Linda R.', 'Marcus T.', 'Derek W.', 'Yolanda J.'].map((name, i) => (
+                              <span key={i} className="flex items-center gap-1 text-[10px]" style={{ color: '#6b7280' }}>
+                                <span className={`w-1.5 h-1.5 rounded-full ${i < 4 ? 'bg-teal-500' : 'bg-gray-300'} inline-block`} />
+                                {name}
+                              </span>
+                            ))}
+                            <span className="text-[10px]" style={{ color: '#9ca3af' }}>+14 more</span>
                           </div>
                         </div>
                       </div>
 
-                      {/* Donut Charts Row */}
-                      <div className="grid grid-cols-3 gap-3">
-                        {/* Hub Login Donut */}
-                        <div className="text-center">
-                          <div className="relative w-16 h-16 mx-auto mb-1">
-                            <svg viewBox="0 0 36 36" className="w-16 h-16">
-                              <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" strokeWidth="3" />
-                              <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#14b8a6" strokeWidth="3" strokeDasharray="95, 100" />
-                            </svg>
-                            <span style={{ color: '#1B2A4A' }} className="absolute inset-0 flex items-center justify-center text-xs font-bold">95%</span>
-                          </div>
-                          <p style={{ color: '#6b7280' }} className="text-[10px]">Hub Logins</p>
-                        </div>
-
-                        {/* Course Completion Donut */}
-                        <div className="text-center">
-                          <div className="relative w-16 h-16 mx-auto mb-1">
-                            <svg viewBox="0 0 36 36" className="w-16 h-16">
-                              <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" strokeWidth="3" />
-                              <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#14b8a6" strokeWidth="3" strokeDasharray="72, 100" />
-                            </svg>
-                            <span style={{ color: '#1B2A4A' }} className="absolute inset-0 flex items-center justify-center text-xs font-bold">72%</span>
-                          </div>
-                          <p style={{ color: '#6b7280' }} className="text-[10px]">1+ Course</p>
-                        </div>
-
-                        {/* Implementation Donut */}
-                        <div className="text-center">
-                          <div className="relative w-16 h-16 mx-auto mb-1">
-                            <svg viewBox="0 0 36 36" className="w-16 h-16">
-                              <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" strokeWidth="3" />
-                              <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#14b8a6" strokeWidth="3" strokeDasharray="68, 100" />
-                            </svg>
-                            <span style={{ color: '#1B2A4A' }} className="absolute inset-0 flex items-center justify-center text-xs font-bold">68%</span>
-                          </div>
-                          <p style={{ color: '#6b7280' }} className="text-[10px]">Implementing</p>
-                        </div>
+                      {/* TDI Spotlight */}
+                      <div className="mt-5 bg-[#FFBA06]/5 border border-[#FFBA06]/20 rounded-lg p-3">
+                        <p style={{ color: '#92400e' }} className="text-xs">
+                          <span className="font-semibold">⭐ TDI Spotlight:</span> Harmony is your model building! Ms. Rivera's PLC structure is driving results across every metric. We'd love to have her share her approach at the Leadership Recap.
+                        </p>
                       </div>
                     </div>
 
-                    {/* Other buildings collapsed */}
+                    {/* ===== COLLAPSED BUILDINGS ===== */}
                     <div className="space-y-3">
-                      <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between">
-                        <div>
-                          <h3 style={{ color: '#1B2A4A' }} className="text-sm font-semibold">Crescendo Middle</h3>
-                          <p style={{ color: '#6b7280' }} className="text-xs">38 staff · 6-8</p>
+                      {[
+                        { name: 'Crescendo Middle', info: '38 staff · 6-8 · Champion: Mr. Okafor', dots: ['teal', 'teal', 'amber', 'teal'], pct: '91%' },
+                        { name: 'Melody Primary', info: '30 staff · PreK-2 · Champion: Mrs. Patel', dots: ['teal', 'amber', 'amber', 'amber'], pct: '85%' },
+                      ].map((bldg, i) => (
+                        <div key={i} className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between">
+                          <div>
+                            <h3 style={{ color: '#1B2A4A' }} className="text-sm font-semibold">{bldg.name}</h3>
+                            <p style={{ color: '#6b7280' }} className="text-xs">{bldg.info}</p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="flex gap-1.5">
+                              {bldg.dots.map((color, j) => (
+                                <div key={j} className={`w-2.5 h-2.5 rounded-full ${color === 'teal' ? 'bg-teal-500' : 'bg-[#FFBA06]'}`} />
+                              ))}
+                            </div>
+                            <span style={{ color: '#14b8a6' }} className="text-sm font-bold">{bldg.pct}</span>
+                          </div>
                         </div>
-                        <div className="flex gap-1.5">
-                          <div className="w-2.5 h-2.5 rounded-full bg-teal-500" />
-                          <div className="w-2.5 h-2.5 rounded-full bg-teal-500" />
-                          <div className="w-2.5 h-2.5 rounded-full bg-[#FFBA06]" />
-                          <div className="w-2.5 h-2.5 rounded-full bg-teal-500" />
-                        </div>
-                      </div>
-                      <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between">
-                        <div>
-                          <h3 style={{ color: '#1B2A4A' }} className="text-sm font-semibold">Melody Primary</h3>
-                          <p style={{ color: '#6b7280' }} className="text-xs">30 staff · PreK-2</p>
-                        </div>
-                        <div className="flex gap-1.5">
-                          <div className="w-2.5 h-2.5 rounded-full bg-teal-500" />
-                          <div className="w-2.5 h-2.5 rounded-full bg-[#FFBA06]" />
-                          <div className="w-2.5 h-2.5 rounded-full bg-[#FFBA06]" />
-                          <div className="w-2.5 h-2.5 rounded-full bg-[#FFBA06]" />
-                        </div>
-                      </div>
+                      ))}
                     </div>
                   </div>
                 </div>

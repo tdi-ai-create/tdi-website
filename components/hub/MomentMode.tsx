@@ -97,6 +97,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   const [noteText, setNoteText] = useState('');
   const [isSubmittingNote, setIsSubmittingNote] = useState(false);
   const [noteSent, setNoteSent] = useState(false);
+  const [showNoteForm, setShowNoteForm] = useState(false);
 
   // Access global Moment Mode context to suppress notifications
   const { setMomentModeActive } = useMomentMode();
@@ -246,6 +247,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
 
       setNoteSent(true);
       setNoteText('');
+      setShowNoteForm(false);
     } catch {
       // Silently fail - this is a safe space
     } finally {
@@ -267,9 +269,14 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
     return color + '1A'; // hex with 10% opacity
   };
 
+  // Get background color at 15% opacity for icon circle
+  const getIconBgColor = (color: string) => {
+    return color + '26'; // hex with 15% opacity
+  };
+
   return (
     <div
-      className="fixed inset-0 flex flex-col items-center justify-center p-4 animate-fade-in-overlay"
+      className="fixed top-0 left-0 right-0 bottom-0 w-screen h-screen flex flex-col items-center justify-center p-4 animate-fade-in-overlay overflow-hidden"
       style={{ backgroundColor: '#FAFAF8', zIndex: 9999 }}
     >
       {/* Global Timer Display - Top Center */}
@@ -486,12 +493,12 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
               className={`flex items-start gap-4 mb-6 ${affirmationSide === 'right' ? 'flex-row-reverse' : ''}`}
               style={{ animation: 'fadeIn 0.3s ease-out' }}
             >
-              {/* Person Icon in Colored Circle */}
+              {/* Person Icon in Colored Circle - background at 15% opacity, icon at full color */}
               <div
                 className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
-                style={{ backgroundColor: affirmationColor }}
+                style={{ backgroundColor: getIconBgColor(affirmationColor) }}
               >
-                <UserCircle size={24} className="text-white" />
+                <UserCircle size={24} style={{ color: affirmationColor }} />
               </div>
 
               {/* Speech Bubble */}
@@ -523,50 +530,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
 
             {/* Note to Team Section */}
             <div className="border-t border-gray-100 pt-6">
-              {!noteSent ? (
-                <>
-                  <p
-                    className="text-center mb-4"
-                    style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontSize: '13px',
-                      color: '#9CA3AF',
-                    }}
-                  >
-                    Need to talk? Send a note to the team.
-                  </p>
-                  <div className="space-y-3">
-                    <textarea
-                      value={noteText}
-                      onChange={(e) => setNoteText(e.target.value.slice(0, 500))}
-                      placeholder="What's on your mind?"
-                      className="w-full h-20 p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:border-[#E8B84B] text-sm"
-                      style={{ fontFamily: "'DM Sans', sans-serif" }}
-                    />
-                    <div className="flex justify-between items-center">
-                      <span
-                        className="text-xs"
-                        style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}
-                      >
-                        {noteText.length}/500
-                      </span>
-                      <button
-                        onClick={handleSubmitNote}
-                        disabled={!noteText.trim() || isSubmittingNote}
-                        className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        style={{
-                          border: '1px solid #D1D5DB',
-                          color: '#6B7280',
-                          fontFamily: "'DM Sans', sans-serif",
-                        }}
-                      >
-                        <Send size={14} />
-                        Send
-                      </button>
-                    </div>
-                  </div>
-                </>
-              ) : (
+              {noteSent ? (
                 <div className="text-center py-4">
                   <div className="flex items-center justify-center gap-2 mb-2">
                     <HeartIcon size={16} style={{ color: '#E8B84B' }} />
@@ -579,6 +543,57 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                     >
                       Sent. Someone from our team will read this.
                     </span>
+                  </div>
+                </div>
+              ) : !showNoteForm ? (
+                <p
+                  className="text-center"
+                  style={{
+                    fontFamily: "'DM Sans', sans-serif",
+                    fontSize: '13px',
+                    color: '#9CA3AF',
+                  }}
+                >
+                  Need to talk?{' '}
+                  <button
+                    onClick={() => setShowNoteForm(true)}
+                    className="underline hover:text-gray-600 transition-colors"
+                    style={{ color: '#9CA3AF' }}
+                  >
+                    Click here
+                  </button>{' '}
+                  to send a note to the team.
+                </p>
+              ) : (
+                <div className="space-y-3" style={{ animation: 'fadeIn 0.3s ease-out' }}>
+                  <textarea
+                    value={noteText}
+                    onChange={(e) => setNoteText(e.target.value.slice(0, 500))}
+                    placeholder="What's on your mind?"
+                    className="w-full h-20 p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:border-[#E8B84B] text-sm"
+                    style={{ fontFamily: "'DM Sans', sans-serif" }}
+                    autoFocus
+                  />
+                  <div className="flex justify-between items-center">
+                    <span
+                      className="text-xs"
+                      style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}
+                    >
+                      {noteText.length}/500
+                    </span>
+                    <button
+                      onClick={handleSubmitNote}
+                      disabled={!noteText.trim() || isSubmittingNote}
+                      className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{
+                        border: '1px solid #D1D5DB',
+                        color: '#6B7280',
+                        fontFamily: "'DM Sans', sans-serif",
+                      }}
+                    >
+                      <Send size={14} />
+                      Send
+                    </button>
                   </div>
                 </div>
               )}
