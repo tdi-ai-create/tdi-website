@@ -80,44 +80,55 @@ export const LEADERSHIP_PERMISSIONS = [
 /**
  * Check if a user has team access by userId or email
  * Returns the team member record or null if not found/inactive
+ * Uses an API route to bypass RLS issues with the anon client
  */
 export async function checkTeamAccess(userId: string, email: string): Promise<TeamMember | null> {
-  const supabase = getSupabase();
+  console.log('[TDI Admin] checkTeamAccess called with:', { userId, email });
 
-  // First try to find by user_id if set
-  const { data: byUserId } = await supabase
-    .from('tdi_team_members')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('is_active', true)
-    .single();
+  try {
+    // Use the API route which uses service role to bypass RLS
+    const response = await fetch('/api/tdi-admin/check-access', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, email }),
+    });
 
-  if (byUserId) {
-    return byUserId as TeamMember;
-  }
+    const result = await response.json();
+    console.log('[TDI Admin] API response:', { status: response.status, result });
 
-  // Fall back to email lookup
-  const { data, error } = await supabase
-    .from('tdi_team_members')
-    .select('*')
-    .eq('email', email.toLowerCase())
-    .eq('is_active', true)
-    .single();
+    if (!response.ok) {
+      console.error('[TDI Admin] Access check failed:', result);
+      return null;
+    }
 
-  if (error || !data) {
-    console.log('[TDI Admin] Team access check failed:', { userId, email, error });
+    if (result.member) {
+      console.log('[TDI Admin] Access granted for:', result.member.email, 'found by:', result.foundBy);
+      return result.member as TeamMember;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('[TDI Admin] Error calling check-access API:', error);
+
+    // Fallback: try direct query (might fail due to RLS)
+    const supabase = getSupabase();
+    const normalizedEmail = email.toLowerCase().trim();
+
+    const { data, error: queryError } = await supabase
+      .from('tdi_team_members')
+      .select('*')
+      .ilike('email', normalizedEmail)
+      .eq('is_active', true)
+      .single();
+
+    console.log('[TDI Admin] Fallback query result:', { data, error: queryError });
+
+    if (data) {
+      return data as TeamMember;
+    }
+
     return null;
   }
-
-  // Link the user_id if not already set
-  if (!data.user_id) {
-    await supabase
-      .from('tdi_team_members')
-      .update({ user_id: userId })
-      .eq('id', data.id);
-  }
-
-  return data as TeamMember;
 }
 
 /**

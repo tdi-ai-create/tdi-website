@@ -415,17 +415,27 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
 
     async function checkAuth() {
       try {
-        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        // Get session first to ensure it's loaded
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        console.log('[TDI Admin Layout] Session check:', { session: session ? 'exists' : 'null', sessionError });
+
+        // Then get user
+        const { data: { user: currentUser }, error: userError } = await supabase.auth.getUser();
+        console.log('[TDI Admin Layout] User check:', {
+          user: currentUser ? { id: currentUser.id, email: currentUser.email } : 'null',
+          userError
+        });
 
         if (!currentUser) {
-          // Not logged in - redirect to admin login
+          console.log('[TDI Admin Layout] No user found, redirecting to login');
           router.push('/tdi-admin/login');
           return;
         }
 
+        console.log('[TDI Admin Layout] Setting user:', { id: currentUser.id, email: currentUser.email });
         setUser(currentUser);
       } catch (err) {
-        console.error('Auth check error:', err);
+        console.error('[TDI Admin Layout] Auth check error:', err);
         router.push('/tdi-admin/login');
       }
       setIsLoading(false);
