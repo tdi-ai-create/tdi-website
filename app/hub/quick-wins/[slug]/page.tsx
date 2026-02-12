@@ -72,12 +72,15 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
       setIsLoading(true);
 
       try {
+        console.log('[QuickWinDetail] Fetching quick win with slug:', slug);
         const { data, error } = await supabase
-          .from('hub_lessons')
-          .select('id, slug, title, description, content, category, estimated_minutes, content_type, video_url, download_url')
+          .from('hub_quick_wins')
+          .select('id, slug, title, description, content, category, quick_win_type, duration_minutes, download_url')
           .eq('slug', slug)
-          .eq('is_quick_win', true)
+          .eq('is_published', true)
           .single();
+
+        console.log('[QuickWinDetail] Result:', { data, error });
 
         if (error || !data) {
           console.error('Error fetching quick win:', error);
@@ -85,7 +88,21 @@ export default function QuickWinPage({ params }: QuickWinPageProps) {
           return;
         }
 
-        setQuickWin(data as QuickWin);
+        // Map hub_quick_wins fields to QuickWin interface
+        const quickWinData: QuickWin = {
+          id: data.id,
+          slug: data.slug,
+          title: data.title,
+          description: data.description,
+          content: data.content,
+          category: data.category,
+          estimated_minutes: data.duration_minutes || 5,
+          content_type: data.quick_win_type || 'activity',
+          video_url: null, // hub_quick_wins doesn't have video_url
+          download_url: data.download_url,
+        };
+
+        setQuickWin(quickWinData);
         setStartTime(new Date());
       } catch (error) {
         console.error('Error loading quick win:', error);

@@ -102,3 +102,18 @@ DROP POLICY IF EXISTS "Anyone can view modules" ON hub_modules;
 CREATE POLICY "Anyone can view modules"
 ON hub_modules FOR SELECT
 USING (true);
+
+-- ============================================
+-- hub_quick_wins - Public Read Access
+-- ============================================
+
+-- Enable RLS on hub_quick_wins (if not already enabled)
+ALTER TABLE hub_quick_wins ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policies if they exist
+DROP POLICY IF EXISTS "Anyone can view published quick wins" ON hub_quick_wins;
+
+-- Anyone can view published quick wins
+CREATE POLICY "Anyone can view published quick wins"
+ON hub_quick_wins FOR SELECT
+USING (is_published = true);

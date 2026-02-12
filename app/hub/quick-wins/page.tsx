@@ -24,7 +24,7 @@ interface QuickWin {
   category: string;
   estimated_minutes: number;
   content_type: 'download' | 'activity' | 'video';
-  course_slug: string;
+  course_slug?: string;
 }
 
 export default function QuickWinsPage() {
@@ -38,37 +38,30 @@ export default function QuickWinsPage() {
       setIsLoading(true);
 
       try {
-        // Fetch all quick wins from published courses
-        const { data } = await supabase
-          .from('hub_lessons')
-          .select(`
-            id,
-            slug,
-            title,
-            description,
-            category,
-            estimated_minutes,
-            content_type,
-            course:hub_courses!inner(slug, is_published)
-          `)
-          .eq('is_quick_win', true)
-          .eq('hub_courses.is_published', true)
+        // Fetch all published quick wins from hub_quick_wins table
+        console.log('[QuickWins] Fetching from hub_quick_wins...');
+        const { data, error } = await supabase
+          .from('hub_quick_wins')
+          .select('*')
+          .eq('is_published', true)
           .order('created_at', { ascending: false });
 
+        console.log('[QuickWins] Result:', { data, error, count: data?.length });
+
+        if (error) {
+          console.error('[QuickWins] Query error:', error);
+        }
+
         if (data) {
-          const formattedQuickWins: QuickWin[] = data.map((qw) => {
-            const courseData = qw.course as { slug: string } | { slug: string }[] | null;
-            return {
-              id: qw.id,
-              slug: qw.slug,
-              title: qw.title,
-              description: qw.description || '',
-              category: qw.category || 'Classroom Tools',
-              estimated_minutes: qw.estimated_minutes || 5,
-              content_type: qw.content_type || 'activity',
-              course_slug: Array.isArray(courseData) ? courseData[0]?.slug : courseData?.slug || '',
-            };
-          });
+          const formattedQuickWins: QuickWin[] = data.map((qw) => ({
+            id: qw.id,
+            slug: qw.slug,
+            title: qw.title,
+            description: qw.description || '',
+            category: qw.category || 'Classroom Tools',
+            estimated_minutes: qw.duration_minutes || 5,
+            content_type: qw.quick_win_type || 'activity',
+          }));
           setQuickWins(formattedQuickWins);
         }
       } catch (error) {
