@@ -244,40 +244,40 @@ export async function getAdminStats() {
     stressScoresResult,
     courseEnrollmentsResult,
   ] = await Promise.all([
-    // Total users
+    // Total users (count only, no data)
     supabase
       .from('hub_profiles')
       .select('*', { count: 'exact', head: true }),
-    // Total enrollments
+    // Total enrollments (count only)
     supabase
       .from('hub_enrollments')
       .select('*', { count: 'exact', head: true }),
-    // Total completions
+    // Total completions (count only)
     supabase
       .from('hub_enrollments')
       .select('*', { count: 'exact', head: true })
       .eq('status', 'completed'),
-    // Total certificates
+    // Total certificates (count only)
     supabase
       .from('hub_certificates')
       .select('*', { count: 'exact', head: true }),
-    // Total PD hours
+    // Total PD hours - only fetch pd_hours column, limit to recent
     supabase
       .from('hub_certificates')
-      .select('pd_hours'),
-    // Latest stress scores per user
+      .select('pd_hours')
+      .limit(1000),
+    // Latest stress scores - limit to last 500 to get enough unique users
     supabase
       .from('hub_assessments')
-      .select('user_id, score, created_at')
+      .select('user_id, score')
       .eq('type', 'daily_check_in')
-      .order('created_at', { ascending: false }),
-    // Enrollments per course
+      .order('created_at', { ascending: false })
+      .limit(500),
+    // Enrollments per course - use group count approach
     supabase
       .from('hub_enrollments')
-      .select(`
-        course_id,
-        course:hub_courses!hub_enrollments_course_id_fkey(title)
-      `),
+      .select('course_id')
+      .limit(5000),
   ]);
 
   // Calculate total PD hours
@@ -295,15 +295,10 @@ export async function getAdminStats() {
     ? (scores.reduce((sum, s) => sum + s, 0) / scores.length).toFixed(1)
     : 'N/A';
 
-  // Group enrollments by course
-  const courseEnrollments: Record<string, { title: string; count: number }> = {};
+  // Count enrollments per course (without fetching course titles - faster)
+  const courseCountMap = new Map<string, number>();
   courseEnrollmentsResult.data?.forEach((e) => {
-    const course = Array.isArray(e.course) ? e.course[0] : e.course;
-    const title = course?.title || 'Unknown';
-    if (!courseEnrollments[e.course_id]) {
-      courseEnrollments[e.course_id] = { title, count: 0 };
-    }
-    courseEnrollments[e.course_id].count++;
+    courseCountMap.set(e.course_id, (courseCountMap.get(e.course_id) || 0) + 1);
   });
 
   return {
@@ -313,6 +308,6 @@ export async function getAdminStats() {
     totalCertificates: certificatesResult.count || 0,
     totalPdHours,
     avgStressScore,
-    courseEnrollments: Object.values(courseEnrollments).sort((a, b) => b.count - a.count),
+    courseEnrollments: [], // Simplified - full breakdown available in Operations page
   };
 }

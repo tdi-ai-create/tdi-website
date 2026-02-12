@@ -83,50 +83,21 @@ export const LEADERSHIP_PERMISSIONS = [
  * Uses an API route to bypass RLS issues with the anon client
  */
 export async function checkTeamAccess(userId: string, email: string): Promise<TeamMember | null> {
-  console.log('[TDI Admin] checkTeamAccess called with:', { userId, email });
-
   try {
-    // Use the API route which uses service role to bypass RLS
     const response = await fetch('/api/tdi-admin/check-access', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ userId, email }),
     });
 
-    const result = await response.json();
-    console.log('[TDI Admin] API response:', { status: response.status, result });
-
     if (!response.ok) {
-      console.error('[TDI Admin] Access check failed:', result);
       return null;
     }
 
-    if (result.member) {
-      console.log('[TDI Admin] Access granted for:', result.member.email, 'found by:', result.foundBy);
-      return result.member as TeamMember;
-    }
-
-    return null;
+    const result = await response.json();
+    return result.member as TeamMember || null;
   } catch (error) {
-    console.error('[TDI Admin] Error calling check-access API:', error);
-
-    // Fallback: try direct query (might fail due to RLS)
-    const supabase = getSupabase();
-    const normalizedEmail = email.toLowerCase().trim();
-
-    const { data, error: queryError } = await supabase
-      .from('tdi_team_members')
-      .select('*')
-      .ilike('email', normalizedEmail)
-      .eq('is_active', true)
-      .single();
-
-    console.log('[TDI Admin] Fallback query result:', { data, error: queryError });
-
-    if (data) {
-      return data as TeamMember;
-    }
-
+    console.error('[TDI Admin] Error checking access:', error);
     return null;
   }
 }

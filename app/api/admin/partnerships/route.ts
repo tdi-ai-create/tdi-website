@@ -27,45 +27,54 @@ function getServiceSupabase() {
 // GET - Fetch all partnerships with stats
 export async function GET(request: NextRequest) {
   try {
-    const authHeader = request.headers.get('authorization');
     const email = request.headers.get('x-user-email');
 
     if (!email || !await isTDIAdmin(email)) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const [partnerships, stats] = await Promise.all([
+    const supabase = getServiceSupabase();
+
+    // Fetch all data in parallel with single queries (no N+1!)
+    const [partnershipsResult, statsResult, orgsResult, staffCountsResult] = await Promise.all([
       getAllPartnerships(),
       getPartnershipStats(),
+      // Single query for all organizations
+      supabase
+        .from('organizations')
+        .select('partnership_id, name'),
+      // Single query for staff counts grouped by partnership
+      supabase
+        .from('staff_members')
+        .select('partnership_id'),
     ]);
 
-    // Enrich partnerships with organization data
-    const supabase = getServiceSupabase();
-    const enrichedPartnerships = await Promise.all(
-      partnerships.map(async (p) => {
-        const { data: org } = await supabase
-          .from('organizations')
-          .select('name')
-          .eq('partnership_id', p.id)
-          .maybeSingle();
+    // Build lookup maps for O(1) access
+    const orgMap = new Map<string, string>();
+    orgsResult.data?.forEach(org => {
+      if (org.partnership_id) {
+        orgMap.set(org.partnership_id, org.name);
+      }
+    });
 
-        const { count: staffCount } = await supabase
-          .from('staff_members')
-          .select('*', { count: 'exact', head: true })
-          .eq('partnership_id', p.id);
+    const staffCountMap = new Map<string, number>();
+    staffCountsResult.data?.forEach(staff => {
+      if (staff.partnership_id) {
+        staffCountMap.set(staff.partnership_id, (staffCountMap.get(staff.partnership_id) || 0) + 1);
+      }
+    });
 
-        return {
-          ...p,
-          org_name: org?.name || null,
-          staff_count: staffCount || 0,
-        };
-      })
-    );
+    // Enrich partnerships using maps (O(n) instead of O(n*2))
+    const enrichedPartnerships = partnershipsResult.map(p => ({
+      ...p,
+      org_name: orgMap.get(p.id) || null,
+      staff_count: staffCountMap.get(p.id) || 0,
+    }));
 
     return NextResponse.json({
       success: true,
       partnerships: enrichedPartnerships,
-      stats,
+      stats: statsResult,
     });
   } catch (error) {
     console.error('Error fetching partnerships:', error);
