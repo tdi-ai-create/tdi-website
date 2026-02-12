@@ -187,50 +187,149 @@ function AdminNavbar() {
   );
 }
 
-function AccessDenied() {
+function MinimalAdminHeader() {
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4"
-      style={{ backgroundColor: '#FAFAF8' }}
+    <header
+      className="sticky top-0 z-50"
+      style={{ backgroundColor: '#2B3A67' }}
     >
-      <div className="text-center max-w-md">
-        <div
-          className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center"
-          style={{ backgroundColor: '#FEE2E2' }}
-        >
-          <ShieldAlert size={32} style={{ color: '#DC2626' }} />
+      <div className="max-w-[1400px] mx-auto px-4 md:px-6">
+        <div className="flex items-center h-16">
+          <Link href="/tdi-admin" className="flex items-center gap-2">
+            <img
+              src="/images/tdi-logo-mark.png"
+              alt="TDI"
+              className="h-8 w-8"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+            <span
+              className="font-bold text-lg"
+              style={{
+                fontFamily: "'DM Sans', sans-serif",
+                color: '#E8B84B',
+              }}
+            >
+              ADMIN PORTAL
+            </span>
+          </Link>
         </div>
-        <h1
-          className="font-bold mb-3"
-          style={{
-            fontFamily: "'Source Serif 4', Georgia, serif",
-            fontSize: '24px',
-            color: '#2B3A67',
-          }}
-        >
-          Access Denied
-        </h1>
-        <p
-          className="mb-6"
-          style={{
-            fontFamily: "'DM Sans', sans-serif",
-            fontSize: '15px',
-            color: '#6B7280',
-          }}
-        >
-          You don&apos;t have access to the TDI Admin Portal. Contact your TDI administrator if you believe this is an error.
-        </p>
-        <Link
-          href="/hub"
-          className="inline-block px-6 py-3 rounded-lg font-medium transition-colors"
-          style={{
-            backgroundColor: '#E8B84B',
-            color: '#2B3A67',
-            fontFamily: "'DM Sans', sans-serif",
-          }}
-        >
-          Go to Learning Hub
-        </Link>
+      </div>
+    </header>
+  );
+}
+
+function AccessDenied({ userEmail }: { userEmail?: string }) {
+  const router = useRouter();
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/hub/login');
+  };
+
+  return (
+    <div className="min-h-screen" style={{ backgroundColor: '#FAFAF8' }}>
+      <MinimalAdminHeader />
+      <div className="flex items-center justify-center p-4" style={{ minHeight: 'calc(100vh - 64px)' }}>
+        <div className="text-center max-w-md">
+          <div
+            className="w-16 h-16 rounded-full mx-auto mb-6 flex items-center justify-center"
+            style={{ backgroundColor: '#FEE2E2' }}
+          >
+            <ShieldAlert size={32} style={{ color: '#DC2626' }} />
+          </div>
+          <h1
+            className="font-bold mb-3"
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              fontSize: '24px',
+              color: '#2B3A67',
+            }}
+          >
+            Access Denied
+          </h1>
+          <p
+            className="mb-4"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '15px',
+              color: '#6B7280',
+            }}
+          >
+            You don&apos;t have access to the TDI Admin Portal. Contact your TDI administrator if you believe this is an error.
+          </p>
+
+          {/* User info section */}
+          {userEmail ? (
+            <div
+              className="mb-6 py-3 px-4 rounded-lg"
+              style={{ backgroundColor: '#F3F4F6' }}
+            >
+              <p
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '14px',
+                  color: '#6B7280',
+                }}
+              >
+                You are signed in as: <strong style={{ color: '#374151' }}>{userEmail}</strong>
+              </p>
+              <button
+                onClick={handleSignOut}
+                className="mt-2 text-sm underline hover:no-underline"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  color: '#2B3A67',
+                }}
+              >
+                Sign in with a different account
+              </button>
+            </div>
+          ) : (
+            <div
+              className="mb-6 py-3 px-4 rounded-lg"
+              style={{ backgroundColor: '#F3F4F6' }}
+            >
+              <p
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontSize: '14px',
+                  color: '#6B7280',
+                }}
+              >
+                You are not signed in.
+              </p>
+            </div>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            {!userEmail && (
+              <Link
+                href="/hub/login?redirect=/tdi-admin"
+                className="inline-block px-6 py-3 rounded-lg font-medium transition-colors"
+                style={{
+                  backgroundColor: '#E8B84B',
+                  color: '#2B3A67',
+                  fontFamily: "'DM Sans', sans-serif",
+                }}
+              >
+                Sign In
+              </Link>
+            )}
+            <Link
+              href="/hub"
+              className="inline-block px-6 py-3 rounded-lg font-medium transition-colors"
+              style={{
+                backgroundColor: userEmail ? '#E8B84B' : '#F3F4F6',
+                color: userEmail ? '#2B3A67' : '#374151',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              Go to Learning Hub
+            </Link>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -282,7 +381,7 @@ function AdminLayoutContent({ children }: { children: React.ReactNode }) {
 
   // No access
   if (!hasAccess) {
-    return <AccessDenied />;
+    return <AccessDenied userEmail={user?.email} />;
   }
 
   return (
