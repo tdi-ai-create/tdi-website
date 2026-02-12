@@ -564,10 +564,10 @@ export default function HubLoginPage() {
                         <button
                           type="submit"
                           disabled={isLoading || !email || !password || (view === 'signup' && !confirmPassword)}
-                          className="w-full font-medium rounded-lg transition-colors disabled:cursor-not-allowed"
+                          className="w-full font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-105"
                           style={{
                             height: '48px',
-                            backgroundColor: isLoading || !email || !password || (view === 'signup' && !confirmPassword) ? 'rgba(232, 184, 75, 0.5)' : '#E8B84B',
+                            backgroundColor: '#E8B84B',
                             color: '#2B3A67',
                             fontFamily: "'DM Sans', sans-serif",
                             borderRadius: '8px',
@@ -659,10 +659,10 @@ export default function HubLoginPage() {
                         <button
                           type="submit"
                           disabled={isLoading || !email}
-                          className="w-full font-medium rounded-lg transition-colors disabled:cursor-not-allowed"
+                          className="w-full font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-105"
                           style={{
                             height: '48px',
-                            backgroundColor: isLoading || !email ? 'rgba(232, 184, 75, 0.5)' : '#E8B84B',
+                            backgroundColor: '#E8B84B',
                             color: '#2B3A67',
                             fontFamily: "'DM Sans', sans-serif",
                             borderRadius: '8px',
@@ -737,9 +737,9 @@ export default function HubLoginPage() {
                       <button
                         type="submit"
                         disabled={isLoading || !email}
-                        className="w-full font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full font-semibold rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed hover:brightness-105"
                         style={{
-                          height: '44px',
+                          height: '48px',
                           backgroundColor: '#E8B84B',
                           color: '#2B3A67',
                           fontFamily: "'DM Sans', sans-serif",

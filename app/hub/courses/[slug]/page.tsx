@@ -723,9 +723,9 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
             </ul>
           </div>
 
-          {/* Enroll CTA (mobile sticky or sidebar) */}
+          {/* Enroll CTA (sidebar on desktop) */}
           {!isEnrolled && (
-            <div className="hub-card" style={{ backgroundColor: '#FFF8E7', border: 'none' }}>
+            <div className="hidden lg:block hub-card" style={{ backgroundColor: '#FFF8E7', border: 'none' }}>
               <p
                 className="text-sm text-gray-600 mb-4"
                 style={{ fontFamily: "'DM Sans', sans-serif" }}
@@ -748,6 +748,29 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
           )}
         </div>
       </div>
+
+      {/* Mobile Sticky Enroll Button */}
+      {!isEnrolled && (
+        <div
+          className="lg:hidden fixed bottom-0 left-0 right-0 p-4 bg-white border-t shadow-lg"
+          style={{ borderColor: '#E5E5E5' }}
+        >
+          <button
+            onClick={handleEnroll}
+            disabled={isEnrolling || !user}
+            className="w-full py-4 rounded-lg font-medium transition-colors disabled:opacity-50"
+            style={{
+              backgroundColor: '#E8B84B',
+              color: '#2B3A67',
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '16px',
+              minHeight: '52px',
+            }}
+          >
+            {isEnrolling ? 'Enrolling...' : !user ? 'Sign in to Enroll' : 'Enroll in Course'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

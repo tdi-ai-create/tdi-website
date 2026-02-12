@@ -359,7 +359,6 @@ export default function PartnerDashboard() {
   const [copiedLink, setCopiedLink] = useState(false);
   const [snoozePickerItemId, setSnoozePickerItemId] = useState<string | null>(null);
   const [recentlyResurfacedIds, setRecentlyResurfacedIds] = useState<string[]>([]);
-  const [hoveredEquationCard, setHoveredEquationCard] = useState<number | null>(null);
   const [activeMilestoneTooltip, setActiveMilestoneTooltip] = useState<string | null>(null);
 
   // Cross-tab navigation helper
