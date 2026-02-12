@@ -3317,100 +3317,119 @@ export default function PartnerDashboard() {
             {/* The TDI Equation - Interactive Cards with Smooth Expansion */}
             <div className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-200">
               <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4 md:mb-6 text-center">The TDI Equation</h2>
-              <div className="flex flex-col md:flex-row items-stretch gap-3">
-                {/* Strong Teachers Card */}
-                <div
-                  className={`rounded-xl p-5 cursor-pointer transition-all duration-500 ease-in-out ${
-                    hoveredEquationCard === 0
-                      ? 'md:flex-[1.4] bg-[#1B2A4A] shadow-xl'
-                      : hoveredEquationCard !== null
-                        ? 'md:flex-[0.8] opacity-70 bg-gray-50 shadow-sm border-b-2 border-dashed border-gray-200'
-                        : 'md:flex-1 bg-gray-50 shadow-sm border-b-2 border-dashed border-gray-200'
-                  }`}
-                  onMouseEnter={() => setHoveredEquationCard(0)}
-                  onMouseLeave={() => setHoveredEquationCard(null)}
-                >
-                  <div className="flex flex-col items-center text-center">
-                    <BookOpen className={`w-8 h-8 mb-2 transition-colors duration-500 ${
-                      hoveredEquationCard === 0 ? 'text-white' : 'text-[#1B2A4A]'
-                    }`} />
-                    <h3 className={`text-sm font-semibold transition-colors duration-500 ${
-                      hoveredEquationCard === 0 ? 'text-white' : 'text-[#1e2749]'
-                    }`}>Strong Teachers</h3>
-                    <p className={`text-xs mt-1.5 transition-colors duration-500 ${
-                      hoveredEquationCard === 0 ? 'text-gray-300' : 'text-gray-500'
-                    }`}>Practical strategies</p>
-                    <p className={`text-sm mt-3 text-gray-200 transition-all duration-500 ease-in-out overflow-hidden ${
-                      hoveredEquationCard === 0 ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
-                    }`}>
-                      Practical strategies from the Learning Hub, tailored to your classrooms and tested by real educators.
-                    </p>
+              <div className="bg-gray-50/50 rounded-xl p-4">
+                <div className="flex flex-col md:flex-row items-stretch gap-2">
+                  {/* Strong Teachers Card */}
+                  <div
+                    className={`rounded-xl p-5 cursor-pointer transition-all duration-500 ease-in-out border ${
+                      hoveredEquationCard === 0
+                        ? 'md:flex-[1.3] bg-[#1B2A4A] shadow-lg border-[#1B2A4A]'
+                        : hoveredEquationCard !== null
+                          ? 'md:flex-[0.85] bg-white shadow-sm border-gray-100'
+                          : 'md:flex-1 bg-white shadow-sm border-gray-100'
+                    }`}
+                    onMouseEnter={() => setHoveredEquationCard(0)}
+                    onMouseLeave={() => setHoveredEquationCard(null)}
+                  >
+                    <div className="flex flex-col items-center text-center gap-2">
+                      <BookOpen className={`w-7 h-7 transition-colors duration-500 ${
+                        hoveredEquationCard === 0 ? 'text-white' : 'text-[#1B2A4A]'
+                      }`} />
+                      <h3 className={`text-sm font-semibold transition-colors duration-500 ${
+                        hoveredEquationCard === 0 ? 'text-white' : 'text-[#1e2749]'
+                      }`}>Strong Teachers</h3>
+                      <p className={`text-xs transition-colors duration-500 ${
+                        hoveredEquationCard === 0 ? 'text-gray-300' : 'text-gray-500'
+                      }`}>Practical strategies</p>
+                      {/* Desktop: show on hover */}
+                      <p className={`text-xs text-gray-300 mt-2 leading-relaxed transition-all duration-500 ease-in-out overflow-hidden hidden md:block ${
+                        hoveredEquationCard === 0 ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+                      }`}>
+                        Practical strategies from the Learning Hub, tailored to your classrooms and tested by real educators.
+                      </p>
+                      {/* Mobile: always show */}
+                      <p className="text-xs text-gray-500 mt-2 leading-relaxed md:hidden">
+                        Practical strategies from the Learning Hub, tailored to your classrooms and tested by real educators.
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                <ArrowRight className="w-5 h-5 text-gray-300 hidden md:block flex-shrink-0 self-center" />
-                <ArrowRight className="w-5 h-5 text-gray-300 rotate-90 md:hidden self-center" />
+                  {/* Yellow Chevron Connector */}
+                  <ChevronRight className="w-5 h-5 text-[#FFBA06] hidden md:block flex-shrink-0 self-center mx-1" />
+                  <ChevronDown className="w-5 h-5 text-[#FFBA06] md:hidden self-center my-1" />
 
-                {/* Strong Support Card */}
-                <div
-                  className={`rounded-xl p-5 cursor-pointer transition-all duration-500 ease-in-out ${
-                    hoveredEquationCard === 1
-                      ? 'md:flex-[1.4] bg-[#1B2A4A] shadow-xl'
-                      : hoveredEquationCard !== null
-                        ? 'md:flex-[0.8] opacity-70 bg-gray-50 shadow-sm border-b-2 border-dashed border-gray-200'
-                        : 'md:flex-1 bg-gray-50 shadow-sm border-b-2 border-dashed border-gray-200'
-                  }`}
-                  onMouseEnter={() => setHoveredEquationCard(1)}
-                  onMouseLeave={() => setHoveredEquationCard(null)}
-                >
-                  <div className="flex flex-col items-center text-center">
-                    <Users className={`w-8 h-8 mb-2 transition-colors duration-500 ${
-                      hoveredEquationCard === 1 ? 'text-white' : 'text-[#1B2A4A]'
-                    }`} />
-                    <h3 className={`text-sm font-semibold transition-colors duration-500 ${
-                      hoveredEquationCard === 1 ? 'text-white' : 'text-[#1e2749]'
-                    }`}>Strong Support</h3>
-                    <p className={`text-xs mt-1.5 transition-colors duration-500 ${
-                      hoveredEquationCard === 1 ? 'text-gray-300' : 'text-gray-500'
-                    }`}>Coaching & community</p>
-                    <p className={`text-sm mt-3 text-gray-200 transition-all duration-500 ease-in-out overflow-hidden ${
-                      hoveredEquationCard === 1 ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
-                    }`}>
-                      Ongoing coaching, Love Notes, observation feedback, and a community of 87,000+ educators.
-                    </p>
+                  {/* Strong Support Card */}
+                  <div
+                    className={`rounded-xl p-5 cursor-pointer transition-all duration-500 ease-in-out border ${
+                      hoveredEquationCard === 1
+                        ? 'md:flex-[1.3] bg-[#1B2A4A] shadow-lg border-[#1B2A4A]'
+                        : hoveredEquationCard !== null
+                          ? 'md:flex-[0.85] bg-white shadow-sm border-gray-100'
+                          : 'md:flex-1 bg-white shadow-sm border-gray-100'
+                    }`}
+                    onMouseEnter={() => setHoveredEquationCard(1)}
+                    onMouseLeave={() => setHoveredEquationCard(null)}
+                  >
+                    <div className="flex flex-col items-center text-center gap-2">
+                      <Users className={`w-7 h-7 transition-colors duration-500 ${
+                        hoveredEquationCard === 1 ? 'text-white' : 'text-[#1B2A4A]'
+                      }`} />
+                      <h3 className={`text-sm font-semibold transition-colors duration-500 ${
+                        hoveredEquationCard === 1 ? 'text-white' : 'text-[#1e2749]'
+                      }`}>Strong Support</h3>
+                      <p className={`text-xs transition-colors duration-500 ${
+                        hoveredEquationCard === 1 ? 'text-gray-300' : 'text-gray-500'
+                      }`}>Coaching & community</p>
+                      {/* Desktop: show on hover */}
+                      <p className={`text-xs text-gray-300 mt-2 leading-relaxed transition-all duration-500 ease-in-out overflow-hidden hidden md:block ${
+                        hoveredEquationCard === 1 ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+                      }`}>
+                        Ongoing coaching, Love Notes, observation feedback, and a community of 87,000+ educators.
+                      </p>
+                      {/* Mobile: always show */}
+                      <p className="text-xs text-gray-500 mt-2 leading-relaxed md:hidden">
+                        Ongoing coaching, Love Notes, observation feedback, and a community of 87,000+ educators.
+                      </p>
+                    </div>
                   </div>
-                </div>
 
-                <ArrowRight className="w-5 h-5 text-gray-300 hidden md:block flex-shrink-0 self-center" />
-                <ArrowRight className="w-5 h-5 text-gray-300 rotate-90 md:hidden self-center" />
+                  {/* Yellow Chevron Connector */}
+                  <ChevronRight className="w-5 h-5 text-[#FFBA06] hidden md:block flex-shrink-0 self-center mx-1" />
+                  <ChevronDown className="w-5 h-5 text-[#FFBA06] md:hidden self-center my-1" />
 
-                {/* Student Success Card */}
-                <div
-                  className={`rounded-xl p-5 cursor-pointer transition-all duration-500 ease-in-out ${
-                    hoveredEquationCard === 2
-                      ? 'md:flex-[1.4] bg-[#1B2A4A] shadow-xl'
-                      : hoveredEquationCard !== null
-                        ? 'md:flex-[0.8] opacity-70 bg-gray-50 shadow-sm border-b-2 border-dashed border-gray-200'
-                        : 'md:flex-1 bg-gray-50 shadow-sm border-b-2 border-dashed border-gray-200'
-                  }`}
-                  onMouseEnter={() => setHoveredEquationCard(2)}
-                  onMouseLeave={() => setHoveredEquationCard(null)}
-                >
-                  <div className="flex flex-col items-center text-center">
-                    <TrendingUp className={`w-8 h-8 mb-2 transition-colors duration-500 ${
-                      hoveredEquationCard === 2 ? 'text-white' : 'text-[#1B2A4A]'
-                    }`} />
-                    <h3 className={`text-sm font-semibold transition-colors duration-500 ${
-                      hoveredEquationCard === 2 ? 'text-white' : 'text-[#1e2749]'
-                    }`}>Student Success</h3>
-                    <p className={`text-xs mt-1.5 transition-colors duration-500 ${
-                      hoveredEquationCard === 2 ? 'text-gray-300' : 'text-gray-500'
-                    }`}>Better outcomes</p>
-                    <p className={`text-sm mt-3 text-gray-200 transition-all duration-500 ease-in-out overflow-hidden ${
-                      hoveredEquationCard === 2 ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
-                    }`}>
-                      When teachers thrive, students thrive. Better engagement, stronger relationships, measurable growth.
-                    </p>
+                  {/* Student Success Card */}
+                  <div
+                    className={`rounded-xl p-5 cursor-pointer transition-all duration-500 ease-in-out border ${
+                      hoveredEquationCard === 2
+                        ? 'md:flex-[1.3] bg-[#1B2A4A] shadow-lg border-[#1B2A4A]'
+                        : hoveredEquationCard !== null
+                          ? 'md:flex-[0.85] bg-white shadow-sm border-gray-100'
+                          : 'md:flex-1 bg-white shadow-sm border-gray-100'
+                    }`}
+                    onMouseEnter={() => setHoveredEquationCard(2)}
+                    onMouseLeave={() => setHoveredEquationCard(null)}
+                  >
+                    <div className="flex flex-col items-center text-center gap-2">
+                      <TrendingUp className={`w-7 h-7 transition-colors duration-500 ${
+                        hoveredEquationCard === 2 ? 'text-white' : 'text-[#1B2A4A]'
+                      }`} />
+                      <h3 className={`text-sm font-semibold transition-colors duration-500 ${
+                        hoveredEquationCard === 2 ? 'text-white' : 'text-[#1e2749]'
+                      }`}>Student Success</h3>
+                      <p className={`text-xs transition-colors duration-500 ${
+                        hoveredEquationCard === 2 ? 'text-gray-300' : 'text-gray-500'
+                      }`}>Better outcomes</p>
+                      {/* Desktop: show on hover */}
+                      <p className={`text-xs text-gray-300 mt-2 leading-relaxed transition-all duration-500 ease-in-out overflow-hidden hidden md:block ${
+                        hoveredEquationCard === 2 ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'
+                      }`}>
+                        When teachers thrive, students thrive. Better engagement, stronger relationships, measurable growth.
+                      </p>
+                      {/* Mobile: always show */}
+                      <p className="text-xs text-gray-500 mt-2 leading-relaxed md:hidden">
+                        When teachers thrive, students thrive. Better engagement, stronger relationships, measurable growth.
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
