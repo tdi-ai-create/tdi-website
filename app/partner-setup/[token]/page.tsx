@@ -77,19 +77,36 @@ function PartnerSetupContent() {
     }
   };
 
-  // Load partnership by token
+  // Load partnership by token AND check for existing session (Google OAuth return)
   useEffect(() => {
-    const loadPartnership = async () => {
+    const loadPartnershipAndCheckSession = async () => {
       try {
+        // First, load partnership data
         const response = await fetch(`/api/partner-setup/${token}`);
         const data = await response.json();
 
-        if (data.success && data.partnership) {
-          setPartnership(data.partnership);
-          setEmail(data.partnership.contact_email);
-          setPageState('welcome');
-        } else {
+        if (!data.success || !data.partnership) {
           setPageState('invalid');
+          return;
+        }
+
+        const loadedPartnership = data.partnership;
+        setPartnership(loadedPartnership);
+        setEmail(loadedPartnership.contact_email);
+
+        // Now check if user is already authenticated (returning from Google OAuth)
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (session?.user) {
+          // User is authenticated - they either:
+          // 1. Just returned from Google OAuth
+          // 2. Already have a session from before
+          // Either way, accept the invite and continue to intake
+          setPageState('creating');
+          await acceptInviteAndRedirect(session.user.id, session.user.email || '');
+        } else {
+          // No session - show welcome screen
+          setPageState('welcome');
         }
       } catch (error) {
         console.error('Error loading partnership:', error);
@@ -98,22 +115,24 @@ function PartnerSetupContent() {
     };
 
     if (token) {
-      loadPartnership();
+      loadPartnershipAndCheckSession();
     }
   }, [token]);
 
-  // Listen for auth state changes (handles Google OAuth callback)
+  // Listen for auth state changes (handles email/password signup or Google OAuth during page session)
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user && partnership) {
-        // User just signed in via Google - accept the invite
+      // Only handle SIGNED_IN events that occur AFTER initial page load
+      // (Initial session is handled in the loadPartnershipAndCheckSession effect above)
+      if (event === 'SIGNED_IN' && session?.user && partnership && pageState !== 'creating') {
+        // User just signed in via Google while on this page
         setPageState('creating');
         await acceptInviteAndRedirect(session.user.id, session.user.email || '');
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [partnership, token, router]);
+  }, [partnership, pageState]);
 
   // Google Sign-In handler
   const handleGoogleSignIn = async () => {
