@@ -8,7 +8,8 @@ import { getCurrentUser } from '@/lib/hub-auth';
 import { ArrowLeft, CheckCircle } from 'lucide-react';
 import TDIPortalLoader from '@/components/TDIPortalLoader';
 
-type AuthView = 'main' | 'signup' | 'forgot' | 'magic';
+type AuthView = 'main' | 'signup' | 'forgot';
+type LoginMethod = 'email' | 'magic';
 
 export default function HubLoginPage() {
   const router = useRouter();
@@ -24,6 +25,7 @@ export default function HubLoginPage() {
 
   // Form states
   const [view, setView] = useState<AuthView>('main');
+  const [loginMethod, setLoginMethod] = useState<LoginMethod>('email');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -72,6 +74,7 @@ export default function HubLoginPage() {
     setConfirmPassword('');
     clearErrors();
     setSuccessMessage('');
+    setLoginMethod('email');
   };
 
   const handleGoogleSignIn = async () => {
@@ -379,118 +382,77 @@ export default function HubLoginPage() {
                             color: '#9CA3AF',
                           }}
                         >
-                          or sign in with email
+                          or
                         </span>
                       </div>
                     </div>
 
-                    {/* Email/Password Form */}
-                    <form onSubmit={view === 'signup' ? handleSignUp : handleSignIn}>
-                      {/* Email Field */}
-                      <div className="mb-4">
-                        <label
-                          htmlFor="email"
-                          className="block text-sm font-medium mb-1.5"
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            color: '#374151',
-                          }}
-                        >
-                          Email address
-                        </label>
-                        <input
-                          id="email"
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="you@school.edu"
-                          required
-                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            borderColor: fieldErrors.email ? '#DC2626' : '#E5E7EB',
-                          }}
-                        />
-                        {fieldErrors.email && (
-                          <p
-                            className="mt-1"
-                            style={{
-                              fontFamily: "'DM Sans', sans-serif",
-                              fontSize: '13px',
-                              color: '#DC2626',
-                            }}
-                          >
-                            {fieldErrors.email}
-                          </p>
-                        )}
-                      </div>
+                    {/* Two Login Method Buttons */}
+                    <div className="flex gap-2 mb-6">
+                      <button
+                        type="button"
+                        onClick={() => setLoginMethod('email')}
+                        className="flex-1 font-medium transition-all"
+                        style={{
+                          height: '48px',
+                          borderRadius: '8px',
+                          backgroundColor: '#2B3A67',
+                          color: 'white',
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: '14px',
+                          borderBottom: loginMethod === 'email' ? '2px solid #E8B84B' : '2px solid transparent',
+                        }}
+                      >
+                        Sign in with Email
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setLoginMethod('magic')}
+                        className="flex-1 font-medium transition-all"
+                        style={{
+                          height: '48px',
+                          borderRadius: '8px',
+                          backgroundColor: '#E8B84B',
+                          color: '#2B3A67',
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontSize: '14px',
+                          borderBottom: loginMethod === 'magic' ? '2px solid #E8B84B' : '2px solid transparent',
+                        }}
+                      >
+                        Send me a Magic Link
+                      </button>
+                    </div>
 
-                      {/* Password Field */}
-                      <div className="mb-4">
-                        <label
-                          htmlFor="password"
-                          className="block text-sm font-medium mb-1.5"
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            color: '#374151',
-                          }}
-                        >
-                          Password
-                        </label>
-                        <input
-                          id="password"
-                          type="password"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Your password"
-                          required
-                          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            borderColor: fieldErrors.password ? '#DC2626' : '#E5E7EB',
-                          }}
-                        />
-                        {fieldErrors.password && (
-                          <p
-                            className="mt-1"
-                            style={{
-                              fontFamily: "'DM Sans', sans-serif",
-                              fontSize: '13px',
-                              color: '#DC2626',
-                            }}
-                          >
-                            {fieldErrors.password}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Confirm Password (Sign Up only) */}
-                      {view === 'signup' && (
+                    {/* Form Area - changes based on selected method */}
+                    {loginMethod === 'email' ? (
+                      /* Email/Password Form */
+                      <form onSubmit={view === 'signup' ? handleSignUp : handleSignIn}>
+                        {/* Email Field */}
                         <div className="mb-4">
                           <label
-                            htmlFor="confirmPassword"
+                            htmlFor="email"
                             className="block text-sm font-medium mb-1.5"
                             style={{
                               fontFamily: "'DM Sans', sans-serif",
                               color: '#374151',
                             }}
                           >
-                            Confirm password
+                            Email address
                           </label>
                           <input
-                            id="confirmPassword"
-                            type="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            placeholder="Confirm your password"
+                            id="email"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="you@school.edu"
                             required
                             className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
                             style={{
                               fontFamily: "'DM Sans', sans-serif",
-                              borderColor: fieldErrors.confirmPassword ? '#DC2626' : '#E5E7EB',
+                              borderColor: fieldErrors.email ? '#DC2626' : '#E5E7EB',
                             }}
                           />
-                          {fieldErrors.confirmPassword && (
+                          {fieldErrors.email && (
                             <p
                               className="mt-1"
                               style={{
@@ -499,69 +461,217 @@ export default function HubLoginPage() {
                                 color: '#DC2626',
                               }}
                             >
-                              {fieldErrors.confirmPassword}
+                              {fieldErrors.email}
                             </p>
                           )}
                         </div>
-                      )}
 
-                      {/* General Error */}
-                      {error && (
-                        <p
-                          className="mb-4"
+                        {/* Password Field */}
+                        <div className="mb-4">
+                          <label
+                            htmlFor="password"
+                            className="block text-sm font-medium mb-1.5"
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              color: '#374151',
+                            }}
+                          >
+                            Password
+                          </label>
+                          <input
+                            id="password"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            placeholder="Your password"
+                            required
+                            className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              borderColor: fieldErrors.password ? '#DC2626' : '#E5E7EB',
+                            }}
+                          />
+                          {fieldErrors.password && (
+                            <p
+                              className="mt-1"
+                              style={{
+                                fontFamily: "'DM Sans', sans-serif",
+                                fontSize: '13px',
+                                color: '#DC2626',
+                              }}
+                            >
+                              {fieldErrors.password}
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Confirm Password (Sign Up only) */}
+                        {view === 'signup' && (
+                          <div className="mb-4">
+                            <label
+                              htmlFor="confirmPassword"
+                              className="block text-sm font-medium mb-1.5"
+                              style={{
+                                fontFamily: "'DM Sans', sans-serif",
+                                color: '#374151',
+                              }}
+                            >
+                              Confirm password
+                            </label>
+                            <input
+                              id="confirmPassword"
+                              type="password"
+                              value={confirmPassword}
+                              onChange={(e) => setConfirmPassword(e.target.value)}
+                              placeholder="Confirm your password"
+                              required
+                              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
+                              style={{
+                                fontFamily: "'DM Sans', sans-serif",
+                                borderColor: fieldErrors.confirmPassword ? '#DC2626' : '#E5E7EB',
+                              }}
+                            />
+                            {fieldErrors.confirmPassword && (
+                              <p
+                                className="mt-1"
+                                style={{
+                                  fontFamily: "'DM Sans', sans-serif",
+                                  fontSize: '13px',
+                                  color: '#DC2626',
+                                }}
+                              >
+                                {fieldErrors.confirmPassword}
+                              </p>
+                            )}
+                          </div>
+                        )}
+
+                        {/* General Error */}
+                        {error && (
+                          <p
+                            className="mb-4"
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              fontSize: '13px',
+                              color: '#DC2626',
+                            }}
+                          >
+                            {error}
+                          </p>
+                        )}
+
+                        {/* Submit Button */}
+                        <button
+                          type="submit"
+                          disabled={isLoading || !email || !password || (view === 'signup' && !confirmPassword)}
+                          className="w-full font-medium rounded-lg transition-colors disabled:cursor-not-allowed"
                           style={{
+                            height: '48px',
+                            backgroundColor: isLoading || !email || !password || (view === 'signup' && !confirmPassword) ? 'rgba(232, 184, 75, 0.5)' : '#E8B84B',
+                            color: '#2B3A67',
                             fontFamily: "'DM Sans', sans-serif",
-                            fontSize: '13px',
-                            color: '#DC2626',
+                            borderRadius: '8px',
                           }}
                         >
-                          {error}
-                        </p>
-                      )}
+                          {isLoading ? 'Please wait...' : view === 'signup' ? 'Create account' : 'Sign in'}
+                        </button>
 
-                      {/* Submit Button */}
-                      <button
-                        type="submit"
-                        disabled={isLoading || !email || !password || (view === 'signup' && !confirmPassword)}
-                        className="w-full font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        style={{
-                          height: '44px',
-                          backgroundColor: '#E8B84B',
-                          color: '#2B3A67',
-                          fontFamily: "'DM Sans', sans-serif",
-                        }}
-                      >
-                        {isLoading ? 'Please wait...' : view === 'signup' ? 'Create account' : 'Sign in'}
-                      </button>
-                    </form>
+                        {/* Links */}
+                        <div className="flex justify-between mt-4">
+                          <button
+                            type="button"
+                            onClick={() => switchView(view === 'signup' ? 'main' : 'signup')}
+                            className="text-left hover:text-[#2B3A67] transition-colors"
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              fontSize: '13px',
+                              color: '#6B7280',
+                            }}
+                          >
+                            {view === 'signup' ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
+                          </button>
+                          {view === 'main' && (
+                            <button
+                              type="button"
+                              onClick={() => switchView('forgot')}
+                              className="hover:text-[#2B3A67] transition-colors"
+                              style={{
+                                fontFamily: "'DM Sans', sans-serif",
+                                fontSize: '13px',
+                                color: '#6B7280',
+                              }}
+                            >
+                              Forgot password?
+                            </button>
+                          )}
+                        </div>
+                      </form>
+                    ) : (
+                      /* Magic Link Form */
+                      <form onSubmit={handleMagicLink}>
+                        <div className="mb-4">
+                          <label
+                            htmlFor="magicEmail"
+                            className="block text-sm font-medium mb-1.5"
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              color: '#374151',
+                            }}
+                          >
+                            Email address
+                          </label>
+                          <input
+                            id="magicEmail"
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="you@school.edu"
+                            required
+                            className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
+                            style={{ fontFamily: "'DM Sans', sans-serif" }}
+                          />
+                        </div>
 
-                    {/* Links */}
-                    <div className="flex justify-between mt-4">
-                      <button
-                        onClick={() => switchView(view === 'signup' ? 'main' : 'signup')}
-                        className="text-left hover:text-[#2B3A67] transition-colors"
-                        style={{
-                          fontFamily: "'DM Sans', sans-serif",
-                          fontSize: '13px',
-                          color: '#6B7280',
-                        }}
-                      >
-                        {view === 'signup' ? 'Already have an account? Sign in' : "Don't have an account? Sign up"}
-                      </button>
-                      {view === 'main' && (
-                        <button
-                          onClick={() => switchView('forgot')}
-                          className="hover:text-[#2B3A67] transition-colors"
+                        <p
+                          className="mb-4 text-center"
                           style={{
                             fontFamily: "'DM Sans', sans-serif",
                             fontSize: '13px',
                             color: '#6B7280',
                           }}
                         >
-                          Forgot password?
+                          We&apos;ll email you a secure link to sign in — no password needed.
+                        </p>
+
+                        {error && (
+                          <p
+                            className="mb-4"
+                            style={{
+                              fontFamily: "'DM Sans', sans-serif",
+                              fontSize: '13px',
+                              color: '#DC2626',
+                            }}
+                          >
+                            {error}
+                          </p>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={isLoading || !email}
+                          className="w-full font-medium rounded-lg transition-colors disabled:cursor-not-allowed"
+                          style={{
+                            height: '48px',
+                            backgroundColor: isLoading || !email ? 'rgba(232, 184, 75, 0.5)' : '#E8B84B',
+                            color: '#2B3A67',
+                            fontFamily: "'DM Sans', sans-serif",
+                            borderRadius: '8px',
+                          }}
+                        >
+                          {isLoading ? 'Sending...' : 'Send magic link'}
                         </button>
-                      )}
-                    </div>
+                      </form>
+                    )}
                   </>
                 ) : view === 'forgot' ? (
                   /* Forgot Password View */
@@ -651,112 +761,7 @@ export default function HubLoginPage() {
                       Back to sign in
                     </button>
                   </>
-                ) : view === 'magic' ? (
-                  /* Magic Link View */
-                  <>
-                    <h2
-                      className="font-semibold mb-2 text-center"
-                      style={{
-                        fontFamily: "'Source Serif 4', Georgia, serif",
-                        fontSize: '18px',
-                        color: '#2B3A67',
-                      }}
-                    >
-                      Sign in with magic link
-                    </h2>
-                    <p
-                      className="text-center mb-6"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: '14px',
-                        color: '#6B7280',
-                      }}
-                    >
-                      We'll email you a secure link to sign in. No password needed.
-                    </p>
-
-                    <form onSubmit={handleMagicLink}>
-                      <div className="mb-4">
-                        <label
-                          htmlFor="magicEmail"
-                          className="block text-sm font-medium mb-1.5"
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            color: '#374151',
-                          }}
-                        >
-                          Email address
-                        </label>
-                        <input
-                          id="magicEmail"
-                          type="email"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="you@school.edu"
-                          required
-                          className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:border-[#E8B84B] focus:ring-2 focus:ring-[#E8B84B]/20 transition-all"
-                          style={{ fontFamily: "'DM Sans', sans-serif" }}
-                        />
-                      </div>
-
-                      {error && (
-                        <p
-                          className="mb-4"
-                          style={{
-                            fontFamily: "'DM Sans', sans-serif",
-                            fontSize: '13px',
-                            color: '#DC2626',
-                          }}
-                        >
-                          {error}
-                        </p>
-                      )}
-
-                      <button
-                        type="submit"
-                        disabled={isLoading || !email}
-                        className="w-full font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        style={{
-                          height: '44px',
-                          backgroundColor: '#E8B84B',
-                          color: '#2B3A67',
-                          fontFamily: "'DM Sans', sans-serif",
-                        }}
-                      >
-                        {isLoading ? 'Sending...' : 'Send magic link'}
-                      </button>
-                    </form>
-
-                    <button
-                      onClick={() => switchView('main')}
-                      className="w-full mt-4 text-center hover:underline"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: '13px',
-                        color: '#6B7280',
-                      }}
-                    >
-                      Back to sign in
-                    </button>
-                  </>
                 ) : null}
-
-                {/* Magic Link Tertiary Option (only on main/signup view) */}
-                {!successMessage && (view === 'main' || view === 'signup') && (
-                  <div className="mt-6 pt-6 border-t border-gray-100 text-center">
-                    <button
-                      onClick={() => switchView('magic')}
-                      className="hover:underline transition-colors"
-                      style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontSize: '13px',
-                        color: '#9CA3AF',
-                      }}
-                    >
-                      Prefer no password? Send me a magic link
-                    </button>
-                  </div>
-                )}
               </div>
 
               {/* Terms Footer */}
