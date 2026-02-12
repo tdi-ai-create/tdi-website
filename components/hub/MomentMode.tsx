@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { X, Wind, Heart, Sparkles, BookOpen, Download } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { X, Wind, Heart, Sparkles, BookOpen, Download, UserCircle, Send, Heart as HeartIcon } from 'lucide-react';
 import { incrementHardDayCount } from '@/lib/hub-auth';
 import { useMomentMode } from './MomentModeContext';
+import { useHub } from './HubContext';
+import { getSupabase } from '@/lib/supabase';
 
 type MomentState = 'entry' | 'pause' | 'affirmation' | 'gentle' | 'journal';
 type JournalTab = 'private' | 'anonymous';
@@ -13,8 +15,18 @@ interface MomentModeProps {
   onClose: () => void;
 }
 
-// Placeholder affirmations (to be replaced with approved content)
-const AFFIRMATIONS = [
+// Warm color palette for affirmation icons
+const AFFIRMATION_COLORS = [
+  '#7C9CBF', // soft blue
+  '#E8B84B', // soft gold
+  '#6BA368', // soft green
+  '#9B7CB8', // soft purple
+  '#E8927C', // soft coral
+  '#5BBEC4', // soft teal
+];
+
+// Placeholder affirmations (fallback if no tips found)
+const FALLBACK_AFFIRMATIONS = [
   'You are making a difference, even on the hard days.',
   'Your dedication matters more than you know.',
   'It is okay to take things one moment at a time.',
@@ -61,16 +73,55 @@ const GENTLE_TOOLS = [
 ];
 
 export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
+  const { user } = useHub();
   const [state, setState] = useState<MomentState>('entry');
-  const [affirmationIndex, setAffirmationIndex] = useState(0);
   const [journalTab, setJournalTab] = useState<JournalTab>('private');
   const [privateJournal, setPrivateJournal] = useState('');
   const [anonymousVent, setAnonymousVent] = useState('');
-  const [timeRemaining, setTimeRemaining] = useState(300); // 5 minutes in seconds
+  const [breathingTimeRemaining, setBreathingTimeRemaining] = useState(300); // 5 minutes for breathing
   const [hasIncremented, setHasIncremented] = useState(false);
+
+  // 3-minute global timer
+  const [globalTimer, setGlobalTimer] = useState(180); // 3 minutes in seconds
+  const [showTimerNudge, setShowTimerNudge] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Affirmation state
+  const [affirmations, setAffirmations] = useState<string[]>(FALLBACK_AFFIRMATIONS);
+  const [affirmationIndex, setAffirmationIndex] = useState(0);
+  const [affirmationColor, setAffirmationColor] = useState(AFFIRMATION_COLORS[0]);
+  const [affirmationSide, setAffirmationSide] = useState<'left' | 'right'>('left');
+  const [affirmationKey, setAffirmationKey] = useState(0); // for fade animation
+
+  // Note to team state
+  const [noteText, setNoteText] = useState('');
+  const [isSubmittingNote, setIsSubmittingNote] = useState(false);
+  const [noteSent, setNoteSent] = useState(false);
 
   // Access global Moment Mode context to suppress notifications
   const { setMomentModeActive } = useMomentMode();
+
+  // Fetch affirmations from TDI tips on mount
+  useEffect(() => {
+    async function fetchAffirmations() {
+      try {
+        const supabase = getSupabase();
+        const { data } = await supabase
+          .from('hub_tdi_tips')
+          .select('content')
+          .eq('approval_status', 'approved')
+          .or('category.eq.motivation,category.eq.self-care')
+          .limit(50);
+
+        if (data && data.length > 0) {
+          setAffirmations(data.map((t) => t.content));
+        }
+      } catch {
+        // Use fallback affirmations
+      }
+    }
+    fetchAffirmations();
+  }, []);
 
   // Handle escape key
   const handleEscape = useCallback((e: KeyboardEvent) => {
@@ -79,14 +130,28 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
     }
   }, []);
 
+  // Start/reset global timer when modal opens
   useEffect(() => {
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
       document.body.style.overflow = 'hidden';
-
-      // Signal to global context that Moment Mode is active
-      // This suppresses all toast notifications and popups
       setMomentModeActive(true);
+
+      // Reset timer on open
+      setGlobalTimer(180);
+      setShowTimerNudge(false);
+
+      // Start the global timer
+      timerRef.current = setInterval(() => {
+        setGlobalTimer((prev) => {
+          if (prev <= 1) {
+            setShowTimerNudge(true);
+            if (timerRef.current) clearInterval(timerRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
 
       // Increment hard day count only once per open
       if (!hasIncremented) {
@@ -94,13 +159,14 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
         setHasIncremented(true);
       }
     } else {
-      // Signal that Moment Mode is no longer active
       setMomentModeActive(false);
+      if (timerRef.current) clearInterval(timerRef.current);
     }
 
     return () => {
       document.removeEventListener('keydown', handleEscape);
       document.body.style.overflow = '';
+      if (timerRef.current) clearInterval(timerRef.current);
     };
   }, [isOpen, handleEscape, hasIncremented, setMomentModeActive]);
 
@@ -108,22 +174,43 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
-    if (state === 'pause' && timeRemaining > 0) {
+    if (state === 'pause' && breathingTimeRemaining > 0) {
       interval = setInterval(() => {
-        setTimeRemaining((prev) => prev - 1);
+        setBreathingTimeRemaining((prev) => prev - 1);
       }, 1000);
     }
 
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [state, timeRemaining]);
+  }, [state, breathingTimeRemaining]);
 
   const handleClose = () => {
     setState('entry');
-    setTimeRemaining(300);
+    setBreathingTimeRemaining(300);
     setHasIncremented(false);
+    setShowTimerNudge(false);
+    setNoteText('');
+    setNoteSent(false);
+    if (timerRef.current) clearInterval(timerRef.current);
     onClose();
+  };
+
+  const handleNeedMoreTime = () => {
+    setShowTimerNudge(false);
+    setGlobalTimer(180); // Reset to 3 more minutes
+
+    // Restart the timer
+    timerRef.current = setInterval(() => {
+      setGlobalTimer((prev) => {
+        if (prev <= 1) {
+          setShowTimerNudge(true);
+          if (timerRef.current) clearInterval(timerRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
   };
 
   const formatTime = (seconds: number): string => {
@@ -133,7 +220,37 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
   };
 
   const cycleAffirmation = () => {
-    setAffirmationIndex((prev) => (prev + 1) % AFFIRMATIONS.length);
+    const newIndex = (affirmationIndex + 1) % affirmations.length;
+    const newColorIndex = Math.floor(Math.random() * AFFIRMATION_COLORS.length);
+    setAffirmationIndex(newIndex);
+    setAffirmationColor(AFFIRMATION_COLORS[newColorIndex]);
+    setAffirmationSide((prev) => (prev === 'left' ? 'right' : 'left'));
+    setAffirmationKey((prev) => prev + 1); // Trigger fade animation
+  };
+
+  const handleSubmitNote = async () => {
+    if (!noteText.trim() || isSubmittingNote) return;
+
+    setIsSubmittingNote(true);
+
+    try {
+      const supabase = getSupabase();
+      await supabase.from('hub_activity_log').insert({
+        user_id: user?.id || null,
+        action: 'moment_note',
+        metadata: {
+          message: noteText.trim(),
+          submitted_at: new Date().toISOString(),
+        },
+      });
+
+      setNoteSent(true);
+      setNoteText('');
+    } catch {
+      // Silently fail - this is a safe space
+    } finally {
+      setIsSubmittingNote(false);
+    }
   };
 
   const handleAnonymousSubmit = () => {
@@ -145,11 +262,74 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
 
   if (!isOpen) return null;
 
+  // Get background color at 10% opacity for speech bubble
+  const getBubbleBgColor = (color: string) => {
+    return color + '1A'; // hex with 10% opacity
+  };
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fade-in-overlay"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 animate-fade-in-overlay"
       style={{ backgroundColor: 'rgba(43, 58, 103, 0.95)' }}
     >
+      {/* Global Timer Display - Top Center */}
+      {!showTimerNudge && (
+        <div
+          className="absolute top-4 left-1/2 -translate-x-1/2"
+          style={{
+            fontFamily: "'DM Sans', sans-serif",
+            fontSize: '14px',
+            color: 'rgba(255, 255, 255, 0.6)',
+          }}
+        >
+          {formatTime(globalTimer)} remaining
+        </div>
+      )}
+
+      {/* Timer Nudge Card - Top */}
+      {showTimerNudge && (
+        <div
+          className="absolute top-4 left-1/2 -translate-x-1/2 bg-white rounded-lg shadow-lg p-4 text-center max-w-sm mx-4"
+          style={{ animation: 'fadeIn 0.3s ease-out' }}
+        >
+          <p
+            className="mb-3"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontSize: '15px',
+              color: '#2B3A67',
+            }}
+          >
+            Your 3 minutes are up. Feeling better?
+          </p>
+          <div className="flex gap-2 justify-center">
+            <button
+              onClick={handleNeedMoreTime}
+              className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              style={{
+                backgroundColor: '#FFF8E7',
+                color: '#2B3A67',
+                border: '1px solid #E8B84B',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              I need more time
+            </button>
+            <button
+              onClick={handleClose}
+              className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              style={{
+                backgroundColor: '#E8B84B',
+                color: '#2B3A67',
+                fontFamily: "'DM Sans', sans-serif",
+              }}
+            >
+              Back to the Hub
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Close Button */}
       <button
         onClick={handleClose}
@@ -259,7 +439,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                     color: '#2B3A67',
                   }}
                 >
-                  {formatTime(timeRemaining)}
+                  {formatTime(breathingTimeRemaining)}
                 </span>
               </div>
             </div>
@@ -277,9 +457,9 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
               Take your time. There is no rush.
             </p>
 
-            {timeRemaining === 0 && (
+            {breathingTimeRemaining === 0 && (
               <button
-                onClick={() => setTimeRemaining(300)}
+                onClick={() => setBreathingTimeRemaining(300)}
                 className="mt-6 hub-btn-primary"
               >
                 Start again
@@ -288,38 +468,120 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
           </div>
         )}
 
-        {/* Affirmation State */}
+        {/* Affirmation State - Updated with person icons */}
         {state === 'affirmation' && (
-          <div className="text-center">
+          <div>
             <button
               onClick={() => setState('entry')}
-              className="text-sm text-gray-400 hover:text-gray-600 mb-6"
+              className="text-sm text-gray-400 hover:text-gray-600 mb-6 block"
               style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
               Back
             </button>
 
+            {/* Affirmation with Person Icon */}
             <div
-              className="p-8 rounded-lg mb-8"
-              style={{ backgroundColor: '#FFF8E7' }}
+              key={affirmationKey}
+              className={`flex items-start gap-4 mb-6 ${affirmationSide === 'right' ? 'flex-row-reverse' : ''}`}
+              style={{ animation: 'fadeIn 0.3s ease-out' }}
             >
-              <p
-                className="text-xl leading-relaxed"
+              {/* Person Icon in Colored Circle */}
+              <div
+                className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: affirmationColor }}
+              >
+                <UserCircle size={24} className="text-white" />
+              </div>
+
+              {/* Speech Bubble */}
+              <div
+                className="flex-1 p-4 rounded-xl"
                 style={{
-                  fontFamily: "'Source Serif 4', Georgia, serif",
-                  color: '#2B3A67',
+                  backgroundColor: getBubbleBgColor(affirmationColor),
+                  borderRadius: '12px',
                 }}
               >
-                {AFFIRMATIONS[affirmationIndex]}
-              </p>
+                <p
+                  className="text-lg leading-relaxed"
+                  style={{
+                    fontFamily: "'Source Serif 4', Georgia, serif",
+                    color: '#2B3A67',
+                  }}
+                >
+                  {affirmations[affirmationIndex]}
+                </p>
+              </div>
             </div>
 
             <button
               onClick={cycleAffirmation}
-              className="hub-btn-secondary"
+              className="w-full hub-btn-secondary mb-8"
             >
-              Show me another
+              Next affirmation
             </button>
+
+            {/* Note to Team Section */}
+            <div className="border-t border-gray-100 pt-6">
+              {!noteSent ? (
+                <>
+                  <p
+                    className="text-center mb-4"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: '13px',
+                      color: '#9CA3AF',
+                    }}
+                  >
+                    Need to talk? Send a note to the team.
+                  </p>
+                  <div className="space-y-3">
+                    <textarea
+                      value={noteText}
+                      onChange={(e) => setNoteText(e.target.value.slice(0, 500))}
+                      placeholder="What's on your mind?"
+                      className="w-full h-20 p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:border-[#E8B84B] text-sm"
+                      style={{ fontFamily: "'DM Sans', sans-serif" }}
+                    />
+                    <div className="flex justify-between items-center">
+                      <span
+                        className="text-xs"
+                        style={{ color: '#9CA3AF', fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        {noteText.length}/500
+                      </span>
+                      <button
+                        onClick={handleSubmitNote}
+                        disabled={!noteText.trim() || isSubmittingNote}
+                        className="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        style={{
+                          border: '1px solid #D1D5DB',
+                          color: '#6B7280',
+                          fontFamily: "'DM Sans', sans-serif",
+                        }}
+                      >
+                        <Send size={14} />
+                        Send
+                      </button>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-4">
+                  <div className="flex items-center justify-center gap-2 mb-2">
+                    <HeartIcon size={16} style={{ color: '#E8B84B' }} />
+                    <span
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontSize: '14px',
+                        color: '#6B7280',
+                      }}
+                    >
+                      Sent. Someone from our team will read this.
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -498,6 +760,20 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
           </div>
         )}
       </div>
+
+      {/* Animation keyframes */}
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(-5px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }

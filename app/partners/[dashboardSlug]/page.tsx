@@ -3357,7 +3357,11 @@ export default function PartnerDashboard() {
             </div>
 
             {/* Phase Timeline with Milestones */}
-            <div id="phase-timeline" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all duration-300">
+            <div
+              id="phase-timeline"
+              className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-200 cursor-pointer hover:shadow-md transition-shadow rounded-2xl"
+              onClick={() => navigateToTab('Blueprint')}
+            >
               <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4 md:mb-8">Your Partnership Journey</h2>
               <div className="relative">
                 {/* Timeline connector line - desktop only */}
@@ -3528,6 +3532,7 @@ export default function PartnerDashboard() {
                     );
                   })()}
                 </div>
+                <p className="text-xs text-[#FFBA06] text-center mt-4 font-medium">Learn more about each phase →</p>
               </div>
 
               {/* Mobile milestone list */}
@@ -3731,6 +3736,30 @@ export default function PartnerDashboard() {
                       <p className="text-xs text-gray-500">Focus: Differentiation strategies</p>
                     </div>
                   </div>
+
+                  {/* Example Love Note */}
+                  <div className="mt-6 bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+                    <div className="flex items-center gap-2 mb-3">
+                      <div className="w-8 h-8 rounded-full bg-[#FFBA06]/20 flex items-center justify-center">
+                        <span className="text-sm">💛</span>
+                      </div>
+                      <div>
+                        <p style={{ color: '#1B2A4A' }} className="text-sm font-semibold">Love Note</p>
+                        <p style={{ color: '#9ca3af' }} className="text-xs">From Observation Day 1 — October 15, 2025</p>
+                      </div>
+                    </div>
+                    <div className="bg-[#FFBA06]/5 rounded-lg p-3" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
+                      <p style={{ color: '#374151' }} className="text-sm italic leading-relaxed">
+                        "Ms. Rivera — Your students were so engaged during the collaborative learning activity today. The way you structured the peer feedback protocol gave every student a voice. Three other teachers asked about your approach after the walkthrough. You're making a real impact at Harmony Elementary."
+                      </p>
+                      <p style={{ color: '#9ca3af' }} className="text-xs mt-2">— Rae Hughart, TDI Partner</p>
+                    </div>
+                  </div>
+
+                  {/* Note about Love Notes */}
+                  <p style={{ color: '#6b7280' }} className="text-xs mt-3 italic">
+                    Love Notes are personalized feedback sent directly to educators after observation days — celebrating what's working and encouraging growth.
+                  </p>
                 </div>
               </ExamplePreview>
             ) : (
@@ -3956,97 +3985,162 @@ export default function PartnerDashboard() {
 
             {/* Building Cards */}
             {apiBuildings.length === 0 ? (
-              <ExamplePreview message="Example — your building data will populate as staff engage with the Hub and surveys are completed.">
+              <ExamplePreview message="Example from a TDI district — your building data will show teacher and paraprofessional breakdowns, engagement metrics, and wellness indicators once staff are onboarded.">
                 <div id="buildings-list" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
                   <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Buildings</h2>
-                  <div className="space-y-3">
-                    {/* Example Building 1 - Harmony Elementary */}
-                    <div className="p-4 bg-gray-50 rounded-xl">
-                      <div className="flex items-center justify-between flex-wrap gap-2">
-                        <div className="flex items-center gap-3">
-                          <Building className="w-5 h-5 text-gray-400" />
-                          <div>
-                            <h3 className="font-medium text-[#1e2749]">Harmony Elementary</h3>
-                            <p className="text-sm text-gray-500">K-5 · 40 staff · Champion: Ms. Rivera</p>
-                          </div>
+                  <div className="space-y-4">
+                    {/* Harmony Elementary — Expanded Example */}
+                    <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+                      {/* Header */}
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h3 style={{ color: '#1B2A4A' }} className="text-base font-semibold">Harmony Elementary</h3>
+                          <p style={{ color: '#6b7280' }} className="text-xs">40 staff · K-5 · Champion: Ms. Rivera</p>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex flex-col items-center" title="Hub: Strong (95%)">
-                            <span className="text-lg leading-none" style={{ color: '#22c55e' }}>●</span>
-                            <span className="text-[10px] text-gray-400 mt-0.5">Hub</span>
+                        {/* 4-dot health indicators */}
+                        <div className="flex gap-2">
+                          <div className="flex flex-col items-center">
+                            <div className="w-3 h-3 rounded-full bg-teal-500" />
+                            <span style={{ color: '#9ca3af' }} className="text-[10px] mt-1">Hub</span>
                           </div>
-                          <div className="flex flex-col items-center" title="Courses: Strong (3.2 avg)">
-                            <span className="text-lg leading-none" style={{ color: '#22c55e' }}>●</span>
-                            <span className="text-[10px] text-gray-400 mt-0.5">Courses</span>
+                          <div className="flex flex-col items-center">
+                            <div className="w-3 h-3 rounded-full bg-teal-500" />
+                            <span style={{ color: '#9ca3af' }} className="text-[10px] mt-1">Courses</span>
                           </div>
-                          <div className="flex flex-col items-center" title="Stress: On Track (5.8)">
-                            <span className="text-lg leading-none" style={{ color: '#4ecdc4' }}>◆</span>
-                            <span className="text-[10px] text-gray-400 mt-0.5">Stress</span>
+                          <div className="flex flex-col items-center">
+                            <div className="w-3 h-3 rounded-full bg-[#FFBA06]" />
+                            <span style={{ color: '#9ca3af' }} className="text-[10px] mt-1">Stress</span>
                           </div>
-                          <div className="flex flex-col items-center" title="Implementation: Strong (72%)">
-                            <span className="text-lg leading-none" style={{ color: '#22c55e' }}>●</span>
-                            <span className="text-[10px] text-gray-400 mt-0.5">Impl.</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    {/* Example Building 2 - Crescendo Middle */}
-                    <div className="p-4 bg-gray-50 rounded-xl">
-                      <div className="flex items-center justify-between flex-wrap gap-2">
-                        <div className="flex items-center gap-3">
-                          <Building className="w-5 h-5 text-gray-400" />
-                          <div>
-                            <h3 className="font-medium text-[#1e2749]">Crescendo Middle</h3>
-                            <p className="text-sm text-gray-500">6-8 · 38 staff · Champion: Mr. Okafor</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex flex-col items-center" title="Hub: Strong (91%)">
-                            <span className="text-lg leading-none" style={{ color: '#22c55e' }}>●</span>
-                            <span className="text-[10px] text-gray-400 mt-0.5">Hub</span>
-                          </div>
-                          <div className="flex flex-col items-center" title="Courses: On Track (2.1 avg)">
-                            <span className="text-lg leading-none" style={{ color: '#4ecdc4' }}>◆</span>
-                            <span className="text-[10px] text-gray-400 mt-0.5">Courses</span>
-                          </div>
-                          <div className="flex flex-col items-center" title="Stress: Developing (6.4)">
-                            <span className="text-lg leading-none" style={{ color: '#f59e0b' }}>▲</span>
-                            <span className="text-[10px] text-gray-400 mt-0.5">Stress</span>
-                          </div>
-                          <div className="flex flex-col items-center" title="Implementation: On Track (45%)">
-                            <span className="text-lg leading-none" style={{ color: '#4ecdc4' }}>◆</span>
-                            <span className="text-[10px] text-gray-400 mt-0.5">Impl.</span>
+                          <div className="flex flex-col items-center">
+                            <div className="w-3 h-3 rounded-full bg-teal-500" />
+                            <span style={{ color: '#9ca3af' }} className="text-[10px] mt-1">Impl.</span>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    {/* Example Building 3 - Rhythm Academy */}
-                    <div className="p-4 bg-gray-50 rounded-xl">
-                      <div className="flex items-center justify-between flex-wrap gap-2">
-                        <div className="flex items-center gap-3">
-                          <Building className="w-5 h-5 text-gray-400" />
-                          <div>
-                            <h3 className="font-medium text-[#1e2749]">Rhythm Academy</h3>
-                            <p className="text-sm text-gray-500">9-12 · 42 staff · Champion: Not yet assigned</p>
+
+                      {/* Staff Breakdown — Teacher vs Para */}
+                      <div className="grid grid-cols-2 gap-4 mb-4">
+                        {/* Teachers */}
+                        <div className="bg-gray-50 rounded-lg p-3">
+                          <p style={{ color: '#1B2A4A' }} className="text-xs font-semibold mb-2">Teachers (28)</p>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span style={{ color: '#6b7280' }} className="text-xs">Hub Logins</span>
+                              <span style={{ color: '#1B2A4A' }} className="text-xs font-semibold">96%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                              <div className="bg-teal-500 h-1.5 rounded-full" style={{ width: '96%' }} />
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span style={{ color: '#6b7280' }} className="text-xs">Avg. Courses</span>
+                              <span style={{ color: '#1B2A4A' }} className="text-xs font-semibold">3.4</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                              <div className="bg-teal-500 h-1.5 rounded-full" style={{ width: '68%' }} />
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span style={{ color: '#6b7280' }} className="text-xs">Avg. Stress</span>
+                              <span style={{ color: '#1B2A4A' }} className="text-xs font-semibold">5.4/10</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                              <div className="bg-teal-500 h-1.5 rounded-full" style={{ width: '46%' }} />
+                            </div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <div className="flex flex-col items-center" title="Hub: On Track (88%)">
-                            <span className="text-lg leading-none" style={{ color: '#4ecdc4' }}>◆</span>
-                            <span className="text-[10px] text-gray-400 mt-0.5">Hub</span>
+
+                        {/* Paras */}
+                        <div className="bg-gray-50 rounded-lg p-3">
+                          <p style={{ color: '#1B2A4A' }} className="text-xs font-semibold mb-2">Paraprofessionals (12)</p>
+                          <div className="space-y-2">
+                            <div className="flex justify-between items-center">
+                              <span style={{ color: '#6b7280' }} className="text-xs">Hub Logins</span>
+                              <span style={{ color: '#1B2A4A' }} className="text-xs font-semibold">92%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                              <div className="bg-teal-500 h-1.5 rounded-full" style={{ width: '92%' }} />
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span style={{ color: '#6b7280' }} className="text-xs">Avg. Courses</span>
+                              <span style={{ color: '#1B2A4A' }} className="text-xs font-semibold">2.1</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                              <div className="bg-[#FFBA06] h-1.5 rounded-full" style={{ width: '42%' }} />
+                            </div>
+                            <div className="flex justify-between items-center">
+                              <span style={{ color: '#6b7280' }} className="text-xs">Avg. Stress</span>
+                              <span style={{ color: '#1B2A4A' }} className="text-xs font-semibold">6.8/10</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-1.5">
+                              <div className="bg-[#FFBA06] h-1.5 rounded-full" style={{ width: '68%' }} />
+                            </div>
                           </div>
-                          <div className="flex flex-col items-center" title="Courses: Developing (1.3 avg)">
-                            <span className="text-lg leading-none" style={{ color: '#f59e0b' }}>▲</span>
-                            <span className="text-[10px] text-gray-400 mt-0.5">Courses</span>
+                        </div>
+                      </div>
+
+                      {/* Donut Charts Row */}
+                      <div className="grid grid-cols-3 gap-3">
+                        {/* Hub Login Donut */}
+                        <div className="text-center">
+                          <div className="relative w-16 h-16 mx-auto mb-1">
+                            <svg viewBox="0 0 36 36" className="w-16 h-16">
+                              <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                              <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#14b8a6" strokeWidth="3" strokeDasharray="95, 100" />
+                            </svg>
+                            <span style={{ color: '#1B2A4A' }} className="absolute inset-0 flex items-center justify-center text-xs font-bold">95%</span>
                           </div>
-                          <div className="flex flex-col items-center" title="Stress: Developing (7.1)">
-                            <span className="text-lg leading-none" style={{ color: '#f59e0b' }}>▲</span>
-                            <span className="text-[10px] text-gray-400 mt-0.5">Stress</span>
+                          <p style={{ color: '#6b7280' }} className="text-[10px]">Hub Logins</p>
+                        </div>
+
+                        {/* Course Completion Donut */}
+                        <div className="text-center">
+                          <div className="relative w-16 h-16 mx-auto mb-1">
+                            <svg viewBox="0 0 36 36" className="w-16 h-16">
+                              <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                              <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#14b8a6" strokeWidth="3" strokeDasharray="72, 100" />
+                            </svg>
+                            <span style={{ color: '#1B2A4A' }} className="absolute inset-0 flex items-center justify-center text-xs font-bold">72%</span>
                           </div>
-                          <div className="flex flex-col items-center" title="Implementation: Developing (28%)">
-                            <span className="text-lg leading-none" style={{ color: '#f59e0b' }}>▲</span>
-                            <span className="text-[10px] text-gray-400 mt-0.5">Impl.</span>
+                          <p style={{ color: '#6b7280' }} className="text-[10px]">1+ Course</p>
+                        </div>
+
+                        {/* Implementation Donut */}
+                        <div className="text-center">
+                          <div className="relative w-16 h-16 mx-auto mb-1">
+                            <svg viewBox="0 0 36 36" className="w-16 h-16">
+                              <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                              <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#14b8a6" strokeWidth="3" strokeDasharray="68, 100" />
+                            </svg>
+                            <span style={{ color: '#1B2A4A' }} className="absolute inset-0 flex items-center justify-center text-xs font-bold">68%</span>
                           </div>
+                          <p style={{ color: '#6b7280' }} className="text-[10px]">Implementing</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Other buildings collapsed */}
+                    <div className="space-y-3">
+                      <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between">
+                        <div>
+                          <h3 style={{ color: '#1B2A4A' }} className="text-sm font-semibold">Crescendo Middle</h3>
+                          <p style={{ color: '#6b7280' }} className="text-xs">38 staff · 6-8</p>
+                        </div>
+                        <div className="flex gap-1.5">
+                          <div className="w-2.5 h-2.5 rounded-full bg-teal-500" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-teal-500" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-[#FFBA06]" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-teal-500" />
+                        </div>
+                      </div>
+                      <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center justify-between">
+                        <div>
+                          <h3 style={{ color: '#1B2A4A' }} className="text-sm font-semibold">Melody Primary</h3>
+                          <p style={{ color: '#6b7280' }} className="text-xs">30 staff · PreK-2</p>
+                        </div>
+                        <div className="flex gap-1.5">
+                          <div className="w-2.5 h-2.5 rounded-full bg-teal-500" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-[#FFBA06]" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-[#FFBA06]" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-[#FFBA06]" />
                         </div>
                       </div>
                     </div>
