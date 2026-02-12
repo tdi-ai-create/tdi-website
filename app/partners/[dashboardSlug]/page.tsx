@@ -298,6 +298,27 @@ const Tooltip = ({
   );
 };
 
+// Example Preview component for Day 1 dashboards
+const ExamplePreview = ({ children, message }: { children: React.ReactNode; message?: string }) => {
+  return (
+    <div className="relative border-2 border-dashed border-[#FFBA06] rounded-xl overflow-hidden">
+      {/* Yellow banner */}
+      <div className="bg-[#FFBA06]/10 border-b border-[#FFBA06]/30 px-4 py-2 flex flex-wrap items-center gap-2">
+        <svg className="w-4 h-4 text-[#d97706] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+        </svg>
+        <span className="text-sm font-medium text-[#92400e]">
+          {message || "This is an example — your data will appear here as your partnership progresses."}
+        </span>
+      </div>
+      {/* Example content with slight opacity to reinforce "not real" */}
+      <div className="opacity-75 pointer-events-none select-none">
+        {children}
+      </div>
+    </div>
+  );
+};
+
 export default function PartnerDashboard() {
   const router = useRouter();
   const params = useParams();
@@ -1291,7 +1312,10 @@ export default function PartnerDashboard() {
               const avgImplementation = getLatestMetric('avg_implementation_confidence') || getLatestMetric('implementation_pct');
               const avgRetention = getLatestMetric('avg_retention_intent');
 
-              return (
+              // Check if ALL survey metrics are null - show example preview
+              const hasNoSurveyData = avgStress === null && avgImplementation === null && avgRetention === null;
+
+              const indicatorsContent = (
                 <div id="leading-indicators" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-2">
@@ -1330,8 +1354,10 @@ export default function PartnerDashboard() {
                         </div>
                         <div>
                           <div className="flex justify-between mb-1">
-                            <span className="text-gray-500">Your Data</span>
-                            {avgStress !== null ? (
+                            <span className="text-gray-500">{hasNoSurveyData ? 'Example District' : 'Your Data'}</span>
+                            {hasNoSurveyData ? (
+                              <span className="font-medium text-[#E8B84B]">6.0/10</span>
+                            ) : avgStress !== null ? (
                               <span className={`font-medium ${avgStress <= 5 ? 'text-[#4ecdc4]' : avgStress <= 7 ? 'text-[#E8B84B]' : 'text-red-500'}`}>
                                 {avgStress.toFixed(1)}/10
                               </span>
@@ -1341,11 +1367,10 @@ export default function PartnerDashboard() {
                           </div>
                           <div className="h-1.5 bg-gray-100 rounded-full">
                             <div
-                              className={`h-full rounded-full ${avgStress !== null ? (avgStress <= 5 ? 'bg-[#4ecdc4]' : avgStress <= 7 ? 'bg-[#E8B84B]' : 'bg-red-400') : 'bg-gray-200'}`}
-                              style={{width: avgStress !== null ? `${(avgStress / 10) * 100}%` : '0%'}}
+                              className={`h-full rounded-full ${hasNoSurveyData ? 'bg-[#E8B84B]' : avgStress !== null ? (avgStress <= 5 ? 'bg-[#4ecdc4]' : avgStress <= 7 ? 'bg-[#E8B84B]' : 'bg-red-400') : 'bg-gray-200'}`}
+                              style={{width: hasNoSurveyData ? '60%' : avgStress !== null ? `${(avgStress / 10) * 100}%` : '0%'}}
                             />
                           </div>
-                          {avgStress === null && <p className="text-[10px] text-gray-400 mt-1">Collecting after baseline survey</p>}
                         </div>
                       </div>
                     </div>
@@ -1373,8 +1398,10 @@ export default function PartnerDashboard() {
                         </div>
                         <div>
                           <div className="flex justify-between mb-1">
-                            <span className="text-gray-500">Your Data</span>
-                            {avgImplementation !== null ? (
+                            <span className="text-gray-500">{hasNoSurveyData ? 'Example District' : 'Your Data'}</span>
+                            {hasNoSurveyData ? (
+                              <span className="font-medium text-[#E8B84B]">21%</span>
+                            ) : avgImplementation !== null ? (
                               <span className={`font-medium ${avgImplementation >= 7 ? 'text-[#4ecdc4]' : avgImplementation >= 5 ? 'text-[#E8B84B]' : 'text-red-500'}`}>
                                 {avgImplementation <= 10 ? `${avgImplementation.toFixed(1)}/10` : `${avgImplementation.toFixed(0)}%`}
                               </span>
@@ -1384,11 +1411,10 @@ export default function PartnerDashboard() {
                           </div>
                           <div className="h-1.5 bg-gray-100 rounded-full">
                             <div
-                              className={`h-full rounded-full ${avgImplementation !== null ? (avgImplementation >= 7 || avgImplementation >= 70 ? 'bg-[#4ecdc4]' : avgImplementation >= 5 || avgImplementation >= 50 ? 'bg-[#E8B84B]' : 'bg-red-400') : 'bg-gray-200'}`}
-                              style={{width: avgImplementation !== null ? `${avgImplementation <= 10 ? (avgImplementation / 10) * 100 : avgImplementation}%` : '0%'}}
+                              className={`h-full rounded-full ${hasNoSurveyData ? 'bg-[#E8B84B]' : avgImplementation !== null ? (avgImplementation >= 7 || avgImplementation >= 70 ? 'bg-[#4ecdc4]' : avgImplementation >= 5 || avgImplementation >= 50 ? 'bg-[#E8B84B]' : 'bg-red-400') : 'bg-gray-200'}`}
+                              style={{width: hasNoSurveyData ? '21%' : avgImplementation !== null ? `${avgImplementation <= 10 ? (avgImplementation / 10) * 100 : avgImplementation}%` : '0%'}}
                             />
                           </div>
-                          {avgImplementation === null && <p className="text-[10px] text-gray-400 mt-1">Collecting after first observation</p>}
                         </div>
                       </div>
                     </div>
@@ -1416,8 +1442,10 @@ export default function PartnerDashboard() {
                         </div>
                         <div>
                           <div className="flex justify-between mb-1">
-                            <span className="text-gray-500">Your Data</span>
-                            {avgRetention !== null ? (
+                            <span className="text-gray-500">{hasNoSurveyData ? 'Example District' : 'Your Data'}</span>
+                            {hasNoSurveyData ? (
+                              <span className="font-medium text-[#4ecdc4]">9.8/10</span>
+                            ) : avgRetention !== null ? (
                               <span className={`font-medium ${avgRetention >= 7 ? 'text-[#4ecdc4]' : avgRetention >= 5 ? 'text-[#E8B84B]' : 'text-red-500'}`}>
                                 {avgRetention.toFixed(1)}/10
                               </span>
@@ -1427,11 +1455,10 @@ export default function PartnerDashboard() {
                           </div>
                           <div className="h-1.5 bg-gray-100 rounded-full">
                             <div
-                              className={`h-full rounded-full ${avgRetention !== null ? (avgRetention >= 7 ? 'bg-[#4ecdc4]' : avgRetention >= 5 ? 'bg-[#E8B84B]' : 'bg-red-400') : 'bg-gray-200'}`}
-                              style={{width: avgRetention !== null ? `${(avgRetention / 10) * 100}%` : '0%'}}
+                              className={`h-full rounded-full ${hasNoSurveyData ? 'bg-[#4ecdc4]' : avgRetention !== null ? (avgRetention >= 7 ? 'bg-[#4ecdc4]' : avgRetention >= 5 ? 'bg-[#E8B84B]' : 'bg-red-400') : 'bg-gray-200'}`}
+                              style={{width: hasNoSurveyData ? '98%' : avgRetention !== null ? `${(avgRetention / 10) * 100}%` : '0%'}}
                             />
                           </div>
-                          {avgRetention === null && <p className="text-[10px] text-gray-400 mt-1">Collecting after baseline survey</p>}
                         </div>
                       </div>
                     </div>
@@ -1442,44 +1469,87 @@ export default function PartnerDashboard() {
                   </div>
                 </div>
               );
+
+              return hasNoSurveyData ? (
+                <ExamplePreview message="Example from a real TDI district — your indicators will appear after your baseline survey.">
+                  {indicatorsContent}
+                </ExamplePreview>
+              ) : indicatorsContent;
             })()}
 
             {/* Building Spotlight */}
             {partnership.partnership_type === 'district' && (
-              <div id="building-spotlight" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <Award className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
-                    <h3 className="text-base md:text-lg font-bold text-gray-900">Building Spotlight</h3>
+              apiBuildings.length === 0 ? (
+                <ExamplePreview message="Example from a TDI district with 6 buildings — your buildings will appear here after onboarding.">
+                  <div id="building-spotlight" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <Award className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
+                        <h3 className="text-base md:text-lg font-bold text-gray-900">Building Spotlight</h3>
+                      </div>
+                      <button className="text-xs text-[#4ecdc4] font-medium hover:underline flex items-center gap-1">
+                        View All <ArrowRight className="w-3 h-3" />
+                      </button>
+                    </div>
+                    <div className="space-y-3">
+                      {/* Example Building 1 */}
+                      <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-[#1e2749]">Harmony Elementary</span>
+                            <span className="text-xs text-gray-400">· 40 staff · K-5</span>
+                          </div>
+                          <div className="flex gap-1">
+                            <span className="text-xs px-2 py-0.5 bg-amber-100 text-amber-700 rounded-full font-medium">Most Engaged</span>
+                            <span className="text-xs px-2 py-0.5 bg-teal-100 text-teal-700 rounded-full font-medium">Implementation</span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">Champion: Ms. Rivera</p>
+                      </div>
+                      {/* Example Building 2 */}
+                      <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-[#1e2749]">Crescendo Middle</span>
+                            <span className="text-xs text-gray-400">· 38 staff · 6-8</span>
+                          </div>
+                          <div className="flex gap-1">
+                            <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium">Top Learners</span>
+                            <span className="text-xs px-2 py-0.5 bg-purple-100 text-purple-700 rounded-full font-medium">Movement Leader</span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">Champion: Mr. Okafor</p>
+                      </div>
+                      {/* Example Building 3 */}
+                      <div className="p-4 bg-gray-50 rounded-lg border border-gray-100">
+                        <div className="flex items-center justify-between flex-wrap gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-[#1e2749]">Melody Primary</span>
+                            <span className="text-xs text-gray-400">· 30 staff · PreK-2</span>
+                          </div>
+                          <div className="flex gap-1">
+                            <span className="text-xs px-2 py-0.5 bg-pink-100 text-pink-700 rounded-full font-medium">Wellness Leader</span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">Champion: Dr. Chen</p>
+                      </div>
+                    </div>
                   </div>
-                  <button
-                    onClick={() => navigateToTab('schools', 'buildings-list')}
-                    className="text-xs text-[#4ecdc4] font-medium hover:underline flex items-center gap-1"
-                  >
-                    View All <ArrowRight className="w-3 h-3" />
-                  </button>
-                </div>
-
-                {apiBuildings.length === 0 ? (
-                  <div className="text-center py-8 bg-gray-50 rounded-lg">
-                    <School className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-sm text-gray-500 mb-2">
-                      Building spotlight will appear here once you add your buildings and we begin collecting engagement data.
-                    </p>
+                </ExamplePreview>
+              ) : (
+                <div id="building-spotlight" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Award className="w-4 h-4 md:w-5 md:h-5 text-amber-500" />
+                      <h3 className="text-base md:text-lg font-bold text-gray-900">Building Spotlight</h3>
+                    </div>
                     <button
-                      onClick={() => {
-                        const addBuildingItem = pendingItems.find(item => item.title.toLowerCase().includes('building'));
-                        if (addBuildingItem) {
-                          const el = document.getElementById(`action-${addBuildingItem.id}`);
-                          if (el) el.scrollIntoView({ behavior: 'smooth' });
-                        }
-                      }}
-                      className="text-sm text-[#4ecdc4] font-medium hover:underline"
+                      onClick={() => navigateToTab('schools', 'buildings-list')}
+                      className="text-xs text-[#4ecdc4] font-medium hover:underline flex items-center gap-1"
                     >
-                      Add Building Details →
+                      View All <ArrowRight className="w-3 h-3" />
                     </button>
                   </div>
-                ) : (
                   <div className="space-y-3">
                     {apiBuildings.map((building) => (
                       <div key={building.id} className="p-4 bg-gray-50 rounded-lg border border-gray-100">
@@ -1493,99 +1563,189 @@ export default function PartnerDashboard() {
                       </div>
                     ))}
                   </div>
-                )}
-              </div>
+                </div>
+              )
             )}
 
             {/* Hub Engagement */}
-            <div id="hub-engagement" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4 md:mb-6">
-                <div className="flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-[#4ecdc4]" />
-                  <h3 className="text-lg font-bold text-gray-900">Hub Engagement</h3>
+            {hubLoginPct === 0 ? (
+              <ExamplePreview message="Example — your Hub engagement data appears once staff begin logging in.">
+                <div id="hub-engagement" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+                  <div className="flex items-center justify-between mb-4 md:mb-6">
+                    <div className="flex items-center gap-2">
+                      <BookOpen className="w-5 h-5 text-[#4ecdc4]" />
+                      <h3 className="text-lg font-bold text-gray-900">Hub Engagement</h3>
+                    </div>
+                    <button className="text-xs text-[#4ecdc4] font-medium hover:underline flex items-center gap-1">
+                      View Details <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                    {/* Donut Chart - Example Login Rate */}
+                    <div className="flex flex-col items-center">
+                      <div className="relative w-28 h-28 md:w-36 md:h-36">
+                        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                          <circle cx="18" cy="18" r="15.915" fill="none" stroke="#4ecdc4" strokeWidth="3"
+                            strokeDasharray="87, 100" strokeLinecap="round" />
+                        </svg>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center">
+                          <span className="text-2xl font-bold text-[#1e2749]">87%</span>
+                          <span className="text-xs text-gray-500">logged in</span>
+                        </div>
+                      </div>
+                      <div className="mt-3 text-center">
+                        <p className="text-sm font-semibold text-[#1e2749]">Hub Logins</p>
+                        <p className="text-xs text-gray-500">223 of 255 staff</p>
+                        <p className="text-xs text-[#4ecdc4] font-medium mt-1">Goal: 100% by Observation Day</p>
+                      </div>
+                    </div>
+
+                    {/* Example Engagement Depth */}
+                    <div className="flex flex-col">
+                      <p className="text-sm font-semibold text-[#1e2749] mb-3">Engagement Depth</p>
+                      <div className="space-y-2 flex-1">
+                        <div className="flex justify-between text-xs py-1.5">
+                          <span className="text-gray-600">Completed 1+ course</span>
+                          <span className="text-[#4ecdc4] font-medium">68%</span>
+                        </div>
+                        <div className="flex justify-between text-xs py-1.5">
+                          <span className="text-gray-600">Downloaded resources</span>
+                          <span className="text-[#4ecdc4] font-medium">74%</span>
+                        </div>
+                        <div className="flex justify-between text-xs py-1.5">
+                          <span className="text-gray-600">Active this month</span>
+                          <span className="text-[#4ecdc4] font-medium">52%</span>
+                        </div>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-3 text-center bg-gray-50 rounded-lg py-2 px-3">
+                        By Building: Harmony 95%, Crescendo 91%, Rhythm 88%
+                      </p>
+                    </div>
+
+                    {/* Example Love Notes & Sessions */}
+                    <div className="flex flex-col">
+                      <p className="text-sm font-semibold text-[#1e2749] mb-3">Support Delivered</p>
+                      <div className="space-y-3">
+                        <div className="bg-pink-50 rounded-lg p-3 flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
+                            <Heart className="w-5 h-5 text-pink-500" />
+                          </div>
+                          <div>
+                            <span className="text-base font-bold text-[#1e2749]">127</span>
+                            <p className="text-xs text-gray-500">Love Notes sent</p>
+                          </div>
+                        </div>
+                        <div className="bg-purple-50 rounded-lg p-3 flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                            <Calendar className="w-5 h-5 text-purple-600" />
+                          </div>
+                          <div>
+                            <span className="text-base font-bold text-[#1e2749]">3 of 4</span>
+                            <p className="text-xs text-gray-500">Virtual sessions</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-xs text-[#4ecdc4] font-medium hover:underline mt-4">
+                    <BookOpen className="w-3.5 h-3.5" /> Open Learning Hub →
+                  </a>
                 </div>
-                <button
-                  onClick={() => navigateToTab('progress', 'hub-engagement-detail')}
-                  className="text-xs text-[#4ecdc4] font-medium hover:underline flex items-center gap-1"
-                >
-                  View Details <ArrowRight className="w-3 h-3" />
-                </button>
+              </ExamplePreview>
+            ) : (
+              <div id="hub-engagement" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+                <div className="flex items-center justify-between mb-4 md:mb-6">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="w-5 h-5 text-[#4ecdc4]" />
+                    <h3 className="text-lg font-bold text-gray-900">Hub Engagement</h3>
+                  </div>
+                  <button
+                    onClick={() => navigateToTab('progress', 'hub-engagement-detail')}
+                    className="text-xs text-[#4ecdc4] font-medium hover:underline flex items-center gap-1"
+                  >
+                    View Details <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                  {/* Donut Chart - Login Rate */}
+                  <div className="flex flex-col items-center">
+                    <div className="relative w-28 h-28 md:w-36 md:h-36">
+                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                        <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
+                        <circle cx="18" cy="18" r="15.915" fill="none" stroke="#4ecdc4" strokeWidth="3"
+                          strokeDasharray={`${hubLoginPct}, 100`} strokeLinecap="round" />
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-2xl font-bold text-[#1e2749]">{hubLoginPct}%</span>
+                        <span className="text-xs text-gray-500">logged in</span>
+                      </div>
+                    </div>
+                    <div className="mt-3 text-center">
+                      <p className="text-sm font-semibold text-[#1e2749]">Hub Logins</p>
+                      <p className="text-xs text-gray-500">{staffStats.hubLoggedIn} of {staffStats.total} staff</p>
+                      <p className="text-xs text-[#4ecdc4] font-medium mt-1">Goal: 100% by Observation Day</p>
+                    </div>
+                  </div>
+
+                  {/* Engagement Depth */}
+                  <div className="flex flex-col">
+                    <p className="text-sm font-semibold text-[#1e2749] mb-3">Engagement Depth</p>
+                    <div className="space-y-2 flex-1">
+                      <div className="flex justify-between text-xs py-1.5">
+                        <span className="text-gray-600">Completed 1+ course</span>
+                        <span className="text-gray-400 italic">Awaiting data</span>
+                      </div>
+                      <div className="flex justify-between text-xs py-1.5">
+                        <span className="text-gray-600">Downloaded resources</span>
+                        <span className="text-gray-400 italic">Awaiting data</span>
+                      </div>
+                      <div className="flex justify-between text-xs py-1.5">
+                        <span className="text-gray-600">Active this month</span>
+                        <span className="text-gray-400 italic">Awaiting data</span>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-3 text-center bg-gray-50 rounded-lg py-2 px-3">
+                      Data populates as staff engage with Hub
+                    </p>
+                  </div>
+
+                  {/* Love Notes & Sessions */}
+                  <div className="flex flex-col">
+                    <p className="text-sm font-semibold text-[#1e2749] mb-3">Support Delivered</p>
+                    <div className="space-y-3">
+                      <div className="bg-pink-50 rounded-lg p-3 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
+                          <Heart className="w-5 h-5 text-pink-500" />
+                        </div>
+                        <div>
+                          <span className="text-base font-bold text-[#1e2749]">{loveNotes}</span>
+                          <p className="text-xs text-gray-500">Love Notes sent</p>
+                        </div>
+                      </div>
+                      <div className="bg-purple-50 rounded-lg p-3 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                          <Calendar className="w-5 h-5 text-purple-600" />
+                        </div>
+                        <div>
+                          <span className="text-base font-bold text-[#1e2749]">{virtualSessionsCompleted} of {partnership.virtual_sessions_total || 4}</span>
+                          <p className="text-xs text-gray-500">Virtual sessions</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-xs text-[#4ecdc4] font-medium hover:underline mt-4">
+                  <BookOpen className="w-3.5 h-3.5" /> Open Learning Hub →
+                </a>
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-                {/* Donut Chart - Login Rate */}
-                <div className="flex flex-col items-center">
-                  <div className="relative w-28 h-28 md:w-36 md:h-36">
-                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                      <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
-                      <circle cx="18" cy="18" r="15.915" fill="none" stroke="#4ecdc4" strokeWidth="3"
-                        strokeDasharray={`${hubLoginPct}, 100`} strokeLinecap="round" />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-2xl font-bold text-[#1e2749]">{hubLoginPct}%</span>
-                      <span className="text-xs text-gray-500">logged in</span>
-                    </div>
-                  </div>
-                  <div className="mt-3 text-center">
-                    <p className="text-sm font-semibold text-[#1e2749]">Hub Logins</p>
-                    <p className="text-xs text-gray-500">{staffStats.hubLoggedIn} of {staffStats.total} staff</p>
-                    <p className="text-xs text-[#4ecdc4] font-medium mt-1">Goal: 100% by Observation Day</p>
-                  </div>
-                </div>
-
-                {/* Engagement Depth */}
-                <div className="flex flex-col">
-                  <p className="text-sm font-semibold text-[#1e2749] mb-3">Engagement Depth</p>
-                  <div className="space-y-2 flex-1">
-                    <div className="flex justify-between text-xs py-1.5">
-                      <span className="text-gray-600">Completed 1+ course</span>
-                      <span className="text-gray-400 italic">Awaiting data</span>
-                    </div>
-                    <div className="flex justify-between text-xs py-1.5">
-                      <span className="text-gray-600">Downloaded resources</span>
-                      <span className="text-gray-400 italic">Awaiting data</span>
-                    </div>
-                    <div className="flex justify-between text-xs py-1.5">
-                      <span className="text-gray-600">Active this month</span>
-                      <span className="text-gray-400 italic">Awaiting data</span>
-                    </div>
-                  </div>
-                  <p className="text-xs text-gray-400 mt-3 text-center bg-gray-50 rounded-lg py-2 px-3">
-                    Data populates as staff engage with Hub
-                  </p>
-                </div>
-
-                {/* Love Notes & Sessions */}
-                <div className="flex flex-col">
-                  <p className="text-sm font-semibold text-[#1e2749] mb-3">Support Delivered</p>
-                  <div className="space-y-3">
-                    <div className="bg-pink-50 rounded-lg p-3 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
-                        <Heart className="w-5 h-5 text-pink-500" />
-                      </div>
-                      <div>
-                        <span className="text-base font-bold text-[#1e2749]">{loveNotes}</span>
-                        <p className="text-xs text-gray-500">Love Notes sent</p>
-                      </div>
-                    </div>
-                    <div className="bg-purple-50 rounded-lg p-3 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                        <Calendar className="w-5 h-5 text-purple-600" />
-                      </div>
-                      <div>
-                        <span className="text-base font-bold text-[#1e2749]">{virtualSessionsCompleted} of {partnership.virtual_sessions_total || 4}</span>
-                        <p className="text-xs text-gray-500">Virtual sessions</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-xs text-[#4ecdc4] font-medium hover:underline mt-4">
-                <BookOpen className="w-3.5 h-3.5" /> Open Learning Hub →
-              </a>
-            </div>
+            )}
 
             {/* Action Items */}
             <div id="action-items" className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 md:p-6">
@@ -3601,25 +3761,41 @@ export default function PartnerDashboard() {
             })()}
 
             {/* Observation Day Highlights */}
-            <div id="observation-highlights" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
-              <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Observation Day Highlights</h2>
-              {(partnership?.observation_days_completed ?? 0) === 0 ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Calendar className="w-8 h-8 text-gray-400" />
+            {(partnership?.observation_days_completed ?? 0) === 0 ? (
+              <ExamplePreview message="Example — your observation highlights will appear after your first on-site visit.">
+                <div id="observation-highlights" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+                  <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Observation Day Highlights</h2>
+                  <div className="space-y-6">
+                    {/* Example Observation Day 1 */}
+                    <div className="border-l-4 border-[#4ecdc4] pl-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Calendar className="w-4 h-4 text-[#4ecdc4]" />
+                        <span className="font-semibold text-[#1e2749]">Observation Day 1</span>
+                        <span className="text-sm text-gray-500">— October 15, 2025</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">Visited 4 buildings, 22 classrooms observed</p>
+                      <div className="flex flex-wrap gap-2 mb-2">
+                        <span className="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded-full">Teacher shoutout: Ms. Rivera (Harmony)</span>
+                        <span className="text-xs px-2 py-1 bg-amber-100 text-amber-700 rounded-full">Teacher shoutout: Mr. Okafor (Crescendo)</span>
+                      </div>
+                      <p className="text-xs text-gray-500">Top strategy spotted: Collaborative learning structures</p>
+                    </div>
+                    {/* Example Observation Day 2 */}
+                    <div className="border-l-4 border-[#80a4ed] pl-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Calendar className="w-4 h-4 text-[#80a4ed]" />
+                        <span className="font-semibold text-[#1e2749]">Observation Day 2</span>
+                        <span className="text-sm text-gray-500">— January 22, 2026</span>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">Visited 3 buildings, 18 classrooms observed</p>
+                      <p className="text-xs text-gray-500">Focus: Differentiation strategies</p>
+                    </div>
                   </div>
-                  <p className="text-gray-600 mb-2">Your first observation day hasn&apos;t been scheduled yet.</p>
-                  <p className="text-sm text-gray-500 mb-4">
-                    Once it&apos;s complete, highlights, teacher shoutouts, and strategy observations will appear here.
-                  </p>
-                  <button
-                    onClick={() => setActiveTab('overview')}
-                    className="px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
-                  >
-                    Confirm Observation Dates
-                  </button>
                 </div>
-              ) : (
+              </ExamplePreview>
+            ) : (
+              <div id="observation-highlights" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+                <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Observation Day Highlights</h2>
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-sm text-gray-500">
                     <Check className="w-4 h-4 text-[#4ecdc4]" />
@@ -3629,19 +3805,33 @@ export default function PartnerDashboard() {
                     Observation highlights and teacher shoutouts will be added by your TDI partner after each visit.
                   </p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Hub Engagement Breakdown */}
-            <div id="hub-engagement-detail" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
-              <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Hub Engagement</h2>
-              {staffStats.hubLoggedIn === 0 ? (
-                <div className="text-center py-6">
-                  <p className="text-gray-500">
-                    Hub engagement data will appear here once your staff begin exploring courses. Check back after your first week!
-                  </p>
+            {staffStats.hubLoggedIn === 0 ? (
+              <ExamplePreview message="Example — your Hub engagement details appear once staff begin exploring courses.">
+                <div id="hub-engagement-detail" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+                  <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Hub Engagement</h2>
+                  <div className="grid sm:grid-cols-3 gap-4">
+                    <div className="p-4 bg-gray-50 rounded-xl text-center">
+                      <p className="text-2xl font-bold text-[#1e2749]">68%</p>
+                      <p className="text-sm text-gray-500">Completed 1+ course</p>
+                    </div>
+                    <div className="p-4 bg-gray-50 rounded-xl text-center">
+                      <p className="text-2xl font-bold text-[#1e2749]">74%</p>
+                      <p className="text-sm text-gray-500">Downloaded resources</p>
+                    </div>
+                    <div className="p-4 bg-gray-50 rounded-xl text-center">
+                      <p className="text-2xl font-bold text-[#1e2749]">52%</p>
+                      <p className="text-sm text-gray-500">Active this month</p>
+                    </div>
+                  </div>
                 </div>
-              ) : (
+              </ExamplePreview>
+            ) : (
+              <div id="hub-engagement-detail" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+                <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Hub Engagement</h2>
                 <div className="grid sm:grid-cols-3 gap-4">
                   <div className="p-4 bg-gray-50 rounded-xl text-center">
                     <p className="text-2xl font-bold text-[#1e2749]">{staffStats.hubLoggedIn}</p>
@@ -3658,8 +3848,8 @@ export default function PartnerDashboard() {
                     <p className="text-sm text-gray-500">Love Notes Sent</p>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Support Delivered Timeline */}
             <div id="support-timeline" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
@@ -3825,19 +4015,107 @@ export default function PartnerDashboard() {
             </div>
 
             {/* Building Cards */}
-            <div id="buildings-list" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
-              <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Buildings</h2>
-              {apiBuildings.length === 0 ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Building className="w-8 h-8 text-gray-400" />
+            {apiBuildings.length === 0 ? (
+              <ExamplePreview message="Example — your building data will populate as staff engage with the Hub and surveys are completed.">
+                <div id="buildings-list" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+                  <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Buildings</h2>
+                  <div className="space-y-3">
+                    {/* Example Building 1 - Harmony Elementary */}
+                    <div className="p-4 bg-gray-50 rounded-xl">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <div className="flex items-center gap-3">
+                          <Building className="w-5 h-5 text-gray-400" />
+                          <div>
+                            <h3 className="font-medium text-[#1e2749]">Harmony Elementary</h3>
+                            <p className="text-sm text-gray-500">K-5 · 40 staff · Champion: Ms. Rivera</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex flex-col items-center" title="Hub: Strong (95%)">
+                            <span className="text-lg leading-none" style={{ color: '#22c55e' }}>●</span>
+                            <span className="text-[10px] text-gray-400 mt-0.5">Hub</span>
+                          </div>
+                          <div className="flex flex-col items-center" title="Courses: Strong (3.2 avg)">
+                            <span className="text-lg leading-none" style={{ color: '#22c55e' }}>●</span>
+                            <span className="text-[10px] text-gray-400 mt-0.5">Courses</span>
+                          </div>
+                          <div className="flex flex-col items-center" title="Stress: On Track (5.8)">
+                            <span className="text-lg leading-none" style={{ color: '#4ecdc4' }}>◆</span>
+                            <span className="text-[10px] text-gray-400 mt-0.5">Stress</span>
+                          </div>
+                          <div className="flex flex-col items-center" title="Implementation: Strong (72%)">
+                            <span className="text-lg leading-none" style={{ color: '#22c55e' }}>●</span>
+                            <span className="text-[10px] text-gray-400 mt-0.5">Impl.</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Example Building 2 - Crescendo Middle */}
+                    <div className="p-4 bg-gray-50 rounded-xl">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <div className="flex items-center gap-3">
+                          <Building className="w-5 h-5 text-gray-400" />
+                          <div>
+                            <h3 className="font-medium text-[#1e2749]">Crescendo Middle</h3>
+                            <p className="text-sm text-gray-500">6-8 · 38 staff · Champion: Mr. Okafor</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex flex-col items-center" title="Hub: Strong (91%)">
+                            <span className="text-lg leading-none" style={{ color: '#22c55e' }}>●</span>
+                            <span className="text-[10px] text-gray-400 mt-0.5">Hub</span>
+                          </div>
+                          <div className="flex flex-col items-center" title="Courses: On Track (2.1 avg)">
+                            <span className="text-lg leading-none" style={{ color: '#4ecdc4' }}>◆</span>
+                            <span className="text-[10px] text-gray-400 mt-0.5">Courses</span>
+                          </div>
+                          <div className="flex flex-col items-center" title="Stress: Developing (6.4)">
+                            <span className="text-lg leading-none" style={{ color: '#f59e0b' }}>▲</span>
+                            <span className="text-[10px] text-gray-400 mt-0.5">Stress</span>
+                          </div>
+                          <div className="flex flex-col items-center" title="Implementation: On Track (45%)">
+                            <span className="text-lg leading-none" style={{ color: '#4ecdc4' }}>◆</span>
+                            <span className="text-[10px] text-gray-400 mt-0.5">Impl.</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    {/* Example Building 3 - Rhythm Academy */}
+                    <div className="p-4 bg-gray-50 rounded-xl">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
+                        <div className="flex items-center gap-3">
+                          <Building className="w-5 h-5 text-gray-400" />
+                          <div>
+                            <h3 className="font-medium text-[#1e2749]">Rhythm Academy</h3>
+                            <p className="text-sm text-gray-500">9-12 · 42 staff · Champion: Not yet assigned</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="flex flex-col items-center" title="Hub: On Track (88%)">
+                            <span className="text-lg leading-none" style={{ color: '#4ecdc4' }}>◆</span>
+                            <span className="text-[10px] text-gray-400 mt-0.5">Hub</span>
+                          </div>
+                          <div className="flex flex-col items-center" title="Courses: Developing (1.3 avg)">
+                            <span className="text-lg leading-none" style={{ color: '#f59e0b' }}>▲</span>
+                            <span className="text-[10px] text-gray-400 mt-0.5">Courses</span>
+                          </div>
+                          <div className="flex flex-col items-center" title="Stress: Developing (7.1)">
+                            <span className="text-lg leading-none" style={{ color: '#f59e0b' }}>▲</span>
+                            <span className="text-[10px] text-gray-400 mt-0.5">Stress</span>
+                          </div>
+                          <div className="flex flex-col items-center" title="Implementation: Developing (28%)">
+                            <span className="text-lg leading-none" style={{ color: '#f59e0b' }}>▲</span>
+                            <span className="text-[10px] text-gray-400 mt-0.5">Impl.</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-gray-600 mb-2">No buildings added yet.</p>
-                  <p className="text-sm text-gray-500">
-                    Add your buildings in the Overview tab to see per-building metrics.
-                  </p>
                 </div>
-              ) : (
+              </ExamplePreview>
+            ) : (
+              <div id="buildings-list" className="bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-gray-100">
+                <h2 className="text-base md:text-lg font-bold text-gray-900 mb-4">Buildings</h2>
                 <div className="space-y-3">
                   {apiBuildings.map((building) => {
                     const hubStatus = getMetricStatus('hub_login_pct', null);
@@ -3892,8 +4170,8 @@ export default function PartnerDashboard() {
                     );
                   })}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Metric Legend */}
             <div className="bg-gray-50 rounded-xl p-4">
@@ -4027,118 +4305,144 @@ export default function PartnerDashboard() {
             </div>
 
             {/* ROI / Impact Summary */}
-            <div id="roi-summary" className="dark-card bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-4 md:p-8 text-white">
-              <h2 className="text-base md:text-lg font-bold text-white mb-4 md:mb-6">Your Impact Summary</h2>
-              {(() => {
-                const daysSinceStart = partnership?.contract_start
-                  ? Math.floor((Date.now() - new Date(partnership.contract_start).getTime()) / (1000 * 60 * 60 * 24))
-                  : 0;
+            {(() => {
+              // Get metrics for change comparison
+              const getMetricValues = (name: string) => {
+                const matching = metricSnapshots
+                  .filter(m => m.metric_name === name)
+                  .sort((a, b) => new Date(a.recorded_at).getTime() - new Date(b.recorded_at).getTime());
+                if (matching.length === 0) return null;
+                const earliest = matching[0].metric_value;
+                const latest = matching[matching.length - 1].metric_value;
+                const hasChange = matching.length > 1 && earliest !== latest;
+                return { earliest, latest, hasChange };
+              };
 
-                // Get metrics for change comparison
-                const getMetricValues = (name: string) => {
-                  const matching = metricSnapshots
-                    .filter(m => m.metric_name === name)
-                    .sort((a, b) => new Date(a.recorded_at).getTime() - new Date(b.recorded_at).getTime());
-                  if (matching.length === 0) return null;
-                  const earliest = matching[0].metric_value;
-                  const latest = matching[matching.length - 1].metric_value;
-                  const hasChange = matching.length > 1 && earliest !== latest;
-                  return { earliest, latest, hasChange };
+              const stressData = getMetricValues('avg_stress');
+              const planningData = getMetricValues('avg_planning_hours');
+              const retentionData = getMetricValues('avg_retention_intent');
+              const implementationData = getMetricValues('implementation_pct') || getMetricValues('avg_implementation_confidence');
+
+              const hasAnyMetricData = stressData || planningData || retentionData || implementationData;
+
+              // Helper to format change
+              const formatChange = (earliest: number, latest: number, isLowerBetter: boolean) => {
+                const pctChange = ((latest - earliest) / earliest) * 100;
+                const improved = isLowerBetter ? pctChange < 0 : pctChange > 0;
+                const arrow = pctChange > 0 ? '↑' : pctChange < 0 ? '↓' : '';
+                return {
+                  text: `${earliest.toFixed(1)} → ${latest.toFixed(1)} (${arrow}${Math.abs(pctChange).toFixed(0)}%)`,
+                  improved,
                 };
+              };
 
-                const stressData = getMetricValues('avg_stress');
-                const planningData = getMetricValues('avg_planning_hours');
-                const retentionData = getMetricValues('avg_retention_intent');
-
-                const hasAnyData = stressData || planningData || retentionData;
-                const isEarly = daysSinceStart < 90 && !hasAnyData;
-
-                // Helper to format change
-                const formatChange = (earliest: number, latest: number, isLowerBetter: boolean) => {
-                  const pctChange = ((latest - earliest) / earliest) * 100;
-                  const improved = isLowerBetter ? pctChange < 0 : pctChange > 0;
-                  const arrow = pctChange > 0 ? '↑' : pctChange < 0 ? '↓' : '';
-                  return {
-                    text: `${earliest.toFixed(1)} → ${latest.toFixed(1)} (${arrow}${Math.abs(pctChange).toFixed(0)}%)`,
-                    improved,
-                  };
-                };
-
+              // Show example preview when no metric data exists
+              if (!hasAnyMetricData) {
                 return (
-                  <>
-                    {isEarly && (
-                      <div className="mb-4 md:mb-6 px-3 py-2 bg-white/10 rounded-lg inline-block">
-                        <span className="text-xs md:text-sm font-medium">Your impact data will populate here as your partnership progresses</span>
-                      </div>
-                    )}
-                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                      <div>
-                        <p className="text-white/70 text-xs md:text-sm mb-1">Educators Supported</p>
-                        <p className="text-xl md:text-2xl font-bold">
-                          {staffStats.total > 0 ? staffStats.total : '—'}
-                          {partnership?.partnership_type === 'district' && apiBuildings.length > 0 && (
-                            <span className="text-sm md:text-lg font-normal text-white/70 block md:inline"> ({apiBuildings.length} bldgs)</span>
-                          )}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-white/70 text-xs md:text-sm mb-1">Hub Engagement</p>
-                        <p className="text-xl md:text-2xl font-bold">
-                          {staffStats.total > 0 ? `${Math.round((staffStats.hubLoggedIn / staffStats.total) * 100)}%` : '—'}
-                          <span className="text-sm md:text-lg font-normal text-white/70 hidden md:inline"> (vs 10% avg)</span>
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-white/70 text-xs md:text-sm mb-1">Love Notes</p>
-                        <p className="text-xl md:text-2xl font-bold">{loveNotes > 0 ? loveNotes : '—'}</p>
-                      </div>
-                      <div>
-                        <p className="text-white/70 text-xs md:text-sm mb-1">Educator Stress</p>
-                        {stressData ? (
-                          stressData.hasChange ? (
-                            <p className={`text-xl md:text-2xl font-bold ${formatChange(stressData.earliest, stressData.latest, true).improved ? 'text-[#4ecdc4]' : 'text-red-300'}`}>
-                              {formatChange(stressData.earliest, stressData.latest, true).text}
-                            </p>
-                          ) : (
-                            <p className="text-xl md:text-2xl font-bold">{stressData.latest.toFixed(1)}/10</p>
-                          )
-                        ) : (
-                          <p className="text-xl md:text-2xl font-bold">—</p>
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-white/70 text-xs md:text-sm mb-1">Planning Time</p>
-                        {planningData ? (
-                          planningData.hasChange ? (
-                            <p className={`text-xl md:text-2xl font-bold ${formatChange(planningData.earliest, planningData.latest, false).improved ? 'text-[#4ecdc4]' : 'text-red-300'}`}>
-                              {formatChange(planningData.earliest, planningData.latest, false).text} hrs
-                            </p>
-                          ) : (
-                            <p className="text-xl md:text-2xl font-bold">{planningData.latest.toFixed(1)} hrs/wk</p>
-                          )
-                        ) : (
-                          <p className="text-xl md:text-2xl font-bold">—</p>
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-white/70 text-xs md:text-sm mb-1">Retention Intent</p>
-                        {retentionData ? (
-                          retentionData.hasChange ? (
-                            <p className={`text-xl md:text-2xl font-bold ${formatChange(retentionData.earliest, retentionData.latest, false).improved ? 'text-[#4ecdc4]' : 'text-red-300'}`}>
-                              {formatChange(retentionData.earliest, retentionData.latest, false).text}
-                            </p>
-                          ) : (
-                            <p className="text-xl md:text-2xl font-bold">{retentionData.latest.toFixed(1)}/10</p>
-                          )
-                        ) : (
-                          <p className="text-xl md:text-2xl font-bold">—</p>
-                        )}
+                  <ExamplePreview message="Example impact data from a mature TDI partnership — your metrics will populate over time.">
+                    <div id="roi-summary" className="dark-card bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-4 md:p-8 text-white">
+                      <h2 className="text-base md:text-lg font-bold text-white mb-4 md:mb-6">Your Impact Summary</h2>
+                      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                        <div>
+                          <p className="text-white/70 text-xs md:text-sm mb-1">Educators Supported</p>
+                          <p className="text-xl md:text-2xl font-bold">255 <span className="text-sm md:text-lg font-normal text-white/70">(6 bldgs)</span></p>
+                        </div>
+                        <div>
+                          <p className="text-white/70 text-xs md:text-sm mb-1">Hub Engagement</p>
+                          <p className="text-xl md:text-2xl font-bold">87% <span className="text-sm md:text-lg font-normal text-white/70 hidden md:inline">(vs 10% avg)</span></p>
+                        </div>
+                        <div>
+                          <p className="text-white/70 text-xs md:text-sm mb-1">Love Notes</p>
+                          <p className="text-xl md:text-2xl font-bold">127</p>
+                        </div>
+                        <div>
+                          <p className="text-white/70 text-xs md:text-sm mb-1">Educator Stress</p>
+                          <p className="text-xl md:text-2xl font-bold text-[#4ecdc4]">8.2 → 6.0 (↓27%)</p>
+                        </div>
+                        <div>
+                          <p className="text-white/70 text-xs md:text-sm mb-1">Planning Time</p>
+                          <p className="text-xl md:text-2xl font-bold text-[#4ecdc4]">12 → 7 hrs (↓42%)</p>
+                        </div>
+                        <div>
+                          <p className="text-white/70 text-xs md:text-sm mb-1">Retention Intent</p>
+                          <p className="text-xl md:text-2xl font-bold text-[#4ecdc4]">4.2 → 9.8 (↑133%)</p>
+                        </div>
                       </div>
                     </div>
-                  </>
+                  </ExamplePreview>
                 );
-              })()}
-            </div>
+              }
+
+              return (
+                <div id="roi-summary" className="dark-card bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-4 md:p-8 text-white">
+                  <h2 className="text-base md:text-lg font-bold text-white mb-4 md:mb-6">Your Impact Summary</h2>
+                  <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                    <div>
+                      <p className="text-white/70 text-xs md:text-sm mb-1">Educators Supported</p>
+                      <p className="text-xl md:text-2xl font-bold">
+                        {staffStats.total > 0 ? staffStats.total : '—'}
+                        {partnership?.partnership_type === 'district' && apiBuildings.length > 0 && (
+                          <span className="text-sm md:text-lg font-normal text-white/70 block md:inline"> ({apiBuildings.length} bldgs)</span>
+                        )}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-white/70 text-xs md:text-sm mb-1">Hub Engagement</p>
+                      <p className="text-xl md:text-2xl font-bold">
+                        {staffStats.total > 0 ? `${Math.round((staffStats.hubLoggedIn / staffStats.total) * 100)}%` : '—'}
+                        <span className="text-sm md:text-lg font-normal text-white/70 hidden md:inline"> (vs 10% avg)</span>
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-white/70 text-xs md:text-sm mb-1">Love Notes</p>
+                      <p className="text-xl md:text-2xl font-bold">{loveNotes > 0 ? loveNotes : '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-white/70 text-xs md:text-sm mb-1">Educator Stress</p>
+                      {stressData ? (
+                        stressData.hasChange ? (
+                          <p className={`text-xl md:text-2xl font-bold ${formatChange(stressData.earliest, stressData.latest, true).improved ? 'text-[#4ecdc4]' : 'text-red-300'}`}>
+                            {formatChange(stressData.earliest, stressData.latest, true).text}
+                          </p>
+                        ) : (
+                          <p className="text-xl md:text-2xl font-bold">{stressData.latest.toFixed(1)}/10</p>
+                        )
+                      ) : (
+                        <p className="text-xl md:text-2xl font-bold">—</p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-white/70 text-xs md:text-sm mb-1">Planning Time</p>
+                      {planningData ? (
+                        planningData.hasChange ? (
+                          <p className={`text-xl md:text-2xl font-bold ${formatChange(planningData.earliest, planningData.latest, false).improved ? 'text-[#4ecdc4]' : 'text-red-300'}`}>
+                            {formatChange(planningData.earliest, planningData.latest, false).text} hrs
+                          </p>
+                        ) : (
+                          <p className="text-xl md:text-2xl font-bold">{planningData.latest.toFixed(1)} hrs/wk</p>
+                        )
+                      ) : (
+                        <p className="text-xl md:text-2xl font-bold">—</p>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-white/70 text-xs md:text-sm mb-1">Retention Intent</p>
+                      {retentionData ? (
+                        retentionData.hasChange ? (
+                          <p className={`text-xl md:text-2xl font-bold ${formatChange(retentionData.earliest, retentionData.latest, false).improved ? 'text-[#4ecdc4]' : 'text-red-300'}`}>
+                            {formatChange(retentionData.earliest, retentionData.latest, false).text}
+                          </p>
+                        ) : (
+                          <p className="text-xl md:text-2xl font-bold">{retentionData.latest.toFixed(1)}/10</p>
+                        )
+                      ) : (
+                        <p className="text-xl md:text-2xl font-bold">—</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Board Presentation Offer */}
             <div className="bg-[#FFF8E7] rounded-2xl p-6 border border-[#E8B84B]/30">
