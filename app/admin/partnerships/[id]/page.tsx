@@ -111,6 +111,18 @@ interface MetricSnapshot {
   source?: string;
 }
 
+interface StaffMember {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  role?: string;
+  role_title?: string;
+  building_id?: string;
+  hub_enrolled?: boolean;
+  buildings?: { name: string } | null;
+}
+
 // Check if user is TDI admin
 async function checkTDIAdmin(email: string): Promise<boolean> {
   return email.toLowerCase().endsWith('@teachersdeserveit.com');
@@ -215,6 +227,7 @@ export default function PartnershipDetailPage() {
   const [activityLog, setActivityLog] = useState<ActivityLogEntry[]>([]);
   const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
   const [staffCount, setStaffCount] = useState(0);
+  const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
 
   // UI state
   const [isLoading, setIsLoading] = useState(true);
@@ -299,6 +312,7 @@ export default function PartnershipDetailPage() {
             setActivityLog(data.activityLog);
             setMetricSnapshots(data.metricSnapshots);
             setStaffCount(data.staffCount);
+            setStaffMembers(data.staff || []);
           }
         } else if (response.status === 404) {
           router.push('/admin/partnerships');
@@ -348,6 +362,28 @@ export default function PartnershipDetailPage() {
       );
     }
   }, [organization]);
+
+  // Download staff roster as CSV
+  const downloadStaffCSV = () => {
+    const orgName = organization?.name || partnership?.contact_name || 'partnership';
+    const headers = ['Name', 'Email', 'Role', 'Building', 'Hub Status'];
+    const rows = staffMembers.map(s => [
+      `${s.first_name} ${s.last_name}`,
+      s.email,
+      s.role_title || s.role || '',
+      s.buildings?.name || '',
+      s.hub_enrolled ? 'Logged in' : 'Not yet'
+    ]);
+
+    const csv = [headers, ...rows].map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${orgName.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-staff-roster.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const handleSavePartnership = async () => {
     if (!userEmail || !partnership) return;
@@ -1152,6 +1188,74 @@ export default function PartnershipDetailPage() {
                   <p className="text-sm text-gray-500">Executive Sessions</p>
                 </div>
               </div>
+            </div>
+
+            {/* Staff Roster */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-lg font-semibold text-[#1e2749]">
+                  Staff Roster
+                  <span className="ml-2 text-sm font-normal text-gray-500">
+                    ({staffCount} educator{staffCount !== 1 ? 's' : ''})
+                  </span>
+                </h2>
+                {staffMembers.length > 0 && (
+                  <button
+                    onClick={downloadStaffCSV}
+                    className="inline-flex items-center gap-1 text-xs px-3 py-1.5 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3459] transition-colors"
+                  >
+                    Download CSV
+                  </button>
+                )}
+              </div>
+
+              {staffMembers.length === 0 ? (
+                <p className="text-gray-500 text-center py-8">No staff members added yet</p>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">Name</th>
+                        <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">Email</th>
+                        <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">Role</th>
+                        <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">Building</th>
+                        <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">Hub Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {staffMembers.map(staff => (
+                        <tr key={staff.id} className="border-b border-gray-100">
+                          <td className="py-2 px-3">{staff.first_name} {staff.last_name}</td>
+                          <td className="py-2 px-3 text-gray-600">{staff.email}</td>
+                          <td className="py-2 px-3">
+                            {staff.role_title || staff.role ? (
+                              <span className={`px-2 py-0.5 rounded text-xs ${
+                                (staff.role_title || staff.role || '').toLowerCase().includes('teacher')
+                                  ? 'bg-blue-50 text-blue-700'
+                                  : 'bg-purple-50 text-purple-700'
+                              }`}>
+                                {staff.role_title || staff.role}
+                              </span>
+                            ) : (
+                              <span className="text-gray-400">-</span>
+                            )}
+                          </td>
+                          <td className="py-2 px-3 text-gray-600">{staff.buildings?.name || '-'}</td>
+                          <td className="py-2 px-3">
+                            <span className={`flex items-center gap-1 text-xs ${
+                              staff.hub_enrolled ? 'text-teal-600' : 'text-gray-400'
+                            }`}>
+                              <span className={`w-2 h-2 rounded-full ${staff.hub_enrolled ? 'bg-teal-500' : 'bg-gray-300'}`} />
+                              {staff.hub_enrolled ? 'Logged in' : 'Not yet'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
 
             {/* Action Items */}

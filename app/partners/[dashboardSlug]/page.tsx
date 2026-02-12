@@ -1782,24 +1782,16 @@ export default function PartnerDashboard() {
                           const renderInlineAction = () => {
                             const titleLower = item.title.toLowerCase();
 
-                            // Item 1: Complete Hub Onboarding - always show (simple button)
+                            // Item 1: Complete Hub Onboarding - instructional text
                             if (titleLower.includes('hub onboarding') || titleLower.includes('hub access')) {
                               return (
-                                <div className="mt-3 flex flex-wrap items-center gap-3">
-                                  <button
-                                    onClick={handleCopyHubLink}
-                                    className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
-                                  >
-                                    {copiedLink ? (
-                                      <Check className="w-4 h-4" />
-                                    ) : (
-                                      <Copy className="w-4 h-4" />
-                                    )}
-                                    {copiedLink ? 'Copied!' : 'Share Hub Access Link'}
-                                  </button>
-                                  <span className="text-xs text-gray-500">
+                                <div className="mt-3">
+                                  <p style={{ color: '#6b7280' }} className="text-sm">
+                                    Your TDI partner will send your staff a welcome email with Hub access instructions. If you need to resend, contact Rae@TeachersDeserveIt.com
+                                  </p>
+                                  <p style={{ color: '#9ca3af' }} className="text-xs mt-1">
                                     {staffStats.hubLoggedIn}/{staffStats.total} logged in
-                                  </span>
+                                  </p>
                                 </div>
                               );
                             }

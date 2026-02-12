@@ -66,10 +66,10 @@ export async function GET(
       .eq('organization_id', organization?.id || '')
       .order('name');
 
-    // Fetch staff members
+    // Fetch staff members with building names
     const { data: staff, count: staffCount } = await supabase
       .from('staff_members')
-      .select('*', { count: 'exact' })
+      .select('*, buildings(name)', { count: 'exact' })
       .eq('partnership_id', partnershipId)
       .order('last_name');
 
