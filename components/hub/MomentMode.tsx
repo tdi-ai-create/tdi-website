@@ -522,24 +522,31 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
 
             {breathPhase !== 'complete' ? (
               <>
-                {/* Breathing Circle */}
-                <div className="relative mx-auto mb-6" style={{ width: '180px', height: '180px' }}>
+                {/* Breathing Circle with smooth animation */}
+                <div className="relative mx-auto mb-8" style={{ width: '200px', height: '200px' }}>
                   <div
-                    className="absolute top-1/2 left-1/2 rounded-full flex items-center justify-center transition-all duration-1000 ease-in-out"
+                    className="absolute top-1/2 left-1/2 rounded-full flex items-center justify-center"
                     style={{
                       width: isCircleExpanded ? '180px' : '120px',
                       height: isCircleExpanded ? '180px' : '120px',
                       transform: 'translate(-50%, -50%)',
                       border: '2px solid white',
-                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      backgroundColor: isCircleExpanded ? 'rgba(255, 255, 255, 0.2)' : 'rgba(255, 255, 255, 0.1)',
+                      boxShadow: isCircleExpanded
+                        ? '0 0 40px rgba(255, 255, 255, 0.3), 0 0 80px rgba(255, 255, 255, 0.15)'
+                        : '0 0 20px rgba(255, 255, 255, 0.1)',
+                      transition: 'width 4s ease-in-out, height 4s ease-in-out, background-color 4s ease-in-out, box-shadow 4s ease-in-out',
                     }}
                   >
                     <span
-                      className="text-center px-4"
+                      key={breathPhase}
+                      className="text-center px-4 breath-text-fade"
                       style={{
                         fontFamily: "'DM Sans', sans-serif",
-                        fontSize: '16px',
+                        fontSize: '17px',
                         color: 'white',
+                        fontWeight: 500,
+                        letterSpacing: '0.02em',
                       }}
                     >
                       {getBreathPhaseText()}
@@ -549,7 +556,6 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
 
                 {/* Cycle Counter */}
                 <p
-                  className="mb-6"
                   style={{
                     fontFamily: "'DM Sans', sans-serif",
                     fontSize: '14px',
@@ -558,33 +564,22 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                 >
                   Breath {breathCycle} of {TOTAL_CYCLES}
                 </p>
-
-                <p
-                  className="mb-2"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    color: 'rgba(255, 255, 255, 0.8)',
-                  }}
-                >
-                  Box breathing: 4 seconds each phase
-                </p>
-                <p
-                  className="text-sm"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    color: 'rgba(255, 255, 255, 0.5)',
-                  }}
-                >
-                  In → Hold → Out → Hold
-                </p>
               </>
             ) : (
               <>
-                {/* Completion State */}
-                <div
-                  className="mb-8 p-6 rounded-xl"
-                  style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)' }}
-                >
+                {/* Completion State - Gentle fade in */}
+                <div className="breath-completion-fade">
+                  {/* Soft glow circle */}
+                  <div
+                    className="mx-auto mb-8 rounded-full"
+                    style={{
+                      width: '120px',
+                      height: '120px',
+                      backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                      boxShadow: '0 0 60px rgba(255, 255, 255, 0.2), 0 0 100px rgba(255, 255, 255, 0.1)',
+                    }}
+                  />
+
                   <p
                     className="text-xl mb-2"
                     style={{
@@ -595,6 +590,7 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                     Well done.
                   </p>
                   <p
+                    className="mb-8"
                     style={{
                       fontFamily: "'DM Sans', sans-serif",
                       fontSize: '15px',
@@ -603,22 +599,23 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
                   >
                     Take one more breath on your own.
                   </p>
-                </div>
 
-                <button
-                  onClick={() => {
-                    resetBreathing();
-                    setState('entry');
-                  }}
-                  className="px-8 py-3 rounded-lg font-medium transition-all hover:bg-white/20"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    backgroundColor: '#E8B84B',
-                    color: '#2B3A67',
-                  }}
-                >
-                  Done
-                </button>
+                  <button
+                    onClick={() => {
+                      resetBreathing();
+                      setState('entry');
+                    }}
+                    className="px-8 py-3 rounded-lg font-medium transition-all hover:bg-white/10"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      backgroundColor: 'transparent',
+                      border: '1px solid rgba(255, 255, 255, 0.5)',
+                      color: 'white',
+                    }}
+                  >
+                    Done
+                  </button>
+                </div>
               </>
             )}
           </div>
@@ -987,6 +984,33 @@ export default function MomentMode({ isOpen, onClose }: MomentModeProps) {
             opacity: 1;
             transform: translateY(0);
           }
+        }
+        @keyframes breathTextFade {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        @keyframes completionFadeIn {
+          from {
+            opacity: 0;
+            transform: scale(0.95);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        .breath-text-fade {
+          animation: breathTextFade 0.3s ease-out;
+          animation-fill-mode: forwards;
+        }
+        .breath-completion-fade {
+          animation: completionFadeIn 1s ease-out;
         }
         textarea::placeholder {
           color: rgba(255, 255, 255, 0.4);
