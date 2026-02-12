@@ -112,7 +112,7 @@ export default function ASD4Dashboard() {
       description: 'Final coaching check-in — schedule after April 20',
       deadline: 'MAY 2026',
       actionLabel: 'Book Your Session',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat',
       icon: Monitor,
       priority: 'now',
       external: true,
@@ -654,7 +654,7 @@ Thanks for everything you do.`
               <span className="text-white/60 hidden md:inline">| Partner Dashboard</span>
             </div>
             <a
-              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
@@ -2309,7 +2309,7 @@ Thanks for everything you do.`
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-2 bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-6 py-3 rounded-xl font-semibold transition-all"
@@ -2384,7 +2384,7 @@ Thanks for everything you do.`
                   </div>
 
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-6 py-3 rounded-xl font-semibold transition-all"
@@ -2666,7 +2666,7 @@ Thanks for everything you do.`
             <p className="text-white/60 text-sm">Partner Dashboard for Addison School District 4</p>
           </div>
           <a
-            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm"

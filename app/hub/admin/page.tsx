@@ -16,6 +16,7 @@ import {
   updateRequestStatus,
   getAdminStats,
 } from '@/lib/hub/admin';
+import { getAdminFeedbackStats } from '@/lib/hub/feedback';
 import { getSupabase } from '@/lib/supabase';
 import {
   BarChart,
@@ -83,6 +84,7 @@ export default function AdminDashboardPage() {
 
   // Stats state
   const [stats, setStats] = useState<any>(null);
+  const [feedbackStats, setFeedbackStats] = useState<any>(null);
 
   // Check admin access
   useEffect(() => {
@@ -113,8 +115,12 @@ export default function AdminDashboardPage() {
       try {
         switch (activeTab) {
           case 'stats':
-            const statsData = await getAdminStats();
+            const [statsData, feedbackData] = await Promise.all([
+              getAdminStats(),
+              getAdminFeedbackStats(),
+            ]);
             setStats(statsData);
+            setFeedbackStats(feedbackData);
             break;
           case 'courses':
             const coursesData = await getAdminCourses();
@@ -387,6 +393,185 @@ export default function AdminDashboardPage() {
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
+                </div>
+              )}
+
+              {/* Feedback Section */}
+              {feedbackStats && (
+                <div className="hub-card">
+                  <h3
+                    className="font-semibold mb-4"
+                    style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontSize: '16px',
+                      color: '#2B3A67',
+                    }}
+                  >
+                    User Feedback
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    {/* Average Course Rating */}
+                    <div className="p-4 rounded-lg" style={{ backgroundColor: '#FFF8E7' }}>
+                      <p
+                        className="text-sm text-gray-500 mb-1"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        Avg Course Rating
+                      </p>
+                      <p
+                        className="text-3xl font-bold"
+                        style={{ fontFamily: "'Source Serif 4', Georgia, serif", color: '#2B3A67' }}
+                      >
+                        {feedbackStats.avgCourseRating || 'N/A'}
+                        {feedbackStats.avgCourseRating && (
+                          <span className="text-sm font-normal text-gray-500"> / 5</span>
+                        )}
+                      </p>
+                      <p
+                        className="text-xs text-gray-400 mt-1"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        {feedbackStats.courseRatingsCount} rating{feedbackStats.courseRatingsCount !== 1 ? 's' : ''}
+                      </p>
+                    </div>
+
+                    {/* Satisfaction Breakdown */}
+                    <div className="p-4 rounded-lg border border-gray-200">
+                      <p
+                        className="text-sm text-gray-500 mb-2"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        Satisfaction
+                      </p>
+                      {feedbackStats.satisfactionBreakdown?.total > 0 ? (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span>😊</span>
+                            <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full"
+                                style={{
+                                  backgroundColor: '#22C55E',
+                                  width: `${(feedbackStats.satisfactionBreakdown.great / feedbackStats.satisfactionBreakdown.total) * 100}%`,
+                                }}
+                              />
+                            </div>
+                            <span className="text-xs text-gray-500 w-8">
+                              {Math.round((feedbackStats.satisfactionBreakdown.great / feedbackStats.satisfactionBreakdown.total) * 100)}%
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span>😐</span>
+                            <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full"
+                                style={{
+                                  backgroundColor: '#F59E0B',
+                                  width: `${(feedbackStats.satisfactionBreakdown.ok / feedbackStats.satisfactionBreakdown.total) * 100}%`,
+                                }}
+                              />
+                            </div>
+                            <span className="text-xs text-gray-500 w-8">
+                              {Math.round((feedbackStats.satisfactionBreakdown.ok / feedbackStats.satisfactionBreakdown.total) * 100)}%
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span>😕</span>
+                            <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full"
+                                style={{
+                                  backgroundColor: '#EF4444',
+                                  width: `${(feedbackStats.satisfactionBreakdown.needs_work / feedbackStats.satisfactionBreakdown.total) * 100}%`,
+                                }}
+                              />
+                            </div>
+                            <span className="text-xs text-gray-500 w-8">
+                              {Math.round((feedbackStats.satisfactionBreakdown.needs_work / feedbackStats.satisfactionBreakdown.total) * 100)}%
+                            </span>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-400">No data yet</p>
+                      )}
+                    </div>
+
+                    {/* Total Feedback */}
+                    <div className="p-4 rounded-lg border border-gray-200">
+                      <p
+                        className="text-sm text-gray-500 mb-1"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        Total Feedback
+                      </p>
+                      <p
+                        className="text-3xl font-bold"
+                        style={{ fontFamily: "'Source Serif 4', Georgia, serif", color: '#2B3A67' }}
+                      >
+                        {feedbackStats.totalFeedback}
+                      </p>
+                      <p
+                        className="text-xs text-gray-400 mt-1"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        responses collected
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Recent Comments */}
+                  {feedbackStats.recentComments?.length > 0 && (
+                    <div>
+                      <p
+                        className="text-sm font-medium text-gray-700 mb-3"
+                        style={{ fontFamily: "'DM Sans', sans-serif" }}
+                      >
+                        Recent Comments
+                      </p>
+                      <div className="space-y-3 max-h-64 overflow-y-auto">
+                        {feedbackStats.recentComments.map((item: any, index: number) => (
+                          <div
+                            key={index}
+                            className="p-3 rounded-lg border border-gray-100"
+                            style={{ backgroundColor: index % 2 === 0 ? 'white' : '#FAFAF8' }}
+                          >
+                            <div className="flex items-center gap-2 mb-1">
+                              <span
+                                className="text-[10px] uppercase font-medium px-2 py-0.5 rounded-full"
+                                style={{
+                                  backgroundColor: item.type === 'course_feedback' ? '#DBEAFE' : item.type === 'feature_request' ? '#FEF3C7' : '#D1FAE5',
+                                  color: item.type === 'course_feedback' ? '#1E40AF' : item.type === 'feature_request' ? '#92400E' : '#065F46',
+                                  fontFamily: "'DM Sans', sans-serif",
+                                }}
+                              >
+                                {item.type?.replace('_', ' ')}
+                              </span>
+                              {item.rating && (
+                                <span className="text-xs text-gray-500">
+                                  {'★'.repeat(item.rating)}{'☆'.repeat(5 - item.rating)}
+                                </span>
+                              )}
+                              {item.satisfaction && (
+                                <span className="text-xs">
+                                  {item.satisfaction === 'great' ? '😊' : item.satisfaction === 'ok' ? '😐' : '😕'}
+                                </span>
+                              )}
+                              <span className="text-[10px] text-gray-400 ml-auto">
+                                {new Date(item.created_at).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <p
+                              className="text-sm text-gray-600"
+                              style={{ fontFamily: "'DM Sans', sans-serif" }}
+                            >
+                              {item.comment}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

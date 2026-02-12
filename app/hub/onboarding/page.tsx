@@ -95,12 +95,18 @@ export default function OnboardingPage() {
   const [isUploading, setIsUploading] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
 
+  // User state
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userDisplayName, setUserDisplayName] = useState<string | null>(null);
+
   // Get current user on mount
   useEffect(() => {
     async function loadUser() {
       const user = await getCurrentUser();
       if (user) {
         setUserId(user.id);
+        setUserEmail(user.email || null);
+        setUserDisplayName(user.user_metadata?.display_name || user.user_metadata?.full_name || null);
       } else {
         router.push('/hub/login');
       }
@@ -222,6 +228,19 @@ export default function OnboardingPage() {
         if (assessmentError) {
           console.error('Assessment insert error:', assessmentError);
         }
+      }
+
+      // 4. Trigger welcome email (async, don't block on it)
+      if (userEmail) {
+        fetch('/api/hub/emails/welcome', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId,
+            email: userEmail,
+            displayName: userDisplayName || undefined,
+          }),
+        }).catch(err => console.error('Welcome email error:', err));
       }
 
       // Redirect to dashboard

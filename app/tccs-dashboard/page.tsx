@@ -327,7 +327,7 @@ export default function TCCSDashboard() {
                     <p className="text-sm text-gray-500">45 min · Included in contract</p>
                   </div>
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
@@ -347,7 +347,7 @@ export default function TCCSDashboard() {
                     </div>
                   </div>
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
@@ -678,7 +678,7 @@ export default function TCCSDashboard() {
                     <p className="text-gray-600 mb-3">A complimentary 45-minute bonus session -  on us! Use it for extra coaching, planning, or questions.</p>
                     <p className="text-xs text-green-700 mb-3">Schedule by April 2026</p>
                     <a
-                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -1036,7 +1036,7 @@ export default function TCCSDashboard() {
                     </div>
                   </div>
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 mt-4 bg-[#35A7FF] hover:bg-[#2896ee] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -1133,7 +1133,7 @@ export default function TCCSDashboard() {
               <p className="text-white/60 text-sm">Partner Dashboard for Tidioute Community Charter School</p>
             </div>
             <a
-              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2896ee] text-white px-5 py-2.5 rounded-lg font-medium transition-colors"

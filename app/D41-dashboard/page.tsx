@@ -176,7 +176,7 @@ export default function D41Dashboard() {
             <span className="text-[#38618C] text-sm">Partner Dashboard</span>
           </div>
           <a
-            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
@@ -1360,7 +1360,7 @@ export default function D41Dashboard() {
                 <p className="text-sm opacity-80">We&apos;re happy to talk through what might work for D41 -  no commitment needed.</p>
               </div>
               <a
-                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white text-[#1e2749] px-6 py-3 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors whitespace-nowrap"
@@ -1421,7 +1421,7 @@ export default function D41Dashboard() {
                   </div>
 
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-6 py-3 rounded-xl font-semibold transition-all"
@@ -1457,7 +1457,7 @@ export default function D41Dashboard() {
                 </a>
 
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="border border-gray-200 rounded-xl p-4 hover:border-[#35A7FF] hover:shadow-md transition-all group"
@@ -1698,7 +1698,7 @@ export default function D41Dashboard() {
             <p className="text-white/60 text-sm">Partner Dashboard for Glen Ellyn School District 41</p>
           </div>
           <a
-            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm"

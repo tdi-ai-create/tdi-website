@@ -155,7 +155,7 @@ export default function StPeterChanelDashboard() {
       deadlineMonth: 4,
       deadlineYear: 2026,
       actionLabel: 'Schedule',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat',
     },
     {
       id: 'virtual-instructional',
@@ -165,7 +165,7 @@ export default function StPeterChanelDashboard() {
       deadlineMonth: 5,
       deadlineYear: 2026,
       actionLabel: 'Schedule',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat',
     },
     {
       id: 'virtual-management',
@@ -175,7 +175,7 @@ export default function StPeterChanelDashboard() {
       deadlineMonth: 5,
       deadlineYear: 2026,
       actionLabel: 'Schedule',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat',
     },
   ];
 
@@ -473,7 +473,7 @@ export default function StPeterChanelDashboard() {
               <span className="text-white/60 hidden md:inline">| Partner Dashboard</span>
             </div>
             <a 
-              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
@@ -621,7 +621,7 @@ export default function StPeterChanelDashboard() {
 
                 {/* Virtual Sessions */}
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-center p-3 bg-[#E07A5F]/10 rounded-lg hover:bg-[#E07A5F]/20 transition-all cursor-pointer block"
@@ -1784,7 +1784,7 @@ export default function StPeterChanelDashboard() {
                   </div>
 
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block w-full bg-[#35A7FF] hover:bg-[#2589db] text-white text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
@@ -1836,7 +1836,7 @@ export default function StPeterChanelDashboard() {
                   </div>
 
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block w-full bg-[#35A7FF] hover:bg-[#2589db] text-white text-center py-3 rounded-xl font-semibold transition-all flex items-center justify-center gap-2"
@@ -2615,7 +2615,7 @@ export default function StPeterChanelDashboard() {
                 <p className="text-sm opacity-80">Let&apos;s lock in your 2026-27 partnership.</p>
               </div>
               <a
-                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-white text-[#1e2749] px-8 py-3 rounded-lg font-semibold text-sm hover:bg-gray-100 transition-colors whitespace-nowrap"
@@ -2676,7 +2676,7 @@ export default function StPeterChanelDashboard() {
                   </div>
 
                   <a 
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-6 py-3 rounded-xl font-semibold transition-all"
@@ -2876,7 +2876,7 @@ export default function StPeterChanelDashboard() {
             <p className="text-white/60 text-sm">Partner Dashboard for St. Peter Chanel School</p>
           </div>
           <a
-            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm"

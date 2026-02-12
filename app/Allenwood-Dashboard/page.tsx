@@ -97,7 +97,7 @@ export default function AllenwoodDashboard() {
       deadlineMonth: 6,
       deadlineYear: 2026,
       actionLabel: 'Schedule Sessions',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat',
     },
     {
       id: 'spring-celebration',
@@ -107,7 +107,7 @@ export default function AllenwoodDashboard() {
       deadlineMonth: 5,
       deadlineYear: 2026,
       actionLabel: 'Schedule Celebration',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat',
     },
   ];
 
@@ -225,7 +225,7 @@ export default function AllenwoodDashboard() {
               <span className="text-white/60 hidden md:inline">| Partner Dashboard</span>
             </div>
             <a
-              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
@@ -407,7 +407,7 @@ export default function AllenwoodDashboard() {
                   <div className="flex items-center justify-between pt-3 border-t border-[#38618C]/20">
                     <p className="text-xs text-gray-500">Mix and match based on your team&apos;s needs</p>
                     <a
-                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 text-sm font-medium text-[#38618C] hover:text-[#35A7FF]"
@@ -665,7 +665,7 @@ export default function AllenwoodDashboard() {
                   <p className="text-sm text-gray-300">Partner Dashboard for Allenwood Elementary</p>
                 </div>
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="bg-white text-[#1e2749] px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100"
@@ -999,7 +999,7 @@ export default function AllenwoodDashboard() {
 
                 {/* Virtual Session #2 */}
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
@@ -1015,7 +1015,7 @@ export default function AllenwoodDashboard() {
 
                 {/* Virtual Session #3 */}
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
@@ -1031,7 +1031,7 @@ export default function AllenwoodDashboard() {
 
                 {/* Virtual Session #4 */}
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
@@ -1047,7 +1047,7 @@ export default function AllenwoodDashboard() {
 
                 {/* Virtual Session #5 */}
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
@@ -1063,7 +1063,7 @@ export default function AllenwoodDashboard() {
 
                 {/* Virtual Session #6 */}
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
@@ -2559,7 +2559,7 @@ export default function AllenwoodDashboard() {
                   </div>
 
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-6 py-3 rounded-xl font-semibold transition-all"

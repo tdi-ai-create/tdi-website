@@ -108,7 +108,7 @@ export default function WegoDashboard() {
               <span className="text-white/60 hidden md:inline">| Partner Dashboard</span>
             </div>
             <a
-              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2"
@@ -336,7 +336,7 @@ export default function WegoDashboard() {
                   </span>
                 </div>
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-between p-3 bg-[#E07A5F]/5 rounded-lg border border-[#E07A5F]/20 hover:bg-[#E07A5F]/10 transition-colors group"
@@ -1648,7 +1648,7 @@ export default function WegoDashboard() {
                     same language, same strategies, same community.
                   </p>
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 text-sm font-medium text-amber-700 hover:text-amber-800"
@@ -1911,7 +1911,7 @@ export default function WegoDashboard() {
                 </span>
               </div>
               <a
-                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-[#ffba06] hover:bg-[#e5a805] text-[#1e2749] px-6 py-3 rounded-xl font-semibold transition-all"
@@ -1973,7 +1973,7 @@ export default function WegoDashboard() {
                   </div>
 
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-6 py-3 rounded-xl font-semibold transition-all"
@@ -2251,7 +2251,7 @@ export default function WegoDashboard() {
             <p className="text-white/60 text-sm">Partner Dashboard for West Chicago D94</p>
           </div>
           <a
-            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm"

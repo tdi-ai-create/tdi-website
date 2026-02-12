@@ -1084,7 +1084,7 @@ export default function PartnerDashboard() {
               </span>
             </div>
             <a
-              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+              href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
               target="_blank"
               rel="noopener noreferrer"
               className="bg-[#FFBA06] text-[#1e2749] px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-[#e5a805] transition-colors"
@@ -1809,7 +1809,7 @@ export default function PartnerDashboard() {
                               return (
                                 <div className="mt-3">
                                   <a
-                                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
@@ -2037,7 +2037,7 @@ export default function PartnerDashboard() {
                                     TDI will send your team a brief wellness survey. We&apos;ll handle the setup and share results with you on this dashboard.
                                   </p>
                                   <a
-                                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-2 px-4 py-2 bg-[#1e2749] text-white rounded-lg text-sm font-medium hover:bg-[#2a3459] transition-colors"
@@ -2498,7 +2498,7 @@ export default function PartnerDashboard() {
                   {/* Action Buttons */}
                   <div className="flex flex-wrap gap-3 mt-5">
                     <a
-                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#FFBA06] text-[#1e2749] rounded-lg font-medium hover:bg-[#e5a805] transition-colors"
@@ -3706,7 +3706,7 @@ export default function PartnerDashboard() {
               <div className="mt-6 bg-gradient-to-r from-[#1B2A4A] to-[#2a3f6e] rounded-xl p-5 text-white flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p className="text-sm text-center sm:text-left">Want to set custom goals? Let&apos;s talk about it in your next session.</p>
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 bg-white text-[#1B2A4A] text-sm font-medium rounded-lg hover:bg-gray-100 transition-colors whitespace-nowrap"
@@ -4259,7 +4259,7 @@ export default function PartnerDashboard() {
                     <div className="text-center">
                       <p className="text-gray-600 mb-4">Questions about what&apos;s ahead?</p>
                       <a
-                        href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                        href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-2 px-6 py-3 bg-[#1e2749] text-white rounded-lg font-medium hover:bg-[#2a3459] transition-colors"
@@ -4478,7 +4478,7 @@ export default function PartnerDashboard() {
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg text-sm font-medium hover:bg-[#1e2749]/5 transition-colors inline-flex items-center gap-2"

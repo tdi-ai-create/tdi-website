@@ -1,14 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { generateEmailHTML, getEmailSubject, type EmailType, type EmailData } from '@/lib/hub/emails';
+import { isEmailConfigured } from '@/lib/hub/email-sender';
 
 /**
- * API endpoint for generating email HTML
- *
- * NOTE: This does NOT send emails yet. It only generates the HTML.
- * Email sending will be configured later with a provider like Resend or SendGrid.
+ * API endpoint for generating or previewing email HTML
  *
  * POST /api/hub/emails
  * Body: { type: 'welcome' | 'nudge' | 'digest', data: EmailData }
+ *
+ * For actual sending, use the specific endpoints:
+ * - POST /api/hub/emails/welcome
+ * - POST /api/hub/emails/nudge
+ * - POST /api/hub/emails/digest
  */
 export async function POST(request: NextRequest) {
   try {
@@ -38,9 +41,10 @@ export async function POST(request: NextRequest) {
       type,
       subject,
       html,
-      // Placeholder for when email sending is configured
-      sent: false,
-      message: 'Email generated but not sent. Email provider not yet configured.',
+      emailConfigured: isEmailConfigured(),
+      message: isEmailConfigured()
+        ? 'Email preview generated. Use specific endpoint to send.'
+        : 'Email preview generated. Resend not configured (add RESEND_API_KEY).',
     });
   } catch (error) {
     console.error('Error generating email:', error);

@@ -121,7 +121,7 @@ export default function SauneminDashboard() {
       deadlineMonth: 4,
       deadlineYear: 2026,
       actionLabel: 'Completed',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat',
       icon: 'calendar',
     },
     {
@@ -412,7 +412,7 @@ export default function SauneminDashboard() {
             <span className="text-white/60 hidden md:inline">| Partner Dashboard</span>
           </div>
           <a
-            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors"
@@ -882,7 +882,7 @@ export default function SauneminDashboard() {
               <p className="text-xs text-gray-400">
                 Partnership services available through July 2026 ·
                 <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-[#35A7FF] hover:underline ml-1"
@@ -2031,7 +2031,7 @@ export default function SauneminDashboard() {
                 Let&apos;s talk about expanding support to your full staff and what Phase 2 could look like for Saunemin.
               </p>
               <a
-                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-6 py-3 rounded-xl font-semibold transition-all"
@@ -2093,7 +2093,7 @@ export default function SauneminDashboard() {
                   </div>
 
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-6 py-3 rounded-xl font-semibold transition-all"
@@ -2334,7 +2334,7 @@ export default function SauneminDashboard() {
                 ))}
               </ul>
               <a
-                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block w-full bg-[#35A7FF] hover:bg-[#2589db] text-white text-center py-3 rounded-xl font-semibold transition-all mt-4"
@@ -2396,7 +2396,7 @@ export default function SauneminDashboard() {
             <p className="text-white/60 text-sm">Partner Dashboard for Saunemin CCSD #438</p>
           </div>
           <a
-            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+            href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2589db] text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm"
