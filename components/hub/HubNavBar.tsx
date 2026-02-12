@@ -73,8 +73,8 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
       items.push({ href: '/hub/champion', label: 'School', exact: false });
     }
     if (isUserAdmin) {
-      // Add "Admin" at the end (after Settings/School)
-      items.push({ href: '/hub/admin', label: 'Admin', exact: false });
+      // Add "Admin Portal" at the end (after Settings/School)
+      items.push({ href: '/tdi-admin', label: 'Admin Portal', exact: false });
     }
     return items;
   }, [trackerEligible, isUserChampion, isUserAdmin]);
@@ -138,7 +138,7 @@ export default function HubNavBar({ profile, userEmail, userId }: HubNavBarProps
         <div className="hidden md:flex items-center justify-center flex-1 gap-1">
           {navItems.map((item) => {
             const active = isActive(item.href, item.exact);
-            const isAdminLink = item.href === '/hub/admin';
+            const isAdminLink = item.href === '/tdi-admin';
             const isSchoolLink = item.href === '/hub/champion';
             return (
               <Link

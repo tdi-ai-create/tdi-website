@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useHub } from '@/components/hub/HubContext';
 import {
   isAdmin,
@@ -263,6 +264,45 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="p-4 md:p-8 max-w-[1400px] mx-auto">
+      {/* Migration Banner */}
+      <div
+        className="mb-6 p-4 rounded-lg flex items-center justify-between"
+        style={{
+          backgroundColor: '#FFF8E7',
+          border: '1px solid #E8B84B',
+        }}
+      >
+        <div>
+          <p
+            className="font-medium"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              color: '#2B3A67',
+            }}
+          >
+            The admin portal has moved!
+          </p>
+          <p
+            className="text-sm text-gray-600"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            We&apos;re migrating to a new unified TDI Admin Portal with better features.
+          </p>
+        </div>
+        <Link
+          href="/tdi-admin"
+          className="px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+          style={{
+            backgroundColor: '#E8B84B',
+            color: '#2B3A67',
+            fontFamily: "'DM Sans', sans-serif",
+          }}
+        >
+          Go to New Portal
+          <ChevronRight size={16} />
+        </Link>
+      </div>
+
       {/* Header */}
       <div className="mb-6">
         <h1
