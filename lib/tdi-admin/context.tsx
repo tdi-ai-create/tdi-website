@@ -1,7 +1,6 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useHub } from '@/components/hub/HubContext';
 import { TeamMember, TeamPermissions, checkTeamAccess, getAccessibleSections, isOwner, canManageTeam, PortalSection } from './permissions';
 
 interface TDIAdminContextType {
@@ -30,27 +29,32 @@ export function useTDIAdmin() {
   return useContext(TDIAdminContext);
 }
 
-export function TDIAdminProvider({ children }: { children: ReactNode }) {
-  const { user } = useHub();
+interface TDIAdminProviderProps {
+  children: ReactNode;
+  userId: string;
+  userEmail: string;
+}
+
+export function TDIAdminProvider({ children, userId, userEmail }: TDIAdminProviderProps) {
   const [teamMember, setTeamMember] = useState<TeamMember | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const loadTeamMember = async () => {
-    if (!user?.email) {
+    if (!userEmail) {
       setTeamMember(null);
       setIsLoading(false);
       return;
     }
 
     setIsLoading(true);
-    const member = await checkTeamAccess(user.email);
+    const member = await checkTeamAccess(userId, userEmail);
     setTeamMember(member);
     setIsLoading(false);
   };
 
   useEffect(() => {
     loadTeamMember();
-  }, [user?.email]);
+  }, [userId, userEmail]);
 
   const hasAccess = teamMember !== null && teamMember.is_active;
   const permissions = teamMember?.permissions || {};

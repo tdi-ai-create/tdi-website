@@ -78,12 +78,25 @@ export const LEADERSHIP_PERMISSIONS = [
 ];
 
 /**
- * Check if a user has team access by email
+ * Check if a user has team access by userId or email
  * Returns the team member record or null if not found/inactive
  */
-export async function checkTeamAccess(email: string): Promise<TeamMember | null> {
+export async function checkTeamAccess(userId: string, email: string): Promise<TeamMember | null> {
   const supabase = getSupabase();
 
+  // First try to find by user_id if set
+  const { data: byUserId } = await supabase
+    .from('tdi_team_members')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_active', true)
+    .single();
+
+  if (byUserId) {
+    return byUserId as TeamMember;
+  }
+
+  // Fall back to email lookup
   const { data, error } = await supabase
     .from('tdi_team_members')
     .select('*')
@@ -92,8 +105,16 @@ export async function checkTeamAccess(email: string): Promise<TeamMember | null>
     .single();
 
   if (error || !data) {
-    console.log('[TDI Admin] Team access check failed:', { email, error });
+    console.log('[TDI Admin] Team access check failed:', { userId, email, error });
     return null;
+  }
+
+  // Link the user_id if not already set
+  if (!data.user_id) {
+    await supabase
+      .from('tdi_team_members')
+      .update({ user_id: userId })
+      .eq('id', data.id);
   }
 
   return data as TeamMember;
