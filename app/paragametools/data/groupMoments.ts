@@ -28,9 +28,17 @@ export const MAKEOVER_GROUP_MOMENTS = [
   "Share one -  who wants to go?",
 ];
 
+export const MADLIBS_GROUP_MOMENTS = [
+  "Read your SILLIEST madlib out loud!",
+  "Which real version was hardest to write?",
+  "Raise your hand if you'll remember the formula better now.",
+  "What made the silly ones funny? The pattern still worked!",
+];
+
 export const GROUP_MOMENTS_BY_GAME = {
   knockout: KNOCKOUT_GROUP_MOMENTS,
   tellorask: TELL_OR_ASK_GROUP_MOMENTS,
   levelup: LEVEL_UP_GROUP_MOMENTS,
+  madlibs: MADLIBS_GROUP_MOMENTS,
   makeover: MAKEOVER_GROUP_MOMENTS,
 } as const;

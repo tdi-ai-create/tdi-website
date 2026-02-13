@@ -19,6 +19,8 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
   const [timerRunning, setTimerRunning] = useState(false);
   const [timerKey, setTimerKey] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [switches, setSwitches] = useState(0);
+  const [showBuzzerEffect, setShowBuzzerEffect] = useState(false);
 
   // Shuffle scenarios on mount
   const scenarios = useMemo(
@@ -31,6 +33,13 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
     setCurrentRound(0);
     setTimerRunning(false);
     setTimerKey(0);
+    setSwitches(0);
+  };
+
+  const triggerBuzzer = () => {
+    setSwitches((prev) => prev + 1);
+    setShowBuzzerEffect(true);
+    setTimeout(() => setShowBuzzerEffect(false), 1000);
   };
 
   const handleNext = () => {
@@ -121,6 +130,27 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
             />
           </div>
 
+          {/* Buzzer Button */}
+          <button
+            onClick={triggerBuzzer}
+            className={`w-full mb-4 flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-lg transition-all ${
+              showBuzzerEffect ? 'animate-pulse scale-105' : 'hover:scale-105 active:scale-95'
+            }`}
+            style={{
+              backgroundColor: showBuzzerEffect ? '#C0392B' : '#E74C3C',
+              color: '#ffffff',
+            }}
+          >
+            <Bell size={24} />
+            BUZZER! They told instead of asked!
+          </button>
+
+          {switches > 0 && (
+            <div className="text-center mb-4">
+              <span className="text-orange-300 font-medium">Role switches: {switches}</span>
+            </div>
+          )}
+
           {/* Controls */}
           <div className="flex flex-col sm:flex-row gap-3 mb-6">
             <TimerControls
@@ -145,6 +175,15 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
             <span>If you tell... you're out!</span>
             <Bell size={16} style={{ color: colorConfig.accent }} />
           </div>
+
+          {/* Buzzer Effect Overlay */}
+          {showBuzzerEffect && (
+            <div className="fixed inset-0 bg-red-500/20 flex items-center justify-center z-50 pointer-events-none animate-fade-in">
+              <div className="bg-red-500 text-white px-8 py-4 rounded-xl text-2xl font-bold animate-bounce">
+                BZZZZT! SWITCH ROLES!
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -155,6 +194,29 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
           tableTalk="What was the hardest scenario to stay in questions?"
           color="orange"
           onBack={onBack}
+          extraContent={
+            <>
+              {switches > 0 && (
+                <div
+                  className="w-full max-w-lg rounded-xl p-4 mb-4 text-center"
+                  style={{ backgroundColor: 'rgba(255, 120, 71, 0.1)', border: '1px solid rgba(255, 120, 71, 0.3)' }}
+                >
+                  <p className="text-orange-300">
+                    Your table had <strong>{switches}</strong> role switch{switches !== 1 ? 'es' : ''} today!
+                  </p>
+                </div>
+              )}
+              <div
+                className="w-full max-w-lg rounded-xl p-4 mb-4 text-center"
+                style={{ backgroundColor: 'rgba(241, 196, 15, 0.1)', border: '1px solid rgba(241, 196, 15, 0.3)' }}
+              >
+                <p className="text-yellow-400 font-semibold mb-1">Victory Challenge!</p>
+                <p className="text-yellow-200 text-sm">
+                  Do your table's victory dance! Other tables guess what skill you practiced.
+                </p>
+              </div>
+            </>
+          }
         />
       )}
     </GameWrapper>

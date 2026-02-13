@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Check, X, ChevronRight, AlertTriangle } from 'lucide-react';
+import { Check, X, ChevronRight, AlertTriangle, AlertCircle, CheckCircle } from 'lucide-react';
 import { GameWrapper, IntroScreen, DoneScreen, ResultCard } from './GameWrapper';
 import { StreakCounter } from './StreakCounter';
 import { TELL_OR_ASK_STATEMENTS, TELL_OR_ASK_ROUNDS } from '../data/tellOrAsk';
@@ -20,6 +20,7 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
   const [userGuess, setUserGuess] = useState<'TELL' | 'ASK' | null>(null);
   const [streak, setStreak] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [confidence, setConfidence] = useState<number | null>(null);
 
   // Shuffle statements on mount
   const statements = useMemo(
@@ -33,6 +34,7 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
     setRevealed(false);
     setUserGuess(null);
     setStreak(0);
+    setConfidence(null);
   };
 
   const handleGuess = (guess: 'TELL' | 'ASK') => {
@@ -54,6 +56,7 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
         setCurrentRound((prev) => prev + 1);
         setRevealed(false);
         setUserGuess(null);
+        setConfidence(null);
         setIsAnimating(false);
       }, 200);
     } else {
@@ -117,6 +120,33 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
           {/* Pre-reveal state - Voting buttons */}
           {!revealed && (
             <div className="flex flex-col items-center gap-4 w-full">
+              {/* Confidence Meter */}
+              <div
+                className="w-full rounded-lg p-4"
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.1)' }}
+              >
+                <h4 className="text-white text-center mb-3">How confident is your table?</h4>
+                <div className="flex justify-between gap-2">
+                  {[1, 2, 3, 4, 5].map((level) => (
+                    <button
+                      key={level}
+                      onClick={() => setConfidence(level)}
+                      className={`flex-1 py-2 rounded text-sm font-medium transition-colors ${
+                        confidence === level
+                          ? 'bg-yellow-500 text-black'
+                          : 'bg-slate-600 hover:bg-slate-500 text-white'
+                      }`}
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex justify-between text-xs text-slate-400 mt-1">
+                  <span>Guessing</span>
+                  <span>Very Sure</span>
+                </div>
+              </div>
+
               <p className="text-lg" style={{ color: '#8899aa' }}>
                 Tables: discuss and decide!
               </p>
@@ -150,6 +180,26 @@ export function TellOrAsk({ onBack }: TellOrAskProps) {
                 explanation={current.why}
                 shake={!isCorrect}
               />
+
+              {/* Confidence Feedback */}
+              {confidence !== null && confidence >= 4 && !isCorrect && (
+                <div
+                  className="w-full rounded-lg p-3 flex items-center justify-center gap-2"
+                  style={{ backgroundColor: 'rgba(241, 196, 15, 0.1)', border: '1px solid rgba(241, 196, 15, 0.3)' }}
+                >
+                  <AlertCircle size={20} className="text-yellow-400" />
+                  <span className="text-yellow-200">Overconfident! These disguised tells are sneaky.</span>
+                </div>
+              )}
+              {confidence !== null && confidence <= 2 && isCorrect && (
+                <div
+                  className="w-full rounded-lg p-3 flex items-center justify-center gap-2"
+                  style={{ backgroundColor: 'rgba(39, 174, 96, 0.1)', border: '1px solid rgba(39, 174, 96, 0.3)' }}
+                >
+                  <CheckCircle size={20} className="text-green-400" />
+                  <span className="text-green-200">Humble but right! Trust your instincts.</span>
+                </div>
+              )}
 
               <button
                 onClick={handleNext}

@@ -36,9 +36,19 @@ export const MAKEOVER_TIPS = [
   "The context card is your cheat sheet -  use the details!",
 ];
 
+export const MADLIBS_TIPS = [
+  "Even absurd feedback follows the Notice-Name-Next Step pattern.",
+  "Laughter releases dopamine, which improves pattern recognition.",
+  "Listen for tables reading their silly versions aloud.",
+  "The real practice rounds are harder after the silly ones.",
+  "Pattern interruption makes the formula more memorable.",
+  "Tables that laugh together learn together.",
+];
+
 export const TIPS_BY_GAME = {
   knockout: KNOCKOUT_TIPS,
   tellorask: TELL_OR_ASK_TIPS,
   levelup: LEVEL_UP_TIPS,
+  madlibs: MADLIBS_TIPS,
   makeover: MAKEOVER_TIPS,
 } as const;

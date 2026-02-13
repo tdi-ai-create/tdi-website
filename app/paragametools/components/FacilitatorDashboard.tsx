@@ -13,6 +13,7 @@ import {
   Target,
   Zap,
   TrendingUp,
+  Smile,
   Wrench,
   ChevronRight,
 } from 'lucide-react';
@@ -24,6 +25,7 @@ const GAME_ICONS = {
   knockout: Target,
   tellorask: Zap,
   levelup: TrendingUp,
+  madlibs: Smile,
   makeover: Wrench,
 } as const;
 

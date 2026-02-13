@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, Target, Zap, TrendingUp, Wrench, Award, Check, X } from 'lucide-react';
+import { ArrowLeft, Target, Zap, TrendingUp, Smile, Wrench, Award, Check, X } from 'lucide-react';
 import { COLORS, type GameId } from '../data/gameConfig';
 import { ConfettiBurst } from './ConfettiBurst';
 
@@ -9,6 +9,7 @@ export const GAME_ICONS = {
   knockout: Target,
   tellorask: Zap,
   levelup: TrendingUp,
+  madlibs: Smile,
   makeover: Wrench,
 } as const;
 

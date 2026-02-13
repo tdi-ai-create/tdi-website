@@ -1,6 +1,6 @@
 'use client';
 
-import { Target, Zap, TrendingUp, Wrench, Monitor } from 'lucide-react';
+import { Target, Zap, TrendingUp, Smile, Wrench, Monitor } from 'lucide-react';
 import { GAMES, COLORS, type GameId } from '../data/gameConfig';
 
 // Icon map for home screen
@@ -8,6 +8,7 @@ const GAME_ICONS = {
   knockout: Target,
   tellorask: Zap,
   levelup: TrendingUp,
+  madlibs: Smile,
   makeover: Wrench,
 } as const;
 

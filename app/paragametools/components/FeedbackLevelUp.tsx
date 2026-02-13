@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Star, ChevronRight, Hand } from 'lucide-react';
+import { Star, ChevronRight, Hand, TrendingDown, AlertTriangle } from 'lucide-react';
 import { GameWrapper, IntroScreen, DoneScreen } from './GameWrapper';
 import { StreakCounter } from './StreakCounter';
 import { FEEDBACK_LEVELS, LEVEL_INFO } from '../data/feedbackLevels';
@@ -20,6 +20,8 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
   const [userGuess, setUserGuess] = useState<number | null>(null);
   const [streak, setStreak] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [trapCount, setTrapCount] = useState(0);
+  const [showTrapMessage, setShowTrapMessage] = useState(false);
 
   // Shuffle feedback examples on mount
   const feedbacks = useMemo(
@@ -33,17 +35,29 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
     setRevealed(false);
     setUserGuess(null);
     setStreak(0);
+    setTrapCount(0);
+    setShowTrapMessage(false);
   };
 
   const handleGuess = (level: number) => {
     setUserGuess(level);
     setRevealed(true);
 
-    const isCorrect = level === feedbacks[currentRound].level;
+    const actualLevel = feedbacks[currentRound].level;
+    const isCorrect = level === actualLevel;
+
     if (isCorrect) {
       setStreak((prev) => prev + 1);
     } else {
       setStreak(0);
+    }
+
+    // Check for Level 2 trap (user guessed Level 2 but it wasn't)
+    if (level === 2 && actualLevel !== 2) {
+      setTrapCount((prev) => prev + 1);
+      setShowTrapMessage(true);
+    } else {
+      setShowTrapMessage(false);
     }
   };
 
@@ -54,6 +68,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
         setCurrentRound((prev) => prev + 1);
         setRevealed(false);
         setUserGuess(null);
+        setShowTrapMessage(false);
         setIsAnimating(false);
       }, 200);
     } else {
@@ -196,6 +211,17 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
                 <p className="text-white">{current.why}</p>
               </div>
 
+              {/* Level 2 Trap Message */}
+              {showTrapMessage && (
+                <div
+                  className="w-full rounded-lg p-3 flex items-center justify-center gap-2"
+                  style={{ backgroundColor: 'rgba(241, 196, 15, 0.1)', border: '1px solid rgba(241, 196, 15, 0.3)' }}
+                >
+                  <AlertTriangle size={20} className="text-yellow-400" />
+                  <span className="text-yellow-200">Level 2 trapped you! It SOUNDS helpful but misses specifics.</span>
+                </div>
+              )}
+
               <button
                 onClick={handleNext}
                 className="flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
@@ -216,6 +242,21 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
           tableTalk="Where do you honestly land most days?"
           color="green"
           onBack={onBack}
+          extraContent={
+            <div
+              className="w-full max-w-lg rounded-xl p-5 mb-4 text-center"
+              style={{ backgroundColor: 'rgba(241, 196, 15, 0.1)', border: '1px solid rgba(241, 196, 15, 0.3)' }}
+            >
+              <TrendingDown size={32} className="text-yellow-400 mx-auto mb-2" />
+              <h3 className="text-lg font-bold text-white mb-1">Level 2 Trap Report</h3>
+              <p className="text-yellow-200">
+                Level 2 trapped <strong>{trapCount}</strong> of your votes today.
+              </p>
+              <p className="text-sm text-yellow-300 mt-2">
+                That's normal! Level 2 SOUNDS good but lacks the specifics that actually help students.
+              </p>
+            </div>
+          }
         />
       )}
     </GameWrapper>

@@ -1,6 +1,6 @@
 // Game configuration and shared utilities
 
-export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'makeover';
+export type GameId = 'knockout' | 'tellorask' | 'levelup' | 'madlibs' | 'makeover';
 
 export interface GameConfig {
   id: GameId;
@@ -8,7 +8,7 @@ export interface GameConfig {
   description: string;
   time: string;
   duration: number; // default minutes for facilitator timer
-  color: 'orange' | 'yellow' | 'green' | 'red';
+  color: 'orange' | 'yellow' | 'green' | 'purple' | 'red';
   rounds: string;
 }
 
@@ -39,6 +39,15 @@ export const GAMES: GameConfig[] = [
     duration: 12,
     color: 'green',
     rounds: '12 rounds',
+  },
+  {
+    id: 'madlibs',
+    title: 'Feedback Madlibs',
+    description: 'Practice the formula... with a twist!',
+    time: '~10 min',
+    duration: 10,
+    color: 'purple',
+    rounds: '6 rounds (3 silly + 3 real)',
   },
   {
     id: 'makeover',
@@ -76,6 +85,12 @@ export const COLORS = {
     bg: 'rgba(231, 76, 60, 0.1)',
     bgHover: 'rgba(231, 76, 60, 0.15)',
     border: 'rgba(231, 76, 60, 0.4)',
+  },
+  purple: {
+    accent: '#9333EA',
+    bg: 'rgba(147, 51, 234, 0.1)',
+    bgHover: 'rgba(147, 51, 234, 0.15)',
+    border: 'rgba(147, 51, 234, 0.4)',
   },
   blue: {
     accent: '#3498DB',

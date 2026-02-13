@@ -9,6 +9,7 @@ import { SlangBreak } from './components/SlangBreak';
 import { QuestionKnockout } from './components/QuestionKnockout';
 import { TellOrAsk } from './components/TellOrAsk';
 import { FeedbackLevelUp } from './components/FeedbackLevelUp';
+import { FeedbackMadlibs } from './components/FeedbackMadlibs';
 import { FeedbackMakeover } from './components/FeedbackMakeover';
 import type { GameId } from './data/gameConfig';
 
@@ -87,6 +88,8 @@ function ParaGameToolsContent() {
           return <TellOrAsk onBack={handleBackToPlayerHome} />;
         case 'levelup':
           return <FeedbackLevelUp onBack={handleBackToPlayerHome} />;
+        case 'madlibs':
+          return <FeedbackMadlibs onBack={handleBackToPlayerHome} />;
         case 'makeover':
           return <FeedbackMakeover onBack={handleBackToPlayerHome} />;
       }
