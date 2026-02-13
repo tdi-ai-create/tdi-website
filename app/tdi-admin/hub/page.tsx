@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { getAdminStats } from '@/lib/hub/admin';
+import ExampleDataBanner from '@/components/tdi-admin/ExampleDataBanner';
 import {
   Users,
   BookOpen,
@@ -127,12 +128,15 @@ export default function HubAdminPage() {
   const { teamMember, permissions } = useTDIAdmin();
   const [stats, setStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasExampleData, setHasExampleData] = useState(false);
 
   useEffect(() => {
     async function loadStats() {
       try {
         const data = await getAdminStats();
         setStats(data);
+        // Check if we likely have example data (500+ users suggests seeded data)
+        setHasExampleData((data?.totalUsers || 0) >= 100);
       } catch (error) {
         console.error('Error loading stats:', error);
       } finally {
@@ -145,6 +149,9 @@ export default function HubAdminPage() {
 
   return (
     <div className="p-4 md:p-8 max-w-[1400px] mx-auto">
+      {/* Example Data Banner */}
+      {hasExampleData && <ExampleDataBanner />}
+
       {/* Page Header */}
       <div className="mb-8">
         <h1

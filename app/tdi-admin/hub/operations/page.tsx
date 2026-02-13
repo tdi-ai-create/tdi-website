@@ -15,6 +15,7 @@ import {
   updateRequestStatus,
 } from '@/lib/hub/admin';
 import { getSupabase } from '@/lib/supabase';
+import ExampleDataBanner from '@/components/tdi-admin/ExampleDataBanner';
 import {
   ArrowLeft,
   Users,
@@ -926,6 +927,9 @@ export default function HubOperationsPage() {
 
   return (
     <div className="p-4 md:p-8 max-w-[1400px] mx-auto">
+      {/* Example Data Banner */}
+      <ExampleDataBanner />
+
       {/* Page Header */}
       <div className="mb-6">
         <Link
