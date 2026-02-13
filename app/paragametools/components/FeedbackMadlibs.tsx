@@ -1,14 +1,18 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Smile, ChevronRight, Eye, Award, ArrowLeft, RotateCcw } from 'lucide-react';
-import { GameWrapper, DoneScreen } from './GameWrapper';
+import { Smile, ChevronRight, Sparkles, Award, RotateCcw, Volume2 } from 'lucide-react';
+import { GameWrapper } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
-import { MADLIBS_SCENARIOS, MADLIBS_SILLY_ROUNDS, MADLIBS_PROMPTS } from '../data/madlibsData';
+import { MADLIBS_SCENARIOS, MADLIBS_SILLY_ROUNDS, SILLY_ROUND_PROMPTS } from '../data/madlibsData';
 import { COLORS, shuffle } from '../data/gameConfig';
 
 type Screen = 'intro' | 'play' | 'done';
-type PlayPhase = 'input' | 'comparison' | 'real-input' | 'real-check';
+
+// Silly round phases: blind input → reveal silly → show real
+// Real round phases: scenario → compare
+type SillyPhase = 'blind_input' | 'reveal_silly' | 'show_real';
+type RealPhase = 'scenario' | 'compare';
 
 interface FeedbackMadlibsProps {
   onBack: () => void;
@@ -17,11 +21,12 @@ interface FeedbackMadlibsProps {
 export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
   const [screen, setScreen] = useState<Screen>('intro');
   const [currentRound, setCurrentRound] = useState(0);
-  const [playPhase, setPlayPhase] = useState<PlayPhase>('input');
+  const [sillyPhase, setSillyPhase] = useState<SillyPhase>('blind_input');
+  const [realPhase, setRealPhase] = useState<RealPhase>('scenario');
   const [isAnimating, setIsAnimating] = useState(false);
 
-  // Madlib inputs for silly rounds
-  const [madlibInputs, setMadlibInputs] = useState({ verb: '', skill: '', action: '' });
+  // Blind inputs for silly rounds (user doesn't see the sentence)
+  const [blindInputs, setBlindInputs] = useState({ verb: '', skill: '', action: '' });
 
   // Real feedback inputs for practice rounds
   const [realInputs, setRealInputs] = useState({ notice: '', name: '', nextStep: '' });
@@ -33,27 +38,38 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
   const isSillyRound = currentRound < MADLIBS_SILLY_ROUNDS;
   const scenario = scenarios[currentRound % scenarios.length];
 
+  // Get prompts for current silly round
+  const currentPrompts = isSillyRound ? SILLY_ROUND_PROMPTS[currentRound % SILLY_ROUND_PROMPTS.length].prompts : [];
+
   const handleStart = () => {
     setScreen('play');
     setCurrentRound(0);
-    setPlayPhase('input');
+    setSillyPhase('blind_input');
+    setRealPhase('scenario');
     resetInputs();
   };
 
   const resetInputs = () => {
-    setMadlibInputs({ verb: '', skill: '', action: '' });
+    setBlindInputs({ verb: '', skill: '', action: '' });
     setRealInputs({ notice: '', name: '', nextStep: '' });
   };
 
-  const handleMadlibReveal = () => {
-    if (madlibInputs.verb && madlibInputs.skill && madlibInputs.action) {
-      setPlayPhase('comparison');
+  // Silly round: reveal the madlib
+  const handleReveal = () => {
+    if (blindInputs.verb && blindInputs.skill && blindInputs.action) {
+      setSillyPhase('reveal_silly');
     }
   };
 
-  const handleRealCheck = () => {
+  // Silly round: show real version
+  const handleShowReal = () => {
+    setSillyPhase('show_real');
+  };
+
+  // Real round: show comparison
+  const handleCompare = () => {
     if (realInputs.notice && realInputs.name && realInputs.nextStep) {
-      setPlayPhase('real-check');
+      setRealPhase('compare');
     }
   };
 
@@ -62,12 +78,11 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
       setIsAnimating(true);
       setTimeout(() => {
         setCurrentRound((prev) => prev + 1);
-        // Determine phase for next round
         const nextRound = currentRound + 1;
         if (nextRound < MADLIBS_SILLY_ROUNDS) {
-          setPlayPhase('input');
+          setSillyPhase('blind_input');
         } else {
-          setPlayPhase('real-input');
+          setRealPhase('scenario');
         }
         resetInputs();
         setIsAnimating(false);
@@ -77,7 +92,8 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
     }
   };
 
-  const sillyFeedback = `I see that you ${madlibInputs.verb || '___'}. That's called ${madlibInputs.skill || '___'}. Now try ${madlibInputs.action || '___'}.`;
+  // The revealed silly feedback sentence
+  const sillyFeedback = `I see that you ${blindInputs.verb}. That's called ${blindInputs.skill}. Now try ${blindInputs.action}.`;
   const realFeedbackFull = `${scenario.realFeedback.notice}. ${scenario.realFeedback.name}. ${scenario.realFeedback.nextStep}.`;
 
   return (
@@ -92,7 +108,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
             <Smile size={48} style={{ color: colorConfig.accent }} />
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Feedback Madlibs</h2>
-          <p className="text-xl text-purple-300 mb-6">Practice the formula... with a TWIST!</p>
+          <p className="text-xl text-purple-300 mb-6">Fill in words BLIND, then watch the magic!</p>
 
           {/* Rules box */}
           <div
@@ -102,55 +118,39 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
             <ul className="space-y-3 text-left">
               <li className="flex items-start gap-3 text-white">
                 <span style={{ color: colorConfig.accent }}>1.</span>
-                <span>Fill in the MOST RIDICULOUS words you can think of</span>
+                <span>Answer silly prompts WITHOUT seeing the sentence</span>
               </li>
               <li className="flex items-start gap-3 text-white">
                 <span style={{ color: colorConfig.accent }}>2.</span>
-                <span>Read your creation OUT LOUD (no whispering!)</span>
+                <span>Hit reveal and READ YOUR CREATION OUT LOUD</span>
               </li>
               <li className="flex items-start gap-3 text-white">
                 <span style={{ color: colorConfig.accent }}>3.</span>
-                <span>Then write REAL feedback for the same scenario</span>
+                <span>See how the formula works even when it's absurd</span>
               </li>
               <li className="flex items-start gap-3 text-white">
                 <span style={{ color: colorConfig.accent }}>4.</span>
-                <span>Watch: same formula works for everything!</span>
+                <span>Then practice writing REAL feedback</span>
               </li>
             </ul>
           </div>
 
-          {/* Humor hint */}
+          {/* Hint */}
           <div
             className="w-full max-w-lg rounded-lg p-4 mb-6"
             style={{ backgroundColor: 'rgba(147, 51, 234, 0.2)' }}
           >
             <p className="text-sm text-purple-200 italic">
-              If it works for "advanced chicken psychology," it works for actual students.
+              The sillier your answers, the harder you'll laugh. Trust us.
             </p>
-          </div>
-
-          {/* Formula Reminder */}
-          <div className="bg-slate-800/50 rounded-lg p-4 mb-6">
-            <p className="text-slate-300 text-sm uppercase tracking-wide mb-2">The Formula</p>
-            <div className="flex items-center justify-center gap-2 text-white font-medium">
-              <span className="text-blue-400">NOTICE</span>
-              <span className="text-slate-500">→</span>
-              <span className="text-green-400">NAME</span>
-              <span className="text-slate-500">→</span>
-              <span className="text-purple-400">NEXT STEP</span>
-            </div>
           </div>
 
           <button
             onClick={handleStart}
-            className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95 animate-glow-pulse"
-            style={{
-              backgroundColor: colorConfig.accent,
-              color: '#ffffff',
-              ['--glow-color' as string]: colorConfig.accent + '40',
-            }}
+            className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
+            style={{ backgroundColor: colorConfig.accent, color: '#ffffff' }}
           >
-            Let's Get Ridiculous! →
+            Let's Get Ridiculous!
           </button>
         </div>
       )}
@@ -166,152 +166,171 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
             {isSillyRound ? 'SILLY' : 'REAL'} ROUND {currentRound + 1} OF {scenarios.length}
           </p>
 
-          {/* Scenario Card */}
-          <div
-            className={`w-full rounded-xl p-6 mb-6 transition-all duration-200 ${
-              isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0 animate-slide-up'
-            }`}
-            style={{ backgroundColor: colorConfig.bg, border: `1px solid ${colorConfig.border}` }}
-          >
-            <p className="text-xs uppercase tracking-wide mb-2" style={{ color: colorConfig.accent }}>
-              Scenario
-            </p>
-            <h3 className="text-lg md:text-xl font-semibold text-white mb-2">{scenario.text}</h3>
-            <p className="text-slate-300 text-sm">{scenario.context}</p>
-          </div>
+          {/* ============ SILLY ROUNDS ============ */}
 
-          {/* SILLY ROUND - Input Phase */}
-          {isSillyRound && playPhase === 'input' && (
-            <div className="w-full space-y-6 animate-fade-in">
-              <div className="text-center">
-                <p className="text-lg text-purple-200 mb-1">
-                  Fill these blanks with the MOST RIDICULOUS words:
-                </p>
-                <p className="text-sm text-purple-300 italic">
-                  The weirder, the better! Go for genuine belly laughs.
+          {/* PHASE 1: BLIND INPUT - No sentence visible! */}
+          {isSillyRound && sillyPhase === 'blind_input' && (
+            <div className={`w-full space-y-6 transition-all duration-200 ${
+              isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0 animate-slide-up'
+            }`}>
+              {/* Big fun header */}
+              <div className="text-center mb-6">
+                <div className="text-4xl mb-3">🎲</div>
+                <h3 className="text-2xl font-bold text-white mb-2">
+                  Fill in these words!
+                </h3>
+                <p className="text-purple-300">
+                  Don't worry about why — just be as SILLY as possible!
                 </p>
               </div>
 
+              {/* Blind prompt inputs - NO SENTENCE TEMPLATE VISIBLE */}
               <div className="space-y-5">
-                {/* Verb input */}
-                <div className="space-y-2">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                    <span className="text-white whitespace-nowrap font-medium">I see that you</span>
+                {currentPrompts.map((prompt, index) => (
+                  <div
+                    key={prompt.id}
+                    className="rounded-xl p-5"
+                    style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', border: '1px solid rgba(147, 51, 234, 0.3)' }}
+                  >
+                    <label className="block text-lg font-medium text-white mb-3">
+                      {index + 1}. {prompt.label}:
+                    </label>
                     <input
                       type="text"
-                      placeholder={MADLIBS_PROMPTS[0].placeholder}
-                      value={madlibInputs.verb}
-                      onChange={(e) => setMadlibInputs((prev) => ({ ...prev, verb: e.target.value }))}
-                      className="bg-slate-700 border border-purple-500/50 rounded-lg px-3 py-2 text-white placeholder:text-slate-400 flex-1 w-full sm:w-auto focus:border-purple-400 focus:outline-none"
+                      placeholder={prompt.placeholder}
+                      value={blindInputs[prompt.id as keyof typeof blindInputs]}
+                      onChange={(e) => setBlindInputs((prev) => ({ ...prev, [prompt.id]: e.target.value }))}
+                      className="w-full bg-slate-700 border-2 border-purple-500/50 rounded-lg px-4 py-3 text-white text-lg placeholder:text-slate-400 focus:border-purple-400 focus:outline-none"
                     />
                   </div>
-                  <p className="text-xs text-purple-300 pl-0 sm:pl-32">
-                    <span className="text-purple-400">{MADLIBS_PROMPTS[0].label}</span> — Try: {MADLIBS_PROMPTS[0].examples.slice(0, 2).join(', ')}
-                  </p>
-                </div>
-
-                {/* Skill input */}
-                <div className="space-y-2">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                    <span className="text-white whitespace-nowrap font-medium">That's called</span>
-                    <input
-                      type="text"
-                      placeholder={MADLIBS_PROMPTS[1].placeholder}
-                      value={madlibInputs.skill}
-                      onChange={(e) => setMadlibInputs((prev) => ({ ...prev, skill: e.target.value }))}
-                      className="bg-slate-700 border border-purple-500/50 rounded-lg px-3 py-2 text-white placeholder:text-slate-400 flex-1 w-full sm:w-auto focus:border-purple-400 focus:outline-none"
-                    />
-                  </div>
-                  <p className="text-xs text-purple-300 pl-0 sm:pl-28">
-                    <span className="text-purple-400">{MADLIBS_PROMPTS[1].label}</span> — Try: {MADLIBS_PROMPTS[1].examples.slice(0, 2).join(', ')}
-                  </p>
-                </div>
-
-                {/* Action input */}
-                <div className="space-y-2">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2">
-                    <span className="text-white whitespace-nowrap font-medium">Now try</span>
-                    <input
-                      type="text"
-                      placeholder={MADLIBS_PROMPTS[2].placeholder}
-                      value={madlibInputs.action}
-                      onChange={(e) => setMadlibInputs((prev) => ({ ...prev, action: e.target.value }))}
-                      className="bg-slate-700 border border-purple-500/50 rounded-lg px-3 py-2 text-white placeholder:text-slate-400 flex-1 w-full sm:w-auto focus:border-purple-400 focus:outline-none"
-                    />
-                  </div>
-                  <p className="text-xs text-purple-300 pl-0 sm:pl-16">
-                    <span className="text-purple-400">{MADLIBS_PROMPTS[2].label}</span> — Try: {MADLIBS_PROMPTS[2].examples.slice(0, 2).join(', ')}
-                  </p>
-                </div>
+                ))}
               </div>
 
               <button
-                onClick={handleMadlibReveal}
-                disabled={!madlibInputs.verb || !madlibInputs.skill || !madlibInputs.action}
+                onClick={handleReveal}
+                disabled={!blindInputs.verb || !blindInputs.skill || !blindInputs.action}
                 className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 style={{ backgroundColor: colorConfig.accent, color: '#ffffff' }}
               >
-                <Eye size={20} />
-                Read It Out Loud! (No Whispering!)
+                <Sparkles size={20} />
+                REVEAL MY FEEDBACK!
               </button>
             </div>
           )}
 
-          {/* SILLY ROUND - Comparison Phase */}
-          {isSillyRound && playPhase === 'comparison' && (
+          {/* PHASE 2: REVEAL SILLY - The big laugh moment */}
+          {isSillyRound && sillyPhase === 'reveal_silly' && (
             <div className="w-full space-y-6 animate-fade-in">
-              <div className="text-center">
-                <h3 className="text-xl font-bold text-purple-300 mb-2">
-                  The Power of Pattern Recognition
-                </h3>
-                <p className="text-purple-200">
-                  Read your silly version OUT LOUD, then compare:
+              {/* Read aloud instruction */}
+              <div
+                className="rounded-xl p-4 text-center"
+                style={{ backgroundColor: 'rgba(251, 146, 60, 0.2)', border: '1px solid rgba(251, 146, 60, 0.4)' }}
+              >
+                <div className="flex items-center justify-center gap-2 text-orange-300 font-bold text-lg mb-1">
+                  <Volume2 size={24} />
+                  READ THIS OUT LOUD TO YOUR TABLE!
+                </div>
+                <p className="text-orange-200 text-sm">No whispering allowed!</p>
+              </div>
+
+              {/* The reveal - their silly feedback */}
+              <div
+                className="rounded-2xl p-6 md:p-8"
+                style={{ backgroundColor: 'rgba(147, 51, 234, 0.15)', border: '2px solid rgba(147, 51, 234, 0.4)' }}
+              >
+                <p className="text-2xl md:text-3xl text-white leading-relaxed font-medium text-center">
+                  "{sillyFeedback}"
                 </p>
               </div>
 
+              {/* Formula breakdown */}
+              <div className="flex flex-wrap items-center justify-center gap-3 text-base">
+                <span className="bg-blue-500/20 text-blue-300 px-3 py-1.5 rounded-lg font-medium">
+                  Notice
+                </span>
+                <span className="text-slate-500">→</span>
+                <span className="bg-green-500/20 text-green-300 px-3 py-1.5 rounded-lg font-medium">
+                  Name
+                </span>
+                <span className="text-slate-500">→</span>
+                <span className="bg-purple-500/20 text-purple-300 px-3 py-1.5 rounded-lg font-medium">
+                  Next Step
+                </span>
+              </div>
+
+              {/* Insight */}
+              <div className="bg-slate-800/50 rounded-lg p-4 text-center">
+                <p className="text-slate-300">
+                  <span className="text-xl mr-2">😂</span>
+                  Even when it's COMPLETELY ABSURD, the formula still works!
+                </p>
+              </div>
+
+              <button
+                onClick={handleShowReal}
+                className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
+                style={{ backgroundColor: '#27AE60', color: '#ffffff' }}
+              >
+                See the REAL Version
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
+
+          {/* PHASE 3: SHOW REAL - Compare silly to professional */}
+          {isSillyRound && sillyPhase === 'show_real' && (
+            <div className="w-full space-y-6 animate-fade-in">
+              <div className="text-center">
+                <h3 className="text-xl font-bold text-white mb-2">
+                  Now here's REAL feedback for the same scenario:
+                </h3>
+              </div>
+
+              {/* Scenario context */}
+              <div
+                className="rounded-xl p-5"
+                style={{ backgroundColor: colorConfig.bg, border: `1px solid ${colorConfig.border}` }}
+              >
+                <p className="text-xs uppercase tracking-wide mb-2" style={{ color: colorConfig.accent }}>
+                  Scenario
+                </p>
+                <p className="text-white">{scenario.text}</p>
+                <p className="text-slate-400 text-sm mt-2">{scenario.context}</p>
+              </div>
+
+              {/* Side by side comparison */}
               <div className="grid md:grid-cols-2 gap-4">
-                {/* Silly Version */}
+                {/* Their silly version */}
                 <div
                   className="rounded-xl p-5"
                   style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', border: '1px solid rgba(147, 51, 234, 0.3)' }}
                 >
                   <h4 className="text-purple-300 font-semibold mb-3 flex items-center gap-2">
-                    <span className="text-2xl">😂</span> YOUR RIDICULOUS VERSION:
+                    <span className="text-xl">😂</span> YOUR SILLY VERSION:
                   </h4>
-                  <div className="bg-purple-800/30 rounded-lg p-4 mb-3">
-                    <p className="text-white text-lg italic leading-relaxed">"{sillyFeedback}"</p>
-                  </div>
-                  <div className="text-sm text-purple-200 bg-purple-600/20 rounded p-2">
-                    <strong>Absurd but notice:</strong> Still follows Notice → Name → Next Step!
-                  </div>
+                  <p className="text-white italic">"{sillyFeedback}"</p>
                 </div>
 
-                {/* Real Version */}
+                {/* Real professional version */}
                 <div
                   className="rounded-xl p-5"
                   style={{ backgroundColor: 'rgba(39, 174, 96, 0.1)', border: '1px solid rgba(39, 174, 96, 0.3)' }}
                 >
                   <h4 className="text-green-300 font-semibold mb-3 flex items-center gap-2">
-                    <span className="text-xl">✓</span> THE PROFESSIONAL VERSION:
+                    <span className="text-xl">✓</span> PROFESSIONAL VERSION:
                   </h4>
-                  <div className="bg-green-800/30 rounded-lg p-4 mb-3">
-                    <p className="text-white text-lg leading-relaxed">"{realFeedbackFull}"</p>
-                  </div>
-                  <div className="text-sm text-green-200 bg-green-600/20 rounded p-2 flex items-center gap-1 flex-wrap">
-                    <span className="font-semibold">Same pattern:</span>
-                    <span className="text-blue-300">Notice</span>→
-                    <span className="text-green-300">Name</span>→
-                    <span className="text-purple-300">Next Step</span>
-                  </div>
+                  <p className="text-white">"{realFeedbackFull}"</p>
                 </div>
               </div>
 
+              {/* Key insight */}
               <div className="bg-slate-800/50 rounded-lg p-5 text-center">
-                <p className="text-slate-300 text-lg">
-                  <strong className="text-white">Here's the magic:</strong> Both follow the exact same pattern!
+                <p className="text-white text-lg font-medium mb-2">
+                  🎯 SAME PATTERN!
                 </p>
-                <p className="text-slate-400 mt-2">
-                  If it works for "{madlibInputs.skill}", it definitely works for real students.
+                <p className="text-slate-300">
+                  Notice → Name → Next Step works whether you're talking about
+                  "{blindInputs.skill}" or actual student learning.
                 </p>
               </div>
 
@@ -320,71 +339,93 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                 className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
                 style={{ backgroundColor: colorConfig.accent, color: '#ffffff' }}
               >
-                {currentRound < scenarios.length - 1 ? 'That Was Hilarious → Next Round' : 'Finish'}
+                {currentRound < scenarios.length - 1 ? 'Next Round!' : 'Finish!'}
                 <ChevronRight size={20} />
               </button>
             </div>
           )}
 
-          {/* REAL ROUND - Input Phase */}
-          {!isSillyRound && playPhase === 'real-input' && (
-            <div className="w-full space-y-6 animate-fade-in">
-              <p className="text-center text-lg text-green-200">
-                NOW FOR REAL: Write Level 3 feedback using the formula
-              </p>
+          {/* ============ REAL ROUNDS ============ */}
 
+          {/* PHASE 1: SCENARIO - Write real feedback */}
+          {!isSillyRound && realPhase === 'scenario' && (
+            <div className={`w-full space-y-6 transition-all duration-200 ${
+              isAnimating ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0 animate-slide-up'
+            }`}>
+              {/* Scenario Card */}
+              <div
+                className="rounded-xl p-6"
+                style={{ backgroundColor: colorConfig.bg, border: `1px solid ${colorConfig.border}` }}
+              >
+                <p className="text-xs uppercase tracking-wide mb-2" style={{ color: colorConfig.accent }}>
+                  Scenario
+                </p>
+                <h3 className="text-lg md:text-xl font-semibold text-white mb-2">{scenario.text}</h3>
+                <p className="text-slate-300 text-sm">{scenario.context}</p>
+              </div>
+
+              <div className="text-center">
+                <p className="text-lg text-green-300 font-medium">
+                  NOW YOU TRY: Write real Level 3 feedback!
+                </p>
+              </div>
+
+              {/* Real feedback inputs */}
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm text-slate-300 mb-2">
-                    <span className="text-blue-400 mr-2">NOTICE</span> what they did
+                    <span className="text-blue-400 font-medium mr-2">NOTICE</span>
+                    What did you see the student do?
                   </label>
                   <textarea
                     placeholder="I see that you..."
                     value={realInputs.notice}
                     onChange={(e) => setRealInputs((prev) => ({ ...prev, notice: e.target.value }))}
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-3 text-white placeholder:text-slate-400 h-20 resize-none focus:border-blue-400 focus:outline-none"
+                    className="w-full bg-slate-700 border border-blue-500/50 rounded-lg px-4 py-3 text-white placeholder:text-slate-400 h-20 resize-none focus:border-blue-400 focus:outline-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm text-slate-300 mb-2">
-                    <span className="text-green-400 mr-2">NAME</span> the skill
+                    <span className="text-green-400 font-medium mr-2">NAME</span>
+                    What skill or strategy is that?
                   </label>
                   <textarea
                     placeholder="That's called..."
                     value={realInputs.name}
                     onChange={(e) => setRealInputs((prev) => ({ ...prev, name: e.target.value }))}
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-3 text-white placeholder:text-slate-400 h-20 resize-none focus:border-green-400 focus:outline-none"
+                    className="w-full bg-slate-700 border border-green-500/50 rounded-lg px-4 py-3 text-white placeholder:text-slate-400 h-20 resize-none focus:border-green-400 focus:outline-none"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm text-slate-300 mb-2">
-                    <span className="text-purple-400 mr-2">NEXT STEP</span> forward
+                    <span className="text-purple-400 font-medium mr-2">NEXT STEP</span>
+                    What should they try now?
                   </label>
                   <textarea
                     placeholder="Now try..."
                     value={realInputs.nextStep}
                     onChange={(e) => setRealInputs((prev) => ({ ...prev, nextStep: e.target.value }))}
-                    className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-3 text-white placeholder:text-slate-400 h-20 resize-none focus:border-purple-400 focus:outline-none"
+                    className="w-full bg-slate-700 border border-purple-500/50 rounded-lg px-4 py-3 text-white placeholder:text-slate-400 h-20 resize-none focus:border-purple-400 focus:outline-none"
                   />
                 </div>
               </div>
 
               <button
-                onClick={handleRealCheck}
+                onClick={handleCompare}
                 disabled={!realInputs.notice || !realInputs.name || !realInputs.nextStep}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 style={{ backgroundColor: '#27AE60', color: '#ffffff' }}
               >
-                Check My Formula
+                See an Example
                 <ChevronRight size={20} />
               </button>
             </div>
           )}
 
-          {/* REAL ROUND - Check Phase */}
-          {!isSillyRound && playPhase === 'real-check' && (
+          {/* PHASE 2: COMPARE - Show their version vs example */}
+          {!isSillyRound && realPhase === 'compare' && (
             <div className="w-full space-y-6 animate-fade-in">
               <div className="grid md:grid-cols-2 gap-4">
                 {/* User's Version */}
@@ -393,10 +434,10 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                   style={{ backgroundColor: 'rgba(52, 152, 219, 0.1)', border: '1px solid rgba(52, 152, 219, 0.3)' }}
                 >
                   <h4 className="text-blue-300 font-semibold mb-3">YOUR VERSION:</h4>
-                  <p className="text-white">
+                  <p className="text-white mb-3">
                     {realInputs.notice}. {realInputs.name}. {realInputs.nextStep}.
                   </p>
-                  <div className="flex flex-wrap gap-2 mt-3">
+                  <div className="flex flex-wrap gap-2">
                     <span className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs">Notice ✓</span>
                     <span className="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs">Name ✓</span>
                     <span className="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">Next Step ✓</span>
@@ -416,10 +457,10 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
 
               <button
                 onClick={handleNext}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all hover:scale-105 active:scale-95"
+                className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
                 style={{ backgroundColor: colorConfig.accent, color: '#ffffff' }}
               >
-                {currentRound < scenarios.length - 1 ? 'Next Round' : 'Finish'}
+                {currentRound < scenarios.length - 1 ? 'Next Round!' : 'Finish!'}
                 <ChevronRight size={20} />
               </button>
             </div>
@@ -441,7 +482,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
 
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">Formula = Bulletproof!</h2>
           <p className="text-xl text-purple-200 mb-6">
-            You just proved Notice-Name-Next Step works for EVERYTHING.
+            You just proved Notice → Name → Next Step works for EVERYTHING.
           </p>
 
           <div
@@ -469,8 +510,8 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
               Table Talk
             </p>
             <div className="space-y-2 text-slate-300 text-left">
-              <p>• Which ridiculous instruction would you most like to try?</p>
-              <p>• What fake academic subject should universities offer?</p>
+              <p>• Which ridiculous feedback got the biggest laugh?</p>
+              <p>• What fake subject should universities offer?</p>
               <p>• Raise your hand if you'll remember the formula better now!</p>
             </div>
           </div>
@@ -481,7 +522,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
             style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#ffffff' }}
           >
             <RotateCcw size={20} />
-            Back to Games (Still Giggling)
+            Back to Games
           </button>
         </div>
       )}

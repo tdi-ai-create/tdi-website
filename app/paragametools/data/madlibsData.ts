@@ -1,4 +1,4 @@
-// Feedback Madlibs game data - ACTUALLY FUNNY VERSION
+// Feedback Madlibs game data - TRUE BLIND MADLIBS VERSION
 
 export interface MadlibScenario {
   id: number;
@@ -11,6 +11,7 @@ export interface MadlibScenario {
   };
 }
 
+// Scenarios for comparison (used in silly rounds to show "real" version)
 export const MADLIBS_SCENARIOS: MadlibScenario[] = [
   {
     id: 1,
@@ -74,25 +75,76 @@ export const MADLIBS_SCENARIOS: MadlibScenario[] = [
   }
 ];
 
-// Enhanced prompts that generate funnier responses
-export const MADLIBS_PROMPTS = [
+// BLIND PROMPTS - Different for each silly round so it stays fresh
+// These are shown WITHOUT any context about the sentence template
+export interface BlindPromptSet {
+  prompts: {
+    id: string;
+    label: string;
+    placeholder: string;
+  }[];
+}
+
+export const SILLY_ROUND_PROMPTS: BlindPromptSet[] = [
+  // Round 1
   {
-    id: "verb",
-    label: "Weird thing people do with their body",
-    placeholder: "snorted through your elbows",
-    examples: ["wiggled your ears independently", "hiccupped in reverse", "burped the alphabet backwards", "sneezed in slow motion"]
+    prompts: [
+      {
+        id: "verb",
+        label: "A weird thing someone does with their body",
+        placeholder: "wiggled your ears independently"
+      },
+      {
+        id: "skill",
+        label: "A subject nobody actually studies",
+        placeholder: "advanced chicken psychology"
+      },
+      {
+        id: "action",
+        label: "Something you'd never tell a student to try",
+        placeholder: "licking the flagpole during winter"
+      }
+    ]
   },
+  // Round 2
   {
-    id: "skill",
-    label: "Subject nobody actually studies",
-    placeholder: "advanced chicken psychology",
-    examples: ["theoretical pickle engineering", "professional mustard appreciation", "competitive lint analysis", "emergency toenail management"]
+    prompts: [
+      {
+        id: "verb",
+        label: "Something gross a kid might do in class",
+        placeholder: "picked your nose with a crayon"
+      },
+      {
+        id: "skill",
+        label: "A skill that would be useless in real life",
+        placeholder: "professional cloud yelling"
+      },
+      {
+        id: "action",
+        label: "An activity that would get you sent to the principal",
+        placeholder: "teaching the class hamster to drive"
+      }
+    ]
   },
+  // Round 3
   {
-    id: "action",
-    label: "Something you'd never tell a student to try",
-    placeholder: "licking the flagpole during winter",
-    examples: ["teaching your socks to tap dance", "negotiating with gravity", "convincing your homework to do itself", "having a serious conversation with your pencil sharpener"]
+    prompts: [
+      {
+        id: "verb",
+        label: "Something your pet does that students shouldn't",
+        placeholder: "licked the whiteboard"
+      },
+      {
+        id: "skill",
+        label: "A made-up name for a school rule",
+        placeholder: "competitive eraser throwing"
+      },
+      {
+        id: "action",
+        label: "Something that sounds like homework but isn't",
+        placeholder: "alphabetizing your snacks by crunchiness"
+      }
+    ]
   }
 ];
 
