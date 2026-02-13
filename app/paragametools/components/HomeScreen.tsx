@@ -1,56 +1,30 @@
 'use client';
 
-import { Monitor } from 'lucide-react';
+import { Monitor, Globe } from 'lucide-react';
 import { COLORS, type GameId } from '../data/gameConfig';
+import { useLanguage } from '../context/LanguageContext';
+import { UI_TRANSLATIONS } from '../data/translations';
 
 // Card data with emoji icons and updated copy
-const GAME_CARDS = [
-  {
-    id: 'knockout' as GameId,
-    icon: '🎯',
-    title: 'Question Knockout',
-    description: 'Real scenarios. Respond with ONLY questions. Can you resist telling?',
-    time: '15 min',
-    format: 'Partner Drill',
-    color: 'orange' as const,
-  },
-  {
-    id: 'tellorask' as GameId,
-    icon: '⚡',
-    title: 'Tell or Ask?',
-    description: 'Spot disguised commands wearing question costumes.',
-    time: '10 min',
-    format: 'Table Debate',
-    color: 'yellow' as const,
-  },
-  {
-    id: 'levelup' as GameId,
-    icon: '📈',
-    title: 'Feedback Level Up',
-    description: 'Rate feedback quality from Level 1-4. Find the Level 2 trap.',
-    time: '12 min',
-    format: 'Group Voting',
-    color: 'green' as const,
-  },
-  {
-    id: 'madlibs' as GameId,
-    icon: '😂',
-    title: 'Feedback Madlibs',
-    description: 'Fill in silly blanks, then write the real version. Proof the formula works.',
-    time: '10 min',
-    format: 'Pattern Practice',
-    color: 'purple' as const,
-  },
-  {
-    id: 'makeover' as GameId,
-    icon: '🔧',
-    title: 'Feedback Makeover',
-    description: 'Transform terrible feedback into Level 3 using the formula. The final exam.',
-    time: '15 min',
-    format: 'Advanced Practice',
-    color: 'red' as const,
-  },
+const GAME_CARDS: {
+  id: GameId;
+  icon: string;
+  color: 'orange' | 'yellow' | 'green' | 'purple' | 'red';
+}[] = [
+  { id: 'knockout', icon: '🎯', color: 'orange' },
+  { id: 'tellorask', icon: '⚡', color: 'yellow' },
+  { id: 'levelup', icon: '📈', color: 'green' },
+  { id: 'madlibs', icon: '😂', color: 'purple' },
+  { id: 'makeover', icon: '🔧', color: 'red' },
 ];
+
+const TIMES: Record<GameId, string> = {
+  knockout: '15 min',
+  tellorask: '10 min',
+  levelup: '12 min',
+  madlibs: '10 min',
+  makeover: '15 min',
+};
 
 interface HomeScreenProps {
   onSelectGame: (gameId: GameId) => void;
@@ -58,6 +32,10 @@ interface HomeScreenProps {
 }
 
 export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps) {
+  const { language, setLanguage } = useLanguage();
+  const t = UI_TRANSLATIONS;
+  const games = t.games;
+
   return (
     <div
       className="min-h-screen flex flex-col items-center px-4 md:px-6 py-8"
@@ -66,22 +44,38 @@ export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps)
         color: '#ffffff',
       }}
     >
+      {/* Language Toggle */}
+      <div className="w-full max-w-[600px] flex justify-end mb-4">
+        <button
+          onClick={() => setLanguage(language === 'en' ? 'es' : 'en')}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all hover:scale-105 active:scale-95"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.1)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            color: '#ffffff',
+          }}
+        >
+          <Globe size={18} />
+          <span>{language === 'en' ? 'Español' : 'English'}</span>
+        </button>
+      </div>
+
       {/* Header */}
       <div className="text-center mb-8 animate-fade-in">
         <p
           className="text-xs md:text-sm uppercase tracking-widest mb-2"
           style={{ color: 'rgba(255, 120, 71, 0.5)' }}
         >
-          The Moves That Matter
+          {t.homeSubtitle[language]}
         </p>
         <h1
           className="text-5xl md:text-7xl font-black mb-3"
           style={{ color: '#ffffff', fontFamily: "'Outfit', sans-serif" }}
         >
-          GAME TIME
+          {t.homeTitle[language]}
         </h1>
         <p className="text-base md:text-lg font-light" style={{ color: '#8899aa' }}>
-          Pick a game to play with your tables
+          {t.homeDescription[language]}
         </p>
       </div>
 
@@ -89,6 +83,7 @@ export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps)
       <div className="flex flex-col gap-6 w-full max-w-[600px]">
         {GAME_CARDS.map((game, index) => {
           const colorConfig = COLORS[game.color];
+          const gameTranslations = games[game.id];
           return (
             <div
               key={game.id}
@@ -111,7 +106,7 @@ export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps)
               <div className="flex items-center gap-3 mb-3">
                 <span className="text-[28px]">{game.icon}</span>
                 <h2 className="text-2xl md:text-[28px] font-bold text-white">
-                  {game.title}
+                  {gameTranslations.title[language]}
                 </h2>
               </div>
 
@@ -120,12 +115,12 @@ export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps)
                 className="text-base md:text-lg mb-3 leading-relaxed"
                 style={{ color: '#8899aa' }}
               >
-                {game.description}
+                {gameTranslations.description[language]}
               </p>
 
               {/* Metadata line */}
               <p className="text-sm mb-4" style={{ color: '#667788' }}>
-                ⏱ {game.time} • {game.format}
+                ⏱ {TIMES[game.id]} • {gameTranslations.format[language]}
               </p>
 
               {/* Play button */}
@@ -137,7 +132,7 @@ export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps)
                   color: '#ffffff',
                 }}
               >
-                PLAY GAME
+                {t.playGame[language]}
               </button>
             </div>
           );
@@ -156,13 +151,13 @@ export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps)
           }}
         >
           <Monitor size={20} />
-          Facilitator Mode
+          {t.facilitatorMode[language]}
         </button>
       )}
 
       {/* Footer */}
       <p className="mt-8 text-xs" style={{ color: '#8899aa', opacity: 0.5 }}>
-        Teachers Deserve It Workshop Tools
+        {t.footer[language]}
       </p>
     </div>
   );

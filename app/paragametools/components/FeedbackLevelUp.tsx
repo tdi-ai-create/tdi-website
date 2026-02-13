@@ -6,6 +6,8 @@ import { GameWrapper, IntroScreen, DoneScreen } from './GameWrapper';
 import { StreakCounter } from './StreakCounter';
 import { FEEDBACK_LEVELS, LEVEL_INFO } from '../data/feedbackLevels';
 import { COLORS, shuffle } from '../data/gameConfig';
+import { useLanguage } from '../context/LanguageContext';
+import { UI_TRANSLATIONS } from '../data/translations';
 
 type Screen = 'intro' | 'play' | 'done';
 
@@ -22,6 +24,9 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [trapCount, setTrapCount] = useState(0);
   const [showTrapMessage, setShowTrapMessage] = useState(false);
+
+  const { language } = useLanguage();
+  const t = UI_TRANSLATIONS;
 
   // Shuffle feedback examples on mount
   const feedbacks = useMemo(
@@ -81,17 +86,16 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
   const levelConfig = LEVEL_INFO[current.level];
   const isCorrect = userGuess === current.level;
 
+  const gameTitle = t.games.levelup.title[language];
+
   return (
-    <GameWrapper gameId="levelup" title="Feedback Level Up" color="green" onBack={onBack}>
+    <GameWrapper gameId="levelup" title={gameTitle} color="green" onBack={onBack}>
       {screen === 'intro' && (
         <IntroScreen
           gameId="levelup"
-          title="Feedback Level Up"
+          title={gameTitle}
           color="green"
-          rules={[
-            "I'll show you a piece of feedback a para gave a student.",
-            "Your table holds up fingers: 1, 2, 3, or 4.",
-          ]}
+          rules={t.levelup_rules[language]}
           onStart={handleStart}
           extraContent={
             <div className="w-full max-w-lg mb-6">
@@ -109,7 +113,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
                         {level}
                       </p>
                       <p className="text-xs font-medium flex items-center justify-center gap-1" style={{ color: config.color }}>
-                        {config.name}
+                        {config.name[language]}
                         {config.star && <Star size={12} fill={config.color} />}
                       </p>
                     </div>
@@ -117,7 +121,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
                 })}
               </div>
               <p className="text-sm text-center" style={{ color: '#27AE60' }}>
-                NOTICE → NAME → NEXT STEP = Level 3 (The Goal)
+                {t.levelup_formula[language]}
               </p>
             </div>
           }
@@ -131,7 +135,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
             className="text-xs uppercase tracking-widest mb-2"
             style={{ color: 'rgba(39, 174, 96, 0.5)' }}
           >
-            Round {currentRound + 1} of {feedbacks.length}
+            {t.round[language]} {currentRound + 1} {t.of[language]} {feedbacks.length}
           </p>
 
           {/* Streak counter */}
@@ -147,7 +151,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
             style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.1)' }}
           >
             <p className="text-lg md:text-xl lg:text-2xl text-white italic leading-relaxed text-center">
-              "{current.feedback}"
+              "{current.feedback[language]}"
             </p>
           </div>
 
@@ -156,7 +160,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
             <div className="flex flex-col items-center gap-4">
               <div className="flex items-center gap-2 text-xl" style={{ color: '#8899aa' }}>
                 <Hand size={24} />
-                <span>Hold up your fingers: 1, 2, 3, or 4!</span>
+                <span>{t.levelup_holdUp[language]}</span>
               </div>
               <div className="grid grid-cols-4 gap-3">
                 {([1, 2, 3, 4] as const).map((level) => {
@@ -174,7 +178,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
                     >
                       <span className="text-3xl">{level}</span>
                       <span className="text-xs flex items-center gap-1">
-                        {config.name}
+                        {config.name[language]}
                         {config.star && <Star size={10} fill={config.color} />}
                       </span>
                     </button>
@@ -205,10 +209,10 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
                   className="text-xl font-bold mb-3 flex items-center justify-center gap-2"
                   style={{ color: levelConfig.color }}
                 >
-                  {levelConfig.name}
+                  {levelConfig.name[language]}
                   {levelConfig.star && <Star size={20} fill={levelConfig.color} />}
                 </p>
-                <p className="text-white">{current.why}</p>
+                <p className="text-white">{current.why[language]}</p>
               </div>
 
               {/* Level 2 Trap Message */}
@@ -218,7 +222,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
                   style={{ backgroundColor: 'rgba(241, 196, 15, 0.1)', border: '1px solid rgba(241, 196, 15, 0.3)' }}
                 >
                   <AlertTriangle size={20} className="text-yellow-400" />
-                  <span className="text-yellow-200">Level 2 trapped you! It SOUNDS helpful but misses specifics.</span>
+                  <span className="text-yellow-200">{t.levelup_trapMessage[language]}</span>
                 </div>
               )}
 
@@ -227,7 +231,7 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
                 className="flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
                 style={{ backgroundColor: colorConfig.accent, color: '#ffffff' }}
               >
-                {currentRound < feedbacks.length - 1 ? 'Next' : 'Finish'}
+                {currentRound < feedbacks.length - 1 ? t.next[language] : t.finish[language]}
                 <ChevronRight size={20} />
               </button>
             </div>
@@ -237,9 +241,9 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
 
       {screen === 'done' && (
         <DoneScreen
-          title="Level Up Complete!"
-          message="Level 2 is the trap -  it sounds good but doesn't give students enough to grow."
-          tableTalk="Where do you honestly land most days?"
+          title={t.levelup_doneTitle[language]}
+          message={t.levelup_doneMessage[language]}
+          tableTalk={t.levelup_tableTalk[language]}
           color="green"
           onBack={onBack}
           extraContent={
@@ -248,12 +252,12 @@ export function FeedbackLevelUp({ onBack }: FeedbackLevelUpProps) {
               style={{ backgroundColor: 'rgba(241, 196, 15, 0.1)', border: '1px solid rgba(241, 196, 15, 0.3)' }}
             >
               <TrendingDown size={32} className="text-yellow-400 mx-auto mb-2" />
-              <h3 className="text-lg font-bold text-white mb-1">Level 2 Trap Report</h3>
+              <h3 className="text-lg font-bold text-white mb-1">{t.levelup_trapReport[language]}</h3>
               <p className="text-yellow-200">
-                Level 2 trapped <strong>{trapCount}</strong> of your votes today.
+                {t.levelup_trapCount[language]} <strong>{trapCount}</strong> {t.levelup_trapCountEnd[language]}
               </p>
               <p className="text-sm text-yellow-300 mt-2">
-                That's normal! Level 2 SOUNDS good but lacks the specifics that actually help students.
+                {t.levelup_trapNormal[language]}
               </p>
             </div>
           }

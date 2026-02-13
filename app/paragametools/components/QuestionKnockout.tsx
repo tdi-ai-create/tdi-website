@@ -6,6 +6,8 @@ import { GameWrapper, IntroScreen, DoneScreen } from './GameWrapper';
 import { Timer, TimerControls } from './Timer';
 import { KNOCKOUT_SCENARIOS, KNOCKOUT_TIMER_SECONDS, KNOCKOUT_ROUNDS } from '../data/scenarios';
 import { COLORS, shuffleAndPick } from '../data/gameConfig';
+import { useLanguage } from '../context/LanguageContext';
+import { UI_TRANSLATIONS } from '../data/translations';
 
 type Screen = 'intro' | 'play' | 'done';
 
@@ -21,6 +23,9 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
   const [isAnimating, setIsAnimating] = useState(false);
   const [switches, setSwitches] = useState(0);
   const [showBuzzerEffect, setShowBuzzerEffect] = useState(false);
+
+  const { language } = useLanguage();
+  const t = UI_TRANSLATIONS;
 
   // Shuffle scenarios on mount
   const scenarios = useMemo(
@@ -65,23 +70,21 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
   // Show "Switch Roles!" reminder at round 5
   const showSwitchReminder = currentRound === 4;
 
+  const gameTitle = t.games.knockout.title[language];
+
   return (
-    <GameWrapper gameId="knockout" title="Question Knockout" color="orange" onBack={onBack}>
+    <GameWrapper gameId="knockout" title={gameTitle} color="orange" onBack={onBack}>
       {screen === 'intro' && (
         <IntroScreen
           gameId="knockout"
-          title="Question Knockout"
+          title={gameTitle}
           color="orange"
-          rules={[
-            "Partner up. One person plays the student scenario.",
-            "The other is the para -  but you can ONLY ask questions.",
-            "If you accidentally TELL... you're out!",
-          ]}
+          rules={t.knockout_rules[language]}
           onStart={handleStart}
           extraContent={
             <div className="flex items-center gap-2 mb-4 text-orange-400">
               <Bell size={18} />
-              <span className="text-sm">Ring the bell if you hear a TELL!</span>
+              <span className="text-sm">{t.knockout_bellHint[language]}</span>
             </div>
           }
         />
@@ -94,7 +97,7 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
             className="text-xs uppercase tracking-widest mb-4"
             style={{ color: 'rgba(255, 120, 71, 0.5)' }}
           >
-            Scenario {currentRound + 1} of {scenarios.length}
+            {t.scenario[language]} {currentRound + 1} {t.of[language]} {scenarios.length}
           </p>
 
           {/* Switch Roles reminder */}
@@ -104,7 +107,7 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
               style={{ backgroundColor: 'rgba(241, 196, 15, 0.2)', border: '1px solid rgba(241, 196, 15, 0.4)' }}
             >
               <RefreshCw size={18} className="text-yellow-400" />
-              <span className="text-yellow-400 font-semibold">Switch Roles!</span>
+              <span className="text-yellow-400 font-semibold">{t.knockout_switchRoles[language]}</span>
             </div>
           )}
 
@@ -116,7 +119,7 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
             style={{ backgroundColor: colorConfig.bg, border: `1px solid ${colorConfig.border}` }}
           >
             <p className="text-xl md:text-2xl lg:text-3xl text-white leading-relaxed text-center">
-              {scenarios[currentRound]}
+              {scenarios[currentRound][language]}
             </p>
           </div>
 
@@ -142,12 +145,12 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
             }}
           >
             <Bell size={24} />
-            BUZZER! They told instead of asked!
+            {t.knockout_buzzer[language]}
           </button>
 
           {switches > 0 && (
             <div className="text-center mb-4">
-              <span className="text-orange-300 font-medium">Role switches: {switches}</span>
+              <span className="text-orange-300 font-medium">{t.knockout_roleSwitches[language]}: {switches}</span>
             </div>
           )}
 
@@ -163,16 +166,16 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
               className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 active:scale-95"
               style={{ backgroundColor: colorConfig.accent, color: '#ffffff' }}
             >
-              {currentRound < scenarios.length - 1 ? 'Next Scenario' : 'Finish'}
+              {currentRound < scenarios.length - 1 ? t.knockout_nextScenario[language] : t.finish[language]}
               <ChevronRight size={20} />
             </button>
           </div>
 
           {/* Footer reminder */}
           <div className="flex items-center gap-2 text-sm text-center" style={{ color: '#8899aa' }}>
-            <span>Remember:</span>
-            <span style={{ color: colorConfig.accent }}>QUESTIONS ONLY!</span>
-            <span>If you tell... you're out!</span>
+            <span>{t.knockout_remember[language]}</span>
+            <span style={{ color: colorConfig.accent }}>{t.knockout_questionsOnly[language]}</span>
+            <span>{t.knockout_ifYouTell[language]}</span>
             <Bell size={16} style={{ color: colorConfig.accent }} />
           </div>
 
@@ -181,9 +184,9 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
 
       {screen === 'done' && (
         <DoneScreen
-          title="Nice Work!"
-          message="That urge to TELL? That's the muscle you're retraining. It gets easier with practice."
-          tableTalk="What was the hardest scenario to stay in questions?"
+          title={t.knockout_doneTitle[language]}
+          message={t.knockout_doneMessage[language]}
+          tableTalk={t.knockout_tableTalk[language]}
           color="orange"
           onBack={onBack}
           extraContent={
@@ -194,7 +197,7 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
                   style={{ backgroundColor: 'rgba(255, 120, 71, 0.1)', border: '1px solid rgba(255, 120, 71, 0.3)' }}
                 >
                   <p className="text-orange-300">
-                    Your table had <strong>{switches}</strong> role switch{switches !== 1 ? 'es' : ''} today!
+                    {t.knockout_roleSwitchesToday[language]} <strong>{switches}</strong> {switches !== 1 ? (language === 'es' ? 'cambios de rol' : 'role switches') : (language === 'es' ? 'cambio de rol' : 'role switch')} {language === 'es' ? 'hoy' : 'today'}!
                   </p>
                 </div>
               )}
@@ -202,9 +205,9 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
                 className="w-full max-w-lg rounded-xl p-4 mb-4 text-center"
                 style={{ backgroundColor: 'rgba(241, 196, 15, 0.1)', border: '1px solid rgba(241, 196, 15, 0.3)' }}
               >
-                <p className="text-yellow-400 font-semibold mb-1">Victory Challenge!</p>
+                <p className="text-yellow-400 font-semibold mb-1">{t.knockout_victoryChallengeTitle[language]}</p>
                 <p className="text-yellow-200 text-sm">
-                  Do your table's victory dance! Other tables guess what skill you practiced.
+                  {t.knockout_victoryChallenge[language]}
                 </p>
               </div>
             </>

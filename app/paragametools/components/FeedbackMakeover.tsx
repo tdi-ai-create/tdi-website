@@ -6,6 +6,8 @@ import { GameWrapper, IntroScreen, DoneScreen } from './GameWrapper';
 import { Timer, TimerControls } from './Timer';
 import { FEEDBACK_MAKEOVERS, MAKEOVER_TIMER_SECONDS } from '../data/makeovers';
 import { COLORS, shuffle } from '../data/gameConfig';
+import { useLanguage } from '../context/LanguageContext';
+import { UI_TRANSLATIONS } from '../data/translations';
 
 type Screen = 'intro' | 'play' | 'done';
 
@@ -23,6 +25,9 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
   const [userMakeover, setUserMakeover] = useState('');
   const [showBeforeAfter, setShowBeforeAfter] = useState(false);
   const [savedMakeovers, setSavedMakeovers] = useState<{ bad: string; after: string }[]>([]);
+
+  const { language } = useLanguage();
+  const t = UI_TRANSLATIONS;
 
   // Shuffle makeovers on mount
   const makeovers = useMemo(
@@ -44,7 +49,7 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
   const handleNext = () => {
     // Save the makeover if user entered one
     if (userMakeover.trim()) {
-      setSavedMakeovers((prev) => [...prev, { bad: current.bad, after: userMakeover }]);
+      setSavedMakeovers((prev) => [...prev, { bad: current.bad[language], after: userMakeover }]);
     }
 
     if (currentRound < makeovers.length - 1) {
@@ -77,22 +82,26 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
   const colorConfig = COLORS.red;
   const current = makeovers[currentRound];
 
+  const gameTitle = t.games.makeover.title[language];
+
+  // Step labels
+  const stepLabels = language === 'es'
+    ? ['OBSERVAR', 'NOMBRAR', 'SIGUIENTE PASO']
+    : ['NOTICE', 'NAME', 'NEXT STEP'];
+
   return (
-    <GameWrapper gameId="makeover" title="Feedback Makeover" color="red" onBack={onBack}>
+    <GameWrapper gameId="makeover" title={gameTitle} color="red" onBack={onBack}>
       {screen === 'intro' && (
         <IntroScreen
           gameId="makeover"
-          title="Feedback Makeover"
+          title={gameTitle}
           color="red"
-          rules={[
-            "You'll see terrible feedback + the student context.",
-            "Your table races to rewrite it as Level 3:",
-          ]}
+          rules={t.makeover_rules[language]}
           onStart={handleStart}
           extraContent={
             <div className="flex flex-col items-center gap-4 mb-6">
               <div className="flex gap-3">
-                {['NOTICE', 'NAME', 'NEXT STEP'].map((step, i) => (
+                {stepLabels.map((step, i) => (
                   <div
                     key={step}
                     className="px-3 py-2 rounded-lg text-center"
@@ -116,7 +125,7 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
             className="text-xs uppercase tracking-widest mb-4"
             style={{ color: 'rgba(231, 76, 60, 0.5)' }}
           >
-            Makeover {currentRound + 1} of {makeovers.length}
+            {language === 'es' ? 'Transformación' : 'Makeover'} {currentRound + 1} {t.of[language]} {makeovers.length}
           </p>
 
           {/* Bad feedback card */}
@@ -127,10 +136,10 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
             style={{ backgroundColor: colorConfig.bg, border: `1px solid ${colorConfig.border}` }}
           >
             <p className="text-xs uppercase tracking-wide mb-2" style={{ color: colorConfig.accent }}>
-              The para said:
+              {language === 'es' ? 'El para dijo:' : 'The para said:'}
             </p>
             <p className="text-xl md:text-2xl text-white italic text-center">
-              "{current.bad}"
+              "{current.bad[language]}"
             </p>
           </div>
 
@@ -146,10 +155,10 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
             }}
           >
             <p className="text-xs uppercase tracking-wide mb-2" style={{ color: '#8899aa' }}>
-              What the student actually did:
+              {language === 'es' ? 'Lo que el estudiante realmente hizo:' : 'What the student actually did:'}
             </p>
             <p className="text-base md:text-lg text-white">
-              {current.context}
+              {current.context[language]}
             </p>
           </div>
 
@@ -176,14 +185,14 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
               style={{ backgroundColor: '#F1C40F', color: '#0a1628' }}
             >
               {showHint ? <EyeOff size={20} /> : <Eye size={20} />}
-              {showHint ? 'Hide Hint' : 'Show Hint'}
+              {showHint ? t.makeover_hideHint[language] : t.makeover_showHint[language]}
             </button>
             <button
               onClick={handleNext}
               className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:scale-105 active:scale-95"
               style={{ backgroundColor: colorConfig.accent, color: '#ffffff' }}
             >
-              {currentRound < makeovers.length - 1 ? 'Next' : 'Finish'}
+              {currentRound < makeovers.length - 1 ? t.next[language] : t.finish[language]}
               <ChevronRight size={20} />
             </button>
           </div>
@@ -197,22 +206,22 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
               <div className="flex items-center gap-2 mb-2">
                 <Lightbulb size={18} style={{ color: '#F1C40F' }} />
                 <p className="text-xs uppercase tracking-wide font-semibold" style={{ color: '#F1C40F' }}>
-                  Hint
+                  {t.makeover_hint[language]}
                 </p>
               </div>
-              <p className="text-white">{current.hint}</p>
+              <p className="text-white">{current.hint[language]}</p>
             </div>
           )}
 
           {/* User Makeover Input */}
           <div className="w-full mb-4">
             <label className="block text-sm text-slate-300 mb-2">
-              Type your Level 3 makeover (optional):
+              {language === 'es' ? 'Escribe tu transformación Nivel 3 (opcional):' : 'Type your Level 3 makeover (optional):'}
             </label>
             <textarea
               value={userMakeover}
               onChange={(e) => setUserMakeover(e.target.value)}
-              placeholder="I see that you... That's called... Now try..."
+              placeholder={language === 'es' ? 'Veo que tú... Eso se llama... Ahora intenta...' : "I see that you... That's called... Now try..."}
               className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-3 text-white placeholder:text-slate-400 h-24 resize-none"
             />
             {userMakeover.trim() && !showBeforeAfter && (
@@ -222,7 +231,7 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
                 style={{ backgroundColor: 'rgba(39, 174, 96, 0.2)', border: '1px solid #27AE60', color: '#27AE60' }}
               >
                 <Eye size={16} />
-                Show Before/After
+                {language === 'es' ? 'Mostrar Antes/Después' : 'Show Before/After'}
               </button>
             )}
           </div>
@@ -234,7 +243,9 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
               style={{ backgroundColor: 'rgba(255, 255, 255, 0.04)', border: '1px solid rgba(255, 255, 255, 0.1)' }}
             >
               <div className="text-center mb-4">
-                <h4 className="text-lg font-semibold text-white">Makeover Complete!</h4>
+                <h4 className="text-lg font-semibold text-white">
+                  {language === 'es' ? '¡Transformación Completa!' : 'Makeover Complete!'}
+                </h4>
               </div>
 
               <div className="space-y-4 md:space-y-0 md:grid md:grid-cols-3 md:gap-4 md:items-center">
@@ -244,9 +255,9 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <X size={16} className="text-red-400" />
-                    <span className="text-red-300 font-medium text-sm">BEFORE</span>
+                    <span className="text-red-300 font-medium text-sm">{language === 'es' ? 'ANTES' : 'BEFORE'}</span>
                   </div>
-                  <p className="text-white text-sm italic">"{current.bad}"</p>
+                  <p className="text-white text-sm italic">"{current.bad[language]}"</p>
                 </div>
 
                 <div className="text-center hidden md:block">
@@ -259,41 +270,43 @@ export function FeedbackMakeover({ onBack }: FeedbackMakeoverProps) {
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <CheckCircle size={16} className="text-green-400" />
-                    <span className="text-green-300 font-medium text-sm">AFTER</span>
+                    <span className="text-green-300 font-medium text-sm">{language === 'es' ? 'DESPUÉS' : 'AFTER'}</span>
                   </div>
                   <p className="text-white text-sm">"{userMakeover}"</p>
                   <div className="flex flex-wrap gap-1 mt-2">
-                    <span className="bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded text-xs">Notice</span>
-                    <span className="bg-green-500/20 text-green-300 px-2 py-0.5 rounded text-xs">Name</span>
-                    <span className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded text-xs">Next Step</span>
+                    <span className="bg-blue-500/20 text-blue-300 px-2 py-0.5 rounded text-xs">{language === 'es' ? 'Observar' : 'Notice'}</span>
+                    <span className="bg-green-500/20 text-green-300 px-2 py-0.5 rounded text-xs">{language === 'es' ? 'Nombrar' : 'Name'}</span>
+                    <span className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded text-xs">{language === 'es' ? 'Siguiente' : 'Next Step'}</span>
                   </div>
                 </div>
               </div>
 
               <p className="text-center text-xs text-slate-400 mt-3">
                 <Camera size={14} className="inline mr-1" />
-                Screenshot this card to keep!
+                {language === 'es' ? '¡Captura esta tarjeta para guardarla!' : 'Screenshot this card to keep!'}
               </p>
             </div>
           )}
 
           {/* Footer reminder */}
           <p className="text-sm text-center" style={{ color: '#8899aa' }}>
-            Tables: say your Level 3 version out loud. Does it have all 3 parts?
+            {language === 'es'
+              ? 'Mesas: digan su versión Nivel 3 en voz alta. ¿Tiene las 3 partes?'
+              : 'Tables: say your Level 3 version out loud. Does it have all 3 parts?'}
           </p>
         </div>
       )}
 
       {screen === 'done' && (
         <DoneScreen
-          title="Makeover Complete!"
-          message="You can turn ANY vague feedback into something powerful. The formula works every time."
-          tableTalk="Which makeover was the hardest to improve?"
+          title={t.makeover_doneTitle[language]}
+          message={t.makeover_doneMessage[language]}
+          tableTalk={t.makeover_tableTalk[language]}
           color="red"
           onBack={onBack}
           extraContent={
             <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
-              {['NOTICE', 'NAME', 'NEXT STEP'].map((step, i) => (
+              {stepLabels.map((step, i) => (
                 <div
                   key={step}
                   className="px-4 py-3 rounded-lg text-center"

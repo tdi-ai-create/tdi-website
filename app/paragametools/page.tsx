@@ -2,6 +2,7 @@
 
 import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { HomeScreen } from './components/HomeScreen';
 import { FacilitatorHome } from './components/FacilitatorHome';
 import { FacilitatorDashboard } from './components/FacilitatorDashboard';
@@ -123,6 +124,30 @@ function ParaGameToolsContent() {
 
 // Loading fallback
 function LoadingFallback() {
+  const { language } = useLanguage();
+  return (
+    <div
+      className="min-h-screen flex items-center justify-center"
+      style={{
+        background: 'linear-gradient(135deg, #0a1628 0%, #1a2d4a 50%, #0a1628 100%)',
+        color: '#ffffff',
+      }}
+    >
+      <div className="text-center">
+        <h1
+          className="text-4xl md:text-6xl font-black text-white mb-4 animate-pulse"
+          style={{ fontFamily: "'Outfit', sans-serif" }}
+        >
+          {language === 'es' ? 'HORA DE JUGAR' : 'GAME TIME'}
+        </h1>
+        <p className="text-gray-400">{language === 'es' ? 'Cargando...' : 'Loading...'}</p>
+      </div>
+    </div>
+  );
+}
+
+// Wrapper with language context outside Suspense for loading fallback
+function LoadingFallbackWrapper() {
   return (
     <div
       className="min-h-screen flex items-center justify-center"
@@ -146,8 +171,10 @@ function LoadingFallback() {
 
 export default function ParaGameToolsPage() {
   return (
-    <Suspense fallback={<LoadingFallback />}>
-      <ParaGameToolsContent />
-    </Suspense>
+    <LanguageProvider>
+      <Suspense fallback={<LoadingFallbackWrapper />}>
+        <ParaGameToolsContent />
+      </Suspense>
+    </LanguageProvider>
   );
 }

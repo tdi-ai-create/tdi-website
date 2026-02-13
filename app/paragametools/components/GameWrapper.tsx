@@ -3,6 +3,8 @@
 import { ArrowLeft, Target, Zap, TrendingUp, Smile, Wrench, Award, Check, X } from 'lucide-react';
 import { COLORS, type GameId } from '../data/gameConfig';
 import { ConfettiBurst } from './ConfettiBurst';
+import { useLanguage } from '../context/LanguageContext';
+import { UI_TRANSLATIONS } from '../data/translations';
 
 // Icon map for games
 export const GAME_ICONS = {
@@ -24,6 +26,8 @@ interface GameWrapperProps {
 export function GameWrapper({ gameId, title, color, onBack, children }: GameWrapperProps) {
   const colorConfig = COLORS[color];
   const IconComponent = GAME_ICONS[gameId];
+  const { language } = useLanguage();
+  const t = UI_TRANSLATIONS;
 
   return (
     <div
@@ -44,7 +48,7 @@ export function GameWrapper({ gameId, title, color, onBack, children }: GameWrap
           style={{ color: '#8899aa' }}
         >
           <ArrowLeft size={20} />
-          Games
+          {t.games_nav[language]}
         </button>
 
         <div className="flex items-center gap-2">
@@ -76,7 +80,7 @@ interface IntroScreenProps {
   gameId: GameId;
   title: string;
   color: keyof typeof COLORS;
-  rules: string[];
+  rules: readonly string[];
   onStart: () => void;
   extraContent?: React.ReactNode;
 }
@@ -84,6 +88,8 @@ interface IntroScreenProps {
 export function IntroScreen({ gameId, title, color, rules, onStart, extraContent }: IntroScreenProps) {
   const colorConfig = COLORS[color];
   const IconComponent = GAME_ICONS[gameId];
+  const { language } = useLanguage();
+  const t = UI_TRANSLATIONS;
 
   return (
     <div className="flex flex-col items-center text-center animate-fade-in">
@@ -121,7 +127,7 @@ export function IntroScreen({ gameId, title, color, rules, onStart, extraContent
           ['--glow-color' as string]: colorConfig.accent + '40',
         }}
       >
-        Let's Go →
+        {t.letsGo[language]}
       </button>
     </div>
   );
@@ -149,6 +155,8 @@ export function DoneScreen({
 }: DoneScreenProps) {
   const colorConfig = COLORS[color];
   const confettiColors = [colorConfig.accent, '#FFD700', '#FFFFFF'];
+  const { language } = useLanguage();
+  const t = UI_TRANSLATIONS;
 
   return (
     <div className="flex flex-col items-center text-center">
@@ -175,7 +183,7 @@ export function DoneScreen({
         style={{ backgroundColor: colorConfig.bg, border: `1px solid ${colorConfig.border}` }}
       >
         <p className="text-sm uppercase tracking-wider mb-2" style={{ color: colorConfig.accent }}>
-          Table Talk
+          {t.tableTalk[language]}
         </p>
         <p className="text-white text-lg">{tableTalk}</p>
       </div>
@@ -186,7 +194,7 @@ export function DoneScreen({
         style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#ffffff' }}
       >
         <ArrowLeft size={20} />
-        Back to Games
+        {t.backToGames[language]}
       </button>
     </div>
   );

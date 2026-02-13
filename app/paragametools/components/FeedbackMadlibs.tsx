@@ -6,6 +6,8 @@ import { GameWrapper } from './GameWrapper';
 import { ConfettiBurst } from './ConfettiBurst';
 import { MADLIBS_SCENARIOS, MADLIBS_SILLY_ROUNDS, SILLY_ROUND_PROMPTS } from '../data/madlibsData';
 import { COLORS, shuffle } from '../data/gameConfig';
+import { useLanguage } from '../context/LanguageContext';
+import { UI_TRANSLATIONS } from '../data/translations';
 
 type Screen = 'intro' | 'play' | 'done';
 
@@ -31,6 +33,9 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
   // Real feedback inputs for practice rounds
   const [realInputs, setRealInputs] = useState({ notice: '', name: '', nextStep: '' });
 
+  const { language } = useLanguage();
+  const t = UI_TRANSLATIONS;
+
   // Shuffle scenarios on mount
   const scenarios = useMemo(() => shuffle(MADLIBS_SCENARIOS), []);
 
@@ -40,6 +45,8 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
 
   // Get prompts for current silly round
   const currentPrompts = isSillyRound ? SILLY_ROUND_PROMPTS[currentRound % SILLY_ROUND_PROMPTS.length].prompts : [];
+
+  const gameTitle = t.games.madlibs.title[language];
 
   const handleStart = () => {
     setScreen('play');
@@ -93,11 +100,14 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
   };
 
   // The revealed silly feedback sentence
-  const sillyFeedback = `I see that you ${blindInputs.verb}. That's called ${blindInputs.skill}. Now try ${blindInputs.action}.`;
-  const realFeedbackFull = `${scenario.realFeedback.notice}. ${scenario.realFeedback.name}. ${scenario.realFeedback.nextStep}.`;
+  const sillyFeedback = language === 'es'
+    ? `Veo que ${blindInputs.verb}. Eso se llama ${blindInputs.skill}. Ahora intenta ${blindInputs.action}.`
+    : `I see that you ${blindInputs.verb}. That's called ${blindInputs.skill}. Now try ${blindInputs.action}.`;
+
+  const realFeedbackFull = `${scenario.realFeedback.notice[language]}. ${scenario.realFeedback.name[language]}. ${scenario.realFeedback.nextStep[language]}.`;
 
   return (
-    <GameWrapper gameId="madlibs" title="Feedback Madlibs" color="purple" onBack={onBack}>
+    <GameWrapper gameId="madlibs" title={gameTitle} color="purple" onBack={onBack}>
       {/* INTRO SCREEN */}
       {screen === 'intro' && (
         <div className="flex flex-col items-center text-center animate-fade-in">
@@ -107,8 +117,10 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
           >
             <Smile size={48} style={{ color: colorConfig.accent }} />
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#ffffff' }}>Feedback Madlibs</h2>
-          <p className="text-xl text-purple-300 mb-6">Fill in words BLIND, then watch the magic!</p>
+          <h2 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#ffffff' }}>{gameTitle}</h2>
+          <p className="text-xl text-purple-300 mb-6">
+            {language === 'es' ? '¡Llena palabras A CIEGAS, luego mira la magia!' : 'Fill in words BLIND, then watch the magic!'}
+          </p>
 
           {/* Rules box */}
           <div
@@ -116,22 +128,12 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
             style={{ backgroundColor: colorConfig.bg, border: `1px solid ${colorConfig.border}` }}
           >
             <ul className="space-y-3 text-left">
-              <li className="flex items-start gap-3" style={{ color: '#ffffff' }}>
-                <span style={{ color: colorConfig.accent }}>1.</span>
-                <span>Answer silly prompts WITHOUT seeing the sentence</span>
-              </li>
-              <li className="flex items-start gap-3" style={{ color: '#ffffff' }}>
-                <span style={{ color: colorConfig.accent }}>2.</span>
-                <span>Hit reveal and READ YOUR CREATION OUT LOUD</span>
-              </li>
-              <li className="flex items-start gap-3" style={{ color: '#ffffff' }}>
-                <span style={{ color: colorConfig.accent }}>3.</span>
-                <span>See how the formula works even when it's absurd</span>
-              </li>
-              <li className="flex items-start gap-3" style={{ color: '#ffffff' }}>
-                <span style={{ color: colorConfig.accent }}>4.</span>
-                <span>Then practice writing REAL feedback</span>
-              </li>
+              {t.madlibs_rules[language].map((rule, i) => (
+                <li key={i} className="flex items-start gap-3" style={{ color: '#ffffff' }}>
+                  <span style={{ color: colorConfig.accent }}>{i + 1}.</span>
+                  <span>{rule}</span>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -141,7 +143,9 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
             style={{ backgroundColor: 'rgba(147, 51, 234, 0.2)' }}
           >
             <p className="text-sm text-purple-200 italic">
-              The sillier your answers, the harder you'll laugh. Trust us.
+              {language === 'es'
+                ? 'Entre más tontas tus respuestas, más te vas a reír. Confía en nosotros.'
+                : 'The sillier your answers, the harder you\'ll laugh. Trust us.'}
             </p>
           </div>
 
@@ -150,7 +154,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
             className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
             style={{ backgroundColor: colorConfig.accent, color: '#ffffff' }}
           >
-            Let's Get Ridiculous!
+            {language === 'es' ? '¡Vamos a lo Ridículo!' : "Let's Get Ridiculous!"}
           </button>
         </div>
       )}
@@ -163,7 +167,10 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
             className="text-xs uppercase tracking-widest mb-4"
             style={{ color: 'rgba(147, 51, 234, 0.5)' }}
           >
-            {isSillyRound ? 'SILLY' : 'REAL'} ROUND {currentRound + 1} OF {scenarios.length}
+            {isSillyRound
+              ? (language === 'es' ? 'RONDA TONTA' : 'SILLY ROUND')
+              : (language === 'es' ? 'PRÁCTICA REAL' : 'REAL PRACTICE')
+            } {currentRound + 1} {t.of[language]} {scenarios.length}
           </p>
 
           {/* ============ SILLY ROUNDS ============ */}
@@ -177,10 +184,12 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
               <div className="text-center mb-6">
                 <div className="text-4xl mb-3">🎲</div>
                 <h3 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>
-                  Fill in these words!
+                  {language === 'es' ? '¡Llena estas palabras!' : 'Fill in these words!'}
                 </h3>
                 <p className="text-purple-300">
-                  Don't worry about why — just be as SILLY as possible!
+                  {language === 'es'
+                    ? 'No te preocupes por qué — ¡solo sé lo más TONTO posible!'
+                    : "Don't worry about why — just be as SILLY as possible!"}
                 </p>
               </div>
 
@@ -193,11 +202,11 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                     style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', border: '1px solid rgba(147, 51, 234, 0.3)' }}
                   >
                     <label className="block text-lg font-medium mb-3" style={{ color: '#ffffff' }}>
-                      {index + 1}. {prompt.label}:
+                      {index + 1}. {prompt.label[language]}:
                     </label>
                     <input
                       type="text"
-                      placeholder={prompt.placeholder}
+                      placeholder={prompt.placeholder[language]}
                       value={blindInputs[prompt.id as keyof typeof blindInputs]}
                       onChange={(e) => setBlindInputs((prev) => ({ ...prev, [prompt.id]: e.target.value }))}
                       className="w-full bg-slate-700 border-2 border-purple-500/50 rounded-lg px-4 py-3 text-white text-lg placeholder:text-slate-400 focus:border-purple-400 focus:outline-none"
@@ -213,7 +222,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                 style={{ backgroundColor: colorConfig.accent, color: '#ffffff' }}
               >
                 <Sparkles size={20} />
-                REVEAL MY FEEDBACK!
+                {language === 'es' ? '¡REVELAR MI RETROALIMENTACIÓN!' : 'REVEAL MY FEEDBACK!'}
               </button>
             </div>
           )}
@@ -228,9 +237,11 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
               >
                 <div className="flex items-center justify-center gap-2 text-orange-300 font-bold text-lg mb-1">
                   <Volume2 size={24} />
-                  READ THIS OUT LOUD TO YOUR TABLE!
+                  {language === 'es' ? '¡LEE ESTO EN VOZ ALTA A TU MESA!' : 'READ THIS OUT LOUD TO YOUR TABLE!'}
                 </div>
-                <p className="text-orange-200 text-sm">No whispering allowed!</p>
+                <p className="text-orange-200 text-sm">
+                  {language === 'es' ? '¡No se permite susurrar!' : 'No whispering allowed!'}
+                </p>
               </div>
 
               {/* The reveal - their silly feedback */}
@@ -246,15 +257,15 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
               {/* Formula breakdown */}
               <div className="flex flex-wrap items-center justify-center gap-3 text-base">
                 <span className="bg-blue-500/20 text-blue-300 px-3 py-1.5 rounded-lg font-medium">
-                  Notice
+                  {language === 'es' ? 'Observar' : 'Notice'}
                 </span>
                 <span className="text-slate-500">→</span>
                 <span className="bg-green-500/20 text-green-300 px-3 py-1.5 rounded-lg font-medium">
-                  Name
+                  {language === 'es' ? 'Nombrar' : 'Name'}
                 </span>
                 <span className="text-slate-500">→</span>
                 <span className="bg-purple-500/20 text-purple-300 px-3 py-1.5 rounded-lg font-medium">
-                  Next Step
+                  {language === 'es' ? 'Siguiente Paso' : 'Next Step'}
                 </span>
               </div>
 
@@ -262,7 +273,9 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
               <div className="bg-slate-800/50 rounded-lg p-4 text-center">
                 <p className="text-slate-300">
                   <span className="text-xl mr-2">😂</span>
-                  Even when it's COMPLETELY ABSURD, the formula still works!
+                  {language === 'es'
+                    ? '¡Aunque sea COMPLETAMENTE ABSURDA, la fórmula funciona!'
+                    : "Even when it's COMPLETELY ABSURD, the formula still works!"}
                 </p>
               </div>
 
@@ -271,7 +284,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                 className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
                 style={{ backgroundColor: '#27AE60', color: '#ffffff' }}
               >
-                See the REAL Version
+                {language === 'es' ? 'Ver la Versión REAL' : 'See the REAL Version'}
                 <ChevronRight size={20} />
               </button>
             </div>
@@ -282,7 +295,9 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
             <div className="w-full space-y-6 animate-fade-in">
               <div className="text-center">
                 <h3 className="text-xl font-bold mb-2" style={{ color: '#ffffff' }}>
-                  Now here's REAL feedback for the same scenario:
+                  {language === 'es'
+                    ? 'Ahora aquí está la retroalimentación REAL para el mismo escenario:'
+                    : "Now here's REAL feedback for the same scenario:"}
                 </h3>
               </div>
 
@@ -292,10 +307,10 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                 style={{ backgroundColor: colorConfig.bg, border: `1px solid ${colorConfig.border}` }}
               >
                 <p className="text-xs uppercase tracking-wide mb-2" style={{ color: colorConfig.accent }}>
-                  Scenario
+                  {language === 'es' ? 'Escenario' : 'Scenario'}
                 </p>
-                <p style={{ color: '#ffffff' }}>{scenario.text}</p>
-                <p className="text-slate-400 text-sm mt-2">{scenario.context}</p>
+                <p style={{ color: '#ffffff' }}>{scenario.text[language]}</p>
+                <p className="text-slate-400 text-sm mt-2">{scenario.context[language]}</p>
               </div>
 
               {/* Side by side comparison */}
@@ -306,7 +321,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                   style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', border: '1px solid rgba(147, 51, 234, 0.3)' }}
                 >
                   <h4 className="text-purple-300 font-semibold mb-3 flex items-center gap-2">
-                    <span className="text-xl">😂</span> YOUR SILLY VERSION:
+                    <span className="text-xl">😂</span> {language === 'es' ? 'TU VERSIÓN TONTA:' : 'YOUR SILLY VERSION:'}
                   </h4>
                   <p className="italic" style={{ color: '#ffffff' }}>"{sillyFeedback}"</p>
                 </div>
@@ -317,7 +332,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                   style={{ backgroundColor: 'rgba(39, 174, 96, 0.1)', border: '1px solid rgba(39, 174, 96, 0.3)' }}
                 >
                   <h4 className="text-green-300 font-semibold mb-3 flex items-center gap-2">
-                    <span className="text-xl">✓</span> PROFESSIONAL VERSION:
+                    <span className="text-xl">✓</span> {language === 'es' ? 'VERSIÓN PROFESIONAL:' : 'PROFESSIONAL VERSION:'}
                   </h4>
                   <p style={{ color: '#ffffff' }}>"{realFeedbackFull}"</p>
                 </div>
@@ -326,11 +341,12 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
               {/* Key insight */}
               <div className="bg-slate-800/50 rounded-lg p-5 text-center">
                 <p className="text-lg font-medium mb-2" style={{ color: '#ffffff' }}>
-                  🎯 SAME PATTERN!
+                  🎯 {language === 'es' ? '¡MISMO PATRÓN!' : 'SAME PATTERN!'}
                 </p>
                 <p className="text-slate-300">
-                  Notice → Name → Next Step works whether you're talking about
-                  "{blindInputs.skill}" or actual student learning.
+                  {language === 'es'
+                    ? `Observar → Nombrar → Siguiente Paso funciona ya sea que estés hablando de "${blindInputs.skill}" o del aprendizaje real del estudiante.`
+                    : `Notice → Name → Next Step works whether you're talking about "${blindInputs.skill}" or actual student learning.`}
                 </p>
               </div>
 
@@ -339,7 +355,9 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                 className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
                 style={{ backgroundColor: colorConfig.accent, color: '#ffffff' }}
               >
-                {currentRound < scenarios.length - 1 ? 'Next Round!' : 'Finish!'}
+                {currentRound < scenarios.length - 1
+                  ? (language === 'es' ? '¡Siguiente Ronda!' : 'Next Round!')
+                  : (language === 'es' ? '¡Terminar!' : 'Finish!')}
                 <ChevronRight size={20} />
               </button>
             </div>
@@ -358,15 +376,17 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                 style={{ backgroundColor: colorConfig.bg, border: `1px solid ${colorConfig.border}` }}
               >
                 <p className="text-xs uppercase tracking-wide mb-2" style={{ color: colorConfig.accent }}>
-                  Scenario
+                  {language === 'es' ? 'Escenario' : 'Scenario'}
                 </p>
-                <h3 className="text-lg md:text-xl font-semibold mb-2" style={{ color: '#ffffff' }}>{scenario.text}</h3>
-                <p className="text-slate-300 text-sm">{scenario.context}</p>
+                <h3 className="text-lg md:text-xl font-semibold mb-2" style={{ color: '#ffffff' }}>{scenario.text[language]}</h3>
+                <p className="text-slate-300 text-sm">{scenario.context[language]}</p>
               </div>
 
               <div className="text-center">
                 <p className="text-lg text-green-300 font-medium">
-                  NOW YOU TRY: Write real Level 3 feedback!
+                  {language === 'es'
+                    ? 'AHORA TÚ INTENTA: ¡Escribe retroalimentación Nivel 3 real!'
+                    : 'NOW YOU TRY: Write real Level 3 feedback!'}
                 </p>
               </div>
 
@@ -374,11 +394,11 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm text-slate-300 mb-2">
-                    <span className="text-blue-400 font-medium mr-2">NOTICE</span>
-                    What did you see the student do?
+                    <span className="text-blue-400 font-medium mr-2">{language === 'es' ? 'OBSERVAR' : 'NOTICE'}</span>
+                    {language === 'es' ? '¿Qué viste que hizo el estudiante?' : 'What did you see the student do?'}
                   </label>
                   <textarea
-                    placeholder="I see that you..."
+                    placeholder={language === 'es' ? 'Veo que tú...' : 'I see that you...'}
                     value={realInputs.notice}
                     onChange={(e) => setRealInputs((prev) => ({ ...prev, notice: e.target.value }))}
                     className="w-full bg-slate-700 border border-blue-500/50 rounded-lg px-4 py-3 text-white placeholder:text-slate-400 h-20 resize-none focus:border-blue-400 focus:outline-none"
@@ -387,11 +407,11 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
 
                 <div>
                   <label className="block text-sm text-slate-300 mb-2">
-                    <span className="text-green-400 font-medium mr-2">NAME</span>
-                    What skill or strategy is that?
+                    <span className="text-green-400 font-medium mr-2">{language === 'es' ? 'NOMBRAR' : 'NAME'}</span>
+                    {language === 'es' ? '¿Qué habilidad o estrategia es esa?' : 'What skill or strategy is that?'}
                   </label>
                   <textarea
-                    placeholder="That's called..."
+                    placeholder={language === 'es' ? 'Eso se llama...' : "That's called..."}
                     value={realInputs.name}
                     onChange={(e) => setRealInputs((prev) => ({ ...prev, name: e.target.value }))}
                     className="w-full bg-slate-700 border border-green-500/50 rounded-lg px-4 py-3 text-white placeholder:text-slate-400 h-20 resize-none focus:border-green-400 focus:outline-none"
@@ -400,11 +420,11 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
 
                 <div>
                   <label className="block text-sm text-slate-300 mb-2">
-                    <span className="text-purple-400 font-medium mr-2">NEXT STEP</span>
-                    What should they try now?
+                    <span className="text-purple-400 font-medium mr-2">{language === 'es' ? 'SIGUIENTE PASO' : 'NEXT STEP'}</span>
+                    {language === 'es' ? '¿Qué deberían intentar ahora?' : 'What should they try now?'}
                   </label>
                   <textarea
-                    placeholder="Now try..."
+                    placeholder={language === 'es' ? 'Ahora intenta...' : 'Now try...'}
                     value={realInputs.nextStep}
                     onChange={(e) => setRealInputs((prev) => ({ ...prev, nextStep: e.target.value }))}
                     className="w-full bg-slate-700 border border-purple-500/50 rounded-lg px-4 py-3 text-white placeholder:text-slate-400 h-20 resize-none focus:border-purple-400 focus:outline-none"
@@ -418,7 +438,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                 className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                 style={{ backgroundColor: '#27AE60', color: '#ffffff' }}
               >
-                See an Example
+                {language === 'es' ? 'Ver un Ejemplo' : 'See an Example'}
                 <ChevronRight size={20} />
               </button>
             </div>
@@ -433,14 +453,14 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                   className="rounded-xl p-5"
                   style={{ backgroundColor: 'rgba(52, 152, 219, 0.1)', border: '1px solid rgba(52, 152, 219, 0.3)' }}
                 >
-                  <h4 className="text-blue-300 font-semibold mb-3">YOUR VERSION:</h4>
+                  <h4 className="text-blue-300 font-semibold mb-3">{language === 'es' ? 'TU VERSIÓN:' : 'YOUR VERSION:'}</h4>
                   <p className="mb-3" style={{ color: '#ffffff' }}>
                     {realInputs.notice}. {realInputs.name}. {realInputs.nextStep}.
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs">Notice ✓</span>
-                    <span className="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs">Name ✓</span>
-                    <span className="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">Next Step ✓</span>
+                    <span className="bg-blue-500/20 text-blue-300 px-2 py-1 rounded text-xs">{language === 'es' ? 'Observar ✓' : 'Notice ✓'}</span>
+                    <span className="bg-green-500/20 text-green-300 px-2 py-1 rounded text-xs">{language === 'es' ? 'Nombrar ✓' : 'Name ✓'}</span>
+                    <span className="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">{language === 'es' ? 'Siguiente ✓' : 'Next Step ✓'}</span>
                   </div>
                 </div>
 
@@ -449,9 +469,11 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                   className="rounded-xl p-5"
                   style={{ backgroundColor: 'rgba(39, 174, 96, 0.1)', border: '1px solid rgba(39, 174, 96, 0.3)' }}
                 >
-                  <h4 className="text-green-300 font-semibold mb-3">EXAMPLE VERSION:</h4>
+                  <h4 className="text-green-300 font-semibold mb-3">{language === 'es' ? 'VERSIÓN EJEMPLO:' : 'EXAMPLE VERSION:'}</h4>
                   <p style={{ color: '#ffffff' }}>"{realFeedbackFull}"</p>
-                  <p className="text-sm text-green-200 mt-3">Both work! The formula is flexible.</p>
+                  <p className="text-sm text-green-200 mt-3">
+                    {language === 'es' ? '¡Ambas funcionan! La fórmula es flexible.' : 'Both work! The formula is flexible.'}
+                  </p>
                 </div>
               </div>
 
@@ -460,7 +482,9 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                 className="w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-bold text-lg transition-all hover:scale-105 active:scale-95"
                 style={{ backgroundColor: colorConfig.accent, color: '#ffffff' }}
               >
-                {currentRound < scenarios.length - 1 ? 'Next Round!' : 'Finish!'}
+                {currentRound < scenarios.length - 1
+                  ? (language === 'es' ? '¡Siguiente Ronda!' : 'Next Round!')
+                  : (language === 'es' ? '¡Terminar!' : 'Finish!')}
                 <ChevronRight size={20} />
               </button>
             </div>
@@ -480,9 +504,13 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
             <Award size={48} style={{ color: colorConfig.accent }} />
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: '#ffffff' }}>Formula = Bulletproof!</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: '#ffffff' }}>
+            {language === 'es' ? '¡Fórmula = Infalible!' : 'Formula = Bulletproof!'}
+          </h2>
           <p className="text-xl text-purple-200 mb-6">
-            You just proved Notice → Name → Next Step works for EVERYTHING.
+            {language === 'es'
+              ? 'Acabas de probar que Observar → Nombrar → Siguiente Paso funciona para TODO.'
+              : 'You just proved Notice → Name → Next Step works for EVERYTHING.'}
           </p>
 
           <div
@@ -490,29 +518,30 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
             style={{ backgroundColor: colorConfig.bg, border: `1px solid ${colorConfig.border}` }}
           >
             <p className="text-lg text-purple-100 leading-relaxed">
-              From "advanced chicken psychology" to actual student feedback — same formula, same strength.
-              That's how you know it's unbreakable.
+              {language === 'es'
+                ? 'Desde "psicología avanzada de pollos" hasta retroalimentación real para estudiantes — misma fórmula, misma fuerza. Así es como sabes que es inquebrantable.'
+                : 'From "advanced chicken psychology" to actual student feedback — same formula, same strength. That\'s how you know it\'s unbreakable.'}
             </p>
           </div>
 
           {/* Formula reminder */}
           <div className="flex items-center justify-center gap-2 font-medium mb-6" style={{ color: '#ffffff' }}>
-            <span className="text-blue-400">NOTICE</span>
+            <span className="text-blue-400">{language === 'es' ? 'OBSERVAR' : 'NOTICE'}</span>
             <span className="text-slate-500">→</span>
-            <span className="text-green-400">NAME</span>
+            <span className="text-green-400">{language === 'es' ? 'NOMBRAR' : 'NAME'}</span>
             <span className="text-slate-500">→</span>
-            <span className="text-purple-400">NEXT STEP</span>
+            <span className="text-purple-400">{language === 'es' ? 'SIGUIENTE' : 'NEXT STEP'}</span>
           </div>
 
           {/* Table Talk */}
           <div className="w-full max-w-lg bg-slate-800/50 rounded-xl p-6 mb-6">
             <p className="text-sm uppercase tracking-wider mb-3" style={{ color: colorConfig.accent }}>
-              Table Talk
+              {t.tableTalk[language]}
             </p>
             <div className="space-y-2 text-slate-300 text-left">
-              <p>• Which ridiculous feedback got the biggest laugh?</p>
-              <p>• What fake subject should universities offer?</p>
-              <p>• Raise your hand if you'll remember the formula better now!</p>
+              <p>• {language === 'es' ? '¿Cuál retroalimentación ridícula causó más risas?' : 'Which ridiculous feedback got the biggest laugh?'}</p>
+              <p>• {language === 'es' ? '¿Qué materia falsa deberían ofrecer las universidades?' : 'What fake subject should universities offer?'}</p>
+              <p>• {language === 'es' ? '¡Levanta la mano si vas a recordar mejor la fórmula ahora!' : "Raise your hand if you'll remember the formula better now!"}</p>
             </div>
           </div>
 
@@ -522,7 +551,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
             style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', color: '#ffffff' }}
           >
             <RotateCcw size={20} />
-            Back to Games
+            {t.backToGames[language]}
           </button>
         </div>
       )}
