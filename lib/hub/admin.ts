@@ -230,84 +230,36 @@ export async function updateRequestStatus(requestId: string, status: string) {
 }
 
 /**
- * Get admin stats
+ * Get admin stats via API route (bypasses RLS)
  */
 export async function getAdminStats() {
-  const supabase = getSupabase();
+  try {
+    const response = await fetch('/api/tdi-admin/stats', {
+      method: 'GET',
+    });
 
-  const [
-    usersResult,
-    enrollmentsResult,
-    completionsResult,
-    certificatesResult,
-    pdHoursResult,
-    stressScoresResult,
-    courseEnrollmentsResult,
-  ] = await Promise.all([
-    // Total users (count only, no data)
-    supabase
-      .from('hub_profiles')
-      .select('*', { count: 'exact', head: true }),
-    // Total enrollments (count only)
-    supabase
-      .from('hub_enrollments')
-      .select('*', { count: 'exact', head: true }),
-    // Total completions (count only)
-    supabase
-      .from('hub_enrollments')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'completed'),
-    // Total certificates (count only)
-    supabase
-      .from('hub_certificates')
-      .select('*', { count: 'exact', head: true }),
-    // Total PD hours - only fetch pd_hours column, limit to recent
-    supabase
-      .from('hub_certificates')
-      .select('pd_hours')
-      .limit(1000),
-    // Latest stress scores - limit to last 500 to get enough unique users
-    supabase
-      .from('hub_assessments')
-      .select('user_id, score')
-      .eq('type', 'daily_check_in')
-      .order('created_at', { ascending: false })
-      .limit(500),
-    // Enrollments per course - use group count approach
-    supabase
-      .from('hub_enrollments')
-      .select('course_id')
-      .limit(5000),
-  ]);
-
-  // Calculate total PD hours
-  const totalPdHours = pdHoursResult.data?.reduce((sum, c) => sum + (c.pd_hours || 0), 0) || 0;
-
-  // Calculate average stress score (latest per user)
-  const latestScores = new Map<string, number>();
-  stressScoresResult.data?.forEach((item) => {
-    if (!latestScores.has(item.user_id)) {
-      latestScores.set(item.user_id, item.score);
+    if (!response.ok) {
+      console.error('[Admin Stats] API error:', response.status);
+      return {
+        totalUsers: 0,
+        totalEnrollments: 0,
+        totalCompletions: 0,
+        totalCertificates: 0,
+        totalPdHours: 0,
+        avgStressScore: 'N/A',
+      };
     }
-  });
-  const scores = Array.from(latestScores.values());
-  const avgStressScore = scores.length > 0
-    ? (scores.reduce((sum, s) => sum + s, 0) / scores.length).toFixed(1)
-    : 'N/A';
 
-  // Count enrollments per course (without fetching course titles - faster)
-  const courseCountMap = new Map<string, number>();
-  courseEnrollmentsResult.data?.forEach((e) => {
-    courseCountMap.set(e.course_id, (courseCountMap.get(e.course_id) || 0) + 1);
-  });
-
-  return {
-    totalUsers: usersResult.count || 0,
-    totalEnrollments: enrollmentsResult.count || 0,
-    totalCompletions: completionsResult.count || 0,
-    totalCertificates: certificatesResult.count || 0,
-    totalPdHours,
-    avgStressScore,
-    courseEnrollments: [], // Simplified - full breakdown available in Operations page
-  };
+    return await response.json();
+  } catch (error) {
+    console.error('[Admin Stats] Error fetching stats:', error);
+    return {
+      totalUsers: 0,
+      totalEnrollments: 0,
+      totalCompletions: 0,
+      totalCertificates: 0,
+      totalPdHours: 0,
+      avgStressScore: 'N/A',
+    };
+  }
 }
