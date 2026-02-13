@@ -566,9 +566,12 @@ export default function ASD4SurveyPage() {
 
           {/* Q4: Confidence - Questions */}
           <div className="mb-6" id="field-confidenceAsking">
-            <label className="block text-white font-medium mb-3">
+            <label className="block text-white font-medium mb-2">
               4. How confident do you feel using QUESTIONS instead of TELLING when a student is stuck? <span className="text-red-400">*</span>
             </label>
+            <p className="text-sm text-slate-400 italic mb-3 pl-3 border-l-2 border-slate-600">
+              Example: Instead of saying "The answer is 5," asking "What have you tried so far?"
+            </p>
             <ScaleInput
               value={formData.confidenceAsking}
               onChange={(val) => updateField('confidenceAsking', val)}
@@ -579,9 +582,12 @@ export default function ASD4SurveyPage() {
 
           {/* Q5: Confidence - Feedback */}
           <div className="mb-6" id="field-confidenceFeedback">
-            <label className="block text-white font-medium mb-3">
+            <label className="block text-white font-medium mb-2">
               5. How confident do you feel giving SPECIFIC feedback using Notice + Name + Next Step? <span className="text-red-400">*</span>
             </label>
+            <p className="text-sm text-slate-400 italic mb-3 pl-3 border-l-2 border-slate-600">
+              Example: "I see you started each sentence with a capital letter (Notice). That's correct capitalization (Name). Now check your proper nouns (Next Step)."
+            </p>
             <ScaleInput
               value={formData.confidenceFeedback}
               onChange={(val) => updateField('confidenceFeedback', val)}
@@ -686,7 +692,7 @@ export default function ASD4SurveyPage() {
                 type="text"
                 value={formData.commitment}
                 onChange={(e) => updateField('commitment', e.target.value)}
-                placeholder="I'm going to try..."
+                placeholder="This week I will try _____ when a student _____"
                 className="w-full p-4 bg-white/5 border-y border-r text-white placeholder:text-slate-500 focus:outline-none text-lg"
                 style={{
                   borderColor: errors.commitment ? '#ef4444' : 'rgba(255,255,255,0.1)',
