@@ -1,4 +1,4 @@
-// Feedback Madlibs game data
+// Feedback Madlibs game data - ACTUALLY FUNNY VERSION
 
 export interface MadlibScenario {
   id: number;
@@ -14,71 +14,87 @@ export interface MadlibScenario {
 export const MADLIBS_SCENARIOS: MadlibScenario[] = [
   {
     id: 1,
-    text: "Jordan drew a picture of their family",
-    context: "Included 4 people and a dog, used 3 different colors",
+    text: "Jayden created a self-portrait using macaroni, glitter, and what appears to be their entire collection of superhero stickers",
+    context: "Mixed media art project with creative material choices",
     realFeedback: {
-      notice: "I see that you included everyone in your family",
-      name: "That's called attention to detail",
-      nextStep: "Now try adding the setting where your family spends time together"
+      notice: "I see that you combined different materials to show your ideas",
+      name: "That's called mixed media art",
+      nextStep: "Now try organizing your materials by texture to create even more contrast"
     }
   },
   {
     id: 2,
-    text: "Sam wrote a paragraph about their weekend",
-    context: "3 sentences, all starting with 'I'",
+    text: "Sam read their story about a dog who becomes mayor with full character voices and interpretive hand gestures",
+    context: "Dramatic reading with vocal and physical expression",
     realFeedback: {
-      notice: "I see that you wrote complete sentences",
-      name: "That's called proper sentence structure",
-      nextStep: "Now try starting some sentences with different words to add variety"
+      notice: "I see that you used your voice and body to bring the story to life",
+      name: "That's called dramatic interpretation",
+      nextStep: "Now try matching your gestures to the story's most important moments"
     }
   },
   {
     id: 3,
-    text: "Maya solved 4 out of 5 math problems correctly",
-    context: "Showed work on all of them",
+    text: "Maya figured out the word problem by acting it out with pencils as the main characters",
+    context: "Mathematical problem-solving through concrete modeling",
     realFeedback: {
-      notice: "I see that you showed your thinking on every problem",
-      name: "That's called mathematical reasoning",
-      nextStep: "Now try double-checking your computation on the last one"
+      notice: "I see that you used objects to represent the problem",
+      name: "That's called concrete modeling",
+      nextStep: "Now try drawing your thinking to show each step of the process"
     }
   },
   {
     id: 4,
-    text: "Alex read a book aloud to the class",
-    context: "Used different voices for characters",
+    text: "Alex asked seven follow-up questions about the volcano experiment, including 'What would happen if we used hot sauce instead of baking soda?'",
+    context: "Scientific curiosity with creative experimental thinking",
     realFeedback: {
-      notice: "I see that you gave each character a unique voice",
-      name: "That's called expressive reading",
-      nextStep: "Now try adjusting your volume to match the story's mood"
+      notice: "I see that you thought of ways to extend our experiment",
+      name: "That's called scientific inquiry",
+      nextStep: "Now try writing down your prediction before we test your hot sauce idea"
     }
   },
   {
     id: 5,
-    text: "Taylor organized all their supplies before starting",
-    context: "Pencils, paper, eraser lined up neatly",
+    text: "River created a filing system for their pencils based on 'how tired they look' and 'which ones have attitude'",
+    context: "Personal organization system with creative categorization",
     realFeedback: {
-      notice: "I see that you prepared everything before beginning",
-      name: "That's called good planning",
-      nextStep: "Now try using that same organization with your written work"
+      notice: "I see that you created categories that make sense to you",
+      name: "That's called personal organization",
+      nextStep: "Now try using that same system to organize your thoughts when you write"
     }
   },
   {
     id: 6,
-    text: "River asked three questions during science class",
-    context: "All related to the experiment we were doing",
+    text: "Jordan figured out what would happen next in the story by looking at the pictures and connecting them to what the character wanted",
+    context: "Reading comprehension through visual clues and character motivation",
     realFeedback: {
-      notice: "I see that you connected your questions to our experiment",
-      name: "That's called scientific thinking",
-      nextStep: "Now try predicting what might happen if we changed one variable"
+      notice: "I see that you used clues from the pictures and text",
+      name: "That's called making predictions",
+      nextStep: "Now try explaining your thinking to see if other clues support your idea"
     }
   }
 ];
 
-export const MADLIBS_PROMPTS = {
-  verb: "VERB (action word)",
-  skill: "SKILL NAME (any subject or ability)",
-  action: "ACTION VERB (something to try next)"
-};
+// Enhanced prompts that generate funnier responses
+export const MADLIBS_PROMPTS = [
+  {
+    id: "verb",
+    label: "Weird thing people do with their body",
+    placeholder: "snorted through your elbows",
+    examples: ["wiggled your ears independently", "hiccupped in reverse", "burped the alphabet backwards", "sneezed in slow motion"]
+  },
+  {
+    id: "skill",
+    label: "Subject nobody actually studies",
+    placeholder: "advanced chicken psychology",
+    examples: ["theoretical pickle engineering", "professional mustard appreciation", "competitive lint analysis", "emergency toenail management"]
+  },
+  {
+    id: "action",
+    label: "Something you'd never tell a student to try",
+    placeholder: "licking the flagpole during winter",
+    examples: ["teaching your socks to tap dance", "negotiating with gravity", "convincing your homework to do itself", "having a serious conversation with your pencil sharpener"]
+  }
+];
 
 // Total rounds: 6 (first 3 are silly madlibs, last 3 are real practice)
 export const MADLIBS_TOTAL_ROUNDS = 6;
