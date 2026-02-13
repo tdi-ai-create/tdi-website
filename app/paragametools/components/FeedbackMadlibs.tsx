@@ -107,7 +107,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
           >
             <Smile size={48} style={{ color: colorConfig.accent }} />
           </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Feedback Madlibs</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#ffffff' }}>Feedback Madlibs</h2>
           <p className="text-xl text-purple-300 mb-6">Fill in words BLIND, then watch the magic!</p>
 
           {/* Rules box */}
@@ -116,19 +116,19 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
             style={{ backgroundColor: colorConfig.bg, border: `1px solid ${colorConfig.border}` }}
           >
             <ul className="space-y-3 text-left">
-              <li className="flex items-start gap-3 text-white">
+              <li className="flex items-start gap-3" style={{ color: '#ffffff' }}>
                 <span style={{ color: colorConfig.accent }}>1.</span>
                 <span>Answer silly prompts WITHOUT seeing the sentence</span>
               </li>
-              <li className="flex items-start gap-3 text-white">
+              <li className="flex items-start gap-3" style={{ color: '#ffffff' }}>
                 <span style={{ color: colorConfig.accent }}>2.</span>
                 <span>Hit reveal and READ YOUR CREATION OUT LOUD</span>
               </li>
-              <li className="flex items-start gap-3 text-white">
+              <li className="flex items-start gap-3" style={{ color: '#ffffff' }}>
                 <span style={{ color: colorConfig.accent }}>3.</span>
                 <span>See how the formula works even when it's absurd</span>
               </li>
-              <li className="flex items-start gap-3 text-white">
+              <li className="flex items-start gap-3" style={{ color: '#ffffff' }}>
                 <span style={{ color: colorConfig.accent }}>4.</span>
                 <span>Then practice writing REAL feedback</span>
               </li>
@@ -176,7 +176,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
               {/* Big fun header */}
               <div className="text-center mb-6">
                 <div className="text-4xl mb-3">🎲</div>
-                <h3 className="text-2xl font-bold text-white mb-2">
+                <h3 className="text-2xl font-bold mb-2" style={{ color: '#ffffff' }}>
                   Fill in these words!
                 </h3>
                 <p className="text-purple-300">
@@ -192,7 +192,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                     className="rounded-xl p-5"
                     style={{ backgroundColor: 'rgba(147, 51, 234, 0.1)', border: '1px solid rgba(147, 51, 234, 0.3)' }}
                   >
-                    <label className="block text-lg font-medium text-white mb-3">
+                    <label className="block text-lg font-medium mb-3" style={{ color: '#ffffff' }}>
                       {index + 1}. {prompt.label}:
                     </label>
                     <input
@@ -238,7 +238,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                 className="rounded-2xl p-6 md:p-8"
                 style={{ backgroundColor: 'rgba(147, 51, 234, 0.15)', border: '2px solid rgba(147, 51, 234, 0.4)' }}
               >
-                <p className="text-2xl md:text-3xl text-white leading-relaxed font-medium text-center">
+                <p className="text-2xl md:text-3xl leading-relaxed font-medium text-center" style={{ color: '#ffffff' }}>
                   "{sillyFeedback}"
                 </p>
               </div>
@@ -281,7 +281,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
           {isSillyRound && sillyPhase === 'show_real' && (
             <div className="w-full space-y-6 animate-fade-in">
               <div className="text-center">
-                <h3 className="text-xl font-bold text-white mb-2">
+                <h3 className="text-xl font-bold mb-2" style={{ color: '#ffffff' }}>
                   Now here's REAL feedback for the same scenario:
                 </h3>
               </div>
@@ -294,7 +294,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                 <p className="text-xs uppercase tracking-wide mb-2" style={{ color: colorConfig.accent }}>
                   Scenario
                 </p>
-                <p className="text-white">{scenario.text}</p>
+                <p style={{ color: '#ffffff' }}>{scenario.text}</p>
                 <p className="text-slate-400 text-sm mt-2">{scenario.context}</p>
               </div>
 
@@ -308,7 +308,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                   <h4 className="text-purple-300 font-semibold mb-3 flex items-center gap-2">
                     <span className="text-xl">😂</span> YOUR SILLY VERSION:
                   </h4>
-                  <p className="text-white italic">"{sillyFeedback}"</p>
+                  <p className="italic" style={{ color: '#ffffff' }}>"{sillyFeedback}"</p>
                 </div>
 
                 {/* Real professional version */}
@@ -319,13 +319,13 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                   <h4 className="text-green-300 font-semibold mb-3 flex items-center gap-2">
                     <span className="text-xl">✓</span> PROFESSIONAL VERSION:
                   </h4>
-                  <p className="text-white">"{realFeedbackFull}"</p>
+                  <p style={{ color: '#ffffff' }}>"{realFeedbackFull}"</p>
                 </div>
               </div>
 
               {/* Key insight */}
               <div className="bg-slate-800/50 rounded-lg p-5 text-center">
-                <p className="text-white text-lg font-medium mb-2">
+                <p className="text-lg font-medium mb-2" style={{ color: '#ffffff' }}>
                   🎯 SAME PATTERN!
                 </p>
                 <p className="text-slate-300">
@@ -360,7 +360,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                 <p className="text-xs uppercase tracking-wide mb-2" style={{ color: colorConfig.accent }}>
                   Scenario
                 </p>
-                <h3 className="text-lg md:text-xl font-semibold text-white mb-2">{scenario.text}</h3>
+                <h3 className="text-lg md:text-xl font-semibold mb-2" style={{ color: '#ffffff' }}>{scenario.text}</h3>
                 <p className="text-slate-300 text-sm">{scenario.context}</p>
               </div>
 
@@ -434,7 +434,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                   style={{ backgroundColor: 'rgba(52, 152, 219, 0.1)', border: '1px solid rgba(52, 152, 219, 0.3)' }}
                 >
                   <h4 className="text-blue-300 font-semibold mb-3">YOUR VERSION:</h4>
-                  <p className="text-white mb-3">
+                  <p className="mb-3" style={{ color: '#ffffff' }}>
                     {realInputs.notice}. {realInputs.name}. {realInputs.nextStep}.
                   </p>
                   <div className="flex flex-wrap gap-2">
@@ -450,7 +450,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
                   style={{ backgroundColor: 'rgba(39, 174, 96, 0.1)', border: '1px solid rgba(39, 174, 96, 0.3)' }}
                 >
                   <h4 className="text-green-300 font-semibold mb-3">EXAMPLE VERSION:</h4>
-                  <p className="text-white">"{realFeedbackFull}"</p>
+                  <p style={{ color: '#ffffff' }}>"{realFeedbackFull}"</p>
                   <p className="text-sm text-green-200 mt-3">Both work! The formula is flexible.</p>
                 </div>
               </div>
@@ -480,7 +480,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
             <Award size={48} style={{ color: colorConfig.accent }} />
           </div>
 
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-3">Formula = Bulletproof!</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-3" style={{ color: '#ffffff' }}>Formula = Bulletproof!</h2>
           <p className="text-xl text-purple-200 mb-6">
             You just proved Notice → Name → Next Step works for EVERYTHING.
           </p>
@@ -496,7 +496,7 @@ export function FeedbackMadlibs({ onBack }: FeedbackMadlibsProps) {
           </div>
 
           {/* Formula reminder */}
-          <div className="flex items-center justify-center gap-2 text-white font-medium mb-6">
+          <div className="flex items-center justify-center gap-2 font-medium mb-6" style={{ color: '#ffffff' }}>
             <span className="text-blue-400">NOTICE</span>
             <span className="text-slate-500">→</span>
             <span className="text-green-400">NAME</span>
