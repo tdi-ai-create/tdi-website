@@ -210,13 +210,13 @@ async function batchInsert(table, records, batchSize = 50) {
 
 async function seedProfiles() {
   console.log('\n📝 Seeding example profiles...');
+  console.log('  Creating auth users and profiles (this may take a minute)...');
 
   const profiles = [];
   const startDate = new Date('2025-08-01');
   const endDate = new Date('2026-02-13');
 
   // Assign staff to schools
-  let staffIndex = 0;
   const schoolAssignments = [];
 
   for (const school of SCHOOLS) {
@@ -233,7 +233,12 @@ async function seedProfiles() {
   // Shuffle assignments
   schoolAssignments.sort(() => Math.random() - 0.5);
 
-  for (let i = 0; i < 500; i++) {
+  // Create users in batches
+  const TARGET_USERS = 500;
+  let created = 0;
+  let failed = 0;
+
+  for (let i = 0; i < TARGET_USERS; i++) {
     const firstName = randomChoice(FIRST_NAMES);
     const lastName = randomChoice(LAST_NAMES);
     const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i}@example.tdi.test`;
@@ -244,79 +249,107 @@ async function seedProfiles() {
 
     const initialStress = randomInt(5, 9);
     const currentStress = randomInt(3, Math.min(8, initialStress));
-    const yearsExp = Math.round(Math.abs(randomInt(0, 30) - 15 + Math.random() * 10)); // Bell curve around 8
+    const yearsExp = Math.round(Math.abs(randomInt(0, 30) - 15 + Math.random() * 10));
 
     const createdAt = randomDate(startDate, endDate);
     const onboardingCompleted = Math.random() < 0.9;
 
-    profiles.push({
-      id: generateUUID(),
-      display_name: `${firstName} ${lastName}`,
-      email: email,
-      role: roleObj.role,
-      onboarding_completed: onboardingCompleted,
-      onboarding_data: {
-        grade_level: gradeLevel,
-        years_experience: yearsExp,
-        goals: [randomChoice(GOALS), randomChoice(GOALS)].filter((v, i, a) => a.indexOf(v) === i),
-        initial_stress_level: initialStress,
-        current_stress_level: currentStress,
-        school_name: school,
-        state: randomChoice(STATES),
-        gender: weightedRandomChoice(['female', 'male', 'non-binary', 'prefer_not_to_say'], [55, 38, 4, 3]),
-      },
-      preferences: {
-        email_notifications: Math.random() > 0.2,
-        dark_mode: Math.random() > 0.85,
-      },
-      created_at: createdAt.toISOString(),
-      updated_at: createdAt.toISOString(),
-      is_example: true,
-    });
+    try {
+      // Create auth user first
+      const { data: authUser, error: authError } = await supabase.auth.admin.createUser({
+        email,
+        password: 'ExampleUser123!',
+        email_confirm: true,
+        user_metadata: {
+          display_name: `${firstName} ${lastName}`,
+          is_example: true,
+        }
+      });
+
+      if (authError) {
+        failed++;
+        continue;
+      }
+
+      // Now create the profile with the auth user's ID
+      const profileData = {
+        id: authUser.user.id,
+        display_name: `${firstName} ${lastName}`,
+        role: roleObj.role,
+        onboarding_completed: onboardingCompleted,
+        onboarding_data: {
+          grade_level: gradeLevel,
+          years_experience: yearsExp,
+          goals: [randomChoice(GOALS), randomChoice(GOALS)].filter((v, idx, a) => a.indexOf(v) === idx),
+          initial_stress_level: initialStress,
+          current_stress_level: currentStress,
+          school_name: school,
+          state: randomChoice(STATES),
+          gender: weightedRandomChoice(['female', 'male', 'non-binary', 'prefer_not_to_say'], [55, 38, 4, 3]),
+        },
+        preferences: {
+          email_notifications: Math.random() > 0.2,
+          dark_mode: Math.random() > 0.85,
+        },
+        created_at: createdAt.toISOString(),
+        updated_at: createdAt.toISOString(),
+        is_example: true,
+      };
+
+      const { error: profileError } = await supabase.from('hub_profiles').insert(profileData);
+
+      if (!profileError) {
+        profiles.push(profileData);
+        created++;
+      } else {
+        failed++;
+      }
+
+      // Progress indicator
+      if ((created + failed) % 50 === 0) {
+        process.stdout.write(`\r  Progress: ${created} created, ${failed} failed of ${TARGET_USERS}`);
+      }
+
+    } catch (err) {
+      failed++;
+    }
   }
 
-  await batchInsert('hub_profiles', profiles);
-  console.log(`  ✓ Created ${profiles.length} example profiles`);
+  console.log(`\n  ✓ Created ${profiles.length} example profiles (${failed} failed)`);
   return profiles;
 }
 
 async function seedCourses() {
-  console.log('\n📚 Checking/seeding courses...');
+  console.log('\n📚 Fetching existing courses...');
 
+  // Just use existing published courses - don't create new ones
+  // (hub_courses doesn't have is_example column)
   const { data: existingCourses } = await supabase
     .from('hub_courses')
     .select('id, title, pd_hours')
     .eq('is_published', true);
 
-  if (existingCourses && existingCourses.length >= 8) {
-    console.log(`  ✓ Found ${existingCourses.length} existing courses, skipping seed`);
+  if (existingCourses && existingCourses.length > 0) {
+    console.log(`  ✓ Found ${existingCourses.length} existing courses to use`);
     return existingCourses;
   }
 
-  // Check which courses already exist
-  const existingTitles = new Set((existingCourses || []).map(c => c.title));
-  const coursesToAdd = EXAMPLE_COURSES.filter(c => !existingTitles.has(c.title));
+  // If no courses exist, create minimal set without is_example
+  console.log('  ⚠️ No published courses found, creating example courses...');
+  const newCourses = EXAMPLE_COURSES.slice(0, 4).map(course => ({
+    id: generateUUID(),
+    title: course.title,
+    slug: course.slug,
+    category: course.category,
+    pd_hours: course.pd_hours,
+    description: `Learn essential ${course.category.toLowerCase()} skills for educators.`,
+    is_published: true,
+    created_at: new Date('2025-07-01').toISOString(),
+  }));
 
-  if (coursesToAdd.length > 0) {
-    const newCourses = coursesToAdd.map(course => ({
-      id: generateUUID(),
-      title: course.title,
-      slug: course.slug,
-      category: course.category,
-      pd_hours: course.pd_hours,
-      description: `Learn essential ${course.category.toLowerCase()} skills for educators.`,
-      is_published: true,
-      created_at: new Date('2025-07-01').toISOString(),
-      is_example: true,
-    }));
-
-    await batchInsert('hub_courses', newCourses);
-    console.log(`  ✓ Added ${newCourses.length} example courses`);
-
-    return [...(existingCourses || []), ...newCourses];
-  }
-
-  return existingCourses || [];
+  await batchInsert('hub_courses', newCourses);
+  console.log(`  ✓ Added ${newCourses.length} courses`);
+  return newCourses;
 }
 
 async function seedEnrollments(profiles, courses) {
@@ -487,44 +520,8 @@ async function seedActivityLog(profiles, enrollments) {
   return activities;
 }
 
-async function seedAssessments(profiles) {
-  console.log('\n📈 Seeding stress assessments...');
-
-  const assessments = [];
-
-  for (const profile of profiles) {
-    const numCheckins = randomInt(2, 4);
-    const initialStress = profile.onboarding_data?.initial_stress_level || randomInt(6, 9);
-
-    for (let i = 0; i < numCheckins; i++) {
-      const daysAfterSignup = i * randomInt(7, 21);
-      const checkInDate = new Date(new Date(profile.created_at).getTime() + daysAfterSignup * 24 * 60 * 60 * 1000);
-
-      if (checkInDate > new Date()) continue;
-
-      // Score improves over time
-      const improvement = Math.min(i * randomInt(1, 2), 4);
-      const score = Math.max(3, initialStress - improvement + randomInt(-1, 1));
-
-      assessments.push({
-        id: generateUUID(),
-        user_id: profile.id,
-        type: 'daily_check_in',
-        score,
-        metadata: {
-          mood: weightedRandomChoice(['stressed', 'overwhelmed', 'okay', 'good', 'great'], [15, 10, 30, 30, 15]),
-          energy: randomInt(1, 10),
-        },
-        created_at: checkInDate.toISOString(),
-        is_example: true,
-      });
-    }
-  }
-
-  await batchInsert('hub_assessments', assessments);
-  console.log(`  ✓ Created ${assessments.length} stress assessments`);
-  return assessments;
-}
+// Note: hub_assessments table doesn't exist in current schema
+// Stress data is stored in hub_activity_log with action='stress_checkin'
 
 async function seedFeedback(enrollments) {
   console.log('\n⭐ Seeding course ratings and feedback...');
@@ -567,14 +564,13 @@ async function seedFeedback(enrollments) {
 async function cleanup() {
   console.log('\n🧹 Cleaning up example data...');
 
+  // Only tables that have is_example column
   const tables = [
     'hub_activity_log',
-    'hub_assessments',
     'hub_certificates',
     'hub_lesson_progress',
     'hub_enrollments',
     'hub_profiles',
-    'hub_courses',
   ];
 
   const results = {};
@@ -599,6 +595,23 @@ async function cleanup() {
       console.log(`  ⚠️ ${table}: ${err.message}`);
       results[table] = 0;
     }
+  }
+
+  // Clean up auth users with example emails
+  console.log('  Cleaning up auth users...');
+  try {
+    const { data: users } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+    const exampleUsers = (users?.users || []).filter(u => u.email?.endsWith('@example.tdi.test'));
+
+    let deleted = 0;
+    for (const user of exampleUsers) {
+      const { error } = await supabase.auth.admin.deleteUser(user.id);
+      if (!error) deleted++;
+    }
+    console.log(`  ✓ auth.users: deleted ${deleted} example users`);
+    results['auth.users'] = deleted;
+  } catch (err) {
+    console.log(`  ⚠️ auth.users: ${err.message}`);
   }
 
   console.log('\n✨ Cleanup complete!');
@@ -635,7 +648,6 @@ async function main() {
     const enrollments = await seedEnrollments(profiles, courses);
     await seedCertificates(enrollments, courses);
     await seedActivityLog(profiles, enrollments);
-    await seedAssessments(profiles);
     await seedFeedback(enrollments);
 
     console.log('\n╔════════════════════════════════════════════════╗');

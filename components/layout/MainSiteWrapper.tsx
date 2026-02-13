@@ -16,9 +16,10 @@ export function MainSiteWrapper({ children }: MainSiteWrapperProps) {
   const isHubRoute = pathname?.startsWith('/hub');
   const isTDIAdminRoute = pathname?.startsWith('/tdi-admin');
   const isLoginPage = pathname === '/login';
+  const isParaGameTools = pathname?.startsWith('/paragametools');
 
-  // Don't render main site chrome on Hub, TDI Admin, or Login routes
-  if (isHubRoute || isTDIAdminRoute || isLoginPage) {
+  // Don't render main site chrome on Hub, TDI Admin, Login, or ParaGameTools routes
+  if (isHubRoute || isTDIAdminRoute || isLoginPage || isParaGameTools) {
     return null;
   }
 
