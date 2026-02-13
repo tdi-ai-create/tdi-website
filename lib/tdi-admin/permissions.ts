@@ -1,5 +1,3 @@
-import { getSupabase } from '@/lib/supabase';
-
 // Types for TDI Team Members
 export interface TeamMember {
   id: string;
@@ -204,26 +202,28 @@ export function getDefaultPermissions(): TeamPermissions {
 }
 
 /**
- * Get all team members
+ * Get all team members via API (bypasses RLS)
  */
 export async function getAllTeamMembers(): Promise<TeamMember[]> {
-  const supabase = getSupabase();
+  try {
+    const response = await fetch('/api/tdi-admin/team-members', {
+      method: 'GET',
+    });
 
-  const { data, error } = await supabase
-    .from('tdi_team_members')
-    .select('*')
-    .order('created_at', { ascending: true });
+    if (!response.ok) {
+      return [];
+    }
 
-  if (error) {
+    const result = await response.json();
+    return result.members as TeamMember[] || [];
+  } catch (error) {
     console.error('[TDI Admin] Error fetching team members:', error);
     return [];
   }
-
-  return data as TeamMember[];
 }
 
 /**
- * Add a new team member
+ * Add a new team member via API
  */
 export async function addTeamMember(
   email: string,
@@ -231,86 +231,98 @@ export async function addTeamMember(
   role: 'admin' | 'member',
   permissions: TeamPermissions
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = getSupabase();
-
-  const { error } = await supabase
-    .from('tdi_team_members')
-    .insert({
-      email: email.toLowerCase(),
-      display_name: displayName,
-      role,
-      permissions,
-      is_active: true,
+  try {
+    const response = await fetch('/api/tdi-admin/team-members', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, displayName, role, permissions }),
     });
 
-  if (error) {
-    console.error('[TDI Admin] Error adding team member:', error);
-    return { success: false, error: error.message };
-  }
+    const result = await response.json();
 
-  return { success: true };
+    if (!response.ok) {
+      return { success: false, error: result.error || 'Failed to add team member' };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error('[TDI Admin] Error adding team member:', error);
+    return { success: false, error: 'Network error' };
+  }
 }
 
 /**
- * Update team member permissions
+ * Update team member permissions via API
  */
 export async function updateTeamMemberPermissions(
   memberId: string,
   permissions: TeamPermissions
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = getSupabase();
+  try {
+    const response = await fetch('/api/tdi-admin/team-members', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: memberId, permissions }),
+    });
 
-  const { error } = await supabase
-    .from('tdi_team_members')
-    .update({ permissions })
-    .eq('id', memberId);
+    if (!response.ok) {
+      const result = await response.json();
+      return { success: false, error: result.error || 'Failed to update permissions' };
+    }
 
-  if (error) {
+    return { success: true };
+  } catch (error) {
     console.error('[TDI Admin] Error updating permissions:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Network error' };
   }
-
-  return { success: true };
 }
 
 /**
- * Deactivate a team member
+ * Deactivate a team member via API
  */
 export async function deactivateTeamMember(
   memberId: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = getSupabase();
+  try {
+    const response = await fetch('/api/tdi-admin/team-members', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: memberId, is_active: false }),
+    });
 
-  const { error } = await supabase
-    .from('tdi_team_members')
-    .update({ is_active: false })
-    .eq('id', memberId);
+    if (!response.ok) {
+      const result = await response.json();
+      return { success: false, error: result.error || 'Failed to deactivate member' };
+    }
 
-  if (error) {
+    return { success: true };
+  } catch (error) {
     console.error('[TDI Admin] Error deactivating member:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Network error' };
   }
-
-  return { success: true };
 }
 
 /**
- * Reactivate a team member
+ * Reactivate a team member via API
  */
 export async function reactivateTeamMember(
   memberId: string
 ): Promise<{ success: boolean; error?: string }> {
-  const supabase = getSupabase();
+  try {
+    const response = await fetch('/api/tdi-admin/team-members', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: memberId, is_active: true }),
+    });
 
-  const { error } = await supabase
-    .from('tdi_team_members')
-    .update({ is_active: true })
-    .eq('id', memberId);
+    if (!response.ok) {
+      const result = await response.json();
+      return { success: false, error: result.error || 'Failed to reactivate member' };
+    }
 
-  if (error) {
+    return { success: true };
+  } catch (error) {
     console.error('[TDI Admin] Error reactivating member:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Network error' };
   }
-
-  return { success: true };
 }
