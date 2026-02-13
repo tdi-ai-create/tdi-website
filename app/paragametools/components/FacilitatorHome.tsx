@@ -24,6 +24,7 @@ export function FacilitatorHome({ onSelectGame, onPlayerMode, onSlangBreak }: Fa
       className="min-h-screen flex flex-col items-center justify-center px-4 py-8"
       style={{
         background: 'linear-gradient(135deg, #0a1628 0%, #1a2d4a 50%, #0a1628 100%)',
+        color: '#ffffff',
       }}
     >
       {/* Header */}

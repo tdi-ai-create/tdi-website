@@ -122,6 +122,7 @@ export function FacilitatorDashboard({ gameId, onBack, onSlangBreak }: Facilitat
       className="min-h-screen flex flex-col"
       style={{
         background: 'linear-gradient(135deg, #0a1628 0%, #1a2d4a 50%, #0a1628 100%)',
+        color: '#ffffff',
       }}
     >
       {/* Pause Overlay */}

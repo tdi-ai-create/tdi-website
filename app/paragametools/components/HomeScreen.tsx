@@ -63,6 +63,7 @@ export function HomeScreen({ onSelectGame, onFacilitatorMode }: HomeScreenProps)
       className="min-h-screen flex flex-col items-center px-4 md:px-6 py-8"
       style={{
         background: 'linear-gradient(135deg, #0a1628 0%, #1a2d4a 50%, #0a1628 100%)',
+        color: '#ffffff',
       }}
     >
       {/* Header */}

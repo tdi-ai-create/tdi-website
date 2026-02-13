@@ -128,6 +128,7 @@ function LoadingFallback() {
       className="min-h-screen flex items-center justify-center"
       style={{
         background: 'linear-gradient(135deg, #0a1628 0%, #1a2d4a 50%, #0a1628 100%)',
+        color: '#ffffff',
       }}
     >
       <div className="text-center">
