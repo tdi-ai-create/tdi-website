@@ -14,14 +14,15 @@ export function EmailPopup({ delay = 30000 }: EmailPopupProps) {
   const [dismissed, setDismissed] = useState(false);
   const pathname = usePathname();
 
-  // Don't show on dashboard pages, internal team pages, creator portal, admin pages, partner pages, or hub
+  // Don't show on dashboard pages, internal team pages, creator portal, admin pages, partner pages, hub, or paragametools
   const isDashboardPage = pathname?.includes('-dashboard') ||
     pathname?.includes('dashboard-creation') ||
     pathname?.startsWith('/creator-portal') ||
     pathname?.startsWith('/admin') ||
     pathname?.startsWith('/partner-setup') ||
     pathname?.startsWith('/partners') ||
-    pathname?.startsWith('/hub');
+    pathname?.startsWith('/hub') ||
+    pathname?.startsWith('/paragametools');
 
   useEffect(() => {
     // Skip on dashboard pages

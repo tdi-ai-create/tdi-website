@@ -61,13 +61,14 @@ export function SocialProofPopup() {
   // Check if Moment Mode is active (sacred space - no distractions)
   const { isMomentModeActive } = useMomentMode();
 
-  // Hide on internal team pages, creator portal, admin pages, partner pages, and hub
+  // Hide on internal team pages, creator portal, admin pages, partner pages, hub, and paragametools
   const isInternalPage = pathname?.includes('dashboard-creation') ||
     pathname?.startsWith('/creator-portal') ||
     pathname?.startsWith('/admin') ||
     pathname?.startsWith('/partner-setup') ||
     pathname?.startsWith('/partners') ||
-    pathname?.startsWith('/hub');
+    pathname?.startsWith('/hub') ||
+    pathname?.startsWith('/paragametools');
 
   const messagesRef = useRef<NotificationMessage[]>([]);
   const messageIndexRef = useRef(0);
