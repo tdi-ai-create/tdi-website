@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasPermission } from '@/lib/tdi-admin/permissions';
 import {
-  getAdminEnrollments,
   getAdminTips,
   getAdminRequests,
   getAdminStats,
@@ -14,7 +13,6 @@ import {
   deleteTip,
   updateRequestStatus,
 } from '@/lib/hub/admin';
-import { getSupabase } from '@/lib/supabase';
 import ExampleDataBanner from '@/components/tdi-admin/ExampleDataBanner';
 import {
   ArrowLeft,
@@ -131,13 +129,15 @@ function AccountsTab() {
 
   useEffect(() => {
     async function load() {
-      const supabase = getSupabase();
-      const { data } = await supabase
-        .from('hub_profiles')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(100);
-      setAccounts(data || []);
+      try {
+        const response = await fetch('/api/tdi-admin/accounts');
+        if (response.ok) {
+          const data = await response.json();
+          setAccounts(data.accounts || []);
+        }
+      } catch (error) {
+        console.error('Error loading accounts:', error);
+      }
       setIsLoading(false);
     }
     load();
@@ -251,8 +251,15 @@ function EnrollmentsTab() {
 
   useEffect(() => {
     async function load() {
-      const data = await getAdminEnrollments();
-      setEnrollments(data || []);
+      try {
+        const response = await fetch('/api/tdi-admin/enrollments');
+        if (response.ok) {
+          const data = await response.json();
+          setEnrollments(data.enrollments || []);
+        }
+      } catch (error) {
+        console.error('Error loading enrollments:', error);
+      }
       setIsLoading(false);
     }
     load();
@@ -383,17 +390,15 @@ function CertificatesTab() {
 
   useEffect(() => {
     async function load() {
-      const supabase = getSupabase();
-      const { data } = await supabase
-        .from('hub_certificates')
-        .select(`
-          *,
-          user:hub_profiles!hub_certificates_user_id_fkey(display_name, email),
-          course:hub_courses!hub_certificates_course_id_fkey(title)
-        `)
-        .order('issued_at', { ascending: false })
-        .limit(100);
-      setCertificates(data || []);
+      try {
+        const response = await fetch('/api/tdi-admin/certificates');
+        if (response.ok) {
+          const data = await response.json();
+          setCertificates(data.certificates || []);
+        }
+      } catch (error) {
+        console.error('Error loading certificates:', error);
+      }
       setIsLoading(false);
     }
     load();
