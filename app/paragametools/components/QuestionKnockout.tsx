@@ -176,15 +176,7 @@ export function QuestionKnockout({ onBack }: QuestionKnockoutProps) {
             <Bell size={16} style={{ color: colorConfig.accent }} />
           </div>
 
-          {/* Buzzer Effect Overlay */}
-          {showBuzzerEffect && (
-            <div className="fixed inset-0 bg-red-500/20 flex items-center justify-center z-50 pointer-events-none animate-fade-in">
-              <div className="bg-red-500 text-white px-8 py-4 rounded-xl text-2xl font-bold animate-bounce">
-                BZZZZT! SWITCH ROLES!
-              </div>
-            </div>
-          )}
-        </div>
+                  </div>
       )}
 
       {screen === 'done' && (
