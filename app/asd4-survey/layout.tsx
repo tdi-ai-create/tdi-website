@@ -30,6 +30,7 @@ export default function SurveyLayout({
           fontFamily: "'Outfit', sans-serif",
           minHeight: '100vh',
           background: 'linear-gradient(135deg, #0a1628 0%, #1a2d4a 50%, #0a1628 100%)',
+          color: '#ffffff',
         }}
       >
         {children}
