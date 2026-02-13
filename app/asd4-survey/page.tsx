@@ -131,10 +131,10 @@ function ScaleInput({
       </div>
       {/* Mobile labels */}
       <div className="flex justify-between mt-2 sm:hidden">
-        <span className="text-xs text-slate-500">Not confident</span>
-        <span className="text-xs text-slate-500">Very confident</span>
+        <span className="text-xs" style={{ color: '#8899aa' }}>Not confident</span>
+        <span className="text-xs" style={{ color: '#8899aa' }}>Very confident</span>
       </div>
-      {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
+      {error && <p className="text-sm mt-2" style={{ color: '#FF6B6B' }}>{error}</p>}
     </div>
   );
 }
@@ -175,11 +175,11 @@ function RadioGroup({
                 <div className="w-2.5 h-2.5 rounded-full bg-[#FF7B47]" />
               )}
             </div>
-            <span className="text-white text-sm">{option}</span>
+            <span style={{ color: '#E2E8F0' }} className="text-sm">{option}</span>
           </button>
         ))}
       </div>
-      {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
+      {error && <p className="text-sm mt-2" style={{ color: '#FF6B6B' }}>{error}</p>}
     </div>
   );
 }
@@ -233,12 +233,12 @@ function CheckboxGroup({
                   </svg>
                 )}
               </div>
-              <span className="text-white text-sm">{option}</span>
+              <span style={{ color: '#E2E8F0' }} className="text-sm">{option}</span>
             </button>
           );
         })}
       </div>
-      {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
+      {error && <p className="text-sm mt-2" style={{ color: '#FF6B6B' }}>{error}</p>}
     </div>
   );
 }
@@ -270,7 +270,7 @@ function GameRadioGroup({
             }}
           >
             <span className="text-2xl">{option.icon}</span>
-            <span className="text-white text-sm flex-1">{option.label}</span>
+            <span style={{ color: '#E2E8F0' }} className="text-sm flex-1">{option.label}</span>
             <div
               className="w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0"
               style={{
@@ -284,7 +284,7 @@ function GameRadioGroup({
           </button>
         ))}
       </div>
-      {error && <p className="text-red-400 text-sm mt-2">{error}</p>}
+      {error && <p className="text-sm mt-2" style={{ color: '#FF6B6B' }}>{error}</p>}
     </div>
   );
 }
@@ -301,25 +301,25 @@ function SuccessScreen({ commitment }: { commitment: string }) {
           </div>
         </div>
 
-        <h1 className="text-4xl font-bold text-white mb-4">THANK YOU!</h1>
+        <h1 className="text-4xl font-bold mb-4" style={{ color: '#ffffff' }}>THANK YOU!</h1>
 
-        <p className="text-slate-300 mb-8">
+        <p className="mb-8" style={{ color: '#cbd5e1' }}>
           Your responses help us make Late Start Days and future sessions better for YOU.
         </p>
 
         {/* Commitment echo */}
         <div className="bg-white/5 border border-white/10 rounded-xl p-6 mb-8">
-          <p className="text-sm uppercase tracking-wider text-orange-400/70 mb-2">
+          <p className="text-sm uppercase tracking-wider mb-2" style={{ color: 'rgba(251, 146, 60, 0.7)' }}>
             Remember your commitment:
           </p>
-          <p className="text-xl text-white italic">"{commitment}"</p>
+          <p className="text-xl italic" style={{ color: '#ffffff' }}>"{commitment}"</p>
         </div>
 
-        <p className="text-2xl font-bold text-white mb-8">YOUR MOVES MATTER.</p>
+        <p className="text-2xl font-bold mb-8" style={{ color: '#ffffff' }}>YOUR MOVES MATTER.</p>
 
         {/* Practice link */}
         <div className="bg-white/5 border border-white/10 rounded-xl p-4">
-          <p className="text-slate-400 text-sm mb-2">Keep practicing anytime:</p>
+          <p className="text-sm mb-2" style={{ color: '#8899aa' }}>Keep practicing anytime:</p>
           <a
             href="/paragametools"
             className="text-orange-400 hover:text-orange-300 font-medium"
@@ -481,11 +481,11 @@ export default function ASD4SurveyPage() {
         >
           The Moves That Matter
         </p>
-        <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">SESSION SURVEY</h1>
-        <p className="text-slate-400 text-sm mb-2">
+        <h1 className="text-4xl md:text-5xl font-bold mb-3" style={{ color: '#ffffff' }}>SESSION SURVEY</h1>
+        <p className="text-sm mb-2" style={{ color: '#8899aa' }}>
           Addison School District 4 | February 13, 2025
         </p>
-        <p className="text-slate-500 text-sm italic">
+        <p className="text-sm italic" style={{ color: '#8899aa' }}>
           12 questions · 5 minutes · Your answers shape what comes next.
         </p>
       </div>
@@ -506,8 +506,8 @@ export default function ASD4SurveyPage() {
 
           {/* Q1: Name */}
           <div className="mb-6" id="field-name">
-            <label className="block text-white font-medium mb-2">
-              1. First and Last Name <span className="text-red-400">*</span>
+            <label className="block font-medium mb-2" style={{ color: '#ffffff' }}>
+              1. First and Last Name <span style={{ color: '#FF6B6B' }}>*</span>
             </label>
             <input
               type="text"
@@ -517,13 +517,13 @@ export default function ASD4SurveyPage() {
               className="w-full p-4 rounded-lg bg-white/5 border text-white placeholder:text-slate-500 focus:outline-none focus:border-orange-400"
               style={{ borderColor: errors.name ? '#ef4444' : 'rgba(255,255,255,0.1)' }}
             />
-            {errors.name && <p className="text-red-400 text-sm mt-2">{errors.name}</p>}
+            {errors.name && <p className="text-sm mt-2" style={{ color: '#FF6B6B' }}>{errors.name}</p>}
           </div>
 
           {/* Q2: School */}
           <div className="mb-6" id="field-school">
-            <label className="block text-white font-medium mb-2">
-              2. Which school do you work at? <span className="text-red-400">*</span>
+            <label className="block font-medium mb-2" style={{ color: '#ffffff' }}>
+              2. Which school do you work at? <span style={{ color: '#FF6B6B' }}>*</span>
             </label>
             <select
               value={formData.school}
@@ -543,13 +543,13 @@ export default function ASD4SurveyPage() {
                 </option>
               ))}
             </select>
-            {errors.school && <p className="text-red-400 text-sm mt-2">{errors.school}</p>}
+            {errors.school && <p className="text-sm mt-2" style={{ color: '#FF6B6B' }}>{errors.school}</p>}
           </div>
 
           {/* Q3: Grade Levels */}
           <div id="field-gradeLevels">
-            <label className="block text-white font-medium mb-2">
-              3. What grade level(s) do you primarily support? <span className="text-red-400">*</span>
+            <label className="block font-medium mb-2" style={{ color: '#ffffff' }}>
+              3. What grade level(s) do you primarily support? <span style={{ color: '#FF6B6B' }}>*</span>
             </label>
             <CheckboxGroup
               options={GRADE_OPTIONS}
@@ -566,10 +566,10 @@ export default function ASD4SurveyPage() {
 
           {/* Q4: Confidence - Questions */}
           <div className="mb-6" id="field-confidenceAsking">
-            <label className="block text-white font-medium mb-2">
-              4. How confident do you feel using QUESTIONS instead of TELLING when a student is stuck? <span className="text-red-400">*</span>
+            <label className="block font-medium mb-2" style={{ color: '#ffffff' }}>
+              4. How confident do you feel using QUESTIONS instead of TELLING when a student is stuck? <span style={{ color: '#FF6B6B' }}>*</span>
             </label>
-            <p className="text-sm text-slate-400 italic mb-3 pl-3 border-l-2 border-slate-600">
+            <p className="text-sm italic mb-3 pl-3 border-l-2" style={{ color: '#8899aa', borderColor: '#4a5568' }}>
               Example: Instead of saying "The answer is 5," asking "What have you tried so far?"
             </p>
             <ScaleInput
@@ -582,10 +582,10 @@ export default function ASD4SurveyPage() {
 
           {/* Q5: Confidence - Feedback */}
           <div className="mb-6" id="field-confidenceFeedback">
-            <label className="block text-white font-medium mb-2">
-              5. How confident do you feel giving SPECIFIC feedback using Notice + Name + Next Step? <span className="text-red-400">*</span>
+            <label className="block font-medium mb-2" style={{ color: '#ffffff' }}>
+              5. How confident do you feel giving SPECIFIC feedback using Notice + Name + Next Step? <span style={{ color: '#FF6B6B' }}>*</span>
             </label>
-            <p className="text-sm text-slate-400 italic mb-3 pl-3 border-l-2 border-slate-600">
+            <p className="text-sm italic mb-3 pl-3 border-l-2" style={{ color: '#8899aa', borderColor: '#4a5568' }}>
               Example: "I see you started each sentence with a capital letter (Notice). That's correct capitalization (Name). Now check your proper nouns (Next Step)."
             </p>
             <ScaleInput
@@ -598,8 +598,8 @@ export default function ASD4SurveyPage() {
 
           {/* Q6: Tried Questions */}
           <div className="mb-6" id="field-triedAsking">
-            <label className="block text-white font-medium mb-3">
-              6. Since the January session, have you tried using questions instead of giving answers with a student? <span className="text-red-400">*</span>
+            <label className="block font-medium mb-3" style={{ color: '#ffffff' }}>
+              6. Since the January session, have you tried using questions instead of giving answers with a student? <span style={{ color: '#FF6B6B' }}>*</span>
             </label>
             <RadioGroup
               options={TRIED_OPTIONS}
@@ -611,8 +611,8 @@ export default function ASD4SurveyPage() {
 
           {/* Q7: Tried Feedback */}
           <div id="field-triedFeedback">
-            <label className="block text-white font-medium mb-3">
-              7. Since the January session, have you tried giving feedback using the Notice/Name/Next Step formula? <span className="text-red-400">*</span>
+            <label className="block font-medium mb-3" style={{ color: '#ffffff' }}>
+              7. Since the January session, have you tried giving feedback using the Notice/Name/Next Step formula? <span style={{ color: '#FF6B6B' }}>*</span>
             </label>
             <RadioGroup
               options={TRIED_OPTIONS}
@@ -629,8 +629,8 @@ export default function ASD4SurveyPage() {
 
           {/* Q8: Hub Login */}
           <div className="mb-6" id="field-hubLogin">
-            <label className="block text-white font-medium mb-3">
-              8. Have you logged into the TDI Learning Hub? <span className="text-red-400">*</span>
+            <label className="block font-medium mb-3" style={{ color: '#ffffff' }}>
+              8. Have you logged into the TDI Learning Hub? <span style={{ color: '#FF6B6B' }}>*</span>
             </label>
             <RadioGroup
               options={HUB_LOGIN_OPTIONS}
@@ -642,7 +642,7 @@ export default function ASD4SurveyPage() {
 
           {/* Q9: Hub Help */}
           <div id="field-hubHelp">
-            <label className="block text-white font-medium mb-3">
+            <label className="block font-medium mb-3" style={{ color: '#ffffff' }}>
               9. What would help you use the Learning Hub more?
             </label>
             <CheckboxGroup
@@ -668,8 +668,8 @@ export default function ASD4SurveyPage() {
 
           {/* Q10: Best Game */}
           <div className="mb-6" id="field-bestGame">
-            <label className="block text-white font-medium mb-3">
-              10. Which game was MOST helpful for your learning today? <span className="text-red-400">*</span>
+            <label className="block font-medium mb-3" style={{ color: '#ffffff' }}>
+              10. Which game was MOST helpful for your learning today? <span style={{ color: '#FF6B6B' }}>*</span>
             </label>
             <GameRadioGroup
               options={GAME_OPTIONS}
@@ -681,8 +681,8 @@ export default function ASD4SurveyPage() {
 
           {/* Q11: Commitment */}
           <div className="mb-6" id="field-commitment">
-            <label className="block text-white font-medium mb-3">
-              11. What is ONE thing you will try with a student this week? <span className="text-red-400">*</span>
+            <label className="block font-medium mb-3" style={{ color: '#ffffff' }}>
+              11. What is ONE thing you will try with a student this week? <span style={{ color: '#FF6B6B' }}>*</span>
             </label>
             <div
               className="rounded-lg overflow-hidden"
@@ -699,12 +699,12 @@ export default function ASD4SurveyPage() {
                 }}
               />
             </div>
-            {errors.commitment && <p className="text-red-400 text-sm mt-2">{errors.commitment}</p>}
+            {errors.commitment && <p className="text-sm mt-2" style={{ color: '#FF6B6B' }}>{errors.commitment}</p>}
           </div>
 
           {/* Q12: Open Feedback */}
           <div id="field-openFeedback">
-            <label className="block text-white font-medium mb-3">
+            <label className="block font-medium mb-3" style={{ color: '#ffffff' }}>
               12. Any feedback for us? What would make the next session even better?
             </label>
             <textarea
@@ -732,7 +732,7 @@ export default function ASD4SurveyPage() {
       </form>
 
       {/* Footer */}
-      <p className="text-center mt-8 text-xs text-slate-600">
+      <p className="text-center mt-8 text-xs" style={{ color: '#667788' }}>
         Teachers Deserve It | Addison School District 4
       </p>
     </div>
