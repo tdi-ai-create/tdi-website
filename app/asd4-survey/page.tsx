@@ -304,7 +304,7 @@ function SuccessScreen({ commitment }: { commitment: string }) {
         <h1 className="text-4xl font-bold text-white mb-4">THANK YOU!</h1>
 
         <p className="text-slate-300 mb-8">
-          Your responses help us make Late Start Mondays and future sessions better for YOU.
+          Your responses help us make Late Start Days and future sessions better for YOU.
         </p>
 
         {/* Commitment echo */}
