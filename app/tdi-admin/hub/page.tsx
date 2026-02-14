@@ -25,6 +25,15 @@ import {
 // Hub theme colors
 const theme = PORTAL_THEMES.hub;
 
+interface HubStats {
+  totalUsers: number;
+  totalEnrollments: number;
+  totalCompletions: number;
+  totalCertificates: number;
+  totalPdHours: number;
+  avgStressScore: number | null;
+}
+
 interface StatCardProps {
   icon: React.ElementType;
   label: string;
@@ -131,7 +140,7 @@ function SectionCard({ title, description, features, href, icon: Icon, color }: 
 
 export default function HubAdminPage() {
   const { teamMember, permissions } = useTDIAdmin();
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<HubStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasExampleData, setHasExampleData] = useState(false);
 
@@ -272,7 +281,7 @@ export default function HubAdminPage() {
           ]}
           href="/tdi-admin/hub/production"
           icon={Clapperboard}
-          color="#E8B84B"
+          color={theme.dark}
         />
       </div>
 

@@ -226,7 +226,7 @@ function AccountsTab() {
             placeholder="Search by name or school..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
+            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
           />
         </div>
         <select
@@ -455,7 +455,7 @@ function EnrollmentsTab() {
             placeholder="Search by user or course..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
+            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
           />
         </div>
         <select
@@ -512,7 +512,7 @@ function EnrollmentsTab() {
                         <div className="w-20 h-2 bg-gray-100 rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full"
-                            style={{ width: `${enrollment.progress_pct || 0}%`, backgroundColor: enrollment.status === 'completed' ? '#16A34A' : '#E8B84B' }}
+                            style={{ width: `${enrollment.progress_pct || 0}%`, backgroundColor: enrollment.status === 'completed' ? '#16A34A' : theme.primary }}
                           />
                         </div>
                         <span className="text-xs text-gray-500">{enrollment.progress_pct || 0}%</span>
@@ -646,7 +646,7 @@ function CertificatesTab() {
             placeholder="Search by user, course, or verification code..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
+            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
           />
         </div>
         <button
@@ -735,7 +735,9 @@ function CertificatesTab() {
 // REPORTS TAB
 function ReportsTab() {
   const [isGenerating, setIsGenerating] = useState<string | null>(null);
-  const [reportData, setReportData] = useState<any>(null);
+  // Report data from analytics API - complex nested structure, using flexible type
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [reportData, setReportData] = useState<Record<string, any> | null>(null);
   const [selectedReport, setSelectedReport] = useState<string | null>(null);
   const [reportFilters, setReportFilters] = useState({
     state: '',
@@ -915,7 +917,7 @@ function ReportsTab() {
           <div
             key={report.id}
             className={`bg-white rounded-lg border p-5 transition-all ${
-              selectedReport === report.id ? 'border-[#E8B84B] shadow-sm' : 'border-gray-200 hover:border-[#E8B84B] hover:shadow-sm'
+              selectedReport === report.id ? 'border-[#5BBEC4] shadow-sm' : 'border-gray-200 hover:border-[#5BBEC4] hover:shadow-sm'
             }`}
           >
             <h3 className="font-semibold text-gray-900 mb-2" style={{ fontFamily: "'DM Sans', sans-serif" }}>
@@ -927,7 +929,7 @@ function ReportsTab() {
                 onClick={() => generateReport(report.id)}
                 disabled={isGenerating === report.id}
                 className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors flex items-center justify-center gap-2"
-                style={{ backgroundColor: '#E8B84B' }}
+                style={{ backgroundColor: theme.primary }}
               >
                 {isGenerating === report.id ? (
                   <>
@@ -1068,12 +1070,14 @@ function ReportsTab() {
   );
 }
 
-// Color palette for charts (TDI colors: teal, gold, coral, green - no purple/violet)
-const CHART_COLORS = ['#5BBEC4', '#E8B84B', '#E8927C', '#16A34A', '#EF4444', '#F59E0B', '#5BBEC4', '#E8927C'];
+// Color palette for charts (Hub uses teal as primary, with complementary colors for contrast)
+const CHART_COLORS = ['#5BBEC4', '#1a6b69', '#3B82F6', '#16A34A', '#F59E0B', '#E8927C', '#6366F1', '#EC4899'];
 
 // ANALYTICS TAB
 function AnalyticsTab() {
-  const [analytics, setAnalytics] = useState<any>(null);
+  // Analytics data from API - complex nested structure
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [analytics, setAnalytics] = useState<Record<string, any> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState({
     state: '',
@@ -1233,13 +1237,13 @@ function AnalyticsTab() {
               </span>
             )}
             {filters.role !== 'all' && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(232, 184, 75, 0.1)', color: '#E8B84B', fontSize: '12px', borderRadius: '9999px' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.15)', color: '#1a6b69', fontSize: '12px', borderRadius: '9999px' }}>
                 Role: {filters.role.replace('_', ' ')}
                 <button onClick={() => setFilters({ ...filters, role: 'all' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
             )}
             {filters.gradeLevel !== 'all' && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(232, 184, 75, 0.1)', color: '#E8B84B', fontSize: '12px', borderRadius: '9999px' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.15)', color: '#1a6b69', fontSize: '12px', borderRadius: '9999px' }}>
                 Grade: {filters.gradeLevel}
                 <button onClick={() => setFilters({ ...filters, gradeLevel: 'all' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
@@ -1392,7 +1396,7 @@ function AnalyticsTab() {
                     <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <Tooltip />
-                    <Bar dataKey="value" fill="#E8B84B" radius={[4, 4, 0, 0]} name="PD Hours" />
+                    <Bar dataKey="value" fill={theme.primary} radius={[4, 4, 0, 0]} name="PD Hours" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -1421,7 +1425,7 @@ function AnalyticsTab() {
             {analytics?.goalAlignment?.length > 0 ? (
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={analytics.goalAlignment} layout="vertical" margin={{ left: 20, right: 20 }}>
+                  <BarChart data={analytics!.goalAlignment} layout="vertical" margin={{ left: 20, right: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis type="number" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <YAxis
@@ -1452,7 +1456,7 @@ function AnalyticsTab() {
             {analytics?.topCourses?.length > 0 ? (
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={analytics.topCourses} layout="vertical" margin={{ left: 20, right: 20 }}>
+                  <BarChart data={analytics!.topCourses} layout="vertical" margin={{ left: 20, right: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis type="number" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <YAxis
@@ -1479,7 +1483,7 @@ function AnalyticsTab() {
             {analytics?.courseCompletionRates?.length > 0 ? (
               <div className="h-80">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={analytics.courseCompletionRates} layout="vertical" margin={{ left: 20, right: 20 }}>
+                  <BarChart data={analytics!.courseCompletionRates} layout="vertical" margin={{ left: 20, right: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 12 }} stroke="#9CA3AF" tickFormatter={(v) => `${v}%`} />
                     <YAxis
@@ -1549,7 +1553,7 @@ function AnalyticsTab() {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={analytics.roleDistribution}
+                        data={analytics!.roleDistribution}
                         cx="50%"
                         cy="50%"
                         outerRadius={80}
@@ -1558,7 +1562,7 @@ function AnalyticsTab() {
                         label={({ role, percent }) => `${role} (${(percent * 100).toFixed(0)}%)`}
                         labelLine={false}
                       >
-                        {analytics.roleDistribution.map((_: any, index: number) => (
+                        {analytics!.roleDistribution.map((_: any, index: number) => (
                           <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                         ))}
                       </Pie>
@@ -1577,7 +1581,7 @@ function AnalyticsTab() {
               {analytics?.gradeDistribution?.length > 0 ? (
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={analytics.gradeDistribution}>
+                    <BarChart data={analytics!.gradeDistribution}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis dataKey="grade" tick={{ fontSize: 11 }} stroke="#9CA3AF" />
                       <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
@@ -1597,12 +1601,12 @@ function AnalyticsTab() {
               {analytics?.experienceDistribution?.length > 0 ? (
                 <div className="h-64">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={analytics.experienceDistribution}>
+                    <BarChart data={analytics!.experienceDistribution}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis dataKey="range" tick={{ fontSize: 11 }} stroke="#9CA3AF" />
                       <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                       <Tooltip />
-                      <Bar dataKey="count" fill="#E8B84B" radius={[4, 4, 0, 0]} name="Users" />
+                      <Bar dataKey="count" fill={theme.primary} radius={[4, 4, 0, 0]} name="Users" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -1619,7 +1623,7 @@ function AnalyticsTab() {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={analytics.genderDistribution}
+                        data={analytics!.genderDistribution}
                         cx="50%"
                         cy="50%"
                         outerRadius={80}
@@ -1628,7 +1632,7 @@ function AnalyticsTab() {
                         label={({ gender, percent }) => `${gender} (${(percent * 100).toFixed(0)}%)`}
                         labelLine={false}
                       >
-                        {analytics.genderDistribution.map((_: any, index: number) => (
+                        {analytics!.genderDistribution.map((_: any, index: number) => (
                           <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                         ))}
                       </Pie>
@@ -1656,7 +1660,7 @@ function AnalyticsTab() {
                 {/* Map - 60% */}
                 <div className="lg:col-span-3">
                   <USMapChart
-                    data={analytics.stateDistribution}
+                    data={analytics!.stateDistribution}
                     onStateClick={(state) => setFilters({ ...filters, state: filters.state === state ? '' : state })}
                     selectedState={filters.state}
                   />
@@ -1665,8 +1669,8 @@ function AnalyticsTab() {
                 <div className="lg:col-span-2">
                   <div className="text-sm font-medium text-gray-500 mb-2">Top States</div>
                   <div className="space-y-1 max-h-[350px] overflow-y-auto">
-                    {analytics.stateDistribution.slice(0, 15).map((item: any, i: number) => {
-                      const total = analytics.stateDistribution.reduce((sum: number, s: any) => sum + s.count, 0);
+                    {analytics!.stateDistribution.slice(0, 15).map((item: any, i: number) => {
+                      const total = analytics!.stateDistribution.reduce((sum: number, s: any) => sum + s.count, 0);
                       const pct = total > 0 ? ((item.count / total) * 100).toFixed(1) : '0';
                       return (
                         <button
@@ -1706,14 +1710,14 @@ function AnalyticsTab() {
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={analytics.languageDistribution}
+                        data={analytics!.languageDistribution}
                         cx="50%"
                         cy="50%"
                         outerRadius={60}
                         dataKey="count"
                         nameKey="language"
                       >
-                        {analytics.languageDistribution.map((_: any, index: number) => (
+                        {analytics!.languageDistribution.map((_: any, index: number) => (
                           <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                         ))}
                       </Pie>
@@ -1723,7 +1727,7 @@ function AnalyticsTab() {
                   </ResponsiveContainer>
                 </div>
                 <div className="flex flex-col justify-center">
-                  {analytics.languageDistribution.map((lang: any, i: number) => (
+                  {analytics!.languageDistribution.map((lang: any, i: number) => (
                     <div key={lang.language} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                       <div className="flex items-center gap-2">
                         <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
@@ -1774,7 +1778,7 @@ function AnalyticsTab() {
             {analytics?.stressRoleComparison?.length > 0 ? (
               <div className="h-64">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={analytics.stressRoleComparison} margin={{ left: 10, right: 20 }}>
+                  <BarChart data={analytics!.stressRoleComparison} margin={{ left: 10, right: 20 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="role" tick={{ fontSize: 11 }} stroke="#9CA3AF" />
                     <YAxis domain={[0, 10]} tick={{ fontSize: 12 }} stroke="#9CA3AF" />
@@ -1796,12 +1800,12 @@ function AnalyticsTab() {
             {analytics?.stressTimeSeries?.length > 0 ? (
               <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={analytics.stressTimeSeries}>
+                  <LineChart data={analytics!.stressTimeSeries}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <YAxis domain={[1, 10]} tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <Tooltip />
-                    <Line type="monotone" dataKey="avgScore" stroke="#E8B84B" strokeWidth={2} dot={{ fill: '#E8B84B' }} name="Avg Stress" />
+                    <Line type="monotone" dataKey="avgScore" stroke={theme.primary} strokeWidth={2} dot={{ fill: theme.primary }} name="Avg Stress" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -1822,14 +1826,14 @@ function AnalyticsTab() {
               {analytics?.activityByDay?.length > 0 ? (
                 <div className="h-48">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={analytics.activityByDay}>
+                    <BarChart data={analytics!.activityByDay}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis dataKey="day" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                       <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                       <Tooltip />
                       <Bar dataKey="count" name="Activity" radius={[4, 4, 0, 0]}>
-                        {analytics.activityByDay.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={entry.isPeak ? '#E8B84B' : '#5BBEC4'} />
+                        {analytics!.activityByDay.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={entry.isPeak ? theme.dark : theme.primary} />
                         ))}
                       </Bar>
                     </BarChart>
@@ -1846,14 +1850,14 @@ function AnalyticsTab() {
               {analytics?.activityByHour?.length > 0 ? (
                 <div className="h-48">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={analytics.activityByHour}>
+                    <BarChart data={analytics!.activityByHour}>
                       <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                       <XAxis dataKey="hour" tick={{ fontSize: 10 }} stroke="#9CA3AF" interval={0} />
                       <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                       <Tooltip />
                       <Bar dataKey="count" name="Activity" radius={[4, 4, 0, 0]}>
-                        {analytics.activityByHour.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={entry.isPeak ? '#E8B84B' : '#5BBEC4'} />
+                        {analytics!.activityByHour.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={entry.isPeak ? theme.dark : theme.primary} />
                         ))}
                       </Bar>
                     </BarChart>
@@ -1871,7 +1875,7 @@ function AnalyticsTab() {
             {analytics?.mauTimeSeries?.length > 0 ? (
               <div className="h-48">
                 <ResponsiveContainer width="100%" height="100%">
-                  <LineChart data={analytics.mauTimeSeries}>
+                  <LineChart data={analytics!.mauTimeSeries}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                     <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
@@ -1886,7 +1890,7 @@ function AnalyticsTab() {
           </div>
 
           {/* Peak Times Summary */}
-          <div className="bg-gradient-to-r from-[#5BBEC4]/10 to-[#E8B84B]/10 rounded-lg p-5 border border-[#5BBEC4]/20">
+          <div className="bg-gradient-to-r from-[#5BBEC4]/10 to-[#1a6b69]/10 rounded-lg p-5 border border-[#5BBEC4]/20">
             <h3 className="font-semibold text-gray-900 mb-3">Peak Activity Summary</h3>
             <div className="grid md:grid-cols-3 gap-4">
               <div>
@@ -1965,7 +1969,7 @@ function TipsTab() {
             placeholder="Enter a new tip..."
             value={newTip}
             onChange={(e) => setNewTip(e.target.value)}
-            className="w-full p-2 border border-gray-200 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
+            className="w-full p-2 border border-gray-200 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
             rows={2}
           />
           <div className="flex items-center gap-2 mt-2">
@@ -1982,7 +1986,7 @@ function TipsTab() {
             <button
               onClick={handleAddTip}
               className="px-3 py-1.5 rounded text-sm font-medium text-white"
-              style={{ backgroundColor: '#E8B84B' }}
+              style={{ backgroundColor: theme.primary }}
             >
               Add Tip
             </button>
@@ -2141,11 +2145,11 @@ function EmailsTab() {
             placeholder="Enter email address..."
             value={testEmail}
             onChange={(e) => setTestEmail(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
+            className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
           />
           <button
             className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2"
-            style={{ backgroundColor: '#E8B84B' }}
+            style={{ backgroundColor: theme.primary }}
           >
             <Send size={16} />
             Send Test

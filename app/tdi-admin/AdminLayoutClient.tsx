@@ -14,6 +14,7 @@ const PORTAL_COLORS = {
   hub: { accent: '#5BBEC4', light: '#E8F6F7', bg15: 'rgba(91, 190, 196, 0.15)', border30: 'rgba(91, 190, 196, 0.3)' },
   creators: { accent: '#9B7CB8', light: '#F3EDF8', bg15: 'rgba(155, 124, 184, 0.15)', border30: 'rgba(155, 124, 184, 0.3)' },
   leadership: { accent: '#E8927C', light: '#FDF0ED', bg15: 'rgba(232, 146, 124, 0.15)', border30: 'rgba(232, 146, 124, 0.3)' },
+  team: { accent: '#E8B84B', light: '#FFF8E7', bg15: 'rgba(232, 184, 75, 0.15)', border30: 'rgba(232, 184, 75, 0.3)' },
 };
 
 // Navigation tabs configuration
@@ -35,7 +36,9 @@ function AdminNavbar({ user }: { user: User }) {
       ? 'creators'
       : pathname.startsWith('/tdi-admin/leadership')
         ? 'leadership'
-        : 'hub';
+        : pathname.startsWith('/tdi-admin/team')
+          ? 'team'
+          : 'hub';
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
@@ -45,7 +48,10 @@ function AdminNavbar({ user }: { user: User }) {
   // Get accent color for current portal section
   const getActiveAccent = () => {
     const activeTabConfig = PORTAL_TABS.find(t => t.id === activeTab);
-    return activeTabConfig?.colors.accent || '#5BBEC4';
+    if (activeTabConfig) return activeTabConfig.colors.accent;
+    // Handle team page which isn't in PORTAL_TABS
+    if (activeTab === 'team') return PORTAL_COLORS.team.accent;
+    return '#5BBEC4';
   };
 
   return (
@@ -430,7 +436,6 @@ export default function AdminLayoutClient({ children }: { children: React.ReactN
     // Timeout fallback - redirect to login after 3 seconds no matter what
     const timeoutId = setTimeout(() => {
       if (isMounted && isLoading) {
-        console.log('[TDI Admin] Auth timeout - redirecting to login');
         router.replace('/tdi-admin/login');
       }
     }, 3000);

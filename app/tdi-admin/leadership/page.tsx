@@ -313,7 +313,7 @@ export default function LeadershipDashboardPage() {
             href="/tdi-admin/hub"
             className="inline-block px-6 py-3 rounded-lg font-medium transition-colors"
             style={{
-              backgroundColor: '#E8B84B',
+              backgroundColor: theme.primary,
               color: '#2B3A67',
               fontFamily: "'DM Sans', sans-serif",
             }}

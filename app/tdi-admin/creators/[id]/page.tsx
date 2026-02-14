@@ -28,6 +28,10 @@ import {
 } from 'lucide-react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
+import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
+
+// Creators theme colors
+const theme = PORTAL_THEMES.creators;
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
 import {
   getCreatorDashboardData,
@@ -66,7 +70,7 @@ const statusConfig: Record<
   },
   available: {
     icon: Circle,
-    color: 'text-[#E8B84B]',
+    color: 'text-[#9B7CB8]',
     bg: 'bg-amber-50',
     label: 'Available',
   },
@@ -340,7 +344,7 @@ export default function TDIAdminCreatorDetailPage() {
             href="/tdi-admin/creators"
             className="inline-block px-6 py-3 rounded-lg font-medium transition-colors"
             style={{
-              backgroundColor: '#E8B84B',
+              backgroundColor: theme.primary,
               color: '#2B3A67',
               fontFamily: "'DM Sans', sans-serif",
             }}
@@ -356,7 +360,7 @@ export default function TDIAdminCreatorDetailPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#E8B84B' }} />
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: theme.primary }} />
           <p className="text-gray-600" style={{ fontFamily: "'DM Sans', sans-serif" }}>
             Loading creator details...
           </p>
@@ -375,7 +379,7 @@ export default function TDIAdminCreatorDetailPage() {
           <Link
             href="/tdi-admin/creators"
             className="mt-4 inline-block"
-            style={{ color: '#E8B84B' }}
+            style={{ color: theme.primary }}
           >
             Back to creators
           </Link>
@@ -436,7 +440,7 @@ export default function TDIAdminCreatorDetailPage() {
               )}
             </div>
             <p className="text-white/70">{creator.email}</p>
-            <p className="mt-2 font-medium capitalize" style={{ color: '#E8B84B' }}>
+            <p className="mt-2 font-medium capitalize" style={{ color: theme.primary }}>
               Current Phase: {creator.current_phase.replace('_', ' ')}
             </p>
             {creator.course_title && (
@@ -465,7 +469,7 @@ export default function TDIAdminCreatorDetailPage() {
                   cx="40"
                   cy="40"
                   r="35"
-                  stroke="#E8B84B"
+                  stroke={theme.primary}
                   strokeWidth="6"
                   fill="none"
                   strokeLinecap="round"
@@ -654,7 +658,7 @@ export default function TDIAdminCreatorDetailPage() {
                                 onClick={() => handleApprove(milestone.id, milestone.title)}
                                 disabled={isProcessing}
                                 className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors flex items-center gap-1.5"
-                                style={{ backgroundColor: '#E8B84B', color: '#2B3A67' }}
+                                style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
                               >
                                 {isProcessing ? (
                                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -701,7 +705,7 @@ export default function TDIAdminCreatorDetailPage() {
                 <button
                   onClick={() => setIsEditingDetails(true)}
                   className="text-sm hover:opacity-80"
-                  style={{ color: '#E8B84B' }}
+                  style={{ color: theme.primary }}
                 >
                   Edit
                 </button>
@@ -767,7 +771,7 @@ export default function TDIAdminCreatorDetailPage() {
                     onClick={handleSaveDetails}
                     disabled={isSaving}
                     className="flex-1 px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1"
-                    style={{ backgroundColor: '#E8B84B', color: '#2B3A67' }}
+                    style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
                   >
                     {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                     Save
@@ -837,7 +841,7 @@ export default function TDIAdminCreatorDetailPage() {
                     type="submit"
                     disabled={!newNote.trim() || isAddingNote}
                     className="px-3 py-1.5 text-sm font-medium rounded-lg disabled:opacity-50 flex items-center gap-1"
-                    style={{ backgroundColor: '#E8B84B', color: '#2B3A67' }}
+                    style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
                   >
                     {isAddingNote ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                     Add Note
