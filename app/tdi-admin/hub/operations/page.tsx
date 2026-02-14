@@ -15,6 +15,17 @@ import {
 } from '@/lib/hub/admin';
 import ExampleDataBanner from '@/components/tdi-admin/ExampleDataBanner';
 import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from 'recharts';
+import {
   ArrowLeft,
   Users,
   BookOpen,
@@ -146,8 +157,20 @@ function AccountsTab() {
   const filtered = accounts.filter(a => {
     if (!search) return true;
     const s = search.toLowerCase();
-    return (a.display_name?.toLowerCase().includes(s) || a.email?.toLowerCase().includes(s));
+    const schoolName = (a.onboarding_data as { school_name?: string })?.school_name || '';
+    return (
+      a.display_name?.toLowerCase().includes(s) ||
+      schoolName.toLowerCase().includes(s)
+    );
   });
+
+  // Calculate stats
+  const activeCount = accounts.filter(a => a.onboarding_completed).length;
+  const thisMonthCount = accounts.filter(a => {
+    const created = new Date(a.created_at);
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    return created > thirtyDaysAgo;
+  }).length;
 
   if (isLoading) {
     return <div className="py-8 text-center text-gray-500">Loading accounts...</div>;
@@ -161,7 +184,7 @@ function AccountsTab() {
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Search by name or email..."
+            placeholder="Search by name or school..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
@@ -180,9 +203,9 @@ function AccountsTab() {
       {/* Stats Row */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         <StatCard label="Total Users" value={accounts.length} icon={Users} />
-        <StatCard label="Active" value={accounts.filter(a => a.role !== 'inactive').length} icon={Activity} />
-        <StatCard label="This Month" value={accounts.filter(a => new Date(a.created_at) > new Date(Date.now() - 30*24*60*60*1000)).length} icon={Calendar} trend="up" />
-        <StatCard label="Avg PD Hours" value="4.2" icon={Clock} />
+        <StatCard label="Onboarded" value={activeCount} icon={Activity} />
+        <StatCard label="This Month" value={thisMonthCount} icon={Calendar} trend="up" />
+        <StatCard label="Completion %" value={`${accounts.length > 0 ? Math.round((activeCount / accounts.length) * 100) : 0}%`} icon={Clock} />
       </div>
 
       {/* Table */}
@@ -191,8 +214,8 @@ function AccountsTab() {
           <thead className="bg-[#FAFAF8]">
             <tr>
               <TableHeader sortable>Name</TableHeader>
-              <TableHeader>Email</TableHeader>
               <TableHeader>Role</TableHeader>
+              <TableHeader>Grade Level</TableHeader>
               <TableHeader>School/Org</TableHeader>
               <TableHeader sortable>Joined</TableHeader>
               <TableHeader>Status</TableHeader>
@@ -204,39 +227,54 @@ function AccountsTab() {
                 <td colSpan={6} className="py-8 text-center text-gray-500">No accounts found</td>
               </tr>
             ) : (
-              filtered.slice(0, 50).map((account, i) => (
-                <tr
-                  key={account.id}
-                  className={`${i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAF8]'} hover:bg-gray-50 cursor-pointer`}
-                  onClick={() => setExpandedId(expandedId === account.id ? null : account.id)}
-                >
-                  <td className="px-4 py-3 text-sm font-medium text-gray-900">{account.display_name || 'No name'}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{account.email}</td>
-                  <td className="px-4 py-3 text-sm">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      account.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-700'
-                    }`}>
-                      {account.role || 'member'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">{account.school_name || '-'}</td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
-                    {new Date(account.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3 text-sm">
-                    <span className="flex items-center gap-1.5 text-green-600">
-                      <span className="w-2 h-2 rounded-full bg-green-500" />
-                      Active
-                    </span>
-                  </td>
-                </tr>
-              ))
+              filtered.slice(0, 100).map((account, i) => {
+                const onboarding = account.onboarding_data as { school_name?: string; grade_level?: string } | null;
+                const schoolName = onboarding?.school_name || '-';
+                const gradeLevel = onboarding?.grade_level || '-';
+                return (
+                  <tr
+                    key={account.id}
+                    className={`${i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAF8]'} hover:bg-gray-50 cursor-pointer`}
+                    onClick={() => setExpandedId(expandedId === account.id ? null : account.id)}
+                  >
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{account.display_name || 'No name'}</td>
+                    <td className="px-4 py-3 text-sm">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        account.role === 'school_leader' ? 'bg-purple-100 text-purple-700' :
+                        account.role === 'coach' ? 'bg-blue-100 text-blue-700' :
+                        account.role === 'para' ? 'bg-amber-100 text-amber-700' :
+                        'bg-gray-100 text-gray-700'
+                      }`}>
+                        {account.role?.replace('_', ' ') || 'teacher'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{gradeLevel}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">{schoolName}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600">
+                      {new Date(account.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3 text-sm">
+                      {account.onboarding_completed ? (
+                        <span className="flex items-center gap-1.5 text-green-600">
+                          <span className="w-2 h-2 rounded-full bg-green-500" />
+                          Active
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1.5 text-amber-600">
+                          <span className="w-2 h-2 rounded-full bg-amber-500" />
+                          Onboarding
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
       </div>
-      {filtered.length > 50 && (
-        <p className="mt-3 text-sm text-gray-500 text-center">Showing 50 of {filtered.length} accounts</p>
+      {filtered.length > 100 && (
+        <p className="mt-3 text-sm text-gray-500 text-center">Showing 100 of {filtered.length} accounts</p>
       )}
     </div>
   );
@@ -553,12 +591,18 @@ function ReportsTab() {
 // ANALYTICS TAB
 function AnalyticsTab() {
   const [stats, setStats] = useState<any>(null);
+  const [analytics, setAnalytics] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [timeRange, setTimeRange] = useState<'30' | '60' | '90'>('90');
 
   useEffect(() => {
     async function load() {
-      const data = await getAdminStats();
-      setStats(data);
+      const [statsData, analyticsRes] = await Promise.all([
+        getAdminStats(),
+        fetch('/api/tdi-admin/analytics').then(r => r.json()),
+      ]);
+      setStats(statsData);
+      setAnalytics(analyticsRes);
       setIsLoading(false);
     }
     load();
@@ -567,6 +611,8 @@ function AnalyticsTab() {
   if (isLoading) {
     return <div className="py-8 text-center text-gray-500">Loading analytics...</div>;
   }
+
+  const insights = analytics?.insights || {};
 
   return (
     <div>
@@ -577,8 +623,8 @@ function AnalyticsTab() {
             <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
             <span className="text-xs text-gray-500 uppercase tracking-wide">Live</span>
           </div>
-          <p className="text-3xl font-bold" style={{ color: '#2B3A67' }}>-</p>
-          <p className="text-sm text-gray-500">Active Users Right Now</p>
+          <p className="text-3xl font-bold" style={{ color: '#2B3A67' }}>{insights.totalUsers || 0}</p>
+          <p className="text-sm text-gray-500">Total Users</p>
         </div>
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <p className="text-3xl font-bold" style={{ color: '#2B3A67' }}>{stats?.totalEnrollments || 0}</p>
@@ -590,51 +636,132 @@ function AnalyticsTab() {
         </div>
       </div>
 
-      {/* Charts Placeholder */}
+      {/* Time Range Toggle */}
+      <div className="flex gap-2 mb-4">
+        {(['30', '60', '90'] as const).map((range) => (
+          <button
+            key={range}
+            onClick={() => setTimeRange(range)}
+            className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
+              timeRange === range
+                ? 'bg-[#5BBEC4] text-white'
+                : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
+            }`}
+          >
+            {range} Days
+          </button>
+        ))}
+      </div>
+
+      {/* Charts */}
       <div className="grid md:grid-cols-2 gap-6 mb-8">
+        {/* Enrollments Over Time */}
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <h3 className="font-semibold text-gray-900 mb-4">Enrollments Over Time</h3>
-          <div className="h-48 flex items-center justify-center bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-400">Chart coming soon</p>
+          <div className="h-48">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={analytics?.enrollmentsTimeSeries || []}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                <Tooltip />
+                <Line type="monotone" dataKey="value" stroke="#5BBEC4" strokeWidth={2} dot={{ fill: '#5BBEC4' }} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
+
+        {/* Completions Over Time */}
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <h3 className="font-semibold text-gray-900 mb-4">Completions Over Time</h3>
-          <div className="h-48 flex items-center justify-center bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-400">Chart coming soon</p>
+          <div className="h-48">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={analytics?.completionsTimeSeries || []}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                <Tooltip />
+                <Line type="monotone" dataKey="value" stroke="#16A34A" strokeWidth={2} dot={{ fill: '#16A34A' }} />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
         </div>
       </div>
 
-      {/* Top Courses */}
+      {/* Top Courses Bar Chart */}
       <div className="bg-white rounded-lg border border-gray-200 p-5 mb-8">
         <h3 className="font-semibold text-gray-900 mb-4">Top Courses by Enrollment</h3>
-        {stats?.courseEnrollments?.length > 0 ? (
-          <div className="space-y-3">
-            {stats.courseEnrollments.slice(0, 5).map((course: any, i: number) => (
-              <div key={i} className="flex items-center gap-3">
-                <span className="text-sm text-gray-500 w-6">{i + 1}.</span>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-900">{course.title}</span>
-                    <span className="text-sm text-gray-500">{course.count}</span>
-                  </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: `${(course.count / (stats.courseEnrollments[0]?.count || 1)) * 100}%`,
-                        backgroundColor: '#E8B84B'
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
+        {analytics?.topCourses?.length > 0 ? (
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={analytics.topCourses} layout="vertical" margin={{ left: 20, right: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis type="number" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                <YAxis
+                  type="category"
+                  dataKey="title"
+                  tick={{ fontSize: 11 }}
+                  stroke="#9CA3AF"
+                  width={150}
+                  tickFormatter={(value) => value.length > 20 ? value.slice(0, 20) + '...' : value}
+                />
+                <Tooltip />
+                <Bar dataKey="count" fill="#5BBEC4" radius={[0, 4, 4, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         ) : (
           <p className="text-sm text-gray-500">No enrollment data available</p>
         )}
+      </div>
+
+      {/* Stress Trends & Goal Alignment */}
+      <div className="grid md:grid-cols-2 gap-6 mb-8">
+        {/* Stress Trends */}
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <h3 className="font-semibold text-gray-900 mb-4">Stress Trends</h3>
+          {analytics?.stressTrends?.length > 0 ? (
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={analytics.stressTrends}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                  <YAxis domain={[1, 10]} tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="avgScore" stroke="#E8B84B" strokeWidth={2} dot={{ fill: '#E8B84B' }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 text-center py-8">No stress data available</p>
+          )}
+        </div>
+
+        {/* Goal Alignment */}
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <h3 className="font-semibold text-gray-900 mb-4">Goal Alignment</h3>
+          {analytics?.goalAlignment?.length > 0 ? (
+            <div className="h-48">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={analytics.goalAlignment} layout="vertical" margin={{ left: 10, right: 20 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis type="number" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                  <YAxis
+                    type="category"
+                    dataKey="goal"
+                    tick={{ fontSize: 10 }}
+                    stroke="#9CA3AF"
+                    width={100}
+                  />
+                  <Tooltip />
+                  <Bar dataKey="count" fill="#8B5CF6" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          ) : (
+            <p className="text-sm text-gray-500 text-center py-8">No goal data available</p>
+          )}
+        </div>
       </div>
 
       {/* AI Insights */}
@@ -643,12 +770,29 @@ function AnalyticsTab() {
           <Lightbulb size={18} />
           <h3 className="font-semibold">AI Insights</h3>
         </div>
-        <ul className="space-y-2 text-sm text-white/90">
-          <li>• Total enrollments: {stats?.totalEnrollments || 0} across all courses.</li>
-          <li>• {stats?.totalCompletions || 0} course completions have been recorded.</li>
-          <li>• {stats?.totalCertificates || 0} certificates issued with {stats?.totalPdHours || 0} total PD hours.</li>
-          <li>• Average stress score: {stats?.avgStressScore || 'N/A'} (1=great, 5=rough).</li>
-        </ul>
+        <div className="space-y-3 text-sm text-white/90">
+          <p>
+            {insights.enrollmentChange >= 0 ? '📈' : '📉'} Enrollments are{' '}
+            <strong>{insights.enrollmentChange >= 0 ? 'up' : 'down'} {Math.abs(insights.enrollmentChange)}%</strong> this month
+            ({insights.enrollmentsThisMonth} vs {insights.enrollmentsLastMonth} last month).
+          </p>
+          <p>
+            🎓 <strong>{insights.completionsThisMonth}</strong> new completions this month.
+            Overall completion rate is <strong>{insights.completionRate}%</strong>.
+          </p>
+          <p>
+            📜 <strong>{stats?.totalCertificates || 0}</strong> certificates issued,
+            awarding <strong>{insights.totalPdHours}</strong> total PD hours.
+          </p>
+          {insights.lowestCompletionCourse?.title !== 'N/A' && (
+            <p>
+              ⚠️ Course with highest drop-off: <strong>{insights.lowestCompletionCourse?.title}</strong> ({insights.lowestCompletionCourse?.rate}% completion rate).
+            </p>
+          )}
+          <p>
+            😌 Average stress score: <strong>{stats?.avgStressScore || 'N/A'}</strong> (1=great, 10=rough).
+          </p>
+        </div>
       </div>
     </div>
   );
