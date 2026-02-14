@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import {
   Search,
   Users,
@@ -22,7 +23,18 @@ import {
   ChevronUp,
   HelpCircle,
   Palette,
+  MapPin,
 } from 'lucide-react';
+
+// Dynamic import for map to avoid SSR issues
+const USMapChart = dynamic(() => import('@/components/tdi-admin/USMapChart'), {
+  ssr: false,
+  loading: () => (
+    <div className="h-[300px] flex items-center justify-center bg-gray-50 rounded-lg">
+      <Loader2 className="w-6 h-6 animate-spin text-[#E8B84B]" />
+    </div>
+  ),
+});
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
 import { createCreator } from '@/lib/creator-portal-data';
@@ -161,6 +173,15 @@ export default function CreatorStudioPage() {
     target_launch_month: '',
   });
 
+  // Geographic distribution state
+  const [locationData, setLocationData] = useState<{
+    stateData: { state: string; count: number }[];
+    topStates: { state: string; count: number }[];
+    totalCreators: number;
+    creatorsWithLocation: number;
+    noLocationCount: number;
+  } | null>(null);
+
   const canEdit = isOwner || hasPermission(permissions, 'creator_studio', 'edit');
 
   const loadDashboardData = useCallback(async () => {
@@ -183,6 +204,15 @@ export default function CreatorStudioPage() {
   useEffect(() => {
     if (hasAccess) {
       loadDashboardData();
+      // Load location data
+      fetch('/api/admin/creator-locations')
+        .then(res => res.json())
+        .then(data => {
+          if (!data.error) {
+            setLocationData(data);
+          }
+        })
+        .catch(err => console.error('Failed to load location data:', err));
     } else {
       setIsLoading(false);
     }
@@ -734,6 +764,91 @@ export default function CreatorStudioPage() {
           </div>
         </div>
       </div>
+
+      {/* Geographic Distribution */}
+      {locationData && (
+        <div className="bg-white rounded-xl border border-gray-200 p-5 mb-4">
+          <h2
+            className="text-base font-semibold mb-4 flex items-center gap-2"
+            style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
+          >
+            <MapPin className="w-5 h-5" style={{ color: '#5BBEC4' }} />
+            Geographic Distribution
+          </h2>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* US Map */}
+            <div className="lg:col-span-2">
+              <USMapChart
+                data={locationData.stateData}
+              />
+            </div>
+
+            {/* Top States + Stats */}
+            <div className="space-y-4">
+              {/* Top States */}
+              <div>
+                <h3 className="text-sm font-semibold mb-3" style={{ color: '#2B3A67' }}>
+                  Top States
+                </h3>
+                {locationData.topStates.length === 0 ? (
+                  <p className="text-sm text-gray-500">No location data yet</p>
+                ) : (
+                  <div className="space-y-2">
+                    {locationData.topStates.slice(0, 5).map((item, index) => {
+                      const percentage = locationData.creatorsWithLocation > 0
+                        ? Math.round((item.count / locationData.creatorsWithLocation) * 100)
+                        : 0;
+                      return (
+                        <div key={item.state} className="flex items-center gap-3">
+                          <span className="text-xs font-medium text-gray-500 w-4">{index + 1}</span>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-sm font-medium" style={{ color: '#2B3A67' }}>
+                                {item.state}
+                              </span>
+                              <span className="text-xs text-gray-500">
+                                {item.count} ({percentage}%)
+                              </span>
+                            </div>
+                            <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full"
+                                style={{
+                                  width: `${percentage}%`,
+                                  backgroundColor: '#5BBEC4',
+                                }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Stats */}
+              <div className="pt-4 border-t border-gray-100">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-[#E8F6F7] rounded-lg p-3 text-center">
+                    <p className="text-2xl font-bold" style={{ color: '#5BBEC4' }}>
+                      {locationData.creatorsWithLocation}
+                    </p>
+                    <p className="text-xs text-gray-600">With Location</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                    <p className="text-2xl font-bold text-gray-400">
+                      {locationData.noLocationCount}
+                    </p>
+                    <p className="text-xs text-gray-500">Not Shared</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Topics in Pipeline - Full Width */}
       <div className="bg-white rounded-xl border border-gray-200 p-5 mb-4">

@@ -65,6 +65,9 @@ export interface Creator {
   // Production preference fields
   wants_video_editing: boolean;
   wants_download_design: boolean;
+  // Location fields
+  state: string | null;
+  location_prompt_dismissed: boolean;
   created_at: string;
   updated_at: string;
 }

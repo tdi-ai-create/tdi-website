@@ -10,6 +10,7 @@ import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
 import { CourseDetailsPanel } from '@/components/creator-portal/CourseDetailsPanel';
 import { NotesPanel } from '@/components/creator-portal/NotesPanel';
 import TDIPortalLoader from '@/components/TDIPortalLoader';
+import LocationPromptModal from '@/components/creator-portal/LocationPromptModal';
 import type { CreatorDashboardData } from '@/types/creator-portal';
 
 // Component to handle search params (must be wrapped in Suspense)
@@ -38,6 +39,7 @@ export default function CreatorDashboardPage() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [showLocationModal, setShowLocationModal] = useState(false);
 
   // NEW: Three independent gates — ALL must be true to show dashboard
   const [animationComplete, setAnimationComplete] = useState(false);
@@ -158,6 +160,74 @@ export default function CreatorDashboardPage() {
     }
   };
 
+  // Show location modal when conditions are met
+  useEffect(() => {
+    // Only show modal once the dashboard is fully visible
+    const isDashboardVisible = animationComplete && dataLoaded && timerDone;
+    if (isDashboardVisible && dashboardData?.creator) {
+      const creator = dashboardData.creator;
+      // Show modal if state is null and hasn't been dismissed
+      if (creator.state === null && !creator.location_prompt_dismissed) {
+        setShowLocationModal(true);
+      }
+    }
+  }, [animationComplete, dataLoaded, timerDone, dashboardData]);
+
+  // Handle location submit
+  const handleLocationSubmit = async (state: string) => {
+    try {
+      const response = await fetch('/api/creator-portal/location', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ state }),
+      });
+
+      if (response.ok) {
+        setShowLocationModal(false);
+        // Update local state to prevent modal from showing again
+        if (dashboardData) {
+          setDashboardData({
+            ...dashboardData,
+            creator: {
+              ...dashboardData.creator,
+              state,
+              location_prompt_dismissed: true,
+            },
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Error saving location:', err);
+    }
+  };
+
+  // Handle location skip
+  const handleLocationSkip = async () => {
+    try {
+      const response = await fetch('/api/creator-portal/location', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dismissed: true }),
+      });
+
+      if (response.ok) {
+        setShowLocationModal(false);
+        // Update local state to prevent modal from showing again
+        if (dashboardData) {
+          setDashboardData({
+            ...dashboardData,
+            creator: {
+              ...dashboardData.creator,
+              location_prompt_dismissed: true,
+            },
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Error dismissing location prompt:', err);
+    }
+  };
+
   const handleMarkComplete = async (milestoneId: string) => {
     if (!dashboardData || !userEmail) return;
 
@@ -200,6 +270,13 @@ export default function CreatorDashboardPage() {
 
   return (
     <>
+      {/* Location Prompt Modal */}
+      <LocationPromptModal
+        isOpen={showLocationModal}
+        onSubmit={handleLocationSubmit}
+        onSkip={handleLocationSkip}
+      />
+
       {/* LOADER: shows until animation calls onComplete */}
       {!animationComplete && (
         <TDIPortalLoader
