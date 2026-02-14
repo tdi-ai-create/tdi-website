@@ -68,6 +68,13 @@ export interface Creator {
   // Location fields
   state: string | null;
   location_prompt_dismissed: boolean;
+  // Website display fields
+  display_on_website: boolean;
+  website_display_name: string | null;
+  website_title: string | null;
+  website_bio: string | null;
+  headshot_url: string | null;
+  display_order: number;
   created_at: string;
   updated_at: string;
 }

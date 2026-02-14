@@ -4,8 +4,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
-// Current Content Creators
-const creators = [
+// Fallback creators (used if API fails)
+const fallbackCreators = [
   { name: 'Erin Light' },
   { name: 'Katie Welch' },
   { name: 'Sue Thompson' },
@@ -100,6 +100,26 @@ export default function CreateWithUsPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [creators, setCreators] = useState(fallbackCreators);
+
+  // Fetch creators from API
+  useEffect(() => {
+    async function fetchCreators() {
+      try {
+        const response = await fetch('/api/public/creators');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.creators && data.creators.length > 0) {
+            setCreators(data.creators.map((c: { name: string }) => ({ name: c.name })));
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch creators:', error);
+        // Keep fallback creators
+      }
+    }
+    fetchCreators();
+  }, []);
 
   // Scroll animation observer
   useEffect(() => {

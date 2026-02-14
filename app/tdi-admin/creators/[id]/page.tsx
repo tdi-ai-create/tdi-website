@@ -132,6 +132,17 @@ export default function TDIAdminCreatorDetailPage() {
   // View mode toggle
   const [viewMode, setViewMode] = useState<'admin' | 'creator'>('admin');
 
+  // Website visibility state
+  const [isEditingWebsite, setIsEditingWebsite] = useState(false);
+  const [websiteSettings, setWebsiteSettings] = useState({
+    display_on_website: false,
+    website_display_name: '',
+    website_title: 'Content Creator',
+    website_bio: '',
+    display_order: 99,
+  });
+  const [isSavingWebsite, setIsSavingWebsite] = useState(false);
+
   const adminEmail = teamMember?.email || '';
 
   const loadData = useCallback(async () => {
@@ -144,6 +155,15 @@ export default function TDIAdminCreatorDetailPage() {
         course_audience: data.creator.course_audience || '',
         target_launch_month: data.creator.target_launch_month || '',
         discount_code: data.creator.discount_code || '',
+      });
+
+      // Initialize website settings
+      setWebsiteSettings({
+        display_on_website: data.creator.display_on_website || false,
+        website_display_name: data.creator.website_display_name || data.creator.name || '',
+        website_title: data.creator.website_title || 'Content Creator',
+        website_bio: data.creator.website_bio || '',
+        display_order: data.creator.display_order || 99,
       });
 
       // Find current phase and expand it
@@ -226,6 +246,22 @@ export default function TDIAdminCreatorDetailPage() {
       console.error('Error saving details:', error);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleSaveWebsiteSettings = async () => {
+    if (!canEdit) return;
+    setIsSavingWebsite(true);
+    try {
+      await updateCreator(creatorId, websiteSettings);
+      await loadData();
+      setIsEditingWebsite(false);
+      setSuccessMessage('Website visibility settings saved!');
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (error) {
+      console.error('Error saving website settings:', error);
+    } finally {
+      setIsSavingWebsite(false);
     }
   };
 
@@ -804,6 +840,162 @@ export default function TDIAdminCreatorDetailPage() {
                     {creator.target_launch_month || 'Not set'}
                   </p>
                 </div>
+              </div>
+            )}
+          </div>
+
+          {/* Website Visibility Card */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3
+                className="font-semibold"
+                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
+              >
+                Website Visibility
+              </h3>
+              {canEdit && !isEditingWebsite && (
+                <button
+                  onClick={() => setIsEditingWebsite(true)}
+                  className="text-sm hover:opacity-80"
+                  style={{ color: theme.primary }}
+                >
+                  Edit
+                </button>
+              )}
+            </div>
+
+            {isEditingWebsite ? (
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <label className="relative inline-flex items-center cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={websiteSettings.display_on_website}
+                      onChange={(e) => setWebsiteSettings({ ...websiteSettings, display_on_website: e.target.checked })}
+                      className="sr-only peer"
+                    />
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-[#E8B84B]/50 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#E8B84B]"></div>
+                  </label>
+                  <span className="text-sm font-medium text-gray-700">Show on website</span>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Display Name</label>
+                  <input
+                    type="text"
+                    value={websiteSettings.website_display_name}
+                    onChange={(e) => setWebsiteSettings({ ...websiteSettings, website_display_name: e.target.value })}
+                    placeholder={creator.name}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Title</label>
+                  <input
+                    type="text"
+                    value={websiteSettings.website_title}
+                    onChange={(e) => setWebsiteSettings({ ...websiteSettings, website_title: e.target.value })}
+                    placeholder="Content Creator"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Short Bio (optional, 150 chars)</label>
+                  <textarea
+                    value={websiteSettings.website_bio}
+                    onChange={(e) => setWebsiteSettings({ ...websiteSettings, website_bio: e.target.value.slice(0, 150) })}
+                    placeholder="Brief description..."
+                    rows={2}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
+                  />
+                  <p className="text-xs text-gray-400 text-right">{websiteSettings.website_bio.length}/150</p>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Display Order</label>
+                  <input
+                    type="number"
+                    value={websiteSettings.display_order}
+                    onChange={(e) => setWebsiteSettings({ ...websiteSettings, display_order: parseInt(e.target.value) || 99 })}
+                    min={1}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                  />
+                </div>
+
+                {/* Preview Card */}
+                {websiteSettings.display_on_website && (
+                  <div className="bg-gray-50 rounded-lg p-3 mt-2">
+                    <p className="text-xs text-gray-500 mb-2">Preview on website:</p>
+                    <div className="text-center">
+                      <div
+                        className="w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center"
+                        style={{ backgroundColor: '#80a4ed' }}
+                      >
+                        <span className="text-white font-bold text-xs">
+                          {(websiteSettings.website_display_name || creator.name).split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                        </span>
+                      </div>
+                      <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>
+                        {websiteSettings.website_display_name || creator.name}
+                      </p>
+                      <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>
+                        {websiteSettings.website_title || 'Content Creator'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={() => setIsEditingWebsite(false)}
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveWebsiteSettings}
+                    disabled={isSavingWebsite}
+                    className="flex-1 px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1"
+                    style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                  >
+                    {isSavingWebsite ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    Save
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-2 text-sm">
+                <div className="flex items-center gap-2">
+                  {websiteSettings.display_on_website ? (
+                    <>
+                      <Eye className="w-4 h-4 text-green-600" />
+                      <span className="text-green-600 font-medium">Visible on website</span>
+                    </>
+                  ) : (
+                    <>
+                      <EyeOff className="w-4 h-4 text-gray-400" />
+                      <span className="text-gray-500">Not shown on website</span>
+                    </>
+                  )}
+                </div>
+                {websiteSettings.display_on_website && (
+                  <div className="bg-gray-50 rounded-lg p-3 mt-2">
+                    <div className="text-center">
+                      <div
+                        className="w-10 h-10 rounded-full mx-auto mb-2 flex items-center justify-center"
+                        style={{ backgroundColor: '#80a4ed' }}
+                      >
+                        <span className="text-white font-bold text-xs">
+                          {(websiteSettings.website_display_name || creator.name).split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                        </span>
+                      </div>
+                      <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>
+                        {websiteSettings.website_display_name || creator.name}
+                      </p>
+                      <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>
+                        {websiteSettings.website_title || 'Content Creator'}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

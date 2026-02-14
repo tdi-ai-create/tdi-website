@@ -229,7 +229,60 @@ export async function POST(request: Request) {
       }
     }
 
-    // 5. Create auto-note for audit trail
+    // 5. Auto-enable website visibility if creator reaches Launch phase
+    if (milestone?.phase_id) {
+      // Check if this is a launch phase milestone
+      const { data: phase } = await supabase
+        .from('phases')
+        .select('name')
+        .eq('id', milestone.phase_id)
+        .single();
+
+      if (phase?.name?.toLowerCase() === 'launch') {
+        // Check if all launch phase milestones are completed
+        const { data: launchMilestones } = await supabase
+          .from('milestones')
+          .select('id')
+          .eq('phase_id', milestone.phase_id);
+
+        const { data: completedLaunchMilestones } = await supabase
+          .from('creator_milestones')
+          .select('milestone_id')
+          .eq('creator_id', creatorId)
+          .eq('status', 'completed')
+          .in('milestone_id', (launchMilestones || []).map(m => m.id));
+
+        // If all launch milestones are completed, auto-enable website visibility
+        if (launchMilestones && completedLaunchMilestones &&
+            completedLaunchMilestones.length >= launchMilestones.length) {
+          const { error: visibilityError } = await supabase
+            .from('creators')
+            .update({
+              display_on_website: true,
+              website_display_name: creator?.name || null,
+              website_title: 'Content Creator',
+            })
+            .eq('id', creatorId);
+
+          if (!visibilityError) {
+            console.log('[approve-milestone] Auto-enabled website visibility for creator:', creator?.name);
+
+            // Add note about auto-enabling
+            await supabase
+              .from('creator_notes')
+              .insert({
+                creator_id: creatorId,
+                content: '[Auto] Creator reached Launch phase - now visible on website!',
+                author: 'System',
+                visible_to_creator: true,
+                phase_id: milestone.phase_id,
+              });
+          }
+        }
+      }
+    }
+
+    // 6. Create auto-note for audit trail
     const milestoneName = milestone?.title || milestone?.name || 'Milestone';
     const autoNoteContent = isOutOfOrder
       ? `[Auto] Milestone approved out of sequence: "${milestoneName}"${note ? ` - Note: ${note}` : ''}`
