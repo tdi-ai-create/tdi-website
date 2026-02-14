@@ -19,11 +19,15 @@ import {
   Line,
   BarChart,
   Bar,
+  PieChart,
+  Pie,
+  Cell,
   XAxis,
   YAxis,
   Tooltip,
   ResponsiveContainer,
   CartesianGrid,
+  Legend,
 } from 'recharts';
 import {
   ArrowLeft,
@@ -136,7 +140,10 @@ function AccountsTab() {
   const [accounts, setAccounts] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [roleFilter, setRoleFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [page, setPage] = useState(1);
+  const perPage = 50;
 
   useEffect(() => {
     async function load() {
@@ -155,6 +162,9 @@ function AccountsTab() {
   }, []);
 
   const filtered = accounts.filter(a => {
+    if (roleFilter !== 'all' && a.role !== roleFilter) return false;
+    if (statusFilter === 'active' && !a.onboarding_completed) return false;
+    if (statusFilter === 'onboarding' && a.onboarding_completed) return false;
     if (!search) return true;
     const s = search.toLowerCase();
     const schoolName = (a.onboarding_data as { school_name?: string })?.school_name || '';
@@ -164,13 +174,28 @@ function AccountsTab() {
     );
   });
 
-  // Calculate stats
+  const totalPages = Math.ceil(filtered.length / perPage);
+  const paginatedData = filtered.slice((page - 1) * perPage, page * perPage);
+
   const activeCount = accounts.filter(a => a.onboarding_completed).length;
   const thisMonthCount = accounts.filter(a => {
     const created = new Date(a.created_at);
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     return created > thirtyDaysAgo;
   }).length;
+
+  const exportCSV = () => {
+    let csv = 'Name,Role,Grade Level,School,State,Joined,Status\n';
+    filtered.forEach(a => {
+      const onboarding = a.onboarding_data as { school_name?: string; grade_level?: string; state?: string } | null;
+      csv += `"${a.display_name || ''}",${a.role || 'teacher'},"${onboarding?.grade_level || ''}","${onboarding?.school_name || ''}","${onboarding?.state || ''}",${new Date(a.created_at).toLocaleDateString()},${a.onboarding_completed ? 'Active' : 'Onboarding'}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `accounts-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  };
 
   if (isLoading) {
     return <div className="py-8 text-center text-gray-500">Loading accounts...</div>;
@@ -186,15 +211,34 @@ function AccountsTab() {
             type="text"
             placeholder="Search by name or school..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
           />
         </div>
-        <button className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-2">
-          <Filter size={16} />
-          Filters
-        </button>
-        <button className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-2">
+        <select
+          value={roleFilter}
+          onChange={(e) => { setRoleFilter(e.target.value); setPage(1); }}
+          className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
+        >
+          <option value="all">All Roles</option>
+          <option value="teacher">Teacher</option>
+          <option value="school_leader">School Leader</option>
+          <option value="coach">Coach</option>
+          <option value="para">Para</option>
+        </select>
+        <select
+          value={statusFilter}
+          onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+          className="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white"
+        >
+          <option value="all">All Status</option>
+          <option value="active">Active</option>
+          <option value="onboarding">Onboarding</option>
+        </select>
+        <button
+          onClick={exportCSV}
+          className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-2"
+        >
           <Download size={16} />
           Export CSV
         </button>
@@ -222,21 +266,17 @@ function AccountsTab() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {filtered.length === 0 ? (
+            {paginatedData.length === 0 ? (
               <tr>
                 <td colSpan={6} className="py-8 text-center text-gray-500">No accounts found</td>
               </tr>
             ) : (
-              filtered.slice(0, 100).map((account, i) => {
+              paginatedData.map((account, i) => {
                 const onboarding = account.onboarding_data as { school_name?: string; grade_level?: string } | null;
                 const schoolName = onboarding?.school_name || '-';
                 const gradeLevel = onboarding?.grade_level || '-';
                 return (
-                  <tr
-                    key={account.id}
-                    className={`${i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAF8]'} hover:bg-gray-50 cursor-pointer`}
-                    onClick={() => setExpandedId(expandedId === account.id ? null : account.id)}
-                  >
+                  <tr key={account.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAF8]'}>
                     <td className="px-4 py-3 text-sm font-medium text-gray-900">{account.display_name || 'No name'}</td>
                     <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -249,7 +289,7 @@ function AccountsTab() {
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">{gradeLevel}</td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{schoolName}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600 max-w-[200px] truncate">{schoolName}</td>
                     <td className="px-4 py-3 text-sm text-gray-600">
                       {new Date(account.created_at).toLocaleDateString()}
                     </td>
@@ -273,8 +313,45 @@ function AccountsTab() {
           </tbody>
         </table>
       </div>
-      {filtered.length > 100 && (
-        <p className="mt-3 text-sm text-gray-500 text-center">Showing 100 of {filtered.length} accounts</p>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4">
+          <p className="text-sm text-gray-500">
+            Showing {(page - 1) * perPage + 1}-{Math.min(page * perPage, filtered.length)} of {filtered.length}
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              Previous
+            </button>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const pageNum = page <= 3 ? i + 1 : page + i - 2;
+              if (pageNum > totalPages || pageNum < 1) return null;
+              return (
+                <button
+                  key={pageNum}
+                  onClick={() => setPage(pageNum)}
+                  className={`px-3 py-1.5 text-sm rounded-lg ${
+                    page === pageNum ? 'bg-[#2B3A67] text-white' : 'border border-gray-200 hover:bg-gray-50'
+                  }`}
+                >
+                  {pageNum}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -286,6 +363,8 @@ function EnrollmentsTab() {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [page, setPage] = useState(1);
+  const perPage = 50;
 
   useEffect(() => {
     async function load() {
@@ -307,13 +386,37 @@ function EnrollmentsTab() {
     if (statusFilter !== 'all' && e.status !== statusFilter) return false;
     if (!search) return true;
     const user = Array.isArray(e.user) ? e.user[0] : e.user;
+    const course = Array.isArray(e.course) ? e.course[0] : e.course;
     const s = search.toLowerCase();
-    return (user?.display_name?.toLowerCase().includes(s) || user?.email?.toLowerCase().includes(s));
+    return (
+      user?.display_name?.toLowerCase().includes(s) ||
+      course?.title?.toLowerCase().includes(s)
+    );
   });
+
+  const totalPages = Math.ceil(filtered.length / perPage);
+  const paginatedData = filtered.slice((page - 1) * perPage, page * perPage);
 
   const activeCount = enrollments.filter(e => e.status === 'active').length;
   const completedCount = enrollments.filter(e => e.status === 'completed').length;
   const droppedCount = enrollments.filter(e => e.status === 'dropped').length;
+  const avgProgress = enrollments.length > 0
+    ? Math.round(enrollments.reduce((sum, e) => sum + (e.progress_pct || 0), 0) / enrollments.length)
+    : 0;
+
+  const exportCSV = () => {
+    let csv = 'User,Course,Enrolled,Progress,Status,Completed\n';
+    filtered.forEach(e => {
+      const user = Array.isArray(e.user) ? e.user[0] : e.user;
+      const course = Array.isArray(e.course) ? e.course[0] : e.course;
+      csv += `"${user?.display_name || ''}","${course?.title || ''}",${new Date(e.created_at).toLocaleDateString()},${e.progress_pct || 0}%,${e.status},${e.completed_at ? new Date(e.completed_at).toLocaleDateString() : ''}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `enrollments-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  };
 
   if (isLoading) {
     return <div className="py-8 text-center text-gray-500">Loading enrollments...</div>;
@@ -322,10 +425,11 @@ function EnrollmentsTab() {
   return (
     <div>
       {/* Stats Row */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-4 gap-4 mb-6">
         <StatCard label="Active" value={activeCount} icon={BookOpen} />
         <StatCard label="Completed" value={completedCount} icon={Check} />
         <StatCard label="Dropped" value={droppedCount} icon={X} />
+        <StatCard label="Avg Progress" value={`${avgProgress}%`} icon={TrendingUp} />
       </div>
 
       {/* Filter Bar */}
@@ -334,23 +438,26 @@ function EnrollmentsTab() {
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Search by user..."
+            placeholder="Search by user or course..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
           />
         </div>
         <select
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 focus:outline-none"
+          onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
+          className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 bg-white"
         >
           <option value="all">All Status</option>
           <option value="active">Active</option>
           <option value="completed">Completed</option>
           <option value="dropped">Dropped</option>
         </select>
-        <button className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-2">
+        <button
+          onClick={exportCSV}
+          className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-2"
+        >
           <Download size={16} />
           Export CSV
         </button>
@@ -369,23 +476,20 @@ function EnrollmentsTab() {
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {filtered.length === 0 ? (
+            {paginatedData.length === 0 ? (
               <tr>
                 <td colSpan={5} className="py-8 text-center text-gray-500">No enrollments found</td>
               </tr>
             ) : (
-              filtered.slice(0, 50).map((enrollment, i) => {
+              paginatedData.map((enrollment, i) => {
                 const user = Array.isArray(enrollment.user) ? enrollment.user[0] : enrollment.user;
                 const course = Array.isArray(enrollment.course) ? enrollment.course[0] : enrollment.course;
                 return (
                   <tr key={enrollment.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAF8]'}>
                     <td className="px-4 py-3">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{user?.display_name || 'Unknown'}</p>
-                        <p className="text-xs text-gray-500">{user?.email}</p>
-                      </div>
+                      <p className="text-sm font-medium text-gray-900">{user?.display_name || 'Unknown'}</p>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{course?.title || 'Unknown'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600 max-w-[200px] truncate">{course?.title || 'Unknown'}</td>
                     <td className="px-4 py-3 text-sm text-gray-600">
                       {new Date(enrollment.created_at).toLocaleDateString()}
                     </td>
@@ -394,7 +498,7 @@ function EnrollmentsTab() {
                         <div className="w-20 h-2 bg-gray-100 rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full"
-                            style={{ width: `${enrollment.progress_pct || 0}%`, backgroundColor: '#E8B84B' }}
+                            style={{ width: `${enrollment.progress_pct || 0}%`, backgroundColor: enrollment.status === 'completed' ? '#16A34A' : '#E8B84B' }}
                           />
                         </div>
                         <span className="text-xs text-gray-500">{enrollment.progress_pct || 0}%</span>
@@ -416,6 +520,31 @@ function EnrollmentsTab() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4">
+          <p className="text-sm text-gray-500">
+            Showing {(page - 1) * perPage + 1}-{Math.min(page * perPage, filtered.length)} of {filtered.length}
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -425,6 +554,8 @@ function CertificatesTab() {
   const [certificates, setCertificates] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const perPage = 50;
 
   useEffect(() => {
     async function load() {
@@ -443,6 +574,11 @@ function CertificatesTab() {
   }, []);
 
   const totalPdHours = certificates.reduce((sum, c) => sum + (c.pd_hours || 0), 0);
+  const thisMonthCerts = certificates.filter(c => {
+    const issued = new Date(c.issued_at);
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+    return issued > thirtyDaysAgo;
+  }).length;
 
   const filtered = certificates.filter(c => {
     if (!search) return true;
@@ -451,11 +587,27 @@ function CertificatesTab() {
     const s = search.toLowerCase();
     return (
       user?.display_name?.toLowerCase().includes(s) ||
-      user?.email?.toLowerCase().includes(s) ||
       course?.title?.toLowerCase().includes(s) ||
       c.verification_code?.toLowerCase().includes(s)
     );
   });
+
+  const totalPages = Math.ceil(filtered.length / perPage);
+  const paginatedData = filtered.slice((page - 1) * perPage, page * perPage);
+
+  const exportCSV = () => {
+    let csv = 'User,Course,PD Hours,Issued Date,Verification Code\n';
+    filtered.forEach(c => {
+      const user = Array.isArray(c.user) ? c.user[0] : c.user;
+      const course = Array.isArray(c.course) ? c.course[0] : c.course;
+      csv += `"${user?.display_name || ''}","${course?.title || ''}",${c.pd_hours || 0},${c.issued_at ? new Date(c.issued_at).toLocaleDateString() : ''},${c.verification_code || ''}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `certificates-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+  };
 
   if (isLoading) {
     return <div className="py-8 text-center text-gray-500">Loading certificates...</div>;
@@ -464,9 +616,11 @@ function CertificatesTab() {
   return (
     <div>
       {/* Stats Row */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
+      <div className="grid grid-cols-4 gap-4 mb-6">
         <StatCard label="Total Certificates" value={certificates.length} icon={Award} />
-        <StatCard label="Total PD Hours Awarded" value={totalPdHours} icon={Clock} />
+        <StatCard label="Total PD Hours" value={totalPdHours} icon={Clock} />
+        <StatCard label="This Month" value={thisMonthCerts} icon={Calendar} trend="up" />
+        <StatCard label="Avg Hours/Cert" value={certificates.length > 0 ? (totalPdHours / certificates.length).toFixed(1) : '0'} icon={TrendingUp} />
       </div>
 
       {/* Filter Bar */}
@@ -475,15 +629,18 @@ function CertificatesTab() {
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
             type="text"
-            placeholder="Search by user, course, or code..."
+            placeholder="Search by user, course, or verification code..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#E8B84B]/50"
           />
         </div>
-        <button className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-2">
+        <button
+          onClick={exportCSV}
+          className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:bg-gray-50 flex items-center gap-2"
+        >
           <Download size={16} />
-          Bulk Download
+          Export CSV
         </button>
       </div>
 
@@ -497,39 +654,33 @@ function CertificatesTab() {
               <TableHeader>PD Hours</TableHeader>
               <TableHeader sortable>Issued</TableHeader>
               <TableHeader>Verification Code</TableHeader>
-              <TableHeader>Actions</TableHeader>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
-            {filtered.length === 0 ? (
+            {paginatedData.length === 0 ? (
               <tr>
-                <td colSpan={6} className="py-8 text-center text-gray-500">No certificates found</td>
+                <td colSpan={5} className="py-8 text-center text-gray-500">No certificates found</td>
               </tr>
             ) : (
-              filtered.slice(0, 50).map((cert, i) => {
+              paginatedData.map((cert, i) => {
                 const user = Array.isArray(cert.user) ? cert.user[0] : cert.user;
                 const course = Array.isArray(cert.course) ? cert.course[0] : cert.course;
                 return (
                   <tr key={cert.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAF8]'}>
                     <td className="px-4 py-3">
-                      <div>
-                        <p className="text-sm font-medium text-gray-900">{user?.display_name || 'Unknown'}</p>
-                        <p className="text-xs text-gray-500">{user?.email}</p>
-                      </div>
+                      <p className="text-sm font-medium text-gray-900">{user?.display_name || 'Unknown'}</p>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600">{course?.title || 'Unknown'}</td>
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{cert.pd_hours || 0}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600 max-w-[200px] truncate">{course?.title || 'Unknown'}</td>
+                    <td className="px-4 py-3">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded bg-green-100 text-green-700 text-sm font-medium">
+                        {cert.pd_hours || 0} hrs
+                      </span>
+                    </td>
                     <td className="px-4 py-3 text-sm text-gray-600">
                       {cert.issued_at ? new Date(cert.issued_at).toLocaleDateString() : '-'}
                     </td>
                     <td className="px-4 py-3">
-                      <code className="text-xs bg-gray-100 px-2 py-1 rounded">{cert.verification_code || '-'}</code>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-2">
-                        <button className="text-xs text-blue-600 hover:underline">Download</button>
-                        <button className="text-xs text-red-600 hover:underline">Revoke</button>
-                      </div>
+                      <code className="text-xs bg-gray-100 px-2 py-1 rounded font-mono">{cert.verification_code || '-'}</code>
                     </td>
                   </tr>
                 );
@@ -538,43 +689,358 @@ function CertificatesTab() {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-between mt-4">
+          <p className="text-sm text-gray-500">
+            Showing {(page - 1) * perPage + 1}-{Math.min(page * perPage, filtered.length)} of {filtered.length}
+          </p>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              Previous
+            </button>
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 // REPORTS TAB
 function ReportsTab() {
+  const [isGenerating, setIsGenerating] = useState<string | null>(null);
+  const [reportData, setReportData] = useState<any>(null);
+  const [selectedReport, setSelectedReport] = useState<string | null>(null);
+  const [reportFilters, setReportFilters] = useState({
+    state: '',
+    org: '',
+    dateFrom: '',
+    dateTo: '',
+  });
+
   const reports = [
-    { id: 'school-pd', title: 'School PD Summary', description: 'Generate a PD summary report for a specific school with date range filtering.' },
-    { id: 'district', title: 'District Roll-Up', description: 'Aggregate report across multiple schools in a district.' },
-    { id: 'effectiveness', title: 'Course Effectiveness', description: 'Completion rate, avg rating, and drop-off funnel for a course.' },
-    { id: 'compliance', title: 'Compliance Report', description: 'Who has/hasn\'t completed required courses for a school.' },
-    { id: 'engagement', title: 'Engagement Report', description: 'Active users, return rate, and peak times for a date range.' },
-    { id: 'ratings', title: 'Course Ratings', description: 'Compare all courses by average rating and trends.' },
-    { id: 'demographics', title: 'Demographic Analysis', description: 'Break down data by state, grade level, gender, or experience.' },
-    { id: 'stress', title: 'Stress Trends', description: 'Aggregate stress data over time, sliceable by school/role/region.' },
+    { id: 'user-summary', title: 'User Summary', description: 'Complete list of all users with their roles, schools, and enrollment status.' },
+    { id: 'enrollment-report', title: 'Enrollment Report', description: 'All enrollments with user info, course, status, and progress.' },
+    { id: 'completion-report', title: 'Completion Report', description: 'All completed courses with user info and PD hours earned.' },
+    { id: 'pd-hours', title: 'PD Hours Report', description: 'Summary of PD hours by user, course, and date.' },
+    { id: 'course-performance', title: 'Course Performance', description: 'Completion rates and enrollment counts for all courses.' },
+    { id: 'demographics', title: 'Demographic Analysis', description: 'User breakdown by role, grade level, experience, and state.' },
+    { id: 'stress-wellness', title: 'Stress & Wellness', description: 'Stress scores by user with improvement tracking.' },
+    { id: 'engagement', title: 'Engagement Report', description: 'Activity patterns by day, hour, and monthly active users.' },
+    { id: 'goals-report', title: 'Goals Report', description: 'User goals distribution and alignment.' },
+    { id: 'state-rollup', title: 'State Roll-Up', description: 'Aggregated metrics by state for geographic analysis.' },
   ];
+
+  const generateReport = async (reportId: string) => {
+    setIsGenerating(reportId);
+    setSelectedReport(reportId);
+
+    try {
+      const params = new URLSearchParams();
+      if (reportFilters.state) params.set('state', reportFilters.state);
+      if (reportFilters.org) params.set('org', reportFilters.org);
+      if (reportFilters.dateFrom) params.set('date_from', reportFilters.dateFrom);
+      if (reportFilters.dateTo) params.set('date_to', reportFilters.dateTo);
+
+      const res = await fetch(`/api/tdi-admin/analytics?${params.toString()}`);
+      const data = await res.json();
+      setReportData(data);
+    } catch (error) {
+      console.error('Error generating report:', error);
+    }
+    setIsGenerating(null);
+  };
+
+  const downloadCSV = (reportId: string) => {
+    if (!reportData) return;
+
+    let csvContent = '';
+    let filename = `${reportId}-${new Date().toISOString().split('T')[0]}.csv`;
+
+    switch (reportId) {
+      case 'user-summary':
+        csvContent = 'Total Users,Onboarded,Teachers,School Leaders,Coaches,Paras\n';
+        const roleData = reportData.roleDistribution || [];
+        const teachers = roleData.find((r: any) => r.role === 'Teacher')?.count || 0;
+        const leaders = roleData.find((r: any) => r.role === 'School Leader')?.count || 0;
+        const coaches = roleData.find((r: any) => r.role === 'Coach')?.count || 0;
+        const paras = roleData.find((r: any) => r.role === 'Para')?.count || 0;
+        csvContent += `${reportData.stats?.totalUsers || 0},${reportData.stats?.totalUsers || 0},${teachers},${leaders},${coaches},${paras}\n`;
+        break;
+
+      case 'enrollment-report':
+        csvContent = 'Month,Enrollments,Completions,Completion Rate\n';
+        const enrollTS = reportData.enrollmentsTimeSeries || [];
+        const compTS = reportData.completionsTimeSeries || [];
+        enrollTS.forEach((e: any, i: number) => {
+          const comp = compTS[i]?.value || 0;
+          const rate = e.value > 0 ? Math.round((comp / e.value) * 100) : 0;
+          csvContent += `${e.month},${e.value},${comp},${rate}%\n`;
+        });
+        break;
+
+      case 'pd-hours':
+        csvContent = 'Month,PD Hours Awarded\n';
+        (reportData.pdTimeSeries || []).forEach((p: any) => {
+          csvContent += `${p.month},${p.value}\n`;
+        });
+        break;
+
+      case 'course-performance':
+        csvContent = 'Course,Enrollments,Completions,Completion Rate\n';
+        (reportData.topCourses || []).forEach((c: any) => {
+          csvContent += `"${c.title}",${c.enrollments},${c.completions},${c.completionRate}%\n`;
+        });
+        break;
+
+      case 'demographics':
+        csvContent = 'Category,Segment,Count\n';
+        (reportData.roleDistribution || []).forEach((r: any) => csvContent += `Role,${r.role},${r.count}\n`);
+        (reportData.gradeDistribution || []).forEach((g: any) => csvContent += `Grade,${g.grade},${g.count}\n`);
+        (reportData.experienceDistribution || []).forEach((e: any) => csvContent += `Experience,${e.range},${e.count}\n`);
+        (reportData.stateDistribution || []).forEach((s: any) => csvContent += `State,${s.state},${s.count}\n`);
+        break;
+
+      case 'stress-wellness':
+        csvContent = 'Role,Initial Stress,Current Stress,Improvement\n';
+        (reportData.stressRoleComparison || []).forEach((s: any) => {
+          const improvement = s.avgInitial - s.avgCurrent;
+          csvContent += `${s.role},${s.avgInitial},${s.avgCurrent},${improvement.toFixed(1)}\n`;
+        });
+        break;
+
+      case 'engagement':
+        csvContent = 'Day,Activity Count\n';
+        (reportData.activityByDay || []).forEach((d: any) => csvContent += `${d.day},${d.count}\n`);
+        csvContent += '\nHour,Activity Count\n';
+        (reportData.activityByHour || []).forEach((h: any) => csvContent += `${h.hour},${h.count}\n`);
+        break;
+
+      case 'goals-report':
+        csvContent = 'Goal,User Count\n';
+        (reportData.goalAlignment || []).forEach((g: any) => csvContent += `"${g.goal}",${g.count}\n`);
+        break;
+
+      case 'state-rollup':
+        csvContent = 'State,User Count\n';
+        (reportData.stateDistribution || []).forEach((s: any) => csvContent += `${s.state},${s.count}\n`);
+        break;
+
+      default:
+        csvContent = 'Report data not available';
+    }
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
 
   return (
     <div>
-      <p className="text-sm text-gray-600 mb-6">Select a report template to generate. Each report can be filtered by date range and exported as CSV or PDF.</p>
+      {/* Filter Bar for Reports */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+        <p className="text-sm font-medium text-gray-700 mb-3">Report Filters (optional)</p>
+        <div className="flex flex-wrap gap-3">
+          <input
+            type="text"
+            placeholder="State (e.g., TX, CA)"
+            value={reportFilters.state}
+            onChange={(e) => setReportFilters({ ...reportFilters, state: e.target.value })}
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+          />
+          <input
+            type="text"
+            placeholder="School/Organization"
+            value={reportFilters.org}
+            onChange={(e) => setReportFilters({ ...reportFilters, org: e.target.value })}
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+          />
+          <input
+            type="date"
+            value={reportFilters.dateFrom}
+            onChange={(e) => setReportFilters({ ...reportFilters, dateFrom: e.target.value })}
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+          />
+          <span className="flex items-center text-gray-400">to</span>
+          <input
+            type="date"
+            value={reportFilters.dateTo}
+            onChange={(e) => setReportFilters({ ...reportFilters, dateTo: e.target.value })}
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+          />
+          {(reportFilters.state || reportFilters.org || reportFilters.dateFrom || reportFilters.dateTo) && (
+            <button
+              onClick={() => setReportFilters({ state: '', org: '', dateFrom: '', dateTo: '' })}
+              className="px-3 py-2 text-sm text-red-600 hover:text-red-700"
+            >
+              Clear Filters
+            </button>
+          )}
+        </div>
+      </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <p className="text-sm text-gray-600 mb-6">Select a report template to generate. Reports can be filtered and exported as CSV.</p>
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {reports.map((report) => (
-          <div key={report.id} className="bg-white rounded-lg border border-gray-200 p-5 hover:border-[#E8B84B] hover:shadow-sm transition-all">
+          <div
+            key={report.id}
+            className={`bg-white rounded-lg border p-5 transition-all ${
+              selectedReport === report.id ? 'border-[#E8B84B] shadow-sm' : 'border-gray-200 hover:border-[#E8B84B] hover:shadow-sm'
+            }`}
+          >
             <h3 className="font-semibold text-gray-900 mb-2" style={{ fontFamily: "'DM Sans', sans-serif" }}>
               {report.title}
             </h3>
             <p className="text-sm text-gray-500 mb-4">{report.description}</p>
-            <button
-              className="w-full px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors"
-              style={{ backgroundColor: '#E8B84B' }}
-            >
-              Generate Report
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => generateReport(report.id)}
+                disabled={isGenerating === report.id}
+                className="flex-1 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors flex items-center justify-center gap-2"
+                style={{ backgroundColor: '#E8B84B' }}
+              >
+                {isGenerating === report.id ? (
+                  <>
+                    <RefreshCw className="animate-spin" size={14} />
+                    Generating...
+                  </>
+                ) : (
+                  'Generate'
+                )}
+              </button>
+              {selectedReport === report.id && reportData && (
+                <button
+                  onClick={() => downloadCSV(report.id)}
+                  className="px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <Download size={14} />
+                  CSV
+                </button>
+              )}
+            </div>
           </div>
         ))}
       </div>
+
+      {/* Report Preview */}
+      {selectedReport && reportData && (
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-semibold text-gray-900">
+              Report Preview: {reports.find(r => r.id === selectedReport)?.title}
+            </h3>
+            <button
+              onClick={() => downloadCSV(selectedReport)}
+              className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2"
+              style={{ backgroundColor: '#5BBEC4' }}
+            >
+              <Download size={14} />
+              Download CSV
+            </button>
+          </div>
+
+          {/* Preview content based on report type */}
+          {selectedReport === 'user-summary' && (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="p-4 bg-gray-50 rounded-lg">
+                <p className="text-2xl font-bold text-[#2B3A67]">{reportData.stats?.totalUsers || 0}</p>
+                <p className="text-sm text-gray-500">Total Users</p>
+              </div>
+              {(reportData.roleDistribution || []).slice(0, 3).map((r: any) => (
+                <div key={r.role} className="p-4 bg-gray-50 rounded-lg">
+                  <p className="text-2xl font-bold text-[#2B3A67]">{r.count}</p>
+                  <p className="text-sm text-gray-500">{r.role}s</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {selectedReport === 'course-performance' && (
+            <table className="w-full">
+              <thead className="bg-[#FAFAF8]">
+                <tr>
+                  <th className="text-left px-4 py-2 text-xs font-medium text-gray-500 uppercase">Course</th>
+                  <th className="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">Enrolled</th>
+                  <th className="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">Completed</th>
+                  <th className="text-right px-4 py-2 text-xs font-medium text-gray-500 uppercase">Rate</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {(reportData.topCourses || []).slice(0, 5).map((c: any) => (
+                  <tr key={c.courseId}>
+                    <td className="px-4 py-2 text-sm">{c.title}</td>
+                    <td className="px-4 py-2 text-sm text-right">{c.enrollments}</td>
+                    <td className="px-4 py-2 text-sm text-right">{c.completions}</td>
+                    <td className="px-4 py-2 text-sm text-right font-medium">{c.completionRate}%</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+
+          {selectedReport === 'demographics' && (
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <h4 className="font-medium text-gray-700 mb-2">By Role</h4>
+                {(reportData.roleDistribution || []).map((r: any) => (
+                  <div key={r.role} className="flex justify-between py-1 border-b border-gray-100">
+                    <span className="text-sm text-gray-600">{r.role}</span>
+                    <span className="text-sm font-medium">{r.count}</span>
+                  </div>
+                ))}
+              </div>
+              <div>
+                <h4 className="font-medium text-gray-700 mb-2">By Grade</h4>
+                {(reportData.gradeDistribution || []).map((g: any) => (
+                  <div key={g.grade} className="flex justify-between py-1 border-b border-gray-100">
+                    <span className="text-sm text-gray-600">{g.grade}</span>
+                    <span className="text-sm font-medium">{g.count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {selectedReport === 'stress-wellness' && (
+            <div>
+              <div className="grid grid-cols-3 gap-4 mb-4">
+                <div className="p-4 bg-red-50 rounded-lg">
+                  <p className="text-2xl font-bold text-red-600">{reportData.stats?.avgStressInitial || 'N/A'}</p>
+                  <p className="text-sm text-gray-500">Avg Initial Stress</p>
+                </div>
+                <div className="p-4 bg-green-50 rounded-lg">
+                  <p className="text-2xl font-bold text-green-600">{reportData.stats?.avgStressCurrent || 'N/A'}</p>
+                  <p className="text-sm text-gray-500">Avg Current Stress</p>
+                </div>
+                <div className="p-4 bg-blue-50 rounded-lg">
+                  <p className="text-2xl font-bold text-blue-600">{reportData.stats?.improvementRate || 0}%</p>
+                  <p className="text-sm text-gray-500">Improved</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!['user-summary', 'course-performance', 'demographics', 'stress-wellness'].includes(selectedReport) && (
+            <p className="text-sm text-gray-500">Preview data loaded. Click Download CSV to export the full report.</p>
+          )}
+        </div>
+      )}
 
       <div className="mt-8 p-4 rounded-lg border border-gray-200 bg-gray-50">
         <h3 className="font-medium text-gray-900 mb-2">Schedule Reports</h3>
@@ -588,212 +1054,767 @@ function ReportsTab() {
   );
 }
 
+// Color palette for charts
+const CHART_COLORS = ['#5BBEC4', '#E8B84B', '#8B5CF6', '#16A34A', '#EF4444', '#F59E0B', '#3B82F6', '#EC4899'];
+
 // ANALYTICS TAB
 function AnalyticsTab() {
-  const [stats, setStats] = useState<any>(null);
   const [analytics, setAnalytics] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState<'30' | '60' | '90'>('90');
+  const [filters, setFilters] = useState({
+    state: '',
+    org: '',
+    role: 'all',
+    gradeLevel: 'all',
+    gender: 'all',
+    language: 'all',
+  });
+  const [activeSection, setActiveSection] = useState<string>('overview');
 
   useEffect(() => {
     async function load() {
-      const [statsData, analyticsRes] = await Promise.all([
-        getAdminStats(),
-        fetch('/api/tdi-admin/analytics').then(r => r.json()),
-      ]);
-      setStats(statsData);
-      setAnalytics(analyticsRes);
+      setIsLoading(true);
+      const params = new URLSearchParams();
+      if (filters.state) params.set('state', filters.state);
+      if (filters.org) params.set('org', filters.org);
+      if (filters.role !== 'all') params.set('role', filters.role);
+      if (filters.gradeLevel !== 'all') params.set('grade_level', filters.gradeLevel);
+      if (filters.gender !== 'all') params.set('gender', filters.gender);
+      if (filters.language !== 'all') params.set('language', filters.language);
+
+      const res = await fetch(`/api/tdi-admin/analytics?${params.toString()}`);
+      const data = await res.json();
+      setAnalytics(data);
       setIsLoading(false);
     }
     load();
-  }, []);
+  }, [filters]);
+
+  const resetFilters = () => setFilters({ state: '', org: '', role: 'all', gradeLevel: 'all', gender: 'all', language: 'all' });
+
+  const activeFilterCount = Object.entries(filters).filter(([, v]) => v && v !== 'all').length;
+  const stats = analytics?.stats || {};
+  const insights = analytics?.insights || {};
+  const filterOptions = analytics?.filterOptions || { states: [], orgs: [] };
 
   if (isLoading) {
-    return <div className="py-8 text-center text-gray-500">Loading analytics...</div>;
+    return (
+      <div className="py-12 text-center">
+        <RefreshCw className="animate-spin mx-auto text-gray-400 mb-3" size={24} />
+        <p className="text-gray-500">Loading analytics...</p>
+      </div>
+    );
   }
-
-  const insights = analytics?.insights || {};
 
   return (
     <div>
-      {/* Real-time Stats */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-            <span className="text-xs text-gray-500 uppercase tracking-wide">Live</span>
+      {/* Sticky Filter Bar */}
+      <div className="sticky top-0 z-10 bg-[#FAFAF8] -mx-4 md:-mx-8 px-4 md:px-8 py-3 mb-6 border-b border-gray-200">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Filter size={16} />
+            <span>Filters:</span>
           </div>
-          <p className="text-3xl font-bold" style={{ color: '#2B3A67' }}>{insights.totalUsers || 0}</p>
-          <p className="text-sm text-gray-500">Total Users</p>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <p className="text-3xl font-bold" style={{ color: '#2B3A67' }}>{stats?.totalEnrollments || 0}</p>
-          <p className="text-sm text-gray-500">Total Enrollments</p>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <p className="text-3xl font-bold" style={{ color: '#2B3A67' }}>{stats?.totalCompletions || 0}</p>
-          <p className="text-sm text-gray-500">Total Completions</p>
+
+          {/* State Filter */}
+          <select
+            value={filters.state}
+            onChange={(e) => setFilters({ ...filters, state: e.target.value })}
+            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+          >
+            <option value="">All States</option>
+            {filterOptions.states.map((s: string) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+
+          {/* Organization Filter */}
+          <select
+            value={filters.org}
+            onChange={(e) => setFilters({ ...filters, org: e.target.value })}
+            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50 max-w-[200px]"
+          >
+            <option value="">All Schools/Orgs</option>
+            {filterOptions.orgs.slice(0, 50).map((o: string) => (
+              <option key={o} value={o}>{o.length > 30 ? o.slice(0, 30) + '...' : o}</option>
+            ))}
+          </select>
+
+          {/* Role Filter */}
+          <select
+            value={filters.role}
+            onChange={(e) => setFilters({ ...filters, role: e.target.value })}
+            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+          >
+            <option value="all">All Roles</option>
+            <option value="teacher">Teacher</option>
+            <option value="school_leader">School Leader</option>
+            <option value="coach">Coach</option>
+            <option value="para">Para</option>
+          </select>
+
+          {/* Grade Level Filter */}
+          <select
+            value={filters.gradeLevel}
+            onChange={(e) => setFilters({ ...filters, gradeLevel: e.target.value })}
+            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+          >
+            <option value="all">All Grades</option>
+            <option value="Pre-K">Pre-K</option>
+            <option value="K-2">K-2</option>
+            <option value="3-5">3-5</option>
+            <option value="6-8">6-8</option>
+            <option value="9-12">9-12</option>
+            <option value="Higher Ed">Higher Ed</option>
+          </select>
+
+          {/* Gender Filter */}
+          <select
+            value={filters.gender}
+            onChange={(e) => setFilters({ ...filters, gender: e.target.value })}
+            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+          >
+            <option value="all">All Genders</option>
+            <option value="female">Female</option>
+            <option value="male">Male</option>
+            <option value="non_binary">Non-Binary</option>
+            <option value="prefer_not_to_say">Prefer Not to Say</option>
+          </select>
+
+          {/* Language Filter */}
+          <select
+            value={filters.language}
+            onChange={(e) => setFilters({ ...filters, language: e.target.value })}
+            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+          >
+            <option value="all">All Languages</option>
+            <option value="english">English</option>
+            <option value="spanish">Spanish</option>
+          </select>
+
+          {/* Reset Button */}
+          {activeFilterCount > 0 && (
+            <button
+              onClick={resetFilters}
+              className="px-3 py-1.5 text-sm text-red-600 hover:text-red-700 flex items-center gap-1"
+            >
+              <X size={14} />
+              Clear ({activeFilterCount})
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Time Range Toggle */}
-      <div className="flex gap-2 mb-4">
-        {(['30', '60', '90'] as const).map((range) => (
+      {/* AI Insights Box */}
+      <div className="bg-gradient-to-r from-[#2B3A67] to-[#3d4f7a] rounded-lg p-5 text-white mb-8">
+        <div className="flex items-center gap-2 mb-3">
+          <Lightbulb size={18} />
+          <h3 className="font-semibold">AI Insights</h3>
+          {activeFilterCount > 0 && (
+            <span className="ml-2 px-2 py-0.5 bg-white/20 rounded text-xs">Filtered View</span>
+          )}
+        </div>
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-white/90">
+          <div>
+            <p className="mb-2">
+              {insights.enrollmentChange >= 0 ? '📈' : '📉'} Enrollments{' '}
+              <strong className="text-white">{insights.enrollmentChange >= 0 ? 'up' : 'down'} {Math.abs(insights.enrollmentChange || 0)}%</strong> this month
+            </p>
+            <p className="text-white/70 text-xs">{insights.enrollmentsThisMonth || 0} vs {insights.enrollmentsLastMonth || 0} last month</p>
+          </div>
+          <div>
+            <p className="mb-2">
+              🎓 Completion rate: <strong className="text-white">{insights.completionRate || 0}%</strong>
+            </p>
+            <p className="text-white/70 text-xs">{stats.totalCompletions || 0} of {stats.totalEnrollments || 0} enrollments completed</p>
+          </div>
+          <div>
+            <p className="mb-2">
+              📜 PD Hours: <strong className="text-white">{stats.totalPdHours || 0}</strong> total awarded
+            </p>
+            <p className="text-white/70 text-xs">Most popular: {insights.mostPopularCourse || 'N/A'}</p>
+          </div>
+          <div>
+            <p className="mb-2">
+              😌 Stress improved: <strong className="text-white">{stats.improvementRate || 0}%</strong> of users
+            </p>
+            <p className="text-white/70 text-xs">Avg reduction: {insights.avgStressReduction || 0} points</p>
+          </div>
+          <div>
+            <p className="mb-2">
+              ⏰ Peak activity: <strong className="text-white">{insights.peakDay || 'N/A'}</strong> at <strong className="text-white">{insights.peakHour || 'N/A'}</strong>
+            </p>
+            <p className="text-white/70 text-xs">Most requested goal: {insights.mostRequestedGoal || 'N/A'}</p>
+          </div>
+          {insights.lowestCompletionRate < 50 && insights.lowestCompletionCourse && (
+            <div>
+              <p className="mb-2">
+                ⚠️ Needs attention: <strong className="text-white">{insights.lowestCompletionCourse}</strong>
+              </p>
+              <p className="text-white/70 text-xs">{insights.lowestCompletionRate}% completion rate</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Stat Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <StatCard label="Total Users" value={stats.totalUsers || 0} icon={Users} />
+        <StatCard label="Total Enrollments" value={stats.totalEnrollments || 0} icon={BookOpen} />
+        <StatCard label="Completions" value={stats.totalCompletions || 0} icon={Award} />
+        <StatCard label="Completion Rate" value={`${stats.completionRate || 0}%`} icon={TrendingUp} trend={stats.completionRate > 50 ? 'up' : null} />
+        <StatCard label="PD Hours" value={stats.totalPdHours || 0} icon={Clock} />
+        <StatCard label="Avg Stress" value={stats.avgStressCurrent?.toFixed(1) || 'N/A'} icon={Activity} trend={stats.stressImproved ? 'up' : null} />
+      </div>
+
+      {/* Section Toggle */}
+      <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+        {[
+          { id: 'overview', label: 'Overview' },
+          { id: 'courses', label: 'Courses' },
+          { id: 'demographics', label: 'Demographics' },
+          { id: 'stress', label: 'Stress & Wellness' },
+          { id: 'engagement', label: 'Engagement' },
+        ].map(section => (
           <button
-            key={range}
-            onClick={() => setTimeRange(range)}
-            className={`px-3 py-1.5 text-sm rounded-lg transition-colors ${
-              timeRange === range
-                ? 'bg-[#5BBEC4] text-white'
+            key={section.id}
+            onClick={() => setActiveSection(section.id)}
+            className={`px-4 py-2 text-sm font-medium rounded-lg whitespace-nowrap transition-colors ${
+              activeSection === section.id
+                ? 'bg-[#2B3A67] text-white'
                 : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
             }`}
           >
-            {range} Days
+            {section.label}
           </button>
         ))}
       </div>
 
-      {/* Charts */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
-        {/* Enrollments Over Time */}
-        <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <h3 className="font-semibold text-gray-900 mb-4">Enrollments Over Time</h3>
-          <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={analytics?.enrollmentsTimeSeries || []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-                <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-                <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#5BBEC4" strokeWidth={2} dot={{ fill: '#5BBEC4' }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Completions Over Time */}
-        <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <h3 className="font-semibold text-gray-900 mb-4">Completions Over Time</h3>
-          <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={analytics?.completionsTimeSeries || []}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-                <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-                <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#16A34A" strokeWidth={2} dot={{ fill: '#16A34A' }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      {/* Top Courses Bar Chart */}
-      <div className="bg-white rounded-lg border border-gray-200 p-5 mb-8">
-        <h3 className="font-semibold text-gray-900 mb-4">Top Courses by Enrollment</h3>
-        {analytics?.topCourses?.length > 0 ? (
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={analytics.topCourses} layout="vertical" margin={{ left: 20, right: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis type="number" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-                <YAxis
-                  type="category"
-                  dataKey="title"
-                  tick={{ fontSize: 11 }}
-                  stroke="#9CA3AF"
-                  width={150}
-                  tickFormatter={(value) => value.length > 20 ? value.slice(0, 20) + '...' : value}
-                />
-                <Tooltip />
-                <Bar dataKey="count" fill="#5BBEC4" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        ) : (
-          <p className="text-sm text-gray-500">No enrollment data available</p>
-        )}
-      </div>
-
-      {/* Stress Trends & Goal Alignment */}
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
-        {/* Stress Trends */}
-        <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <h3 className="font-semibold text-gray-900 mb-4">Stress Trends</h3>
-          {analytics?.stressTrends?.length > 0 ? (
-            <div className="h-48">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={analytics.stressTrends}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-                  <YAxis domain={[1, 10]} tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="avgScore" stroke="#E8B84B" strokeWidth={2} dot={{ fill: '#E8B84B' }} />
-                </LineChart>
-              </ResponsiveContainer>
+      {/* OVERVIEW SECTION */}
+      {activeSection === 'overview' && (
+        <div className="space-y-8">
+          {/* Time Series Charts */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Enrollments Over Time */}
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <h3 className="font-semibold text-gray-900 mb-4">Enrollments Over Time</h3>
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={analytics?.enrollmentsTimeSeries || []}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="value" stroke="#5BBEC4" strokeWidth={2} dot={{ fill: '#5BBEC4' }} name="Enrollments" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
-          ) : (
-            <p className="text-sm text-gray-500 text-center py-8">No stress data available</p>
-          )}
-        </div>
 
-        {/* Goal Alignment */}
-        <div className="bg-white rounded-lg border border-gray-200 p-5">
-          <h3 className="font-semibold text-gray-900 mb-4">Goal Alignment</h3>
-          {analytics?.goalAlignment?.length > 0 ? (
-            <div className="h-48">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={analytics.goalAlignment} layout="vertical" margin={{ left: 10, right: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis type="number" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-                  <YAxis
-                    type="category"
-                    dataKey="goal"
-                    tick={{ fontSize: 10 }}
-                    stroke="#9CA3AF"
-                    width={100}
-                  />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#8B5CF6" radius={[0, 4, 4, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+            {/* Completions Over Time */}
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <h3 className="font-semibold text-gray-900 mb-4">Completions Over Time</h3>
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={analytics?.completionsTimeSeries || []}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="value" stroke="#16A34A" strokeWidth={2} dot={{ fill: '#16A34A' }} name="Completions" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
             </div>
-          ) : (
-            <p className="text-sm text-gray-500 text-center py-8">No goal data available</p>
-          )}
-        </div>
-      </div>
 
-      {/* AI Insights */}
-      <div className="bg-gradient-to-r from-[#2B3A67] to-[#3d4f7a] rounded-lg p-5 text-white">
-        <div className="flex items-center gap-2 mb-3">
-          <Lightbulb size={18} />
-          <h3 className="font-semibold">AI Insights</h3>
+            {/* PD Hours Over Time */}
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <h3 className="font-semibold text-gray-900 mb-4">PD Hours Awarded Over Time</h3>
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analytics?.pdTimeSeries || []}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <Tooltip />
+                    <Bar dataKey="value" fill="#E8B84B" radius={[4, 4, 0, 0]} name="PD Hours" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Monthly Active Users */}
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <h3 className="font-semibold text-gray-900 mb-4">Monthly Active Users</h3>
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={analytics?.mauTimeSeries || []}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="users" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6' }} name="Active Users" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+          </div>
+
+          {/* Goal Alignment */}
+          <div className="bg-white rounded-lg border border-gray-200 p-5">
+            <h3 className="font-semibold text-gray-900 mb-4">User Goals Distribution</h3>
+            {analytics?.goalAlignment?.length > 0 ? (
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analytics.goalAlignment} layout="vertical" margin={{ left: 20, right: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis type="number" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <YAxis
+                      type="category"
+                      dataKey="goal"
+                      tick={{ fontSize: 11 }}
+                      stroke="#9CA3AF"
+                      width={140}
+                    />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#8B5CF6" radius={[0, 4, 4, 0]} name="Users" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 text-center py-8">No goal data available</p>
+            )}
+          </div>
         </div>
-        <div className="space-y-3 text-sm text-white/90">
-          <p>
-            {insights.enrollmentChange >= 0 ? '📈' : '📉'} Enrollments are{' '}
-            <strong>{insights.enrollmentChange >= 0 ? 'up' : 'down'} {Math.abs(insights.enrollmentChange)}%</strong> this month
-            ({insights.enrollmentsThisMonth} vs {insights.enrollmentsLastMonth} last month).
-          </p>
-          <p>
-            🎓 <strong>{insights.completionsThisMonth}</strong> new completions this month.
-            Overall completion rate is <strong>{insights.completionRate}%</strong>.
-          </p>
-          <p>
-            📜 <strong>{stats?.totalCertificates || 0}</strong> certificates issued,
-            awarding <strong>{insights.totalPdHours}</strong> total PD hours.
-          </p>
-          {insights.lowestCompletionCourse?.title !== 'N/A' && (
-            <p>
-              ⚠️ Course with highest drop-off: <strong>{insights.lowestCompletionCourse?.title}</strong> ({insights.lowestCompletionCourse?.rate}% completion rate).
-            </p>
-          )}
-          <p>
-            😌 Average stress score: <strong>{stats?.avgStressScore || 'N/A'}</strong> (1=great, 10=rough).
-          </p>
+      )}
+
+      {/* COURSES SECTION */}
+      {activeSection === 'courses' && (
+        <div className="space-y-8">
+          {/* Top Courses by Enrollment */}
+          <div className="bg-white rounded-lg border border-gray-200 p-5">
+            <h3 className="font-semibold text-gray-900 mb-4">Top Courses by Enrollment</h3>
+            {analytics?.topCourses?.length > 0 ? (
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analytics.topCourses} layout="vertical" margin={{ left: 20, right: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis type="number" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <YAxis
+                      type="category"
+                      dataKey="title"
+                      tick={{ fontSize: 11 }}
+                      stroke="#9CA3AF"
+                      width={180}
+                      tickFormatter={(value) => value.length > 25 ? value.slice(0, 25) + '...' : value}
+                    />
+                    <Tooltip />
+                    <Bar dataKey="enrollments" fill="#5BBEC4" radius={[0, 4, 4, 0]} name="Enrollments" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">No enrollment data available</p>
+            )}
+          </div>
+
+          {/* Course Completion Rates */}
+          <div className="bg-white rounded-lg border border-gray-200 p-5">
+            <h3 className="font-semibold text-gray-900 mb-4">Course Completion Rates</h3>
+            {analytics?.courseCompletionRates?.length > 0 ? (
+              <div className="h-80">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analytics.courseCompletionRates} layout="vertical" margin={{ left: 20, right: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 12 }} stroke="#9CA3AF" tickFormatter={(v) => `${v}%`} />
+                    <YAxis
+                      type="category"
+                      dataKey="title"
+                      tick={{ fontSize: 11 }}
+                      stroke="#9CA3AF"
+                      width={180}
+                      tickFormatter={(value) => value.length > 25 ? value.slice(0, 25) + '...' : value}
+                    />
+                    <Tooltip formatter={(value: number) => `${value}%`} />
+                    <Bar dataKey="completionRate" fill="#16A34A" radius={[0, 4, 4, 0]} name="Completion Rate" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500">No completion data available</p>
+            )}
+          </div>
+
+          {/* Course Details Table */}
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <div className="p-5 border-b border-gray-100">
+              <h3 className="font-semibold text-gray-900">Course Performance Details</h3>
+            </div>
+            <table className="w-full">
+              <thead className="bg-[#FAFAF8]">
+                <tr>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Course</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Enrolled</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Completed</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Rate</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {analytics?.topCourses?.slice(0, 10).map((course: any, i: number) => (
+                  <tr key={course.courseId} className={i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAF8]'}>
+                    <td className="px-4 py-3 text-sm text-gray-900">{course.title}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600 text-right">{course.enrollments}</td>
+                    <td className="px-4 py-3 text-sm text-gray-600 text-right">{course.completions}</td>
+                    <td className="px-4 py-3 text-right">
+                      <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${
+                        course.completionRate >= 70 ? 'bg-green-100 text-green-700' :
+                        course.completionRate >= 40 ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {course.completionRate}%
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* DEMOGRAPHICS SECTION */}
+      {activeSection === 'demographics' && (
+        <div className="space-y-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Role Distribution */}
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <h3 className="font-semibold text-gray-900 mb-4">Role Distribution</h3>
+              {analytics?.roleDistribution?.length > 0 ? (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={analytics.roleDistribution}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        dataKey="count"
+                        nameKey="role"
+                        label={({ role, percent }) => `${role} (${(percent * 100).toFixed(0)}%)`}
+                        labelLine={false}
+                      >
+                        {analytics.roleDistribution.map((_: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-8">No role data available</p>
+              )}
+            </div>
+
+            {/* Grade Level Distribution */}
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <h3 className="font-semibold text-gray-900 mb-4">Grade Level Distribution</h3>
+              {analytics?.gradeDistribution?.length > 0 ? (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={analytics.gradeDistribution}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="grade" tick={{ fontSize: 11 }} stroke="#9CA3AF" />
+                      <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="#5BBEC4" radius={[4, 4, 0, 0]} name="Users" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-8">No grade data available</p>
+              )}
+            </div>
+
+            {/* Experience Distribution */}
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <h3 className="font-semibold text-gray-900 mb-4">Years of Experience</h3>
+              {analytics?.experienceDistribution?.length > 0 ? (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={analytics.experienceDistribution}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="range" tick={{ fontSize: 11 }} stroke="#9CA3AF" />
+                      <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                      <Tooltip />
+                      <Bar dataKey="count" fill="#E8B84B" radius={[4, 4, 0, 0]} name="Users" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-8">No experience data available</p>
+              )}
+            </div>
+
+            {/* Gender Distribution */}
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <h3 className="font-semibold text-gray-900 mb-4">Gender Distribution</h3>
+              {analytics?.genderDistribution?.length > 0 ? (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={analytics.genderDistribution}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        dataKey="count"
+                        nameKey="gender"
+                        label={({ gender, percent }) => `${gender} (${(percent * 100).toFixed(0)}%)`}
+                        labelLine={false}
+                      >
+                        {analytics.genderDistribution.map((_: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-8">No gender data available</p>
+              )}
+            </div>
+          </div>
+
+          {/* State Distribution */}
+          <div className="bg-white rounded-lg border border-gray-200 p-5">
+            <h3 className="font-semibold text-gray-900 mb-4">Geographic Distribution (Top 10 States)</h3>
+            {analytics?.stateDistribution?.length > 0 ? (
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analytics.stateDistribution} layout="vertical" margin={{ left: 10, right: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis type="number" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <YAxis type="category" dataKey="state" tick={{ fontSize: 11 }} stroke="#9CA3AF" width={80} />
+                    <Tooltip />
+                    <Bar dataKey="count" fill="#3B82F6" radius={[0, 4, 4, 0]} name="Users" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 text-center py-8">No state data available</p>
+            )}
+          </div>
+
+          {/* Language Distribution */}
+          <div className="bg-white rounded-lg border border-gray-200 p-5">
+            <h3 className="font-semibold text-gray-900 mb-4">Language Preferences</h3>
+            {analytics?.languageDistribution?.length > 0 ? (
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={analytics.languageDistribution}
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={60}
+                        dataKey="count"
+                        nameKey="language"
+                      >
+                        {analytics.languageDistribution.map((_: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Legend />
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="flex flex-col justify-center">
+                  {analytics.languageDistribution.map((lang: any, i: number) => (
+                    <div key={lang.language} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }} />
+                        <span className="text-sm text-gray-700">{lang.language}</span>
+                      </div>
+                      <span className="text-sm font-medium text-gray-900">{lang.count} users</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 text-center py-8">No language data available</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* STRESS & WELLNESS SECTION */}
+      {activeSection === 'stress' && (
+        <div className="space-y-8">
+          {/* Stress Summary Cards */}
+          <div className="grid md:grid-cols-4 gap-4">
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <p className="text-sm text-gray-500 mb-1">Average Initial Stress</p>
+              <p className="text-2xl font-bold" style={{ color: '#EF4444' }}>{stats.avgStressInitial || 'N/A'}</p>
+              <p className="text-xs text-gray-400">Scale: 1-10</p>
+            </div>
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <p className="text-sm text-gray-500 mb-1">Average Current Stress</p>
+              <p className="text-2xl font-bold" style={{ color: '#16A34A' }}>{stats.avgStressCurrent || 'N/A'}</p>
+              <p className="text-xs text-gray-400">Scale: 1-10</p>
+            </div>
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <p className="text-sm text-gray-500 mb-1">Users Improved</p>
+              <p className="text-2xl font-bold" style={{ color: '#5BBEC4' }}>{stats.improvementRate || 0}%</p>
+              <p className="text-xs text-gray-400">Lower stress score</p>
+            </div>
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <p className="text-sm text-gray-500 mb-1">Avg Reduction</p>
+              <p className="text-2xl font-bold" style={{ color: '#8B5CF6' }}>{insights.avgStressReduction || 0}</p>
+              <p className="text-xs text-gray-400">Points improved</p>
+            </div>
+          </div>
+
+          {/* Stress by Role */}
+          <div className="bg-white rounded-lg border border-gray-200 p-5">
+            <h3 className="font-semibold text-gray-900 mb-4">Stress Comparison by Role</h3>
+            {analytics?.stressRoleComparison?.length > 0 ? (
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={analytics.stressRoleComparison} margin={{ left: 10, right: 20 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="role" tick={{ fontSize: 11 }} stroke="#9CA3AF" />
+                    <YAxis domain={[0, 10]} tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="avgInitial" name="Initial Stress" fill="#EF4444" radius={[4, 4, 0, 0]} />
+                    <Bar dataKey="avgCurrent" name="Current Stress" fill="#16A34A" radius={[4, 4, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 text-center py-8">No stress data by role available</p>
+            )}
+          </div>
+
+          {/* Stress Trends Over Time */}
+          <div className="bg-white rounded-lg border border-gray-200 p-5">
+            <h3 className="font-semibold text-gray-900 mb-4">Stress Check-in Trends</h3>
+            {analytics?.stressTimeSeries?.length > 0 ? (
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={analytics.stressTimeSeries}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <YAxis domain={[1, 10]} tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="avgScore" stroke="#E8B84B" strokeWidth={2} dot={{ fill: '#E8B84B' }} name="Avg Stress" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 text-center py-8">No stress check-in data available</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ENGAGEMENT SECTION */}
+      {activeSection === 'engagement' && (
+        <div className="space-y-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Activity by Day of Week */}
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <h3 className="font-semibold text-gray-900 mb-4">Activity by Day of Week</h3>
+              {analytics?.activityByDay?.length > 0 ? (
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={analytics.activityByDay}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="day" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                      <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                      <Tooltip />
+                      <Bar dataKey="count" name="Activity" radius={[4, 4, 0, 0]}>
+                        {analytics.activityByDay.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={entry.isPeak ? '#E8B84B' : '#5BBEC4'} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-8">No activity data available</p>
+              )}
+            </div>
+
+            {/* Activity by Hour */}
+            <div className="bg-white rounded-lg border border-gray-200 p-5">
+              <h3 className="font-semibold text-gray-900 mb-4">Activity by Hour</h3>
+              {analytics?.activityByHour?.length > 0 ? (
+                <div className="h-48">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={analytics.activityByHour}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis dataKey="hour" tick={{ fontSize: 10 }} stroke="#9CA3AF" interval={0} />
+                      <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                      <Tooltip />
+                      <Bar dataKey="count" name="Activity" radius={[4, 4, 0, 0]}>
+                        {analytics.activityByHour.map((entry: any, index: number) => (
+                          <Cell key={`cell-${index}`} fill={entry.isPeak ? '#E8B84B' : '#8B5CF6'} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500 text-center py-8">No hourly data available</p>
+              )}
+            </div>
+          </div>
+
+          {/* Monthly Active Users Trend */}
+          <div className="bg-white rounded-lg border border-gray-200 p-5">
+            <h3 className="font-semibold text-gray-900 mb-4">Monthly Active Users</h3>
+            {analytics?.mauTimeSeries?.length > 0 ? (
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={analytics.mauTimeSeries}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                    <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
+                    <Tooltip />
+                    <Line type="monotone" dataKey="users" stroke="#3B82F6" strokeWidth={2} dot={{ fill: '#3B82F6' }} name="Active Users" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            ) : (
+              <p className="text-sm text-gray-500 text-center py-8">No MAU data available</p>
+            )}
+          </div>
+
+          {/* Peak Times Summary */}
+          <div className="bg-gradient-to-r from-[#5BBEC4]/10 to-[#E8B84B]/10 rounded-lg p-5 border border-[#5BBEC4]/20">
+            <h3 className="font-semibold text-gray-900 mb-3">Peak Activity Summary</h3>
+            <div className="grid md:grid-cols-3 gap-4">
+              <div>
+                <p className="text-sm text-gray-500">Peak Day</p>
+                <p className="text-lg font-bold text-[#2B3A67]">{insights.peakDay || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Peak Hour</p>
+                <p className="text-lg font-bold text-[#2B3A67]">{insights.peakHour || 'N/A'}</p>
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Recommendation</p>
+                <p className="text-sm text-gray-700">Schedule new content releases and emails for {insights.peakDay || 'weekdays'} around {insights.peakHour || 'mid-morning'} for maximum engagement.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
