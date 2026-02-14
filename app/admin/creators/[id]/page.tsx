@@ -328,6 +328,12 @@ export default function AdminCreatorDetailPage() {
   const [optionalReason, setOptionalReason] = useState('');
   const [isTogglingOptional, setIsTogglingOptional] = useState(false);
 
+  // Content path change modal state
+  const [showContentPathModal, setShowContentPathModal] = useState(false);
+  const [pendingContentPath, setPendingContentPath] = useState<'blog' | 'download' | 'course' | null>(null);
+  const [isUpdatingContentPath, setIsUpdatingContentPath] = useState(false);
+  const [contentPathUpdatedAt, setContentPathUpdatedAt] = useState<string | null>(null);
+
   const loadData = useCallback(async () => {
     const data = await getCreatorDashboardData(creatorId);
     if (data) {
@@ -371,6 +377,12 @@ export default function AdminCreatorDetailPage() {
     // Get all notes including internal ones
     const notes = await getCreatorNotes(creatorId, true);
     setAllNotes(notes);
+
+    // Find the most recent content path change note
+    const contentPathNote = notes.find(n => n.content.startsWith('Content path changed from'));
+    if (contentPathNote) {
+      setContentPathUpdatedAt(contentPathNote.created_at);
+    }
 
     setIsLoading(false);
   }, [creatorId]);
@@ -431,6 +443,15 @@ export default function AdminCreatorDetailPage() {
   };
 
   const handleSaveDetails = async () => {
+    // Check if content_path is being changed
+    if (dashboardData && editedDetails.content_path !== dashboardData.creator.content_path) {
+      // Show confirmation modal instead of saving directly
+      setPendingContentPath(editedDetails.content_path);
+      setShowContentPathModal(true);
+      return;
+    }
+
+    // No content path change, save normally
     setIsSaving(true);
     try {
       await updateCreator(creatorId, editedDetails);
@@ -440,6 +461,53 @@ export default function AdminCreatorDetailPage() {
       console.error('Error saving details:', error);
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleConfirmContentPathChange = async () => {
+    if (!pendingContentPath || !dashboardData) return;
+
+    setIsUpdatingContentPath(true);
+
+    try {
+      // Call the new API endpoint for content path changes
+      const response = await fetch('/api/admin/update-content-path', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          oldPath: dashboardData.creator.content_path,
+          newPath: pendingContentPath,
+          adminEmail,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Now save any other details that may have changed
+        const otherDetails = {
+          course_title: editedDetails.course_title,
+          course_audience: editedDetails.course_audience,
+          target_launch_month: editedDetails.target_launch_month,
+          discount_code: editedDetails.discount_code,
+        };
+        await updateCreator(creatorId, otherDetails);
+
+        await loadData();
+        setShowContentPathModal(false);
+        setPendingContentPath(null);
+        setIsEditingDetails(false);
+        setSuccessMessage('Content path updated successfully');
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        alert(`Failed to update content path: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error updating content path:', error);
+      alert('Error updating content path. Please try again.');
+    } finally {
+      setIsUpdatingContentPath(false);
     }
   };
 
@@ -1140,6 +1208,11 @@ export default function AdminCreatorDetailPage() {
                        creator.content_path === 'course' ? 'Learning Hub course' :
                        'Not selected'}
                     </p>
+                    {contentPathUpdatedAt && (
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Updated {new Date(contentPathUpdatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <p className="text-xs text-gray-500 uppercase">Course Title</p>
@@ -1586,6 +1659,92 @@ export default function AdminCreatorDetailPage() {
                   <>
                     <Check className="w-4 h-4" />
                     Complete Anyway
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Content Path Change Confirmation Modal */}
+      {showContentPathModal && pendingContentPath && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-md w-full shadow-2xl">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                  <AlertCircle className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-[#1e2749]">Change Content Path</h3>
+                  <p className="text-sm text-gray-500">Confirm this change</p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setShowContentPathModal(false);
+                  setPendingContentPath(null);
+                }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <p className="text-sm text-blue-800">
+                Changing content path from{' '}
+                <strong>
+                  {dashboardData?.creator.content_path === 'blog' ? 'Blog posts' :
+                   dashboardData?.creator.content_path === 'download' ? 'Digital downloads' :
+                   dashboardData?.creator.content_path === 'course' ? 'Learning Hub course' :
+                   'Not selected'}
+                </strong>{' '}
+                to{' '}
+                <strong>
+                  {pendingContentPath === 'blog' ? 'Blog posts' :
+                   pendingContentPath === 'download' ? 'Digital downloads' :
+                   'Learning Hub course'}
+                </strong>
+              </p>
+            </div>
+
+            <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+              <p className="text-sm text-gray-600">
+                <strong>What will happen:</strong>
+              </p>
+              <ul className="text-sm text-gray-600 mt-1 space-y-1">
+                <li>• Milestones will be updated to match the new path</li>
+                <li>• Any completed milestones will be preserved</li>
+                <li>• A note will be added to the creator&apos;s record</li>
+              </ul>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowContentPathModal(false);
+                  setPendingContentPath(null);
+                }}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmContentPathChange}
+                disabled={isUpdatingContentPath}
+                className="flex-1 px-4 py-2 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3459] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+              >
+                {isUpdatingContentPath ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-4 h-4" />
+                    Confirm Change
                   </>
                 )}
               </button>
