@@ -129,13 +129,35 @@ export default function ASD4Dashboard() {
       priority: 'now',
       external: true,
       showCalendar: true
+    },
+    {
+      id: 'unrostered-accounts',
+      title: 'Confirm 8 Unrostered Hub Accounts',
+      description: '8 accounts are active in the Learning Hub but were not included on the paraprofessional roster provided by leadership. These may be new hires, reassigned staff, or accounts needing cleanup.',
+      deadline: 'MARCH 2026',
+      actionLabel: 'Email Rae to Confirm',
+      actionUrl: 'mailto:rae@teachersdeserveit.com?subject=ASD4%20Dashboard%20-%20Unrostered%20Account%20Confirmation',
+      icon: AlertCircle,
+      priority: 'now',
+      external: true,
+      showCalendar: false,
+      extraContent: [
+        'Katie Purse (kpurse@asd4.org) — Admin role',
+        'Giulia Bucaro (gbucaro@asd4.org)',
+        'Janet Diaz (jdiaz@asd4.org)',
+        'Maria Cortez (mcortez@asd4.org)',
+        'Amanda Leveille (aleveille@asd4.org)',
+        'Elizabeth Herrera (eherrera@asd4.org)',
+        'J G (jgonzalez@asd4.org) — name incomplete',
+        'J Perez (jperez@asd4.org) — name incomplete'
+      ]
     }
   ];
 
   // Completed sessions data
   const completedSessions = [
     {
-      title: "Partnership Kickoff",
+      title: "The Moves That Matter: Part 1",
       date: "January 5, 2026",
       format: "In-Person",
       duration: "Multi-Hour Session",
@@ -144,7 +166,8 @@ export default function ASD4Dashboard() {
         "Questioning techniques in the classroom",
         "Learning Hub onboarding and login walkthrough"
       ],
-      status: "complete" as const
+      status: "complete" as const,
+      practiceReps: 8
     },
     {
       title: "Executive Impact Session 1",
@@ -159,30 +182,24 @@ export default function ASD4Dashboard() {
       status: "complete" as const,
       reportUrl: "https://drive.google.com/file/d/1XfzJGTyb60kp3t8MbcGtN8ro-psBBnbj/view?usp=sharing",
       reportLabel: "View Executive Summary Report →"
+    },
+    {
+      title: "The Moves That Matter: Part 2",
+      date: "February 13, 2026",
+      format: "In-Person",
+      duration: "2-Hour Session",
+      focusAreas: [
+        "Ask, Don't Tell — Questioning scenarios with partner role-play",
+        "Feedback That Builds Capacity — Notice. Name. Next Step. formula",
+        "Game-based practice tool introduction"
+      ],
+      status: "complete" as const,
+      practiceReps: 54
     }
   ];
 
   // Upcoming/Scheduled sessions data
   const upcomingSessions = [
-    {
-      title: "In-Person Para Training",
-      date: "February 13, 2026",
-      time: "1:00 - 3:00 PM",
-      format: "In-Person",
-      location: "222 N. JF Kennedy Dr., Addison, IL 60101",
-      participants: "All paraprofessionals",
-      focusAreas: [
-        "Ask, Don't Tell — Questioning scenarios with partner role-play",
-        "Feedback That Builds Capacity — Notice. Name. Next Step. formula"
-      ],
-      additionalNotes: [
-        "Baseline survey data collection (tied to district success metrics)",
-        "Learning Hub goal updates",
-        "Game-based practice tool introduction"
-      ],
-      highlightStat: "First hands-on strategy practice session",
-      status: "scheduled" as const
-    },
     {
       title: "Observation Day",
       date: "February 26, 2026",
@@ -221,7 +238,7 @@ export default function ASD4Dashboard() {
       status: "scheduled" as const
     },
     {
-      title: "Virtual Session 3",
+      title: "Virtual Session 3 (Late Start Days Support)",
       date: "April 20, 2026",
       time: "7:30 - 8:15 AM",
       format: "Virtual",
@@ -246,25 +263,16 @@ export default function ASD4Dashboard() {
   ];
 
   const topCourses = [
-    { name: "Paraprofessional Foundations", started: 19, completed70: 9, inProgress: 10, completionRate: 47 },
-    { name: "Differentiated Choice Boards", started: 9, completed70: 3, inProgress: 6, completionRate: 33 },
-    { name: "Streamline Your Inbox", started: 9, completed70: 3, inProgress: 6, completionRate: 33 },
-    { name: "Understanding Student Needs & Modifications", started: 9, completed70: 5, inProgress: 4, completionRate: 56 },
-    { name: "Classroom Management Toolkit", started: 8, completed70: 5, inProgress: 3, completionRate: 63 },
-    { name: "Building Strong Teacher-Para Partnerships", started: 6, completed70: 4, inProgress: 2, completionRate: 67 },
-    { name: "Effective Small-Group & One-on-One Instruction", started: 6, completed70: 3, inProgress: 3, completionRate: 50 },
-    { name: "Calm Classrooms, Not Chaos", started: 5, completed70: 5, inProgress: 0, completionRate: 100 },
-    { name: "Connected Educators", started: 5, completed70: 1, inProgress: 4, completionRate: 20 },
-    { name: "How to Get the MOST out of the TDI Learning Hub", started: 5, completed70: 1, inProgress: 4, completionRate: 20 },
-    { name: "Maximize Impact: One-on-One Student Conferences", started: 5, completed70: 3, inProgress: 2, completionRate: 60 },
-    { name: "De-Escalation Strategies for Unstructured Environments", started: 3, completed70: 3, inProgress: 0, completionRate: 100 },
-    { name: "Communication that Clicks", started: 2, completed70: 2, inProgress: 0, completionRate: 100 },
-    { name: "Effective Communication Strategies for Leaders", started: 1, completed70: 0, inProgress: 1, completionRate: 0 },
-    { name: "Parent Tools That Support Student Success", started: 1, completed70: 0, inProgress: 1, completionRate: 0 },
-    { name: "Procedures & Daily Routines for Art Teachers", started: 1, completed70: 0, inProgress: 1, completionRate: 0 },
-    { name: "Supporting Students Through Their Daily Schedule", started: 1, completed70: 1, inProgress: 0, completionRate: 100 },
-    { name: "The Differentiation Fix", started: 1, completed70: 1, inProgress: 0, completionRate: 100 },
-    { name: "Your Designation Isn\u2019t Your Destiny", started: 1, completed70: 1, inProgress: 0, completionRate: 100 },
+    { name: "Paraprofessional Foundations – Understanding Your Role & Impact", started: 19, completed70: 9, inProgress: 10, completionRate: 47, avgProgress: 10 },
+    { name: "Streamline Your Inbox: Effective Email Management", started: 13, completed70: 4, inProgress: 9, completionRate: 31, avgProgress: 5 },
+    { name: "Classroom Management Toolkit", started: 10, completed70: 5, inProgress: 5, completionRate: 50, avgProgress: 5 },
+    { name: "Differentiated Choice Boards", started: 10, completed70: 3, inProgress: 7, completionRate: 30, avgProgress: 4 },
+    { name: "Understanding Student Needs & Modifications", started: 9, completed70: 5, inProgress: 4, completionRate: 56, avgProgress: 5 },
+    { name: "Calm Classrooms, Not Chaos", started: 6, completed70: 6, inProgress: 0, completionRate: 100, avgProgress: 5 },
+    { name: "Boundaries Without Backlash", started: 6, completed70: 4, inProgress: 2, completionRate: 67, avgProgress: 4 },
+    { name: "Building Strong Teacher-Para Partnerships", started: 6, completed70: 4, inProgress: 2, completionRate: 67, avgProgress: 4 },
+    { name: "Effective Small-Group & One-on-One Instruction", started: 6, completed70: 3, inProgress: 3, completionRate: 50, avgProgress: 3 },
+    { name: "De-Escalation Strategies for Unstructured Environments", started: 4, completed70: 3, inProgress: 1, completionRate: 75, avgProgress: 3 },
   ];
 
   // School-level engagement data (with real course metrics)
@@ -285,7 +293,7 @@ export default function ASD4Dashboard() {
         { name: 'Delgado, Beatriz', email: 'bdelgado@asd4.org', loggedIn: true },
         { name: 'Garcia, Claudia', email: 'cgarcia@asd4.org', loggedIn: true },
         { name: 'Mendiola, Georjina', email: 'gmendiola@asd4.org', loggedIn: false },
-        { name: 'Simone, Patricia', email: 'psimone@asd4.org', loggedIn: false },
+        { name: 'Simone, Patricia', email: 'psimone@asd4.org', loggedIn: true },
         { name: 'Padilla, Jayla', email: 'japadilla@asd4.org', loggedIn: true },
         { name: 'Tirado, Carmen', email: 'ctirado@asd4.org', loggedIn: true },
         { name: 'Reyes, Kelly', email: 'kreyes@asd4.org', loggedIn: true },
@@ -318,7 +326,7 @@ export default function ASD4Dashboard() {
         { name: 'Hodo, Mirela', email: 'mhodo@asd4.org', loggedIn: false },
         { name: 'Miller, Paula', email: 'pmiller@asd4.org', loggedIn: true },
         { name: 'Judd, Marisa', email: 'mjudd@asd4.org', loggedIn: true },
-        { name: 'Juarez, Alexia', email: 'ajuarez@asd4.org', loggedIn: false },
+        { name: 'Juarez, Alexia', email: 'ajuarez@asd4.org', loggedIn: true },
         { name: 'Salerno, Cori', email: 'csalerno@asd4.org', loggedIn: true },
         { name: 'Zarate, Claudia', email: 'czarate@asd4.org', loggedIn: true },
         { name: 'Sanchez, Maria', email: 'msanchez@asd4.org', loggedIn: true },
@@ -343,7 +351,7 @@ export default function ASD4Dashboard() {
         { name: 'Chavez, Carlos', email: 'cchavez@asd4.org', loggedIn: true },
         { name: 'Lopez-Castaneda, Victoria', email: 'vcastaneda@asd4.org', loggedIn: true },
         { name: 'Montalvo, Jazzleen', email: 'jmontalvo@asd4.org', loggedIn: true },
-        { name: 'Ortiz, Maria', email: 'mortiz@asd4.org', loggedIn: false },
+        { name: 'Ortiz, Maria', email: 'mortiz@asd4.org', loggedIn: true },
         { name: 'Torres, Manuela', email: 'matorres@asd4.org', loggedIn: true },
         { name: 'Bezdicek, Michelle', email: 'mbezdicek@asd4.org', loggedIn: false },
         { name: 'Arredondo, Gregoria', email: 'garredondo@asd4.org', loggedIn: true },
@@ -400,7 +408,7 @@ export default function ASD4Dashboard() {
         { name: 'Dunkel, Mary', email: 'mdunkel@asd4.org', loggedIn: true },
         { name: 'Garcia, Esperanza', email: 'egarcia@asd4.org', loggedIn: true },
         { name: 'Garcia, Maria', email: 'msgarcia@asd4.org', loggedIn: true },
-        { name: 'Hendricks, Sarah', email: 'shendricks@asd4.org', loggedIn: false },
+        { name: 'Hendricks, Sarah', email: 'shendricks@asd4.org', loggedIn: true },
         { name: 'Garica, Jacquelynn', email: 'jagarcia@asd4.org', loggedIn: true },
         { name: 'Orellana, Kristina', email: 'korellana@asd4.org', loggedIn: true },
       ],
@@ -469,7 +477,7 @@ export default function ASD4Dashboard() {
         topCourses: [],
       },
       paras: [
-        { name: 'Mondragon, Sugey', email: 'smondragon@asd4.org', loggedIn: false },
+        { name: 'Mondragon, Sugey', email: 'smondragon@asd4.org', loggedIn: true },
         { name: 'Peters, Maddalena', email: 'mpeters@asd4.org', loggedIn: true },
         { name: 'Weissgerber, Sara', email: 'sweissgerber@asd4.org', loggedIn: true },
       ],
@@ -495,56 +503,50 @@ export default function ASD4Dashboard() {
         { name: 'Jacqueline Vazquez', email: 'jvazquez@asd4.org', loggedIn: true },
         { name: 'Miriam Carbajal', email: 'mcarbajal@asd4.org', loggedIn: true },
         { name: 'Leslie Olvera', email: 'lolvera@asd4.org', loggedIn: true },
-        { name: 'Nuvia Rodriguez Luna', email: 'nurodriguez@asd4.org', loggedIn: false },
+        { name: 'Nuvia Rodriguez Luna', email: 'nurodriguez@asd4.org', loggedIn: true },
         { name: 'Marie Cano', email: 'mcano@asd4.org', loggedIn: false },
-        { name: 'Anahi Carrera', email: 'ancarrera@asd4.org', loggedIn: false },
+        { name: 'Anahi Carrera', email: 'ancarrera@asd4.org', loggedIn: true },
         { name: 'Yesenia Perez', email: 'yperez@asd4.org', loggedIn: true },
-        { name: 'Michelle Samples', email: 'msamples@asd4.org', loggedIn: false },
+        { name: 'Michelle Samples', email: 'msamples@asd4.org', loggedIn: true },
         { name: 'Daniela Juarez', email: 'djuarez@asd4.org', loggedIn: false },
-        { name: 'Mayra Saucedo', email: 'msaucedo@asd4.org', loggedIn: false },
+        { name: 'Mayra Saucedo', email: 'msaucedo@asd4.org', loggedIn: true },
         { name: 'Katherine Ruffolo', email: 'kruffolo@asd4.org', loggedIn: true },
         { name: 'Maria Lopez', email: 'mlopez@asd4.org', loggedIn: true },
         { name: 'Ruby Valois-Suarez', email: 'rvalois@asd4.org', loggedIn: true },
         { name: 'Kimberly Martinez', email: 'kmartinez@asd4.org', loggedIn: true },
-        { name: 'Kayla Carrillo', email: 'kcarrillo@asd4.org', loggedIn: false },
+        { name: 'Kayla Carrillo', email: 'kcarrillo@asd4.org', loggedIn: true },
       ],
     },
   ];
 
   const notLoggedInParas = [
-    { name: "Alexia Juarez", email: "ajuarez@asd4.org" },
-    { name: "Anahi Carrera", email: "acarrera@asd4.org" },
-    { name: "Aysha Chaudary", email: "achaudary@asd4.org" },
-    { name: "Brittany Lanzo", email: "blanzo@asd4.org" },
-    { name: "Daniela Cova Gonzalez", email: "dcgonzalez@asd4.org" },
-    { name: "Daniela Juarez", email: "djuarez@asd4.org" },
-    { name: "Georjina Mendiola", email: "gmendiola@asd4.org" },
-    { name: "Giselle Galvan", email: "ggalvan@asd4.org" },
-    { name: "Irma Martinez", email: "imartinez@asd4.org" },
-    { name: "Irma Robles", email: "irobles@asd4.org" },
-    { name: "Jessica Gonzalez", email: "jesgonzalez@asd4.org" },
-    { name: "Kayla Carrillo", email: "kcarrillo@asd4.org" },
-    { name: "Kristine Colbert", email: "kcolbert@asd4.org" },
-    { name: "Leslie Olvera (typo account)", email: "lolvera@skd4.org" },
-    { name: "Maria Ortiz", email: "mortiz@asd4.org" },
-    { name: "Maribel Marquez", email: "mmarquez@asd4.org" },
-    { name: "Maribel Ontiveros", email: "montiveros@asd4.org" },
-    { name: "Marie Cano", email: "mcano@asd4.org" },
-    { name: "Mary Falco", email: "mfalco@asd4.org" },
-    { name: "Mayra Saucedo", email: "msaucedo@asd4.org" },
-    { name: "Melany Tinajero Monroy", email: "mtinajero@asd4.org" },
-    { name: "Michelle Bezdicek", email: "mbezdicek@asd4.org" },
-    { name: "Michelle Samples", email: "msamples@asd4.org" },
-    { name: "Mirela Hodo", email: "mhodo@asd4.org" },
-    { name: "Monika Nicieja", email: "mnicieja@asd4.org" },
-    { name: "Nancy Gremo", email: "ngremo@asd4.org" },
-    { name: "Natalia Villalobos", email: "nvillalobos@asd4.org" },
-    { name: "Nuvia Rodriguez Luna", email: "nrodriguez@asd4.org" },
-    { name: "Patricia Schlesser", email: "pschlesser@asd4.org" },
-    { name: "Patricia Simone", email: "psimone@asd4.org" },
-    { name: "Sarah Hendricks", email: "shendricks@asd4.org" },
-    { name: "Sugey Mondragon", email: "smondragon@asd4.org" },
-    { name: "Yasmin Villa Casillas", email: "yvillacasillas@asd4.org" },
+    // ELC (6)
+    { name: "Melany Tinajero Monroy", email: "mtinajero@asd4.org", school: "ELC" },
+    { name: "Yasmin Villa Casillas", email: "yvillacasillas@asd4.org", school: "ELC" },
+    { name: "Giselle Galvan", email: "ggalvan@asd4.org", school: "ELC" },
+    { name: "Irma Robles", email: "irobles@asd4.org", school: "ELC" },
+    { name: "Marie Cano", email: "mcano@asd4.org", school: "ELC" },
+    { name: "Daniela Juarez", email: "djuarez@asd4.org", school: "ELC" },
+    // Lake Park (4)
+    { name: "Maribel Ontiveros", email: "montiveros@asd4.org", school: "Lake Park" },
+    { name: "Natalia Villalobos", email: "nvillalobos@asd4.org", school: "Lake Park" },
+    { name: "Aysha Chaudary", email: "achaudary@asd4.org", school: "Lake Park" },
+    { name: "Mary Falco", email: "mfalco@asd4.org", school: "Lake Park" },
+    // Army Trail (3)
+    { name: "Kristine Colbert", email: "kcolbert@asd4.org", school: "Army Trail" },
+    { name: "Maribel Marquez", email: "mmarquez@asd4.org", school: "Army Trail" },
+    { name: "Monika Nicieja", email: "mnicieja@asd4.org", school: "Army Trail" },
+    // Stone (2)
+    { name: "Brittany Lanzo", email: "blanzo@asd4.org", school: "Stone" },
+    { name: "Patricia Schlesser", email: "pschlesser@asd4.org", school: "Stone" },
+    // Fullerton (1)
+    { name: "Nancy Gremo", email: "ngremo@asd4.org", school: "Fullerton" },
+    // Indian Trail (1)
+    { name: "Mirela Hodo", email: "mhodo@asd4.org", school: "Indian Trail" },
+    // Lincoln (1)
+    { name: "Michelle Bezdicek", email: "mbezdicek@asd4.org", school: "Lincoln" },
+    // Wesley (1)
+    { name: "Georjina Mendiola", email: "gmendiola@asd4.org", school: "Wesley" },
   ];
 
   // Generate individual nudge email
@@ -746,7 +748,7 @@ Thanks for everything you do.`
                   <span className="text-xs text-gray-500 uppercase">Paras Enrolled</span>
                   <Tooltip text="Total paraprofessionals with Learning Hub access." position="bottom" iconSize={12} />
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">119/119</div>
+                <div className="text-2xl font-bold text-[#1e2749]">113/113</div>
                 <div className="text-xs text-[#38618C] font-medium">Hub Access</div>
               </div>
 
@@ -756,9 +758,20 @@ Thanks for everything you do.`
                   <span className="text-xs text-gray-500 uppercase">Hub Logins</span>
                   <Tooltip text="Percentage of enrolled paras who have logged into the Learning Hub at least once. Industry average is ~40%." position="bottom" iconSize={12} />
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">72%</div>
-                <div className="text-xs text-[#38618C] font-medium">86/119 logged in</div>
+                <div className="text-2xl font-bold text-[#1e2749]">83%</div>
+                <div className="text-xs text-[#38618C] font-medium">94/113 logged in</div>
                 <div className="text-xs text-gray-400 mt-1">Goal: 100% before Observation Day 1</div>
+              </div>
+
+              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
+                <div className="flex items-center gap-2 mb-1">
+                  <BookOpen className="w-4 h-4 text-[#38618C]" />
+                  <span className="text-xs text-gray-500 uppercase">Course Engagement</span>
+                  <Tooltip text="Paras who have started at least one course in the Learning Hub." position="bottom" iconSize={12} />
+                </div>
+                <div className="text-2xl font-bold text-[#1e2749]">20%</div>
+                <div className="text-xs text-[#38618C] font-medium">~25/113 started a course</div>
+                <div className="text-xs text-gray-400 mt-1">57 total course completions</div>
               </div>
 
               <div
@@ -793,13 +806,13 @@ Thanks for everything you do.`
               <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
                 <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
                 <p className="text-sm font-semibold text-green-800">Exec Session 1 Complete</p>
-                <p className="text-xs text-green-600">1/2 Exec · 5 sessions scheduled · 86 paras logged in</p>
+                <p className="text-xs text-green-600">1/2 Exec · 5 sessions scheduled · 94 paras logged in</p>
               </div>
 
               {/* Card 2: Action Needed */}
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
                 <Lightbulb className="w-8 h-8 text-amber-600 mx-auto mb-2" />
-                <p className="text-sm font-semibold text-amber-800">33 Paras Remaining</p>
+                <p className="text-sm font-semibold text-amber-800">19 Paras Remaining</p>
                 <p className="text-xs text-amber-600">Try a walkthrough at your next meeting</p>
               </div>
 
@@ -833,38 +846,54 @@ Thanks for everything you do.`
                       .map(item => (
                         <div
                           key={item.id}
-                          className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#E07A5F] bg-gray-50"
+                          className="p-4 rounded-xl border-l-4 border-[#E07A5F] bg-gray-50"
                         >
-                          <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                              <item.icon className="w-5 h-5 text-[#E07A5F]" />
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                <item.icon className="w-5 h-5 text-[#E07A5F]" />
+                              </div>
+                              <div>
+                                <div className="font-medium text-[#1e2749]">{item.title}</div>
+                                <p className="text-sm text-gray-500">{item.description}</p>
+                              </div>
                             </div>
-                            <div>
-                              <div className="font-medium text-[#1e2749]">{item.title}</div>
-                              <p className="text-sm text-gray-500">{item.description}</p>
+                            <div className="flex items-center gap-3">
+                              <span className="text-xs text-gray-400 hidden sm:inline">RESPOND BY {item.deadline}</span>
+                              <a
+                                href={item.actionUrl}
+                                target={item.external ? '_blank' : undefined}
+                                rel={item.external ? 'noopener noreferrer' : undefined}
+                                className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 hover:bg-[#2d3a5c] transition-colors"
+                              >
+                                {item.showCalendar && <Calendar className="w-4 h-4" />}
+                                {!item.showCalendar && <Mail className="w-4 h-4" />}
+                                {item.actionLabel}
+                              </a>
+                              <button
+                                onClick={() => toggleComplete(item.id)}
+                                className="inline-flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-700 text-sm font-medium rounded-lg transition-colors"
+                                title="Mark as complete"
+                              >
+                                <Check className="w-4 h-4" />
+                                Done
+                              </button>
                             </div>
                           </div>
-                          <div className="flex items-center gap-3">
-                            <span className="text-xs text-gray-400 hidden sm:inline">SCHEDULE BY {item.deadline}</span>
-                            <a
-                              href={item.actionUrl}
-                              target={item.external ? '_blank' : undefined}
-                              rel={item.external ? 'noopener noreferrer' : undefined}
-                              className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 hover:bg-[#2d3a5c] transition-colors"
-                            >
-                              {item.showCalendar && <Calendar className="w-4 h-4" />}
-                              {item.actionLabel}
-                              {!item.showCalendar && <ArrowRight className="w-4 h-4" />}
-                            </a>
-                            <button
-                              onClick={() => toggleComplete(item.id)}
-                              className="inline-flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-700 text-sm font-medium rounded-lg transition-colors"
-                              title="Mark as complete"
-                            >
-                              <Check className="w-4 h-4" />
-                              Done
-                            </button>
-                          </div>
+                          {/* Show extra content for items with account lists */}
+                          {item.extraContent && (
+                            <div className="mt-4 pt-3 border-t border-gray-200">
+                              <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Accounts needing confirmation:</p>
+                              <ul className="text-sm text-gray-600 space-y-1 columns-2">
+                                {item.extraContent.map((account: string, idx: number) => (
+                                  <li key={idx} className="flex items-start gap-1">
+                                    <span className="text-gray-400">•</span>
+                                    <span>{account}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
                         </div>
                       ))}
                   </div>
@@ -1228,14 +1257,14 @@ Thanks for everything you do.`
             <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-8 text-white text-center">
               <div className="text-5xl font-bold mb-2 flex items-center justify-center gap-3">
                 <Trophy className="w-10 h-10" />
-                50
+                57
               </div>
               <div className="text-xl font-medium mb-1">Courses Completed</div>
               <div className="text-emerald-100 text-sm">
                 by your paraprofessionals -  and counting!
               </div>
               <div className="text-emerald-100 text-sm mt-2">
-                That&apos;s 50 strategies ready to use in classrooms tomorrow.
+                That&apos;s 57 strategies ready to use in classrooms tomorrow.
               </div>
             </div>
 
@@ -1318,14 +1347,11 @@ Thanks for everything you do.`
                             <div>
                               <h4 className="font-semibold text-gray-900">{session.title}</h4>
                               <p className="text-sm text-gray-500 mt-0.5">
-                                {session.date} · {session.time} · {session.format} · {session.location}
-                              </p>
-                              <p className="text-sm text-gray-500 mt-0.5">
-                                Participants: {session.participants}
+                                {session.date} · {session.time} · {session.format}{session.location ? ` · ${session.location}` : ''}
                               </p>
 
                               <div className="mt-3">
-                                <p className="text-sm font-medium text-gray-700 mb-1">What We&apos;re Practicing:</p>
+                                <p className="text-sm font-medium text-gray-700 mb-1">Focus Areas:</p>
                                 <ul className="space-y-1.5">
                                   {session.focusAreas.map((area, i) => (
                                     <li key={i} className="text-sm text-gray-600 flex items-start gap-2">
@@ -1335,28 +1361,6 @@ Thanks for everything you do.`
                                   ))}
                                 </ul>
                               </div>
-
-                              {session.additionalNotes && session.additionalNotes.length > 0 && (
-                                <div className="mt-3">
-                                  <p className="text-sm font-medium text-gray-500 mb-1">Also This Session:</p>
-                                  <ul className="space-y-1">
-                                    {session.additionalNotes.map((note, i) => (
-                                      <li key={i} className="text-sm text-gray-500 flex items-start gap-2">
-                                        <span className="text-gray-300 mt-1">&#8226;</span>
-                                        {note}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-
-                              {session.highlightStat && (
-                                <div className="mt-3 bg-blue-50 rounded-lg px-3 py-2 inline-block">
-                                  <p className="text-sm text-blue-700 font-medium">
-                                    {session.highlightStat}
-                                  </p>
-                                </div>
-                              )}
                             </div>
                           </div>
                           <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2.5 py-1 rounded-full flex-shrink-0">
@@ -1383,10 +1387,10 @@ Thanks for everything you do.`
                     </div>
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-gray-900">86<span className="text-lg text-gray-400">/119</span></div>
-                <div className="text-sm text-gray-500 mb-3">72% logged in</div>
+                <div className="text-3xl font-bold text-gray-900">94<span className="text-lg text-gray-400">/113</span></div>
+                <div className="text-sm text-gray-500 mb-3">83% logged in</div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-teal-500 h-2 rounded-full" style={{width: '72%'}}></div>
+                  <div className="bg-teal-500 h-2 rounded-full" style={{width: '83%'}}></div>
                 </div>
               </div>
 
@@ -1401,10 +1405,10 @@ Thanks for everything you do.`
                     </div>
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-gray-900">97</div>
-                <div className="text-sm text-gray-500 mb-3">engaged enrollments across 19 courses</div>
+                <div className="text-3xl font-bold text-gray-900">~25</div>
+                <div className="text-sm text-gray-500 mb-3">paras started 1+ course (22%)</div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '58%'}}></div>
+                  <div className="bg-blue-500 h-2 rounded-full" style={{width: '22%'}}></div>
                 </div>
               </div>
 
@@ -1419,12 +1423,12 @@ Thanks for everything you do.`
                     </div>
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-gray-900">50</div>
-                <div className="text-sm text-gray-500 mb-3">courses fully completed</div>
+                <div className="text-3xl font-bold text-gray-900">57</div>
+                <div className="text-sm text-gray-500 mb-3">total course completions</div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-emerald-500 h-2 rounded-full" style={{width: '52%'}}></div>
+                  <div className="bg-emerald-500 h-2 rounded-full" style={{width: '58%'}}></div>
                 </div>
-                <div className="text-xs text-emerald-600 mt-2">52% of enrollments completed!</div>
+                <div className="text-xs text-emerald-600 mt-2">across 18 courses</div>
               </div>
             </div>
 
@@ -1500,7 +1504,7 @@ Thanks for everything you do.`
                   <BookOpen className="w-5 h-5 text-blue-500" />
                   <h3 className="text-lg font-semibold text-gray-900">What&apos;s Resonating</h3>
                 </div>
-                <span className="text-xs text-gray-500">19 of 33 courses with engagement</span>
+                <span className="text-xs text-gray-500">Top 10 courses · 13 of 33 have zero engagement</span>
               </div>
 
               <div className="space-y-3">
@@ -1545,7 +1549,7 @@ Thanks for everything you do.`
                     <Users className="w-5 h-5 text-amber-600" />
                   </div>
                   <div className="text-left">
-                    <div className="font-semibold text-gray-900">33 paras haven&apos;t logged in yet</div>
+                    <div className="font-semibold text-gray-900">19 paras haven&apos;t logged in yet</div>
                     <div className="text-sm text-amber-700">They may need a quick walkthrough to get started</div>
                   </div>
                 </div>
@@ -1638,17 +1642,17 @@ Thanks for everything you do.`
                   </div>
                 </div>
 
-                {/* Scheduled Sessions */}
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50/50">
-                  <div className="w-5 h-5 rounded bg-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <Calendar className="w-3 h-3 text-white" />
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-green-50/50">
+                  <div className="w-5 h-5 rounded bg-emerald-500 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <Check className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <div className="font-medium text-blue-900">In-Person Para Training</div>
-                    <div className="text-sm text-blue-600">February 13, 2026 · 1:00 - 3:00 PM · Baseline survey collection</div>
+                    <div className="font-medium text-gray-400 line-through">The Moves That Matter: Part 1 & Part 2</div>
+                    <div className="text-sm text-emerald-600">Complete · 62 practice reps delivered (8 + 54)</div>
                   </div>
                 </div>
 
+                {/* Scheduled Sessions */}
                 <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50/50">
                   <div className="w-5 h-5 rounded bg-blue-500 flex items-center justify-center flex-shrink-0 mt-0.5">
                     <Calendar className="w-3 h-3 text-white" />
@@ -1705,34 +1709,21 @@ Thanks for everything you do.`
         {activeTab === 'schools' && (
           <div className="space-y-6">
             {/* Summary Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="bg-white rounded-xl p-4 border border-gray-200">
-                <div className="text-2xl font-bold text-gray-900">9</div>
-                <div className="text-sm text-gray-500">Schools</div>
-              </div>
-              <div className="bg-white rounded-xl p-4 border border-gray-200">
-                <div className="text-2xl font-bold text-blue-600">49</div>
-                <div className="text-sm text-gray-500">Paras Engaged</div>
-              </div>
-              <div className="bg-white rounded-xl p-4 border border-gray-200">
-                <div className="text-2xl font-bold text-emerald-600">89</div>
-                <div className="text-sm text-gray-500">Course Activities</div>
-              </div>
-              <div className="bg-white rounded-xl p-4 border border-gray-200">
-                <div className="text-2xl font-bold text-red-600">2</div>
-                <div className="text-sm text-gray-500">Need Attention</div>
-              </div>
+            <div className="bg-white rounded-xl p-4 border border-gray-200 mb-4">
+              <div className="text-lg font-bold text-gray-900">9 schools · 113 paras · 94 logged in (83%)</div>
+              <div className="text-sm text-gray-500 mt-1">Top performers: Ardmore (100%), Wesley (93%), Fullerton & Indian Trail (92%)</div>
+              <div className="text-sm text-amber-600 mt-1">Needs attention: Lake Park (67%), ELC (75%)</div>
             </div>
 
-            {/* Alert for schools with no engagement */}
+            {/* Alert for schools needing attention */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
               <div className="flex items-start gap-3">
                 <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-medium text-amber-800">ELC and Ardmore have zero course engagement</p>
+                  <p className="font-medium text-amber-800">Lake Park (67%) and ELC (75%) have the lowest login rates</p>
                   <p className="text-sm text-amber-700 mt-1">
-                    These teams have logged in but haven&apos;t started any courses yet. Consider a Hub walkthrough
-                    or recommending a specific starting point.
+                    ELC has the most paras (24) and the most remaining logins (6). Lake Park has the lowest login rate.
+                    Consider a targeted outreach or walkthrough at the next staff meetings.
                   </p>
                 </div>
               </div>
@@ -2453,7 +2444,7 @@ Thanks for everything you do.`
               <h3 className="font-bold text-[#1e2749] mb-4">Your Partnership Includes</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <p className="text-2xl font-bold text-[#1e2749]">119</p>
+                  <p className="text-2xl font-bold text-[#1e2749]">113</p>
                   <p className="text-xs text-gray-500">Paras Enrolled</p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
