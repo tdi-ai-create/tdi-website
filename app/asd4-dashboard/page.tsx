@@ -1883,15 +1883,6 @@ Thanks for everything you do.`
                   <span className="text-sm text-gray-500 w-20 text-right">43 responses</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-600 w-48 flex-shrink-0">Knowing which courses to start with</span>
-                  <div className="flex-1 bg-gray-200 rounded-full h-4">
-                    <div className="bg-[#38618C]/70 h-4 rounded-full flex items-center justify-end pr-2" style={{width: '35%'}}>
-                      <span className="text-xs text-white font-medium">35%</span>
-                    </div>
-                  </div>
-                  <span className="text-sm text-gray-500 w-20 text-right">28 responses</span>
-                </div>
-                <div className="flex items-center gap-3">
                   <span className="text-sm text-gray-600 w-48 flex-shrink-0">A walkthrough of how to use it</span>
                   <div className="flex-1 bg-gray-200 rounded-full h-4">
                     <div className="bg-[#38618C]/50 h-4 rounded-full flex items-center justify-end pr-2" style={{width: '17%'}}>
@@ -1932,17 +1923,6 @@ Thanks for everything you do.`
                   </div>
                   <div className="flex items-start gap-2">
                     <span className="font-bold text-[#1e2749]">2.</span>
-                    <div>
-                      <span className="font-medium">Share recommended starting courses with para teams:</span>
-                      <ul className="text-gray-500 ml-4 mt-1 space-y-0.5">
-                        <li>• &quot;How to Get the MOST Out of the TDI Learning Hub&quot; (orientation)</li>
-                        <li>• &quot;Paraprofessional Foundations&quot; (most popular, 19 started)</li>
-                      </ul>
-                      <span className="text-gray-500">→ 35% said knowing where to start would help</span>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="font-bold text-[#1e2749]">3.</span>
                     <div>
                       <span className="font-medium">Building-level walkthroughs for schools below 80% login rate</span>
                       <span className="text-gray-500 ml-1">→ 17% requested a walkthrough</span>
