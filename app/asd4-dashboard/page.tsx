@@ -133,7 +133,7 @@ export default function ASD4Dashboard() {
     {
       id: 'unrostered-accounts',
       title: 'Confirm 8 Unrostered Hub Accounts',
-      description: '8 accounts are active in the Learning Hub but were not included on the paraprofessional roster provided by leadership. These may be new hires, reassigned staff, or accounts needing cleanup.',
+      description: '8 accounts are active in the Learning Hub but were not on the paraprofessional roster provided by leadership.',
       deadline: 'MARCH 2026',
       actionLabel: 'Email Rae to Confirm',
       actionUrl: 'mailto:rae@teachersdeserveit.com?subject=ASD4%20Dashboard%20-%20Unrostered%20Account%20Confirmation',
@@ -141,15 +141,17 @@ export default function ASD4Dashboard() {
       priority: 'now',
       external: true,
       showCalendar: false,
-      extraContent: [
+      confirmedAccounts: [
+        'Elizabeth Herrera (eherrera@asd4.org) — attended Feb 13',
+        'Amanda Leveille (aleveille@asd4.org) — attended Feb 13',
+        'Giulia Bucaro (gbucaro@asd4.org) — attended Feb 13',
+        'Jennifer Perez (jperez@asd4.org) — attended Feb 13, name listed as "J Perez"'
+      ],
+      unconfirmedAccounts: [
         'Katie Purse (kpurse@asd4.org) — Admin role',
-        'Giulia Bucaro (gbucaro@asd4.org)',
         'Janet Diaz (jdiaz@asd4.org)',
         'Maria Cortez (mcortez@asd4.org)',
-        'Amanda Leveille (aleveille@asd4.org)',
-        'Elizabeth Herrera (eherrera@asd4.org)',
-        'J G (jgonzalez@asd4.org) — name incomplete',
-        'J Perez (jperez@asd4.org) — name incomplete'
+        'J G (jgonzalez@asd4.org) — name incomplete'
       ]
     }
   ];
@@ -275,7 +277,7 @@ export default function ASD4Dashboard() {
     { name: "De-Escalation Strategies for Unstructured Environments", started: 4, completed70: 3, inProgress: 1, completionRate: 75, avgProgress: 3 },
   ];
 
-  // School-level engagement data (with real course metrics)
+  // School-level engagement data (with real course metrics and survey data)
   const schoolData = [
     {
       id: 'wesley',
@@ -289,6 +291,7 @@ export default function ASD4Dashboard() {
           { name: 'Streamline Your Inbox: Email Management', count: 4, avgProgress: 65 },
         ],
       },
+      survey: { responses: 2, asking: null, feedback: null, limitedData: true },
       paras: [
         { name: 'Delgado, Beatriz', email: 'bdelgado@asd4.org', loggedIn: true },
         { name: 'Garcia, Claudia', email: 'cgarcia@asd4.org', loggedIn: true },
@@ -318,6 +321,7 @@ export default function ASD4Dashboard() {
           { name: 'Classroom Management Toolkit', count: 2, avgProgress: 28 },
         ],
       },
+      survey: { responses: 12, asking: 3.75, feedback: 3.83, limitedData: false },
       paras: [
         { name: 'Gorostieta, Michele', email: 'mgorostieta@asd4.org', loggedIn: true },
         { name: 'Beahan, Linda', email: 'lbeahan@asd4.org', loggedIn: true },
@@ -345,6 +349,7 @@ export default function ASD4Dashboard() {
           { name: 'Maximize Impact: One-on-One Conferences', count: 2, avgProgress: 55 },
         ],
       },
+      survey: { responses: 10, asking: 4.10, feedback: 4.00, limitedData: false },
       paras: [
         { name: 'Hawkins, Michelina', email: 'mhawkins@asd4.org', loggedIn: true },
         { name: 'Aguilar, Denys', email: 'daguilar@asd4.org', loggedIn: true },
@@ -371,6 +376,7 @@ export default function ASD4Dashboard() {
           { name: 'Differentiated Choice Boards', count: 1, avgProgress: 100 },
         ],
       },
+      survey: { responses: 8, asking: 3.25, feedback: 3.50, limitedData: false },
       paras: [
         { name: 'Castro, Caprice', email: 'ccastro@asd4.org', loggedIn: true },
         { name: 'Gorostieta, Jessica', email: 'jgorostieta@asd4.org', loggedIn: true },
@@ -397,6 +403,7 @@ export default function ASD4Dashboard() {
           { name: 'Differentiated Choice Boards', count: 1, avgProgress: 5 },
         ],
       },
+      survey: { responses: 12, asking: 4.08, feedback: 3.67, limitedData: false },
       paras: [
         { name: 'Bekhrani, Fatema', email: 'fbakhrani@asd4.org', loggedIn: true },
         { name: 'Guzman, Norma', email: 'nguzman@asd4.org', loggedIn: true },
@@ -425,6 +432,7 @@ export default function ASD4Dashboard() {
           { name: 'Differentiated Choice Boards', count: 2, avgProgress: 100 },
         ],
       },
+      survey: { responses: 4, asking: 4.50, feedback: 3.50, limitedData: true },
       paras: [
         { name: 'Alvarado, Patricia', email: 'palvarado@asd4.org', loggedIn: true },
         { name: 'Marquez, Claudia', email: 'cmarquez@asd4.org', loggedIn: true },
@@ -452,6 +460,7 @@ export default function ASD4Dashboard() {
           { name: 'Effective Communication Strategies', count: 1, avgProgress: 28 },
         ],
       },
+      survey: { responses: 6, asking: 3.83, feedback: 3.67, limitedData: false },
       paras: [
         { name: 'Zaragoza Aguilar, Ana', email: 'azaragoza@asd4.org', loggedIn: true },
         { name: 'Cantu, Imelda', email: 'icantu@asd4.org', loggedIn: true },
@@ -476,6 +485,7 @@ export default function ASD4Dashboard() {
         totalActivities: 0,
         topCourses: [],
       },
+      survey: { responses: 3, asking: 3.33, feedback: 3.67, limitedData: true },
       paras: [
         { name: 'Mondragon, Sugey', email: 'smondragon@asd4.org', loggedIn: true },
         { name: 'Peters, Maddalena', email: 'mpeters@asd4.org', loggedIn: true },
@@ -490,6 +500,7 @@ export default function ASD4Dashboard() {
         totalActivities: 0,
         topCourses: [],
       },
+      survey: { responses: 20, asking: 3.90, feedback: 3.75, limitedData: false },
       paras: [
         { name: 'Tinajero Monroy, Melany', email: 'mtinajero@asd4.org', loggedIn: false },
         { name: 'Katherine De La Cruz', email: 'kdelacruz@asd4.org', loggedIn: true },
@@ -816,12 +827,95 @@ Thanks for everything you do.`
                 <p className="text-xs text-amber-600">Try a walkthrough at your next meeting</p>
               </div>
 
-              {/* Card 3: TDI Impact */}
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-                <TrendingUp className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                <p className="text-sm font-semibold text-blue-800">65% Implementation</p>
-                <p className="text-xs text-blue-600">vs 10% industry average</p>
+              {/* Card 3: ASD4 Implementation */}
+              <div className="bg-gradient-to-br from-[#1e2749] to-[#38618C] border border-[#38618C] rounded-xl p-4 text-white">
+                <p className="text-xs font-semibold uppercase tracking-wide mb-2 opacity-80">After 2 Sessions</p>
+                <div className="space-y-2">
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span>Move #1: Questions</span>
+                      <span className="font-bold text-[#ffba06]">91%</span>
+                    </div>
+                    <div className="w-full bg-white/20 rounded-full h-2">
+                      <div className="bg-[#ffba06] h-2 rounded-full" style={{width: '91%'}}></div>
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between text-xs mb-1">
+                      <span>Move #2: Feedback</span>
+                      <span className="font-bold text-teal-300">70%</span>
+                    </div>
+                    <div className="w-full bg-white/20 rounded-full h-2">
+                      <div className="bg-teal-400 h-2 rounded-full" style={{width: '70%'}}></div>
+                    </div>
+                  </div>
+                </div>
+                <p className="text-xs opacity-60 mt-2">vs 10% industry avg</p>
               </div>
+            </div>
+
+            {/* ASD4 Implementation Comparison */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center gap-2 mb-4">
+                <BarChart3 className="w-5 h-5 text-[#38618C]" />
+                <h3 className="text-lg font-bold text-[#1e2749]">ASD4 Implementation — After 2 Sessions</h3>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                {/* Move #1 */}
+                <div className="bg-[#ffba06]/10 rounded-xl p-4 border border-[#ffba06]/30">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-semibold text-[#1e2749]">Move #1: Questions Instead of Telling</span>
+                    <span className="text-2xl font-bold text-[#ffba06]">91%</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">69 of 76 paras who attended Part 1 are implementing</p>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div className="bg-[#ffba06] h-3 rounded-full" style={{width: '91%'}}></div>
+                  </div>
+                </div>
+
+                {/* Move #2 */}
+                <div className="bg-teal-50 rounded-xl p-4 border border-teal-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="font-semibold text-[#1e2749]">Move #2: Feedback Formula</span>
+                    <span className="text-2xl font-bold text-teal-600">70%</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">53 of 76 paras who attended Part 1 are implementing</p>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div className="bg-teal-500 h-3 rounded-full" style={{width: '70%'}}></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tiered Comparison */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">How this compares:</p>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-gray-600 w-28">Industry Avg</span>
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div className="bg-gray-400 h-2 rounded-full" style={{width: '10%'}}></div>
+                    </div>
+                    <span className="text-sm font-medium text-gray-500 w-12 text-right">10%</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-gray-600 w-28">TDI Partners</span>
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div className="bg-[#ffba06]/50 h-2 rounded-full" style={{width: '65%'}}></div>
+                    </div>
+                    <span className="text-sm font-medium text-[#ffba06] w-12 text-right">65%</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-semibold text-[#1e2749] w-28">ASD4 Paras</span>
+                    <div className="flex-1 bg-gray-200 rounded-full h-2">
+                      <div className="bg-gradient-to-r from-[#ffba06] to-teal-500 h-2 rounded-full" style={{width: '91%'}}></div>
+                    </div>
+                    <span className="text-sm font-bold text-[#1e2749] w-12 text-right">91%</span>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-400 mt-4 text-center">Self-reported after 2 in-person sessions · 62 practice reps · Survey Feb 13, 2026</p>
             </div>
 
             {/* Section 2: Needs Attention */}
@@ -880,18 +974,32 @@ Thanks for everything you do.`
                               </button>
                             </div>
                           </div>
-                          {/* Show extra content for items with account lists */}
-                          {item.extraContent && (
+                          {/* Show confirmed/unconfirmed accounts for unrostered item */}
+                          {item.confirmedAccounts && item.unconfirmedAccounts && (
                             <div className="mt-4 pt-3 border-t border-gray-200">
-                              <p className="text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Accounts needing confirmation:</p>
-                              <ul className="text-sm text-gray-600 space-y-1 columns-2">
-                                {item.extraContent.map((account: string, idx: number) => (
-                                  <li key={idx} className="flex items-start gap-1">
-                                    <span className="text-gray-400">•</span>
-                                    <span>{account}</span>
-                                  </li>
-                                ))}
-                              </ul>
+                              <div className="mb-4">
+                                <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-2">4 attended Feb 13 session — confirm school assignments:</p>
+                                <ul className="text-sm text-gray-600 space-y-1">
+                                  {item.confirmedAccounts.map((account: string, idx: number) => (
+                                    <li key={idx} className="flex items-start gap-1">
+                                      <span className="text-emerald-500">•</span>
+                                      <span>{account}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                              <div>
+                                <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">4 additional accounts need confirmation:</p>
+                                <ul className="text-sm text-gray-600 space-y-1">
+                                  {item.unconfirmedAccounts.map((account: string, idx: number) => (
+                                    <li key={idx} className="flex items-start gap-1">
+                                      <span className="text-amber-500">•</span>
+                                      <span>{account}</span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              </div>
+                              <p className="text-xs text-gray-500 mt-3 italic">Please confirm school assignments and whether these should be added to the official roster.</p>
                             </div>
                           )}
                         </div>
@@ -1268,6 +1376,94 @@ Thanks for everything you do.`
               </div>
             </div>
 
+            {/* Session Impact — Survey Data */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center gap-2 mb-4">
+                <Activity className="w-5 h-5 text-[#38618C]" />
+                <h3 className="text-lg font-bold text-[#1e2749]">After 2 Sessions: What the Data Shows</h3>
+              </div>
+
+              {/* Implementation Rates */}
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
+                {/* Move #1 */}
+                <div className="bg-[#ffba06]/10 rounded-xl p-5 border border-[#ffba06]/30">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-semibold text-[#1e2749]">Move #1: Questions Instead of Telling</span>
+                    <span className="text-3xl font-bold text-[#ffba06]">91%</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3">69 of 76 paras who attended Part 1</p>
+                  <div className="text-xs text-gray-500 space-y-1">
+                    <div className="flex justify-between"><span>Multiple times:</span><span className="font-medium">31</span></div>
+                    <div className="flex justify-between"><span>Once or twice:</span><span className="font-medium">38</span></div>
+                    <div className="flex justify-between"><span>Plan to:</span><span className="font-medium">5</span></div>
+                    <div className="flex justify-between"><span>Wasn&apos;t sure how:</span><span className="font-medium">2</span></div>
+                  </div>
+                </div>
+
+                {/* Move #2 */}
+                <div className="bg-teal-50 rounded-xl p-5 border border-teal-200">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-semibold text-[#1e2749]">Move #2: Feedback Formula</span>
+                    <span className="text-3xl font-bold text-teal-600">70%</span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3">53 of 76 paras who attended Part 1</p>
+                  <div className="text-xs text-gray-500 space-y-1">
+                    <div className="flex justify-between"><span>Multiple times:</span><span className="font-medium">20</span></div>
+                    <div className="flex justify-between"><span>Once or twice:</span><span className="font-medium">33</span></div>
+                    <div className="flex justify-between"><span>Plan to:</span><span className="font-medium">18</span></div>
+                    <div className="flex justify-between"><span>Wasn&apos;t sure how:</span><span className="font-medium">5</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-500 mb-6">Based on 76 respondents who attended Part 1 in January. 5 additional respondents were not at Part 1. Self-reported Feb 13, 2026.</p>
+
+              {/* Post-Session Confidence */}
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-700">Confidence: Asking Questions</span>
+                    <div className="text-right">
+                      <span className="text-xl font-bold text-[#1e2749]">3.86</span>
+                      <span className="text-sm text-gray-400">/5</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">70% rated 4 or 5</p>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-700">Confidence: Feedback Formula</span>
+                    <div className="text-right">
+                      <span className="text-xl font-bold text-[#1e2749]">3.74</span>
+                      <span className="text-sm text-gray-400">/5</span>
+                    </div>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-1">62% rated 4 or 5</p>
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-500 mb-6">Self-reported after 2 in-person sessions and 62 practice reps. Observation day data will provide the next comparison point.</p>
+
+              {/* Survey Engagement */}
+              <div className="bg-[#38618C]/5 rounded-lg p-4">
+                <p className="text-xs font-semibold text-[#38618C] uppercase tracking-wide mb-2">Survey Engagement</p>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <div className="text-xl font-bold text-[#1e2749]">72%</div>
+                    <div className="text-xs text-gray-500">Response Rate<br />(81 of 113)</div>
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-[#1e2749]">100%</div>
+                    <div className="text-xs text-gray-500">Written Commitments<br />(81 of 81)</div>
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold text-[#1e2749]">51%</div>
+                    <div className="text-xs text-gray-500">Favorite Game<br />Tell or Ask</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Sessions Completed */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
@@ -1613,6 +1809,93 @@ Thanks for everything you do.`
               )}
             </div>
 
+            {/* Hub Barriers — What Paras Need */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border">
+              <div className="flex items-center gap-2 mb-4">
+                <HelpCircle className="w-5 h-5 text-[#38618C]" />
+                <h3 className="text-lg font-semibold text-gray-900">What Would Help Paras Use the Hub</h3>
+              </div>
+
+              <div className="space-y-3 mb-6">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600 w-48 flex-shrink-0">Dedicated time during work hours</span>
+                  <div className="flex-1 bg-gray-200 rounded-full h-4">
+                    <div className="bg-[#38618C] h-4 rounded-full flex items-center justify-end pr-2" style={{width: '53%'}}>
+                      <span className="text-xs text-white font-medium">53%</span>
+                    </div>
+                  </div>
+                  <span className="text-sm text-gray-500 w-20 text-right">43 responses</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600 w-48 flex-shrink-0">Knowing which courses to start with</span>
+                  <div className="flex-1 bg-gray-200 rounded-full h-4">
+                    <div className="bg-[#38618C]/70 h-4 rounded-full flex items-center justify-end pr-2" style={{width: '35%'}}>
+                      <span className="text-xs text-white font-medium">35%</span>
+                    </div>
+                  </div>
+                  <span className="text-sm text-gray-500 w-20 text-right">28 responses</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600 w-48 flex-shrink-0">A walkthrough of how to use it</span>
+                  <div className="flex-1 bg-gray-200 rounded-full h-4">
+                    <div className="bg-[#38618C]/50 h-4 rounded-full flex items-center justify-end pr-2" style={{width: '17%'}}>
+                      <span className="text-xs text-white font-medium">17%</span>
+                    </div>
+                  </div>
+                  <span className="text-sm text-gray-500 w-20 text-right">14 responses</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600 w-48 flex-shrink-0">Reminders / accountability</span>
+                  <div className="flex-1 bg-gray-200 rounded-full h-4">
+                    <div className="bg-[#38618C]/30 h-4 rounded-full" style={{width: '9%'}}></div>
+                  </div>
+                  <span className="text-sm text-gray-500 w-20 text-right">7 responses</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-600 w-48 flex-shrink-0">Already using it regularly</span>
+                  <div className="flex-1 bg-gray-200 rounded-full h-4">
+                    <div className="bg-emerald-500 h-4 rounded-full" style={{width: '2%'}}></div>
+                  </div>
+                  <span className="text-sm text-gray-500 w-20 text-right">2 responses</span>
+                </div>
+              </div>
+
+              {/* Recommended Actions */}
+              <div className="bg-[#ffba06]/10 border border-[#ffba06]/30 rounded-xl p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <Lightbulb className="w-5 h-5 text-[#ffba06]" />
+                  <span className="font-semibold text-[#1e2749]">Recommended Actions for Admin</span>
+                </div>
+                <div className="space-y-3 text-sm text-gray-700">
+                  <div className="flex items-start gap-2">
+                    <span className="font-bold text-[#1e2749]">1.</span>
+                    <div>
+                      <span className="font-medium">Dedicate 15-30 min of Late Start Day time for Hub exploration</span>
+                      <span className="text-gray-500 ml-1">→ 53% of paras say this is the #1 thing that would help</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="font-bold text-[#1e2749]">2.</span>
+                    <div>
+                      <span className="font-medium">Share recommended starting courses with para teams:</span>
+                      <ul className="text-gray-500 ml-4 mt-1 space-y-0.5">
+                        <li>• &quot;How to Get the MOST Out of the TDI Learning Hub&quot; (orientation)</li>
+                        <li>• &quot;Paraprofessional Foundations&quot; (most popular, 19 started)</li>
+                      </ul>
+                      <span className="text-gray-500">→ 35% said knowing where to start would help</span>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="font-bold text-[#1e2749]">3.</span>
+                    <div>
+                      <span className="font-medium">Building-level walkthroughs for schools below 80% login rate</span>
+                      <span className="text-gray-500 ml-1">→ 17% requested a walkthrough</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Section 7: Suggested Next Steps */}
             <div className="bg-white rounded-xl p-6 shadow-sm border">
               <div className="flex items-center gap-2 mb-4">
@@ -1792,6 +2075,32 @@ Thanks for everything you do.`
                             {school.loginRate}% logged in
                           </div>
 
+                          {/* Survey Confidence Badge */}
+                          {school.survey && (
+                            <div className="hidden md:flex items-center gap-2 text-xs">
+                              {school.survey.limitedData ? (
+                                <span className="text-gray-400">{school.survey.responses} responses</span>
+                              ) : (
+                                <>
+                                  <span className={`px-1.5 py-0.5 rounded ${
+                                    school.survey.asking && school.survey.asking >= 4.0 ? 'bg-emerald-100 text-emerald-700' :
+                                    school.survey.asking && school.survey.asking >= 3.5 ? 'bg-gray-100 text-gray-600' :
+                                    'bg-amber-100 text-amber-700'
+                                  }`}>
+                                    Ask: {school.survey.asking?.toFixed(2) || '—'}
+                                  </span>
+                                  <span className={`px-1.5 py-0.5 rounded ${
+                                    school.survey.feedback && school.survey.feedback >= 4.0 ? 'bg-emerald-100 text-emerald-700' :
+                                    school.survey.feedback && school.survey.feedback >= 3.5 ? 'bg-gray-100 text-gray-600' :
+                                    'bg-amber-100 text-amber-700'
+                                  }`}>
+                                    Feedback: {school.survey.feedback?.toFixed(2) || '—'}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          )}
+
                           {/* Chevron */}
                           <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${
                             isExpanded ? 'rotate-180' : ''
@@ -1841,6 +2150,43 @@ Thanks for everything you do.`
                               </div>
                             )}
                           </div>
+
+                          {/* Survey Confidence Section */}
+                          {school.survey && (
+                            <div className="py-4 border-t border-gray-100">
+                              <h5 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
+                                Survey Confidence ({school.survey.responses} responses{school.survey.limitedData ? ' - limited data' : ''})
+                              </h5>
+                              {school.survey.limitedData ? (
+                                <p className="text-sm text-gray-500">
+                                  Not enough survey responses to show reliable confidence data.
+                                </p>
+                              ) : (
+                                <div className="flex gap-6">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm text-gray-600">Asking Questions:</span>
+                                    <span className={`px-2 py-1 rounded-full text-sm font-medium ${
+                                      school.survey.asking && school.survey.asking >= 4.0 ? 'bg-emerald-100 text-emerald-700' :
+                                      school.survey.asking && school.survey.asking >= 3.5 ? 'bg-gray-100 text-gray-600' :
+                                      'bg-amber-100 text-amber-700'
+                                    }`}>
+                                      {school.survey.asking?.toFixed(2) || '—'}
+                                    </span>
+                                  </div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-sm text-gray-600">Giving Feedback:</span>
+                                    <span className={`px-2 py-1 rounded-full text-sm font-medium ${
+                                      school.survey.feedback && school.survey.feedback >= 4.0 ? 'bg-emerald-100 text-emerald-700' :
+                                      school.survey.feedback && school.survey.feedback >= 3.5 ? 'bg-gray-100 text-gray-600' :
+                                      'bg-amber-100 text-amber-700'
+                                    }`}>
+                                      {school.survey.feedback?.toFixed(2) || '—'}
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          )}
 
                           {/* Action Buttons Row */}
                           <div className="flex flex-wrap items-center gap-3 py-3 border-t border-gray-100">
