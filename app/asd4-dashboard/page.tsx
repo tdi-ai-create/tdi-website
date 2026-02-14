@@ -1883,15 +1883,6 @@ Thanks for everything you do.`
                   <span className="text-sm text-gray-500 w-20 text-right">43 responses</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-600 w-48 flex-shrink-0">A walkthrough of how to use it</span>
-                  <div className="flex-1 bg-gray-200 rounded-full h-4">
-                    <div className="bg-[#38618C]/50 h-4 rounded-full flex items-center justify-end pr-2" style={{width: '17%'}}>
-                      <span className="text-xs text-white font-medium">17%</span>
-                    </div>
-                  </div>
-                  <span className="text-sm text-gray-500 w-20 text-right">14 responses</span>
-                </div>
-                <div className="flex items-center gap-3">
                   <span className="text-sm text-gray-600 w-48 flex-shrink-0">Reminders / accountability</span>
                   <div className="flex-1 bg-gray-200 rounded-full h-4">
                     <div className="bg-[#38618C]/30 h-4 rounded-full" style={{width: '9%'}}></div>
@@ -1919,13 +1910,6 @@ Thanks for everything you do.`
                     <div>
                       <span className="font-medium">Dedicate 15-30 min of Late Start Day time for Hub exploration</span>
                       <span className="text-gray-500 ml-1">→ 53% of paras say this is the #1 thing that would help</span>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="font-bold text-[#1e2749]">2.</span>
-                    <div>
-                      <span className="font-medium">Building-level walkthroughs for schools below 80% login rate</span>
-                      <span className="text-gray-500 ml-1">→ 17% requested a walkthrough</span>
                     </div>
                   </div>
                 </div>
