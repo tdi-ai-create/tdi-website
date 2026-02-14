@@ -1054,8 +1054,8 @@ function ReportsTab() {
   );
 }
 
-// Color palette for charts
-const CHART_COLORS = ['#5BBEC4', '#E8B84B', '#8B5CF6', '#16A34A', '#EF4444', '#F59E0B', '#3B82F6', '#EC4899'];
+// Color palette for charts (TDI colors: teal, gold, coral, green - no purple/violet)
+const CHART_COLORS = ['#5BBEC4', '#E8B84B', '#E8927C', '#16A34A', '#EF4444', '#F59E0B', '#5BBEC4', '#E8927C'];
 
 // ANALYTICS TAB
 function AnalyticsTab() {
@@ -1109,18 +1109,18 @@ function AnalyticsTab() {
   return (
     <div>
       {/* Sticky Filter Bar */}
-      <div className="sticky top-0 z-10 bg-[#FAFAF8] -mx-4 md:-mx-8 px-4 md:px-8 py-3 mb-6 border-b border-gray-200">
+      <div className="sticky top-0 z-10 bg-white rounded-lg border border-gray-200 p-4 mb-6 shadow-sm">
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-gray-500 mr-1">
             <Filter size={16} />
-            <span>Filters:</span>
+            <span className="font-medium">Filters:</span>
           </div>
 
           {/* State Filter */}
           <select
             value={filters.state}
             onChange={(e) => setFilters({ ...filters, state: e.target.value })}
-            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50 min-w-[120px] max-w-[160px]"
           >
             <option value="">All States</option>
             {filterOptions.states.map((s: string) => (
@@ -1132,11 +1132,11 @@ function AnalyticsTab() {
           <select
             value={filters.org}
             onChange={(e) => setFilters({ ...filters, org: e.target.value })}
-            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50 max-w-[200px]"
+            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50 min-w-[140px] max-w-[180px]"
           >
-            <option value="">All Schools/Orgs</option>
+            <option value="">All Schools</option>
             {filterOptions.orgs.slice(0, 50).map((o: string) => (
-              <option key={o} value={o}>{o.length > 30 ? o.slice(0, 30) + '...' : o}</option>
+              <option key={o} value={o}>{o.length > 20 ? o.slice(0, 20) + '...' : o}</option>
             ))}
           </select>
 
@@ -1144,7 +1144,7 @@ function AnalyticsTab() {
           <select
             value={filters.role}
             onChange={(e) => setFilters({ ...filters, role: e.target.value })}
-            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50 min-w-[120px] max-w-[150px]"
           >
             <option value="all">All Roles</option>
             <option value="teacher">Teacher</option>
@@ -1157,7 +1157,7 @@ function AnalyticsTab() {
           <select
             value={filters.gradeLevel}
             onChange={(e) => setFilters({ ...filters, gradeLevel: e.target.value })}
-            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50 min-w-[120px] max-w-[140px]"
           >
             <option value="all">All Grades</option>
             <option value="Pre-K">Pre-K</option>
@@ -1172,20 +1172,19 @@ function AnalyticsTab() {
           <select
             value={filters.gender}
             onChange={(e) => setFilters({ ...filters, gender: e.target.value })}
-            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50 min-w-[120px] max-w-[150px]"
           >
             <option value="all">All Genders</option>
             <option value="female">Female</option>
             <option value="male">Male</option>
             <option value="non_binary">Non-Binary</option>
-            <option value="prefer_not_to_say">Prefer Not to Say</option>
           </select>
 
           {/* Language Filter */}
           <select
             value={filters.language}
             onChange={(e) => setFilters({ ...filters, language: e.target.value })}
-            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50 min-w-[120px] max-w-[150px]"
           >
             <option value="all">All Languages</option>
             <option value="english">English</option>
@@ -1196,13 +1195,55 @@ function AnalyticsTab() {
           {activeFilterCount > 0 && (
             <button
               onClick={resetFilters}
-              className="px-3 py-1.5 text-sm text-red-600 hover:text-red-700 flex items-center gap-1"
+              className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 flex items-center gap-1"
             >
               <X size={14} />
-              Clear ({activeFilterCount})
+              Reset
             </button>
           )}
         </div>
+
+        {/* Active Filter Pills */}
+        {activeFilterCount > 0 && (
+          <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100">
+            {filters.state && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#5BBEC4]/10 text-[#5BBEC4] text-xs rounded-full">
+                State: {filters.state}
+                <button onClick={() => setFilters({ ...filters, state: '' })} className="hover:text-[#2B3A67]"><X size={12} /></button>
+              </span>
+            )}
+            {filters.org && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#5BBEC4]/10 text-[#5BBEC4] text-xs rounded-full">
+                Org: {filters.org.length > 15 ? filters.org.slice(0, 15) + '...' : filters.org}
+                <button onClick={() => setFilters({ ...filters, org: '' })} className="hover:text-[#2B3A67]"><X size={12} /></button>
+              </span>
+            )}
+            {filters.role !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#E8B84B]/10 text-[#E8B84B] text-xs rounded-full">
+                Role: {filters.role.replace('_', ' ')}
+                <button onClick={() => setFilters({ ...filters, role: 'all' })} className="hover:text-[#2B3A67]"><X size={12} /></button>
+              </span>
+            )}
+            {filters.gradeLevel !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#E8B84B]/10 text-[#E8B84B] text-xs rounded-full">
+                Grade: {filters.gradeLevel}
+                <button onClick={() => setFilters({ ...filters, gradeLevel: 'all' })} className="hover:text-[#2B3A67]"><X size={12} /></button>
+              </span>
+            )}
+            {filters.gender !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#E8927C]/10 text-[#E8927C] text-xs rounded-full">
+                Gender: {filters.gender}
+                <button onClick={() => setFilters({ ...filters, gender: 'all' })} className="hover:text-[#2B3A67]"><X size={12} /></button>
+              </span>
+            )}
+            {filters.language !== 'all' && (
+              <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#E8927C]/10 text-[#E8927C] text-xs rounded-full">
+                Language: {filters.language}
+                <button onClick={() => setFilters({ ...filters, language: 'all' })} className="hover:text-[#2B3A67]"><X size={12} /></button>
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* AI Insights Box */}
@@ -1353,7 +1394,7 @@ function AnalyticsTab() {
                     <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <Tooltip />
-                    <Line type="monotone" dataKey="users" stroke="#8B5CF6" strokeWidth={2} dot={{ fill: '#8B5CF6' }} name="Active Users" />
+                    <Line type="monotone" dataKey="users" stroke="#E8927C" strokeWidth={2} dot={{ fill: '#E8927C' }} name="Active Users" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -1377,7 +1418,7 @@ function AnalyticsTab() {
                       width={140}
                     />
                     <Tooltip />
-                    <Bar dataKey="count" fill="#8B5CF6" radius={[0, 4, 4, 0]} name="Users" />
+                    <Bar dataKey="count" fill="#E8927C" radius={[0, 4, 4, 0]} name="Users" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -1598,7 +1639,7 @@ function AnalyticsTab() {
                     <XAxis type="number" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <YAxis type="category" dataKey="state" tick={{ fontSize: 11 }} stroke="#9CA3AF" width={80} />
                     <Tooltip />
-                    <Bar dataKey="count" fill="#3B82F6" radius={[0, 4, 4, 0]} name="Users" />
+                    <Bar dataKey="count" fill="#5BBEC4" radius={[0, 4, 4, 0]} name="Users" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -1673,7 +1714,7 @@ function AnalyticsTab() {
             </div>
             <div className="bg-white rounded-lg border border-gray-200 p-5">
               <p className="text-sm text-gray-500 mb-1">Avg Reduction</p>
-              <p className="text-2xl font-bold" style={{ color: '#8B5CF6' }}>{insights.avgStressReduction || 0}</p>
+              <p className="text-2xl font-bold" style={{ color: '#E8927C' }}>{insights.avgStressReduction || 0}</p>
               <p className="text-xs text-gray-400">Points improved</p>
             </div>
           </div>
@@ -1763,7 +1804,7 @@ function AnalyticsTab() {
                       <Tooltip />
                       <Bar dataKey="count" name="Activity" radius={[4, 4, 0, 0]}>
                         {analytics.activityByHour.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={entry.isPeak ? '#E8B84B' : '#8B5CF6'} />
+                          <Cell key={`cell-${index}`} fill={entry.isPeak ? '#E8B84B' : '#5BBEC4'} />
                         ))}
                       </Bar>
                     </BarChart>
@@ -1786,7 +1827,7 @@ function AnalyticsTab() {
                     <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <Tooltip />
-                    <Line type="monotone" dataKey="users" stroke="#3B82F6" strokeWidth={2} dot={{ fill: '#3B82F6' }} name="Active Users" />
+                    <Line type="monotone" dataKey="users" stroke="#5BBEC4" strokeWidth={2} dot={{ fill: '#5BBEC4' }} name="Active Users" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
