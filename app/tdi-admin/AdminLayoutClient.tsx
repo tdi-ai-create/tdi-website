@@ -7,8 +7,9 @@ import { getSupabase } from '@/lib/supabase';
 import { TDIAdminProvider, useTDIAdmin } from '@/lib/tdi-admin/context';
 import { BookOpen, Palette, Building2, Users, LogOut, ShieldAlert } from 'lucide-react';
 import type { User } from '@supabase/supabase-js';
+import { getPortalTheme } from '@/lib/tdi-admin/theme';
 
-// Portal accent colors
+// Portal accent colors (extended for nav styling)
 const PORTAL_COLORS = {
   hub: { accent: '#5BBEC4', light: '#E8F6F7', bg15: 'rgba(91, 190, 196, 0.15)', border30: 'rgba(91, 190, 196, 0.3)' },
   creators: { accent: '#9B7CB8', light: '#F3EDF8', bg15: 'rgba(155, 124, 184, 0.15)', border30: 'rgba(155, 124, 184, 0.3)' },
@@ -185,6 +186,15 @@ function AdminNavbar({ user }: { user: User }) {
           })}
         </div>
       </div>
+
+      {/* Portal Accent Line */}
+      <div
+        style={{
+          height: 3,
+          backgroundColor: getActiveAccent(),
+          width: '100%',
+        }}
+      />
     </header>
   );
 }

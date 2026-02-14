@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
+import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 import {
   TeamMember,
   TeamPermissions,
@@ -28,6 +29,9 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import Link from 'next/link';
+
+// Team theme colors (gold)
+const theme = PORTAL_THEMES.team;
 
 export default function TeamManagementPage() {
   const { isOwner, canManageTeam, refreshTeamMember } = useTDIAdmin();

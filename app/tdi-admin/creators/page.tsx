@@ -25,19 +25,23 @@ import {
   Palette,
   MapPin,
 } from 'lucide-react';
+import { useTDIAdmin } from '@/lib/tdi-admin/context';
+import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
+import { createCreator } from '@/lib/creator-portal-data';
+import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
+
+// Creators theme colors
+const theme = PORTAL_THEMES.creators;
 
 // Dynamic import for map to avoid SSR issues
 const USMapChart = dynamic(() => import('@/components/tdi-admin/USMapChart'), {
   ssr: false,
   loading: () => (
     <div className="h-[300px] flex items-center justify-center bg-gray-50 rounded-lg">
-      <Loader2 className="w-6 h-6 animate-spin text-[#E8B84B]" />
+      <Loader2 className="w-6 h-6 animate-spin" style={{ color: theme.primary }} />
     </div>
   ),
 });
-import { useTDIAdmin } from '@/lib/tdi-admin/context';
-import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
-import { createCreator } from '@/lib/creator-portal-data';
 
 // Types
 interface EnrichedCreator {
@@ -427,7 +431,7 @@ export default function CreatorStudioPage() {
     return (
       <div className="flex items-center justify-center py-20">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: '#E8B84B' }} />
+          <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4" style={{ color: theme.primary }} />
           <p className="text-gray-600" style={{ fontFamily: "'DM Sans', sans-serif" }}>
             Loading Creator Studio...
           </p>
@@ -465,11 +469,16 @@ export default function CreatorStudioPage() {
         <div>
           <h1
             className="text-2xl font-bold"
-            style={{ fontFamily: "'Source Serif 4', Georgia, serif", color: '#2B3A67' }}
+            style={{
+              fontFamily: "'Source Serif 4', Georgia, serif",
+              color: '#2B3A67',
+              borderLeft: `4px solid ${theme.primary}`,
+              paddingLeft: '16px',
+            }}
           >
             Creator Command Center
           </h1>
-          <p className="text-gray-600" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+          <p className="text-gray-600 pl-5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
             Pipeline overview and creator management
           </p>
         </div>
@@ -479,10 +488,12 @@ export default function CreatorStudioPage() {
             onClick={() => setShowAddModal(true)}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
             style={{
-              backgroundColor: '#E8B84B',
-              color: '#2B3A67',
+              backgroundColor: theme.primary,
+              color: 'white',
               fontFamily: "'DM Sans', sans-serif",
             }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.dark}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theme.primary}
           >
             <Plus className="w-4 h-4" />
             Add Creator
@@ -495,19 +506,21 @@ export default function CreatorStudioPage() {
         {/* Total */}
         <button
           onClick={() => handleStatCardClick(null)}
-          className={`bg-white rounded-xl p-4 border transition-all text-left ${
-            activeStatFilter === null ? 'border-[#E8B84B] ring-2 ring-[#E8B84B]/20' : 'border-gray-200 hover:border-gray-300'
-          }`}
+          className="bg-white rounded-xl p-4 border transition-all text-left"
+          style={{
+            borderColor: activeStatFilter === null ? theme.primary : '#E5E7EB',
+            boxShadow: activeStatFilter === null ? `0 0 0 2px ${theme.primary}20` : 'none',
+          }}
         >
           <div className="flex items-center gap-3">
             <div
               className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: 'rgba(43, 58, 103, 0.1)' }}
+              style={{ backgroundColor: theme.light }}
             >
-              <Users className="w-5 h-5" style={{ color: '#2B3A67' }} />
+              <Users className="w-5 h-5" style={{ color: theme.primary }} />
             </div>
             <div>
-              <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>{stats.total}</p>
+              <p className="text-2xl font-bold" style={{ color: theme.primary }}>{stats.total}</p>
               <p className="text-xs text-gray-600">Total</p>
             </div>
           </div>

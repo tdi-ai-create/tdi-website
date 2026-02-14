@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission } from '@/lib/tdi-admin/permissions';
+import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 import {
   Building2,
   School,
@@ -29,6 +30,9 @@ import {
   Calendar,
   RefreshCw,
 } from 'lucide-react';
+
+// Leadership theme colors
+const theme = PORTAL_THEMES.leadership;
 
 // Types
 interface Partnership {
@@ -331,12 +335,14 @@ export default function LeadershipDashboardPage() {
             fontFamily: "'Source Serif 4', Georgia, serif",
             fontSize: '28px',
             color: '#1a1a2e',
+            borderLeft: `4px solid ${theme.primary}`,
+            paddingLeft: '16px',
           }}
         >
           Lead Dashboard
         </h1>
         <p
-          className="text-gray-500"
+          className="text-gray-500 pl-5"
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
           Manage school partnerships, reports, action items, and billing.
@@ -348,11 +354,11 @@ export default function LeadershipDashboardPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
           <div className="bg-white rounded-xl p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                <Check className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: theme.light }}>
+                <Check className="w-5 h-5" style={{ color: theme.primary }} />
               </div>
               <div>
-                <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>
+                <p className="text-2xl font-bold" style={{ color: theme.primary }}>
                   {stats.activeCount}
                 </p>
                 <p className="text-xs text-gray-600">Active Partnerships</p>
@@ -362,11 +368,11 @@ export default function LeadershipDashboardPage() {
 
           <div className="bg-white rounded-xl p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                <Users className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: theme.light }}>
+                <Users className="w-5 h-5" style={{ color: theme.primary }} />
               </div>
               <div>
-                <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>
+                <p className="text-2xl font-bold" style={{ color: theme.primary }}>
                   {stats.totalEducators}
                 </p>
                 <p className="text-xs text-gray-600">Total Educators</p>
@@ -376,11 +382,11 @@ export default function LeadershipDashboardPage() {
 
           <div className="bg-white rounded-xl p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
-                <Clock className="w-5 h-5 text-amber-600" />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: theme.light }}>
+                <Clock className="w-5 h-5" style={{ color: theme.primary }} />
               </div>
               <div>
-                <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>
+                <p className="text-2xl font-bold" style={{ color: theme.primary }}>
                   {stats.pendingSetup}
                 </p>
                 <p className="text-xs text-gray-600">Pending Setup</p>
@@ -390,11 +396,11 @@ export default function LeadershipDashboardPage() {
 
           <div className="bg-white rounded-xl p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                <Mail className="w-5 h-5 text-gray-600" />
+              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: theme.light }}>
+                <Mail className="w-5 h-5" style={{ color: theme.primary }} />
               </div>
               <div>
-                <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>
+                <p className="text-2xl font-bold" style={{ color: theme.primary }}>
                   {stats.awaitingAccept}
                 </p>
                 <p className="text-xs text-gray-600">Awaiting Accept</p>
@@ -416,10 +422,10 @@ export default function LeadershipDashboardPage() {
               className="flex items-center gap-2 px-4 py-2 rounded-t-lg font-medium transition-all relative"
               style={{
                 backgroundColor: isActive ? 'white' : 'transparent',
-                color: isActive ? '#2B3A67' : '#6B7280',
+                color: isActive ? theme.primary : '#6B7280',
                 fontFamily: "'DM Sans', sans-serif",
                 borderBottom: isActive
-                  ? '2px solid #E8B84B'
+                  ? `2px solid ${theme.primary}`
                   : '2px solid transparent',
                 marginBottom: '-2px',
               }}

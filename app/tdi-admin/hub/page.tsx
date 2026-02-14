@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { getAdminStats } from '@/lib/hub/admin';
+import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 import ExampleDataBanner from '@/components/tdi-admin/ExampleDataBanner';
 import {
   Users,
@@ -21,6 +22,9 @@ import {
   Clapperboard,
 } from 'lucide-react';
 
+// Hub theme colors
+const theme = PORTAL_THEMES.hub;
+
 interface StatCardProps {
   icon: React.ElementType;
   label: string;
@@ -34,16 +38,16 @@ function StatCard({ icon: Icon, label, value, subtitle }: StatCardProps) {
       <div className="flex items-center gap-3 mb-2">
         <div
           className="w-10 h-10 rounded-lg flex items-center justify-center"
-          style={{ backgroundColor: '#FFF8E7' }}
+          style={{ backgroundColor: theme.light }}
         >
-          <Icon size={20} style={{ color: '#E8B84B' }} />
+          <Icon size={20} style={{ color: theme.primary }} />
         </div>
       </div>
       <p
         className="font-bold text-2xl mb-1"
         style={{
           fontFamily: "'DM Sans', sans-serif",
-          color: '#2B3A67',
+          color: theme.primary,
         }}
       >
         {typeof value === 'number' ? value.toLocaleString() : value}
@@ -80,13 +84,14 @@ function SectionCard({ title, description, features, href, icon: Icon, color }: 
     <Link
       href={href}
       className="block bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200 transition-all group"
+      style={{ borderLeft: `4px solid ${theme.primary}` }}
     >
       <div className="flex items-start justify-between mb-4">
         <div
           className="w-12 h-12 rounded-lg flex items-center justify-center"
-          style={{ backgroundColor: `${color}15` }}
+          style={{ backgroundColor: theme.light }}
         >
-          <Icon size={24} style={{ color }} />
+          <Icon size={24} style={{ color: theme.primary }} />
         </div>
         <ChevronRight
           size={20}
@@ -115,7 +120,7 @@ function SectionCard({ title, description, features, href, icon: Icon, color }: 
             className="flex items-center gap-2 text-sm text-gray-600"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
-            <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />
+            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: theme.primary }} />
             {feature}
           </li>
         ))}
@@ -160,12 +165,14 @@ export default function HubAdminPage() {
             fontFamily: "'Source Serif 4', Georgia, serif",
             fontSize: '28px',
             color: '#2B3A67',
+            borderLeft: `4px solid ${theme.primary}`,
+            paddingLeft: '16px',
           }}
         >
           Learning Hub Management
         </h1>
         <p
-          className="text-gray-500"
+          className="text-gray-500 pl-5"
           style={{ fontFamily: "'DM Sans', sans-serif" }}
         >
           Manage enrollments, content, and analytics for the TDI Learning Hub.
@@ -284,55 +291,75 @@ export default function HubAdminPage() {
         <div className="flex flex-wrap gap-3">
           <Link
             href="/tdi-admin/hub/operations"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             style={{
               fontFamily: "'DM Sans', sans-serif",
-              color: '#2B3A67',
+              color: theme.primary,
+              border: `1.5px solid ${theme.primary}`,
+              backgroundColor: 'transparent',
             }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.light}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             <BarChart3 size={16} />
             View Analytics
           </Link>
           <Link
             href="/tdi-admin/hub/production"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             style={{
               fontFamily: "'DM Sans', sans-serif",
-              color: '#2B3A67',
+              color: theme.primary,
+              border: `1.5px solid ${theme.primary}`,
+              backgroundColor: 'transparent',
             }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.light}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             <FileText size={16} />
             Manage Courses
           </Link>
           <Link
             href="/tdi-admin/hub/production"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             style={{
               fontFamily: "'DM Sans', sans-serif",
-              color: '#2B3A67',
+              color: theme.primary,
+              border: `1.5px solid ${theme.primary}`,
+              backgroundColor: 'transparent',
             }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.light}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             <Zap size={16} />
             Manage Quick Wins
           </Link>
           <Link
             href="/tdi-admin/hub/operations"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             style={{
               fontFamily: "'DM Sans', sans-serif",
-              color: '#2B3A67',
+              color: theme.primary,
+              border: `1.5px solid ${theme.primary}`,
+              backgroundColor: 'transparent',
             }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.light}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             <Download size={16} />
             Export Reports
           </Link>
           <Link
             href="/tdi-admin/hub/operations"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 bg-white text-sm font-medium hover:bg-gray-50 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             style={{
               fontFamily: "'DM Sans', sans-serif",
-              color: '#2B3A67',
+              color: theme.primary,
+              border: `1.5px solid ${theme.primary}`,
+              backgroundColor: 'transparent',
             }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.light}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             <Mail size={16} />
             Email Management

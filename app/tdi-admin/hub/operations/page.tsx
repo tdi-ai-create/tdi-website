@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasPermission } from '@/lib/tdi-admin/permissions';
+import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 import {
   getAdminTips,
   getAdminRequests,
@@ -16,10 +17,13 @@ import {
 import ExampleDataBanner from '@/components/tdi-admin/ExampleDataBanner';
 import dynamic from 'next/dynamic';
 
+// Hub theme colors
+const theme = PORTAL_THEMES.hub;
+
 // Dynamic import for USMapChart to avoid SSR issues with D3
 const USMapChart = dynamic(() => import('@/components/tdi-admin/USMapChart'), {
   ssr: false,
-  loading: () => <div className="h-[350px] flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5BBEC4]"></div></div>
+  loading: () => <div className="h-[350px] flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.primary }}></div></div>
 });
 import {
   LineChart,
@@ -73,11 +77,11 @@ function StatCard({ label, value, icon: Icon, trend }: { label: string; value: s
   return (
     <div className="bg-white rounded-lg border border-gray-100 p-4">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#FFF8E7' }}>
-          <Icon size={18} style={{ color: '#E8B84B' }} />
+        <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: theme.light }}>
+          <Icon size={18} style={{ color: theme.primary }} />
         </div>
         <div>
-          <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>{value}</p>
+          <p className="text-2xl font-bold" style={{ color: theme.primary }}>{value}</p>
           <p className="text-sm text-gray-500">{label}</p>
         </div>
         {trend && (
@@ -96,14 +100,13 @@ function TabButton({ active, onClick, children, disabled }: { active: boolean; o
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2 ${
-        active
-          ? 'border-[#E8B84B] text-[#2B3A67]'
-          : disabled
-          ? 'border-transparent text-gray-300 cursor-not-allowed'
-          : 'border-transparent text-gray-500 hover:text-[#2B3A67] hover:border-gray-200'
-      }`}
-      style={{ fontFamily: "'DM Sans', sans-serif" }}
+      className="px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2"
+      style={{
+        fontFamily: "'DM Sans', sans-serif",
+        borderColor: active ? theme.primary : 'transparent',
+        color: active ? theme.primary : disabled ? '#D1D5DB' : '#6B7280',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+      }}
     >
       {children}
     </button>
@@ -115,6 +118,7 @@ function TableHeader({ children, sortable, sorted, onSort }: { children: React.R
   return (
     <th
       className={`text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${sortable ? 'cursor-pointer hover:text-gray-700' : ''}`}
+      style={{ backgroundColor: theme.light }}
       onClick={sortable ? onSort : undefined}
     >
       <div className="flex items-center gap-1">
@@ -131,8 +135,8 @@ function TableHeader({ children, sortable, sorted, onSort }: { children: React.R
 function EmptyState({ icon: Icon, title, description }: { icon: React.ElementType; title: string; description: string }) {
   return (
     <div className="text-center py-12">
-      <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-        <Icon size={24} className="text-gray-400" />
+      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: theme.light }}>
+        <Icon size={24} style={{ color: theme.primary }} />
       </div>
       <h3 className="font-medium text-gray-900 mb-1">{title}</h3>
       <p className="text-sm text-gray-500">{description}</p>
@@ -2198,11 +2202,13 @@ export default function HubOperationsPage() {
             fontFamily: "'Source Serif 4', Georgia, serif",
             fontSize: '28px',
             color: '#2B3A67',
+            borderLeft: `4px solid ${theme.primary}`,
+            paddingLeft: '16px',
           }}
         >
           Operations
         </h1>
-        <p className="text-gray-500" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+        <p className="text-gray-500 pl-5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
           Manage accounts, enrollments, reports, and analytics.
         </p>
       </div>
