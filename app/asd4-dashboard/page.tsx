@@ -853,55 +853,17 @@ Thanks for everything you do.`
                 <div className="text-2xl font-bold text-[#E07A5F]">{needsAttentionItems.filter(item => !isComplete(item.id)).length}</div>
                 <div className="text-xs text-[#E07A5F] font-medium">Items pending</div>
               </div>
-
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#ffba06]">
-                <div className="flex items-center gap-2 mb-1">
-                  <Flame className="w-4 h-4 text-[#ffba06]" />
-                  <span className="text-xs text-gray-500 uppercase">Current Phase</span>
-                  <Tooltip text="IGNITE focuses on building foundation and identifying your pilot group." position="bottom" iconSize={12} />
-                </div>
-                <div className="text-2xl font-bold text-[#1e2749]">IGNITE</div>
-                <div className="text-xs text-[#ffba06] font-medium">Phase 1</div>
-              </div>
             </div>
 
-            {/* Feature Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Card 1: Wins */}
-              <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
-                <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                <p className="text-sm font-semibold text-green-800">Exec Session 1 Complete</p>
-                <p className="text-xs text-green-600">1/2 Exec · 5 sessions scheduled · 94 paras logged in</p>
-              </div>
-
-              {/* Card 2: ASD4 Implementation */}
-              <div className="bg-gradient-to-br from-[#1e2749] to-[#38618C] border border-[#38618C] rounded-xl p-4 text-white">
-                <p className="text-xs font-semibold uppercase tracking-wide mb-2 opacity-80">After 2 Sessions</p>
-                <div className="space-y-2">
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span>Move #1: Questions</span>
-                      <span className="font-bold text-[#ffba06]">91%</span>
-                    </div>
-                    <div className="w-full bg-white/20 rounded-full h-2">
-                      <div className="bg-[#ffba06] h-2 rounded-full" style={{width: '91%'}}></div>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between text-xs mb-1">
-                      <span>Move #2: Feedback</span>
-                      <span className="font-bold text-teal-300">70%</span>
-                    </div>
-                    <div className="w-full bg-white/20 rounded-full h-2">
-                      <div className="bg-teal-400 h-2 rounded-full" style={{width: '70%'}}></div>
-                    </div>
-                  </div>
-                </div>
-                <p className="text-xs opacity-60 mt-2">vs 10% industry avg</p>
-              </div>
+            {/* Current Phase - Compact Inline */}
+            <div className="flex items-center gap-3 bg-[#ffba06]/10 border border-[#ffba06]/30 rounded-lg px-4 py-2">
+              <Flame className="w-5 h-5 text-[#ffba06]" />
+              <span className="text-sm font-semibold text-[#1e2749]">Current Phase:</span>
+              <span className="text-sm font-bold text-[#ffba06]">IGNITE</span>
+              <span className="text-xs text-gray-500">(Phase 1 — Building Foundation)</span>
             </div>
 
-            {/* ASD4 Implementation Comparison */}
+            {/* HERO: Implementation Card - FULL WIDTH with Tiered Comparison */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <div className="flex items-center gap-2 mb-4">
                 <BarChart3 className="w-5 h-5 text-[#38618C]" />
@@ -913,7 +875,7 @@ Thanks for everything you do.`
                 <div className="bg-[#ffba06]/10 rounded-xl p-4 border border-[#ffba06]/30">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-semibold text-[#1e2749]">Move #1: Questions Instead of Telling</span>
-                    <span className="text-2xl font-bold text-[#ffba06]">91%</span>
+                    <span className="text-3xl font-bold text-[#ffba06]">91%</span>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">69 of 76 paras who attended Part 1 are implementing</p>
                   <div className="w-full bg-gray-200 rounded-full h-3">
@@ -925,7 +887,7 @@ Thanks for everything you do.`
                 <div className="bg-teal-50 rounded-xl p-4 border border-teal-200">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-semibold text-[#1e2749]">Move #2: Feedback Formula</span>
-                    <span className="text-2xl font-bold text-teal-600">70%</span>
+                    <span className="text-3xl font-bold text-teal-600">70%</span>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">53 of 76 paras who attended Part 1 are implementing</p>
                   <div className="w-full bg-gray-200 rounded-full h-3">
@@ -965,6 +927,31 @@ Thanks for everything you do.`
               <p className="text-xs text-gray-400 mt-4 text-center">Self-reported after 2 in-person sessions · 62 practice reps · Survey Feb 13, 2026</p>
             </div>
 
+            {/* Two-Card Row: Status Indicators */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Card 1: Wins */}
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-4">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <p className="font-semibold text-green-800">Exec Session 1 Complete</p>
+                  <p className="text-sm text-green-600">1/2 Exec · 5 sessions scheduled · 94 paras logged in</p>
+                </div>
+              </div>
+
+              {/* Card 2: 19 Paras Remaining */}
+              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-4">
+                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Lightbulb className="w-6 h-6 text-amber-600" />
+                </div>
+                <div>
+                  <p className="font-semibold text-amber-800">19 Paras Remaining</p>
+                  <p className="text-sm text-amber-600">Try a walkthrough at your next meeting</p>
+                </div>
+              </div>
+            </div>
+
             {/* What Your Paras Are Saying */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
               <div className="flex items-center gap-2 mb-4">
@@ -991,17 +978,6 @@ Thanks for everything you do.`
                 </div>
               </div>
               <p className="text-xs text-gray-400 mt-4 text-center">From post-session survey · February 13, 2026</p>
-            </div>
-
-            {/* 19 Paras Remaining Callout */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-4">
-              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Lightbulb className="w-6 h-6 text-amber-600" />
-              </div>
-              <div>
-                <p className="font-semibold text-amber-800">19 Paras Remaining</p>
-                <p className="text-sm text-amber-600">Try a walkthrough at your next meeting to help the last 19 paras log in before Observation Day.</p>
-              </div>
             </div>
 
             {/* Section 2: Needs Attention */}
