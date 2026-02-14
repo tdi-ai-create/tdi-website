@@ -1644,7 +1644,7 @@ function AnalyticsTab() {
             <div className="mb-4">
               <h3 className="font-semibold text-gray-900">Geographic Distribution</h3>
               <p className="text-sm text-gray-500">
-                Users located across {analytics?.stateDistribution?.length || 0} states
+                Users located across {analytics?.totalStatesWithUsers || analytics?.stateDistribution?.length || 0} states
                 {filters.state && <span className="ml-2 text-[#5BBEC4]">(filtered to {filters.state})</span>}
               </p>
             </div>

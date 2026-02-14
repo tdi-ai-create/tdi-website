@@ -301,8 +301,9 @@ export async function GET(request: NextRequest) {
     });
     const stateDistribution = Object.entries(byState)
       .map(([state, count]) => ({ state, count }))
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 10);
+      .filter(s => s.state !== 'Unknown') // Exclude unknown for map display
+      .sort((a, b) => b.count - a.count);
+    const totalStatesWithUsers = stateDistribution.length;
 
     // By language
     const byLanguage: Record<string, number> = {};
@@ -507,6 +508,7 @@ export async function GET(request: NextRequest) {
       gradeDistribution,
       experienceDistribution,
       stateDistribution,
+      totalStatesWithUsers,
       languageDistribution,
       genderDistribution,
       // Stress
