@@ -225,12 +225,14 @@ export default function TeamManagementPage() {
               fontFamily: "'Source Serif 4', Georgia, serif",
               fontSize: '28px',
               color: '#2B3A67',
+              borderLeft: `4px solid ${theme.primary}`,
+              paddingLeft: '16px',
             }}
           >
             Team & Access Management
           </h1>
           <p
-            className="text-gray-500"
+            className="text-gray-500 pl-5"
             style={{ fontFamily: "'DM Sans', sans-serif" }}
           >
             Manage who has access to the TDI Admin Portal and their permissions.
@@ -240,10 +242,12 @@ export default function TeamManagementPage() {
           onClick={() => setShowAddModal(true)}
           className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
           style={{
-            backgroundColor: '#E8B84B',
+            backgroundColor: theme.primary,
             color: '#2B3A67',
             fontFamily: "'DM Sans', sans-serif",
           }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.dark}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theme.primary}
         >
           <Plus size={18} />
           Add Team Member

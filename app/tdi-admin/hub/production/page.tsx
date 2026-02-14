@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasPermission } from '@/lib/tdi-admin/permissions';
+import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
 import { getAdminCourses, toggleCoursePublished } from '@/lib/hub/admin';
 import { getSupabase } from '@/lib/supabase';
 import ExampleDataBanner from '@/components/tdi-admin/ExampleDataBanner';
@@ -42,6 +43,9 @@ import {
   X,
 } from 'lucide-react';
 
+// Hub theme colors
+const theme = PORTAL_THEMES.hub;
+
 type Tab = 'courses' | 'quick-wins' | 'media' | 'calendar' | 'feedback';
 
 // Tab Button Component
@@ -50,14 +54,13 @@ function TabButton({ active, onClick, children, disabled }: { active: boolean; o
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2 ${
-        active
-          ? 'border-[#E8B84B] text-[#2B3A67]'
-          : disabled
-          ? 'border-transparent text-gray-300 cursor-not-allowed'
-          : 'border-transparent text-gray-500 hover:text-[#2B3A67] hover:border-gray-200'
-      }`}
-      style={{ fontFamily: "'DM Sans', sans-serif" }}
+      className="px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-colors border-b-2"
+      style={{
+        fontFamily: "'DM Sans', sans-serif",
+        borderColor: active ? theme.primary : 'transparent',
+        color: active ? theme.primary : disabled ? '#D1D5DB' : '#6B7280',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+      }}
     >
       {children}
     </button>
@@ -68,8 +71,8 @@ function TabButton({ active, onClick, children, disabled }: { active: boolean; o
 function EmptyState({ icon: Icon, title, description, action }: { icon: React.ElementType; title: string; description: string; action?: React.ReactNode }) {
   return (
     <div className="text-center py-12">
-      <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-        <Icon size={24} className="text-gray-400" />
+      <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: theme.light }}>
+        <Icon size={24} style={{ color: theme.primary }} />
       </div>
       <h3 className="font-medium text-gray-900 mb-1">{title}</h3>
       <p className="text-sm text-gray-500 mb-4">{description}</p>
@@ -912,11 +915,13 @@ export default function HubProductionPage() {
             fontFamily: "'Source Serif 4', Georgia, serif",
             fontSize: '28px',
             color: '#2B3A67',
+            borderLeft: `4px solid ${theme.primary}`,
+            paddingLeft: '16px',
           }}
         >
           Production
         </h1>
-        <p className="text-gray-500" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+        <p className="text-gray-500 pl-5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
           Create and manage courses, Quick Wins, and content.
         </p>
       </div>
