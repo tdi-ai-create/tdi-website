@@ -132,8 +132,8 @@ export default function ASD4Dashboard() {
     },
     {
       id: 'unrostered-accounts',
-      title: 'Confirm 8 Unrostered Hub Accounts',
-      description: '8 accounts are active in the Learning Hub but were not on the paraprofessional roster provided by leadership.',
+      title: 'Confirm 6 Unrostered Hub Accounts',
+      description: '6 accounts are active in the Learning Hub but were not on the paraprofessional roster provided by leadership.',
       deadline: 'MARCH 2026',
       actionLabel: 'Email Rae to Confirm',
       actionUrl: 'mailto:rae@teachersdeserveit.com?subject=ASD4%20Dashboard%20-%20Unrostered%20Account%20Confirmation',
@@ -148,8 +148,6 @@ export default function ASD4Dashboard() {
         'Jennifer Perez (jperez@asd4.org) — attended Feb 13, name listed as "J Perez"'
       ],
       unconfirmedAccounts: [
-        'Katie Purse (kpurse@asd4.org) — Admin role',
-        'Janet Diaz (jdiaz@asd4.org)',
         'Maria Cortez (mcortez@asd4.org)',
         'J G (jgonzalez@asd4.org) — name incomplete'
       ]
@@ -1051,7 +1049,7 @@ Thanks for everything you do.`
                                 </ul>
                               </div>
                               <div>
-                                <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">4 additional accounts need confirmation:</p>
+                                <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">2 additional accounts need confirmation:</p>
                                 <ul className="text-sm text-gray-600 space-y-1">
                                   {item.unconfirmedAccounts.map((account: string, idx: number) => (
                                     <li key={idx} className="flex items-start gap-1">
