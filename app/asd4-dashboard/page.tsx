@@ -292,6 +292,11 @@ export default function ASD4Dashboard() {
         ],
       },
       survey: { responses: 2, asking: null, feedback: null, limitedData: true },
+      implementation: { asking: null, feedback: null },
+      medals: [
+        { type: 'gold', label: 'Above 90% Club' },
+        { type: 'bronze', label: 'Strong Login Rate' },
+      ],
       paras: [
         { name: 'Delgado, Beatriz', email: 'bdelgado@asd4.org', loggedIn: true },
         { name: 'Garcia, Claudia', email: 'cgarcia@asd4.org', loggedIn: true },
@@ -322,6 +327,12 @@ export default function ASD4Dashboard() {
         ],
       },
       survey: { responses: 12, asking: 3.75, feedback: 3.83, limitedData: false },
+      implementation: { asking: 83, feedback: 67 },
+      medals: [
+        { type: 'gold', label: '100% Survey Response' },
+        { type: 'gold', label: 'Above 90% Club' },
+        { type: 'silver', label: 'Engaged Team' },
+      ],
       paras: [
         { name: 'Gorostieta, Michele', email: 'mgorostieta@asd4.org', loggedIn: true },
         { name: 'Beahan, Linda', email: 'lbeahan@asd4.org', loggedIn: true },
@@ -350,6 +361,13 @@ export default function ASD4Dashboard() {
         ],
       },
       survey: { responses: 10, asking: 4.10, feedback: 4.00, limitedData: false },
+      implementation: { asking: 89, feedback: 56 },
+      medals: [
+        { type: 'gold', label: 'Confidence Leader: Feedback (4.00)' },
+        { type: 'gold', label: 'Above 90% Club' },
+        { type: 'silver', label: 'High Confidence: Asking (4.10)' },
+      ],
+      note: 'Lincoln has the highest feedback confidence across all schools.',
       paras: [
         { name: 'Hawkins, Michelina', email: 'mhawkins@asd4.org', loggedIn: true },
         { name: 'Aguilar, Denys', email: 'daguilar@asd4.org', loggedIn: true },
@@ -377,6 +395,12 @@ export default function ASD4Dashboard() {
         ],
       },
       survey: { responses: 8, asking: 3.25, feedback: 3.50, limitedData: false },
+      implementation: { asking: 88, feedback: 38 },
+      medals: [
+        { type: 'silver', label: 'Strong Login Rate' },
+        { type: 'bronze', label: 'Implementing Questions (88%)' },
+      ],
+      note: 'Stone has the lowest confidence in asking questions and feedback implementation. This building may benefit from targeted support during Late Start Days.',
       paras: [
         { name: 'Castro, Caprice', email: 'ccastro@asd4.org', loggedIn: true },
         { name: 'Gorostieta, Jessica', email: 'jgorostieta@asd4.org', loggedIn: true },
@@ -404,6 +428,12 @@ export default function ASD4Dashboard() {
         ],
       },
       survey: { responses: 12, asking: 4.08, feedback: 3.67, limitedData: false },
+      implementation: { asking: 90, feedback: 80 },
+      medals: [
+        { type: 'gold', label: 'Above 90% Club' },
+        { type: 'silver', label: 'High Confidence: Asking (4.08)' },
+        { type: 'silver', label: 'Feedback Implementation (80%)' },
+      ],
       paras: [
         { name: 'Bekhrani, Fatema', email: 'fbakhrani@asd4.org', loggedIn: true },
         { name: 'Guzman, Norma', email: 'nguzman@asd4.org', loggedIn: true },
@@ -433,6 +463,12 @@ export default function ASD4Dashboard() {
         ],
       },
       survey: { responses: 4, asking: 4.50, feedback: 3.50, limitedData: true },
+      implementation: { asking: 75, feedback: 50 },
+      medals: [
+        { type: 'silver', label: 'Highest Asking Confidence (4.50)' },
+        { type: 'bronze', label: 'Growing Team' },
+      ],
+      note: 'Lake Park paras who responded show the highest asking confidence in the district. Login rate and survey participation need attention — a targeted walkthrough at the next staff meeting is recommended.',
       paras: [
         { name: 'Alvarado, Patricia', email: 'palvarado@asd4.org', loggedIn: true },
         { name: 'Marquez, Claudia', email: 'cmarquez@asd4.org', loggedIn: true },
@@ -461,6 +497,11 @@ export default function ASD4Dashboard() {
         ],
       },
       survey: { responses: 6, asking: 3.83, feedback: 3.67, limitedData: false },
+      implementation: { asking: 100, feedback: 67 },
+      medals: [
+        { type: 'gold', label: 'Ask Implementation (100%)' },
+        { type: 'bronze', label: 'Growing Login Rate' },
+      ],
       paras: [
         { name: 'Zaragoza Aguilar, Ana', email: 'azaragoza@asd4.org', loggedIn: true },
         { name: 'Cantu, Imelda', email: 'icantu@asd4.org', loggedIn: true },
@@ -486,6 +527,12 @@ export default function ASD4Dashboard() {
         topCourses: [],
       },
       survey: { responses: 3, asking: 3.33, feedback: 3.67, limitedData: true },
+      implementation: { asking: 100, feedback: 67 },
+      medals: [
+        { type: 'gold', label: 'First to 100% Login' },
+        { type: 'gold', label: 'Ask Implementation (100%)' },
+        { type: 'silver', label: 'All In (100% survey response)' },
+      ],
       paras: [
         { name: 'Mondragon, Sugey', email: 'smondragon@asd4.org', loggedIn: true },
         { name: 'Peters, Maddalena', email: 'mpeters@asd4.org', loggedIn: true },
@@ -501,6 +548,13 @@ export default function ASD4Dashboard() {
         topCourses: [],
       },
       survey: { responses: 20, asking: 3.90, feedback: 3.75, limitedData: false },
+      implementation: { asking: 95, feedback: 90 },
+      medals: [
+        { type: 'gold', label: 'Feedback Implementation Leader (90%)' },
+        { type: 'gold', label: 'Most Represented (20 survey responses)' },
+        { type: 'silver', label: 'Strong Confidence' },
+      ],
+      note: 'ELC has the strongest feedback implementation in the district at 90%. Login rate is lower — a dedicated walkthrough session would help close the gap.',
       paras: [
         { name: 'Tinajero Monroy, Melany', email: 'mtinajero@asd4.org', loggedIn: false },
         { name: 'Katherine De La Cruz', email: 'kdelacruz@asd4.org', loggedIn: true },
@@ -2012,6 +2066,12 @@ Thanks for everything you do.`
               </div>
             </div>
 
+            {/* Building Spotlight Intro */}
+            <div className="bg-white rounded-xl p-4 border border-gray-200">
+              <h3 className="text-lg font-bold text-gray-900">Building Spotlight — Here&apos;s What We&apos;re Noticing</h3>
+              <p className="text-sm text-gray-500 mt-1">Celebrating wins and sharing progress across your district</p>
+            </div>
+
             {/* Schools Accordion */}
             <div className="space-y-3">
               {schoolData
@@ -2112,6 +2172,24 @@ Thanks for everything you do.`
                       {isExpanded && (
                         <div className="px-4 pb-4 border-t border-gray-100">
 
+                          {/* Medal Badges - First Thing Visible */}
+                          {school.medals && school.medals.length > 0 && (
+                            <div className="py-3 flex flex-wrap gap-2">
+                              {school.medals.map((medal: { type: string; label: string }, i: number) => (
+                                <span
+                                  key={i}
+                                  className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${
+                                    medal.type === 'gold' ? 'bg-amber-100 text-amber-800' :
+                                    medal.type === 'silver' ? 'bg-gray-200 text-gray-700' :
+                                    'bg-orange-100 text-orange-700'
+                                  }`}
+                                >
+                                  {medal.type === 'gold' ? '🥇' : medal.type === 'silver' ? '🥈' : '🥉'} {medal.label}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+
                           {/* HERO: What This School Is Learning */}
                           <div className="py-4">
                             <h5 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4 flex items-center gap-2">
@@ -2185,6 +2263,48 @@ Thanks for everything you do.`
                                   </div>
                                 </div>
                               )}
+                            </div>
+                          )}
+
+                          {/* Implementation Data Section */}
+                          {school.implementation && (school.implementation.asking !== null || school.implementation.feedback !== null) && (
+                            <div className="py-4 border-t border-gray-100">
+                              <h5 className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-3">
+                                Implementation
+                              </h5>
+                              <div className="flex flex-wrap gap-4 text-sm">
+                                {school.implementation.asking !== null && (
+                                  <span className="text-gray-700">
+                                    <span className="font-medium text-[#ffba06]">{school.implementation.asking}%</span> tried asking questions
+                                  </span>
+                                )}
+                                {school.implementation.feedback !== null && (
+                                  <span className="text-gray-700">
+                                    <span className="font-medium text-teal-600">{school.implementation.feedback}%</span> tried feedback formula
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          )}
+
+                          {/* School Note */}
+                          {school.note && (
+                            <div className="py-3 border-t border-gray-100">
+                              <p className="text-sm text-gray-600 italic">{school.note}</p>
+                            </div>
+                          )}
+
+                          {/* Not Logged In List */}
+                          {notLoggedInParas.length > 0 && (
+                            <div className="py-4 border-t border-gray-100">
+                              <h5 className="text-sm font-semibold text-amber-700 uppercase tracking-wide mb-2">
+                                Not Logged In ({notLoggedInParas.length})
+                              </h5>
+                              <ul className="text-sm text-gray-600 space-y-1">
+                                {notLoggedInParas.map((para, i) => (
+                                  <li key={i}>• {para.name.split(',').reverse().join(' ').trim()}</li>
+                                ))}
+                              </ul>
                             </div>
                           )}
 
@@ -2335,6 +2455,13 @@ Thanks for everything you do.`
                     </div>
                   );
                 })}
+            </div>
+
+            {/* Building Spotlight Footer */}
+            <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 text-center">
+              <p className="text-sm text-gray-600">
+                Every building has paras implementing new strategies. Share these wins at staff meetings and board presentations!
+              </p>
             </div>
           </div>
         )}
