@@ -204,7 +204,7 @@ export default function ASD4Dashboard() {
   const upcomingSessions = [
     {
       title: "Observation Day",
-      date: "February 26, 2026",
+      date: "February 24, 2026",
       time: "7:30 AM - 3:00 PM",
       format: "In-Person",
       location: "District Schools",
@@ -866,7 +866,7 @@ Thanks for everything you do.`
             </div>
 
             {/* Feature Cards Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Card 1: Wins */}
               <div className="bg-green-50 border border-green-200 rounded-xl p-4 text-center">
                 <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
@@ -874,14 +874,7 @@ Thanks for everything you do.`
                 <p className="text-xs text-green-600">1/2 Exec · 5 sessions scheduled · 94 paras logged in</p>
               </div>
 
-              {/* Card 2: Action Needed */}
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-center">
-                <Lightbulb className="w-8 h-8 text-amber-600 mx-auto mb-2" />
-                <p className="text-sm font-semibold text-amber-800">19 Paras Remaining</p>
-                <p className="text-xs text-amber-600">Try a walkthrough at your next meeting</p>
-              </div>
-
-              {/* Card 3: ASD4 Implementation */}
+              {/* Card 2: ASD4 Implementation */}
               <div className="bg-gradient-to-br from-[#1e2749] to-[#38618C] border border-[#38618C] rounded-xl p-4 text-white">
                 <p className="text-xs font-semibold uppercase tracking-wide mb-2 opacity-80">After 2 Sessions</p>
                 <div className="space-y-2">
@@ -970,6 +963,45 @@ Thanks for everything you do.`
               </div>
 
               <p className="text-xs text-gray-400 mt-4 text-center">Self-reported after 2 in-person sessions · 62 practice reps · Survey Feb 13, 2026</p>
+            </div>
+
+            {/* What Your Paras Are Saying */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="flex items-center gap-2 mb-4">
+                <Quote className="w-5 h-5 text-[#38618C]" />
+                <h3 className="text-lg font-bold text-[#1e2749]">What Your Paras Are Saying</h3>
+              </div>
+              <div className="space-y-4">
+                <div className="border-l-2 border-[#38618C]/30 pl-4">
+                  <p className="text-sm text-gray-700 italic">&ldquo;It was helpful collaborating with my peers and hearing their responses to different situations.&rdquo;</p>
+                  <p className="text-xs text-gray-500 mt-1">— Lincoln Elementary</p>
+                </div>
+                <div className="border-l-2 border-[#38618C]/30 pl-4">
+                  <p className="text-sm text-gray-700 italic">&ldquo;A lot of these games are relatable to our students that we work with. It&apos;s nice to also chat and discuss these students/situations together with our co-workers. Since we don&apos;t get time to discuss or chat about work. Thank you!&rdquo;</p>
+                  <p className="text-xs text-gray-500 mt-1">— Stone Elementary</p>
+                </div>
+                <div className="border-l-2 border-[#38618C]/30 pl-4">
+                  <p className="text-sm text-gray-700 italic">&ldquo;I really enjoyed the session because you guide us how we can help our students better.&rdquo;</p>
+                  <p className="text-xs text-gray-500 mt-1">— Fullerton Elementary</p>
+                </div>
+                <div className="border-l-2 border-[#38618C]/30 pl-4">
+                  <p className="text-sm text-gray-700 italic">&ldquo;Me encanta este tipo de sesiones de gran aprendizaje y practica para luego llevarlo a cabo a los estudiantes.&rdquo;</p>
+                  <p className="text-xs text-gray-500 mt-1">I love this type of session — great learning and practice to carry out with students.</p>
+                  <p className="text-xs text-gray-500">— Lincoln Elementary</p>
+                </div>
+              </div>
+              <p className="text-xs text-gray-400 mt-4 text-center">From post-session survey · February 13, 2026</p>
+            </div>
+
+            {/* 19 Paras Remaining Callout */}
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-4">
+              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Lightbulb className="w-6 h-6 text-amber-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-amber-800">19 Paras Remaining</p>
+                <p className="text-sm text-amber-600">Try a walkthrough at your next meeting to help the last 19 paras log in before Observation Day.</p>
+              </div>
             </div>
 
             {/* Section 2: Needs Attention */}
@@ -1150,14 +1182,10 @@ Thanks for everything you do.`
               )}
 
               {/* Virtual Sessions Flexibility Note */}
-              <div className="mt-4 bg-[#35A7FF]/10 border border-[#35A7FF]/30 rounded-lg p-4 flex items-start gap-3">
-                <Info className="w-5 h-5 text-[#35A7FF] flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-semibold text-[#1e2749] text-sm mb-1">Virtual Sessions are Flexible</p>
-                  <p className="text-sm text-gray-600">
-                    Schedule by dates indicate when sessions should be scheduled by. You have flexibility in how you use them -  combine sessions back-to-back, spread them out, whatever works best for your team.
-                  </p>
-                </div>
+              <div className="mt-4 pt-3 border-t border-gray-100">
+                <p className="text-xs text-gray-500 italic">
+                  <span className="font-medium">Note:</span> Virtual sessions are flexible — combine them back-to-back, spread them out, whatever works best for your team.
+                </p>
               </div>
             </div>
 
@@ -1170,10 +1198,10 @@ Thanks for everything you do.`
                     Recommendation: Dedicated Hub Time
                   </h3>
                   <p className="text-gray-600 text-sm mb-2">
-                    Districts that build in 15-30 minutes of protected time during para meetings see 3x higher implementation rates.
+                    Your paras are already at <strong className="text-[#38618C]">91% implementation</strong> — well above the TDI partner average of 65% and the industry average of 10%.
                   </p>
                   <p className="text-gray-600 text-sm mb-3">
-                    <strong className="text-[#38618C]">TDI partners see 65% strategy implementation</strong> vs 10% industry average.
+                    Districts that build in 15-30 minutes of protected Hub time see these gains sustain and grow through the rest of the school year.
                   </p>
                   <div className="flex flex-wrap gap-4">
                     <a
@@ -1202,13 +1230,13 @@ Thanks for everything you do.`
               <div className="flex justify-between items-center">
                 <div>
                   <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Looking Ahead</span>
-                  <h3 className="text-lg font-bold mt-2">2026-27 Partnership Plan</h3>
+                  <h3 className="text-lg font-bold mt-2">2026-27 Partnership Plan — Year 2: ACCELERATE</h3>
                   <p className="text-sm opacity-80 mt-1">
-                    Continue building on your pilot group success.
+                    Build on your <span className="text-[#ffba06] font-medium">91% implementation rate</span> with observation-based coaching cycles, building-level TDI Champions, and expanded teacher-para collaboration training.
                   </p>
-                  <p className="text-sm mt-1">
-                    <span className="text-[#ffba06] font-medium">TDI partners see 65% implementation</span>
-                    <span className="opacity-70"> vs 10% industry average.</span>
+                  <p className="text-sm mt-2">
+                    <span className="text-[#ffba06] font-medium">72% of Year 1 TDI partners</span>
+                    <span className="opacity-70"> continue to Year 2.</span>
                   </p>
                 </div>
                 <div className="text-right flex flex-col items-center">
