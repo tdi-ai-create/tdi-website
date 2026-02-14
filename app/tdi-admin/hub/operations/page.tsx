@@ -59,6 +59,7 @@ import {
   Plus,
   Trash2,
   AlertCircle,
+  AlertTriangle,
   Calendar,
   TrendingUp,
   TrendingDown,
@@ -68,6 +69,8 @@ import {
   Eye,
   Filter,
   RefreshCw,
+  GraduationCap,
+  Heart,
 } from 'lucide-react';
 
 type Tab = 'accounts' | 'enrollments' | 'certificates' | 'reports' | 'analytics' | 'tips' | 'emails';
@@ -1268,40 +1271,40 @@ function AnalyticsTab() {
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm text-white/90">
           <div>
-            <p className="mb-2">
-              {insights.enrollmentChange >= 0 ? '📈' : '📉'} Enrollments{' '}
+            <p className="mb-2 flex items-center gap-1.5">
+              {insights.enrollmentChange >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />} Enrollments{' '}
               <strong className="text-white">{insights.enrollmentChange >= 0 ? 'up' : 'down'} {Math.abs(insights.enrollmentChange || 0)}%</strong> this month
             </p>
             <p className="text-white/70 text-xs">{insights.enrollmentsThisMonth || 0} vs {insights.enrollmentsLastMonth || 0} last month</p>
           </div>
           <div>
-            <p className="mb-2">
-              🎓 Completion rate: <strong className="text-white">{insights.completionRate || 0}%</strong>
+            <p className="mb-2 flex items-center gap-1.5">
+              <GraduationCap size={14} /> Completion rate: <strong className="text-white">{insights.completionRate || 0}%</strong>
             </p>
             <p className="text-white/70 text-xs">{stats.totalCompletions || 0} of {stats.totalEnrollments || 0} enrollments completed</p>
           </div>
           <div>
-            <p className="mb-2">
-              📜 PD Hours: <strong className="text-white">{stats.totalPdHours || 0}</strong> total awarded
+            <p className="mb-2 flex items-center gap-1.5">
+              <Award size={14} /> PD Hours: <strong className="text-white">{stats.totalPdHours || 0}</strong> total awarded
             </p>
             <p className="text-white/70 text-xs">Most popular: {insights.mostPopularCourse || 'N/A'}</p>
           </div>
           <div>
-            <p className="mb-2">
-              😌 Stress improved: <strong className="text-white">{stats.improvementRate || 0}%</strong> of users
+            <p className="mb-2 flex items-center gap-1.5">
+              <Heart size={14} /> Stress improved: <strong className="text-white">{stats.improvementRate || 0}%</strong> of users
             </p>
             <p className="text-white/70 text-xs">Avg reduction: {insights.avgStressReduction || 0} points</p>
           </div>
           <div>
-            <p className="mb-2">
-              ⏰ Peak activity: <strong className="text-white">{insights.peakDay || 'N/A'}</strong> at <strong className="text-white">{insights.peakHour || 'N/A'}</strong>
+            <p className="mb-2 flex items-center gap-1.5">
+              <Clock size={14} /> Peak activity: <strong className="text-white">{insights.peakDay || 'N/A'}</strong> at <strong className="text-white">{insights.peakHour || 'N/A'}</strong>
             </p>
             <p className="text-white/70 text-xs">Most requested goal: {insights.mostRequestedGoal || 'N/A'}</p>
           </div>
           {insights.lowestCompletionRate < 50 && insights.lowestCompletionCourse && (
             <div>
-              <p className="mb-2">
-                ⚠️ Needs attention: <strong className="text-white">{insights.lowestCompletionCourse}</strong>
+              <p className="mb-2 flex items-center gap-1.5">
+                <AlertTriangle size={14} /> Needs attention: <strong className="text-white">{insights.lowestCompletionCourse}</strong>
               </p>
               <p className="text-white/70 text-xs">{insights.lowestCompletionRate}% completion rate</p>
             </div>

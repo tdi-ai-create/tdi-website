@@ -10,9 +10,9 @@ import {
   Plus,
   X,
   Loader2,
-  PenLine,
-  Package,
-  GraduationCap,
+  FileText,
+  Download as DownloadIcon,
+  BookOpen,
   Clock,
   AlertTriangle,
   Filter,
@@ -465,13 +465,13 @@ export default function CreatorStudioPage() {
   const getPathBadge = (path: string | null) => {
     switch (path) {
       case 'course':
-        return { icon: <GraduationCap className="w-3.5 h-3.5" />, label: 'Course', color: 'bg-purple-100 text-purple-700' };
+        return { icon: <BookOpen className="w-3.5 h-3.5" />, label: 'Course', color: 'bg-purple-100 text-purple-700' };
       case 'blog':
-        return { icon: <PenLine className="w-3.5 h-3.5" />, label: 'Blog', color: 'bg-green-100 text-green-700' };
+        return { icon: <FileText className="w-3.5 h-3.5" />, label: 'Blog', color: 'bg-purple-100 text-purple-700' };
       case 'download':
-        return { icon: <Package className="w-3.5 h-3.5" />, label: 'Download', color: 'bg-amber-100 text-amber-700' };
+        return { icon: <DownloadIcon className="w-3.5 h-3.5" />, label: 'Download', color: 'bg-purple-100 text-purple-700' };
       default:
-        return { icon: <HelpCircle className="w-3.5 h-3.5" />, label: 'Not set', color: 'bg-gray-100 text-gray-500' };
+        return { icon: <HelpCircle className="w-3.5 h-3.5" />, label: 'Not set', color: 'bg-orange-100 text-orange-600' };
     }
   };
 
@@ -885,23 +885,31 @@ export default function CreatorStudioPage() {
               </h3>
               <div className="grid grid-cols-2 gap-2">
                 {[
-                  { key: 'blog', icon: '📝', label: 'Blog', count: pathCounts.blog },
-                  { key: 'download', icon: '📦', label: 'Download', count: pathCounts.download },
-                  { key: 'course', icon: '🎓', label: 'Course', count: pathCounts.course },
-                  { key: 'notSet', icon: '❓', label: 'Not Set', count: pathCounts.notSet },
-                ].map((path) => (
-                  <button
-                    key={path.key}
-                    onClick={() => handlePathClick(path.key)}
-                    className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer text-left"
-                  >
-                    <span className="text-base">{path.icon}</span>
-                    <div>
-                      <p className="text-lg font-bold leading-none" style={{ color: theme.primary }}>{path.count}</p>
-                      <p className="text-xs text-gray-500">{path.label}</p>
-                    </div>
-                  </button>
-                ))}
+                  { key: 'blog', icon: FileText, label: 'Blog', count: pathCounts.blog, color: theme.primary },
+                  { key: 'download', icon: DownloadIcon, label: 'Download', count: pathCounts.download, color: theme.primary },
+                  { key: 'course', icon: BookOpen, label: 'Course', count: pathCounts.course, color: theme.primary },
+                  { key: 'notSet', icon: HelpCircle, label: 'Not Set', count: pathCounts.notSet, color: '#E8927C' },
+                ].map((path) => {
+                  const IconComponent = path.icon;
+                  return (
+                    <button
+                      key={path.key}
+                      onClick={() => handlePathClick(path.key)}
+                      className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-purple-50 transition-colors cursor-pointer text-left"
+                    >
+                      <div
+                        className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+                        style={{ backgroundColor: theme.light }}
+                      >
+                        <IconComponent className="w-5 h-5" style={{ color: path.color }} />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-bold leading-none" style={{ color: theme.primary }}>{path.count}</p>
+                        <p className="text-sm text-gray-500">{path.label}</p>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </div>
           </div>
