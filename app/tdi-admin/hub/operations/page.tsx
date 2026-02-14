@@ -14,6 +14,13 @@ import {
   updateRequestStatus,
 } from '@/lib/hub/admin';
 import ExampleDataBanner from '@/components/tdi-admin/ExampleDataBanner';
+import dynamic from 'next/dynamic';
+
+// Dynamic import for USMapChart to avoid SSR issues with D3
+const USMapChart = dynamic(() => import('@/components/tdi-admin/USMapChart'), {
+  ssr: false,
+  loading: () => <div className="h-[350px] flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5BBEC4]"></div></div>
+});
 import {
   LineChart,
   Line,
@@ -1109,18 +1116,18 @@ function AnalyticsTab() {
   return (
     <div>
       {/* Sticky Filter Bar */}
-      <div className="sticky top-0 z-10 bg-white rounded-lg border border-gray-200 p-4 mb-6 shadow-sm">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex items-center gap-2 text-sm text-gray-500 mr-1">
+      <div className="sticky top-0 z-10 bg-white rounded-lg border border-gray-200 mb-6 shadow-sm" style={{ padding: '16px' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#6B7280', fontSize: '14px', marginRight: '4px' }}>
             <Filter size={16} />
-            <span className="font-medium">Filters:</span>
+            <span style={{ fontWeight: 500 }}>Filters:</span>
           </div>
 
           {/* State Filter */}
           <select
             value={filters.state}
             onChange={(e) => setFilters({ ...filters, state: e.target.value })}
-            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50 min-w-[120px] max-w-[160px]"
+            style={{ minWidth: '140px', maxWidth: '180px', padding: '6px 12px', fontSize: '14px', border: '1px solid #E5E7EB', borderRadius: '8px', backgroundColor: 'white' }}
           >
             <option value="">All States</option>
             {filterOptions.states.map((s: string) => (
@@ -1132,7 +1139,7 @@ function AnalyticsTab() {
           <select
             value={filters.org}
             onChange={(e) => setFilters({ ...filters, org: e.target.value })}
-            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50 min-w-[140px] max-w-[180px]"
+            style={{ minWidth: '140px', maxWidth: '180px', padding: '6px 12px', fontSize: '14px', border: '1px solid #E5E7EB', borderRadius: '8px', backgroundColor: 'white' }}
           >
             <option value="">All Schools</option>
             {filterOptions.orgs.slice(0, 50).map((o: string) => (
@@ -1144,7 +1151,7 @@ function AnalyticsTab() {
           <select
             value={filters.role}
             onChange={(e) => setFilters({ ...filters, role: e.target.value })}
-            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50 min-w-[120px] max-w-[150px]"
+            style={{ minWidth: '140px', maxWidth: '180px', padding: '6px 12px', fontSize: '14px', border: '1px solid #E5E7EB', borderRadius: '8px', backgroundColor: 'white' }}
           >
             <option value="all">All Roles</option>
             <option value="teacher">Teacher</option>
@@ -1157,7 +1164,7 @@ function AnalyticsTab() {
           <select
             value={filters.gradeLevel}
             onChange={(e) => setFilters({ ...filters, gradeLevel: e.target.value })}
-            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50 min-w-[120px] max-w-[140px]"
+            style={{ minWidth: '140px', maxWidth: '180px', padding: '6px 12px', fontSize: '14px', border: '1px solid #E5E7EB', borderRadius: '8px', backgroundColor: 'white' }}
           >
             <option value="all">All Grades</option>
             <option value="Pre-K">Pre-K</option>
@@ -1172,7 +1179,7 @@ function AnalyticsTab() {
           <select
             value={filters.gender}
             onChange={(e) => setFilters({ ...filters, gender: e.target.value })}
-            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50 min-w-[120px] max-w-[150px]"
+            style={{ minWidth: '140px', maxWidth: '180px', padding: '6px 12px', fontSize: '14px', border: '1px solid #E5E7EB', borderRadius: '8px', backgroundColor: 'white' }}
           >
             <option value="all">All Genders</option>
             <option value="female">Female</option>
@@ -1184,7 +1191,7 @@ function AnalyticsTab() {
           <select
             value={filters.language}
             onChange={(e) => setFilters({ ...filters, language: e.target.value })}
-            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50 min-w-[120px] max-w-[150px]"
+            style={{ minWidth: '140px', maxWidth: '180px', padding: '6px 12px', fontSize: '14px', border: '1px solid #E5E7EB', borderRadius: '8px', backgroundColor: 'white' }}
           >
             <option value="all">All Languages</option>
             <option value="english">English</option>
@@ -1195,7 +1202,7 @@ function AnalyticsTab() {
           {activeFilterCount > 0 && (
             <button
               onClick={resetFilters}
-              className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 flex items-center gap-1"
+              style={{ padding: '6px 12px', fontSize: '14px', border: '1px solid #D1D5DB', borderRadius: '8px', color: '#4B5563', backgroundColor: 'white', display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
             >
               <X size={14} />
               Reset
@@ -1205,41 +1212,41 @@ function AnalyticsTab() {
 
         {/* Active Filter Pills */}
         {activeFilterCount > 0 && (
-          <div className="flex flex-wrap gap-2 mt-3 pt-3 border-t border-gray-100">
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #F3F4F6' }}>
             {filters.state && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#5BBEC4]/10 text-[#5BBEC4] text-xs rounded-full">
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.1)', color: '#5BBEC4', fontSize: '12px', borderRadius: '9999px' }}>
                 State: {filters.state}
-                <button onClick={() => setFilters({ ...filters, state: '' })} className="hover:text-[#2B3A67]"><X size={12} /></button>
+                <button onClick={() => setFilters({ ...filters, state: '' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
             )}
             {filters.org && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#5BBEC4]/10 text-[#5BBEC4] text-xs rounded-full">
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.1)', color: '#5BBEC4', fontSize: '12px', borderRadius: '9999px' }}>
                 Org: {filters.org.length > 15 ? filters.org.slice(0, 15) + '...' : filters.org}
-                <button onClick={() => setFilters({ ...filters, org: '' })} className="hover:text-[#2B3A67]"><X size={12} /></button>
+                <button onClick={() => setFilters({ ...filters, org: '' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
             )}
             {filters.role !== 'all' && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#E8B84B]/10 text-[#E8B84B] text-xs rounded-full">
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(232, 184, 75, 0.1)', color: '#E8B84B', fontSize: '12px', borderRadius: '9999px' }}>
                 Role: {filters.role.replace('_', ' ')}
-                <button onClick={() => setFilters({ ...filters, role: 'all' })} className="hover:text-[#2B3A67]"><X size={12} /></button>
+                <button onClick={() => setFilters({ ...filters, role: 'all' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
             )}
             {filters.gradeLevel !== 'all' && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#E8B84B]/10 text-[#E8B84B] text-xs rounded-full">
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(232, 184, 75, 0.1)', color: '#E8B84B', fontSize: '12px', borderRadius: '9999px' }}>
                 Grade: {filters.gradeLevel}
-                <button onClick={() => setFilters({ ...filters, gradeLevel: 'all' })} className="hover:text-[#2B3A67]"><X size={12} /></button>
+                <button onClick={() => setFilters({ ...filters, gradeLevel: 'all' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
             )}
             {filters.gender !== 'all' && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#E8927C]/10 text-[#E8927C] text-xs rounded-full">
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(232, 146, 124, 0.1)', color: '#E8927C', fontSize: '12px', borderRadius: '9999px' }}>
                 Gender: {filters.gender}
-                <button onClick={() => setFilters({ ...filters, gender: 'all' })} className="hover:text-[#2B3A67]"><X size={12} /></button>
+                <button onClick={() => setFilters({ ...filters, gender: 'all' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
             )}
             {filters.language !== 'all' && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-[#E8927C]/10 text-[#E8927C] text-xs rounded-full">
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(232, 146, 124, 0.1)', color: '#E8927C', fontSize: '12px', borderRadius: '9999px' }}>
                 Language: {filters.language}
-                <button onClick={() => setFilters({ ...filters, language: 'all' })} className="hover:text-[#2B3A67]"><X size={12} /></button>
+                <button onClick={() => setFilters({ ...filters, language: 'all' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
             )}
           </div>
@@ -1628,20 +1635,55 @@ function AnalyticsTab() {
             </div>
           </div>
 
-          {/* State Distribution */}
+          {/* Geographic Distribution - Interactive US Map */}
           <div className="bg-white rounded-lg border border-gray-200 p-5">
-            <h3 className="font-semibold text-gray-900 mb-4">Geographic Distribution (Top 10 States)</h3>
+            <div className="mb-4">
+              <h3 className="font-semibold text-gray-900">Geographic Distribution</h3>
+              <p className="text-sm text-gray-500">
+                Users located across {analytics?.stateDistribution?.length || 0} states
+                {filters.state && <span className="ml-2 text-[#5BBEC4]">(filtered to {filters.state})</span>}
+              </p>
+            </div>
             {analytics?.stateDistribution?.length > 0 ? (
-              <div className="h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={analytics.stateDistribution} layout="vertical" margin={{ left: 10, right: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis type="number" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
-                    <YAxis type="category" dataKey="state" tick={{ fontSize: 11 }} stroke="#9CA3AF" width={80} />
-                    <Tooltip />
-                    <Bar dataKey="count" fill="#5BBEC4" radius={[0, 4, 4, 0]} name="Users" />
-                  </BarChart>
-                </ResponsiveContainer>
+              <div className="grid lg:grid-cols-5 gap-6">
+                {/* Map - 60% */}
+                <div className="lg:col-span-3">
+                  <USMapChart
+                    data={analytics.stateDistribution}
+                    onStateClick={(state) => setFilters({ ...filters, state: filters.state === state ? '' : state })}
+                    selectedState={filters.state}
+                  />
+                </div>
+                {/* Table - 40% */}
+                <div className="lg:col-span-2">
+                  <div className="text-sm font-medium text-gray-500 mb-2">Top States</div>
+                  <div className="space-y-1 max-h-[350px] overflow-y-auto">
+                    {analytics.stateDistribution.slice(0, 15).map((item: any, i: number) => {
+                      const total = analytics.stateDistribution.reduce((sum: number, s: any) => sum + s.count, 0);
+                      const pct = total > 0 ? ((item.count / total) * 100).toFixed(1) : '0';
+                      return (
+                        <button
+                          key={item.state}
+                          onClick={() => setFilters({ ...filters, state: filters.state === item.state ? '' : item.state })}
+                          className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors ${
+                            filters.state === item.state
+                              ? 'bg-[#5BBEC4]/10 border border-[#5BBEC4]'
+                              : 'hover:bg-gray-50 border border-transparent'
+                          }`}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs text-gray-400 w-4">{i + 1}</span>
+                            <span className="font-medium text-gray-900">{item.state}</span>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className="text-sm text-gray-600">{item.count}</span>
+                            <span className="text-xs text-gray-400 w-12 text-right">{pct}%</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
               </div>
             ) : (
               <p className="text-sm text-gray-500 text-center py-8">No state data available</p>
