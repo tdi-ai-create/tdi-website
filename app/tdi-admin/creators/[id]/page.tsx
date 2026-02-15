@@ -30,12 +30,12 @@ import {
   Calendar,
   Globe,
   RotateCcw,
-  Mail,
+  Copy,
 } from 'lucide-react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
-import { openMailto, EMAIL_TEMPLATES, getFirstName } from '@/lib/tdi-admin/mailto';
+import { copyToClipboard } from '@/lib/tdi-admin/clipboard';
 
 // Creators theme colors
 const theme = PORTAL_THEMES.creators;
@@ -111,6 +111,7 @@ export default function TDIAdminCreatorDetailPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [approvingMilestoneId, setApprovingMilestoneId] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [emailCopied, setEmailCopied] = useState(false);
 
   // Course details editing
   const [isEditingDetails, setIsEditingDetails] = useState(false);
@@ -557,18 +558,22 @@ export default function TDIAdminCreatorDetailPage() {
             <div className="flex items-center gap-2">
               <p className="text-white/70">{creator.email}</p>
               <button
-                onClick={() => {
-                  const firstName = getFirstName(creator.name);
-                  openMailto({
-                    to: creator.email,
-                    subject: EMAIL_TEMPLATES.creatorJourney.subject,
-                    body: EMAIL_TEMPLATES.creatorJourney.getBody(firstName),
-                  });
+                onClick={async () => {
+                  await copyToClipboard(creator.email);
+                  setEmailCopied(true);
+                  setTimeout(() => setEmailCopied(false), 2000);
                 }}
-                className="p-1.5 rounded-full transition-colors hover:bg-white/20"
-                title="Email creator"
+                className="inline-flex items-center gap-1 px-2 py-1 rounded-lg transition-colors hover:bg-white/20 text-xs"
+                title="Copy email to clipboard"
               >
-                <Mail className="w-4 h-4 text-white/70 hover:text-white" />
+                {emailCopied ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-green-400" />
+                    <span className="text-green-400">Copied!</span>
+                  </>
+                ) : (
+                  <Copy className="w-3.5 h-3.5 text-white/70 hover:text-white" />
+                )}
               </button>
             </div>
             <p className="mt-2 font-medium capitalize" style={{ color: theme.primary }}>

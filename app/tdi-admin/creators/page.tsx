@@ -33,12 +33,14 @@ import {
   CalendarDays,
   Globe,
   Check,
+  Copy,
 } from 'lucide-react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
 import { createCreator } from '@/lib/creator-portal-data';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
-import { openMailto, EMAIL_TEMPLATES, getFirstName } from '@/lib/tdi-admin/mailto';
+import { copyToClipboard, formatEmailsForCopy } from '@/lib/tdi-admin/clipboard';
+import { Toast, useToast } from '@/components/tdi-admin/Toast';
 import {
   BarChart,
   Bar,
@@ -213,7 +215,6 @@ function StatCard({
   value,
   isActive,
   onClick,
-  onEmail,
   accentColor,
   lightColor,
 }: {
@@ -222,7 +223,6 @@ function StatCard({
   value: number;
   isActive: boolean;
   onClick: () => void;
-  onEmail?: () => void;
   accentColor?: string;
   lightColor?: string;
 }) {
@@ -230,50 +230,36 @@ function StatCard({
   const light = lightColor || theme.light;
 
   return (
-    <div className="relative">
-      <button
-        onClick={onClick}
-        className="bg-white rounded-xl p-4 border transition-all text-left cursor-pointer hover:shadow-md w-full"
-        style={{
-          borderColor: isActive ? accent : '#E5E7EB',
-          boxShadow: isActive ? `0 0 0 2px ${accent}20` : 'none',
-          transform: 'scale(1)',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'scale(1.02)';
-          e.currentTarget.style.borderColor = accent;
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'scale(1)';
-          e.currentTarget.style.borderColor = isActive ? accent : '#E5E7EB';
-        }}
-      >
-        <div className="flex items-center gap-3">
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-            style={{ backgroundColor: light }}
-          >
-            <Icon className="w-5 h-5" style={{ color: accent }} />
-          </div>
-          <div>
-            <p className="text-2xl font-bold" style={{ color: accent }}>{value}</p>
-            <p className="text-xs text-gray-600">{label}</p>
-          </div>
-        </div>
-      </button>
-      {onEmail && value > 0 && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onEmail();
-          }}
-          className="absolute top-2 right-2 p-1.5 rounded-full transition-colors hover:bg-gray-100 group"
-          title={`Email ${value} creators`}
+    <button
+      onClick={onClick}
+      className="bg-white rounded-xl p-4 border transition-all text-left cursor-pointer hover:shadow-md"
+      style={{
+        borderColor: isActive ? accent : '#E5E7EB',
+        boxShadow: isActive ? `0 0 0 2px ${accent}20` : 'none',
+        transform: 'scale(1)',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'scale(1.02)';
+        e.currentTarget.style.borderColor = accent;
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'scale(1)';
+        e.currentTarget.style.borderColor = isActive ? accent : '#E5E7EB';
+      }}
+    >
+      <div className="flex items-center gap-3">
+        <div
+          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+          style={{ backgroundColor: light }}
         >
-          <Mail className="w-4 h-4 text-gray-400 group-hover:text-purple-600" />
-        </button>
-      )}
-    </div>
+          <Icon className="w-5 h-5" style={{ color: accent }} />
+        </div>
+        <div>
+          <p className="text-2xl font-bold" style={{ color: accent }}>{value}</p>
+          <p className="text-xs text-gray-600">{label}</p>
+        </div>
+      </div>
+    </button>
   );
 }
 
@@ -489,52 +475,29 @@ export default function CreatorStudioPage() {
     setActiveTab('creators');
   };
 
-  // Email handlers for stat cards
-  const handleEmailStalled = () => {
-    const stalledCreators = dashboardData?.creators.filter(c => c.waitingOn === 'stalled') || [];
-    if (stalledCreators.length === 0) return;
-    openMailto({
-      to: stalledCreators[0].email,
-      bcc: stalledCreators.slice(1).map(c => c.email),
-      subject: EMAIL_TEMPLATES.stalled.subject,
-      body: EMAIL_TEMPLATES.stalled.body,
-    });
+  // Toast state
+  const { toast, showToast, hideToast } = useToast();
+
+  // Copy button states for "Copied!" feedback
+  const [copiedSection, setCopiedSection] = useState<string | null>(null);
+
+  // Copy emails to clipboard helper
+  const handleCopyEmails = async (emails: string[], sectionId: string) => {
+    if (emails.length === 0) return;
+    const emailString = formatEmailsForCopy(emails);
+    await copyToClipboard(emailString);
+    setCopiedSection(sectionId);
+    showToast(`${emails.length} email address${emails.length > 1 ? 'es' : ''} copied to clipboard`);
+    setTimeout(() => setCopiedSection(null), 2000);
   };
 
-  const handleEmailWaitingOnCreator = () => {
-    const waitingCreators = dashboardData?.creators.filter(c => c.waitingOn === 'creator') || [];
-    if (waitingCreators.length === 0) return;
-    openMailto({
-      to: waitingCreators[0].email,
-      bcc: waitingCreators.slice(1).map(c => c.email),
-      subject: EMAIL_TEMPLATES.waitingOnCreator.subject,
-      body: EMAIL_TEMPLATES.waitingOnCreator.body,
-    });
-  };
-
-  const handleEmailWaitingOnTDI = () => {
-    const waitingCreators = dashboardData?.creators.filter(c => c.waitingOn === 'tdi') || [];
-    if (waitingCreators.length === 0) return;
-    openMailto({
-      to: waitingCreators[0].email,
-      bcc: waitingCreators.slice(1).map(c => c.email),
-      subject: EMAIL_TEMPLATES.waitingOnTDI.subject,
-      body: EMAIL_TEMPLATES.waitingOnTDI.body,
-    });
-  };
-
-  // Handle bulk email for selected creators
-  const handleBulkEmail = () => {
+  // Handle bulk copy for selected creators
+  const handleBulkCopy = async () => {
     const selectedEmails = filteredCreators
       .filter(c => selectedCreatorIds.has(c.id))
       .map(c => c.email);
     if (selectedEmails.length === 0) return;
-    openMailto({
-      to: selectedEmails[0],
-      bcc: selectedEmails.slice(1),
-      subject: 'Quick Update from TDI',
-      body: `Hi there!\n\n`,
-    });
+    await handleCopyEmails(selectedEmails, 'bulk');
   };
 
   // Toggle single creator selection
@@ -788,7 +751,6 @@ export default function CreatorStudioPage() {
               value={stats.stalled}
               isActive={activeStatFilter === 'stalled'}
               onClick={() => handleStatCardClick('stalled')}
-              onEmail={handleEmailStalled}
               accentColor="#F97316"
               lightColor="#FFF7ED"
             />
@@ -798,7 +760,6 @@ export default function CreatorStudioPage() {
               value={stats.waitingOnCreator}
               isActive={activeStatFilter === 'waitingOnCreator'}
               onClick={() => handleStatCardClick('waitingOnCreator')}
-              onEmail={handleEmailWaitingOnCreator}
               accentColor="#F59E0B"
               lightColor="#FFFBEB"
             />
@@ -808,7 +769,6 @@ export default function CreatorStudioPage() {
               value={stats.waitingOnTDI}
               isActive={activeStatFilter === 'waitingOnTDI'}
               onClick={() => handleStatCardClick('waitingOnTDI')}
-              onEmail={handleEmailWaitingOnTDI}
               accentColor="#3B82F6"
               lightColor="#EFF6FF"
             />
@@ -881,13 +841,39 @@ export default function CreatorStudioPage() {
 
             {/* Closest to Launch */}
             <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3
-                className="text-sm font-semibold mb-3 flex items-center gap-2"
-                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-              >
-                <Trophy className="w-4 h-4" style={{ color: theme.primary }} />
-                Closest to Launch
-              </h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3
+                  className="text-sm font-semibold flex items-center gap-2"
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
+                >
+                  <Trophy className="w-4 h-4" style={{ color: theme.primary }} />
+                  Closest to Launch
+                </h3>
+                {closestToLaunch.length > 0 && (
+                  <button
+                    onClick={() => {
+                      const emails = closestToLaunch
+                        .map(c => dashboardData.creators.find(cr => cr.id === c.id)?.email)
+                        .filter((e): e is string => !!e);
+                      handleCopyEmails(emails, 'closestToLaunch');
+                    }}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium border rounded-lg transition-colors hover:border-purple-300 hover:bg-purple-50"
+                    style={{ borderColor: '#E5E7EB', color: copiedSection === 'closestToLaunch' ? theme.primary : '#6B7280' }}
+                  >
+                    {copiedSection === 'closestToLaunch' ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        Copy Emails
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
               {closestToLaunch.length === 0 ? (
                 <p className="text-sm text-gray-500">No creators in progress</p>
               ) : (
@@ -947,21 +933,21 @@ export default function CreatorStudioPage() {
                       </h3>
                       {scheduled.length > 0 && (
                         <button
-                          onClick={() => {
-                            const emails = scheduled.map(c => c.email);
-                            const firstName = getFirstName(scheduled[0].name);
-                            const date = new Date(scheduled[0].scheduled_publish_date!).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-                            openMailto({
-                              to: emails[0],
-                              bcc: emails.slice(1),
-                              subject: EMAIL_TEMPLATES.publishingDate.subject,
-                              body: EMAIL_TEMPLATES.publishingDate.getBody(firstName, date),
-                            });
-                          }}
-                          className="p-1.5 rounded-full transition-colors hover:bg-gray-100 group"
-                          title={`Email ${scheduled.length} scheduled creators`}
+                          onClick={() => handleCopyEmails(scheduled.map(c => c.email), 'scheduled')}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium border rounded-lg transition-colors hover:border-purple-300 hover:bg-purple-50"
+                          style={{ borderColor: '#E5E7EB', color: copiedSection === 'scheduled' ? theme.primary : '#6B7280' }}
                         >
-                          <Mail className="w-4 h-4 text-gray-400 group-hover:text-purple-600" />
+                          {copiedSection === 'scheduled' ? (
+                            <>
+                              <Check className="w-3.5 h-3.5" />
+                              Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5" />
+                              Copy Emails
+                            </>
+                          )}
                         </button>
                       )}
                     </div>
@@ -1007,50 +993,74 @@ export default function CreatorStudioPage() {
 
             {/* Recently Published */}
             <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3
-                className="text-sm font-semibold mb-3 flex items-center gap-2"
-                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-              >
-                <Globe className="w-4 h-4 text-green-600" />
-                Recently Published
-              </h3>
               {(() => {
                 const published = dashboardData.creators
                   .filter(c => c.publish_status === 'published' && c.published_date)
                   .sort((a, b) => new Date(b.published_date!).getTime() - new Date(a.published_date!).getTime())
                   .slice(0, 5);
 
-                if (published.length === 0) {
-                  return <p className="text-sm text-gray-500">No published creators yet</p>;
-                }
-
                 return (
-                  <div className="space-y-2">
-                    {published.map((creator) => (
-                      <Link
-                        key={creator.id}
-                        href={`/tdi-admin/creators/${creator.id}`}
-                        className="flex items-center gap-2 group"
+                  <>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3
+                        className="text-sm font-semibold flex items-center gap-2"
+                        style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
                       >
-                        <div
-                          className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0 bg-green-500"
+                        <Globe className="w-4 h-4 text-green-600" />
+                        Recently Published
+                      </h3>
+                      {published.length > 0 && (
+                        <button
+                          onClick={() => handleCopyEmails(published.map(c => c.email), 'published')}
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium border rounded-lg transition-colors hover:border-purple-300 hover:bg-purple-50"
+                          style={{ borderColor: '#E5E7EB', color: copiedSection === 'published' ? theme.primary : '#6B7280' }}
                         >
-                          <Check className="w-4 h-4" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p
-                            className="text-sm font-medium truncate group-hover:opacity-80"
-                            style={{ color: '#2B3A67' }}
+                          {copiedSection === 'published' ? (
+                            <>
+                              <Check className="w-3.5 h-3.5" />
+                              Copied!
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3.5 h-3.5" />
+                              Copy Emails
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
+
+                    {published.length === 0 ? (
+                      <p className="text-sm text-gray-500">No published creators yet</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {published.map((creator) => (
+                          <Link
+                            key={creator.id}
+                            href={`/tdi-admin/creators/${creator.id}`}
+                            className="flex items-center gap-2 group"
                           >
-                            {creator.name}
-                          </p>
-                        </div>
-                        <div className="text-xs text-gray-500 flex-shrink-0">
-                          {new Date(creator.published_date!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        </div>
-                      </Link>
-                    ))}
-                  </div>
+                            <div
+                              className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0 bg-green-500"
+                            >
+                              <Check className="w-4 h-4" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p
+                                className="text-sm font-medium truncate group-hover:opacity-80"
+                                style={{ color: '#2B3A67' }}
+                              >
+                                {creator.name}
+                              </p>
+                            </div>
+                            <div className="text-xs text-gray-500 flex-shrink-0">
+                              {new Date(creator.published_date!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </>
                 );
               })()}
             </div>
@@ -1070,20 +1080,21 @@ export default function CreatorStudioPage() {
                 </h3>
                 {needsAttention.length > 0 && (
                   <button
-                    onClick={() => {
-                      const emails = needsAttention.map(c => c.email);
-                      const firstName = getFirstName(needsAttention[0].name);
-                      openMailto({
-                        to: emails[0],
-                        bcc: emails.slice(1),
-                        subject: EMAIL_TEMPLATES.needsAttention.getSubject(needsAttention[0].content_path || 'default'),
-                        body: `Hi ${firstName}!\n\n`,
-                      });
-                    }}
-                    className="p-1.5 rounded-full transition-colors hover:bg-gray-100 group"
-                    title={`Email ${needsAttention.length} creators`}
+                    onClick={() => handleCopyEmails(needsAttention.map(c => c.email), 'needsAttention')}
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium border rounded-lg transition-colors hover:border-purple-300 hover:bg-purple-50"
+                    style={{ borderColor: '#E5E7EB', color: copiedSection === 'needsAttention' ? theme.primary : '#6B7280' }}
                   >
-                    <Mail className="w-4 h-4 text-gray-400 group-hover:text-purple-600" />
+                    {copiedSection === 'needsAttention' ? (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-3.5 h-3.5" />
+                        Copy Emails
+                      </>
+                    )}
                   </button>
                 )}
               </div>
@@ -1637,7 +1648,7 @@ export default function CreatorStudioPage() {
           </div>
         </div>
 
-        {/* Floating Action Bar for Bulk Email */}
+        {/* Floating Action Bar for Bulk Copy */}
         {selectedCreatorIds.size > 0 && (
           <div
             className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white px-6 py-3 rounded-xl shadow-lg border border-gray-200 flex items-center gap-4 z-50"
@@ -1647,18 +1658,28 @@ export default function CreatorStudioPage() {
               {selectedCreatorIds.size} creator{selectedCreatorIds.size > 1 ? 's' : ''} selected
             </span>
             <button
-              onClick={handleBulkEmail}
+              onClick={handleBulkCopy}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
               style={{ backgroundColor: theme.primary, color: 'white' }}
               onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.dark}
               onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theme.primary}
             >
-              <Mail className="w-4 h-4" />
-              Email Selected
+              {copiedSection === 'bulk' ? (
+                <>
+                  <Check className="w-4 h-4" />
+                  Copied!
+                </>
+              ) : (
+                <>
+                  <Copy className="w-4 h-4" />
+                  Copy Email Addresses
+                </>
+              )}
             </button>
             <button
               onClick={clearSelection}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-700"
+              title="Clear selection"
             >
               <X className="w-4 h-4" />
             </button>
@@ -1961,6 +1982,15 @@ export default function CreatorStudioPage() {
             </form>
           </div>
         </div>
+      )}
+
+      {/* Toast notification */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={hideToast}
+        />
       )}
     </div>
   );
