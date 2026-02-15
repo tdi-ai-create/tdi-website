@@ -30,10 +30,12 @@ import {
   Calendar,
   Globe,
   RotateCcw,
+  Mail,
 } from 'lucide-react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
+import { openMailto, EMAIL_TEMPLATES, getFirstName } from '@/lib/tdi-admin/mailto';
 
 // Creators theme colors
 const theme = PORTAL_THEMES.creators;
@@ -552,7 +554,23 @@ export default function TDIAdminCreatorDetailPage() {
                 </span>
               )}
             </div>
-            <p className="text-white/70">{creator.email}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-white/70">{creator.email}</p>
+              <button
+                onClick={() => {
+                  const firstName = getFirstName(creator.name);
+                  openMailto({
+                    to: creator.email,
+                    subject: EMAIL_TEMPLATES.creatorJourney.subject,
+                    body: EMAIL_TEMPLATES.creatorJourney.getBody(firstName),
+                  });
+                }}
+                className="p-1.5 rounded-full transition-colors hover:bg-white/20"
+                title="Email creator"
+              >
+                <Mail className="w-4 h-4 text-white/70 hover:text-white" />
+              </button>
+            </div>
             <p className="mt-2 font-medium capitalize" style={{ color: theme.primary }}>
               Current Phase: {creator.current_phase.replace('_', ' ')}
             </p>

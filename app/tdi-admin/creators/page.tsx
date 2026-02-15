@@ -38,6 +38,7 @@ import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
 import { createCreator } from '@/lib/creator-portal-data';
 import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
+import { openMailto, EMAIL_TEMPLATES, getFirstName } from '@/lib/tdi-admin/mailto';
 import {
   BarChart,
   Bar,
@@ -212,6 +213,7 @@ function StatCard({
   value,
   isActive,
   onClick,
+  onEmail,
   accentColor,
   lightColor,
 }: {
@@ -220,6 +222,7 @@ function StatCard({
   value: number;
   isActive: boolean;
   onClick: () => void;
+  onEmail?: () => void;
   accentColor?: string;
   lightColor?: string;
 }) {
@@ -227,36 +230,50 @@ function StatCard({
   const light = lightColor || theme.light;
 
   return (
-    <button
-      onClick={onClick}
-      className="bg-white rounded-xl p-4 border transition-all text-left cursor-pointer hover:shadow-md"
-      style={{
-        borderColor: isActive ? accent : '#E5E7EB',
-        boxShadow: isActive ? `0 0 0 2px ${accent}20` : 'none',
-        transform: 'scale(1)',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'scale(1.02)';
-        e.currentTarget.style.borderColor = accent;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'scale(1)';
-        e.currentTarget.style.borderColor = isActive ? accent : '#E5E7EB';
-      }}
-    >
-      <div className="flex items-center gap-3">
-        <div
-          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ backgroundColor: light }}
+    <div className="relative">
+      <button
+        onClick={onClick}
+        className="bg-white rounded-xl p-4 border transition-all text-left cursor-pointer hover:shadow-md w-full"
+        style={{
+          borderColor: isActive ? accent : '#E5E7EB',
+          boxShadow: isActive ? `0 0 0 2px ${accent}20` : 'none',
+          transform: 'scale(1)',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'scale(1.02)';
+          e.currentTarget.style.borderColor = accent;
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'scale(1)';
+          e.currentTarget.style.borderColor = isActive ? accent : '#E5E7EB';
+        }}
+      >
+        <div className="flex items-center gap-3">
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
+            style={{ backgroundColor: light }}
+          >
+            <Icon className="w-5 h-5" style={{ color: accent }} />
+          </div>
+          <div>
+            <p className="text-2xl font-bold" style={{ color: accent }}>{value}</p>
+            <p className="text-xs text-gray-600">{label}</p>
+          </div>
+        </div>
+      </button>
+      {onEmail && value > 0 && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onEmail();
+          }}
+          className="absolute top-2 right-2 p-1.5 rounded-full transition-colors hover:bg-gray-100 group"
+          title={`Email ${value} creators`}
         >
-          <Icon className="w-5 h-5" style={{ color: accent }} />
-        </div>
-        <div>
-          <p className="text-2xl font-bold" style={{ color: accent }}>{value}</p>
-          <p className="text-xs text-gray-600">{label}</p>
-        </div>
-      </div>
-    </button>
+          <Mail className="w-4 h-4 text-gray-400 group-hover:text-purple-600" />
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -285,6 +302,9 @@ export default function CreatorStudioPage() {
   // Sort state
   const [sortBy, setSortBy] = useState<'lastActive' | 'progress' | 'name'>('lastActive');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+  // Selection state for bulk email
+  const [selectedCreatorIds, setSelectedCreatorIds] = useState<Set<string>>(new Set());
 
   const [newCreator, setNewCreator] = useState({
     name: '',
@@ -467,6 +487,81 @@ export default function CreatorStudioPage() {
     setFilterPath(path);
     setActiveStatFilter(null);
     setActiveTab('creators');
+  };
+
+  // Email handlers for stat cards
+  const handleEmailStalled = () => {
+    const stalledCreators = dashboardData?.creators.filter(c => c.waitingOn === 'stalled') || [];
+    if (stalledCreators.length === 0) return;
+    openMailto({
+      to: stalledCreators[0].email,
+      bcc: stalledCreators.slice(1).map(c => c.email),
+      subject: EMAIL_TEMPLATES.stalled.subject,
+      body: EMAIL_TEMPLATES.stalled.body,
+    });
+  };
+
+  const handleEmailWaitingOnCreator = () => {
+    const waitingCreators = dashboardData?.creators.filter(c => c.waitingOn === 'creator') || [];
+    if (waitingCreators.length === 0) return;
+    openMailto({
+      to: waitingCreators[0].email,
+      bcc: waitingCreators.slice(1).map(c => c.email),
+      subject: EMAIL_TEMPLATES.waitingOnCreator.subject,
+      body: EMAIL_TEMPLATES.waitingOnCreator.body,
+    });
+  };
+
+  const handleEmailWaitingOnTDI = () => {
+    const waitingCreators = dashboardData?.creators.filter(c => c.waitingOn === 'tdi') || [];
+    if (waitingCreators.length === 0) return;
+    openMailto({
+      to: waitingCreators[0].email,
+      bcc: waitingCreators.slice(1).map(c => c.email),
+      subject: EMAIL_TEMPLATES.waitingOnTDI.subject,
+      body: EMAIL_TEMPLATES.waitingOnTDI.body,
+    });
+  };
+
+  // Handle bulk email for selected creators
+  const handleBulkEmail = () => {
+    const selectedEmails = filteredCreators
+      .filter(c => selectedCreatorIds.has(c.id))
+      .map(c => c.email);
+    if (selectedEmails.length === 0) return;
+    openMailto({
+      to: selectedEmails[0],
+      bcc: selectedEmails.slice(1),
+      subject: 'Quick Update from TDI',
+      body: `Hi there!\n\n`,
+    });
+  };
+
+  // Toggle single creator selection
+  const toggleCreatorSelection = (creatorId: string) => {
+    setSelectedCreatorIds(prev => {
+      const next = new Set(prev);
+      if (next.has(creatorId)) {
+        next.delete(creatorId);
+      } else {
+        next.add(creatorId);
+      }
+      return next;
+    });
+  };
+
+  // Toggle all creators selection
+  const toggleAllCreators = () => {
+    if (selectedCreatorIds.size === filteredCreators.length) {
+      setSelectedCreatorIds(new Set());
+    } else {
+      setSelectedCreatorIds(new Set(filteredCreators.map(c => c.id)));
+    }
+  };
+
+  // Clear selection
+  const clearSelection = () => {
+    setSelectedCreatorIds(new Set());
   };
 
   const activeFiltersCount =
@@ -693,6 +788,7 @@ export default function CreatorStudioPage() {
               value={stats.stalled}
               isActive={activeStatFilter === 'stalled'}
               onClick={() => handleStatCardClick('stalled')}
+              onEmail={handleEmailStalled}
               accentColor="#F97316"
               lightColor="#FFF7ED"
             />
@@ -702,6 +798,7 @@ export default function CreatorStudioPage() {
               value={stats.waitingOnCreator}
               isActive={activeStatFilter === 'waitingOnCreator'}
               onClick={() => handleStatCardClick('waitingOnCreator')}
+              onEmail={handleEmailWaitingOnCreator}
               accentColor="#F59E0B"
               lightColor="#FFFBEB"
             />
@@ -711,6 +808,7 @@ export default function CreatorStudioPage() {
               value={stats.waitingOnTDI}
               isActive={activeStatFilter === 'waitingOnTDI'}
               onClick={() => handleStatCardClick('waitingOnTDI')}
+              onEmail={handleEmailWaitingOnTDI}
               accentColor="#3B82F6"
               lightColor="#EFF6FF"
             />
@@ -831,54 +929,78 @@ export default function CreatorStudioPage() {
 
             {/* Scheduled for Launch */}
             <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3
-                className="text-sm font-semibold mb-3 flex items-center gap-2"
-                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-              >
-                <CalendarDays className="w-4 h-4 text-blue-600" />
-                Scheduled for Launch
-              </h3>
               {(() => {
                 const scheduled = dashboardData.creators
                   .filter(c => c.publish_status === 'scheduled' && c.scheduled_publish_date)
                   .sort((a, b) => new Date(a.scheduled_publish_date!).getTime() - new Date(b.scheduled_publish_date!).getTime())
                   .slice(0, 5);
 
-                if (scheduled.length === 0) {
-                  return <p className="text-sm text-gray-500">No creators scheduled</p>;
-                }
-
                 return (
-                  <div className="space-y-2">
-                    {scheduled.map((creator) => {
-                      const scheduledDate = new Date(creator.scheduled_publish_date!);
-                      const isPastDue = scheduledDate <= new Date();
-                      return (
-                        <Link
-                          key={creator.id}
-                          href={`/tdi-admin/creators/${creator.id}`}
-                          className="flex items-center gap-2 group"
+                  <>
+                    <div className="flex items-center justify-between mb-3">
+                      <h3
+                        className="text-sm font-semibold flex items-center gap-2"
+                        style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
+                      >
+                        <CalendarDays className="w-4 h-4 text-blue-600" />
+                        Scheduled for Launch
+                      </h3>
+                      {scheduled.length > 0 && (
+                        <button
+                          onClick={() => {
+                            const emails = scheduled.map(c => c.email);
+                            const firstName = getFirstName(scheduled[0].name);
+                            const date = new Date(scheduled[0].scheduled_publish_date!).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                            openMailto({
+                              to: emails[0],
+                              bcc: emails.slice(1),
+                              subject: EMAIL_TEMPLATES.publishingDate.subject,
+                              body: EMAIL_TEMPLATES.publishingDate.getBody(firstName, date),
+                            });
+                          }}
+                          className="p-1.5 rounded-full transition-colors hover:bg-gray-100 group"
+                          title={`Email ${scheduled.length} scheduled creators`}
                         >
-                          <div
-                            className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0 bg-blue-500"
-                          >
-                            {creator.name.charAt(0).toUpperCase()}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p
-                              className="text-sm font-medium truncate group-hover:opacity-80"
-                              style={{ color: '#2B3A67' }}
+                          <Mail className="w-4 h-4 text-gray-400 group-hover:text-purple-600" />
+                        </button>
+                      )}
+                    </div>
+
+                    {scheduled.length === 0 ? (
+                      <p className="text-sm text-gray-500">No creators scheduled</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {scheduled.map((creator) => {
+                          const scheduledDate = new Date(creator.scheduled_publish_date!);
+                          const isPastDue = scheduledDate <= new Date();
+                          return (
+                            <Link
+                              key={creator.id}
+                              href={`/tdi-admin/creators/${creator.id}`}
+                              className="flex items-center gap-2 group"
                             >
-                              {creator.name}
-                            </p>
-                          </div>
-                          <div className={`text-xs flex-shrink-0 px-2 py-0.5 rounded ${isPastDue ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>
-                            {isPastDue ? 'Past due' : scheduledDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                          </div>
-                        </Link>
-                      );
-                    })}
-                  </div>
+                              <div
+                                className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0 bg-blue-500"
+                              >
+                                {creator.name.charAt(0).toUpperCase()}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p
+                                  className="text-sm font-medium truncate group-hover:opacity-80"
+                                  style={{ color: '#2B3A67' }}
+                                >
+                                  {creator.name}
+                                </p>
+                              </div>
+                              <div className={`text-xs flex-shrink-0 px-2 py-0.5 rounded ${isPastDue ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>
+                                {isPastDue ? 'Past due' : scheduledDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              </div>
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
                 );
               })()}
             </div>
@@ -935,16 +1057,36 @@ export default function CreatorStudioPage() {
 
             {/* Needs Your Attention */}
             <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-5">
-              <h3
-                className="text-sm font-semibold mb-3 flex items-center gap-2"
-                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-              >
-                <AlertTriangle className="w-4 h-4 text-amber-500" />
-                Needs Your Attention
-                {stats.waitingOnTDI > 0 && (
-                  <span className="text-xs font-normal text-gray-500">({stats.waitingOnTDI})</span>
+              <div className="flex items-center justify-between mb-3">
+                <h3
+                  className="text-sm font-semibold flex items-center gap-2"
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
+                >
+                  <AlertTriangle className="w-4 h-4 text-amber-500" />
+                  Needs Your Attention
+                  {stats.waitingOnTDI > 0 && (
+                    <span className="text-xs font-normal text-gray-500">({stats.waitingOnTDI})</span>
+                  )}
+                </h3>
+                {needsAttention.length > 0 && (
+                  <button
+                    onClick={() => {
+                      const emails = needsAttention.map(c => c.email);
+                      const firstName = getFirstName(needsAttention[0].name);
+                      openMailto({
+                        to: emails[0],
+                        bcc: emails.slice(1),
+                        subject: EMAIL_TEMPLATES.needsAttention.getSubject(needsAttention[0].content_path || 'default'),
+                        body: `Hi ${firstName}!\n\n`,
+                      });
+                    }}
+                    className="p-1.5 rounded-full transition-colors hover:bg-gray-100 group"
+                    title={`Email ${needsAttention.length} creators`}
+                  >
+                    <Mail className="w-4 h-4 text-gray-400 group-hover:text-purple-600" />
+                  </button>
                 )}
-              </h3>
+              </div>
               {needsAttention.length === 0 ? (
                 <div className="flex items-center gap-2 text-green-600 py-2">
                   <span>✓</span>
@@ -1156,6 +1298,7 @@ export default function CreatorStudioPage() {
 
       {/* CREATORS TAB */}
       {activeTab === 'creators' && (
+        <>
         <div className="bg-white rounded-xl border border-gray-200">
           {/* Search and Filters Bar */}
           <div className="p-4 border-b border-gray-100">
@@ -1301,6 +1444,15 @@ export default function CreatorStudioPage() {
             <table className="w-full">
               <thead>
                 <tr style={{ backgroundColor: theme.light }}>
+                  <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3 w-10">
+                    <input
+                      type="checkbox"
+                      checked={selectedCreatorIds.size === filteredCreators.length && filteredCreators.length > 0}
+                      onChange={toggleAllCreators}
+                      className="w-4 h-4 rounded border-gray-300 cursor-pointer"
+                      style={{ accentColor: theme.primary }}
+                    />
+                  </th>
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3">
                     Creator
                   </th>
@@ -1357,7 +1509,7 @@ export default function CreatorStudioPage() {
               <tbody className="divide-y divide-gray-50">
                 {filteredCreators.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
+                    <td colSpan={8} className="px-4 py-8 text-center text-gray-500">
                       {searchQuery || activeFiltersCount > 0 || activeStatFilter
                         ? 'No creators found matching your criteria.'
                         : 'No creators yet. Add your first creator to get started.'}
@@ -1369,15 +1521,26 @@ export default function CreatorStudioPage() {
                     const waitingBadge = getWaitingOnBadge(creator.waitingOn, creator.isStalled);
                     const daysSinceActive = getDaysSince(creator.lastActivityDate);
                     const isInactive = daysSinceActive >= 14 && creator.progressPercentage < 100;
+                    const isSelected = selectedCreatorIds.has(creator.id);
 
                     return (
                       <tr
                         key={creator.id}
                         className={`hover:bg-gray-50 transition-colors cursor-pointer ${
                           creator.isStalled ? 'border-l-4 border-l-red-400 bg-red-50/30' : ''
-                        }`}
+                        } ${isSelected ? 'bg-purple-50' : ''}`}
                         onClick={() => window.location.href = `/tdi-admin/creators/${creator.id}`}
                       >
+                        {/* Checkbox */}
+                        <td className="px-4 py-3" onClick={(e) => e.stopPropagation()}>
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleCreatorSelection(creator.id)}
+                            className="w-4 h-4 rounded border-gray-300 cursor-pointer"
+                            style={{ accentColor: theme.primary }}
+                          />
+                        </td>
                         {/* Creator */}
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
@@ -1473,6 +1636,35 @@ export default function CreatorStudioPage() {
             Showing {filteredCreators.length} of {dashboardData.creators.length} creators
           </div>
         </div>
+
+        {/* Floating Action Bar for Bulk Email */}
+        {selectedCreatorIds.size > 0 && (
+          <div
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white px-6 py-3 rounded-xl shadow-lg border border-gray-200 flex items-center gap-4 z-50"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            <span className="text-sm font-medium" style={{ color: '#2B3A67' }}>
+              {selectedCreatorIds.size} creator{selectedCreatorIds.size > 1 ? 's' : ''} selected
+            </span>
+            <button
+              onClick={handleBulkEmail}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
+              style={{ backgroundColor: theme.primary, color: 'white' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.dark}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theme.primary}
+            >
+              <Mail className="w-4 h-4" />
+              Email Selected
+            </button>
+            <button
+              onClick={clearSelection}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-700"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+        </>
       )}
 
       {/* ANALYTICS TAB */}
