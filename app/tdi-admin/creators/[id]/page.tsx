@@ -922,6 +922,81 @@ export default function TDIAdminCreatorDetailPage() {
             </div>
           </div>
 
+          {/* Notes Card */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <h3
+              className="font-semibold mb-4"
+              style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
+            >
+              Notes
+            </h3>
+
+            {/* Add Note Form */}
+            {canEdit && (
+              <form onSubmit={handleAddNote} className="mb-4">
+                <textarea
+                  value={newNote}
+                  onChange={(e) => setNewNote(e.target.value)}
+                  placeholder="Add a note..."
+                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
+                  rows={3}
+                />
+                <div className="flex items-center justify-between mt-2">
+                  <label className="flex items-center gap-2 text-sm text-gray-600">
+                    <input
+                      type="checkbox"
+                      checked={noteVisibleToCreator}
+                      onChange={(e) => setNoteVisibleToCreator(e.target.checked)}
+                      className="rounded"
+                    />
+                    Visible to creator
+                  </label>
+                  <button
+                    type="submit"
+                    disabled={!newNote.trim() || isAddingNote}
+                    className="px-3 py-1.5 text-sm font-medium rounded-lg disabled:opacity-50 flex items-center gap-1"
+                    style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                  >
+                    {isAddingNote ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
+                    Add Note
+                  </button>
+                </div>
+              </form>
+            )}
+
+            {/* Notes List */}
+            <div className="space-y-3 max-h-80 overflow-y-auto">
+              {allNotes.length === 0 ? (
+                <p className="text-sm text-gray-500">No notes yet</p>
+              ) : (
+                allNotes.map((note) => (
+                  <div
+                    key={note.id}
+                    className={`p-3 rounded-lg text-sm ${
+                      note.visible_to_creator ? 'bg-gray-50' : 'bg-amber-50 border border-amber-200'
+                    }`}
+                  >
+                    <p className="text-gray-800">{note.content}</p>
+                    <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+                      <span>{note.author}</span>
+                      <div className="flex items-center gap-2">
+                        {!note.visible_to_creator && (
+                          <span className="flex items-center gap-1">
+                            <EyeOff className="w-3 h-3" />
+                            Internal
+                          </span>
+                        )}
+                        <span>
+                          {new Date(note.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+
           {/* Course Details Card */}
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center justify-between mb-4">
@@ -1192,81 +1267,6 @@ export default function TDIAdminCreatorDetailPage() {
                 )}
               </div>
             )}
-          </div>
-
-          {/* Notes Card */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h3
-              className="font-semibold mb-4"
-              style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-            >
-              Notes
-            </h3>
-
-            {/* Add Note Form */}
-            {canEdit && (
-              <form onSubmit={handleAddNote} className="mb-4">
-                <textarea
-                  value={newNote}
-                  onChange={(e) => setNewNote(e.target.value)}
-                  placeholder="Add a note..."
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none"
-                  rows={3}
-                />
-                <div className="flex items-center justify-between mt-2">
-                  <label className="flex items-center gap-2 text-sm text-gray-600">
-                    <input
-                      type="checkbox"
-                      checked={noteVisibleToCreator}
-                      onChange={(e) => setNoteVisibleToCreator(e.target.checked)}
-                      className="rounded"
-                    />
-                    Visible to creator
-                  </label>
-                  <button
-                    type="submit"
-                    disabled={!newNote.trim() || isAddingNote}
-                    className="px-3 py-1.5 text-sm font-medium rounded-lg disabled:opacity-50 flex items-center gap-1"
-                    style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
-                  >
-                    {isAddingNote ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                    Add Note
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {/* Notes List */}
-            <div className="space-y-3 max-h-80 overflow-y-auto">
-              {allNotes.length === 0 ? (
-                <p className="text-sm text-gray-500">No notes yet</p>
-              ) : (
-                allNotes.map((note) => (
-                  <div
-                    key={note.id}
-                    className={`p-3 rounded-lg text-sm ${
-                      note.visible_to_creator ? 'bg-gray-50' : 'bg-amber-50 border border-amber-200'
-                    }`}
-                  >
-                    <p className="text-gray-800">{note.content}</p>
-                    <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
-                      <span>{note.author}</span>
-                      <div className="flex items-center gap-2">
-                        {!note.visible_to_creator && (
-                          <span className="flex items-center gap-1">
-                            <EyeOff className="w-3 h-3" />
-                            Internal
-                          </span>
-                        )}
-                        <span>
-                          {new Date(note.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
           </div>
         </div>
       </div>
