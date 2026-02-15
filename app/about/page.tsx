@@ -1,8 +1,52 @@
+'use client';
+
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import SymbolAnimation from '@/components/SymbolAnimation';
 import ContentCreatorsSection from '@/components/ContentCreatorsSection';
 
+// Navigation sections
+const navSections = [
+  { id: 'our-story', label: 'Our Story' },
+  { id: 'founder', label: 'Founder' },
+  { id: 'our-symbol', label: 'Our Symbol' },
+  { id: 'blueprint', label: 'Blueprint' },
+  { id: 'impact', label: 'Impact' },
+  { id: 'team', label: 'Team' },
+  { id: 'creators', label: 'Creators' },
+];
+
 export default function AboutPage() {
+  const [activeSection, setActiveSection] = useState<string>('');
+
+  // Active section tracking for navigation
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.3, rootMargin: '-100px 0px -50% 0px' }
+    );
+
+    navSections.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <main>
       {/* Hero Section with Background Image */}
@@ -38,6 +82,27 @@ export default function AboutPage() {
         </div>
       </section>
 
+      {/* Navigation Pills */}
+      <nav className="sticky top-16 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100 py-3">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex justify-center gap-2 flex-wrap">
+            {navSections.map(({ id, label }) => (
+              <button
+                key={id}
+                onClick={() => scrollToSection(id)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                  activeSection === id
+                    ? 'bg-[#1e2749] text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </nav>
+
       {/* Stats Section */}
       <section className="py-16" style={{ backgroundColor: '#80a4ed' }}>
         <div className="container-default">
@@ -59,7 +124,7 @@ export default function AboutPage() {
       </section>
 
       {/* How It Started */}
-      <section className="relative py-20 md:py-28 overflow-hidden">
+      <section id="our-story" className="relative py-20 md:py-28 overflow-hidden scroll-mt-32">
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -116,7 +181,7 @@ export default function AboutPage() {
       </section>
 
       {/* Meet Rae Section + TEDx Talk */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
+      <section id="founder" className="py-16 md:py-20 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
             Meet the Founder
@@ -253,7 +318,7 @@ export default function AboutPage() {
       </section>
 
       {/* The Story Behind the Symbol */}
-      <section id="symbol" className="py-16 md:py-24" style={{ background: '#faf3e0' }}>
+      <section id="our-symbol" className="py-16 md:py-24 scroll-mt-32" style={{ background: '#faf3e0' }}>
         <div className="max-w-5xl mx-auto px-6">
 
           <h2 className="text-2xl md:text-3xl font-bold mb-12" style={{ color: '#1e3a5f' }}>
@@ -307,7 +372,7 @@ export default function AboutPage() {
       </section>
 
       {/* The TDI Blueprint */}
-      <section className="py-16 md:py-20" style={{ backgroundColor: '#1e2749' }}>
+      <section id="blueprint" className="py-16 md:py-20 scroll-mt-32" style={{ backgroundColor: '#1e2749' }}>
         <div className="container-default">
           <div className="max-w-3xl mx-auto">
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8">
@@ -386,7 +451,7 @@ export default function AboutPage() {
       </section>
 
       {/* Our Impact Section */}
-      <section className="py-16" style={{ backgroundColor: '#ffba06' }}>
+      <section id="impact" className="py-16 scroll-mt-32" style={{ backgroundColor: '#ffba06' }}>
         <div className="container-default">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-10" style={{ color: '#1e2749' }}>
             Our Impact So Far
@@ -418,7 +483,7 @@ export default function AboutPage() {
       </section>
 
       {/* The Team */}
-      <section className="py-20" style={{ backgroundColor: '#f5f5f5' }}>
+      <section id="team" className="py-20 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
             The Team That Makes It Possible
@@ -504,10 +569,13 @@ export default function AboutPage() {
               <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>Executive Communication Coordinator</p>
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Content Creators - Dynamic from database */}
+      {/* Content Creators - Dynamic from database */}
+      <section id="creators" className="py-16 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-default">
           <ContentCreatorsSection />
-
         </div>
       </section>
 

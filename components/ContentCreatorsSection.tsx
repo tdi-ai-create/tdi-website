@@ -9,6 +9,7 @@ interface Creator {
   title: string;
   bio: string | null;
   headshotUrl: string | null;
+  contentPath: 'blog' | 'download' | 'course' | null;
 }
 
 // Get initials from name (e.g., "John Smith" -> "JS")
@@ -18,6 +19,19 @@ function getInitials(name: string): string {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
   return name.slice(0, 2).toUpperCase();
+}
+
+// Content path badge styling
+function getContentPathBadge(contentPath: 'blog' | 'download' | 'course' | null) {
+  if (!contentPath) return null;
+
+  const styles = {
+    course: { bg: '#E8F6F7', text: '#1a6b69', label: 'Course' },
+    blog: { bg: '#F3EDF8', text: '#6B4E9B', label: 'Blog' },
+    download: { bg: '#FFF8E7', text: '#92400E', label: 'Download' },
+  };
+
+  return styles[contentPath];
 }
 
 export default function ContentCreatorsSection() {
@@ -49,12 +63,12 @@ export default function ContentCreatorsSection() {
         <h3 className="font-bold text-lg mb-6 text-center" style={{ color: '#1e2749' }}>
           Content Creators and Contributors
         </h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {[...Array(8)].map((_, i) => (
-            <div key={i} className="text-center p-3 animate-pulse">
-              <div className="w-12 h-12 rounded-full mx-auto mb-2 bg-gray-200" />
-              <div className="h-4 bg-gray-200 rounded w-20 mx-auto mb-1" />
-              <div className="h-3 bg-gray-100 rounded w-16 mx-auto" />
+            <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 animate-pulse">
+              <div className="w-16 h-16 rounded-full mx-auto mb-3 bg-gray-200" />
+              <div className="h-4 bg-gray-200 rounded w-24 mx-auto mb-2" />
+              <div className="h-3 bg-gray-100 rounded w-20 mx-auto" />
             </div>
           ))}
         </div>
@@ -94,31 +108,46 @@ export default function ContentCreatorsSection() {
   }
 
   return (
-    <div className="bg-white rounded-xl p-8 max-w-4xl mx-auto">
+    <div className="bg-white rounded-xl p-8 max-w-5xl mx-auto">
       <h3 className="font-bold text-lg mb-6 text-center" style={{ color: '#1e2749' }}>
         Content Creators and Contributors
       </h3>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {creators.map((creator) => (
-          <div key={creator.id} className="text-center p-3">
-            {creator.headshotUrl ? (
-              <img
-                src={creator.headshotUrl}
-                alt={creator.name}
-                className="w-12 h-12 rounded-full mx-auto mb-2 object-cover"
-              />
-            ) : (
-              <div
-                className="w-12 h-12 rounded-full mx-auto mb-2 flex items-center justify-center"
-                style={{ backgroundColor: '#80a4ed' }}
-              >
-                <span className="text-white font-bold text-sm">{getInitials(creator.name)}</span>
-              </div>
-            )}
-            <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>{creator.name}</p>
-            <p className="text-xs" style={{ color: '#1e2749', opacity: 0.6 }}>{creator.title}</p>
-          </div>
-        ))}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {creators.map((creator) => {
+          const badge = getContentPathBadge(creator.contentPath);
+          return (
+            <div
+              key={creator.id}
+              className="bg-white border rounded-xl p-5 text-center hover:shadow-md transition-shadow duration-300"
+              style={{ borderColor: '#E5E7EB' }}
+            >
+              {creator.headshotUrl ? (
+                <img
+                  src={creator.headshotUrl}
+                  alt={creator.name}
+                  className="w-16 h-16 rounded-full mx-auto mb-3 object-cover"
+                />
+              ) : (
+                <div
+                  className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center"
+                  style={{ backgroundColor: '#5BBEC4' }}
+                >
+                  <span className="text-white font-bold text-base">{getInitials(creator.name)}</span>
+                </div>
+              )}
+              <p className="font-bold text-base mb-1" style={{ color: '#1a1a2e' }}>{creator.name}</p>
+              <p className="text-sm mb-2" style={{ color: '#6B7280' }}>{creator.title}</p>
+              {badge && (
+                <span
+                  className="inline-block px-2 py-0.5 rounded-full text-xs font-medium"
+                  style={{ backgroundColor: badge.bg, color: badge.text }}
+                >
+                  {badge.label}
+                </span>
+              )}
+            </div>
+          );
+        })}
       </div>
 
       <p className="text-center mt-6 text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>

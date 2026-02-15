@@ -4,8 +4,17 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 
+// Creator interface with content path
+interface Creator {
+  id?: string;
+  name: string;
+  title?: string;
+  headshotUrl?: string | null;
+  contentPath?: 'blog' | 'download' | 'course' | null;
+}
+
 // Fallback creators (used if API fails)
-const fallbackCreators = [
+const fallbackCreators: Creator[] = [
   { name: 'Erin Light' },
   { name: 'Katie Welch' },
   { name: 'Sue Thompson' },
@@ -89,6 +98,37 @@ const phases = [
   },
 ];
 
+// Navigation sections
+const navSections = [
+  { id: 'how-it-works', label: 'How It Works' },
+  { id: 'your-guide', label: 'Your Guide' },
+  { id: 'apply', label: 'Apply' },
+  { id: 'our-creators', label: 'Our Creators' },
+  { id: 'why-create', label: 'Why Create' },
+];
+
+// Get initials from name
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+}
+
+// Content path badge styling
+function getContentPathBadge(contentPath: 'blog' | 'download' | 'course' | null | undefined) {
+  if (!contentPath) return null;
+
+  const styles = {
+    course: { bg: '#E8F6F7', text: '#1a6b69', label: 'Course' },
+    blog: { bg: '#F3EDF8', text: '#6B4E9B', label: 'Blog' },
+    download: { bg: '#FFF8E7', text: '#92400E', label: 'Download' },
+  };
+
+  return styles[contentPath];
+}
+
 export default function CreateWithUsPage() {
   const [formState, setFormState] = useState({
     name: '',
@@ -100,7 +140,8 @@ export default function CreateWithUsPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const [creators, setCreators] = useState(fallbackCreators);
+  const [creators, setCreators] = useState<Creator[]>(fallbackCreators);
+  const [activeSection, setActiveSection] = useState<string>('');
 
   // Fetch creators from API
   useEffect(() => {
@@ -110,7 +151,7 @@ export default function CreateWithUsPage() {
         if (response.ok) {
           const data = await response.json();
           if (data.creators && data.creators.length > 0) {
-            setCreators(data.creators.map((c: { name: string }) => ({ name: c.name })));
+            setCreators(data.creators);
           }
         }
       } catch (error) {
@@ -137,6 +178,27 @@ export default function CreateWithUsPage() {
 
     document.querySelectorAll('[data-animate="true"]').forEach((el) => {
       observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
+  // Active section tracking for navigation
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      { threshold: 0.3, rootMargin: '-100px 0px -50% 0px' }
+    );
+
+    navSections.forEach(({ id }) => {
+      const el = document.getElementById(id);
+      if (el) observer.observe(el);
     });
 
     return () => observer.disconnect();
@@ -202,6 +264,13 @@ export default function CreateWithUsPage() {
     }
   };
 
+  const scrollToSection = (id: string) => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <main className="min-h-screen overflow-x-hidden">
       {/* Hero Section */}
@@ -241,6 +310,27 @@ export default function CreateWithUsPage() {
         </div>
       </section>
 
+      {/* Navigation Pills */}
+      <nav className="sticky top-16 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100 py-3">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex justify-center gap-2 flex-wrap">
+            {navSections.map(({ id, label }) => (
+              <button
+                key={id}
+                onClick={() => scrollToSection(id)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                  activeSection === id
+                    ? 'bg-[#1e2749] text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </nav>
+
       {/* Subtle login link for existing creators */}
       <div className="bg-white py-4">
         <p className="text-center text-gray-500 text-sm">
@@ -257,7 +347,7 @@ export default function CreateWithUsPage() {
       </div>
 
       {/* How It Works Timeline - Horizontal Layout */}
-      <section className="py-16 md:py-20 bg-gray-50 overflow-hidden">
+      <section id="how-it-works" className="py-16 md:py-20 bg-gray-50 overflow-hidden scroll-mt-32">
         <div className="max-w-6xl mx-auto px-6">
           <h2
             className="text-3xl md:text-4xl font-bold text-[#1e2749] mb-12 md:mb-16 text-center opacity-0 translate-y-8 transition-all duration-700"
@@ -321,7 +411,7 @@ export default function CreateWithUsPage() {
       </section>
 
       {/* Your Guide Through the Process */}
-      <section className="py-16 md:py-20 bg-white">
+      <section id="your-guide" className="py-16 md:py-20 bg-white scroll-mt-32">
         <div className="max-w-4xl mx-auto px-6">
           <h2
             className="text-3xl md:text-4xl font-bold text-[#1e2749] mb-12 text-center opacity-0 translate-y-8 transition-all duration-700"
@@ -398,7 +488,7 @@ export default function CreateWithUsPage() {
       </section>
 
       {/* Application Form */}
-      <section id="apply" className="relative py-16 md:py-20 bg-white scroll-mt-20">
+      <section id="apply" className="relative py-16 md:py-20 bg-white scroll-mt-32">
         <div className="max-w-3xl mx-auto px-6">
           {/* Form Card with negative margin overlap */}
           <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 -mt-24 relative z-20">
@@ -595,7 +685,7 @@ export default function CreateWithUsPage() {
       </section>
 
       {/* Meet Our Creators */}
-      <section className="py-16 md:py-20 bg-gray-50">
+      <section id="our-creators" className="py-16 md:py-20 bg-gray-50 scroll-mt-32">
         <div className="max-w-6xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2
@@ -613,24 +703,50 @@ export default function CreateWithUsPage() {
           </div>
 
           <div
-            className="flex flex-wrap justify-center gap-3 opacity-0 translate-y-8 transition-all duration-700 delay-200"
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 opacity-0 translate-y-8 transition-all duration-700 delay-200"
             data-animate="true"
           >
-            {creators.map((creator, index) => (
-              <span
-                key={creator.name}
-                className="bg-white px-4 py-2 rounded-full text-[#1e2749] font-medium shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300"
-                style={{ transitionDelay: `${index * 50}ms` }}
-              >
-                {creator.name}
-              </span>
-            ))}
+            {creators.map((creator) => {
+              const badge = getContentPathBadge(creator.contentPath);
+              return (
+                <div
+                  key={creator.id || creator.name}
+                  className="bg-white border rounded-xl p-5 text-center hover:shadow-md transition-shadow duration-300"
+                  style={{ borderColor: '#E5E7EB' }}
+                >
+                  {creator.headshotUrl ? (
+                    <img
+                      src={creator.headshotUrl}
+                      alt={creator.name}
+                      className="w-16 h-16 rounded-full mx-auto mb-3 object-cover"
+                    />
+                  ) : (
+                    <div
+                      className="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center"
+                      style={{ backgroundColor: '#5BBEC4' }}
+                    >
+                      <span className="text-white font-bold text-base">{getInitials(creator.name)}</span>
+                    </div>
+                  )}
+                  <p className="font-bold text-base mb-1" style={{ color: '#1a1a2e' }}>{creator.name}</p>
+                  <p className="text-sm mb-2" style={{ color: '#6B7280' }}>{creator.title || 'Content Creator'}</p>
+                  {badge && (
+                    <span
+                      className="inline-block px-2 py-0.5 rounded-full text-xs font-medium"
+                      style={{ backgroundColor: badge.bg, color: badge.text }}
+                    >
+                      {badge.label}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* Why Create for TDI - Numbered Editorial Layout */}
-      <section className="py-16 md:py-20 bg-white">
+      <section id="why-create" className="py-16 md:py-20 bg-white scroll-mt-32">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2
