@@ -86,11 +86,13 @@ export async function GET() {
       const requiresTeamAction = nextMilestone?.milestone?.requires_team_action || false;
 
       // Determine waiting status (use corePercent for "launched" since bonus is optional)
+      // Also consider publish_status - scheduled/published creators are "launched"
+      const publishStatus = creator.publish_status || 'in_progress';
       const hasIncompleteCoreMillestones = coreCompleted < coreTotal;
-      const isStalled = hasIncompleteCoreMillestones && lastActivityDate < fourteenDaysAgo;
+      const isStalled = hasIncompleteCoreMillestones && publishStatus === 'in_progress' && lastActivityDate < fourteenDaysAgo;
 
       let waitingOn: 'creator' | 'tdi' | 'stalled' | 'launched' = 'creator';
-      if (corePercent === 100) {
+      if (publishStatus === 'published' || publishStatus === 'scheduled' || corePercent === 100) {
         waitingOn = 'launched';
       } else if (isStalled) {
         waitingOn = 'stalled';
