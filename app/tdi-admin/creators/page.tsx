@@ -30,6 +30,9 @@ import {
   TrendingUp,
   Calendar,
   Zap,
+  CalendarDays,
+  Globe,
+  Check,
 } from 'lucide-react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
@@ -95,6 +98,10 @@ interface EnrichedCreator {
   requiresTeamAction: boolean;
   waitingOn: 'creator' | 'tdi' | 'stalled' | 'launched';
   isStalled: boolean;
+  // Publish workflow fields
+  publish_status: 'in_progress' | 'scheduled' | 'published';
+  scheduled_publish_date: string | null;
+  published_date: string | null;
   progress?: {
     coreTotal: number;
     coreCompleted: number;
@@ -271,6 +278,7 @@ export default function CreatorStudioPage() {
   const [filterPath, setFilterPath] = useState<string>('all');
   const [filterPhase, setFilterPhase] = useState<string>('all');
   const [filterWaitingOn, setFilterWaitingOn] = useState<string>('all');
+  const [filterPublishStatus, setFilterPublishStatus] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
   const [activeStatFilter, setActiveStatFilter] = useState<string | null>(null);
 
@@ -385,6 +393,11 @@ export default function CreatorStudioPage() {
       filtered = filtered.filter((c) => c.waitingOn === filterWaitingOn);
     }
 
+    // Apply publish status filter
+    if (filterPublishStatus !== 'all') {
+      filtered = filtered.filter((c) => c.publish_status === filterPublishStatus);
+    }
+
     // Apply sorting
     filtered.sort((a, b) => {
       let comparison = 0;
@@ -410,7 +423,7 @@ export default function CreatorStudioPage() {
     }
 
     setFilteredCreators(filtered);
-  }, [searchQuery, dashboardData, filterPath, filterPhase, filterWaitingOn, activeStatFilter, sortBy, sortOrder]);
+  }, [searchQuery, dashboardData, filterPath, filterPhase, filterWaitingOn, filterPublishStatus, activeStatFilter, sortBy, sortOrder]);
 
   const handleAddCreator = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -459,7 +472,8 @@ export default function CreatorStudioPage() {
   const activeFiltersCount =
     (filterPath !== 'all' ? 1 : 0) +
     (filterPhase !== 'all' ? 1 : 0) +
-    (filterWaitingOn !== 'all' ? 1 : 0);
+    (filterWaitingOn !== 'all' ? 1 : 0) +
+    (filterPublishStatus !== 'all' ? 1 : 0);
 
   // Get path badge styling
   const getPathBadge = (path: string | null) => {
@@ -815,6 +829,110 @@ export default function CreatorStudioPage() {
               )}
             </div>
 
+            {/* Scheduled for Launch */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <h3
+                className="text-sm font-semibold mb-3 flex items-center gap-2"
+                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
+              >
+                <CalendarDays className="w-4 h-4 text-blue-600" />
+                Scheduled for Launch
+              </h3>
+              {(() => {
+                const scheduled = dashboardData.creators
+                  .filter(c => c.publish_status === 'scheduled' && c.scheduled_publish_date)
+                  .sort((a, b) => new Date(a.scheduled_publish_date!).getTime() - new Date(b.scheduled_publish_date!).getTime())
+                  .slice(0, 5);
+
+                if (scheduled.length === 0) {
+                  return <p className="text-sm text-gray-500">No creators scheduled</p>;
+                }
+
+                return (
+                  <div className="space-y-2">
+                    {scheduled.map((creator) => {
+                      const scheduledDate = new Date(creator.scheduled_publish_date!);
+                      const isPastDue = scheduledDate <= new Date();
+                      return (
+                        <Link
+                          key={creator.id}
+                          href={`/tdi-admin/creators/${creator.id}`}
+                          className="flex items-center gap-2 group"
+                        >
+                          <div
+                            className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0 bg-blue-500"
+                          >
+                            {creator.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p
+                              className="text-sm font-medium truncate group-hover:opacity-80"
+                              style={{ color: '#2B3A67' }}
+                            >
+                              {creator.name}
+                            </p>
+                          </div>
+                          <div className={`text-xs flex-shrink-0 px-2 py-0.5 rounded ${isPastDue ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>
+                            {isPastDue ? 'Past due' : scheduledDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Recently Published */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <h3
+                className="text-sm font-semibold mb-3 flex items-center gap-2"
+                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
+              >
+                <Globe className="w-4 h-4 text-green-600" />
+                Recently Published
+              </h3>
+              {(() => {
+                const published = dashboardData.creators
+                  .filter(c => c.publish_status === 'published' && c.published_date)
+                  .sort((a, b) => new Date(b.published_date!).getTime() - new Date(a.published_date!).getTime())
+                  .slice(0, 5);
+
+                if (published.length === 0) {
+                  return <p className="text-sm text-gray-500">No published creators yet</p>;
+                }
+
+                return (
+                  <div className="space-y-2">
+                    {published.map((creator) => (
+                      <Link
+                        key={creator.id}
+                        href={`/tdi-admin/creators/${creator.id}`}
+                        className="flex items-center gap-2 group"
+                      >
+                        <div
+                          className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0 bg-green-500"
+                        >
+                          <Check className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className="text-sm font-medium truncate group-hover:opacity-80"
+                            style={{ color: '#2B3A67' }}
+                          >
+                            {creator.name}
+                          </p>
+                        </div>
+                        <div className="text-xs text-gray-500 flex-shrink-0">
+                          {new Date(creator.published_date!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </div>
+                      </Link>
+                    ))}
+                  </div>
+                );
+              })()}
+            </div>
+
             {/* Needs Your Attention */}
             <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-5">
               <h3
@@ -1128,12 +1246,27 @@ export default function CreatorStudioPage() {
                     <option value="launched">Launched</option>
                   </select>
                 </div>
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Publish Status</label>
+                  <select
+                    value={filterPublishStatus}
+                    onChange={(e) => setFilterPublishStatus(e.target.value)}
+                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                    style={{ outlineColor: theme.primary }}
+                  >
+                    <option value="all">All</option>
+                    <option value="in_progress">In Progress</option>
+                    <option value="scheduled">Scheduled</option>
+                    <option value="published">Published</option>
+                  </select>
+                </div>
                 {(activeFiltersCount > 0 || activeStatFilter) && (
                   <button
                     onClick={() => {
                       setFilterPath('all');
                       setFilterPhase('all');
                       setFilterWaitingOn('all');
+                      setFilterPublishStatus('all');
                       setActiveStatFilter(null);
                     }}
                     className="self-end px-3 py-2 text-sm text-gray-500 hover:text-gray-700"

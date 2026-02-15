@@ -42,6 +42,9 @@ export interface Milestone {
 // Content path types
 export type ContentPath = 'blog' | 'download' | 'course';
 
+// Publish status types
+export type PublishStatus = 'in_progress' | 'scheduled' | 'published';
+
 // Creator from database
 export interface Creator {
   id: string;
@@ -75,6 +78,11 @@ export interface Creator {
   website_bio: string | null;
   headshot_url: string | null;
   display_order: number;
+  // Publish workflow fields
+  publish_status: PublishStatus;
+  scheduled_publish_date: string | null;
+  published_date: string | null;
+  publish_notes: string | null;
   created_at: string;
   updated_at: string;
 }

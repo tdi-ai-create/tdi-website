@@ -100,6 +100,10 @@ export async function GET() {
 
       return {
         ...creator,
+        // Ensure publish_status fields have defaults
+        publish_status: creator.publish_status || 'in_progress',
+        scheduled_publish_date: creator.scheduled_publish_date || null,
+        published_date: creator.published_date || null,
         totalMilestones,
         completedMilestones,
         progressPercentage,

@@ -25,6 +25,11 @@ import {
   GraduationCap,
   MoreVertical,
   Palette,
+  Rocket,
+  CalendarDays,
+  Calendar,
+  Globe,
+  RotateCcw,
 } from 'lucide-react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
@@ -142,6 +147,13 @@ export default function TDIAdminCreatorDetailPage() {
     display_order: 99,
   });
   const [isSavingWebsite, setIsSavingWebsite] = useState(false);
+
+  // Publish workflow state
+  const [showPublishModal, setShowPublishModal] = useState(false);
+  const [publishAction, setPublishAction] = useState<'publish_now' | 'schedule'>('publish_now');
+  const [scheduledDate, setScheduledDate] = useState('');
+  const [publishNotes, setPublishNotes] = useState('');
+  const [isPublishing, setIsPublishing] = useState(false);
 
   const adminEmail = teamMember?.email || '';
 
@@ -265,6 +277,61 @@ export default function TDIAdminCreatorDetailPage() {
     }
   };
 
+  const handlePublishStatusUpdate = async (action: string) => {
+    if (!canEdit) return;
+    setIsPublishing(true);
+    try {
+      const response = await fetch('/api/admin/update-publish-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          action,
+          scheduledDate: action === 'schedule' || action === 'reschedule' ? scheduledDate : undefined,
+          publishNotes: publishNotes || undefined,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        await loadData();
+        setShowPublishModal(false);
+        setScheduledDate('');
+        setPublishNotes('');
+        setPublishAction('publish_now');
+
+        const actionMessages: Record<string, string> = {
+          publish_now: 'Creator published successfully!',
+          schedule: 'Creator scheduled for publishing!',
+          reschedule: 'Publish date rescheduled!',
+          unpublish: 'Creator unpublished.',
+          mark_published: 'Marked as published!',
+        };
+        setSuccessMessage(actionMessages[action] || 'Status updated!');
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        alert(`Failed: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error updating publish status:', error);
+      alert('Error updating publish status.');
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
+  // Check if this is the final milestone in Launch phase
+  const isFinalLaunchMilestone = (milestoneId: string): boolean => {
+    if (!dashboardData) return false;
+    const launchPhase = dashboardData.phases.find(p => p.id === 'launch');
+    if (!launchPhase) return false;
+    const applicableMilestones = launchPhase.milestones.filter((m: MilestoneWithStatus) => m.isApplicable !== false);
+    if (applicableMilestones.length === 0) return false;
+    const lastMilestone = applicableMilestones[applicableMilestones.length - 1];
+    return lastMilestone.id === milestoneId;
+  };
+
   const handleAddNote = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newNote.trim() || !canEdit) return;
@@ -335,6 +402,16 @@ export default function TDIAdminCreatorDetailPage() {
         if (!data.success) throw new Error(data.error);
         await loadData();
         setSuccessMessage(`Completed: ${milestoneTitle}`);
+
+        // Check if this was the final Launch milestone - show publish modal
+        if (isFinalLaunchMilestone(milestoneId)) {
+          // Only show if not already published
+          setTimeout(() => {
+            if (dashboardData?.creator.publish_status !== 'published') {
+              setShowPublishModal(true);
+            }
+          }, 500);
+        }
       }
       setTimeout(() => setSuccessMessage(null), 3000);
     } catch (error) {
@@ -728,6 +805,100 @@ export default function TDIAdminCreatorDetailPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Publish Status Card */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3
+                className="font-semibold flex items-center gap-2"
+                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
+              >
+                <Globe className="w-4 h-4" style={{ color: theme.primary }} />
+                Publish Status
+              </h3>
+            </div>
+
+            {/* Status Display */}
+            <div className="space-y-3">
+              {creator.publish_status === 'published' ? (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 border border-green-200">
+                  <Check className="w-5 h-5 text-green-600" />
+                  <div>
+                    <p className="font-medium text-green-800">Published</p>
+                    {creator.published_date && (
+                      <p className="text-sm text-green-600">
+                        Since {new Date(creator.published_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ) : creator.publish_status === 'scheduled' ? (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-blue-50 border border-blue-200">
+                  <CalendarDays className="w-5 h-5 text-blue-600" />
+                  <div>
+                    <p className="font-medium text-blue-800">Scheduled</p>
+                    {creator.scheduled_publish_date && (
+                      <p className="text-sm text-blue-600">
+                        For {new Date(creator.scheduled_publish_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 p-3 rounded-lg bg-gray-50 border border-gray-200">
+                  <Clock className="w-5 h-5 text-gray-500" />
+                  <div>
+                    <p className="font-medium text-gray-700">In Progress</p>
+                    <p className="text-sm text-gray-500">Not yet ready to publish</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Actions */}
+              {canEdit && (
+                <div className="flex flex-wrap gap-2 pt-2">
+                  {creator.publish_status !== 'published' && (
+                    <button
+                      onClick={() => setShowPublishModal(true)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
+                      style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                    >
+                      <Rocket className="w-4 h-4" />
+                      {creator.publish_status === 'scheduled' ? 'Change' : 'Publish'}
+                    </button>
+                  )}
+                  {creator.publish_status === 'published' && (
+                    <button
+                      onClick={() => handlePublishStatusUpdate('unpublish')}
+                      disabled={isPublishing}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      {isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <EyeOff className="w-4 h-4" />}
+                      Unpublish
+                    </button>
+                  )}
+                  {creator.publish_status === 'scheduled' && creator.scheduled_publish_date && new Date(creator.scheduled_publish_date) <= new Date() && (
+                    <button
+                      onClick={() => handlePublishStatusUpdate('mark_published')}
+                      disabled={isPublishing}
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg text-orange-700 border border-orange-300 hover:bg-orange-50 transition-colors"
+                    >
+                      {isPublishing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                      Mark Published
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Publish Notes */}
+              {creator.publish_notes && (
+                <div className="mt-2 p-2 bg-gray-50 rounded text-sm text-gray-600">
+                  <p className="font-medium text-gray-700 text-xs mb-1">Note:</p>
+                  {creator.publish_notes}
+                </div>
+              )}
+            </div>
+          </div>
+
           {/* Course Details Card */}
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center justify-between mb-4">
@@ -1076,6 +1247,170 @@ export default function TDIAdminCreatorDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Publish Modal */}
+      {showPublishModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div
+            className="bg-white rounded-2xl shadow-xl max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-6 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: theme.light }}
+                >
+                  <Rocket size={24} style={{ color: theme.primary }} />
+                </div>
+                <div>
+                  <h2
+                    className="font-bold text-lg"
+                    style={{ fontFamily: "'Source Serif 4', Georgia, serif", color: '#2B3A67' }}
+                  >
+                    Ready to Publish!
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    {creator.name} is ready to go live
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 space-y-4">
+              {/* Action Selection */}
+              <div className="space-y-3">
+                <label className="block">
+                  <div
+                    className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      publishAction === 'publish_now'
+                        ? 'border-[#9B7CB8] bg-[#F3EDF8]'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => setPublishAction('publish_now')}
+                  >
+                    <input
+                      type="radio"
+                      name="publishAction"
+                      value="publish_now"
+                      checked={publishAction === 'publish_now'}
+                      onChange={() => setPublishAction('publish_now')}
+                      className="sr-only"
+                    />
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: publishAction === 'publish_now' ? theme.primary : '#F3F4F6' }}
+                    >
+                      <Rocket size={20} className={publishAction === 'publish_now' ? 'text-white' : 'text-gray-500'} />
+                    </div>
+                    <div>
+                      <p className="font-medium" style={{ color: '#2B3A67' }}>Publish Now</p>
+                      <p className="text-sm text-gray-500">Make visible on website immediately</p>
+                    </div>
+                  </div>
+                </label>
+
+                <label className="block">
+                  <div
+                    className={`flex items-center gap-3 p-4 rounded-xl border-2 cursor-pointer transition-all ${
+                      publishAction === 'schedule'
+                        ? 'border-[#9B7CB8] bg-[#F3EDF8]'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => setPublishAction('schedule')}
+                  >
+                    <input
+                      type="radio"
+                      name="publishAction"
+                      value="schedule"
+                      checked={publishAction === 'schedule'}
+                      onChange={() => setPublishAction('schedule')}
+                      className="sr-only"
+                    />
+                    <div
+                      className="w-10 h-10 rounded-full flex items-center justify-center"
+                      style={{ backgroundColor: publishAction === 'schedule' ? theme.primary : '#F3F4F6' }}
+                    >
+                      <Calendar size={20} className={publishAction === 'schedule' ? 'text-white' : 'text-gray-500'} />
+                    </div>
+                    <div>
+                      <p className="font-medium" style={{ color: '#2B3A67' }}>Schedule for Later</p>
+                      <p className="text-sm text-gray-500">Set a specific launch date</p>
+                    </div>
+                  </div>
+                </label>
+              </div>
+
+              {/* Date Picker (shown if scheduling) */}
+              {publishAction === 'schedule' && (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Publish Date
+                    </label>
+                    <input
+                      type="date"
+                      value={scheduledDate}
+                      onChange={(e) => setScheduledDate(e.target.value)}
+                      min={new Date().toISOString().split('T')[0]}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#9B7CB8]/50 focus:border-[#9B7CB8]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Notes (optional)
+                    </label>
+                    <textarea
+                      value={publishNotes}
+                      onChange={(e) => setPublishNotes(e.target.value)}
+                      placeholder="e.g., Coordinating with social media campaign..."
+                      rows={2}
+                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#9B7CB8]/50 focus:border-[#9B7CB8]"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-6 border-t border-gray-100 flex gap-3">
+              <button
+                onClick={() => {
+                  setShowPublishModal(false);
+                  setScheduledDate('');
+                  setPublishNotes('');
+                  setPublishAction('publish_now');
+                }}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handlePublishStatusUpdate(publishAction)}
+                disabled={isPublishing || (publishAction === 'schedule' && !scheduledDate)}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+              >
+                {isPublishing ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : publishAction === 'publish_now' ? (
+                  <>
+                    <Rocket className="w-4 h-4" />
+                    Publish Now
+                  </>
+                ) : (
+                  <>
+                    <Calendar className="w-4 h-4" />
+                    Schedule
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
