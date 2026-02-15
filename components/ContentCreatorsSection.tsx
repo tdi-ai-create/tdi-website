@@ -9,7 +9,6 @@ interface Creator {
   title: string;
   bio: string | null;
   headshotUrl: string | null;
-  contentPath: 'blog' | 'download' | 'course' | null;
 }
 
 // Get initials from name (e.g., "John Smith" -> "JS")
@@ -19,19 +18,6 @@ function getInitials(name: string): string {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
   return name.slice(0, 2).toUpperCase();
-}
-
-// Content path badge styling
-function getContentPathBadge(contentPath: 'blog' | 'download' | 'course' | null) {
-  if (!contentPath) return null;
-
-  const styles = {
-    course: { bg: '#E8F6F7', text: '#1a6b69', label: 'Course' },
-    blog: { bg: '#F3EDF8', text: '#6B4E9B', label: 'Blog' },
-    download: { bg: '#FFF8E7', text: '#92400E', label: 'Download' },
-  };
-
-  return styles[contentPath];
 }
 
 export default function ContentCreatorsSection() {
@@ -113,9 +99,7 @@ export default function ContentCreatorsSection() {
         Content Creators and Contributors
       </h3>
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {creators.map((creator) => {
-          const badge = getContentPathBadge(creator.contentPath);
-          return (
+        {creators.map((creator) => (
             <div
               key={creator.id}
               className="bg-white border rounded-xl p-5 text-center hover:shadow-md transition-shadow duration-300"
@@ -136,18 +120,9 @@ export default function ContentCreatorsSection() {
                 </div>
               )}
               <p className="font-bold text-base mb-1" style={{ color: '#1a1a2e' }}>{creator.name}</p>
-              <p className="text-sm mb-2" style={{ color: '#6B7280' }}>{creator.title}</p>
-              {badge && (
-                <span
-                  className="inline-block px-2 py-0.5 rounded-full text-xs font-medium"
-                  style={{ backgroundColor: badge.bg, color: badge.text }}
-                >
-                  {badge.label}
-                </span>
-              )}
+              <p className="text-sm" style={{ color: '#6B7280' }}>{creator.title}</p>
             </div>
-          );
-        })}
+        ))}
       </div>
 
       <p className="text-center mt-6 text-sm" style={{ color: '#1e2749', opacity: 0.6 }}>

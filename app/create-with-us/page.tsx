@@ -116,19 +116,6 @@ function getInitials(name: string): string {
   return name.slice(0, 2).toUpperCase();
 }
 
-// Content path badge styling
-function getContentPathBadge(contentPath: 'blog' | 'download' | 'course' | null | undefined) {
-  if (!contentPath) return null;
-
-  const styles = {
-    course: { bg: '#E8F6F7', text: '#1a6b69', label: 'Course' },
-    blog: { bg: '#F3EDF8', text: '#6B4E9B', label: 'Blog' },
-    download: { bg: '#FFF8E7', text: '#92400E', label: 'Download' },
-  };
-
-  return styles[contentPath];
-}
-
 export default function CreateWithUsPage() {
   const [formState, setFormState] = useState({
     name: '',
@@ -311,7 +298,7 @@ export default function CreateWithUsPage() {
       </section>
 
       {/* Navigation Pills */}
-      <nav className="sticky top-16 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100 py-3">
+      <nav className="bg-white border-b border-gray-100 py-3">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex justify-center gap-2 flex-wrap">
             {navSections.map(({ id, label }) => (
@@ -706,9 +693,7 @@ export default function CreateWithUsPage() {
             className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 opacity-0 translate-y-8 transition-all duration-700 delay-200"
             data-animate="true"
           >
-            {creators.map((creator) => {
-              const badge = getContentPathBadge(creator.contentPath);
-              return (
+            {creators.map((creator) => (
                 <div
                   key={creator.id || creator.name}
                   className="bg-white border rounded-xl p-5 text-center hover:shadow-md transition-shadow duration-300"
@@ -729,18 +714,9 @@ export default function CreateWithUsPage() {
                     </div>
                   )}
                   <p className="font-bold text-base mb-1" style={{ color: '#1a1a2e' }}>{creator.name}</p>
-                  <p className="text-sm mb-2" style={{ color: '#6B7280' }}>{creator.title || 'Content Creator'}</p>
-                  {badge && (
-                    <span
-                      className="inline-block px-2 py-0.5 rounded-full text-xs font-medium"
-                      style={{ backgroundColor: badge.bg, color: badge.text }}
-                    >
-                      {badge.label}
-                    </span>
-                  )}
+                  <p className="text-sm" style={{ color: '#6B7280' }}>{creator.title || 'Content Creator'}</p>
                 </div>
-              );
-            })}
+            ))}
           </div>
         </div>
       </section>

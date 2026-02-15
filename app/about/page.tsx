@@ -83,7 +83,7 @@ export default function AboutPage() {
       </section>
 
       {/* Navigation Pills */}
-      <nav className="sticky top-16 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100 py-3">
+      <nav className="bg-white border-b border-gray-100 py-3">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex justify-center gap-2 flex-wrap">
             {navSections.map(({ id, label }) => (
