@@ -532,7 +532,7 @@ export default function AboutPage() {
           </div>
 
           {/* Team Members (no bios, card style like Content Creators) */}
-          <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto mb-12">
+          <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto">
             {/* Rachel Patragas */}
             <div className="text-center p-3">
               <div
@@ -573,7 +573,7 @@ export default function AboutPage() {
       </section>
 
       {/* Content Creators - Dynamic from database */}
-      <section id="creators" className="py-16 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
+      <section id="creators" className="pt-4 pb-16 scroll-mt-32" style={{ backgroundColor: '#f5f5f5' }}>
         <div className="container-default">
           <ContentCreatorsSection />
         </div>
