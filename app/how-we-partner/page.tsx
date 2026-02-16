@@ -641,7 +641,7 @@ function BookPanel() {
         {/* Book Cover Image */}
         <div className="flex-shrink-0">
           <Image
-            src="/images/teachers-deserve-it-book.png"
+            src="/images/teachers-deserve-it-book.jpg"
             alt="Teachers Deserve It book cover by Rae Hughart and Adam Welcome"
             width={200}
             height={300}

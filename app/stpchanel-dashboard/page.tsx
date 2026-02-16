@@ -462,7 +462,7 @@ export default function StPeterChanelDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5]">
+    <div className="min-h-screen bg-[#F5F5F5] overflow-x-hidden">
       {/* Compact Navigation */}
       <nav className="bg-[#1e2749] sticky top-0 z-50 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

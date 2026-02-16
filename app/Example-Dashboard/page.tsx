@@ -940,7 +940,7 @@ export default function ExampleDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F5F5]">
+    <div className="min-h-screen bg-[#F5F5F5] overflow-x-hidden">
       {/* Confetti celebration for gold medal schools */}
       <Confetti isActive={showConfetti} />
 

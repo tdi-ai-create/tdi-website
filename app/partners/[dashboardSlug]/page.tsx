@@ -2978,7 +2978,7 @@ export default function PartnerDashboard() {
                         <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
                           <div className="flex-shrink-0">
                             <Image
-                              src="/images/teachers-deserve-it-book.png"
+                              src="/images/teachers-deserve-it-book.jpg"
                               alt="Teachers Deserve It book cover"
                               width={200}
                               height={300}

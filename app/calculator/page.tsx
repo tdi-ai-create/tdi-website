@@ -33,6 +33,7 @@ export default function CalculatorPage() {
 
         {/* Calculator Content */}
         <div className="relative z-20 w-full max-w-2xl">
+          <h1 className="sr-only">TDI Impact Calculator</h1>
           <TabbedCalculator defaultTab="teachers" />
         </div>
 
