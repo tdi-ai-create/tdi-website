@@ -245,6 +245,7 @@ export default function AllenwoodDashboard() {
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Allenwood Elementary School</h1>
             <p className="text-white/80 text-sm">Camp Springs, Maryland | Partner Dashboard</p>
+            <p className="text-xs text-gray-400 mt-1">Data updated February 17, 2026</p>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <div className="bg-white/10 px-3 py-2 rounded-lg text-center">
@@ -304,7 +305,7 @@ export default function AllenwoodDashboard() {
                   <Users className="w-4 h-4 text-[#38618C]" />
                   <span className="text-xs text-gray-500 uppercase">Teachers Enrolled</span>
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">10/10</div>
+                <div className="text-2xl font-bold text-[#1e2749]">11/11</div>
                 <div className="text-xs text-[#38618C] font-medium">Hub Access</div>
               </div>
 
@@ -344,11 +345,9 @@ export default function AllenwoodDashboard() {
               <div className="flex items-start gap-3">
                 <Lightbulb className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Recommendation: Hub Re-engagement</h4>
+                  <h4 className="font-semibold text-gray-800 mb-2">Recommendation: Follow the Explorer</h4>
                   <p className="text-sm text-gray-700">
-                    Most teachers logged in during October but haven&apos;t returned since.
-                    Consider a quick Hub refresher at the Feb 18 observation to re-engage
-                    the team and highlight new resources.
+                    Since October, one team member has started exploring - spending time in 4 different courses including Teacher-Tested Hacks, Supporting Students, and Parent Tools. The rest of the team hasn&apos;t returned to the Hub yet. A 5-minute walkthrough at your next team meeting showing where this explorer started could spark the same curiosity across the group.
                   </p>
                 </div>
               </div>
@@ -633,6 +632,19 @@ export default function AllenwoodDashboard() {
                     </p>
                   </div>
                 </div>
+              </div>
+
+              {/* Inclusion Bundle - NEW */}
+              <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mt-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded">NEW</span>
+                  <h4 className="font-semibold text-gray-900">Teachers Deserve Real Inclusion</h4>
+                </div>
+                <p className="text-gray-600 text-sm">
+                  5 courses just added to your team&apos;s access focused on building truly inclusive classrooms.
+                  Pairs well with the support strategies your team is already exploring.
+                </p>
+                <p className="text-gray-500 text-xs mt-2">Added February 2026</p>
               </div>
             </div>
 
@@ -1163,6 +1175,110 @@ export default function AllenwoodDashboard() {
                 <p>
                   The good news? Even 15 minutes with a targeted course or download can create immediate classroom impact. We&apos;ve curated starting points below based on what we saw during our visit.
                 </p>
+              </div>
+            </div>
+
+            {/* First Explorer Highlight */}
+            <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl p-6 border border-amber-200 shadow-sm">
+              <div className="flex items-start gap-4">
+                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Sparkles className="w-6 h-6 text-amber-500" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">First Explorer</h3>
+                  <p className="text-gray-700">
+                    One team member has been quietly diving in - viewing 7 lessons across 4 courses and spending about 14 minutes on the platform. The courses they chose (classroom hacks, student support, parent tools) are practical picks the whole team would benefit from.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Platform Activity Summary */}
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-green-500" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">Platform Activity Summary</h3>
+              </div>
+
+              <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+                <div className="bg-gray-50 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#1e2749]">1 of 11</div>
+                  <div className="text-xs text-gray-500">Staff Active on Hub</div>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#1e2749]">4 of 33</div>
+                  <div className="text-xs text-gray-500">Courses Explored</div>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#1e2749]">7</div>
+                  <div className="text-xs text-gray-500">Lessons Viewed</div>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#1e2749]">1</div>
+                  <div className="text-xs text-gray-500">Lessons Completed</div>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-4 text-center">
+                  <div className="text-2xl font-bold text-[#1e2749]">~14 min</div>
+                  <div className="text-xs text-gray-500">Total Time on Platform</div>
+                </div>
+              </div>
+
+              {/* Where the Activity Is Happening */}
+              <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <BarChart3 className="w-4 h-4 text-blue-500" />
+                Where the Activity Is Happening
+              </h4>
+
+              <div className="space-y-3 mb-6">
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                  <div className="flex justify-between items-start mb-1">
+                    <p className="text-gray-900 font-medium">Teacher-Tested Hacks for Smarter Days</p>
+                    <span className="text-gray-500 text-xs whitespace-nowrap">~5.5 min</span>
+                  </div>
+                  <p className="text-gray-500 text-sm">4 lessons viewed · Topics explored: energy reset strategies, student voice techniques</p>
+                </div>
+
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                  <div className="flex justify-between items-start mb-1">
+                    <p className="text-gray-900 font-medium">Understanding Student Needs &amp; Modifications</p>
+                    <span className="text-gray-500 text-xs whitespace-nowrap">~4 min</span>
+                  </div>
+                  <p className="text-gray-500 text-sm">1 lesson viewed · Started with the Welcome video</p>
+                </div>
+
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                  <div className="flex justify-between items-start mb-1">
+                    <div className="flex items-center gap-2">
+                      <p className="text-gray-900 font-medium">Supporting Students Through Their Daily Schedule</p>
+                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Completed</span>
+                    </div>
+                    <span className="text-gray-500 text-xs whitespace-nowrap">~3 min</span>
+                  </div>
+                  <p className="text-gray-500 text-sm">1 lesson viewed + completed · Welcome video completed (the only completion so far)</p>
+                </div>
+
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                  <div className="flex justify-between items-start mb-1">
+                    <p className="text-gray-900 font-medium">Parent Tools That Support Student Success</p>
+                    <span className="text-gray-500 text-xs whitespace-nowrap">~2 min</span>
+                  </div>
+                  <p className="text-gray-500 text-sm">1 lesson viewed · Started with the Welcome video</p>
+                </div>
+              </div>
+
+              {/* What This Tells Us */}
+              <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+                <div className="flex items-start gap-3">
+                  <Lightbulb className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-blue-800 font-medium mb-1">What This Tells Us</p>
+                    <p className="text-gray-700 text-sm">
+                      The topics drawing attention - classroom hacks, student support strategies, parent tools, and modifications - suggest your team is looking for practical, ready-to-use resources. These are great entry points for the rest of the team too.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
 
