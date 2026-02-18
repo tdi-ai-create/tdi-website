@@ -1458,15 +1458,10 @@ export default function AllenwoodDashboard() {
             </div>
 
             {/* ===== Quick-Glance Stat Cards ===== */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
                 <p className="text-3xl font-bold text-[#0ea5a0]">68</p>
                 <p className="text-sm text-gray-600 font-medium">Educators Supported</p>
-              </div>
-              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
-                <p className="text-3xl font-bold text-[#0ea5a0]">$704</p>
-                <p className="text-sm text-gray-600 font-medium">Per Staff Member</p>
-                <p className="text-xs text-gray-400 mt-1">$144 per student</p>
               </div>
               <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
                 <p className="text-3xl font-bold text-[#22c55e]">3</p>
