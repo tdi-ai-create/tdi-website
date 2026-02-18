@@ -28,6 +28,7 @@ import {
   PlayCircle,
   PenLine,
   Package,
+  FileText,
   GraduationCap,
   Star,
   MoreVertical,
@@ -965,6 +966,46 @@ export default function AdminCreatorDetailPage() {
             </div>
           </div>
         </div>
+
+        {/* Intake Form Responses - shown if available */}
+        {creator.intake_responses && Object.keys(creator.intake_responses).length > 0 && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <FileText className="w-5 h-5 text-amber-600" />
+              <h3 className="font-semibold text-[#1e2749]">Intake Form Responses</h3>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {creator.intake_responses.strategy && (
+                <div className="bg-white rounded-lg p-3 border border-amber-100">
+                  <p className="text-xs font-medium text-gray-500 uppercase mb-1">Content Strategy / Idea</p>
+                  <p className="text-sm text-gray-800">{creator.intake_responses.strategy}</p>
+                </div>
+              )}
+              {creator.intake_responses.content_types && (
+                <div className="bg-white rounded-lg p-3 border border-amber-100">
+                  <p className="text-xs font-medium text-gray-500 uppercase mb-1">Content Types Interested In</p>
+                  <p className="text-sm text-gray-800">{creator.intake_responses.content_types}</p>
+                </div>
+              )}
+              {creator.intake_responses.referral_source && (
+                <div className="bg-white rounded-lg p-3 border border-amber-100">
+                  <p className="text-xs font-medium text-gray-500 uppercase mb-1">How They Heard About TDI</p>
+                  <p className="text-sm text-gray-800">{creator.intake_responses.referral_source}</p>
+                </div>
+              )}
+              {/* Display any additional fields */}
+              {Object.entries(creator.intake_responses)
+                .filter(([key]) => !['strategy', 'content_types', 'referral_source'].includes(key))
+                .map(([key, value]) => (
+                  <div key={key} className="bg-white rounded-lg p-3 border border-amber-100">
+                    <p className="text-xs font-medium text-gray-500 uppercase mb-1">{key.replace(/_/g, ' ')}</p>
+                    <p className="text-sm text-gray-800">{String(value)}</p>
+                  </div>
+                ))
+              }
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main content - Milestones */}

@@ -28,6 +28,8 @@ import {
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { isAdmin, createCreator } from '@/lib/creator-portal-data';
+import CreatorSwimlane from '@/components/admin/CreatorSwimlane';
+import { LayoutList, Kanban } from 'lucide-react';
 
 // Types
 interface EnrichedCreator {
@@ -153,6 +155,9 @@ export default function AdminCreatorsPage() {
   // Sort state
   const [sortBy, setSortBy] = useState<'lastActive' | 'progress' | 'name'>('lastActive');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+
+  // View mode state
+  const [viewMode, setViewMode] = useState<'list' | 'pipeline'>('list');
 
   const [newCreator, setNewCreator] = useState({
     name: '',
@@ -774,6 +779,33 @@ export default function AdminCreatorsPage() {
                   className="w-full pl-12 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
                 />
               </div>
+              {/* View Toggle */}
+              <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    viewMode === 'list'
+                      ? 'bg-white text-[#1e2749] shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  title="List View"
+                >
+                  <LayoutList className="w-4 h-4" />
+                  <span className="hidden sm:inline">List</span>
+                </button>
+                <button
+                  onClick={() => setViewMode('pipeline')}
+                  className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                    viewMode === 'pipeline'
+                      ? 'bg-white text-[#1e2749] shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                  title="Pipeline View"
+                >
+                  <Kanban className="w-4 h-4" />
+                  <span className="hidden sm:inline">Pipeline</span>
+                </button>
+              </div>
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`inline-flex items-center gap-2 px-4 py-2.5 border rounded-lg transition-colors ${
@@ -873,7 +905,19 @@ export default function AdminCreatorsPage() {
             </div>
           )}
 
-          {/* Creator Table */}
+          {/* Pipeline View (Swimlane) */}
+          {viewMode === 'pipeline' && (
+            <div className="p-4">
+              <CreatorSwimlane
+                creators={dashboardData.creators}
+                filterPath={filterPath}
+                filterWaitingOn={filterWaitingOn}
+              />
+            </div>
+          )}
+
+          {/* Creator Table (List View) */}
+          {viewMode === 'list' && (
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
@@ -1043,11 +1087,14 @@ export default function AdminCreatorsPage() {
               </tbody>
             </table>
           </div>
+          )}
 
           {/* Table footer with count */}
+          {viewMode === 'list' && (
           <div className="px-4 py-3 border-t border-gray-100 text-sm text-gray-500">
             Showing {filteredCreators.length} of {dashboardData.creators.length} creators
           </div>
+          )}
         </div>
       </main>
 

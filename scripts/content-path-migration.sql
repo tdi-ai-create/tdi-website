@@ -82,19 +82,19 @@ INSERT INTO public.milestones (
         "value": "blog",
         "label": "Blog Post",
         "emoji": "✍️",
-        "description": "Share your expertise through a written article on the TDI blog. Great for building visibility and testing ideas."
+        "description": "Write and publish a blog post on the TDI platform."
       },
       {
         "value": "download",
         "label": "Digital Download",
         "emoji": "📦",
-        "description": "Create a downloadable resource like a guide, template, or toolkit. Includes a blog post to promote your resource."
+        "description": "Create a downloadable resource for educators. This path includes a blog post to support your launch."
       },
       {
         "value": "course",
-        "label": "Learning Hub Course",
+        "label": "Online Course",
         "emoji": "🎓",
-        "description": "Build a full online course with video lessons, resources, and assessments. Includes downloads and blog content."
+        "description": "Build a full online course with video modules. This path includes a digital download and blog post to support your launch."
       }
     ]
   }',

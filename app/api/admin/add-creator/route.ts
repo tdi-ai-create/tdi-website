@@ -18,7 +18,7 @@ export async function POST(request: Request) {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    const { name, email, note, noteAuthor } = await request.json();
+    const { name, email, note, noteAuthor, intakeResponses } = await request.json();
 
     if (!name || !email) {
       return NextResponse.json({ success: false, error: 'Name and email are required' }, { status: 400 });
@@ -26,14 +26,21 @@ export async function POST(request: Request) {
 
     console.log('[add-creator] Adding creator:', name, email);
 
-    // 1. Create the creator record
+    // 1. Create the creator record (with intake responses if provided)
+    const creatorData: Record<string, unknown> = {
+      email: email.toLowerCase(),
+      name,
+      current_phase: 'onboarding',
+    };
+
+    // Add intake responses if provided
+    if (intakeResponses) {
+      creatorData.intake_responses = intakeResponses;
+    }
+
     const { data: creator, error: creatorError } = await supabase
       .from('creators')
-      .insert({
-        email: email.toLowerCase(),
-        name,
-        current_phase: 'onboarding',
-      })
+      .insert(creatorData)
       .select()
       .single();
 

@@ -1063,26 +1063,26 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   {/* Path Descriptions */}
                   <div className="grid gap-3">
                     <div className="bg-white rounded-lg p-3 border border-gray-100">
-                      <p className="font-medium text-[#1e2749] text-sm mb-1">Blog Posts</p>
+                      <p className="font-medium text-[#1e2749] text-sm mb-1">Blog Post</p>
                       <p className="text-xs text-gray-600 leading-relaxed">
-                        Write and share your expertise as a featured article on the TDI blog. Great for getting your voice out there and building your presence in the education community. This is a collaborative contribution - no direct compensation, but you&apos;ll reach thousands of educators and build your brand.
+                        Write and publish a blog post on the TDI platform. Great for getting your voice out there and building your presence in the education community.
                       </p>
                     </div>
 
                     <div className="bg-white rounded-lg p-3 border border-gray-100">
-                      <p className="font-medium text-[#1e2749] text-sm mb-1">Digital Downloads</p>
+                      <p className="font-medium text-[#1e2749] text-sm mb-1">Digital Download</p>
                       <p className="text-xs text-gray-600 leading-relaxed">
-                        Create downloadable resources like guides, toolkits, or templates that educators can use in their classrooms. Like blog posts, these are collaborative contributions that build your visibility and portfolio.
+                        Create a downloadable resource for educators. <span className="font-medium text-[#38618C]">This path includes a blog post</span> to support your launch.
                       </p>
                     </div>
 
                     <div className="bg-white rounded-lg p-3 border border-green-100 ring-1 ring-green-200">
                       <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-[#1e2749] text-sm">Learning Hub Courses</span>
+                        <span className="font-medium text-[#1e2749] text-sm">Online Course</span>
                         <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium">REVENUE</span>
                       </div>
                       <p className="text-xs text-gray-600 leading-relaxed">
-                        Build a full online course with video lessons and downloadable resources. This is our most involved path - and the one where you earn ongoing revenue. You&apos;ll receive a personal discount code and earn money every time an educator enrolls. We handle production, marketing, and distribution.
+                        Build a full online course with video modules. <span className="font-medium text-[#38618C]">This path includes a digital download and blog post</span> to support your launch. You&apos;ll earn ongoing revenue with every enrollment.
                       </p>
                     </div>
                   </div>
@@ -1090,11 +1090,18 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   {/* Tip */}
                   <div className="bg-amber-50 rounded-lg p-3 border border-amber-100">
                     <p className="text-xs text-amber-800">
-                      <strong>Not sure?</strong> Start with a blog post or download - you can always create a course later! Each path includes everything before it, so a course creator also gets a blog feature and downloadable resources.
+                      <strong>How it works:</strong> Each path builds on the one before it. Choosing &quot;Online Course&quot; automatically includes a digital download and blog post as part of your launch package.
                     </p>
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Helper Note - Cumulative Paths */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+              <p className="text-sm text-blue-800">
+                <strong>Select one option below.</strong> Each path builds on the one before it &mdash; for example, choosing &quot;Online Course&quot; automatically includes a blog post and digital download as part of your launch.
+              </p>
             </div>
 
             {/* Path Selection Cards */}

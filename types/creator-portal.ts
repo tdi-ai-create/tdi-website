@@ -78,6 +78,13 @@ export interface Creator {
   website_bio: string | null;
   headshot_url: string | null;
   display_order: number;
+  // Intake form responses
+  intake_responses: {
+    strategy?: string;
+    content_types?: string;
+    referral_source?: string;
+    [key: string]: unknown;
+  } | null;
   // Publish workflow fields
   publish_status: PublishStatus;
   scheduled_publish_date: string | null;
