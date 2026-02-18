@@ -914,39 +914,75 @@ export default function AllenwoodDashboard() {
                         </ul>
                       </div>
 
-                      {/* Hub Resources Matched to This Visit */}
+                      {/* Already in Their Hands */}
                       <div className="bg-green-50 rounded-xl p-5 border border-green-200">
                         <div className="flex items-start gap-3 mb-4">
-                          <Sparkles className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                          <Mail className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
                           <div>
-                            <h4 className="font-semibold text-gray-800">Resources We&apos;re Sending Based on What We Saw</h4>
-                            <p className="text-gray-600 text-sm mt-1">After every observation, we match Hub resources to what each classroom actually needs.</p>
+                            <h4 className="font-semibold text-gray-800">Tools We Sent the Same Day</h4>
+                            <p className="text-gray-600 text-sm mt-1">Within hours of our visit, every teacher observed received a personal email with three tools matched to what we saw in their classrooms.</p>
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <div className="bg-white rounded-xl p-4 border border-gray-200">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className="font-medium text-gray-800">What Should I Be Doing Right Now? - A Para&apos;s Classroom Playbook</p>
+                                <p className="text-sm text-gray-600 mt-1">Breaks down exactly what active engagement looks like during every part of the school day - whole group, independent work, small groups, transitions, testing, and those &quot;I&apos;m not sure what to do&quot; moments. No guessing. Just clarity.</p>
+                              </div>
+                              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0">Print &amp; Go</span>
+                            </div>
+                          </div>
+                          <div className="bg-white rounded-xl p-4 border border-gray-200">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className="font-medium text-gray-800">The Whiteboard Playbook: Visual Management Strategies That Actually Work</p>
+                                <p className="text-sm text-gray-600 mt-1">Your whiteboard is the most powerful (and underused!) management tool in your classroom. 7 strategies that research shows make teachers up to 49% more effective in transitions. Simple, clear, and ready to use tomorrow.</p>
+                              </div>
+                              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0">New Tool</span>
+                            </div>
+                          </div>
+                          <div className="bg-white rounded-xl p-4 border border-gray-200">
+                            <div className="flex items-start justify-between gap-3">
+                              <div>
+                                <p className="font-medium text-gray-800">Insight Timer App</p>
+                                <p className="text-sm text-gray-600 mt-1">Several classrooms were already using breathing exercises and mindfulness transitions. This app has zero ads, searchable by age group and time (20 seconds to 5+ minutes). A game-changer for transitions, calm-down moments, and starting the day with focus.</p>
+                              </div>
+                              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full whitespace-nowrap flex-shrink-0">Free, No Ads</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* More Hub Resources Matched to This Visit */}
+                      <div className="bg-teal-50 rounded-xl p-5 border border-teal-200">
+                        <div className="flex items-start gap-3 mb-4">
+                          <Sparkles className="w-5 h-5 text-teal-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <h4 className="font-semibold text-gray-800">Additional Resources Matched to Your Classrooms</h4>
+                            <p className="text-gray-600 text-sm mt-1">These are available in the Learning Hub for anyone ready to explore further.</p>
                           </div>
                         </div>
                         <ul className="space-y-2 text-sm text-gray-700">
                           <li className="flex items-start gap-2">
-                            <span className="text-green-500 mt-0.5">•</span>
+                            <span className="text-teal-500 mt-0.5">•</span>
                             <span><strong>Calm Response Scripts</strong> - For classrooms where transitions and redirections need a calmer, more consistent approach</span>
                           </li>
                           <li className="flex items-start gap-2">
-                            <span className="text-green-500 mt-0.5">•</span>
+                            <span className="text-teal-500 mt-0.5">•</span>
                             <span><strong>Autism Support Bundle</strong> - For classrooms supporting students with unique sensory and communication needs</span>
                           </li>
                           <li className="flex items-start gap-2">
-                            <span className="text-green-500 mt-0.5">•</span>
+                            <span className="text-teal-500 mt-0.5">•</span>
                             <span><strong>Para Quick-Start Confidence Kit &amp; SpEd Para Toolkit</strong> - For paras ready to level up their independent support strategies</span>
                           </li>
                           <li className="flex items-start gap-2">
-                            <span className="text-green-500 mt-0.5">•</span>
+                            <span className="text-teal-500 mt-0.5">•</span>
                             <span><strong>Station Rotation Routines</strong> - For teachers already using small groups who want smoother transitions between stations</span>
                           </li>
                           <li className="flex items-start gap-2">
-                            <span className="text-green-500 mt-0.5">•</span>
+                            <span className="text-teal-500 mt-0.5">•</span>
                             <span><strong>No-Hands-Up Help Systems</strong> - For classrooms where students struggle getting started or staying on task independently</span>
-                          </li>
-                          <li className="flex items-start gap-2">
-                            <span className="text-green-500 mt-0.5">•</span>
-                            <span><strong>Insight Timer (free app)</strong> - Recommended as an ad-free replacement for YouTube during breathing and transition moments</span>
                           </li>
                         </ul>
                       </div>
@@ -954,7 +990,7 @@ export default function AllenwoodDashboard() {
                       {/* Recommendation */}
                       <div className="bg-blue-50 rounded-xl p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#3B82F6', borderLeftStyle: 'solid' }}>
                         <p className="text-gray-700 text-sm">
-                          <span className="font-medium">Recommendation:</span> Your team showed real growth between October and February. The structures are stronger, the partnerships between teachers and paras are visible, and students are showing more independence. Use the upcoming virtual sessions to give your team protected time with the Hub resources matched to their classrooms - that&apos;s where the next shift happens.
+                          <span className="font-medium">Recommendation:</span> Your team showed real growth between October and February. The structures are stronger, the partnerships between teachers and paras are visible, and students are showing more independence. Within hours of our visit, every teacher had three matched tools in their inbox - that&apos;s TDI&apos;s promise: we see you, we respond, and we deliver. Use the upcoming virtual sessions to give your team protected time with these resources - that&apos;s where the next shift happens.
                         </p>
                       </div>
                     </div>
