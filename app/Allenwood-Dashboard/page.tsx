@@ -1570,7 +1570,7 @@ export default function AllenwoodDashboard() {
                   <p className="text-gray-700 italic mb-3">
                     The funding piece was what worried us most. TDI handled 90% of it - we just picked a path and signed. Our teachers had access within a week.
                   </p>
-                  <p className="text-sm font-semibold text-[#1e2749]">— Principal, PGCPS Partner School</p>
+                  <p className="text-sm font-semibold text-[#1e2749]">- Principal</p>
                 </div>
               </div>
             </div>

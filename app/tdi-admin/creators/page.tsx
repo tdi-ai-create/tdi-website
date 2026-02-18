@@ -316,6 +316,21 @@ export default function CreatorStudioPage() {
     noLocationCount: number;
   } | null>(null);
 
+  // Analytics data state
+  const [analyticsData, setAnalyticsData] = useState<{
+    phaseVelocity: { phase: string; name: string; avgDays: number; sampleSize: number; color: string }[];
+    bottleneckReport: { id: string; name: string; phase: string; phaseId: string; avgDays: number; currentlyStuck: number }[];
+    contentPathBreakdown: { name: string; value: number; color: string; percent: number }[];
+    contentPathTrends: { month: string; monthLabel: string; blog: number; download: number; course: number; notSet: number; total: number }[];
+    activityHeatmap: { id: string; name: string; initials: string; contentPath: string | null; activityLevel: 'green' | 'yellow' | 'orange' | 'red'; daysSinceActivity: number; lastActivity: string }[];
+    journeyTimes: { id: string; name: string; contentPath: string | null; days: number; startDate: string; endDate: string }[];
+    completionFunnel: { phase: string; name: string; count: number; percent: number }[];
+    stalledCreators: { id: string; name: string; email: string; contentPath: string | null; currentStep: string | null; daysSinceActivity: number; lastActivityDate: string; severity: 'yellow' | 'orange' | 'red' }[];
+    publishedPerMonth: { month: string; monthLabel: string; courses: number; blogs: number; cumulativeCourses: number; cumulativeBlogs: number; total: number }[];
+    geographicDistribution: { hasData: boolean; total: number; withState: number; withoutState: number; states: { state: string; count: number; percent: number }[] };
+  } | null>(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+
   const canEdit = isOwner || hasPermission(permissions, 'creator_studio', 'edit');
 
   const loadDashboardData = useCallback(async () => {
@@ -354,6 +369,22 @@ export default function CreatorStudioPage() {
       setIsLoading(false);
     }
   }, [hasAccess, loadDashboardData]);
+
+  // Load analytics data when analytics tab is active
+  useEffect(() => {
+    if (activeTab === 'analytics' && !analyticsData && !analyticsLoading) {
+      setAnalyticsLoading(true);
+      fetch('/api/admin/analytics')
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setAnalyticsData(data);
+          }
+        })
+        .catch(err => console.error('Failed to load analytics data:', err))
+        .finally(() => setAnalyticsLoading(false));
+    }
+  }, [activeTab, analyticsData, analyticsLoading]);
 
   // Filter and sort creators
   useEffect(() => {
