@@ -2350,25 +2350,6 @@ export default function AllenwoodDashboard() {
                     </div>
                   </div>
 
-                  {/* E. Funding CTA */}
-                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
-                    <div className="flex items-start gap-3">
-                      <DollarSign className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <h4 className="font-semibold text-gray-800 mb-2">We Find the Funding. You Focus on Teaching.</h4>
-                        <p className="text-sm text-gray-700 mb-3">
-                          80% of schools we partner with find over $35K in funding for TDI.
-                        </p>
-                        <a
-                          href="/funding"
-                          className="inline-flex items-center gap-2 text-sm font-medium text-amber-700 hover:text-amber-800"
-                        >
-                          Explore Funding Options
-                          <ArrowRight className="w-4 h-4" />
-                        </a>
-                      </div>
-                    </div>
-                  </div>
                 </div>
               )}
             </div>
