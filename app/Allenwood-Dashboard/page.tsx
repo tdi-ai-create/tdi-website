@@ -266,7 +266,7 @@ export default function AllenwoodDashboard() {
               { id: 'journey', label: 'Journey', icon: TrendingUp },
               { id: 'progress', label: 'Progress', icon: Users },
               { id: 'blueprint', label: 'Blueprint', icon: Star },
-              { id: 'next-year', label: '2026-27', icon: Sparkles },
+              { id: 'next-year', label: '2026-27', icon: Sparkles, glow: true },
               { id: 'team', label: 'Team', icon: User },
               { id: 'billing', label: 'Billing', icon: CreditCard, alert: true },
             ].map((tab) => (
@@ -278,6 +278,8 @@ export default function AllenwoodDashboard() {
                     ? 'bg-[#1e2749] text-white shadow-md'
                     : tab.alert
                     ? 'bg-red-50 text-red-700 border border-red-200 ring-2 ring-red-500 ring-offset-2'
+                    : tab.glow
+                    ? 'bg-gradient-to-r from-[#35A7FF]/10 to-[#38618C]/10 text-[#38618C] border border-[#35A7FF]/40 shadow-[0_0_12px_rgba(53,167,255,0.4)] hover:shadow-[0_0_16px_rgba(53,167,255,0.5)]'
                     : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
                 }`}
               >
@@ -2061,190 +2063,7 @@ export default function AllenwoodDashboard() {
               <p className="text-sm text-gray-500 mt-1">Prepared for Dr. Porter &amp; Allenwood Leadership</p>
             </div>
 
-            {/* ===== ACCORDION 1: Year 2 Support Plan ===== */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-              <button
-                onClick={() => setYear2SupportOpen(!year2SupportOpen)}
-                className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-full flex items-center justify-center">
-                    <Compass className="w-5 h-5 text-[#38618C]" />
-                  </div>
-                  <div className="text-left">
-                    <h3 className="font-bold text-[#1e2749]">Your Year 2 Support Plan</h3>
-                    <p className="text-sm text-gray-500">Full-staff professional development for all 68 educators - here&apos;s what it looks like.</p>
-                  </div>
-                </div>
-                {year2SupportOpen ? (
-                  <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                ) : (
-                  <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                )}
-              </button>
-
-              {year2SupportOpen && (
-                <div className="px-5 pb-6 space-y-6 border-t border-gray-100">
-                  {/* A. Vision Card */}
-                  <div className="bg-[#1e2749] rounded-xl p-6 text-white mt-4">
-                    <h4 className="text-xl font-bold mb-2">&quot;Together We Will Rise&quot; - powered by year-round support.</h4>
-                    <p className="text-white/90">
-                      Year 1 built the foundation with your pilot team. Year 2 brings every teacher, para, and staff member into the fold - with coaching, tools, and strategies designed around what YOUR students need.
-                    </p>
-                  </div>
-
-                  {/* B. What Full Staff Support Includes */}
-                  <div>
-                    <h4 className="font-semibold text-[#1e2749] mb-4">What Full Staff Support Includes</h4>
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                        <div className="flex items-center gap-2 mb-2">
-                          <BookOpen className="w-5 h-5 text-[#38618C]" />
-                          <span className="font-medium text-[#1e2749]">Learning Hub (68 staff)</span>
-                        </div>
-                        <p className="text-xl font-bold text-[#38618C] mb-1">$12,240</p>
-                        <p className="text-sm text-gray-600">Year-round digital PD - differentiation, inclusion, EL strategies, autism support</p>
-                      </div>
-                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Eye className="w-5 h-5 text-[#38618C]" />
-                          <span className="font-medium text-[#1e2749]">On-Campus Coaching (2 days)</span>
-                        </div>
-                        <p className="text-xl font-bold text-[#38618C] mb-1">$12,000</p>
-                        <p className="text-sm text-gray-600">Classroom observations with real-time feedback and strategy modeling</p>
-                      </div>
-                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Star className="w-5 h-5 text-[#38618C]" />
-                          <span className="font-medium text-[#1e2749]">Executive Impact Sessions (4)</span>
-                        </div>
-                        <p className="text-xl font-bold text-[#38618C] mb-1">$6,000</p>
-                        <p className="text-sm text-gray-600">Leadership development for Principal and AP</p>
-                      </div>
-                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                        <div className="flex items-center gap-2 mb-2">
-                          <MessageCircle className="w-5 h-5 text-[#38618C]" />
-                          <span className="font-medium text-[#1e2749]">Virtual Strategy Sessions (4)</span>
-                        </div>
-                        <p className="text-xl font-bold text-[#38618C] mb-1">$6,000</p>
-                        <p className="text-sm text-gray-600">Follow-up coaching for implementation support</p>
-                      </div>
-                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                        <div className="flex items-center gap-2 mb-2">
-                          <BarChart3 className="w-5 h-5 text-[#38618C]" />
-                          <span className="font-medium text-[#1e2749]">Leadership Dashboard</span>
-                        </div>
-                        <p className="text-xl font-bold text-[#38618C] mb-1">$9,999</p>
-                        <p className="text-sm text-gray-600">Track PD progress, outcomes, and compliance reporting</p>
-                      </div>
-                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                        <div className="flex items-center gap-2 mb-2">
-                          <BookOpen className="w-5 h-5 text-[#38618C]" />
-                          <span className="font-medium text-[#1e2749]">TDI Books (68 copies)</span>
-                        </div>
-                        <p className="text-xl font-bold text-[#38618C] mb-1">$1,632</p>
-                        <p className="text-sm text-gray-600">Building-wide collegial book study</p>
-                      </div>
-                    </div>
-                    <div className="mt-4 p-4 bg-[#38618C]/5 rounded-xl text-center">
-                      <p className="font-bold text-[#1e2749]">$47,871 total · $704 per staff member · $144 per student</p>
-                    </div>
-                  </div>
-
-                  {/* C. Projected Outcomes */}
-                  <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl p-5 border border-teal-200">
-                    <h4 className="font-semibold text-[#1e2749] mb-4">What schools like Allenwood experience with full-year TDI support:</h4>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-teal-600">65%</div>
-                        <div className="text-sm font-medium text-gray-700">Strategy Implementation</div>
-                        <div className="text-xs text-gray-500">vs. 10% industry average</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-teal-600">8→5</div>
-                        <div className="text-sm font-medium text-gray-700">Stress Reduction</div>
-                        <div className="text-xs text-gray-500">on a 10-point scale</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-teal-600">12→7hrs</div>
-                        <div className="text-sm font-medium text-gray-700">Weekly Planning Time</div>
-                        <div className="text-xs text-gray-500">freed for actual teaching</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-3xl font-bold text-teal-600">+Retention</div>
-                        <div className="text-sm font-medium text-gray-700">Teachers Stay</div>
-                        <div className="text-xs text-gray-500">when they feel supported</div>
-                      </div>
-                    </div>
-                    <p className="text-xs text-gray-500 text-center mt-4">Based on verified outcomes from TDI partner schools after 3-4 months.</p>
-                  </div>
-
-                  {/* D. Aligned to Your Priorities */}
-                  <div>
-                    <h4 className="font-semibold text-[#1e2749] mb-4">Aligned to Your Priorities</h4>
-                    <div className="space-y-3">
-                      <div className="grid md:grid-cols-2 gap-2">
-                        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
-                          <p className="text-sm text-amber-800 font-medium">Math proficiency at 5-8%</p>
-                        </div>
-                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
-                          <p className="text-sm text-teal-800">Evidence-based math coaching + differentiation modules in Hub</p>
-                        </div>
-                      </div>
-                      <div className="grid md:grid-cols-2 gap-2">
-                        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
-                          <p className="text-sm text-amber-800 font-medium">30% novice teachers</p>
-                        </div>
-                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
-                          <p className="text-sm text-teal-800">Mentoring, classroom management PD, real-time coaching</p>
-                        </div>
-                      </div>
-                      <div className="grid md:grid-cols-2 gap-2">
-                        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
-                          <p className="text-sm text-amber-800 font-medium">46-54% Hispanic/EL population</p>
-                        </div>
-                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
-                          <p className="text-sm text-teal-800">EL instructional strategies; Spanish translation coming to all content</p>
-                        </div>
-                      </div>
-                      <div className="grid md:grid-cols-2 gap-2">
-                        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
-                          <p className="text-sm text-amber-800 font-medium">Autism &amp; special education</p>
-                        </div>
-                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
-                          <p className="text-sm text-teal-800">Autism Support Bundle + Inclusion courses; coaching for paras and teachers</p>
-                        </div>
-                      </div>
-                      <div className="grid md:grid-cols-2 gap-2">
-                        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
-                          <p className="text-sm text-amber-800 font-medium">PBIS school culture</p>
-                        </div>
-                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
-                          <p className="text-sm text-teal-800">SEL strategies, restorative practices, trauma-informed approaches in Hub</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* E. Early Access Opportunity */}
-                  <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-5">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Sparkles className="w-5 h-5 text-amber-600" />
-                      <h4 className="font-bold text-gray-900">Start Before Fall: Early Hub Access</h4>
-                    </div>
-                    <p className="text-gray-700 mb-3">
-                      Sign your Year 2 agreement by March and your full staff of 68 gets Learning Hub access starting immediately - that&apos;s 4 extra months to explore, build confidence with tools, and hit the ground running in August.
-                    </p>
-                    <p className="text-sm text-amber-700 font-medium">
-                      Your pilot team&apos;s explorer has already completed content in 4 courses. Imagine what 68 educators could do with a head start.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-            </div>
-
-            {/* ===== ACCORDION 2: Funding ===== */}
+            {/* ===== ACCORDION 1: Funding ===== */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <button
                 onClick={() => setFundingOpen(!fundingOpen)}
@@ -2549,6 +2368,188 @@ export default function AllenwoodDashboard() {
                         </a>
                       </div>
                     </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* ===== ACCORDION 2: Year 2 Support Plan ===== */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <button
+                onClick={() => setYear2SupportOpen(!year2SupportOpen)}
+                className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-full flex items-center justify-center">
+                    <Compass className="w-5 h-5 text-[#38618C]" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-bold text-[#1e2749]">Your Year 2 Support Plan</h3>
+                    <p className="text-sm text-gray-500">Full-staff professional development for all 68 educators - here&apos;s what it looks like.</p>
+                  </div>
+                </div>
+                {year2SupportOpen ? (
+                  <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                )}
+              </button>
+
+              {year2SupportOpen && (
+                <div className="px-5 pb-6 space-y-6 border-t border-gray-100">
+                  {/* A. Vision Card */}
+                  <div className="bg-[#1e2749] rounded-xl p-6 text-white mt-4">
+                    <h4 className="text-xl font-bold mb-2">&quot;Together We Will Rise&quot; - powered by year-round support.</h4>
+                    <p className="text-white/90">
+                      Year 1 built the foundation with your pilot team. Year 2 brings every teacher, para, and staff member into the fold - with coaching, tools, and strategies designed around what YOUR students need.
+                    </p>
+                  </div>
+
+                  {/* B. What Full Staff Support Includes */}
+                  <div>
+                    <h4 className="font-semibold text-[#1e2749] mb-4">What Full Staff Support Includes</h4>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <BookOpen className="w-5 h-5 text-[#38618C]" />
+                          <span className="font-medium text-[#1e2749]">Learning Hub (68 staff)</span>
+                        </div>
+                        <p className="text-xl font-bold text-[#38618C] mb-1">$12,240</p>
+                        <p className="text-sm text-gray-600">Year-round digital PD - differentiation, inclusion, EL strategies, autism support</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Eye className="w-5 h-5 text-[#38618C]" />
+                          <span className="font-medium text-[#1e2749]">On-Campus Coaching (2 days)</span>
+                        </div>
+                        <p className="text-xl font-bold text-[#38618C] mb-1">$12,000</p>
+                        <p className="text-sm text-gray-600">Classroom observations with real-time feedback and strategy modeling</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Star className="w-5 h-5 text-[#38618C]" />
+                          <span className="font-medium text-[#1e2749]">Executive Impact Sessions (4)</span>
+                        </div>
+                        <p className="text-xl font-bold text-[#38618C] mb-1">$6,000</p>
+                        <p className="text-sm text-gray-600">Leadership development for Principal and AP</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <MessageCircle className="w-5 h-5 text-[#38618C]" />
+                          <span className="font-medium text-[#1e2749]">Virtual Strategy Sessions (4)</span>
+                        </div>
+                        <p className="text-xl font-bold text-[#38618C] mb-1">$6,000</p>
+                        <p className="text-sm text-gray-600">Follow-up coaching for implementation support</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <BarChart3 className="w-5 h-5 text-[#38618C]" />
+                          <span className="font-medium text-[#1e2749]">Leadership Dashboard</span>
+                        </div>
+                        <p className="text-xl font-bold text-[#38618C] mb-1">$9,999</p>
+                        <p className="text-sm text-gray-600">Track PD progress, outcomes, and compliance reporting</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <BookOpen className="w-5 h-5 text-[#38618C]" />
+                          <span className="font-medium text-[#1e2749]">TDI Books (68 copies)</span>
+                        </div>
+                        <p className="text-xl font-bold text-[#38618C] mb-1">$1,632</p>
+                        <p className="text-sm text-gray-600">Building-wide collegial book study</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 p-4 bg-[#38618C]/5 rounded-xl text-center">
+                      <p className="font-bold text-[#1e2749]">$47,871 total · $704 per staff member · $144 per student</p>
+                    </div>
+                  </div>
+
+                  {/* C. Projected Outcomes */}
+                  <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl p-5 border border-teal-200">
+                    <h4 className="font-semibold text-[#1e2749] mb-4">What schools like Allenwood experience with full-year TDI support:</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-teal-600">65%</div>
+                        <div className="text-sm font-medium text-gray-700">Strategy Implementation</div>
+                        <div className="text-xs text-gray-500">vs. 10% industry average</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-teal-600">8→5</div>
+                        <div className="text-sm font-medium text-gray-700">Stress Reduction</div>
+                        <div className="text-xs text-gray-500">on a 10-point scale</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-teal-600">12→7hrs</div>
+                        <div className="text-sm font-medium text-gray-700">Weekly Planning Time</div>
+                        <div className="text-xs text-gray-500">freed for actual teaching</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-teal-600">+Retention</div>
+                        <div className="text-sm font-medium text-gray-700">Teachers Stay</div>
+                        <div className="text-xs text-gray-500">when they feel supported</div>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 text-center mt-4">Based on verified outcomes from TDI partner schools after 3-4 months.</p>
+                  </div>
+
+                  {/* D. Aligned to Your Priorities */}
+                  <div>
+                    <h4 className="font-semibold text-[#1e2749] mb-4">Aligned to Your Priorities</h4>
+                    <div className="space-y-3">
+                      <div className="grid md:grid-cols-2 gap-2">
+                        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                          <p className="text-sm text-amber-800 font-medium">Math proficiency at 5-8%</p>
+                        </div>
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-teal-800">Evidence-based math coaching + differentiation modules in Hub</p>
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-2">
+                        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                          <p className="text-sm text-amber-800 font-medium">30% novice teachers</p>
+                        </div>
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-teal-800">Mentoring, classroom management PD, real-time coaching</p>
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-2">
+                        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                          <p className="text-sm text-amber-800 font-medium">46-54% Hispanic/EL population</p>
+                        </div>
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-teal-800">EL instructional strategies; Spanish translation coming to all content</p>
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-2">
+                        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                          <p className="text-sm text-amber-800 font-medium">Autism &amp; special education</p>
+                        </div>
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-teal-800">Autism Support Bundle + Inclusion courses; coaching for paras and teachers</p>
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-2">
+                        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                          <p className="text-sm text-amber-800 font-medium">PBIS school culture</p>
+                        </div>
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-teal-800">SEL strategies, restorative practices, trauma-informed approaches in Hub</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* E. Early Access Opportunity */}
+                  <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-5">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sparkles className="w-5 h-5 text-amber-600" />
+                      <h4 className="font-bold text-gray-900">Start Before Fall: Early Hub Access</h4>
+                    </div>
+                    <p className="text-gray-700 mb-3">
+                      Sign your Year 2 agreement by March and your full staff of 68 gets Learning Hub access starting immediately - that&apos;s 4 extra months to explore, build confidence with tools, and hit the ground running in August.
+                    </p>
+                    <p className="text-sm text-amber-700 font-medium">
+                      Your pilot team&apos;s explorer has already completed content in 4 courses. Imagine what 68 educators could do with a head start.
+                    </p>
                   </div>
                 </div>
               )}
