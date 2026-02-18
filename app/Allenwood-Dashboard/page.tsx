@@ -663,7 +663,7 @@ export default function AllenwoodDashboard() {
                 What Full-Year TDI Support Produces
               </h3>
               <p className="text-gray-600 text-sm mb-6">
-                Allenwood data coming after Virtual Session 1 baseline survey
+                Allenwood baseline data from staff survey · Goal: Move amber bars toward teal by end of year
               </p>
 
               {/* 3-Way Comparison Bars */}
@@ -692,10 +692,10 @@ export default function AllenwoodDashboard() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-400 w-28">Allenwood</span>
-                      <div className="flex-1 bg-gray-50 rounded-full h-6 overflow-hidden border-2 border-dashed border-gray-300">
-                        <div className="h-full rounded-full flex items-center justify-center">
-                          <span className="text-xs text-gray-400 italic">Coming after VS1</span>
+                      <span className="text-xs text-amber-600 w-28 font-medium">Allenwood</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-amber-500 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '90%' }}>
+                          <span className="text-xs font-bold text-white">9/10</span>
                         </div>
                       </div>
                     </div>
@@ -726,10 +726,10 @@ export default function AllenwoodDashboard() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-400 w-28">Allenwood</span>
-                      <div className="flex-1 bg-gray-50 rounded-full h-6 overflow-hidden border-2 border-dashed border-gray-300">
-                        <div className="h-full rounded-full flex items-center justify-center">
-                          <span className="text-xs text-gray-400 italic">Coming after VS1</span>
+                      <span className="text-xs text-amber-600 w-28 font-medium">Allenwood</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-amber-500 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '1%', minWidth: '35px' }}>
+                          <span className="text-xs font-bold text-white">1%</span>
                         </div>
                       </div>
                     </div>
@@ -760,10 +760,10 @@ export default function AllenwoodDashboard() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-400 w-28">Allenwood</span>
-                      <div className="flex-1 bg-gray-50 rounded-full h-6 overflow-hidden border-2 border-dashed border-gray-300">
-                        <div className="h-full rounded-full flex items-center justify-center">
-                          <span className="text-xs text-gray-400 italic">Coming after VS1</span>
+                      <span className="text-xs text-amber-600 w-28 font-medium">Allenwood</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-amber-500 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '30%', minWidth: '45px' }}>
+                          <span className="text-xs font-bold text-white">30%</span>
                         </div>
                       </div>
                     </div>
@@ -794,10 +794,10 @@ export default function AllenwoodDashboard() {
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-400 w-28">Allenwood</span>
-                      <div className="flex-1 bg-gray-50 rounded-full h-6 overflow-hidden border-2 border-dashed border-gray-300">
-                        <div className="h-full rounded-full flex items-center justify-center">
-                          <span className="text-xs text-gray-400 italic">Coming after VS1</span>
+                      <span className="text-xs text-amber-600 w-28 font-medium">Allenwood</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-amber-500 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '67%' }}>
+                          <span className="text-xs font-bold text-white">10+ hrs</span>
                         </div>
                       </div>
                     </div>
@@ -816,8 +816,8 @@ export default function AllenwoodDashboard() {
                   <span className="text-xs text-gray-500">TDI Partner Average</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 bg-gray-50 rounded border-2 border-dashed border-gray-300"></div>
-                  <span className="text-xs text-gray-500">Allenwood (pending)</span>
+                  <div className="w-4 h-4 bg-amber-500 rounded"></div>
+                  <span className="text-xs text-gray-500">Allenwood Baseline</span>
                 </div>
               </div>
 

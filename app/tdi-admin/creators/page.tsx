@@ -648,12 +648,29 @@ export default function CreatorStudioPage() {
   const maxPhaseCount = Math.max(...Object.values(phaseCounts), 1);
 
   // Compute creators needing team attention
+  // Include: waitingOn === 'tdi' OR has post_launch_notes (active follow-up work)
   const needsAttention = dashboardData.creators
-    .filter((c: EnrichedCreator) => c.waitingOn === 'tdi')
-    .sort((a: EnrichedCreator, b: EnrichedCreator) =>
-      new Date(a.lastActivityDate).getTime() - new Date(b.lastActivityDate).getTime()
-    )
-    .slice(0, 5);
+    .filter((c: EnrichedCreator) => c.waitingOn === 'tdi' || (c.post_launch_notes && c.post_launch_notes.trim() !== ''))
+    .sort((a: EnrichedCreator, b: EnrichedCreator) => {
+      // Sort post-launch notes items to the end, then by last activity date
+      const aHasNotes = a.post_launch_notes && a.post_launch_notes.trim() !== '';
+      const bHasNotes = b.post_launch_notes && b.post_launch_notes.trim() !== '';
+      const aIsWaitingTDI = a.waitingOn === 'tdi';
+      const bIsWaitingTDI = b.waitingOn === 'tdi';
+
+      // TDI waiting items come first
+      if (aIsWaitingTDI && !bIsWaitingTDI) return -1;
+      if (!aIsWaitingTDI && bIsWaitingTDI) return 1;
+
+      // Within same category, sort by last activity date
+      return new Date(a.lastActivityDate).getTime() - new Date(b.lastActivityDate).getTime();
+    })
+    .slice(0, 8);
+
+  // Count for display - how many need attention
+  const needsAttentionCount = dashboardData.creators.filter(
+    (c: EnrichedCreator) => c.waitingOn === 'tdi' || (c.post_launch_notes && c.post_launch_notes.trim() !== '')
+  ).length;
 
   // Prepare analytics data
   const phaseChartData = [
@@ -1089,8 +1106,8 @@ export default function CreatorStudioPage() {
                 >
                   <AlertTriangle className="w-4 h-4 text-amber-500" />
                   Needs Your Attention
-                  {stats.waitingOnTDI > 0 && (
-                    <span className="text-xs font-normal text-gray-500">({stats.waitingOnTDI})</span>
+                  {needsAttentionCount > 0 && (
+                    <span className="text-xs font-normal text-gray-500">({needsAttentionCount})</span>
                   )}
                 </h3>
                 {needsAttention.length > 0 && (
@@ -1120,41 +1137,65 @@ export default function CreatorStudioPage() {
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {needsAttention.map((creator: EnrichedCreator) => (
-                    <Link
-                      key={creator.id}
-                      href={`/tdi-admin/creators/${creator.id}`}
-                      className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-purple-50 transition-colors group"
-                    >
-                      <div
-                        className="w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0"
-                        style={{ backgroundColor: theme.primary }}
+                  {needsAttention.map((creator: EnrichedCreator) => {
+                    const hasPostLaunchNotes = creator.post_launch_notes && creator.post_launch_notes.trim() !== '';
+                    const isWaitingOnTDI = creator.waitingOn === 'tdi';
+
+                    return (
+                      <Link
+                        key={creator.id}
+                        href={`/tdi-admin/creators/${creator.id}`}
+                        className="flex items-center gap-3 p-2 -mx-2 rounded-lg hover:bg-purple-50 transition-colors group"
                       >
-                        {creator.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p
-                          className="text-sm font-medium truncate group-hover:text-purple-700"
-                          style={{ color: '#2B3A67' }}
+                        <div
+                          className={`w-8 h-8 rounded-full text-white flex items-center justify-center text-sm font-medium flex-shrink-0 ${
+                            hasPostLaunchNotes && !isWaitingOnTDI ? 'bg-green-500' : ''
+                          }`}
+                          style={{ backgroundColor: hasPostLaunchNotes && !isWaitingOnTDI ? undefined : theme.primary }}
                         >
-                          {creator.name}
-                        </p>
-                        <p className="text-xs text-gray-500 truncate">
-                          {creator.currentMilestoneName || 'Waiting on review'}
-                        </p>
-                      </div>
-                      <p className="text-xs font-medium flex-shrink-0" style={{ color: theme.primary }}>
-                        {getRelativeTime(creator.lastActivityDate)}
-                      </p>
-                    </Link>
-                  ))}
-                  {stats.waitingOnTDI > 5 && (
+                          {hasPostLaunchNotes && !isWaitingOnTDI ? (
+                            <Check className="w-4 h-4" />
+                          ) : (
+                            creator.name.charAt(0).toUpperCase()
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className="text-sm font-medium truncate group-hover:text-purple-700"
+                            style={{ color: '#2B3A67' }}
+                          >
+                            {creator.name}
+                          </p>
+                          {hasPostLaunchNotes ? (
+                            <p className="text-xs text-amber-700 truncate flex items-center gap-1">
+                              <Clock className="w-3 h-3 flex-shrink-0" />
+                              {creator.post_launch_notes}
+                            </p>
+                          ) : (
+                            <p className="text-xs text-gray-500 truncate">
+                              {creator.currentMilestoneName || 'Waiting on review'}
+                            </p>
+                          )}
+                        </div>
+                        {hasPostLaunchNotes && !isWaitingOnTDI ? (
+                          <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 flex-shrink-0">
+                            Published
+                          </span>
+                        ) : (
+                          <p className="text-xs font-medium flex-shrink-0" style={{ color: theme.primary }}>
+                            {getRelativeTime(creator.lastActivityDate)}
+                          </p>
+                        )}
+                      </Link>
+                    );
+                  })}
+                  {needsAttentionCount > 8 && (
                     <button
                       onClick={() => handleStatCardClick('waitingOnTDI')}
                       className="w-full text-center text-xs pt-1"
                       style={{ color: theme.primary }}
                     >
-                      View all {stats.waitingOnTDI} waiting →
+                      View all {needsAttentionCount} items →
                     </button>
                   )}
                 </div>
