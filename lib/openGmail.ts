@@ -9,16 +9,21 @@ export function openGmail({
   subject?: string;
   body?: string;
 }) {
-  const params = new URLSearchParams();
-  params.set('view', 'cm');
+  const params: string[] = ['view=cm'];
 
   if (to) {
     const toStr = Array.isArray(to) ? to.join(',') : to;
-    params.set('to', toStr);
+    params.push(`to=${encodeURIComponent(toStr)}`);
   }
-  if (bcc?.length) params.set('bcc', bcc.join(','));
-  if (subject) params.set('su', subject);
-  if (body) params.set('body', body);
+  if (bcc?.length) {
+    params.push(`bcc=${encodeURIComponent(bcc.join(','))}`);
+  }
+  if (subject) {
+    params.push(`su=${encodeURIComponent(subject)}`);
+  }
+  if (body) {
+    params.push(`body=${encodeURIComponent(body)}`);
+  }
 
-  window.open(`https://mail.google.com/mail/?${params.toString()}`, '_blank');
+  window.open(`https://mail.google.com/mail/?${params.join('&')}`, '_blank');
 }
