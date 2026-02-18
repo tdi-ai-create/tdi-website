@@ -24,6 +24,12 @@ const USMapChart = dynamic(() => import('@/components/tdi-admin/USMapChart'), {
   ssr: false,
   loading: () => <div className="h-[350px] flex items-center justify-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: theme.primary }}></div></div>
 });
+
+// Dynamic import for AnalyticsDashboard (comprehensive analytics)
+const AnalyticsDashboard = dynamic(() => import('@/components/tdi-admin/analytics/AnalyticsDashboard').then(mod => ({ default: mod.AnalyticsDashboard })), {
+  ssr: false,
+  loading: () => <div className="py-12 text-center"><div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto" style={{ borderColor: theme.primary }}></div><p className="text-gray-500 mt-3">Loading analytics...</p></div>
+});
 import {
   LineChart,
   Line,
@@ -130,7 +136,7 @@ function SidebarNavItem({
   );
 }
 
-type Tab = 'accounts' | 'enrollments' | 'certificates' | 'reports' | 'analytics' | 'tips' | 'emails';
+type Tab = 'accounts' | 'enrollments' | 'certificates' | 'analytics-reports' | 'tips' | 'emails';
 
 // Stat Card Component - Updated to match Creator Studio design
 function StatCard({ label, value, icon: Icon, trend }: { label: string; value: string | number; icon: React.ElementType; trend?: 'up' | 'down' | null }) {
@@ -1154,7 +1160,453 @@ function ReportsTab() {
 // Color palette for charts (Hub uses teal as primary, with complementary colors for contrast)
 const CHART_COLORS = ['#0D9488', '#115E59', '#3B82F6', '#16A34A', '#F59E0B', '#E8927C', '#6366F1', '#EC4899'];
 
-// ANALYTICS TAB
+// ANALYTICS & REPORTS TAB (Combined)
+function AnalyticsReportsTab() {
+  // Sub-tab state: 'overview' for existing content, 'full' for comprehensive analytics
+  const [analyticsView, setAnalyticsView] = useState<'overview' | 'full'>('full');
+
+  // Analytics data from API
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [analytics, setAnalytics] = useState<Record<string, any> | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [filters, setFilters] = useState({
+    state: '',
+    org: '',
+    role: 'all',
+    gradeLevel: 'all',
+    dateFrom: '',
+    dateTo: '',
+  });
+  const [tableSort, setTableSort] = useState<{ column: string; direction: 'asc' | 'desc' }>({ column: 'enrollments', direction: 'desc' });
+
+  useEffect(() => {
+    async function load() {
+      setIsLoading(true);
+      const params = new URLSearchParams();
+      if (filters.state) params.set('state', filters.state);
+      if (filters.org) params.set('org', filters.org);
+      if (filters.role !== 'all') params.set('role', filters.role);
+      if (filters.gradeLevel !== 'all') params.set('grade_level', filters.gradeLevel);
+      if (filters.dateFrom) params.set('date_from', filters.dateFrom);
+      if (filters.dateTo) params.set('date_to', filters.dateTo);
+
+      const res = await fetch(`/api/tdi-admin/analytics?${params.toString()}`);
+      const data = await res.json();
+      setAnalytics(data);
+      setIsLoading(false);
+    }
+    load();
+  }, [filters]);
+
+  const resetFilters = () => setFilters({ state: '', org: '', role: 'all', gradeLevel: 'all', dateFrom: '', dateTo: '' });
+  const activeFilterCount = Object.entries(filters).filter(([, v]) => v && v !== 'all').length;
+  const stats = analytics?.stats || {};
+  const insights = analytics?.insights || {};
+  const filterOptions = analytics?.filterOptions || { states: [], orgs: [] };
+
+  // Sort table data
+  const sortedCourses = [...(analytics?.topCourses || [])].sort((a: any, b: any) => {
+    const aVal = a[tableSort.column] || 0;
+    const bVal = b[tableSort.column] || 0;
+    return tableSort.direction === 'asc' ? aVal - bVal : bVal - aVal;
+  });
+
+  // Export CSV function
+  const exportCSV = () => {
+    if (!analytics) return;
+
+    let csv = 'Course,Enrollments,Completions,Completion Rate,PD Hours\n';
+    sortedCourses.forEach((c: any) => {
+      csv += `"${c.title}",${c.enrollments},${c.completions},${c.completionRate}%,${c.pdHours || 0}\n`;
+    });
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `analytics-report-${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
+
+  // Export PDF function (generates printable view)
+  const exportPDF = () => {
+    const printContent = `
+      <html>
+      <head>
+        <title>Analytics Report - ${new Date().toLocaleDateString()}</title>
+        <style>
+          body { font-family: system-ui, -apple-system, sans-serif; padding: 40px; color: #1f2937; }
+          h1 { color: #0D9488; margin-bottom: 8px; }
+          .subtitle { color: #6b7280; margin-bottom: 24px; }
+          .stats { display: flex; gap: 20px; margin-bottom: 32px; }
+          .stat-card { padding: 16px; background: #f9fafb; border-radius: 8px; border-left: 3px solid #0D9488; }
+          .stat-value { font-size: 24px; font-weight: bold; color: #0D9488; }
+          .stat-label { font-size: 12px; color: #6b7280; }
+          table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+          th { text-align: left; padding: 12px; background: #f9fafb; font-size: 12px; text-transform: uppercase; color: #6b7280; border-bottom: 1px solid #e5e7eb; }
+          td { padding: 12px; border-bottom: 1px solid #f3f4f6; }
+          .rate-good { color: #16a34a; }
+          .rate-warn { color: #ca8a04; }
+          .rate-bad { color: #dc2626; }
+          @media print { body { padding: 20px; } }
+        </style>
+      </head>
+      <body>
+        <h1>Learning Hub Analytics Report</h1>
+        <p class="subtitle">Generated ${new Date().toLocaleDateString()} ${activeFilterCount > 0 ? '(Filtered)' : ''}</p>
+
+        <div class="stats">
+          <div class="stat-card"><div class="stat-value">${stats.totalUsers || 0}</div><div class="stat-label">Total Users</div></div>
+          <div class="stat-card"><div class="stat-value">${stats.totalEnrollments || 0}</div><div class="stat-label">Enrollments</div></div>
+          <div class="stat-card"><div class="stat-value">${stats.totalCompletions || 0}</div><div class="stat-label">Completions</div></div>
+          <div class="stat-card"><div class="stat-value">${stats.completionRate || 0}%</div><div class="stat-label">Completion Rate</div></div>
+          <div class="stat-card"><div class="stat-value">${stats.totalPdHours || 0}</div><div class="stat-label">PD Hours</div></div>
+        </div>
+
+        <h2>Course Performance</h2>
+        <table>
+          <thead>
+            <tr><th>Course</th><th>Enrollments</th><th>Completions</th><th>Rate</th></tr>
+          </thead>
+          <tbody>
+            ${sortedCourses.map((c: any) => `
+              <tr>
+                <td>${c.title}</td>
+                <td>${c.enrollments}</td>
+                <td>${c.completions}</td>
+                <td class="${c.completionRate >= 70 ? 'rate-good' : c.completionRate >= 40 ? 'rate-warn' : 'rate-bad'}">${c.completionRate}%</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </body>
+      </html>
+    `;
+
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
+  const handleSort = (column: string) => {
+    setTableSort(prev => ({
+      column,
+      direction: prev.column === column && prev.direction === 'desc' ? 'asc' : 'desc'
+    }));
+  };
+
+  // Sub-tab toggle component
+  const AnalyticsToggle = () => {
+    const isFull = analyticsView === 'full';
+    return (
+      <div className="flex items-center gap-2 mb-6">
+        <button
+          onClick={() => setAnalyticsView('full')}
+          className="px-4 py-2 text-sm font-medium rounded-lg transition-all"
+          style={{
+            backgroundColor: isFull ? `${theme.primary}15` : 'transparent',
+            color: isFull ? theme.primary : '#6B7280',
+            border: isFull ? `1px solid ${theme.primary}30` : '1px solid transparent',
+          }}
+        >
+          Full Analytics
+        </button>
+        <button
+          onClick={() => setAnalyticsView('overview')}
+          className="px-4 py-2 text-sm font-medium rounded-lg transition-all"
+          style={{
+            backgroundColor: !isFull ? `${theme.primary}15` : 'transparent',
+            color: !isFull ? theme.primary : '#6B7280',
+            border: !isFull ? `1px solid ${theme.primary}30` : '1px solid transparent',
+          }}
+        >
+          Quick Overview
+        </button>
+      </div>
+    );
+  };
+
+  // Show Full Analytics Dashboard
+  if (analyticsView === 'full') {
+    return (
+      <div>
+        <AnalyticsToggle />
+        <AnalyticsDashboard />
+      </div>
+    );
+  }
+
+  if (isLoading) {
+    return (
+      <div className="py-12 text-center">
+        <RefreshCw className="animate-spin mx-auto text-gray-400 mb-3" size={24} />
+        <p className="text-gray-500">Loading analytics...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <AnalyticsToggle />
+
+      {/* Live Dashboard Charts (Always Visible) */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <StatCard label="Total Users" value={stats.totalUsers || 0} icon={Users} />
+        <StatCard label="Enrollments" value={stats.totalEnrollments || 0} icon={BookOpen} />
+        <StatCard label="Completions" value={stats.totalCompletions || 0} icon={Award} />
+        <StatCard label="Completion Rate" value={`${stats.completionRate || 0}%`} icon={TrendingUp} trend={stats.completionRate > 50 ? 'up' : null} />
+      </div>
+
+      {/* Charts Row */}
+      <div className="grid md:grid-cols-3 gap-6 mb-6">
+        {/* Enrollments Chart */}
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <h3 className="font-semibold text-gray-900 mb-4 text-sm">Enrollments Over Time</h3>
+          <div className="h-40">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={analytics?.enrollmentsTimeSeries || []}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="month" tick={{ fontSize: 10 }} stroke="#9CA3AF" />
+                <YAxis tick={{ fontSize: 10 }} stroke="#9CA3AF" />
+                <Tooltip />
+                <Line type="monotone" dataKey="value" stroke="#0D9488" strokeWidth={2} dot={{ fill: '#0D9488', r: 3 }} name="Enrollments" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Completions Chart */}
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <h3 className="font-semibold text-gray-900 mb-4 text-sm">Completions Over Time</h3>
+          <div className="h-40">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={analytics?.completionsTimeSeries || []}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="month" tick={{ fontSize: 10 }} stroke="#9CA3AF" />
+                <YAxis tick={{ fontSize: 10 }} stroke="#9CA3AF" />
+                <Tooltip />
+                <Line type="monotone" dataKey="value" stroke="#16A34A" strokeWidth={2} dot={{ fill: '#16A34A', r: 3 }} name="Completions" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* PD Hours Chart */}
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <h3 className="font-semibold text-gray-900 mb-4 text-sm">PD Hours Awarded</h3>
+          <div className="h-40">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={analytics?.pdTimeSeries || []}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="month" tick={{ fontSize: 10 }} stroke="#9CA3AF" />
+                <YAxis tick={{ fontSize: 10 }} stroke="#9CA3AF" />
+                <Tooltip />
+                <Bar dataKey="value" fill={theme.primary} radius={[4, 4, 0, 0]} name="PD Hours" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+
+      {/* Filter Bar */}
+      <div className="bg-white rounded-lg border border-gray-200 p-4 mb-6">
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2 text-gray-500 text-sm mr-1">
+            <Filter size={16} />
+            <span className="font-medium">Filters:</span>
+          </div>
+
+          <select
+            value={filters.state}
+            onChange={(e) => setFilters({ ...filters, state: e.target.value })}
+            className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white min-w-[120px]"
+          >
+            <option value="">All States</option>
+            {filterOptions.states.map((s: string) => <option key={s} value={s}>{s}</option>)}
+          </select>
+
+          <select
+            value={filters.org}
+            onChange={(e) => setFilters({ ...filters, org: e.target.value })}
+            className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white min-w-[140px]"
+          >
+            <option value="">All Schools</option>
+            {filterOptions.orgs.slice(0, 50).map((o: string) => (
+              <option key={o} value={o}>{o.length > 20 ? o.slice(0, 20) + '...' : o}</option>
+            ))}
+          </select>
+
+          <select
+            value={filters.role}
+            onChange={(e) => setFilters({ ...filters, role: e.target.value })}
+            className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white min-w-[120px]"
+          >
+            <option value="all">All Roles</option>
+            <option value="teacher">Teacher</option>
+            <option value="school_leader">School Leader</option>
+            <option value="coach">Coach</option>
+            <option value="para">Para</option>
+          </select>
+
+          <select
+            value={filters.gradeLevel}
+            onChange={(e) => setFilters({ ...filters, gradeLevel: e.target.value })}
+            className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white min-w-[120px]"
+          >
+            <option value="all">All Grades</option>
+            <option value="Pre-K">Pre-K</option>
+            <option value="K-2">K-2</option>
+            <option value="3-5">3-5</option>
+            <option value="6-8">6-8</option>
+            <option value="9-12">9-12</option>
+            <option value="Higher Ed">Higher Ed</option>
+          </select>
+
+          <input
+            type="date"
+            value={filters.dateFrom}
+            onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
+            className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white"
+            placeholder="From"
+          />
+          <span className="text-gray-400 text-sm">to</span>
+          <input
+            type="date"
+            value={filters.dateTo}
+            onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
+            className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg bg-white"
+            placeholder="To"
+          />
+
+          {activeFilterCount > 0 && (
+            <button
+              onClick={resetFilters}
+              className="px-3 py-1.5 text-sm border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 flex items-center gap-1"
+            >
+              <X size={14} />
+              Clear ({activeFilterCount})
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Data Table with Export Buttons */}
+      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <div className="flex items-center justify-between p-5 border-b border-gray-100">
+          <h3 className="font-semibold text-gray-900">Course Performance</h3>
+          <div className="flex gap-2">
+            <button
+              onClick={exportCSV}
+              className="px-4 py-2 rounded-lg text-sm font-medium border border-gray-200 text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+            >
+              <Download size={14} />
+              Export CSV
+            </button>
+            <button
+              onClick={exportPDF}
+              className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2"
+              style={{ backgroundColor: theme.primary }}
+            >
+              <FileText size={14} />
+              Export PDF
+            </button>
+          </div>
+        </div>
+
+        <table className="w-full">
+          <thead className="bg-[#FAFAF8]">
+            <tr>
+              <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Course</th>
+              <th
+                className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700"
+                onClick={() => handleSort('enrollments')}
+              >
+                <div className="flex items-center justify-end gap-1">
+                  Enrollments
+                  {tableSort.column === 'enrollments' && (tableSort.direction === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                </div>
+              </th>
+              <th
+                className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700"
+                onClick={() => handleSort('completions')}
+              >
+                <div className="flex items-center justify-end gap-1">
+                  Completions
+                  {tableSort.column === 'completions' && (tableSort.direction === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                </div>
+              </th>
+              <th
+                className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase cursor-pointer hover:text-gray-700"
+                onClick={() => handleSort('completionRate')}
+              >
+                <div className="flex items-center justify-end gap-1">
+                  Rate
+                  {tableSort.column === 'completionRate' && (tableSort.direction === 'asc' ? <ChevronUp size={14} /> : <ChevronDown size={14} />)}
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {sortedCourses.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="px-4 py-8 text-center text-gray-500 text-sm">No course data available</td>
+              </tr>
+            ) : (
+              sortedCourses.map((course: any, i: number) => (
+                <tr key={course.courseId} className={i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAF8]'}>
+                  <td className="px-4 py-3 text-sm text-gray-900">{course.title}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600 text-right">{course.enrollments}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600 text-right">{course.completions}</td>
+                  <td className="px-4 py-3 text-right">
+                    <span className={`inline-flex px-2 py-0.5 rounded text-xs font-medium ${
+                      course.completionRate >= 70 ? 'bg-green-100 text-green-700' :
+                      course.completionRate >= 40 ? 'bg-yellow-100 text-yellow-700' :
+                      'bg-red-100 text-red-700'
+                    }`}>
+                      {course.completionRate}%
+                    </span>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* AI Insights Summary */}
+      <div className="mt-6 bg-gradient-to-r from-[#2B3A67] to-[#3d4f7a] rounded-lg p-5 text-white">
+        <div className="flex items-center gap-2 mb-3">
+          <Lightbulb size={18} />
+          <h3 className="font-semibold">AI Insights</h3>
+          {activeFilterCount > 0 && <span className="ml-2 px-2 py-0.5 bg-white/20 rounded text-xs">Filtered View</span>}
+        </div>
+        <div className="grid md:grid-cols-3 gap-4 text-sm text-white/90">
+          <div>
+            <p className="mb-1 flex items-center gap-1.5">
+              {insights.enrollmentChange >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+              Enrollments <strong className="text-white">{insights.enrollmentChange >= 0 ? 'up' : 'down'} {Math.abs(insights.enrollmentChange || 0)}%</strong> this month
+            </p>
+          </div>
+          <div>
+            <p className="mb-1 flex items-center gap-1.5">
+              <GraduationCap size={14} /> Completion rate: <strong className="text-white">{insights.completionRate || 0}%</strong>
+            </p>
+          </div>
+          <div>
+            <p className="mb-1 flex items-center gap-1.5">
+              <Award size={14} /> Most popular: <strong className="text-white">{insights.mostPopularCourse || 'N/A'}</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ANALYTICS TAB (Legacy - keeping for reference)
 function AnalyticsTab() {
   // Analytics data from API - complex nested structure
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -2265,8 +2717,7 @@ export default function HubOperationsPage() {
   // Default to first available tab
   useEffect(() => {
     if (!canViewEnrollments && activeTab === 'accounts') {
-      if (canExportReports) setActiveTab('reports');
-      else if (canViewAnalytics) setActiveTab('analytics');
+      if (canExportReports || canViewAnalytics) setActiveTab('analytics-reports');
       else if (canManageTips) setActiveTab('tips');
       else if (canManageEmails) setActiveTab('emails');
     }
@@ -2407,20 +2858,12 @@ export default function HubOperationsPage() {
                 Certificates
               </TabButton>
               <TabButton
-                active={activeTab === 'reports'}
-                onClick={() => setActiveTab('reports')}
-                disabled={!canExportReports}
-              >
-                <FileText size={16} className="mr-2 inline" />
-                Reports
-              </TabButton>
-              <TabButton
-                active={activeTab === 'analytics'}
-                onClick={() => setActiveTab('analytics')}
-                disabled={!canViewAnalytics}
+                active={activeTab === 'analytics-reports'}
+                onClick={() => setActiveTab('analytics-reports')}
+                disabled={!canExportReports && !canViewAnalytics}
               >
                 <BarChart3 size={16} className="mr-2 inline" />
-                Analytics
+                Analytics & Reports
               </TabButton>
               <TabButton
                 active={activeTab === 'tips'}
@@ -2446,8 +2889,7 @@ export default function HubOperationsPage() {
             {activeTab === 'accounts' && canViewEnrollments && <AccountsTab />}
             {activeTab === 'enrollments' && canViewEnrollments && <EnrollmentsTab />}
             {activeTab === 'certificates' && canManageCertificates && <CertificatesTab />}
-            {activeTab === 'reports' && canExportReports && <ReportsTab />}
-            {activeTab === 'analytics' && canViewAnalytics && <AnalyticsTab />}
+            {activeTab === 'analytics-reports' && (canExportReports || canViewAnalytics) && <AnalyticsReportsTab />}
             {activeTab === 'tips' && canManageTips && <TipsTab />}
             {activeTab === 'emails' && canManageEmails && <EmailsTab />}
 
