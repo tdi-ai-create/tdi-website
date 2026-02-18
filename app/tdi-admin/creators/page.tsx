@@ -33,6 +33,10 @@ import {
   Globe,
   Check,
   Copy,
+  LayoutGrid,
+  LogOut,
+  Menu,
+  ChevronLeft,
 } from 'lucide-react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
@@ -74,7 +78,7 @@ type TabId = 'dashboard' | 'creators' | 'analytics' | 'payouts';
 
 // Tab configuration
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
-  { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+  { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
   { id: 'creators', label: 'Creators', icon: Users },
   { id: 'analytics', label: 'Analytics', icon: TrendingUp },
   { id: 'payouts', label: 'Payouts', icon: DollarSign },
@@ -193,25 +197,24 @@ function getDaysSince(dateStr: string): number {
   return Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-// Tab Button Component
-function TabButton({ active, onClick, icon: Icon, children }: { active: boolean; onClick: () => void; icon: React.ElementType; children: React.ReactNode }) {
+// Sidebar Navigation Item Component
+function SidebarNavItem({ active, onClick, icon: Icon, children }: { active: boolean; onClick: () => void; icon: React.ElementType; children: React.ReactNode }) {
   return (
     <button
       onClick={onClick}
-      className="flex items-center gap-2 px-4 py-2.5 font-medium transition-all border-b-2"
-      style={{
-        fontFamily: "'DM Sans', sans-serif",
-        borderColor: active ? theme.primary : 'transparent',
-        color: active ? theme.primary : '#6B7280',
-      }}
+      className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-left ${
+        active
+          ? 'bg-indigo-50 text-indigo-700'
+          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+      }`}
     >
-      <Icon size={18} />
-      {children}
+      <Icon size={20} className={active ? 'text-indigo-600' : 'text-gray-400'} />
+      <span className={active ? 'font-semibold' : ''}>{children}</span>
     </button>
   );
 }
 
-// Clickable Stat Card Component
+// Modern Stat Card Component
 function StatCard({
   icon: Icon,
   label,
@@ -229,37 +232,36 @@ function StatCard({
   accentColor?: string;
   lightColor?: string;
 }) {
-  const accent = accentColor || theme.primary;
-  const light = lightColor || theme.light;
+  const accent = accentColor || '#6366F1';
+  const light = lightColor || '#F8F9FA';
 
   return (
     <button
       onClick={onClick}
-      className="bg-white rounded-xl p-4 border transition-all text-left cursor-pointer hover:shadow-md"
+      className="group bg-white rounded-xl p-5 text-left cursor-pointer transition-all duration-200"
       style={{
-        borderColor: isActive ? accent : '#E5E7EB',
-        boxShadow: isActive ? `0 0 0 2px ${accent}20` : 'none',
-        transform: 'scale(1)',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'scale(1.02)';
-        e.currentTarget.style.borderColor = accent;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'scale(1)';
-        e.currentTarget.style.borderColor = isActive ? accent : '#E5E7EB';
+        backgroundColor: light,
+        borderLeft: `3px solid ${accent}`,
+        boxShadow: isActive
+          ? `0 4px 12px ${accent}25, 0 1px 3px rgba(0,0,0,0.08)`
+          : '0 1px 3px rgba(0,0,0,0.08)',
       }}
     >
-      <div className="flex items-center gap-3">
-        <div
-          className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
-          style={{ backgroundColor: light }}
-        >
-          <Icon className="w-5 h-5" style={{ color: accent }} />
-        </div>
+      <div className="flex items-center justify-between">
         <div>
-          <p className="text-2xl font-bold" style={{ color: accent }}>{value}</p>
-          <p className="text-xs text-gray-600">{label}</p>
+          <p
+            className="text-3xl font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+            style={{ color: accent }}
+          >
+            {value}
+          </p>
+          <p className="text-sm text-gray-500 font-medium">{label}</p>
+        </div>
+        <div
+          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
+          style={{ backgroundColor: `${accent}15` }}
+        >
+          <Icon className="w-6 h-6" style={{ color: accent }} />
         </div>
       </div>
     </button>
@@ -272,6 +274,7 @@ export default function CreatorStudioPage() {
 
   // Tab state
   const [activeTab, setActiveTab] = useState<TabId>('dashboard');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [filteredCreators, setFilteredCreators] = useState<EnrichedCreator[]>([]);
@@ -703,59 +706,111 @@ export default function CreatorStudioPage() {
   const mostActiveCreator = Object.entries(recentActivityCounts).sort((a, b) => b[1] - a[1])[0];
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-8">
-      {/* Page header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-        <div>
-          <h1
-            className="text-2xl font-bold"
-            style={{
-              fontFamily: "'Source Serif 4', Georgia, serif",
-              color: '#2B3A67',
-              borderLeft: `4px solid ${theme.primary}`,
-              paddingLeft: '16px',
-            }}
-          >
-            Creator Command Center
-          </h1>
-          <p className="text-gray-600 pl-5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-            Pipeline overview and creator management
-          </p>
+    <div className="flex min-h-screen bg-[#FAFBFC]">
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 transform transition-transform duration-200 ease-in-out lg:transform-none ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}
+        style={{ boxShadow: '1px 0 3px rgba(0,0,0,0.03)' }}
+      >
+        <div className="flex flex-col h-full">
+          {/* Sidebar Header */}
+          <div className="flex items-center justify-between px-5 py-5 border-b border-gray-100">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
+                <Rocket className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-semibold text-gray-900">Creator Studio</span>
+            </div>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden p-1 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
+
+          {/* Navigation */}
+          <nav className="flex-1 px-3 py-4 space-y-1">
+            {TABS.map((tab) => (
+              <SidebarNavItem
+                key={tab.id}
+                active={activeTab === tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setSidebarOpen(false);
+                }}
+                icon={tab.icon}
+              >
+                {tab.label}
+              </SidebarNavItem>
+            ))}
+          </nav>
+
+          {/* Sidebar Footer - User */}
+          <div className="px-3 py-4 border-t border-gray-100">
+            <div className="flex items-center gap-3 px-3 py-2">
+              <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-medium text-sm">
+                RH
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">Rae Hughart</p>
+                <p className="text-xs text-gray-500 truncate">Admin</p>
+              </div>
+              <button className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-600">
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
         </div>
+      </aside>
 
-        {canEdit && (
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
-            style={{
-              backgroundColor: theme.primary,
-              color: 'white',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.dark}
-            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theme.primary}
-          >
-            <Plus className="w-4 h-4" />
-            Add Creator
-          </button>
-        )}
-      </div>
+      {/* Main Content Area */}
+      <main className="flex-1 min-w-0">
+        {/* Top Header Bar */}
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-sm border-b border-gray-100">
+          <div className="flex items-center justify-between px-6 py-4">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <Menu className="w-5 h-5 text-gray-600" />
+              </button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                  Creator Command Center
+                </h1>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  Pipeline overview and creator management
+                </p>
+              </div>
+            </div>
 
-      {/* Tab Navigation */}
-      <div className="flex flex-wrap gap-1 mb-6 border-b border-gray-200">
-        {TABS.map((tab) => (
-          <TabButton
-            key={tab.id}
-            active={activeTab === tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            icon={tab.icon}
-          >
-            {tab.label}
-          </TabButton>
-        ))}
-      </div>
+            {canEdit && (
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm hover:shadow-md"
+              >
+                <Plus className="w-4 h-4" />
+                Add Creator
+              </button>
+            )}
+          </div>
+        </header>
 
-      {/* TAB CONTENT */}
+        {/* Page Content */}
+        <div className="px-6 py-6">
+          {/* TAB CONTENT */}
 
       {/* DASHBOARD TAB */}
       {activeTab === 'dashboard' && (
@@ -808,54 +863,50 @@ export default function CreatorStudioPage() {
           </div>
 
           {/* Grid Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-5">
             {/* Pipeline Funnel */}
-            <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-5">
-              <h2
-                className="text-base font-semibold mb-3"
-                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-              >
+            <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+              <h2 className="text-lg font-semibold mb-4 text-gray-900">
                 Creator Pipeline
               </h2>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {[
-                  { key: 'onboarding', label: 'Onboarding' },
-                  { key: 'agreement', label: 'Agreement' },
-                  { key: 'course_design', label: 'Prep & Resources' },
-                  { key: 'test_prep', label: 'Production' },
-                  { key: 'launch', label: 'Launch' },
-                ].map((phase, index) => {
+                  { key: 'onboarding', label: 'Onboarding', color: '#6366F1' },
+                  { key: 'agreement', label: 'Agreement', color: '#8B5CF6' },
+                  { key: 'course_design', label: 'Prep & Resources', color: '#A78BFA' },
+                  { key: 'test_prep', label: 'Production', color: '#F59E0B' },
+                  { key: 'launch', label: 'Launch', color: '#22C55E' },
+                ].map((phase) => {
                   const count = phaseCounts[phase.key as keyof typeof phaseCounts];
-                  const widthPercent = Math.max((count / maxPhaseCount) * 100, 8);
-                  // Create gradient from dark lavender to light
-                  const opacity = 1 - (index * 0.15);
+                  const widthPercent = Math.max((count / maxPhaseCount) * 100, 5);
                   return (
                     <button
                       key={phase.key}
                       onClick={() => handlePhaseClick(phase.key)}
-                      className="flex items-center gap-2 w-full text-left group cursor-pointer"
+                      className="flex items-center gap-3 w-full text-left group cursor-pointer"
                     >
-                      <div
-                        className="w-24 text-sm flex-shrink-0 group-hover:font-medium transition-all"
-                        style={{ fontFamily: "'DM Sans', sans-serif", color: '#6B7280' }}
-                      >
+                      <div className="w-28 text-sm flex-shrink-0 text-gray-600 group-hover:text-gray-900 transition-colors font-medium">
                         {phase.label}
                       </div>
                       <div className="flex-1 flex items-center gap-2">
-                        <div
-                          className="h-6 rounded flex items-center justify-end px-2 transition-all group-hover:opacity-80"
-                          style={{
-                            width: `${widthPercent}%`,
-                            minWidth: count > 0 ? '32px' : '8px',
-                            backgroundColor: phase.key === 'launch' ? '#22C55E' : theme.primary,
-                            opacity: phase.key === 'launch' ? 1 : opacity,
-                          }}
-                        >
-                          {count > 0 && (
-                            <span className="text-white text-xs font-medium">{count}</span>
-                          )}
+                        {/* Background track */}
+                        <div className="flex-1 h-8 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full flex items-center justify-end px-3 transition-all duration-500 group-hover:brightness-110"
+                            style={{
+                              width: `${widthPercent}%`,
+                              minWidth: count > 0 ? '40px' : '0',
+                              background: `linear-gradient(135deg, ${phase.color}, ${phase.color}dd)`,
+                            }}
+                          >
+                            {count > 0 && (
+                              <span className="text-white text-xs font-semibold">{count}</span>
+                            )}
+                          </div>
                         </div>
-                        {count === 0 && <span className="text-gray-400 text-xs">0</span>}
+                        {count === 0 && (
+                          <span className="text-gray-300 text-xs font-medium px-2">0</span>
+                        )}
                       </div>
                     </button>
                   );
@@ -864,13 +915,10 @@ export default function CreatorStudioPage() {
             </div>
 
             {/* Closest to Launch */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <div className="flex items-center justify-between mb-3">
-                <h3
-                  className="text-sm font-semibold flex items-center gap-2"
-                  style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-                >
-                  <Trophy className="w-4 h-4" style={{ color: theme.primary }} />
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
+                  <Trophy className="w-5 h-5 text-amber-500" />
                   Closest to Launch
                 </h3>
                 {closestToLaunch.length > 0 && (
@@ -881,8 +929,11 @@ export default function CreatorStudioPage() {
                         .filter((e): e is string => !!e);
                       handleCopyEmails(emails, 'closestToLaunch');
                     }}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium border rounded-lg transition-colors hover:border-purple-300 hover:bg-purple-50"
-                    style={{ borderColor: '#E5E7EB', color: copiedSection === 'closestToLaunch' ? theme.primary : '#6B7280' }}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
+                      copiedSection === 'closestToLaunch'
+                        ? 'bg-green-50 text-green-600 border border-green-200'
+                        : 'text-gray-500 hover:bg-gray-100 border border-transparent'
+                    }`}
                   >
                     {copiedSection === 'closestToLaunch' ? (
                       <>
@@ -901,44 +952,41 @@ export default function CreatorStudioPage() {
               {closestToLaunch.length === 0 ? (
                 <p className="text-sm text-gray-500">No creators in progress</p>
               ) : (
-                <div className="space-y-2">
-                  {closestToLaunch.map((creator) => (
-                    <Link
-                      key={creator.id}
-                      href={`/tdi-admin/creators/${creator.id}`}
-                      className="flex items-center gap-2 group"
-                    >
-                      <div
-                        className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0"
-                        style={{ backgroundColor: theme.primary }}
+                <div className="space-y-3">
+                  {closestToLaunch.map((creator) => {
+                    const progressColor = creator.progressPercentage >= 80 ? '#22C55E' : creator.progressPercentage >= 50 ? '#F59E0B' : '#6366F1';
+                    return (
+                      <Link
+                        key={creator.id}
+                        href={`/tdi-admin/creators/${creator.id}`}
+                        className="flex items-center gap-3 group p-2 -mx-2 rounded-xl hover:bg-gray-50 transition-colors"
                       >
-                        {creator.name.charAt(0).toUpperCase()}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p
-                          className="text-sm font-medium truncate group-hover:opacity-80"
-                          style={{ color: '#2B3A67' }}
-                        >
-                          {creator.name}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        <div className="w-12 h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full"
-                            style={{ width: `${creator.progressPercentage}%`, backgroundColor: theme.primary }}
-                          />
+                        <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white flex items-center justify-center text-sm font-medium flex-shrink-0 ring-2 ring-white shadow-sm">
+                          {creator.name.charAt(0).toUpperCase()}
                         </div>
-                        <span className="text-xs font-medium text-gray-600 w-8">{creator.progressPercentage}%</span>
-                      </div>
-                    </Link>
-                  ))}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate text-gray-900 group-hover:text-indigo-600 transition-colors">
+                            {creator.name}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              className="h-full rounded-full transition-all duration-500"
+                              style={{ width: `${creator.progressPercentage}%`, backgroundColor: progressColor }}
+                            />
+                          </div>
+                          <span className="text-xs font-semibold w-9 text-right" style={{ color: progressColor }}>{creator.progressPercentage}%</span>
+                        </div>
+                      </Link>
+                    );
+                  })}
                 </div>
               )}
             </div>
 
             {/* Scheduled for Launch */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
               {(() => {
                 const scheduled = dashboardData.creators
                   .filter(c => c.publish_status === 'scheduled' && c.scheduled_publish_date)
@@ -947,19 +995,19 @@ export default function CreatorStudioPage() {
 
                 return (
                   <>
-                    <div className="flex items-center justify-between mb-3">
-                      <h3
-                        className="text-sm font-semibold flex items-center gap-2"
-                        style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-                      >
-                        <CalendarDays className="w-4 h-4 text-blue-600" />
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
+                        <CalendarDays className="w-5 h-5 text-blue-500" />
                         Scheduled for Launch
                       </h3>
                       {scheduled.length > 0 && (
                         <button
                           onClick={() => handleCopyEmails(scheduled.map(c => c.email), 'scheduled')}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium border rounded-lg transition-colors hover:border-purple-300 hover:bg-purple-50"
-                          style={{ borderColor: '#E5E7EB', color: copiedSection === 'scheduled' ? theme.primary : '#6B7280' }}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
+                            copiedSection === 'scheduled'
+                              ? 'bg-green-50 text-green-600 border border-green-200'
+                              : 'text-gray-500 hover:bg-gray-100 border border-transparent'
+                          }`}
                         >
                           {copiedSection === 'scheduled' ? (
                             <>
@@ -1016,7 +1064,7 @@ export default function CreatorStudioPage() {
             </div>
 
             {/* Recently Published */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
               {(() => {
                 // Include creators who are either:
                 // 1. Explicitly marked as published (publish_status === 'published')
@@ -1033,19 +1081,19 @@ export default function CreatorStudioPage() {
 
                 return (
                   <>
-                    <div className="flex items-center justify-between mb-3">
-                      <h3
-                        className="text-sm font-semibold flex items-center gap-2"
-                        style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-                      >
-                        <Globe className="w-4 h-4 text-green-600" />
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
+                        <Globe className="w-5 h-5 text-green-500" />
                         Recently Published
                       </h3>
                       {published.length > 0 && (
                         <button
                           onClick={() => handleCopyEmails(published.map(c => c.email), 'published')}
-                          className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium border rounded-lg transition-colors hover:border-purple-300 hover:bg-purple-50"
-                          style={{ borderColor: '#E5E7EB', color: copiedSection === 'published' ? theme.primary : '#6B7280' }}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
+                            copiedSection === 'published'
+                              ? 'bg-green-50 text-green-600 border border-green-200'
+                              : 'text-gray-500 hover:bg-gray-100 border border-transparent'
+                          }`}
                         >
                           {copiedSection === 'published' ? (
                             <>
@@ -1065,33 +1113,28 @@ export default function CreatorStudioPage() {
                     {published.length === 0 ? (
                       <p className="text-sm text-gray-500">No published creators yet</p>
                     ) : (
-                      <div className="space-y-2">
+                      <div className="space-y-3">
                         {published.map((creator) => (
                           <Link
                             key={creator.id}
                             href={`/tdi-admin/creators/${creator.id}`}
-                            className="flex items-start gap-2 group"
+                            className="flex items-start gap-3 group p-2 -mx-2 rounded-xl hover:bg-gray-50 transition-colors"
                           >
-                            <div
-                              className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0 bg-green-500 mt-0.5"
-                            >
+                            <div className="w-9 h-9 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0 bg-gradient-to-br from-green-400 to-emerald-600 shadow-sm">
                               <Check className="w-4 h-4" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p
-                                className="text-sm font-medium truncate group-hover:opacity-80"
-                                style={{ color: '#2B3A67' }}
-                              >
+                              <p className="text-sm font-medium truncate text-gray-900 group-hover:text-green-600 transition-colors">
                                 {creator.name}
                               </p>
                               {creator.post_launch_notes && (
-                                <p className="text-xs text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded mt-0.5 truncate flex items-center gap-1">
+                                <p className="text-xs text-amber-700 bg-amber-50 px-2 py-1 rounded-lg mt-1 truncate flex items-center gap-1">
                                   <Clock className="w-3 h-3 flex-shrink-0" />
                                   <span className="truncate">{creator.post_launch_notes}</span>
                                 </p>
                               )}
                             </div>
-                            <div className="text-xs text-gray-500 flex-shrink-0 mt-0.5">
+                            <div className="text-xs text-gray-400 flex-shrink-0 mt-0.5 font-medium">
                               {new Date(creator.published_date || creator.lastActivityDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                             </div>
                           </Link>
@@ -1104,13 +1147,10 @@ export default function CreatorStudioPage() {
             </div>
 
             {/* Needs Your Attention */}
-            <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-5">
-              <div className="flex items-center justify-between mb-3">
-                <h3
-                  className="text-sm font-semibold flex items-center gap-2"
-                  style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-                >
-                  <AlertTriangle className="w-4 h-4 text-amber-500" />
+            <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
+                  <AlertTriangle className="w-5 h-5 text-amber-500" />
                   Needs Your Attention
                   {needsAttentionCount > 0 && (
                     <span className="text-xs font-normal text-gray-500">({needsAttentionCount})</span>
@@ -1119,8 +1159,11 @@ export default function CreatorStudioPage() {
                 {needsAttention.length > 0 && (
                   <button
                     onClick={() => handleCopyEmails(needsAttention.map(c => c.email), 'needsAttention')}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium border rounded-lg transition-colors hover:border-purple-300 hover:bg-purple-50"
-                    style={{ borderColor: '#E5E7EB', color: copiedSection === 'needsAttention' ? theme.primary : '#6B7280' }}
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-lg transition-all duration-200 ${
+                      copiedSection === 'needsAttention'
+                        ? 'bg-green-50 text-green-600 border border-green-200'
+                        : 'text-gray-500 hover:bg-gray-100 border border-transparent'
+                    }`}
                   >
                     {copiedSection === 'needsAttention' ? (
                       <>
@@ -1209,11 +1252,8 @@ export default function CreatorStudioPage() {
             </div>
 
             {/* Content Paths */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3
-                className="text-sm font-semibold mb-3"
-                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-              >
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+              <h3 className="text-lg font-semibold mb-4 text-gray-900">
                 Content Paths
               </h3>
               <div className="grid grid-cols-2 gap-2">
@@ -1249,12 +1289,9 @@ export default function CreatorStudioPage() {
 
           {/* Geographic Distribution */}
           {locationData && (
-            <div className="bg-white rounded-xl border border-gray-200 p-5 mb-4">
-              <h2
-                className="text-base font-semibold mb-4 flex items-center gap-2"
-                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-              >
-                <MapPin className="w-5 h-5" style={{ color: theme.primary }} />
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] mb-5">
+              <h2 className="text-lg font-semibold mb-4 flex items-center gap-2 text-gray-900">
+                <MapPin className="w-5 h-5 text-indigo-500" />
                 Geographic Distribution
               </h2>
 
@@ -1326,11 +1363,8 @@ export default function CreatorStudioPage() {
           )}
 
           {/* Recent Activity */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <h3
-              className="text-sm font-semibold mb-3"
-              style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-            >
+          <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900">
               Recent Activity
             </h3>
             {recentActivity.length === 0 ? (
@@ -1372,9 +1406,9 @@ export default function CreatorStudioPage() {
       {/* CREATORS TAB */}
       {activeTab === 'creators' && (
         <>
-        <div className="bg-white rounded-xl border border-gray-200">
+        <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)] overflow-hidden">
           {/* Search and Filters Bar */}
-          <div className="p-4 border-b border-gray-100">
+          <div className="p-5 border-b border-gray-100">
             <div className="flex flex-col md:flex-row gap-3">
               <div className="relative flex-1">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -1383,30 +1417,21 @@ export default function CreatorStudioPage() {
                   placeholder="Search by name, email, or course title..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-12 pr-4 py-2.5 border border-gray-200 rounded-lg"
-                  style={{
-                    fontFamily: "'DM Sans', sans-serif",
-                    outlineColor: theme.primary,
-                  }}
+                  className="w-full pl-12 pr-4 py-2.5 border border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                 />
               </div>
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="inline-flex items-center gap-2 px-4 py-2.5 border rounded-lg transition-colors"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  color: '#2B3A67',
-                  borderColor: showFilters || activeFiltersCount > 0 ? theme.primary : '#E5E7EB',
-                  backgroundColor: showFilters || activeFiltersCount > 0 ? `${theme.primary}10` : 'transparent',
-                }}
+                className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl transition-all duration-200 font-medium ${
+                  showFilters || activeFiltersCount > 0
+                    ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                    : 'border border-gray-200 text-gray-700 hover:bg-gray-50'
+                }`}
               >
                 <Filter className="w-4 h-4" />
                 Filters
                 {activeFiltersCount > 0 && (
-                  <span
-                    className="text-white text-xs px-2 py-0.5 rounded-full"
-                    style={{ backgroundColor: theme.primary }}
-                  >
+                  <span className="text-white text-xs px-2 py-0.5 rounded-full bg-indigo-600">
                     {activeFiltersCount}
                   </span>
                 )}
@@ -1415,14 +1440,13 @@ export default function CreatorStudioPage() {
 
             {/* Expanded Filters */}
             {showFilters && (
-              <div className="flex flex-wrap gap-3 mt-3 pt-3 border-t border-gray-100">
+              <div className="flex flex-wrap gap-4 mt-4 pt-4 border-t border-gray-100">
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Content Path</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Content Path</label>
                   <select
                     value={filterPath}
                     onChange={(e) => setFilterPath(e.target.value)}
-                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                    style={{ outlineColor: theme.primary }}
+                    className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all bg-white"
                   >
                     <option value="all">All Paths</option>
                     <option value="blog">Blog</option>
@@ -1432,12 +1456,11 @@ export default function CreatorStudioPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Phase</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Phase</label>
                   <select
                     value={filterPhase}
                     onChange={(e) => setFilterPhase(e.target.value)}
-                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                    style={{ outlineColor: theme.primary }}
+                    className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all bg-white"
                   >
                     <option value="all">All Phases</option>
                     <option value="onboarding">Onboarding</option>
@@ -1448,12 +1471,11 @@ export default function CreatorStudioPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Waiting On</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Waiting On</label>
                   <select
                     value={filterWaitingOn}
                     onChange={(e) => setFilterWaitingOn(e.target.value)}
-                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                    style={{ outlineColor: theme.primary }}
+                    className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all bg-white"
                   >
                     <option value="all">All</option>
                     <option value="creator">Creator</option>
@@ -1463,12 +1485,11 @@ export default function CreatorStudioPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Publish Status</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Publish Status</label>
                   <select
                     value={filterPublishStatus}
                     onChange={(e) => setFilterPublishStatus(e.target.value)}
-                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                    style={{ outlineColor: theme.primary }}
+                    className="px-3 py-2 border border-gray-200 rounded-xl text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all bg-white"
                   >
                     <option value="all">All</option>
                     <option value="in_progress">In Progress</option>
@@ -1485,7 +1506,7 @@ export default function CreatorStudioPage() {
                       setFilterPublishStatus('all');
                       setActiveStatFilter(null);
                     }}
-                    className="self-end px-3 py-2 text-sm text-gray-500 hover:text-gray-700"
+                    className="self-end px-3 py-2 text-sm text-gray-500 hover:text-indigo-600 transition-colors"
                   >
                     Clear all filters
                   </button>
@@ -1496,8 +1517,7 @@ export default function CreatorStudioPage() {
                     type="checkbox"
                     checked={showArchived}
                     onChange={(e) => setShowArchived(e.target.checked)}
-                    className="w-4 h-4 rounded border-gray-300"
-                    style={{ accentColor: theme.primary }}
+                    className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                   />
                   <span className="text-sm text-gray-600">
                     Show Archived {dashboardData?.stats.archived ? `(${dashboardData.stats.archived})` : ''}
@@ -1509,16 +1529,16 @@ export default function CreatorStudioPage() {
 
           {/* Active stat filter indicator */}
           {activeStatFilter && (
-            <div className="px-4 py-2 border-b border-gray-100 flex items-center gap-2" style={{ backgroundColor: theme.light }}>
+            <div className="px-5 py-3 border-b border-gray-100 flex items-center gap-2 bg-indigo-50">
               <span className="text-sm text-gray-600">Showing:</span>
-              <span className="text-sm font-medium capitalize" style={{ color: theme.primary }}>
+              <span className="text-sm font-semibold capitalize text-indigo-700">
                 {activeStatFilter === 'waitingOnCreator' ? 'Waiting on Creator' :
                  activeStatFilter === 'waitingOnTDI' ? 'Waiting on TDI' :
                  activeStatFilter}
               </span>
               <button
                 onClick={() => setActiveStatFilter(null)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-indigo-600 transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1529,7 +1549,7 @@ export default function CreatorStudioPage() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr style={{ backgroundColor: theme.light }}>
+                <tr className="bg-gray-50/80">
                   <th className="text-left text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-3 w-10">
                     <input
                       type="checkbox"
@@ -1715,29 +1735,20 @@ export default function CreatorStudioPage() {
           </div>
 
           {/* Table footer */}
-          <div
-            className="px-4 py-3 border-t border-gray-100 text-sm text-gray-500"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          >
+          <div className="px-5 py-4 border-t border-gray-100 text-sm text-gray-500 font-medium">
             Showing {filteredCreators.length} of {dashboardData.creators.length} creators
           </div>
         </div>
 
         {/* Floating Action Bar for Bulk Copy */}
         {selectedCreatorIds.size > 0 && (
-          <div
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white px-6 py-3 rounded-xl shadow-lg border border-gray-200 flex items-center gap-4 z-50"
-            style={{ fontFamily: "'DM Sans', sans-serif" }}
-          >
-            <span className="text-sm font-medium" style={{ color: '#2B3A67' }}>
+          <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white px-6 py-4 rounded-2xl shadow-xl border border-gray-100 flex items-center gap-4 z-50 backdrop-blur-sm">
+            <span className="text-sm font-medium text-gray-700">
               {selectedCreatorIds.size} creator{selectedCreatorIds.size > 1 ? 's' : ''} selected
             </span>
             <button
               onClick={handleBulkCopy}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
-              style={{ backgroundColor: theme.primary, color: 'white' }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.dark}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theme.primary}
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm hover:shadow-md"
             >
               {copiedSection === 'bulk' ? (
                 <>
@@ -1753,7 +1764,7 @@ export default function CreatorStudioPage() {
             </button>
             <button
               onClick={clearSelection}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-500 hover:text-gray-700"
+              className="p-2 hover:bg-gray-100 rounded-xl transition-all duration-200 text-gray-400 hover:text-gray-600"
               title="Clear selection"
             >
               <X className="w-4 h-4" />
@@ -1768,31 +1779,31 @@ export default function CreatorStudioPage() {
         <div>
           {/* Analytics Stat Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white rounded-xl p-4 border border-gray-200">
-              <p className="text-xs text-gray-500 mb-1">Avg Progress</p>
-              <p className="text-2xl font-bold" style={{ color: theme.primary }}>{avgProgress}%</p>
+            <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+              <p className="text-sm text-gray-500 mb-1 font-medium">Avg Progress</p>
+              <p className="text-3xl font-bold text-indigo-600">{avgProgress}%</p>
             </div>
-            <div className="bg-white rounded-xl p-4 border border-gray-200">
-              <p className="text-xs text-gray-500 mb-1">Total Creators</p>
-              <p className="text-2xl font-bold" style={{ color: theme.primary }}>{stats.total}</p>
+            <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+              <p className="text-sm text-gray-500 mb-1 font-medium">Total Creators</p>
+              <p className="text-3xl font-bold text-indigo-600">{stats.total}</p>
             </div>
-            <div className="bg-white rounded-xl p-4 border border-gray-200">
-              <p className="text-xs text-gray-500 mb-1">Most Active (30d)</p>
-              <p className="text-lg font-bold truncate" style={{ color: theme.primary }}>
+            <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+              <p className="text-sm text-gray-500 mb-1 font-medium">Most Active (30d)</p>
+              <p className="text-xl font-bold truncate text-indigo-600">
                 {mostActiveCreator ? mostActiveCreator[0] : '-'}
               </p>
             </div>
-            <div className="bg-white rounded-xl p-4 border border-gray-200">
-              <p className="text-xs text-gray-500 mb-1">Launched</p>
-              <p className="text-2xl font-bold text-green-600">{stats.launched}</p>
+            <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+              <p className="text-sm text-gray-500 mb-1 font-medium">Launched</p>
+              <p className="text-3xl font-bold text-green-600">{stats.launched}</p>
             </div>
           </div>
 
           {/* Charts Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {/* Creators by Phase */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3 className="text-base font-semibold mb-4" style={{ color: '#2B3A67' }}>
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+              <h3 className="text-lg font-semibold mb-4 text-gray-900">
                 Creators by Phase
               </h3>
               <div className="h-[250px]">
@@ -1809,8 +1820,8 @@ export default function CreatorStudioPage() {
             </div>
 
             {/* Content Path Distribution */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3 className="text-base font-semibold mb-4" style={{ color: '#2B3A67' }}>
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+              <h3 className="text-lg font-semibold mb-4 text-gray-900">
                 Content Path Distribution
               </h3>
               <div className="h-[250px]">
@@ -1837,8 +1848,8 @@ export default function CreatorStudioPage() {
             </div>
 
             {/* Stalled Creators */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3 className="text-base font-semibold mb-4" style={{ color: '#2B3A67' }}>
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+              <h3 className="text-lg font-semibold mb-4 text-gray-900">
                 Stalled Creators
               </h3>
               <div className="flex items-center justify-center h-[200px]">
@@ -1861,8 +1872,8 @@ export default function CreatorStudioPage() {
             </div>
 
             {/* Progress Distribution */}
-            <div className="bg-white rounded-xl border border-gray-200 p-5">
-              <h3 className="text-base font-semibold mb-4" style={{ color: '#2B3A67' }}>
+            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+              <h3 className="text-lg font-semibold mb-4 text-gray-900">
                 Progress Distribution
               </h3>
               <div className="space-y-3">
@@ -1901,15 +1912,12 @@ export default function CreatorStudioPage() {
 
       {/* PAYOUTS TAB */}
       {activeTab === 'payouts' && (
-        <div className="bg-white rounded-xl border border-gray-200 p-8">
+        <div className="bg-white rounded-2xl p-8 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
           <div className="text-center py-12">
-            <div
-              className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
-              style={{ backgroundColor: theme.light }}
-            >
-              <DollarSign className="w-8 h-8" style={{ color: theme.primary }} />
+            <div className="w-16 h-16 rounded-2xl mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg">
+              <DollarSign className="w-8 h-8 text-white" />
             </div>
-            <h2 className="text-xl font-semibold mb-2" style={{ color: '#2B3A67' }}>
+            <h2 className="text-xl font-semibold mb-2 text-gray-900">
               Creator Payouts Coming Soon
             </h2>
             <p className="text-gray-500 max-w-md mx-auto">
@@ -1922,18 +1930,15 @@ export default function CreatorStudioPage() {
 
       {/* Add Creator Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/30 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <h2
-                className="text-xl font-semibold"
-                style={{ fontFamily: "'Source Serif 4', Georgia, serif", color: '#2B3A67' }}
-              >
+              <h2 className="text-xl font-semibold text-gray-900">
                 Add Creator
               </h2>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 hover:bg-gray-100 rounded-xl transition-colors text-gray-400 hover:text-gray-600"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -1941,7 +1946,7 @@ export default function CreatorStudioPage() {
 
             <form onSubmit={handleAddCreator} className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>
+                <label className="block text-sm font-medium mb-1.5 text-gray-700">
                   Name *
                 </label>
                 <input
@@ -1949,13 +1954,12 @@ export default function CreatorStudioPage() {
                   required
                   value={newCreator.name}
                   onChange={(e) => setNewCreator({ ...newCreator, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  style={{ outlineColor: theme.primary }}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>
+                <label className="block text-sm font-medium mb-1.5 text-gray-700">
                   Email *
                 </label>
                 <input
@@ -1963,26 +1967,24 @@ export default function CreatorStudioPage() {
                   required
                   value={newCreator.email}
                   onChange={(e) => setNewCreator({ ...newCreator, email: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  style={{ outlineColor: theme.primary }}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>
+                <label className="block text-sm font-medium mb-1.5 text-gray-700">
                   Course Title
                 </label>
                 <input
                   type="text"
                   value={newCreator.course_title}
                   onChange={(e) => setNewCreator({ ...newCreator, course_title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  style={{ outlineColor: theme.primary }}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>
+                <label className="block text-sm font-medium mb-1.5 text-gray-700">
                   Target Audience
                 </label>
                 <input
@@ -1990,13 +1992,12 @@ export default function CreatorStudioPage() {
                   value={newCreator.course_audience}
                   onChange={(e) => setNewCreator({ ...newCreator, course_audience: e.target.value })}
                   placeholder="e.g., Elementary teachers, K-12 paras"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  style={{ outlineColor: theme.primary }}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all placeholder:text-gray-400"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: '#374151' }}>
+                <label className="block text-sm font-medium mb-1.5 text-gray-700">
                   Target Launch Month
                 </label>
                 <input
@@ -2004,8 +2005,7 @@ export default function CreatorStudioPage() {
                   value={newCreator.target_launch_month}
                   onChange={(e) => setNewCreator({ ...newCreator, target_launch_month: e.target.value })}
                   placeholder="e.g., March 2026"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  style={{ outlineColor: theme.primary }}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-xl focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all placeholder:text-gray-400"
                 />
               </div>
 
@@ -2013,15 +2013,14 @@ export default function CreatorStudioPage() {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                  className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50 transition-all duration-200 text-gray-600 font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isAdding}
-                  className="flex-1 px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-                  style={{ backgroundColor: theme.primary, color: 'white' }}
+                  className="flex-1 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 flex items-center justify-center gap-2 bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm hover:shadow-md"
                 >
                   {isAdding ? (
                     <>
@@ -2046,6 +2045,8 @@ export default function CreatorStudioPage() {
           onClose={hideToast}
         />
       )}
+        </div>
+      </main>
     </div>
   );
 }
