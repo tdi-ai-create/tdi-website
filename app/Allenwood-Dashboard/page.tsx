@@ -51,13 +51,24 @@ import {
   Flame,
   TreePine,
   Circle,
-  CheckSquare
+  CheckSquare,
+  Compass,
+  DollarSign,
+  Shield,
+  Sprout,
+  Puzzle
 } from 'lucide-react';
 
 export default function AllenwoodDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
   const [showPolicy, setShowPolicy] = useState(false);
   const [engagementExpanded, setEngagementExpanded] = useState(false);
+
+  // 2026-27 Tab accordion states
+  const [year2SupportOpen, setYear2SupportOpen] = useState(false);
+  const [fundingOpen, setFundingOpen] = useState(false);
+  const [weeklyMessagesOpen, setWeeklyMessagesOpen] = useState(false);
+  const [activeFundingPath, setActiveFundingPath] = useState<string | null>(null);
 
   // Needs Attention completion state
   const [completedItems, setCompletedItems] = useState<string[]>([]);
@@ -265,7 +276,7 @@ export default function AllenwoodDashboard() {
               { id: 'journey', label: 'Journey', icon: TrendingUp },
               { id: 'progress', label: 'Progress', icon: Users },
               { id: 'blueprint', label: 'Blueprint', icon: Star },
-              { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
+              { id: 'next-year', label: '2026-27', icon: Sparkles },
               { id: 'team', label: 'Team', icon: User },
               { id: 'billing', label: 'Billing', icon: CreditCard, alert: true },
             ].map((tab) => (
@@ -282,11 +293,6 @@ export default function AllenwoodDashboard() {
               >
                 <tab.icon className={`w-4 h-4 ${tab.alert && activeTab !== tab.id ? 'text-red-600' : ''}`} />
                 <span>{tab.label}</span>
-                {tab.badge && (
-                  <span className="text-xs bg-[#35A7FF] text-white px-2 py-0.5 rounded-full">
-                    {tab.badge}
-                  </span>
-                )}
               </button>
             ))}
           </div>
@@ -2076,552 +2082,612 @@ export default function AllenwoodDashboard() {
 
         {/* 2026-27 TAB */}
         {activeTab === 'next-year' && (
-          <div className="space-y-8">
-            {/* ===== HERO SECTION ===== */}
-            <div className="bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#35A7FF] rounded-2xl p-8 text-white text-center">
-              <div className="flex justify-center mb-4">
-                <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                  <Rocket className="w-8 h-8 text-white" />
-                </div>
-              </div>
-              <h2 className="text-3xl font-bold mb-3">Expand Your Impact in 2026-27</h2>
-              <p className="text-white/90 max-w-2xl mx-auto text-lg">
-                Your new teacher pilot team is building strong foundations.
-                Year 2 is the perfect opportunity to expand this support schoolwide.
-              </p>
-              <div className="mt-6 flex flex-wrap justify-center gap-4">
-                <div className="bg-white/10 backdrop-blur px-4 py-2 rounded-full text-sm">
-                  <span className="font-semibold">92%</span> of partners renew
-                </div>
-                <div className="bg-white/10 backdrop-blur px-4 py-2 rounded-full text-sm">
-                  <span className="font-semibold">4.8/5</span> satisfaction rating
-                </div>
-                <div className="bg-white/10 backdrop-blur px-4 py-2 rounded-full text-sm">
-                  <span className="font-semibold">3.2x</span> deeper impact in Year 2
-                </div>
-              </div>
+          <div className="space-y-6">
+            {/* Tab Header */}
+            <div className="text-center mb-8">
+              <h2 className="text-3xl font-bold text-[#1e2749] mb-2">2026-27 Partnership Plan</h2>
+              <p className="text-lg text-[#38618C]">Full Staff Support for All 68 Educators</p>
+              <p className="text-sm text-gray-500 mt-1">Prepared for Dr. Porter &amp; Allenwood Leadership</p>
             </div>
 
-            {/* ===== YEAR 1 VS YEAR 2 COMPARISON ===== */}
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Year 1 Card */}
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-bold text-gray-500">1</span>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[#1e2749]">Year 1: LAUNCH</h3>
-                    <p className="text-xs text-gray-500">Build Foundation</p>
-                  </div>
-                </div>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2 text-sm text-gray-600">
-                    <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>10 pilot teachers introduced to TDI</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-600">
-                    <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>2 on-site observation days</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-600">
-                    <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Initial strategy implementation</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-600">
-                    <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                    <span>Hub access and resource exploration</span>
-                  </li>
-                </ul>
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-xs text-gray-500">
-                    <span className="font-medium text-[#1e2749]">Focus:</span> Learn TDI strategies, build trust, see early wins
-                  </p>
-                </div>
-              </div>
-
-              {/* Year 2 Card */}
-              <div className="bg-gradient-to-br from-[#38618C]/5 to-[#35A7FF]/10 rounded-xl p-6 shadow-sm border-2 border-[#38618C]/30 relative overflow-hidden">
-                <div className="absolute top-3 right-3 bg-[#ffba06] text-[#1e2749] text-xs font-bold px-2 py-1 rounded-full">
-                  RECOMMENDED
-                </div>
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-[#38618C] rounded-full flex items-center justify-center">
-                    <span className="text-lg font-bold text-white">2</span>
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-[#1e2749]">Year 2: ACCELERATE</h3>
-                    <p className="text-xs text-[#38618C]">Expand & Deepen</p>
-                  </div>
-                </div>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-2 text-sm text-gray-700">
-                    <Rocket className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
-                    <span><strong>Expand team</strong> -  add more teachers schoolwide</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-700">
-                    <Repeat className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
-                    <span><strong>Full-year support</strong> -  August to July</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-700">
-                    <Award className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
-                    <span><strong>Teacher leaders emerge</strong> -  pilot teachers mentor new members</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-700">
-                    <TrendingUp className="w-4 h-4 text-[#38618C] mt-0.5 flex-shrink-0" />
-                    <span><strong>Deeper implementation</strong> -  strategies become habits</span>
-                  </li>
-                </ul>
-                <div className="mt-4 pt-4 border-t border-[#38618C]/20">
-                  <p className="text-xs text-gray-600">
-                    <span className="font-medium text-[#1e2749]">Focus:</span> Scale impact, build internal capacity, sustain momentum
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* ===== WHY SCHOOLS CONTINUE ===== */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 mb-6">
-                <BarChart3 className="w-5 h-5 text-[#38618C]" />
-                <h3 className="font-bold text-[#1e2749]">Why Schools Continue with TDI</h3>
-              </div>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="text-center p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl border border-green-200">
-                  <div className="text-3xl font-bold text-green-600 mb-1">92%</div>
-                  <div className="text-xs text-gray-600">Partner Renewal Rate</div>
-                  <div className="text-[10px] text-gray-400 mt-1">Schools that renew for Year 2+</div>
-                </div>
-                <div className="text-center p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl border border-blue-200">
-                  <div className="text-3xl font-bold text-[#38618C] mb-1">4.8/5</div>
-                  <div className="text-xs text-gray-600">Satisfaction Rating</div>
-                  <div className="text-[10px] text-gray-400 mt-1">End-of-year surveys</div>
-                </div>
-                <div className="text-center p-4 bg-gradient-to-br from-purple-50 to-purple-100 rounded-xl border border-purple-200">
-                  <div className="text-3xl font-bold text-purple-600 mb-1">3.2x</div>
-                  <div className="text-xs text-gray-600">Deeper Implementation</div>
-                  <div className="text-[10px] text-gray-400 mt-1">Year 2 vs Year 1 strategy use</div>
-                </div>
-                <div className="text-center p-4 bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl border border-amber-200">
-                  <div className="text-3xl font-bold text-amber-600 mb-1">87%</div>
-                  <div className="text-xs text-gray-600">Retention Intent</div>
-                  <div className="text-[10px] text-gray-400 mt-1">Teachers planning to stay in profession</div>
-                </div>
-              </div>
-            </div>
-
-            {/* ===== TESTIMONIALS ===== */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Quote className="w-5 h-5 text-[#38618C]" />
-                <h3 className="font-bold text-[#1e2749]">What Year 2 Partners Say</h3>
-              </div>
-              <div className="grid md:grid-cols-2 gap-4">
-                {/* Testimonial 1 */}
-                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 relative">
-                  <div className="absolute -top-2 -left-2 w-8 h-8 bg-[#ffba06] rounded-full flex items-center justify-center">
-                    <Quote className="w-4 h-4 text-[#1e2749]" />
-                  </div>
-                  <p className="text-gray-600 text-sm italic mb-4 pl-4">
-                    &quot;Year 2 was when everything clicked. Our pilot teachers became mentors,
-                    and the strategies became part of our school culture -  not just something
-                    a few teachers were trying.&quot;
-                  </p>
-                  <div className="flex items-center gap-3 pl-4">
-                    <div className="w-10 h-10 bg-[#38618C]/10 rounded-full flex items-center justify-center">
-                      <User className="w-5 h-5 text-[#38618C]" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-[#1e2749] text-sm">Principal Martinez</p>
-                      <p className="text-xs text-gray-500">Year 3 Partner School</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Testimonial 2 */}
-                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 relative">
-                  <div className="absolute -top-2 -left-2 w-8 h-8 bg-[#ffba06] rounded-full flex items-center justify-center">
-                    <Quote className="w-4 h-4 text-[#1e2749]" />
-                  </div>
-                  <p className="text-gray-600 text-sm italic mb-4 pl-4">
-                    &quot;I was skeptical about another PD program, but TDI is different.
-                    By Year 2, I was leading sessions for new teachers. That&apos;s never
-                    happened with any other program.&quot;
-                  </p>
-                  <div className="flex items-center gap-3 pl-4">
-                    <div className="w-10 h-10 bg-[#38618C]/10 rounded-full flex items-center justify-center">
-                      <GraduationCap className="w-5 h-5 text-[#38618C]" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-[#1e2749] text-sm">5th Grade Teacher</p>
-                      <p className="text-xs text-gray-500">Year 1 → Year 2 Participant</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Year 2 Planning Tip */}
-            <div className="flex items-start gap-3 p-4 bg-gradient-to-r from-[#38618C]/5 to-[#35A7FF]/5 rounded-xl border border-[#38618C]/10">
-              <Lightbulb className="w-5 h-5 text-[#38618C] mt-0.5 flex-shrink-0" />
-              <div>
-                <p className="text-sm text-[#1e2749] font-medium mb-1">How to use this preview</p>
-                <p className="text-xs text-gray-600">
-                  This isn&apos;t a commitment -  it&apos;s a conversation starter. Use these options to think about what
-                  makes sense for YOUR school. We&apos;ll customize any Year 2 plan based on your goals, budget, and capacity.
-                </p>
-              </div>
-            </div>
-
-            {/* What Year 2 Includes */}
-            <div className="space-y-4">
-              <h3 className="font-bold text-[#1e2749] text-lg flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-[#35A7FF]" />
-                What Year 2 Could Include
-              </h3>
-
-              <div className="grid gap-4">
-                {/* Expand Your Team */}
-                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Users className="w-6 h-6 text-[#38618C]" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-semibold text-[#1e2749]">Expand Your Team</h4>
-                        <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full font-medium">Year 2 Feature</span>
-                      </div>
-                      <p className="text-gray-600 text-sm">
-                        Bring additional teachers into the TDI community -  gen ed, specialists, or department teams ready for sustainable PD.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Continued Pilot Support */}
-                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <RefreshCw className="w-6 h-6 text-[#38618C]" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-semibold text-[#1e2749]">Continued Pilot Support</h4>
-                        <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full font-medium">Year 2 Feature</span>
-                      </div>
-                      <p className="text-gray-600 text-sm">
-                        Your original 10 teachers keep growing with additional observation cycles and targeted coaching.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Teacher Leadership Pathway */}
-                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Award className="w-6 h-6 text-[#38618C]" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-semibold text-[#1e2749]">Teacher Leadership Pathway</h4>
-                        <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full font-medium">Year 2 Feature</span>
-                      </div>
-                      <p className="text-gray-600 text-sm">
-                        Your pilot teachers become in-house mentors -  modeling strategies and supporting new team members as they onboard.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Full-Year Implementation */}
-                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-[#38618C]/10 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Calendar className="w-6 h-6 text-[#38618C]" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between mb-1">
-                        <h4 className="font-semibold text-[#1e2749]">Full-Year Implementation</h4>
-                        <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-2 py-1 rounded-full font-medium">Year 2 Feature</span>
-                      </div>
-                      <p className="text-gray-600 text-sm">
-                        Start in August with a full school year of support -  not just spring semester.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            {/* ===== TWO-COLUMN LAYOUT: PACKAGE + TIMELINE ===== */}
-            <div className="grid md:grid-cols-5 gap-6">
-              {/* Left Column: Year 2 Package (2 cols) */}
-              <div className="md:col-span-2 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <div className="flex items-center gap-2 mb-4">
-                  <Package className="w-5 h-5 text-[#38618C]" />
-                  <h3 className="font-bold text-[#1e2749]">Year 2 Package</h3>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4 p-3 bg-[#38618C]/5 rounded-lg">
-                    <div className="text-3xl font-bold text-[#38618C]">2</div>
-                    <div>
-                      <p className="font-medium text-[#1e2749] text-sm">On-Site Days</p>
-                      <p className="text-xs text-gray-500">Classroom observations + coaching</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 p-3 bg-[#35A7FF]/5 rounded-lg">
-                    <div className="text-3xl font-bold text-[#35A7FF]">4</div>
-                    <div>
-                      <p className="font-medium text-[#1e2749] text-sm">Virtual Sessions</p>
-                      <p className="text-xs text-gray-500">Strategy deep-dives & check-ins</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 p-3 bg-[#1e2749]/5 rounded-lg">
-                    <div className="text-3xl font-bold text-[#1e2749]">3</div>
-                    <div>
-                      <p className="font-medium text-[#1e2749] text-sm">Leadership Sessions</p>
-                      <p className="text-xs text-gray-500">Goal setting & progress review</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4 p-3 bg-green-50 rounded-lg">
-                    <div className="text-2xl font-bold text-green-600">Hub</div>
-                    <div>
-                      <p className="font-medium text-[#1e2749] text-sm">Full Access</p>
-                      <p className="text-xs text-gray-500">All teachers, all year</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <p className="text-xs text-gray-500 flex items-center gap-1">
-                    <CheckCircle className="w-3 h-3 text-green-500" />
-                    Customizable based on your school&apos;s needs
-                  </p>
-                </div>
-              </div>
-
-              {/* Right Column: Timeline (3 cols) */}
-              <div className="md:col-span-3 bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 className="font-semibold text-gray-800 mb-2">Proposed 2026-27 Timeline</h3>
-                <p className="text-sm text-gray-500 mb-4">Phase 2 (ACCELERATE) -  Expanding Schoolwide</p>
-
-                <div className="space-y-2 max-h-[500px] overflow-y-auto pr-2">
-                  {/* 1. July/August - Leadership Planning */}
-                  <TimelineAccordion id="timeline-1" number={1} date="July/August 2026" title="Leadership Planning Session" type="leadership">
-                    <p className="text-sm text-gray-600 mb-2">
-                      Meet with leadership to set Year 2 goals and identify which grade levels
-                      or departments should join the expanded partnership.
-                    </p>
-                    <ul className="text-sm text-gray-500 space-y-1">
-                      <li>• Review Year 1 data and wins</li>
-                      <li>• Discuss schoolwide expansion strategy</li>
-                      <li>• Plan onboarding for new teachers</li>
-                    </ul>
-                  </TimelineAccordion>
-
-                  {/* 2. September - Kickoff + Observation */}
-                  <TimelineAccordion id="timeline-2" number={2} date="September 2026" title="On-Site Kickoff + Observation Day #1" type="onsite">
-                    <p className="text-sm text-gray-600 mb-2">
-                      Welcome new teachers to the TDI community, activate Hub access,
-                      and conduct classroom observations.
-                    </p>
-                    <ul className="text-sm text-gray-500 space-y-1">
-                      <li>• New teacher onboarding and Hub orientation</li>
-                      <li>• Classroom observations for all participating teachers</li>
-                      <li>• Personalized Love Notes with specific feedback</li>
-                    </ul>
-                  </TimelineAccordion>
-
-                  {/* 3. October - Virtual #1 */}
-                  <TimelineAccordion id="timeline-3" number={3} date="October 2026" title="Virtual Session #1" type="virtual">
-                    <p className="text-sm text-gray-600">
-                      Build on observation insights. Focus on quick wins and immediate
-                      classroom strategies based on what we saw in September.
-                    </p>
-                  </TimelineAccordion>
-
-                  {/* 4. November - Virtual #2 */}
-                  <TimelineAccordion id="timeline-4" number={4} date="November 2026" title="Virtual Session #2" type="virtual">
-                    <p className="text-sm text-gray-600">
-                      Deep dive into classroom management strategies tailored to
-                      the needs we&apos;ve identified across your team.
-                    </p>
-                  </TimelineAccordion>
-
-                  {/* 5. December - Mid-Year Check-in */}
-                  <TimelineAccordion id="timeline-5" number={5} date="December 2026" title="Mid-Year Leadership Check-in" type="leadership">
-                    <p className="text-sm text-gray-600 mb-2">
-                      Pause to celebrate first-semester wins and adjust strategy for spring.
-                    </p>
-                    <ul className="text-sm text-gray-500 space-y-1">
-                      <li>• Review Hub engagement data</li>
-                      <li>• Celebrate teacher growth</li>
-                      <li>• Adjust focus areas for spring</li>
-                    </ul>
-                  </TimelineAccordion>
-
-                  {/* 6. January - Virtual #3 */}
-                  <TimelineAccordion id="timeline-6" number={6} date="January 2027" title="Virtual Session #3" type="virtual">
-                    <p className="text-sm text-gray-600">
-                      Fresh start energy! Focus on sustainability and preventing
-                      spring burnout with practical strategies.
-                    </p>
-                  </TimelineAccordion>
-
-                  {/* 7. February - Observation #2 */}
-                  <TimelineAccordion id="timeline-7" number={7} date="February 2027" title="On-Site Observation Day #2" type="onsite">
-                    <p className="text-sm text-gray-600 mb-2">
-                      Follow-up observations to see growth and provide fresh feedback.
-                    </p>
-                    <ul className="text-sm text-gray-500 space-y-1">
-                      <li>• Compare to September observations</li>
-                      <li>• New Love Notes with growth-focused feedback</li>
-                      <li>• Identify teachers ready for leadership roles</li>
-                    </ul>
-                  </TimelineAccordion>
-
-                  {/* 8. March - Virtual #4 */}
-                  <TimelineAccordion id="timeline-8" number={8} date="March 2027" title="Virtual Session #4" type="virtual">
-                    <p className="text-sm text-gray-600">
-                      Leadership development and finishing the year strong.
-                      Focus on sustaining momentum through testing season.
-                    </p>
-                  </TimelineAccordion>
-
-                  {/* 9. April - Celebration */}
-                  <TimelineAccordion id="timeline-9" number={9} date="April 2027" title="Year 2 Celebration + Year 3 Planning" type="celebration">
-                    <p className="text-sm text-gray-600 mb-2">
-                      Celebrate your team&apos;s growth and discuss continuing the partnership.
-                    </p>
-                    <ul className="text-sm text-gray-500 space-y-1">
-                      <li>• Review year-over-year data</li>
-                      <li>• Celebrate individual and team wins</li>
-                      <li>• Discuss Year 3 options (SUSTAIN phase)</li>
-                    </ul>
-                  </TimelineAccordion>
-                </div>
-              </div>
-            </div>
-
-            {/* Recommendation Card */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
-              <div className="flex items-start gap-3">
-                <Lightbulb className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Recommendation</h4>
-                  <p className="text-sm text-gray-700 mb-3">
-                    Your new teacher pilot team is building strong foundations.
-                    Year 2 is the perfect opportunity to expand this support schoolwide.
-                  </p>
-                  <p className="text-sm text-gray-700 font-medium mb-2">Questions worth discussing:</p>
-                  <ul className="text-sm text-gray-700 mb-4 space-y-2 ml-4">
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-600 mt-1">•</span>
-                      <span>Which grade levels or departments would benefit most from joining Year 2?</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-amber-600 mt-1">•</span>
-                      <span>Are there teachers who&apos;ve expressed interest in the strategies your pilot team is using?</span>
-                    </li>
-                  </ul>
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-sm font-medium text-amber-700 hover:text-amber-800"
-                  >
-                    Discuss at Spring Celebration
-                    <ArrowRight className="w-4 h-4" />
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* ===== GOAL METRICS SECTION ===== */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 mb-4">
-                <Target className="w-5 h-5 text-[#38618C]" />
-                <h3 className="font-bold text-[#1e2749]">Year 2 Goal Metrics</h3>
-                <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded-full ml-auto">
-                  Set together at planning session
-                </span>
-              </div>
-              <p className="text-sm text-gray-600 mb-4">
-                These are example metrics we can track together. We&apos;ll customize based on Allenwood&apos;s priorities.
-              </p>
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-gray-500 uppercase">Teachers Enrolled</span>
-                    <Users className="w-4 h-4 text-gray-400" />
-                  </div>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-[#1e2749]">10</span>
-                    <ArrowRight className="w-4 h-4 text-gray-400" />
-                    <span className="text-2xl font-bold text-[#38618C]">20+</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">Year 1 → Year 2 target</p>
-                </div>
-
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-gray-500 uppercase">Strategy Implementation</span>
-                    <TrendingUp className="w-4 h-4 text-gray-400" />
-                  </div>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-gray-400">TBD</span>
-                    <ArrowRight className="w-4 h-4 text-gray-400" />
-                    <span className="text-2xl font-bold text-[#38618C]">65%+</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">Baseline → Year 2 target</p>
-                </div>
-
-                <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-medium text-gray-500 uppercase">Teacher Retention</span>
-                    <Heart className="w-4 h-4 text-gray-400" />
-                  </div>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-2xl font-bold text-gray-400">TBD</span>
-                    <ArrowRight className="w-4 h-4 text-gray-400" />
-                    <span className="text-2xl font-bold text-green-600">95%+</span>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">Baseline → Year 2 target</p>
-                </div>
-              </div>
-            </div>
-
-            {/* ===== GREEN CTA FOOTER ===== */}
-            <div className="bg-gradient-to-r from-green-600 to-green-500 rounded-2xl p-8 text-center shadow-lg">
-              <div className="flex justify-center mb-4">
-                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                  <ThumbsUp className="w-6 h-6 text-white" />
-                </div>
-              </div>
-              <h3 className="text-2xl font-bold text-white mb-2">Ready to Talk About Year 2?</h3>
-              <p className="text-white/90 mb-6 max-w-xl mx-auto">
-                We&apos;ll customize the plan to fit YOUR goals -  whether that&apos;s expanding to more teachers, deepening with your current team, or something in between.
-              </p>
-              <a
-                href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-white hover:bg-gray-100 text-green-700 px-8 py-4 rounded-xl font-bold transition-all shadow-md"
+            {/* ===== ACCORDION 1: Year 2 Support Plan ===== */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <button
+                onClick={() => setYear2SupportOpen(!year2SupportOpen)}
+                className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition-colors"
               >
-                <Calendar className="w-5 h-5" />
-                Schedule Year 2 Conversation
-                <ArrowRight className="w-4 h-4" />
-              </a>
-              <p className="text-white/70 text-xs mt-4">
-                No commitment required -  just a conversation about what&apos;s possible
-              </p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-[#38618C]/10 rounded-full flex items-center justify-center">
+                    <Compass className="w-5 h-5 text-[#38618C]" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-bold text-[#1e2749]">Your Year 2 Support Plan</h3>
+                    <p className="text-sm text-gray-500">Full-staff professional development for all 68 educators - here&apos;s what it looks like.</p>
+                  </div>
+                </div>
+                {year2SupportOpen ? (
+                  <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                )}
+              </button>
+
+              {year2SupportOpen && (
+                <div className="px-5 pb-6 space-y-6 border-t border-gray-100">
+                  {/* A. Vision Card */}
+                  <div className="bg-[#1e2749] rounded-xl p-6 text-white mt-4">
+                    <h4 className="text-xl font-bold mb-2">&quot;Together We Will Rise&quot; - powered by year-round support.</h4>
+                    <p className="text-white/90">
+                      Year 1 built the foundation with your pilot team. Year 2 brings every teacher, para, and staff member into the fold - with coaching, tools, and strategies designed around what YOUR students need.
+                    </p>
+                  </div>
+
+                  {/* B. What Full Staff Support Includes */}
+                  <div>
+                    <h4 className="font-semibold text-[#1e2749] mb-4">What Full Staff Support Includes</h4>
+                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <BookOpen className="w-5 h-5 text-[#38618C]" />
+                          <span className="font-medium text-[#1e2749]">Learning Hub (68 staff)</span>
+                        </div>
+                        <p className="text-xl font-bold text-[#38618C] mb-1">$12,240</p>
+                        <p className="text-sm text-gray-600">Year-round digital PD - differentiation, inclusion, EL strategies, autism support</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Eye className="w-5 h-5 text-[#38618C]" />
+                          <span className="font-medium text-[#1e2749]">On-Campus Coaching (2 days)</span>
+                        </div>
+                        <p className="text-xl font-bold text-[#38618C] mb-1">$12,000</p>
+                        <p className="text-sm text-gray-600">Classroom observations with real-time feedback and strategy modeling</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Star className="w-5 h-5 text-[#38618C]" />
+                          <span className="font-medium text-[#1e2749]">Executive Impact Sessions (4)</span>
+                        </div>
+                        <p className="text-xl font-bold text-[#38618C] mb-1">$6,000</p>
+                        <p className="text-sm text-gray-600">Leadership development for Principal and AP</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <MessageCircle className="w-5 h-5 text-[#38618C]" />
+                          <span className="font-medium text-[#1e2749]">Virtual Strategy Sessions (4)</span>
+                        </div>
+                        <p className="text-xl font-bold text-[#38618C] mb-1">$6,000</p>
+                        <p className="text-sm text-gray-600">Follow-up coaching for implementation support</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <BarChart3 className="w-5 h-5 text-[#38618C]" />
+                          <span className="font-medium text-[#1e2749]">Leadership Dashboard</span>
+                        </div>
+                        <p className="text-xl font-bold text-[#38618C] mb-1">$9,999</p>
+                        <p className="text-sm text-gray-600">Track PD progress, outcomes, and compliance reporting</p>
+                      </div>
+                      <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                        <div className="flex items-center gap-2 mb-2">
+                          <BookOpen className="w-5 h-5 text-[#38618C]" />
+                          <span className="font-medium text-[#1e2749]">TDI Books (68 copies)</span>
+                        </div>
+                        <p className="text-xl font-bold text-[#38618C] mb-1">$1,632</p>
+                        <p className="text-sm text-gray-600">Building-wide collegial book study</p>
+                      </div>
+                    </div>
+                    <div className="mt-4 p-4 bg-[#38618C]/5 rounded-xl text-center">
+                      <p className="font-bold text-[#1e2749]">$47,871 total · $704 per staff member · $144 per student</p>
+                    </div>
+                  </div>
+
+                  {/* C. Projected Outcomes */}
+                  <div className="bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl p-5 border border-teal-200">
+                    <h4 className="font-semibold text-[#1e2749] mb-4">What schools like Allenwood experience with full-year TDI support:</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-teal-600">65%</div>
+                        <div className="text-sm font-medium text-gray-700">Strategy Implementation</div>
+                        <div className="text-xs text-gray-500">vs. 10% industry average</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-teal-600">8→5</div>
+                        <div className="text-sm font-medium text-gray-700">Stress Reduction</div>
+                        <div className="text-xs text-gray-500">on a 10-point scale</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-teal-600">12→7hrs</div>
+                        <div className="text-sm font-medium text-gray-700">Weekly Planning Time</div>
+                        <div className="text-xs text-gray-500">freed for actual teaching</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-3xl font-bold text-teal-600">+Retention</div>
+                        <div className="text-sm font-medium text-gray-700">Teachers Stay</div>
+                        <div className="text-xs text-gray-500">when they feel supported</div>
+                      </div>
+                    </div>
+                    <p className="text-xs text-gray-500 text-center mt-4">Based on verified outcomes from TDI partner schools after 3-4 months.</p>
+                  </div>
+
+                  {/* D. Aligned to Your Priorities */}
+                  <div>
+                    <h4 className="font-semibold text-[#1e2749] mb-4">Aligned to Your Priorities</h4>
+                    <div className="space-y-3">
+                      <div className="grid md:grid-cols-2 gap-2">
+                        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                          <p className="text-sm text-amber-800 font-medium">Math proficiency at 5-8%</p>
+                        </div>
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-teal-800">Evidence-based math coaching + differentiation modules in Hub</p>
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-2">
+                        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                          <p className="text-sm text-amber-800 font-medium">30% novice teachers</p>
+                        </div>
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-teal-800">Mentoring, classroom management PD, real-time coaching</p>
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-2">
+                        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                          <p className="text-sm text-amber-800 font-medium">46-54% Hispanic/EL population</p>
+                        </div>
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-teal-800">EL instructional strategies; Spanish translation coming to all content</p>
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-2">
+                        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                          <p className="text-sm text-amber-800 font-medium">Autism &amp; special education</p>
+                        </div>
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-teal-800">Autism Support Bundle + Inclusion courses; coaching for paras and teachers</p>
+                        </div>
+                      </div>
+                      <div className="grid md:grid-cols-2 gap-2">
+                        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                          <p className="text-sm text-amber-800 font-medium">PBIS school culture</p>
+                        </div>
+                        <div className="bg-teal-50 rounded-lg p-3 border border-teal-200">
+                          <p className="text-sm text-teal-800">SEL strategies, restorative practices, trauma-informed approaches in Hub</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* E. Early Access Opportunity */}
+                  <div className="bg-amber-50 border-2 border-amber-300 rounded-xl p-5">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sparkles className="w-5 h-5 text-amber-600" />
+                      <h4 className="font-bold text-gray-900">Start Before Fall: Early Hub Access</h4>
+                    </div>
+                    <p className="text-gray-700 mb-3">
+                      Sign your Year 2 agreement by March and your full staff of 68 gets Learning Hub access starting immediately - that&apos;s 4 extra months to explore, build confidence with tools, and hit the ground running in August.
+                    </p>
+                    <p className="text-sm text-amber-700 font-medium">
+                      Your pilot team&apos;s explorer has already completed content in 4 courses. Imagine what 68 educators could do with a head start.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+            </div>
+
+            {/* ===== ACCORDION 2: Funding ===== */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <button
+                onClick={() => setFundingOpen(!fundingOpen)}
+                className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <DollarSign className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-bold text-[#1e2749]">Funding - 90% of the Work Is Done</h3>
+                    <p className="text-sm text-gray-500">Three ready-to-submit funding paths. Your team picks one - we handle the paperwork.</p>
+                  </div>
+                </div>
+                {fundingOpen ? (
+                  <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                )}
+              </button>
+
+              {fundingOpen && (
+                <div className="px-5 pb-6 space-y-6 border-t border-gray-100">
+                  {/* A. Key Message Banner */}
+                  <div className="bg-amber-50 rounded-xl p-5 text-center mt-4">
+                    <p className="text-gray-800">
+                      <span className="font-bold">90% of the funding work is already done.</span> We&apos;ve written the budget justifications, grant narratives, and compliance language. <span className="font-bold">Your team picks a path - we handle the paperwork.</span>
+                    </p>
+                  </div>
+
+                  {/* B. Who Does What */}
+                  <div>
+                    <p className="text-center text-gray-600 mb-4">We mapped 16 tasks to get this funded. We handle 90% of them. Here&apos;s the breakdown:</p>
+                    <div className="grid md:grid-cols-2 gap-4">
+                      {/* We Handle */}
+                      <div className="bg-teal-50 rounded-xl p-5 border border-teal-200">
+                        <div className="flex items-center gap-2 mb-4">
+                          <Shield className="w-5 h-5 text-teal-600" />
+                          <h4 className="font-bold text-teal-700">We Handle · 90%</h4>
+                        </div>
+                        <ul className="space-y-2">
+                          {[
+                            'Write all budget narratives & justification language',
+                            'Prepare grant application drafts for foundations',
+                            'Complete vendor registration & compliance docs',
+                            'Draft DonorsChoose project pages for teachers',
+                            'Provide itemized invoices matching budget lines',
+                            'Deliver scope of work for PGCPS procurement',
+                            'Supply evidence-of-effectiveness documentation',
+                            'Monthly follow-up support & check-ins',
+                            'Grant compliance reporting via Dashboard'
+                          ].map((item, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                              <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Your Team's Part */}
+                      <div className="bg-amber-50 rounded-xl p-5 border border-amber-200">
+                        <div className="flex items-center gap-2 mb-4">
+                          <FileText className="w-5 h-5 text-amber-600" />
+                          <h4 className="font-bold text-amber-700">Your Team&apos;s Part · 10%</h4>
+                        </div>
+                        <ul className="space-y-2">
+                          {[
+                            'Choose which funding path works best (A, B, or C)',
+                            'Submit the budget request through PGCPS channels',
+                            'Sign off on the partnership agreement',
+                            "That's it - we've prepared everything else"
+                          ].map((item, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                              <ArrowRight className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* C. Three Funding Paths */}
+                  <div>
+                    <h4 className="font-semibold text-[#1e2749] mb-4">Three Funding Paths</h4>
+                    <div className="grid md:grid-cols-3 gap-4">
+                      {/* Path A */}
+                      <div
+                        className={`rounded-xl border-2 transition-all cursor-pointer ${activeFundingPath === 'A' ? 'border-green-500 bg-green-50' : 'border-gray-200 bg-white hover:border-green-300'}`}
+                        onClick={() => setActiveFundingPath(activeFundingPath === 'A' ? null : 'A')}
+                      >
+                        <div className="p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Zap className="w-5 h-5 text-green-600" />
+                            <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Fastest</span>
+                          </div>
+                          <h5 className="font-bold text-[#1e2749] mb-1">Path A</h5>
+                          <p className="text-sm text-gray-600">One request, one approval. Full amount through Title I or Title II-A.</p>
+                        </div>
+                        {activeFundingPath === 'A' && (
+                          <div className="px-4 pb-4 border-t border-green-200 pt-3">
+                            <div className="h-3 bg-green-500 rounded-full mb-3"></div>
+                            <p className="text-xs text-gray-500 mb-2">100% from single source</p>
+                            <div className="space-y-2 text-xs">
+                              <div className="flex items-center gap-2">
+                                <span className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-bold">1</span>
+                                <span>Choose Title I or Title II-A</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-bold">2</span>
+                                <span>Submit to Instructional Director</span>
+                                <span className="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-[10px]">Pre-written</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center text-green-700 font-bold">3</span>
+                                <span>Approval &amp; contracting</span>
+                                <span className="bg-green-100 text-green-700 px-1.5 py-0.5 rounded text-[10px]">Docs ready</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Path B */}
+                      <div
+                        className={`rounded-xl border-2 transition-all cursor-pointer ${activeFundingPath === 'B' ? 'border-teal-500 bg-teal-50' : 'border-gray-200 bg-white hover:border-teal-300'}`}
+                        onClick={() => setActiveFundingPath(activeFundingPath === 'B' ? null : 'B')}
+                      >
+                        <div className="p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Puzzle className="w-5 h-5 text-teal-600" />
+                            <span className="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full font-medium">Strategic</span>
+                          </div>
+                          <h5 className="font-bold text-[#1e2749] mb-1">Path B</h5>
+                          <p className="text-sm text-gray-600">Split across 4 federal sources. Smaller asks, stronger compliance.</p>
+                        </div>
+                        {activeFundingPath === 'B' && (
+                          <div className="px-4 pb-4 border-t border-teal-200 pt-3">
+                            <div className="flex h-3 rounded-full overflow-hidden mb-2">
+                              <div className="bg-blue-500 w-[38%]"></div>
+                              <div className="bg-teal-500 w-[29%]"></div>
+                              <div className="bg-purple-500 w-[21%]"></div>
+                              <div className="bg-orange-500 w-[12%]"></div>
+                            </div>
+                            <div className="flex flex-wrap gap-1 text-[10px] mb-3">
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-blue-500 rounded"></span>IDEA $18K</span>
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-teal-500 rounded"></span>Title II-A $13.9K</span>
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-purple-500 rounded"></span>Title I $10K</span>
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-orange-500 rounded"></span>Comm $6K</span>
+                            </div>
+                            <div className="space-y-2 text-xs">
+                              <div className="flex items-center gap-2">
+                                <span className="w-5 h-5 bg-teal-100 rounded-full flex items-center justify-center text-teal-700 font-bold">1</span>
+                                <span>Four requests with justifications</span>
+                                <span className="bg-teal-100 text-teal-700 px-1.5 py-0.5 rounded text-[10px]">All 4 pre-written</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="w-5 h-5 bg-teal-100 rounded-full flex items-center justify-center text-teal-700 font-bold">2</span>
+                                <span>Coordinate across budget offices</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="w-5 h-5 bg-teal-100 rounded-full flex items-center justify-center text-teal-700 font-bold">3</span>
+                                <span>Approvals come in stages</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Path C */}
+                      <div
+                        className={`rounded-xl border-2 transition-all cursor-pointer ${activeFundingPath === 'C' ? 'border-orange-500 bg-orange-50' : 'border-gray-200 bg-white hover:border-orange-300'}`}
+                        onClick={() => setActiveFundingPath(activeFundingPath === 'C' ? null : 'C')}
+                      >
+                        <div className="p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Sprout className="w-5 h-5 text-orange-600" />
+                            <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full font-medium">Maximum Leverage</span>
+                          </div>
+                          <h5 className="font-bold text-[#1e2749] mb-1">Path C</h5>
+                          <p className="text-sm text-gray-600">Federal funds + foundation grants. Builds your funding portfolio.</p>
+                        </div>
+                        {activeFundingPath === 'C' && (
+                          <div className="px-4 pb-4 border-t border-orange-200 pt-3">
+                            <div className="flex h-3 rounded-full overflow-hidden mb-2">
+                              <div className="bg-teal-500 w-[58%]"></div>
+                              <div className="bg-red-500 w-[10%]"></div>
+                              <div className="bg-purple-500 w-[10%]"></div>
+                              <div className="bg-orange-500 w-[13%]"></div>
+                              <div className="bg-gray-700 w-[9%]"></div>
+                            </div>
+                            <div className="flex flex-wrap gap-1 text-[10px] mb-3">
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-teal-500 rounded"></span>Federal ~$28K</span>
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-red-500 rounded"></span>NEA $5K</span>
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-purple-500 rounded"></span>OAR $5K</span>
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-orange-500 rounded"></span>McCarthey $6K</span>
+                              <span className="flex items-center gap-1"><span className="w-2 h-2 bg-gray-700 rounded"></span>DC $3.9K</span>
+                            </div>
+                            <div className="space-y-2 text-xs">
+                              <div className="flex items-center gap-2">
+                                <span className="w-5 h-5 bg-orange-100 rounded-full flex items-center justify-center text-orange-700 font-bold">1</span>
+                                <span>District covers ~$28K</span>
+                                <span className="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded text-[10px]">Ready</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="w-5 h-5 bg-orange-100 rounded-full flex items-center justify-center text-orange-700 font-bold">2</span>
+                                <span>Foundation grants ~$20K</span>
+                                <span className="bg-orange-100 text-orange-700 px-1.5 py-0.5 rounded text-[10px]">Pre-written</span>
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <span className="w-5 h-5 bg-orange-100 rounded-full flex items-center justify-center text-orange-700 font-bold">3</span>
+                                <span>Grants arrive on different timelines</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* D. Timeline */}
+                  <div>
+                    <h4 className="font-semibold text-[#1e2749] mb-4">Timeline</h4>
+                    <div className="relative pl-6">
+                      <div className="absolute left-2 top-2 bottom-2 w-0.5 bg-gray-200"></div>
+                      <div className="space-y-4">
+                        <div className="relative flex items-start gap-4">
+                          <div className="absolute left-[-16px] w-4 h-4 rounded-full bg-green-500 border-2 border-white"></div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-semibold text-green-600 uppercase">Completed</span>
+                              <span className="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded">TDI</span>
+                            </div>
+                            <p className="font-medium text-[#1e2749]">Research &amp; Preparation</p>
+                            <p className="text-sm text-gray-500">School profile, grant eligibility, funding strategy, budget narratives all done</p>
+                          </div>
+                        </div>
+                        <div className="relative flex items-start gap-4">
+                          <div className="absolute left-[-16px] w-4 h-4 rounded-full bg-teal-500 border-2 border-white flex items-center justify-center text-[10px] text-white font-bold">1</div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-semibold text-teal-600 uppercase">Monday, March 2</span>
+                              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded">Joint</span>
+                            </div>
+                            <p className="font-medium text-[#1e2749]">Virtual Meeting - Choose Your Path</p>
+                            <p className="text-sm text-gray-500">No homework - just bring questions</p>
+                          </div>
+                        </div>
+                        <div className="relative flex items-start gap-4">
+                          <div className="absolute left-[-16px] w-4 h-4 rounded-full bg-teal-500 border-2 border-white flex items-center justify-center text-[10px] text-white font-bold">2</div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-semibold text-teal-600 uppercase">Week of March 2</span>
+                              <span className="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded">TDI</span>
+                            </div>
+                            <p className="font-medium text-[#1e2749]">We Send You Everything</p>
+                            <p className="text-sm text-gray-500">Completed docs for your chosen path within 48 hours</p>
+                          </div>
+                        </div>
+                        <div className="relative flex items-start gap-4">
+                          <div className="absolute left-[-16px] w-4 h-4 rounded-full bg-teal-500 border-2 border-white flex items-center justify-center text-[10px] text-white font-bold">3</div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-semibold text-teal-600 uppercase">Mid-March</span>
+                              <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded">Allenwood</span>
+                            </div>
+                            <p className="font-medium text-[#1e2749]">Submit the Request</p>
+                            <p className="text-sm text-gray-500">Route pre-written budget request to Instructional Director</p>
+                          </div>
+                        </div>
+                        <div className="relative flex items-start gap-4">
+                          <div className="absolute left-[-16px] w-4 h-4 rounded-full bg-teal-500 border-2 border-white flex items-center justify-center text-[10px] text-white font-bold">4</div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-xs font-semibold text-teal-600 uppercase">March-April</span>
+                              <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded">Joint</span>
+                            </div>
+                            <p className="font-medium text-[#1e2749]">Approval &amp; Kickoff</p>
+                            <p className="text-sm text-gray-500">We handle contracting, scheduling, onboarding</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* E. Funding CTA */}
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
+                    <div className="flex items-start gap-3">
+                      <DollarSign className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <h4 className="font-semibold text-gray-800 mb-2">We Find the Funding. You Focus on Teaching.</h4>
+                        <p className="text-sm text-gray-700 mb-3">
+                          80% of schools we partner with find over $35K in funding for TDI.
+                        </p>
+                        <a
+                          href="/funding"
+                          className="inline-flex items-center gap-2 text-sm font-medium text-amber-700 hover:text-amber-800"
+                        >
+                          Explore Funding Options
+                          <ArrowRight className="w-4 h-4" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* ===== ACCORDION 3: Weekly Staff Messages ===== */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+              <button
+                onClick={() => setWeeklyMessagesOpen(!weeklyMessagesOpen)}
+                className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition-colors"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                    <Mail className="w-5 h-5 text-purple-600" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="font-bold text-[#1e2749]">Weekly Staff Message Ideas</h3>
+                    <p className="text-sm text-gray-500">Ready-to-use blurbs for Dr. Porter&apos;s weekly email to build excitement.</p>
+                  </div>
+                </div>
+                {weeklyMessagesOpen ? (
+                  <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                ) : (
+                  <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                )}
+              </button>
+
+              {weeklyMessagesOpen && (
+                <div className="px-5 pb-6 space-y-4 border-t border-gray-100">
+                  <p className="text-gray-600 mt-4">
+                    These short messages are designed to drop into your weekly staff email. Each one introduces a TDI tool or strategy in a way that feels natural - no extra work for you.
+                  </p>
+
+                  {/* Week 1 */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div className="text-xs font-semibold text-teal-600 uppercase mb-2">Week 1: The Invitation</div>
+                    <p className="text-sm text-gray-500 italic mb-2">Subject line idea: &quot;A New Tool Just for You&quot;</p>
+                    <p className="text-sm text-gray-700">
+                      Team - I&apos;m excited to share that we&apos;re partnering with Teachers Deserve It for next year&apos;s professional development. You now have access to the TDI Learning Hub - a library of short, teacher-created courses you can explore on your own time. No deadlines, no assignments. Just strategies built by educators who get it. Log in when you&apos;re ready.
+                    </p>
+                  </div>
+
+                  {/* Week 2 */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div className="text-xs font-semibold text-teal-600 uppercase mb-2">Week 2: The Quick Win</div>
+                    <p className="text-sm text-gray-500 italic mb-2">Subject line idea: &quot;5 Minutes That Might Change Your Tuesday&quot;</p>
+                    <p className="text-sm text-gray-700">
+                      Have 5 free minutes this week? Try downloading the &quot;Daily Support Cheat Sheet&quot; from the TDI Hub. It&apos;s a one-page reference that several schools use to keep things consistent across classrooms. Some of our pilot team members have already found it helpful.
+                    </p>
+                  </div>
+
+                  {/* Week 3 */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div className="text-xs font-semibold text-teal-600 uppercase mb-2">Week 3: The Explorer Nudge</div>
+                    <p className="text-sm text-gray-500 italic mb-2">Subject line idea: &quot;Your Colleagues Are Already Exploring&quot;</p>
+                    <p className="text-sm text-gray-700">
+                      Quick update - several team members have already started browsing courses in the TDI Hub. The most popular so far? &quot;K-2 Station Rotation Routines&quot; and &quot;Classroom Management Toolkit.&quot; Each one is about 25 minutes. Perfect for a planning period or commute.
+                    </p>
+                  </div>
+
+                  {/* Week 4 */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div className="text-xs font-semibold text-teal-600 uppercase mb-2">Week 4: The Autism/Inclusion Focus</div>
+                    <p className="text-sm text-gray-500 italic mb-2">Subject line idea: &quot;New Resources for Our Unique Learners&quot;</p>
+                    <p className="text-sm text-gray-700">
+                      The TDI Hub just added an Autism Support Bundle with courses on visual routines, communication supports, and sensory-safe transitions. If you work with students who benefit from structured supports, this was built for you. It&apos;s in your Hub under &quot;Autism &amp; Special Education.&quot;
+                    </p>
+                  </div>
+
+                  {/* Week 5 */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div className="text-xs font-semibold text-teal-600 uppercase mb-2">Week 5: The Para Shoutout</div>
+                    <p className="text-sm text-gray-500 italic mb-2">Subject line idea: &quot;Paras - This One&apos;s for You&quot;</p>
+                    <p className="text-sm text-gray-700">
+                      To our incredible paraprofessional team - the TDI Hub has resources designed specifically for your role, including &quot;Building Strong Teacher-Para Partnerships&quot; and support guides for working with diverse learners. You have full access. This is YOUR professional development too.
+                    </p>
+                  </div>
+
+                  {/* Week 6 */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div className="text-xs font-semibold text-teal-600 uppercase mb-2">Week 6: The Strategy Spotlight</div>
+                    <p className="text-sm text-gray-500 italic mb-2">Subject line idea: &quot;One Small Shift, Big Difference&quot;</p>
+                    <p className="text-sm text-gray-700">
+                      This week&apos;s TDI spotlight: &quot;No-Hands-Up Help Systems.&quot; It&apos;s a downloadable resource that gives students more ways to signal they need support without raising a hand. Great for classrooms where students are managing a lot. Takes 5 minutes to read, and you can try it tomorrow.
+                    </p>
+                  </div>
+
+                  {/* Week 7 */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div className="text-xs font-semibold text-teal-600 uppercase mb-2">Week 7: The Bilingual/EL Focus</div>
+                    <p className="text-sm text-gray-500 italic mb-2">Subject line idea: &quot;Supporting Our Multilingual Learners&quot;</p>
+                    <p className="text-sm text-gray-700">
+                      For our team members working with English learners - the Hub includes EL instructional strategies and sheltered instruction techniques. With our school&apos;s incredible multilingual community, these tools help us meet students where they are. Spanish translations are also being added across the platform.
+                    </p>
+                  </div>
+
+                  {/* Week 8 */}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
+                    <div className="text-xs font-semibold text-teal-600 uppercase mb-2">Week 8: The Book Study Teaser</div>
+                    <p className="text-sm text-gray-500 italic mb-2">Subject line idea: &quot;Coming Soon: Our Building-Wide Book Study&quot;</p>
+                    <p className="text-sm text-gray-700">
+                      Next year, every staff member will receive a copy of the Teachers Deserve It book for a building-wide book study. It&apos;s not a textbook - it&apos;s written by educators, for educators. Think of it as your permission slip to prioritize what matters. More details coming soon.
+                    </p>
+                  </div>
+
+                  <p className="text-sm text-gray-500 mt-4">
+                    Feel free to adjust these with your own voice. The goal: by August, your team already feels familiar with the tools.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         )}
