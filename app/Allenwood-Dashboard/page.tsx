@@ -766,10 +766,10 @@ export default function AllenwoodDashboard() {
                     <div className="flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-medium text-teal-700">Observation Day 2</span>
-                        <span className="text-gray-500 text-sm">· February 18, 2026</span>
+                        <span className="text-gray-500 text-sm">· 10 Classrooms · Love Notes Delivered · February 18, 2026</span>
                       </div>
                       {!obsDay2Open && (
-                        <p className="text-sm text-gray-400 mt-1 italic">See what&apos;s planned for this visit...</p>
+                        <p className="text-sm text-gray-400 mt-1 italic">See strengths we celebrated, Love Note samples, and growth opportunities...</p>
                       )}
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
@@ -781,17 +781,181 @@ export default function AllenwoodDashboard() {
                   </button>
 
                   {obsDay2Open && (
-                    <div className="p-4 pt-0 border-t border-gray-100">
-                      <div className="bg-teal-50 rounded-xl p-5 mt-4">
-                        <div className="flex items-start gap-3">
-                          <Eye className="w-5 h-5 text-teal-600 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <p className="text-teal-800 font-medium">Observation complete. Full write-up and Love Notes coming soon.</p>
-                            <p className="text-gray-600 text-sm mt-2">
-                              Personalized Love Notes will be emailed to every teacher observed, with leadership CC&apos;d - just like Observation Day 1.
-                            </p>
+                    <div className="p-4 pt-0 space-y-6 border-t border-gray-100">
+                      {/* What We Did */}
+                      <div className="pt-4">
+                        <h4 className="font-semibold text-gray-800 mb-3">What We Did</h4>
+                        <div className="space-y-2">
+                          {[
+                            'Visited 10 classrooms across grade levels',
+                            'Observed teacher-student interactions, classroom environment, routines, and para support',
+                            'Delivered personalized Love Notes to every teacher observed',
+                            "All Love Notes emailed to teachers with leadership CC'd",
+                            "Identified Hub resources matched to each classroom's specific needs",
+                            'Debrief with school leadership',
+                          ].map((item, i) => (
+                            <div key={i} className="flex items-center gap-2 text-sm text-gray-600">
+                              <Check className="w-4 h-4 text-green-500 flex-shrink-0" />
+                              <span>{item}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* What We Celebrated */}
+                      <div className="bg-teal-50 rounded-xl p-5">
+                        <h4 className="font-semibold text-gray-800 mb-4">Strengths We Saw Across Your Classrooms</h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <Sparkles className="w-4 h-4 text-teal-600" />
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-800">Student-Centered Transitions</p>
+                                <p className="text-sm text-gray-600 mt-1">Teachers used movement, breathing exercises, and creative resets to help students transition between activities - thinking about the whole child.</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <Users className="w-4 h-4 text-teal-600" />
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-800">Strong Small Group Structures</p>
+                                <p className="text-sm text-gray-600 mt-1">Students moved between collaborative groups and independent work with purpose. Teachers balanced whole-class instruction with targeted small group support.</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <BookOpen className="w-4 h-4 text-teal-600" />
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-800">Focused Independent Work</p>
+                                <p className="text-sm text-gray-600 mt-1">Headphones on, reading programs open, math worksheets out - students showed real focus during independent work time across multiple classrooms.</p>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                <Shield className="w-4 h-4 text-teal-600" />
+                              </div>
+                              <div>
+                                <p className="font-medium text-gray-800">Teacher-Para Partnerships</p>
+                                <p className="text-sm text-gray-600 mt-1">Adults in classrooms worked as true teams. Paras showed up ready to support, and teachers created space for that partnership to thrive.</p>
+                              </div>
+                            </div>
                           </div>
                         </div>
+                      </div>
+
+                      {/* Love Note Samples */}
+                      <div>
+                        <h4 className="font-semibold text-gray-800 mb-2">Love Notes from This Visit</h4>
+                        <p className="text-gray-600 text-sm mb-4">
+                          All teachers observed received personalized Love Notes via email. Leadership was CC&apos;d on every note. Here are 6 examples.
+                        </p>
+                        <div className="space-y-3">
+                          <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
+                            <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Your small group setup is working beautifully. Students moved between collab groups and whole-class work without missing a beat, and the encouragement in your voice kept the room energized. When a student asked to staple their own work, that&apos;s ownership in action.&quot;</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 2</p>
+                          </div>
+                          <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
+                            <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Your students were locked into their reading program with headphones on and focused. The problem-solving conversations happening between you and your students showed real trust - they weren&apos;t afraid to work through challenges with you right beside them.&quot;</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 2</p>
+                          </div>
+                          <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
+                            <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Your teacher voice commands attention in all the right ways. The way you chunk directions - &apos;when you&apos;re done with this, go to Dreambox&apos; - gives students a clear path forward. When you work 1:1, your scaffolding is strong and intentional. Students respond to your presence.&quot;</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 2</p>
+                          </div>
+                          <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
+                            <p className="text-gray-700 italic text-sm leading-relaxed">&quot;The movement and breathing transitions are creative and student-centered. Using video and deep breathing to reset the room shows you&apos;re thinking about the whole child - body and mind - before jumping into content. That instinct is exactly right.&quot;</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 2</p>
+                          </div>
+                          <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
+                            <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Your classroom is a space where students with unique needs feel included. We saw students engaged on the carpet and adults working together to support them. The foundation is there - and we have Hub resources that will help take your autism support strategies even further.&quot;</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 2</p>
+                          </div>
+                          <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
+                            <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Your paras are showing up and doing the work. We saw real partnership between teachers and support staff in these classrooms. We&apos;re sending over para-specific tools from the Hub that will give your team even more strategies to support students independently.&quot;</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 2</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Where Small Shifts Could Make a Big Difference */}
+                      <div className="bg-amber-50 rounded-xl p-5 border border-amber-200">
+                        <h4 className="font-semibold text-gray-800 mb-3">Where Small Shifts Could Make a Big Difference</h4>
+                        <ul className="space-y-2 text-sm text-gray-700">
+                          <li className="flex items-start gap-2">
+                            <span className="text-amber-500 mt-0.5">•</span>
+                            <span>Consistent classroom management routines - visual steps on the board or checklists on desks to help students self-start</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-amber-500 mt-0.5">•</span>
+                            <span>Intentional transition prep - breathing and movement exercises work best when prepped before the moment arrives</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-amber-500 mt-0.5">•</span>
+                            <span>Positive reinforcement over volume - calm, specific praise (&quot;good job following those directions, David&quot;) goes further than raising voices</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-amber-500 mt-0.5">•</span>
+                            <span>Purposeful screen time - replacing YouTube with ad-free tools like Insight Timer and curated Hub videos keeps learning intentional</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-amber-500 mt-0.5">•</span>
+                            <span>Para-specific strategies - equipping paras with their own toolkit so they can support students independently</span>
+                          </li>
+                        </ul>
+                      </div>
+
+                      {/* Hub Resources Matched to This Visit */}
+                      <div className="bg-green-50 rounded-xl p-5 border border-green-200">
+                        <div className="flex items-start gap-3 mb-4">
+                          <Sparkles className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <h4 className="font-semibold text-gray-800">Resources We&apos;re Sending Based on What We Saw</h4>
+                            <p className="text-gray-600 text-sm mt-1">After every observation, we match Hub resources to what each classroom actually needs.</p>
+                          </div>
+                        </div>
+                        <ul className="space-y-2 text-sm text-gray-700">
+                          <li className="flex items-start gap-2">
+                            <span className="text-green-500 mt-0.5">•</span>
+                            <span><strong>Calm Response Scripts</strong> - For classrooms where transitions and redirections need a calmer, more consistent approach</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-green-500 mt-0.5">•</span>
+                            <span><strong>Autism Support Bundle</strong> - For classrooms supporting students with unique sensory and communication needs</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-green-500 mt-0.5">•</span>
+                            <span><strong>Para Quick-Start Confidence Kit &amp; SpEd Para Toolkit</strong> - For paras ready to level up their independent support strategies</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-green-500 mt-0.5">•</span>
+                            <span><strong>Station Rotation Routines</strong> - For teachers already using small groups who want smoother transitions between stations</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-green-500 mt-0.5">•</span>
+                            <span><strong>No-Hands-Up Help Systems</strong> - For classrooms where students struggle getting started or staying on task independently</span>
+                          </li>
+                          <li className="flex items-start gap-2">
+                            <span className="text-green-500 mt-0.5">•</span>
+                            <span><strong>Insight Timer (free app)</strong> - Recommended as an ad-free replacement for YouTube during breathing and transition moments</span>
+                          </li>
+                        </ul>
+                      </div>
+
+                      {/* Recommendation */}
+                      <div className="bg-blue-50 rounded-xl p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#3B82F6', borderLeftStyle: 'solid' }}>
+                        <p className="text-gray-700 text-sm">
+                          <span className="font-medium">Recommendation:</span> Your team showed real growth between October and February. The structures are stronger, the partnerships between teachers and paras are visible, and students are showing more independence. Use the upcoming virtual sessions to give your team protected time with the Hub resources matched to their classrooms - that&apos;s where the next shift happens.
+                        </p>
                       </div>
                     </div>
                   )}
