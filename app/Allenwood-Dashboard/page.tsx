@@ -246,7 +246,7 @@ export default function AllenwoodDashboard() {
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Allenwood Elementary School</h1>
             <p className="text-white/80 text-sm">Camp Springs, Maryland | Partner Dashboard</p>
-            <p className="text-xs text-gray-400 mt-1">Data updated February 17, 2026</p>
+            <p className="text-xs text-gray-400 mt-1">Data updated February 18, 2026</p>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <div className="bg-white/10 px-3 py-2 rounded-lg text-center">
@@ -343,9 +343,9 @@ export default function AllenwoodDashboard() {
               <div className="flex items-start gap-3">
                 <Lightbulb className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Recommendation: Follow the Explorer</h4>
+                  <h4 className="font-semibold text-gray-800 mb-2">Recommendation: First Lesson Complete</h4>
                   <p className="text-sm text-gray-700">
-                    Since October, one team member has started exploring - spending time in 4 different courses including Teacher-Tested Hacks, Supporting Students, and Parent Tools. The rest of the team hasn&apos;t returned to the Hub yet. A 5-minute walkthrough at your next team meeting showing where this explorer started could spark the same curiosity across the group.
+                    Good news - your team&apos;s explorer just completed their first full lesson in &apos;Supporting Students Through Their Daily Schedule&apos; and has now spent time in 4 different courses including Teacher-Tested Hacks, Understanding Student Needs, and Parent Tools. That&apos;s real momentum from one person. A 5-minute walkthrough at your next team meeting showing where this explorer started could spark the same curiosity across the group.
                   </p>
                 </div>
               </div>
