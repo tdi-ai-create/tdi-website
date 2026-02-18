@@ -936,6 +936,122 @@ export default function TDIAdminCreatorDetailPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {/* Course Details Card */}
+          <div className="bg-white rounded-xl border border-gray-200 p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3
+                className="font-semibold"
+                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
+              >
+                Course Details
+              </h3>
+              {canEdit && !isEditingDetails && (
+                <button
+                  onClick={() => setIsEditingDetails(true)}
+                  className="text-sm hover:opacity-80"
+                  style={{ color: theme.primary }}
+                >
+                  Edit
+                </button>
+              )}
+            </div>
+
+            {isEditingDetails ? (
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Content Path</label>
+                  <select
+                    value={editedDetails.content_path || ''}
+                    onChange={(e) =>
+                      setEditedDetails({
+                        ...editedDetails,
+                        content_path: (e.target.value as 'blog' | 'download' | 'course') || null,
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                  >
+                    <option value="">Not set</option>
+                    <option value="blog">Blog</option>
+                    <option value="download">Download</option>
+                    <option value="course">Course</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Course Title</label>
+                  <input
+                    type="text"
+                    value={editedDetails.course_title}
+                    onChange={(e) => setEditedDetails({ ...editedDetails, course_title: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Target Audience</label>
+                  <input
+                    type="text"
+                    value={editedDetails.course_audience}
+                    onChange={(e) => setEditedDetails({ ...editedDetails, course_audience: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-600 mb-1">Target Launch</label>
+                  <input
+                    type="text"
+                    value={editedDetails.target_launch_month}
+                    onChange={(e) => setEditedDetails({ ...editedDetails, target_launch_month: e.target.value })}
+                    placeholder="e.g., March 2026"
+                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
+                  />
+                </div>
+                <div className="flex gap-2 pt-2">
+                  <button
+                    onClick={() => setIsEditingDetails(false)}
+                    className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSaveDetails}
+                    disabled={isSaving}
+                    className="flex-1 px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1"
+                    style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                  >
+                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                    Save
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3 text-sm">
+                <div>
+                  <p className="text-gray-500">Content Path</p>
+                  <p className="font-medium capitalize" style={{ color: '#2B3A67' }}>
+                    {creator.content_path || 'Not set'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Course Title</p>
+                  <p className="font-medium" style={{ color: '#2B3A67' }}>
+                    {creator.course_title || 'Not set'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Target Audience</p>
+                  <p className="font-medium" style={{ color: '#2B3A67' }}>
+                    {creator.course_audience || 'Not set'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Target Launch</p>
+                  <p className="font-medium" style={{ color: '#2B3A67' }}>
+                    {creator.target_launch_month || 'Not set'}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
+
           {/* Publish Status Card */}
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center justify-between mb-4">
@@ -1213,122 +1329,6 @@ export default function TDIAdminCreatorDetailPage() {
                 ))
               )}
             </div>
-          </div>
-
-          {/* Course Details Card */}
-          <div className="bg-white rounded-xl border border-gray-200 p-5">
-            <div className="flex items-center justify-between mb-4">
-              <h3
-                className="font-semibold"
-                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
-              >
-                Course Details
-              </h3>
-              {canEdit && !isEditingDetails && (
-                <button
-                  onClick={() => setIsEditingDetails(true)}
-                  className="text-sm hover:opacity-80"
-                  style={{ color: theme.primary }}
-                >
-                  Edit
-                </button>
-              )}
-            </div>
-
-            {isEditingDetails ? (
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">Content Path</label>
-                  <select
-                    value={editedDetails.content_path || ''}
-                    onChange={(e) =>
-                      setEditedDetails({
-                        ...editedDetails,
-                        content_path: (e.target.value as 'blog' | 'download' | 'course') || null,
-                      })
-                    }
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                  >
-                    <option value="">Not set</option>
-                    <option value="blog">Blog</option>
-                    <option value="download">Download</option>
-                    <option value="course">Course</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">Course Title</label>
-                  <input
-                    type="text"
-                    value={editedDetails.course_title}
-                    onChange={(e) => setEditedDetails({ ...editedDetails, course_title: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">Target Audience</label>
-                  <input
-                    type="text"
-                    value={editedDetails.course_audience}
-                    onChange={(e) => setEditedDetails({ ...editedDetails, course_audience: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm text-gray-600 mb-1">Target Launch</label>
-                  <input
-                    type="text"
-                    value={editedDetails.target_launch_month}
-                    onChange={(e) => setEditedDetails({ ...editedDetails, target_launch_month: e.target.value })}
-                    placeholder="e.g., March 2026"
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                  />
-                </div>
-                <div className="flex gap-2 pt-2">
-                  <button
-                    onClick={() => setIsEditingDetails(false)}
-                    className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleSaveDetails}
-                    disabled={isSaving}
-                    className="flex-1 px-3 py-2 rounded-lg text-sm font-medium flex items-center justify-center gap-1"
-                    style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
-                  >
-                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                    Save
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-3 text-sm">
-                <div>
-                  <p className="text-gray-500">Content Path</p>
-                  <p className="font-medium capitalize" style={{ color: '#2B3A67' }}>
-                    {creator.content_path || 'Not set'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Course Title</p>
-                  <p className="font-medium" style={{ color: '#2B3A67' }}>
-                    {creator.course_title || 'Not set'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Target Audience</p>
-                  <p className="font-medium" style={{ color: '#2B3A67' }}>
-                    {creator.course_audience || 'Not set'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Target Launch</p>
-                  <p className="font-medium" style={{ color: '#2B3A67' }}>
-                    {creator.target_launch_month || 'Not set'}
-                  </p>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Website Visibility Card */}

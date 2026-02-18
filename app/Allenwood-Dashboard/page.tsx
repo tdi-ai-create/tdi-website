@@ -500,133 +500,6 @@ export default function AllenwoodDashboard() {
 
             </div>
 
-            {/* Curated Starting Points */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-yellow-100 rounded-full flex items-center justify-center">
-                  <Target className="w-5 h-5 text-yellow-500" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900">Curated Starting Points for Your Team</h3>
-              </div>
-              <p className="text-gray-600 mb-6">
-                Based on our October classroom visits, here are resources that align with what your team is already doing well and where small shifts could make a big difference.
-              </p>
-
-              {/* Quick-Win Downloads */}
-              <div className="mb-6">
-                <h4 className="text-gray-900 font-semibold mb-3 flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-green-500" />
-                  Quick-Win Downloads
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">5 min or less</span>
-                </h4>
-
-                <div className="grid md:grid-cols-3 gap-3">
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
-                    <FileText className="w-5 h-5 text-green-500 mb-2" />
-                    <p className="text-gray-900 font-medium text-sm">The Sentence Starter Guide</p>
-                    <p className="text-gray-500 text-xs mt-1">We saw teachers using calm, clear phrasing. This takes it further.</p>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
-                    <FileText className="w-5 h-5 text-green-500 mb-2" />
-                    <p className="text-gray-900 font-medium text-sm">No-Hands-Up Help Systems</p>
-                    <p className="text-gray-500 text-xs mt-1">Perfect for classrooms managing multiple adults and student needs.</p>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
-                    <FileText className="w-5 h-5 text-green-500 mb-2" />
-                    <p className="text-gray-900 font-medium text-sm">Daily Support Cheat Sheet</p>
-                    <p className="text-gray-500 text-xs mt-1">Great for para consistency across all rooms.</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recommended First Courses */}
-              <div className="mb-6">
-                <h4 className="text-gray-900 font-semibold mb-3 flex items-center gap-2">
-                  <Play className="w-4 h-4 text-blue-500" />
-                  Recommended First Courses
-                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">25-30 min each</span>
-                </h4>
-
-                <div className="space-y-3">
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-gray-900 font-medium">K-2 Station Rotation Routines</p>
-                        <p className="text-gray-500 text-sm mt-1">Color-coded systems, transition countdowns. Matches what&apos;s already working in classrooms like Yvette&apos;s.</p>
-                      </div>
-                      <span className="text-gray-500 text-xs whitespace-nowrap">~25 min</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-gray-900 font-medium">Your Class Runs Smoother When the Flow Makes Sense</p>
-                        <p className="text-gray-500 text-sm mt-1">Transitions and predictable routines. The most common growth area we identified.</p>
-                      </div>
-                      <span className="text-gray-500 text-xs whitespace-nowrap">~25 min</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-gray-900 font-medium">Classroom Management Toolkit</p>
-                        <p className="text-gray-500 text-sm mt-1">Our most-recommended resource from observation feedback. Short videos perfect for lunch or commute.</p>
-                      </div>
-                      <span className="text-gray-500 text-xs whitespace-nowrap">~30 min</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-gray-900 font-medium">Building Strong Teacher-Para Partnerships</p>
-                        <p className="text-gray-500 text-sm mt-1">We saw strong teamwork. This course deepens that foundation.</p>
-                      </div>
-                      <span className="text-gray-500 text-xs whitespace-nowrap">~30 min</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Autism Bundle - NOW LIVE */}
-              <div className="bg-purple-50 border border-purple-200 rounded-xl p-5">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-6 h-6 text-purple-500" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <h4 className="text-gray-900 font-semibold">Autism Support Bundle</h4>
-                      <span className="text-xs bg-purple-200 text-purple-700 px-2 py-0.5 rounded-full">NOW LIVE</span>
-                    </div>
-                    <p className="text-gray-600 text-sm">
-                      Designed for exactly what we saw at Allenwood: visual routines, communication supports, and sensory-safe transitions. Built for both teachers and paras working with unique learners.
-                    </p>
-                    <p className="text-purple-700 text-sm mt-2 font-medium">
-                      Your team has full access. Perfect for classrooms like Carlita&apos;s and Rofiat&apos;s.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Inclusion Bundle - NEW */}
-              <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mt-4">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="bg-purple-600 text-white text-xs font-bold px-2 py-0.5 rounded">NEW</span>
-                  <h4 className="font-semibold text-gray-900">Teachers Deserve Real Inclusion</h4>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  5 courses just added to your team&apos;s access focused on building truly inclusive classrooms.
-                  Pairs well with the support strategies your team is already exploring.
-                </p>
-                <p className="text-gray-500 text-xs mt-2">Added February 2026</p>
-              </div>
-            </div>
-
             {/* Looking Ahead Teaser */}
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
               <div className="flex justify-between items-center">
@@ -1362,570 +1235,159 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Observation Day Accordions */}
+            {/* Section 3: Curated Starting Points */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <button
-                onClick={() => toggleSection('obs-day-1')}
-                className="w-full flex items-center justify-between"
-              >
-                <div className="flex items-center gap-3">
-                  <CheckCircle className="w-6 h-6 text-green-500" />
-                  <div className="text-left">
-                    <h3 className="font-semibold text-gray-800">Observation Day #1 -  October 15, 2025</h3>
-                    <p className="text-sm text-gray-500">10 teachers observed · 10 personalized Love Notes delivered</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">COMPLETE</span>
-                  {openSections['obs-day-1'] ? (
-                    <ChevronDown className="w-5 h-5 text-gray-400" />
-                  ) : (
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
-                  )}
-                </div>
-              </button>
+              <h3 className="font-bold text-[#1e2749] text-lg mb-2">
+                Curated Starting Points for Your Team
+              </h3>
+              <p className="text-gray-600 text-sm mb-6">
+                Based on our October classroom visits, here are resources that align with what your team is already doing well and where small shifts could make a big difference.
+              </p>
 
-              {openSections['obs-day-1'] && (
-                <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
-                  <p className="text-sm text-gray-600 mb-4">Click on each teacher to view their personalized observation notes:</p>
+              {/* Quick-Win Downloads */}
+              <div className="mb-6">
+                <h4 className="text-gray-900 font-semibold mb-3 flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-green-500" />
+                  Quick-Win Downloads
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">5 min or less</span>
+                </h4>
 
-                  {/* Teacher 1 */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleSection('obs-teacher-1')}
-                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
-                    >
-                      <span className="font-medium text-gray-800">Georgette Cruickshank</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">Kindergarten Autism</span>
-                        {openSections['obs-teacher-1'] ? (
-                          <ChevronDown className="w-4 h-4 text-gray-400" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
-                        )}
-                      </div>
-                    </button>
-                    {openSections['obs-teacher-1'] && (
-                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
-                        <p><span className="font-medium text-green-700">Strengths:</span> Excellent rapport with students, calm demeanor, effective use of visual supports</p>
-                        <p><span className="font-medium text-amber-700">Growth area:</span> Consider adding more structured transitions between activities</p>
-                        <p><span className="font-medium text-blue-700">Resource shared:</span> Transition songs toolkit in Hub</p>
-                      </div>
-                    )}
+                <div className="grid md:grid-cols-3 gap-3">
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
+                    <FileText className="w-5 h-5 text-green-500 mb-2" />
+                    <p className="text-gray-900 font-medium text-sm">The Sentence Starter Guide</p>
+                    <p className="text-gray-500 text-xs mt-1">We saw teachers using calm, clear phrasing. This takes it further.</p>
                   </div>
 
-                  {/* Teacher 2 */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleSection('obs-teacher-2')}
-                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
-                    >
-                      <span className="font-medium text-gray-800">Alexander Summerlot</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">1st Autism</span>
-                        {openSections['obs-teacher-2'] ? (
-                          <ChevronDown className="w-4 h-4 text-gray-400" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
-                        )}
-                      </div>
-                    </button>
-                    {openSections['obs-teacher-2'] && (
-                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
-                        <p><span className="font-medium text-green-700">Strengths:</span> Strong classroom routines, positive reinforcement, engaging instruction</p>
-                        <p><span className="font-medium text-amber-700">Growth area:</span> Para communication and role clarity</p>
-                        <p><span className="font-medium text-blue-700">Resource shared:</span> Para alignment guide in Hub</p>
-                      </div>
-                    )}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
+                    <FileText className="w-5 h-5 text-green-500 mb-2" />
+                    <p className="text-gray-900 font-medium text-sm">No-Hands-Up Help Systems</p>
+                    <p className="text-gray-500 text-xs mt-1">Perfect for classrooms managing multiple adults and student needs.</p>
                   </div>
 
-                  {/* Teacher 3 */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleSection('obs-teacher-3')}
-                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
-                    >
-                      <span className="font-medium text-gray-800">Alexander Holmes</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">3rd Grade</span>
-                        {openSections['obs-teacher-3'] ? (
-                          <ChevronDown className="w-4 h-4 text-gray-400" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
-                        )}
-                      </div>
-                    </button>
-                    {openSections['obs-teacher-3'] && (
-                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
-                        <p><span className="font-medium text-green-700">Strengths:</span> Great energy, students clearly engaged</p>
-                        <p><span className="font-medium text-amber-700">Growth area:</span> Attention signals and whole-group management</p>
-                        <p><span className="font-medium text-blue-700">Resource shared:</span> Call-and-response strategies in Hub</p>
-                      </div>
-                    )}
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
+                    <FileText className="w-5 h-5 text-green-500 mb-2" />
+                    <p className="text-gray-900 font-medium text-sm">Daily Support Cheat Sheet</p>
+                    <p className="text-gray-500 text-xs mt-1">Great for para consistency across all rooms.</p>
                   </div>
-
-                  {/* Teacher 4 */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleSection('obs-teacher-4')}
-                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
-                    >
-                      <span className="font-medium text-gray-800">Andrea Johnson</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">Kindergarten</span>
-                        {openSections['obs-teacher-4'] ? (
-                          <ChevronDown className="w-4 h-4 text-gray-400" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
-                        )}
-                      </div>
-                    </button>
-                    {openSections['obs-teacher-4'] && (
-                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
-                        <p><span className="font-medium text-green-700">Strengths:</span> Warm classroom environment, joyful learning atmosphere</p>
-                        <p><span className="font-medium text-amber-700">Growth area:</span> Consistent expectations and follow-through</p>
-                        <p><span className="font-medium text-blue-700">Resource shared:</span> Consequence consistency guide in Hub</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Teacher 5 */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleSection('obs-teacher-5')}
-                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
-                    >
-                      <span className="font-medium text-gray-800">Jasmin Taylor</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">Kindergarten Autism</span>
-                        {openSections['obs-teacher-5'] ? (
-                          <ChevronDown className="w-4 h-4 text-gray-400" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
-                        )}
-                      </div>
-                    </button>
-                    {openSections['obs-teacher-5'] && (
-                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
-                        <p><span className="font-medium text-green-700">Strengths:</span> Patient and caring, strong sensory awareness</p>
-                        <p><span className="font-medium text-amber-700">Growth area:</span> Proactive behavior prevention strategies</p>
-                        <p><span className="font-medium text-blue-700">Resource shared:</span> Antecedent interventions toolkit in Hub</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Teacher 6 */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleSection('obs-teacher-6')}
-                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
-                    >
-                      <span className="font-medium text-gray-800">Traci Wallace</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">4th Math & Science</span>
-                        {openSections['obs-teacher-6'] ? (
-                          <ChevronDown className="w-4 h-4 text-gray-400" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
-                        )}
-                      </div>
-                    </button>
-                    {openSections['obs-teacher-6'] && (
-                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
-                        <p><span className="font-medium text-green-700">Strengths:</span> Strong content knowledge, engaging lessons</p>
-                        <p><span className="font-medium text-amber-700">Growth area:</span> Managing off-task behavior during transitions</p>
-                        <p><span className="font-medium text-blue-700">Resource shared:</span> Quick transitions guide in Hub</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Teacher 7 */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleSection('obs-teacher-7')}
-                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
-                    >
-                      <span className="font-medium text-gray-800">Yvette Whittaker</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">Kindergarten</span>
-                        {openSections['obs-teacher-7'] ? (
-                          <ChevronDown className="w-4 h-4 text-gray-400" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
-                        )}
-                      </div>
-                    </button>
-                    {openSections['obs-teacher-7'] && (
-                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
-                        <p><span className="font-medium text-green-700">Strengths:</span> Nurturing presence, strong relationships with students</p>
-                        <p><span className="font-medium text-amber-700">Growth area:</span> Building student independence</p>
-                        <p><span className="font-medium text-blue-700">Resource shared:</span> Gradual release strategies in Hub</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Teacher 8 */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleSection('obs-teacher-8')}
-                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
-                    >
-                      <span className="font-medium text-gray-800">Carlita Law</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">3rd Grade Autism</span>
-                        {openSections['obs-teacher-8'] ? (
-                          <ChevronDown className="w-4 h-4 text-gray-400" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
-                        )}
-                      </div>
-                    </button>
-                    {openSections['obs-teacher-8'] && (
-                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
-                        <p><span className="font-medium text-green-700">Strengths:</span> Calm environment, consistent daily schedule</p>
-                        <p><span className="font-medium text-amber-700">Growth area:</span> Incorporating more student choice</p>
-                        <p><span className="font-medium text-blue-700">Resource shared:</span> Choice boards toolkit in Hub</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Teacher 9 */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleSection('obs-teacher-9')}
-                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
-                    >
-                      <span className="font-medium text-gray-800">Tia Bowles-Simon</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">5th Grade Autism</span>
-                        {openSections['obs-teacher-9'] ? (
-                          <ChevronDown className="w-4 h-4 text-gray-400" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
-                        )}
-                      </div>
-                    </button>
-                    {openSections['obs-teacher-9'] && (
-                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
-                        <p><span className="font-medium text-green-700">Strengths:</span> Good pacing, age-appropriate expectations</p>
-                        <p><span className="font-medium text-amber-700">Growth area:</span> De-escalation techniques</p>
-                        <p><span className="font-medium text-blue-700">Resource shared:</span> Crisis prevention strategies in Hub</p>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Teacher 10 */}
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <button
-                      onClick={() => toggleSection('obs-teacher-10')}
-                      className="w-full flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 transition-colors"
-                    >
-                      <span className="font-medium text-gray-800">Rofiat Adigun</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-500">Teacher</span>
-                        {openSections['obs-teacher-10'] ? (
-                          <ChevronDown className="w-4 h-4 text-gray-400" />
-                        ) : (
-                          <ChevronRight className="w-4 h-4 text-gray-400" />
-                        )}
-                      </div>
-                    </button>
-                    {openSections['obs-teacher-10'] && (
-                      <div className="p-4 bg-white text-sm text-gray-700 space-y-2">
-                        <p><span className="font-medium text-green-700">Strengths:</span> Enthusiastic, builds strong student rapport</p>
-                        <p><span className="font-medium text-amber-700">Growth area:</span> Classroom organization and systems</p>
-                        <p><span className="font-medium text-blue-700">Resource shared:</span> Classroom setup guide in Hub</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Observation Day 2 - Scheduled */}
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Calendar className="w-6 h-6 text-blue-500" />
-                    <div>
-                      <h3 className="font-semibold text-gray-800">Observation Day #2 -  February 18, 2026</h3>
-                      <p className="text-sm text-gray-500">Follow-up observations + continued coaching</p>
-                    </div>
-                  </div>
-                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">SCHEDULED</span>
                 </div>
               </div>
-            </div>
 
-            {/* SECTION 3: Momentum + Hub Login Progress Ring */}
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Momentum Moment */}
-              <div className="bg-green-50 border border-green-200 rounded-xl p-5">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-green-500" />
+              {/* Recommended First Courses */}
+              <div className="mb-6">
+                <h4 className="text-gray-900 font-semibold mb-3 flex items-center gap-2">
+                  <Play className="w-4 h-4 text-blue-500" />
+                  Recommended First Courses
+                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">25-30 min each</span>
+                </h4>
+
+                <div className="space-y-3">
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-gray-900 font-medium">K-2 Station Rotation Routines</p>
+                        <p className="text-gray-500 text-sm mt-1">Color-coded systems, transition countdowns. Matches what&apos;s already working.</p>
+                      </div>
+                      <span className="text-gray-500 text-xs whitespace-nowrap">~25 min</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-gray-900 font-medium">Your Class Runs Smoother When the Flow Makes Sense</p>
+                        <p className="text-gray-500 text-sm mt-1">Transitions and predictable routines. The most common growth area we identified.</p>
+                      </div>
+                      <span className="text-gray-500 text-xs whitespace-nowrap">~25 min</span>
+                    </div>
+                  </div>
+
+                  <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <p className="text-gray-900 font-medium">Building Strong Teacher-Para Partnerships</p>
+                        <p className="text-gray-500 text-sm mt-1">We saw strong teamwork. This course deepens that foundation.</p>
+                      </div>
+                      <span className="text-gray-500 text-xs whitespace-nowrap">~30 min</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Autism Bundle */}
+              <div className="bg-purple-50 border border-purple-200 rounded-xl p-5">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Sparkles className="w-6 h-6 text-purple-500" />
                   </div>
                   <div>
-                    <p className="text-green-700 font-semibold">First Mover! 🎉</p>
-                  </div>
-                </div>
-                <p className="text-gray-600 text-sm">
-                  One team member has already started <span className="text-gray-900 font-medium">Supporting Students Through Their Daily Schedule</span>. The momentum is building!
-                </p>
-              </div>
-
-              {/* Hub Login Progress Ring */}
-              <div className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="text-sm font-semibold text-gray-900">Hub Login Progress</div>
-                  <span className="text-xs text-gray-400">Goal: 100%</span>
-                </div>
-
-                <div className="flex items-center gap-6">
-                  {/* Progress Ring */}
-                  <div className="relative w-24 h-24">
-                    <svg className="w-24 h-24 transform -rotate-90">
-                      <circle
-                        cx="48"
-                        cy="48"
-                        r="40"
-                        stroke="#E5E7EB"
-                        strokeWidth="8"
-                        fill="none"
-                      />
-                      <circle
-                        cx="48"
-                        cy="48"
-                        r="40"
-                        stroke="#3B82F6"
-                        strokeWidth="8"
-                        fill="none"
-                        strokeDasharray="251"
-                        strokeDashoffset="45"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-2xl font-bold text-gray-900">82%</span>
+                    <div className="flex items-center gap-2 mb-1">
+                      <h4 className="text-gray-900 font-semibold">Autism Support Bundle</h4>
+                      <span className="text-xs bg-purple-200 text-purple-700 px-2 py-0.5 rounded-full">NOW LIVE</span>
                     </div>
-                  </div>
-
-                  {/* Details */}
-                  <div className="flex-1">
-                    <div className="text-xl font-bold text-gray-900">9 <span className="text-base font-normal text-gray-400">/ 11</span></div>
-                    <div className="text-sm text-gray-500 mb-2">teachers logged in</div>
-
-                    <div className="flex gap-3 text-xs">
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                        <span className="text-gray-600">Logged in</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <div className="w-2 h-2 rounded-full bg-gray-200"></div>
-                        <span className="text-gray-600">Not yet (2)</span>
-                      </div>
-                    </div>
+                    <p className="text-gray-600 text-sm">
+                      Designed for exactly what we saw at Allenwood: visual routines, communication supports, and sensory-safe transitions. Built for both teachers and paras working with unique learners.
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* 6. Hub Engagement Details */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-800 mb-2 flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-blue-500" />
-                Hub Engagement Details
+            {/* Section 4: What's Next */}
+            <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-6 border border-amber-200">
+              <h3 className="font-bold text-[#1e2749] text-lg mb-4 flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-amber-600" />
+                What&apos;s Next
               </h3>
 
-              {/* Hub Engagement Tip */}
-              <p className="text-xs text-gray-500 mb-4 flex items-start gap-2">
-                <Lightbulb className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
-                <span><strong>What we&apos;re watching:</strong> 3+ logins = building habits. The goal isn&apos;t just access -  it&apos;s regular use. We&apos;ll re-engage the &quot;Getting Started&quot; group at the Feb observation.</span>
-              </p>
-
-              {/* Stats Row */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <p className="text-2xl font-bold text-green-600">82%</p>
-                  <p className="text-sm text-gray-500">Logged In (9/11)</p>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <p className="text-2xl font-bold text-[#1e2749]">13</p>
-                  <p className="text-sm text-gray-500">Total Logins</p>
-                </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <p className="text-2xl font-bold text-orange-500">2</p>
-                  <p className="text-sm text-gray-500">Need Support</p>
-                </div>
-              </div>
-
-              {/* Visual Progress Bars */}
-              <div className="space-y-4 mb-6">
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Login Rate</span>
-                    <span className="font-medium text-green-600">82%</span>
-                  </div>
-                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-green-500 rounded-full" style={{ width: '82%' }} />
+              <div className="space-y-4">
+                {/* Upcoming Items */}
+                <div className="bg-white/70 rounded-lg p-4 border border-amber-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Check className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-800">Observation Day #2</p>
+                      <p className="text-sm text-gray-600">February 18, 2026 - Scheduled</p>
+                    </div>
                   </div>
                 </div>
 
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">High Engagement (3+ logins)</span>
-                    <span className="font-medium text-green-600">9%</span>
-                  </div>
-                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-green-500 rounded-full" style={{ width: '9%' }} />
+                <div className="bg-white/70 rounded-lg p-4 border border-amber-100">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-5 h-5 text-amber-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-800">Virtual Sessions 2-6</p>
+                        <p className="text-sm text-gray-600">5 sessions remaining before April</p>
+                      </div>
+                    </div>
+                    <a
+                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      Schedule Now
+                    </a>
                   </div>
                 </div>
 
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Building Habits (1-2 logins)</span>
-                    <span className="font-medium text-amber-500">73%</span>
-                  </div>
-                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-400 rounded-full" style={{ width: '73%' }} />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-gray-600">Getting Started (0 logins)</span>
-                    <span className="font-medium text-orange-500">18%</span>
-                  </div>
-                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-orange-400 rounded-full" style={{ width: '18%' }} />
+                <div className="bg-white/70 rounded-lg p-4 border border-amber-100">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <PartyPopper className="w-5 h-5 text-gray-500" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-800">Spring Leadership Celebration</p>
+                      <p className="text-sm text-gray-600">Celebrate wins + Year 2 planning</p>
+                    </div>
                   </div>
                 </div>
               </div>
-
-              {/* Engagement Tiers */}
-              <div className="space-y-3">
-                <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
-                  <div className="w-3 h-3 bg-green-500 rounded-full mt-1.5"></div>
-                  <div>
-                    <span className="font-semibold text-green-800">High Engagement: 1 Teacher</span>
-                    <p className="text-sm text-green-700">Logging in regularly (3+ logins)</p>
-                    <p className="text-xs text-green-600 mt-1">Georgette Cruickshank</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg border border-amber-200">
-                  <div className="w-3 h-3 bg-amber-500 rounded-full mt-1.5"></div>
-                  <div>
-                    <span className="font-semibold text-amber-800">Building Habits: 8 Teachers</span>
-                    <p className="text-sm text-amber-700">Logged in 1-2 times</p>
-                    <p className="text-xs text-amber-600 mt-1">Alexander H., Alexander S., Andrea J., Jasmin T., Traci W., Yvette W., Jovy O., Rofiat A.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                  <div className="w-3 h-3 bg-gray-400 rounded-full mt-1.5"></div>
-                  <div>
-                    <span className="font-semibold text-gray-700">Getting Started: 2 Teachers</span>
-                    <p className="text-sm text-gray-600">Haven&apos;t logged in yet -  we&apos;ll reconnect at Feb observation</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* 7. Teacher Roster */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-2">
-                <Users className="w-5 h-5 text-[#38618C]" />
-                <span className="font-semibold text-[#1e2749]">Teacher Roster</span>
-              </div>
-
-              {/* Teacher Roster Tip */}
-              <p className="text-xs text-gray-500 mb-4 flex items-start gap-2">
-                <Lightbulb className="w-3 h-3 text-gray-400 mt-0.5 flex-shrink-0" />
-                <span><strong>Red rows</strong> = teachers who haven&apos;t logged into the Hub yet. These are great candidates for a quick 1:1 check-in or virtual office hours session.</span>
-              </p>
-
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-2 font-medium text-gray-500">Name</th>
-                      <th className="text-left py-2 font-medium text-gray-500">Role</th>
-                      <th className="text-center py-2 font-medium text-gray-500">Logins</th>
-                      <th className="text-left py-2 font-medium text-gray-500">Last Active</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    <tr>
-                      <td className="py-2">Georgette Cruickshank</td>
-                      <td className="py-2 text-gray-600">Kindergarten Autism</td>
-                      <td className="py-2 text-center"><span className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-xs font-medium">3</span></td>
-                      <td className="py-2 text-gray-500">Oct 22, 2025</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2">Alexander Summerlot</td>
-                      <td className="py-2 text-gray-600">1st Autism</td>
-                      <td className="py-2 text-center"><span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-xs font-medium">2</span></td>
-                      <td className="py-2 text-gray-500">Oct 16, 2025</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2">Alexander Holmes</td>
-                      <td className="py-2 text-gray-600">3rd Grade</td>
-                      <td className="py-2 text-center"><span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-xs font-medium">1</span></td>
-                      <td className="py-2 text-gray-500">Oct 15, 2025</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2">Andrea Johnson</td>
-                      <td className="py-2 text-gray-600">Kindergarten</td>
-                      <td className="py-2 text-center"><span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-xs font-medium">1</span></td>
-                      <td className="py-2 text-gray-500">Oct 15, 2025</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2">Jasmin Taylor</td>
-                      <td className="py-2 text-gray-600">Kindergarten Autism</td>
-                      <td className="py-2 text-center"><span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-xs font-medium">1</span></td>
-                      <td className="py-2 text-gray-500">Oct 15, 2025</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2">Traci Wallace</td>
-                      <td className="py-2 text-gray-600">4th Math &amp; Science</td>
-                      <td className="py-2 text-center"><span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-xs font-medium">1</span></td>
-                      <td className="py-2 text-gray-500">Oct 15, 2025</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2">Yvette Whittaker</td>
-                      <td className="py-2 text-gray-600">Kindergarten</td>
-                      <td className="py-2 text-center"><span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-xs font-medium">1</span></td>
-                      <td className="py-2 text-gray-500">Oct 15, 2025</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2">Jovy Ortiz</td>
-                      <td className="py-2 text-gray-600">Admin</td>
-                      <td className="py-2 text-center"><span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-xs font-medium">1</span></td>
-                      <td className="py-2 text-gray-500">Nov 6, 2025</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2">Rofiat Adigun</td>
-                      <td className="py-2 text-gray-600">Teacher</td>
-                      <td className="py-2 text-center"><span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full text-xs font-medium">1</span></td>
-                      <td className="py-2 text-gray-500">Oct 15, 2025</td>
-                    </tr>
-                    <tr className="bg-red-50">
-                      <td className="py-2">Carlita Law</td>
-                      <td className="py-2 text-gray-600">3rd Grade Autism</td>
-                      <td className="py-2 text-center"><span className="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-medium">0</span></td>
-                      <td className="py-2 text-red-600">Never</td>
-                    </tr>
-                    <tr className="bg-red-50">
-                      <td className="py-2">Tia Bowles-Simon</td>
-                      <td className="py-2 text-gray-600">5th Grade Autism</td>
-                      <td className="py-2 text-center"><span className="bg-red-100 text-red-700 px-2 py-0.5 rounded-full text-xs font-medium">0</span></td>
-                      <td className="py-2 text-red-600">Never</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <p className="text-xs text-gray-500 mt-4 italic">
-                Note: 11 people enrolled (contract is for 10). Last activity was November 6, 2025.
-              </p>
             </div>
 
           </div>
