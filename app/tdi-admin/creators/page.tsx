@@ -105,6 +105,10 @@ interface EnrichedCreator {
   publish_status: 'in_progress' | 'scheduled' | 'published';
   scheduled_publish_date: string | null;
   published_date: string | null;
+  // Archive and post-launch fields
+  status: 'active' | 'archived';
+  post_launch_notes: string | null;
+  previous_project_id: string | null;
   progress?: {
     coreTotal: number;
     coreCompleted: number;
@@ -124,6 +128,7 @@ interface DashboardData {
     waitingOnCreator: number;
     waitingOnTDI: number;
     launched: number;
+    archived: number;
   };
   phaseCounts: {
     onboarding: number;
@@ -284,6 +289,7 @@ export default function CreatorStudioPage() {
   const [filterPublishStatus, setFilterPublishStatus] = useState<string>('all');
   const [showFilters, setShowFilters] = useState(false);
   const [activeStatFilter, setActiveStatFilter] = useState<string | null>(null);
+  const [showArchived, setShowArchived] = useState(false);
 
   // Sort state
   const [sortBy, setSortBy] = useState<'lastActive' | 'progress' | 'name'>('lastActive');
@@ -313,7 +319,10 @@ export default function CreatorStudioPage() {
 
   const loadDashboardData = useCallback(async () => {
     try {
-      const response = await fetch('/api/admin/dashboard-data');
+      const url = showArchived
+        ? '/api/admin/dashboard-data?includeArchived=true'
+        : '/api/admin/dashboard-data';
+      const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
@@ -326,7 +335,7 @@ export default function CreatorStudioPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [showArchived]);
 
   useEffect(() => {
     if (hasAccess) {
@@ -1428,6 +1437,19 @@ export default function CreatorStudioPage() {
                     Clear all filters
                   </button>
                 )}
+                {/* Show Archived Toggle */}
+                <label className="flex items-center gap-2 self-end cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={showArchived}
+                    onChange={(e) => setShowArchived(e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-300"
+                    style={{ accentColor: theme.primary }}
+                  />
+                  <span className="text-sm text-gray-600">
+                    Show Archived {dashboardData?.stats.archived ? `(${dashboardData.stats.archived})` : ''}
+                  </span>
+                </label>
               </div>
             )}
           </div>

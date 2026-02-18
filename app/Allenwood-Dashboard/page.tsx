@@ -671,437 +671,425 @@ export default function AllenwoodDashboard() {
         {/* JOURNEY TAB */}
         {activeTab === 'journey' && (
           <div className="space-y-6">
-            {/* 1. Partnership Goal */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <Target className="w-5 h-5 text-blue-500" />
-                Partnership Goal
-              </h3>
+            {/* Section 1: Partnership Goal */}
+            <div className="bg-gradient-to-br from-[#1e2749] to-[#2d3a5c] rounded-xl p-8 text-center">
+              <p className="text-xl md:text-2xl text-white font-medium leading-relaxed max-w-3xl mx-auto">
+                &quot;Equip Allenwood teachers with practical strategies and resources to build calm, connected classrooms where every student — including those with autism, special needs, and multilingual learners — feels supported and seen.&quot;
+              </p>
+              <p className="text-white/70 text-sm mt-4">
+                Aligned to Dr. Porter&apos;s 2025-26 theme: <span className="text-amber-300 font-medium">Together We Will Rise</span>
+              </p>
+            </div>
 
-              <p className="text-gray-600 mb-6">
-                Support 10 new teachers (new to Allenwood and/or new to the profession) with
-                practical strategies for managing diverse classrooms and building confidence
-                in their first years.
+            {/* Section 2: Academic Context */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-bold text-[#1e2749] text-lg mb-2">
+                Your Team Is Working in One of the Toughest Environments in Maryland
+              </h3>
+              <p className="text-gray-600 text-sm mb-6">
+                These numbers aren&apos;t a grade on your school — they&apos;re the reason this partnership exists. Your teachers show up every day for these students. TDI makes sure they don&apos;t have to do it alone.
               </p>
 
-              {/* Visual flow */}
-              <div className="flex items-center justify-between">
-                <div className="text-center p-4 bg-blue-50 rounded-lg flex-1">
-                  <Heart className="w-6 h-6 text-blue-500 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-gray-700">Supported Teachers</p>
-                </div>
-                <ArrowRight className="w-5 h-5 text-gray-300 mx-2" />
-                <div className="text-center p-4 bg-blue-100 rounded-lg flex-1">
-                  <Users className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-gray-700">Confident Classrooms</p>
-                </div>
-                <ArrowRight className="w-5 h-5 text-gray-300 mx-2" />
-                <div className="text-center p-4 bg-amber-50 rounded-lg flex-1">
-                  <Star className="w-6 h-6 text-amber-500 mx-auto mb-2" />
-                  <p className="text-sm font-medium text-gray-700">Student Success</p>
-                </div>
-              </div>
-            </div>
-
-            {/* 2. Leading Indicators */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-green-500" />
-                  Leading Indicators
-                </h3>
-                <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
-                  Progress Snapshot
-                </span>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div className="text-center p-4 bg-green-50 rounded-lg border border-green-100">
-                  <div className="text-2xl font-bold text-green-600">82%</div>
-                  <div className="text-xs text-gray-600 mt-1">Hub Login Rate</div>
-                  <div className="text-xs text-green-600 mt-1">9 of 11 active</div>
-                </div>
-                <div className="text-center p-4 bg-blue-50 rounded-lg border border-blue-100">
-                  <div className="text-2xl font-bold text-blue-600">100%</div>
-                  <div className="text-xs text-gray-600 mt-1">Love Notes Delivered</div>
-                  <div className="text-xs text-blue-600 mt-1">10 of 10</div>
-                </div>
-                <div className="text-center p-4 bg-amber-50 rounded-lg border border-amber-100">
-                  <div className="text-2xl font-bold text-amber-600">50%</div>
-                  <div className="text-xs text-gray-600 mt-1">Observations Complete</div>
-                  <div className="text-xs text-amber-600 mt-1">1 of 2</div>
-                </div>
-                <div className="text-center p-4 bg-purple-50 rounded-lg border border-purple-100">
-                  <div className="text-2xl font-bold text-purple-600">17%</div>
-                  <div className="text-xs text-gray-600 mt-1">Virtual Sessions</div>
-                  <div className="text-xs text-purple-600 mt-1">1 of 6 complete</div>
-                </div>
-              </div>
-            </div>
-
-            {/* 2b. Success Metrics -  Card Grid with Clear Goals */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex justify-between items-center mb-6">
+              {/* Comparison Bars */}
+              <div className="space-y-6 mb-6">
+                {/* Math Proficiency */}
                 <div>
-                  <h3 className="font-semibold text-[#1e2749] flex items-center gap-2">
-                    <Target className="w-5 h-5 text-[#38618C]" />
-                    Success Metrics
-                  </h3>
-                  <p className="text-sm text-gray-500">What we&apos;ll measure together</p>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-700">Math Proficiency</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-24">Allenwood</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-amber-400 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '8%', minWidth: '40px' }}>
+                          <span className="text-xs font-bold text-amber-900">5-8%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-24">PGCPS District</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-blue-400 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '13%', minWidth: '40px' }}>
+                          <span className="text-xs font-bold text-blue-900">13%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-24">Maryland State</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-teal-400 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '27%', minWidth: '50px' }}>
+                          <span className="text-xs font-bold text-teal-900">25-28%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                <span className="text-xs bg-amber-100 text-amber-700 px-3 py-1 rounded-full">Baseline: TBD</span>
+
+                {/* Reading Proficiency */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-700">Reading Proficiency</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-24">Allenwood</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-amber-400 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '27%', minWidth: '40px' }}>
+                          <span className="text-xs font-bold text-amber-900">27%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-24">PGCPS District</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-blue-400 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '33%', minWidth: '40px' }}>
+                          <span className="text-xs font-bold text-blue-900">33%</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-24">Maryland State</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-teal-400 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '44%', minWidth: '60px' }}>
+                          <span className="text-xs font-bold text-teal-900">42-45%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Context Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <div className="bg-amber-50 rounded-lg p-3 border border-amber-100">
+                  <p className="text-lg font-bold text-amber-700">30%</p>
+                  <p className="text-xs text-gray-600">novice teachers</p>
+                  <p className="text-[10px] text-gray-400 mt-1">Nearly 1 in 3 in first or second year</p>
+                </div>
+                <div className="bg-teal-50 rounded-lg p-3 border border-teal-100">
+                  <p className="text-lg font-bold text-teal-700">74-81%</p>
+                  <p className="text-xs text-gray-600">FRPL</p>
+                  <p className="text-[10px] text-gray-400 mt-1">High economic need</p>
+                </div>
+                <div className="bg-amber-50 rounded-lg p-3 border border-amber-100">
+                  <p className="text-lg font-bold text-amber-700">46-54%</p>
+                  <p className="text-xs text-gray-600">Hispanic/EL</p>
+                  <p className="text-[10px] text-gray-400 mt-1">Multilingual learner population</p>
+                </div>
+                <div className="bg-teal-50 rounded-lg p-3 border border-teal-100">
+                  <p className="text-lg font-bold text-teal-700">333</p>
+                  <p className="text-xs text-gray-600">students</p>
+                  <p className="text-[10px] text-gray-400 mt-1">Every one deserves supported teachers</p>
+                </div>
+              </div>
+            </div>
 
+            {/* Section 3: Leading Indicators - What We're Measuring */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-bold text-[#1e2749] text-lg mb-2">
+                What Full-Year TDI Support Produces
+              </h3>
+              <p className="text-gray-600 text-sm mb-6">
+                Allenwood data coming after Virtual Session 1 baseline survey
+              </p>
+
+              {/* 3-Way Comparison Bars */}
+              <div className="space-y-6">
                 {/* Teacher Stress */}
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <p className="font-medium text-[#1e2749]">Teacher Stress</p>
-                      <p className="text-xs text-gray-400">Lower is better ↓</p>
-                    </div>
-                    <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
-                      <Heart className="w-4 h-4 text-red-500" />
-                    </div>
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-700">Teacher Stress Level</span>
+                    <span className="text-xs text-gray-400">Lower is better</span>
                   </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Industry Avg</span>
-                      <span className="text-red-500 font-medium">8-9/10</span>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-gray-400 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '85%' }}>
+                          <span className="text-xs font-bold text-white">8-9/10</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">TDI Partners</span>
-                      <span className="text-[#38618C] font-medium">5-7/10</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-teal-500 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '60%' }}>
+                          <span className="text-xs font-bold text-white">5-7/10</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between pt-2 border-t border-gray-100">
-                      <span className="text-green-700 font-medium">Your Goal</span>
-                      <span className="text-green-700 font-bold">≤5/10</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-400 w-28">Allenwood</span>
+                      <div className="flex-1 bg-gray-50 rounded-full h-6 overflow-hidden border-2 border-dashed border-gray-300">
+                        <div className="h-full rounded-full flex items-center justify-center">
+                          <span className="text-xs text-gray-400 italic">Coming after VS1</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Strategy Implementation */}
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <p className="font-medium text-[#1e2749]">Implementation</p>
-                      <p className="text-xs text-gray-400">Higher is better ↑</p>
-                    </div>
-                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
-                    </div>
+                {/* Implementation Rate */}
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-700">Strategy Implementation</span>
+                    <span className="text-xs text-gray-400">Higher is better</span>
                   </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Industry Avg</span>
-                      <span className="text-red-500 font-medium">10%</span>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-gray-400 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '10%', minWidth: '45px' }}>
+                          <span className="text-xs font-bold text-white">10%</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">TDI Partners</span>
-                      <span className="text-[#38618C] font-medium">65%</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-teal-500 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '65%' }}>
+                          <span className="text-xs font-bold text-white">65%</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between pt-2 border-t border-gray-100">
-                      <span className="text-green-700 font-medium">Your Goal</span>
-                      <span className="text-green-700 font-bold">≥65%</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-400 w-28">Allenwood</span>
+                      <div className="flex-1 bg-gray-50 rounded-full h-6 overflow-hidden border-2 border-dashed border-gray-300">
+                        <div className="h-full rounded-full flex items-center justify-center">
+                          <span className="text-xs text-gray-400 italic">Coming after VS1</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Retention Intent */}
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <p className="font-medium text-[#1e2749]">Retention Intent</p>
-                      <p className="text-xs text-gray-400">Higher is better ↑</p>
-                    </div>
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Users className="w-4 h-4 text-blue-500" />
-                    </div>
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-700">Retention Intent</span>
+                    <span className="text-xs text-gray-400">Higher is better</span>
                   </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Industry Avg</span>
-                      <span className="text-red-500 font-medium">20-40%</span>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-gray-400 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '30%', minWidth: '55px' }}>
+                          <span className="text-xs font-bold text-white">20-40%</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">TDI Partners</span>
-                      <span className="text-[#38618C] font-medium">98%</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-teal-500 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '98%' }}>
+                          <span className="text-xs font-bold text-white">98%</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between pt-2 border-t border-gray-100">
-                      <span className="text-green-700 font-medium">Your Goal</span>
-                      <span className="text-green-700 font-bold">≥95%</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-400 w-28">Allenwood</span>
+                      <div className="flex-1 bg-gray-50 rounded-full h-6 overflow-hidden border-2 border-dashed border-gray-300">
+                        <div className="h-full rounded-full flex items-center justify-center">
+                          <span className="text-xs text-gray-400 italic">Coming after VS1</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
 
                 {/* Weekly Planning Time */}
-                <div className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <p className="font-medium text-[#1e2749]">Planning Time</p>
-                      <p className="text-xs text-gray-400">Lower is better ↓</p>
-                    </div>
-                    <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center">
-                      <Clock className="w-4 h-4 text-amber-500" />
-                    </div>
+                <div>
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-sm font-medium text-gray-700">Weekly Planning Time</span>
+                    <span className="text-xs text-gray-400">Lower is better</span>
                   </div>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">Industry Avg</span>
-                      <span className="text-red-500 font-medium">12+ hrs</span>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-gray-400 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '80%' }}>
+                          <span className="text-xs font-bold text-white">12+ hrs</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">TDI Partners</span>
-                      <span className="text-[#38618C] font-medium">6-8 hrs</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-28">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-6 overflow-hidden">
+                        <div className="bg-teal-500 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '47%' }}>
+                          <span className="text-xs font-bold text-white">6-8 hrs</span>
+                        </div>
+                      </div>
                     </div>
-                    <div className="flex justify-between pt-2 border-t border-gray-100">
-                      <span className="text-green-700 font-medium">Your Goal</span>
-                      <span className="text-green-700 font-bold">≤8 hrs</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-400 w-28">Allenwood</span>
+                      <div className="flex-1 bg-gray-50 rounded-full h-6 overflow-hidden border-2 border-dashed border-gray-300">
+                        <div className="h-full rounded-full flex items-center justify-center">
+                          <span className="text-xs text-gray-400 italic">Coming after VS1</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
+              </div>
 
+              {/* Legend */}
+              <div className="flex flex-wrap items-center gap-4 mt-6 pt-4 border-t border-gray-100">
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-gray-400 rounded"></div>
+                  <span className="text-xs text-gray-500">Industry Average</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-teal-500 rounded"></div>
+                  <span className="text-xs text-gray-500">TDI Partner Average</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 bg-gray-50 rounded border-2 border-dashed border-gray-300"></div>
+                  <span className="text-xs text-gray-500">Allenwood (pending)</span>
+                </div>
               </div>
 
               {/* Source Citation */}
-              <p className="text-xs text-gray-400 text-center mt-6 pt-4 border-t border-gray-100">
+              <p className="text-xs text-gray-400 text-center mt-4">
                 Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys
               </p>
             </div>
 
-            {/* Journey Tip */}
-            <div className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
-              <Lightbulb className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-              <p className="text-xs text-amber-800">
-                <span className="font-semibold">Timeline tip:</span> Green checkmarks = completed milestones. The blue &quot;NOW&quot; marker shows where you are.
-                Gray items are upcoming -  click the schedule buttons to book them!
-              </p>
-            </div>
-
-            {/* Partnership Timeline */}
+            {/* Section 4: Phase Timeline */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-800 mb-6">Your Partnership Journey</h3>
-
-              <div className="relative">
-                {/* Timeline line */}
-                <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200" />
-
-                <div className="space-y-6">
-                  {/* July - Contract */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center z-10">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-800">Partnership Launched</p>
-                      <p className="text-sm text-gray-500">July 2025 -  Contract signed, goals aligned</p>
-                    </div>
-                  </div>
-
-                  {/* July - Leadership */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center z-10">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-800">Summer Leadership Meeting</p>
-                      <p className="text-sm text-gray-500">July 25, 2025 -  Planning and preparation</p>
-                    </div>
-                  </div>
-
-                  {/* September - Virtual */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center z-10">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-800">Virtual Session #1</p>
-                      <p className="text-sm text-gray-500">September 17, 2025 -  Team kickoff</p>
-                    </div>
-                  </div>
-
-                  {/* October - Observation */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center z-10">
-                      <Check className="w-4 h-4 text-white" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-800">Observation Day #1</p>
-                      <p className="text-sm text-gray-500">October 15, 2025 -  10 teachers observed, 10 Love Notes delivered</p>
-                    </div>
-                  </div>
-
-                  {/* TODAY marker */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-[#35A7FF] flex items-center justify-center z-10 ring-4 ring-[#35A7FF]/20">
-                      <span className="text-white text-xs font-bold">NOW</span>
-                    </div>
-                    <div>
-                      <p className="font-medium text-[#35A7FF]">January 2026</p>
-                      <p className="text-sm text-gray-500">Planning next steps</p>
-                    </div>
-                  </div>
-
-                  {/* February - Observation 2 */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center z-10">
-                      <Calendar className="w-4 h-4 text-gray-500" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-800">Observation Day #2</p>
-                      <p className="text-sm text-gray-500">February 18, 2026 -  Scheduled</p>
-                    </div>
-                  </div>
-
-                  {/* Spring - Celebration */}
-                  <div className="flex items-start gap-4 relative">
-                    <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center z-10">
-                      <PartyPopper className="w-4 h-4 text-gray-500" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-800">Spring Leadership Celebration</p>
-                      <p className="text-sm text-gray-500">Spring 2026 -  Celebrate wins + Year 2 planning</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Upcoming Sessions - Individual Items */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h3 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-blue-500" />
-                UPCOMING SESSIONS
+              <h3 className="font-bold text-[#1e2749] text-lg mb-6">
+                Your Partnership Year at a Glance
               </h3>
 
-              <div className="space-y-3">
-                {/* Observation Day 2 - Scheduled */}
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-blue-600 w-24">Feb 18</span>
-                    <span className="text-gray-800">Observation Day 2</span>
+              {/* 3-Phase Visual Timeline */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                {/* IGNITE Phase - Complete */}
+                <div className="relative">
+                  <div className="bg-gradient-to-br from-amber-400 to-amber-500 rounded-xl p-4 text-white h-full">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-semibold bg-white/20 px-2 py-1 rounded">PHASE 1</span>
+                      <Check className="w-5 h-5" />
+                    </div>
+                    <h4 className="text-lg font-bold mb-1">IGNITE</h4>
+                    <p className="text-xs text-white/80 mb-3">Jul - Oct 2025</p>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3 h-3 flex-shrink-0" />
+                        <span className="line-through opacity-80">Partnership Launch</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3 h-3 flex-shrink-0" />
+                        <span className="line-through opacity-80">Leadership Meeting</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3 h-3 flex-shrink-0" />
+                        <span className="line-through opacity-80">Virtual Session #1</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3 h-3 flex-shrink-0" />
+                        <span className="line-through opacity-80">Observation Day #1</span>
+                      </li>
+                    </ul>
                   </div>
-                  <span className="text-sm text-green-600 flex items-center gap-1">
-                    <Check className="w-4 h-4" />
-                    Scheduled
-                  </span>
+                  {/* Connector arrow */}
+                  <div className="hidden md:block absolute -right-2 top-1/2 -translate-y-1/2 z-10">
+                    <div className="w-4 h-4 bg-amber-400 rotate-45"></div>
+                  </div>
                 </div>
 
-                {/* Virtual Session #2 */}
+                {/* ACCELERATE Phase - Current */}
+                <div className="relative">
+                  <div className="bg-gradient-to-br from-[#35A7FF] to-[#38618C] rounded-xl p-4 text-white h-full ring-4 ring-[#35A7FF]/30">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-semibold bg-white/20 px-2 py-1 rounded">PHASE 2</span>
+                      <span className="text-xs font-bold bg-white text-[#35A7FF] px-2 py-1 rounded animate-pulse">NOW</span>
+                    </div>
+                    <h4 className="text-lg font-bold mb-1">ACCELERATE</h4>
+                    <p className="text-xs text-white/80 mb-3">Nov 2025 - Mar 2026</p>
+                    <ul className="space-y-2 text-sm">
+                      <li className="flex items-center gap-2 text-white/60">
+                        <div className="w-3 h-3 rounded-full border border-white/60 flex-shrink-0"></div>
+                        <span>Virtual Sessions 2-6</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-3 h-3 flex-shrink-0 text-green-300" />
+                        <span>Observation Day #2 (Feb 18)</span>
+                      </li>
+                      <li className="flex items-center gap-2 text-white/60">
+                        <div className="w-3 h-3 rounded-full border border-white/60 flex-shrink-0"></div>
+                        <span>Hub Engagement Push</span>
+                      </li>
+                    </ul>
+                  </div>
+                  {/* Connector arrow */}
+                  <div className="hidden md:block absolute -right-2 top-1/2 -translate-y-1/2 z-10">
+                    <div className="w-4 h-4 bg-[#35A7FF] rotate-45"></div>
+                  </div>
+                </div>
+
+                {/* SUSTAIN Phase - Upcoming */}
+                <div className="relative">
+                  <div className="bg-gradient-to-br from-gray-200 to-gray-300 rounded-xl p-4 text-gray-600 h-full">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-xs font-semibold bg-white/50 px-2 py-1 rounded">PHASE 3</span>
+                      <Clock className="w-5 h-5 text-gray-400" />
+                    </div>
+                    <h4 className="text-lg font-bold mb-1 text-gray-700">SUSTAIN</h4>
+                    <p className="text-xs text-gray-500 mb-3">Apr - Jun 2026</p>
+                    <ul className="space-y-2 text-sm text-gray-500">
+                      <li className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full border border-gray-400 flex-shrink-0"></div>
+                        <span>End-of-Year Survey</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full border border-gray-400 flex-shrink-0"></div>
+                        <span>Leadership Celebration</span>
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full border border-gray-400 flex-shrink-0"></div>
+                        <span>Year 2 Planning</span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+
+              {/* Upcoming Action Items */}
+              <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
+                <h4 className="font-semibold text-amber-800 mb-3 flex items-center gap-2">
+                  <Calendar className="w-4 h-4" />
+                  Next Up: Schedule Your Virtual Sessions
+                </h4>
+                <p className="text-sm text-amber-700 mb-3">
+                  5 virtual sessions remaining before April. Each 30-minute session keeps momentum going and addresses your team&apos;s specific needs.
+                </p>
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
+                  className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 >
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
-                    <span className="text-gray-800">Virtual Session #2</span>
-                  </div>
-                  <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
-                    Schedule Now
-                  </span>
-                </a>
-
-                {/* Virtual Session #3 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
-                    <span className="text-gray-800">Virtual Session #3</span>
-                  </div>
-                  <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
-                    Schedule Now
-                  </span>
-                </a>
-
-                {/* Virtual Session #4 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
-                    <span className="text-gray-800">Virtual Session #4</span>
-                  </div>
-                  <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
-                    Schedule Now
-                  </span>
-                </a>
-
-                {/* Virtual Session #5 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
-                    <span className="text-gray-800">Virtual Session #5</span>
-                  </div>
-                  <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
-                    Schedule Now
-                  </span>
-                </a>
-
-                {/* Virtual Session #6 */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
-                    <span className="text-gray-800">Virtual Session #6</span>
-                  </div>
-                  <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
-                    Schedule Now
-                  </span>
-                </a>
-
-                {/* Leadership Celebration */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-3 bg-orange-50 rounded-lg border border-orange-100 hover:bg-orange-100 transition-colors"
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm font-medium text-orange-600 w-24">Before Apr</span>
-                    <span className="text-gray-800">Leadership Celebration + Year 2 Planning</span>
-                  </div>
-                  <span className="text-sm bg-orange-500 text-white px-3 py-1 rounded-full hover:bg-orange-600">
-                    Schedule Now
-                  </span>
+                  <Calendar className="w-4 h-4" />
+                  Schedule Virtual Session
                 </a>
               </div>
             </div>
 
-            {/* The Insight: Planning Time vs PD Time */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 mt-6 shadow-sm">
+            {/* Section 5: What We've Learned Together */}
+            <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                   <Lightbulb className="w-5 h-5 text-blue-500" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">What We&apos;ve Learned Together</h3>
+                <h3 className="font-bold text-[#1e2749] text-lg">What We&apos;ve Learned Together</h3>
               </div>
 
               <div className="space-y-4 text-gray-600">
                 <p>
-                  During our observation, we saw incredible classroom practices: calm environments, strong routines, and teachers who genuinely care. <span className="text-gray-900 font-medium">The foundation is absolutely there.</span>
+                  During our October observation, we saw incredible classroom practices: calm environments, strong routines, and teachers who genuinely care about their students. <span className="text-gray-900 font-medium">The foundation is absolutely there.</span>
                 </p>
 
                 <p>
-                  Here&apos;s what we&apos;ve noticed across schools like Allenwood: when staff are told to &quot;explore the Hub during planning time,&quot; that time gets consumed by the urgent: grading, emails, copies, putting out fires, finally getting a bathroom break.
+                  Here&apos;s what we&apos;ve noticed across schools like Allenwood: when staff are told to &quot;explore the Hub during planning time,&quot; that time gets consumed by the urgent — grading, emails, copies, putting out fires, finally getting a bathroom break.
                 </p>
 
                 <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 my-4">
@@ -1114,9 +1102,75 @@ export default function AllenwoodDashboard() {
                 </div>
 
                 <p>
-                  The good news? Even 15 minutes with a targeted course or download can create immediate classroom impact. We&apos;ve curated starting points in the <span className="text-yellow-600 font-medium">Progress tab</span> based on what we saw during our visit.
+                  The good news? Even 15 minutes with a targeted course or download can create immediate classroom impact. We&apos;ve curated starting points in the <span className="text-[#38618C] font-medium">Progress tab</span> based on what we saw during our visit.
                 </p>
               </div>
+            </div>
+
+            {/* Section 6: What Success Looks Like */}
+            <div className="bg-gradient-to-br from-green-50 to-teal-50 rounded-xl p-6 border border-green-200 shadow-sm">
+              <h3 className="font-bold text-[#1e2749] text-lg mb-4 flex items-center gap-2">
+                <Target className="w-5 h-5 text-green-600" />
+                What Success Looks Like
+              </h3>
+
+              <p className="text-gray-700 mb-4">
+                When this partnership succeeds, here&apos;s what changes for Allenwood:
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-white/70 rounded-lg p-4 border border-green-100">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Heart className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-800">Less Teacher Burnout</p>
+                      <p className="text-sm text-gray-600">Staff stress drops from industry average (8-9/10) to sustainable levels (5-6/10)</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/70 rounded-lg p-4 border border-green-100">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Clock className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-800">Time Saved</p>
+                      <p className="text-sm text-gray-600">Teachers reclaim 4-6 hours weekly through ready-to-use resources</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/70 rounded-lg p-4 border border-green-100">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Users className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-800">Teachers Stay</p>
+                      <p className="text-sm text-gray-600">Retention intent rises to 95%+ as staff feel supported</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white/70 rounded-lg p-4 border border-green-100">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <CheckCircle className="w-4 h-4 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-800">Strategies Stick</p>
+                      <p className="text-sm text-gray-600">65%+ of PD strategies actually make it into classrooms</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-500 mt-4 text-center italic">
+                &quot;Equip Allenwood teachers with practical strategies and resources to build calm, connected classrooms where every student feels supported and seen.&quot;
+              </p>
             </div>
           </div>
         )}
@@ -1124,137 +1178,90 @@ export default function AllenwoodDashboard() {
         {/* PROGRESS TAB */}
         {activeTab === 'progress' && (
           <div className="space-y-6">
-            {/* What We've Learned Together */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Lightbulb className="w-5 h-5 text-blue-500" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900">What We&apos;ve Learned Together</h3>
-              </div>
+            {/* Section 1: Hub Engagement */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-bold text-[#1e2749] text-lg mb-2">
+                Hub Engagement
+              </h3>
+              <p className="text-gray-600 text-sm mb-6">
+                Tracking teacher participation and platform usage for the pilot team of 11 staff members.
+              </p>
 
-              <div className="space-y-4 text-gray-600">
-                <p>
-                  During our observation, we saw incredible classroom practices: calm environments, strong routines, and teachers who genuinely care. <span className="text-gray-900 font-medium">The foundation is absolutely there.</span>
-                </p>
-
-                <p>
-                  Here&apos;s what we&apos;ve noticed across schools like Allenwood: when staff are told to &quot;explore the Hub during planning time,&quot; that time gets consumed by the urgent: grading, emails, copies, putting out fires, finally getting a bathroom break.
-                </p>
-
-                <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 my-4">
-                  <p className="text-blue-700 font-semibold text-center text-lg">
-                    Planning time ≠ PD time
-                  </p>
-                  <p className="text-gray-600 text-sm text-center mt-2">
-                    Meaningful professional development happens when there&apos;s <span className="text-gray-900 font-medium">protected time with a specific resource in mind.</span>
-                  </p>
+              {/* Login Goal Progress Bar */}
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-medium text-gray-700">Staff Login Rate</span>
+                  <span className="text-sm text-gray-500">Goal: 100% (11 staff)</span>
                 </div>
-
-                <p>
-                  The good news? Even 15 minutes with a targeted course or download can create immediate classroom impact. We&apos;ve curated starting points below based on what we saw during our visit.
-                </p>
-              </div>
-            </div>
-
-            {/* First Explorer Highlight */}
-            <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl p-6 border border-amber-200 shadow-sm">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Sparkles className="w-6 h-6 text-amber-500" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">First Explorer</h3>
-                  <p className="text-gray-700">
-                    One team member has been quietly diving in - viewing 7 lessons across 4 courses and spending about 14 minutes on the platform. The courses they chose (classroom hacks, student support, parent tools) are practical picks the whole team would benefit from.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Platform Activity Summary */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                  <Activity className="w-5 h-5 text-green-500" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900">Platform Activity Summary</h3>
-              </div>
-
-              <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-[#1e2749]">1 of 11</div>
-                  <div className="text-xs text-gray-500">Staff Active on Hub</div>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-[#1e2749]">4 of 33</div>
-                  <div className="text-xs text-gray-500">Courses Explored</div>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-[#1e2749]">7</div>
-                  <div className="text-xs text-gray-500">Lessons Viewed</div>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-[#1e2749]">1</div>
-                  <div className="text-xs text-gray-500">Lessons Completed</div>
-                </div>
-                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                  <div className="text-2xl font-bold text-[#1e2749]">~14 min</div>
-                  <div className="text-xs text-gray-500">Total Time on Platform</div>
-                </div>
-              </div>
-
-              {/* Where the Activity Is Happening */}
-              <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <BarChart3 className="w-4 h-4 text-blue-500" />
-                Where the Activity Is Happening
-              </h4>
-
-              <div className="space-y-3 mb-6">
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                  <div className="flex justify-between items-start mb-1">
-                    <p className="text-gray-900 font-medium">Teacher-Tested Hacks for Smarter Days</p>
-                    <span className="text-gray-500 text-xs whitespace-nowrap">~5.5 min</span>
+                <div className="bg-gray-100 rounded-full h-8 overflow-hidden relative">
+                  <div
+                    className="bg-gradient-to-r from-teal-400 to-teal-500 h-full rounded-full flex items-center justify-end pr-3 transition-all duration-500"
+                    style={{ width: '82%' }}
+                  >
+                    <span className="text-sm font-bold text-white">9 of 11</span>
                   </div>
-                  <p className="text-gray-500 text-sm">4 lessons viewed · Topics explored: energy reset strategies, student voice techniques</p>
                 </div>
+                <p className="text-xs text-gray-500 mt-2">82% have logged in at least once. 2 staff members haven&apos;t created accounts yet.</p>
+              </div>
 
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                  <div className="flex justify-between items-start mb-1">
-                    <p className="text-gray-900 font-medium">Understanding Student Needs &amp; Modifications</p>
-                    <span className="text-gray-500 text-xs whitespace-nowrap">~4 min</span>
-                  </div>
-                  <p className="text-gray-500 text-sm">1 lesson viewed · Started with the Welcome video</p>
-                </div>
+              {/* Engagement Depth Funnel */}
+              <div className="bg-gray-50 rounded-xl p-5 border border-gray-200">
+                <h4 className="font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                  <BarChart3 className="w-4 h-4 text-blue-500" />
+                  Engagement Depth
+                </h4>
 
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                  <div className="flex justify-between items-start mb-1">
-                    <div className="flex items-center gap-2">
-                      <p className="text-gray-900 font-medium">Supporting Students Through Their Daily Schedule</p>
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">Completed</span>
+                <div className="space-y-3">
+                  {/* Level 1: Logged In */}
+                  <div className="flex items-center gap-3">
+                    <div className="w-24 text-right">
+                      <span className="text-xs text-gray-500">Logged In</span>
                     </div>
-                    <span className="text-gray-500 text-xs whitespace-nowrap">~3 min</span>
+                    <div className="flex-1 bg-gray-200 rounded-full h-6 overflow-hidden">
+                      <div className="bg-teal-300 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '82%' }}>
+                        <span className="text-xs font-medium text-teal-900">9</span>
+                      </div>
+                    </div>
                   </div>
-                  <p className="text-gray-500 text-sm">1 lesson viewed + completed · Welcome video completed (the only completion so far)</p>
+
+                  {/* Level 2: Viewed Content */}
+                  <div className="flex items-center gap-3">
+                    <div className="w-24 text-right">
+                      <span className="text-xs text-gray-500">Viewed Content</span>
+                    </div>
+                    <div className="flex-1 bg-gray-200 rounded-full h-6 overflow-hidden">
+                      <div className="bg-teal-400 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '9%', minWidth: '30px' }}>
+                        <span className="text-xs font-medium text-teal-900">1</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Level 3: Completed Lesson */}
+                  <div className="flex items-center gap-3">
+                    <div className="w-24 text-right">
+                      <span className="text-xs text-gray-500">Completed</span>
+                    </div>
+                    <div className="flex-1 bg-gray-200 rounded-full h-6 overflow-hidden">
+                      <div className="bg-teal-500 h-full rounded-full flex items-center justify-end pr-2" style={{ width: '9%', minWidth: '30px' }}>
+                        <span className="text-xs font-medium text-white">1</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-                  <div className="flex justify-between items-start mb-1">
-                    <p className="text-gray-900 font-medium">Parent Tools That Support Student Success</p>
-                    <span className="text-gray-500 text-xs whitespace-nowrap">~2 min</span>
-                  </div>
-                  <p className="text-gray-500 text-sm">1 lesson viewed · Started with the Welcome video</p>
-                </div>
+                <p className="text-xs text-gray-500 mt-4 text-center">
+                  1 staff member has viewed 7 lessons across 4 courses (~14 min total)
+                </p>
               </div>
 
               {/* What This Tells Us */}
-              <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
+              <div className="bg-blue-50 rounded-xl p-4 border border-blue-200 mt-4">
                 <div className="flex items-start gap-3">
                   <Lightbulb className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <p className="text-blue-800 font-medium mb-1">What This Tells Us</p>
+                    <p className="text-blue-800 font-medium mb-1">Insight</p>
                     <p className="text-gray-700 text-sm">
-                      The topics drawing attention - classroom hacks, student support strategies, parent tools, and modifications - suggest your team is looking for practical, ready-to-use resources. These are great entry points for the rest of the team too.
+                      Most staff have logged in but haven&apos;t explored content yet. This is normal early in a partnership - the virtual sessions and leadership guidance help drive meaningful engagement. The one active user gravitated toward practical classroom management resources.
                     </p>
                   </div>
                 </div>

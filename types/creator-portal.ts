@@ -45,6 +45,9 @@ export type ContentPath = 'blog' | 'download' | 'course';
 // Publish status types
 export type PublishStatus = 'in_progress' | 'scheduled' | 'published';
 
+// Creator status types
+export type CreatorStatus = 'active' | 'archived';
+
 // Creator from database
 export interface Creator {
   id: string;
@@ -90,6 +93,10 @@ export interface Creator {
   scheduled_publish_date: string | null;
   published_date: string | null;
   publish_notes: string | null;
+  // Archive and project tracking fields
+  status: CreatorStatus;
+  post_launch_notes: string | null;
+  previous_project_id: string | null;
   created_at: string;
   updated_at: string;
 }

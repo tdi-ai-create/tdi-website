@@ -1,7 +1,7 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -14,11 +14,22 @@ export async function GET() {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    // Get all creators with their milestones
-    const { data: creators, error: creatorsError } = await supabase
+    // Check if we should include archived creators
+    const { searchParams } = new URL(request.url);
+    const includeArchived = searchParams.get('includeArchived') === 'true';
+
+    // Get creators (filter out archived by default)
+    let creatorsQuery = supabase
       .from('creators')
       .select('*')
       .order('created_at', { ascending: false });
+
+    if (!includeArchived) {
+      // Filter to only active creators (or null status for backwards compatibility)
+      creatorsQuery = creatorsQuery.or('status.eq.active,status.is.null');
+    }
+
+    const { data: creators, error: creatorsError } = await creatorsQuery;
 
     if (creatorsError) {
       console.error('[dashboard-data] Creators error:', creatorsError);
@@ -106,6 +117,10 @@ export async function GET() {
         publish_status: creator.publish_status || 'in_progress',
         scheduled_publish_date: creator.scheduled_publish_date || null,
         published_date: creator.published_date || null,
+        // Archive and post-launch fields
+        status: creator.status || 'active',
+        post_launch_notes: creator.post_launch_notes || null,
+        previous_project_id: creator.previous_project_id || null,
         totalMilestones,
         completedMilestones,
         progressPercentage,
@@ -127,34 +142,39 @@ export async function GET() {
       };
     }) || [];
 
-    // Calculate stats
+    // Filter to active creators for stats (exclude archived)
+    const activeCreators = enrichedCreators.filter((c) => c.status === 'active' || !c.status);
+    const archivedCreators = enrichedCreators.filter((c) => c.status === 'archived');
+
+    // Calculate stats (only for active creators)
     const stats = {
-      total: enrichedCreators.length,
-      stalled: enrichedCreators.filter((c) => c.waitingOn === 'stalled').length,
-      waitingOnCreator: enrichedCreators.filter((c) => c.waitingOn === 'creator').length,
-      waitingOnTDI: enrichedCreators.filter((c) => c.waitingOn === 'tdi').length,
-      launched: enrichedCreators.filter((c) => c.waitingOn === 'launched').length,
+      total: activeCreators.length,
+      stalled: activeCreators.filter((c) => c.waitingOn === 'stalled').length,
+      waitingOnCreator: activeCreators.filter((c) => c.waitingOn === 'creator').length,
+      waitingOnTDI: activeCreators.filter((c) => c.waitingOn === 'tdi').length,
+      launched: activeCreators.filter((c) => c.waitingOn === 'launched').length,
+      archived: archivedCreators.length,
     };
 
-    // Phase counts for pipeline funnel
+    // Phase counts for pipeline funnel (only active creators)
     const phaseCounts = {
-      onboarding: enrichedCreators.filter((c) => c.current_phase === 'onboarding').length,
-      agreement: enrichedCreators.filter((c) => c.current_phase === 'agreement').length,
-      course_design: enrichedCreators.filter((c) => c.current_phase === 'course_design').length,
-      test_prep: enrichedCreators.filter((c) => c.current_phase === 'test_prep' || c.current_phase === 'production').length,
-      launch: enrichedCreators.filter((c) => c.current_phase === 'launch').length,
+      onboarding: activeCreators.filter((c) => c.current_phase === 'onboarding').length,
+      agreement: activeCreators.filter((c) => c.current_phase === 'agreement').length,
+      course_design: activeCreators.filter((c) => c.current_phase === 'course_design').length,
+      test_prep: activeCreators.filter((c) => c.current_phase === 'test_prep' || c.current_phase === 'production').length,
+      launch: activeCreators.filter((c) => c.current_phase === 'launch').length,
     };
 
-    // Content path counts
+    // Content path counts (only active creators)
     const pathCounts = {
-      blog: enrichedCreators.filter((c) => c.content_path === 'blog').length,
-      download: enrichedCreators.filter((c) => c.content_path === 'download').length,
-      course: enrichedCreators.filter((c) => c.content_path === 'course').length,
-      notSet: enrichedCreators.filter((c) => !c.content_path).length,
+      blog: activeCreators.filter((c) => c.content_path === 'blog').length,
+      download: activeCreators.filter((c) => c.content_path === 'download').length,
+      course: activeCreators.filter((c) => c.content_path === 'course').length,
+      notSet: activeCreators.filter((c) => !c.content_path).length,
     };
 
-    // Closest to launch (top 4 not at 100%)
-    const closestToLaunch = enrichedCreators
+    // Closest to launch (top 4 not at 100%, only active creators)
+    const closestToLaunch = activeCreators
       .filter((c) => c.progressPercentage < 100)
       .sort((a, b) => b.progressPercentage - a.progressPercentage)
       .slice(0, 4)
@@ -186,8 +206,8 @@ export async function GET() {
         };
       }) || [];
 
-    // Topics in pipeline (course titles as tags)
-    const topics = enrichedCreators
+    // Topics in pipeline (course titles as tags, only active creators)
+    const topics = activeCreators
       .filter((c) => c.course_title)
       .map((c) => ({
         id: c.id,

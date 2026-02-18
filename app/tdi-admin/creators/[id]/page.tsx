@@ -31,6 +31,11 @@ import {
   Globe,
   RotateCcw,
   Copy,
+  Archive,
+  ArchiveRestore,
+  Sparkles,
+  History,
+  ExternalLink,
 } from 'lucide-react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
@@ -158,6 +163,24 @@ export default function TDIAdminCreatorDetailPage() {
   const [publishNotes, setPublishNotes] = useState('');
   const [isPublishing, setIsPublishing] = useState(false);
 
+  // Post-launch notes state
+  const [postLaunchNotes, setPostLaunchNotes] = useState('');
+  const [isEditingPostLaunch, setIsEditingPostLaunch] = useState(false);
+  const [isSavingPostLaunch, setIsSavingPostLaunch] = useState(false);
+
+  // Archive state
+  const [isArchiving, setIsArchiving] = useState(false);
+  const [showStartNewProjectModal, setShowStartNewProjectModal] = useState(false);
+  const [isStartingNewProject, setIsStartingNewProject] = useState(false);
+
+  // Previous projects state
+  const [previousProjects, setPreviousProjects] = useState<Array<{
+    id: string;
+    course_title: string | null;
+    content_path: string | null;
+    published_date: string | null;
+  }>>([]);
+
   const adminEmail = teamMember?.email || '';
 
   const loadData = useCallback(async () => {
@@ -171,6 +194,9 @@ export default function TDIAdminCreatorDetailPage() {
         target_launch_month: data.creator.target_launch_month || '',
         discount_code: data.creator.discount_code || '',
       });
+
+      // Initialize post-launch notes
+      setPostLaunchNotes(data.creator.post_launch_notes || '');
 
       // Initialize website settings
       setWebsiteSettings({
@@ -333,6 +359,88 @@ export default function TDIAdminCreatorDetailPage() {
     if (applicableMilestones.length === 0) return false;
     const lastMilestone = applicableMilestones[applicableMilestones.length - 1];
     return lastMilestone.id === milestoneId;
+  };
+
+  // Handle post-launch notes save
+  const handleSavePostLaunchNotes = async () => {
+    if (!canEdit) return;
+    setIsSavingPostLaunch(true);
+    try {
+      const response = await fetch('/api/admin/update-post-launch-notes', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          postLaunchNotes: postLaunchNotes.trim() || null,
+        }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        await loadData();
+        setIsEditingPostLaunch(false);
+        setSuccessMessage('Post-launch notes saved!');
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        alert(`Failed: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error saving post-launch notes:', error);
+      alert('Error saving post-launch notes.');
+    } finally {
+      setIsSavingPostLaunch(false);
+    }
+  };
+
+  // Handle archive/unarchive
+  const handleArchiveToggle = async (action: 'archive' | 'unarchive') => {
+    if (!canEdit) return;
+    setIsArchiving(true);
+    try {
+      const response = await fetch('/api/admin/archive-creator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ creatorId, action }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        await loadData();
+        setSuccessMessage(action === 'archive' ? 'Creator archived!' : 'Creator restored!');
+        setTimeout(() => setSuccessMessage(null), 3000);
+      } else {
+        alert(`Failed: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error toggling archive:', error);
+      alert('Error updating archive status.');
+    } finally {
+      setIsArchiving(false);
+    }
+  };
+
+  // Handle start new project
+  const handleStartNewProject = async () => {
+    if (!canEdit) return;
+    setIsStartingNewProject(true);
+    try {
+      const response = await fetch('/api/admin/start-new-project', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ creatorId }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        setShowStartNewProjectModal(false);
+        // Redirect to the new project
+        window.location.href = `/tdi-admin/creators/${result.newCreator.id}`;
+      } else {
+        alert(`Failed: ${result.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Error starting new project:', error);
+      alert('Error starting new project.');
+    } finally {
+      setIsStartingNewProject(false);
+    }
   };
 
   const handleAddNote = async (e: React.FormEvent) => {
@@ -919,8 +1027,118 @@ export default function TDIAdminCreatorDetailPage() {
                   {creator.publish_notes}
                 </div>
               )}
+
+              {/* Post-Launch Notes (for published creators) */}
+              {creator.publish_status === 'published' && canEdit && (
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  <div className="flex items-center justify-between mb-2">
+                    <p className="text-xs font-medium text-gray-700">Post-Launch Follow-up</p>
+                    {!isEditingPostLaunch && (
+                      <button
+                        onClick={() => setIsEditingPostLaunch(true)}
+                        className="text-xs text-purple-600 hover:text-purple-800"
+                      >
+                        {creator.post_launch_notes ? 'Edit' : 'Add note'}
+                      </button>
+                    )}
+                  </div>
+                  {isEditingPostLaunch ? (
+                    <div className="space-y-2">
+                      <textarea
+                        value={postLaunchNotes}
+                        onChange={(e) => setPostLaunchNotes(e.target.value)}
+                        placeholder="e.g., Blog in editing with team..."
+                        className="w-full px-2 py-1.5 text-sm border border-gray-200 rounded resize-none"
+                        rows={2}
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleSavePostLaunchNotes}
+                          disabled={isSavingPostLaunch}
+                          className="flex-1 px-2 py-1 text-xs font-medium rounded text-white"
+                          style={{ backgroundColor: theme.primary }}
+                        >
+                          {isSavingPostLaunch ? 'Saving...' : 'Save'}
+                        </button>
+                        <button
+                          onClick={() => {
+                            setPostLaunchNotes(creator.post_launch_notes || '');
+                            setIsEditingPostLaunch(false);
+                          }}
+                          className="px-2 py-1 text-xs text-gray-600 hover:text-gray-800"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : creator.post_launch_notes ? (
+                    <p className="text-sm text-amber-700 bg-amber-50 px-2 py-1.5 rounded">
+                      {creator.post_launch_notes}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-gray-400 italic">No follow-up items</p>
+                  )}
+                </div>
+              )}
+
+              {/* Archive Actions */}
+              {canEdit && creator.publish_status === 'published' && (
+                <div className="mt-3 pt-3 border-t border-gray-100">
+                  {creator.status === 'archived' ? (
+                    <button
+                      onClick={() => handleArchiveToggle('unarchive')}
+                      disabled={isArchiving}
+                      className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      {isArchiving ? <Loader2 className="w-4 h-4 animate-spin" /> : <ArchiveRestore className="w-4 h-4" />}
+                      Restore from Archive
+                    </button>
+                  ) : (
+                    <div className="space-y-2">
+                      <button
+                        onClick={() => setShowStartNewProjectModal(true)}
+                        className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+                        style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                      >
+                        <Sparkles className="w-4 h-4" />
+                        Start New Project
+                      </button>
+                      <button
+                        onClick={() => handleArchiveToggle('archive')}
+                        disabled={isArchiving}
+                        className="w-full flex items-center justify-center gap-2 px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+                      >
+                        {isArchiving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Archive className="w-3 h-3" />}
+                        Archive Only
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           </div>
+
+          {/* Previous Projects Card */}
+          {creator.previous_project_id && (
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+              <h3
+                className="font-semibold flex items-center gap-2 mb-3"
+                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
+              >
+                <History className="w-4 h-4" style={{ color: theme.primary }} />
+                Previous Projects
+              </h3>
+              <div className="text-sm">
+                <Link
+                  href={`/tdi-admin/creators/${creator.previous_project_id}`}
+                  className="flex items-center gap-2 text-purple-600 hover:text-purple-800"
+                >
+                  <ExternalLink className="w-3 h-3" />
+                  View previous project
+                </Link>
+              </div>
+            </div>
+          )}
 
           {/* Notes Card */}
           <div className="bg-white rounded-xl border border-gray-200 p-5">
@@ -1427,6 +1645,89 @@ export default function TDIAdminCreatorDetailPage() {
                   <>
                     <Calendar className="w-4 h-4" />
                     Schedule
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Start New Project Modal */}
+      {showStartNewProjectModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div
+            className="bg-white rounded-2xl shadow-xl max-w-md w-full"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="p-6 border-b border-gray-100">
+              <div className="flex items-center gap-3">
+                <div
+                  className="w-12 h-12 rounded-full flex items-center justify-center"
+                  style={{ backgroundColor: theme.light }}
+                >
+                  <Sparkles size={24} style={{ color: theme.primary }} />
+                </div>
+                <div>
+                  <h2
+                    className="font-bold text-lg"
+                    style={{ fontFamily: "'Source Serif 4', Georgia, serif", color: '#2B3A67' }}
+                  >
+                    Start a New Project
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    Ready to create something new?
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6">
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
+                <p className="text-sm text-purple-800">
+                  This will archive <strong>{creator.name}</strong>&apos;s current project
+                  {creator.course_title && <> ({creator.course_title})</>} and create a fresh
+                  project with the same profile info.
+                </p>
+              </div>
+              <ul className="space-y-2 text-sm text-gray-600">
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                  Profile info (name, email, bio) will be carried over
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                  Fresh milestones starting from content path selection
+                </li>
+                <li className="flex items-start gap-2">
+                  <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                  Current project fully preserved in archive
+                </li>
+              </ul>
+            </div>
+
+            {/* Modal Footer */}
+            <div className="p-6 border-t border-gray-100 flex gap-3">
+              <button
+                onClick={() => setShowStartNewProjectModal(false)}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleStartNewProject}
+                disabled={isStartingNewProject}
+                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+              >
+                {isStartingNewProject ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Start New Project
                   </>
                 )}
               </button>
