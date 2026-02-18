@@ -101,16 +101,6 @@ export default function AllenwoodDashboard() {
   // Needs Attention items
   const needsAttentionItems = [
     {
-      id: 'virtual-sessions',
-      title: '5 Virtual Sessions Remaining',
-      description: 'Included in contract',
-      deadline: 'JUNE 2026',
-      deadlineMonth: 6,
-      deadlineYear: 2026,
-      actionLabel: 'Schedule Sessions',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat',
-    },
-    {
       id: 'spring-celebration',
       title: 'Spring Leadership Celebration',
       description: 'Celebrate wins + discuss Year 2 options · Complimentary',
@@ -359,7 +349,7 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Virtual Sessions -  Ideas & Scheduling */}
+            {/* Virtual Sessions - Scheduled Dates */}
             <div className="bg-gradient-to-r from-[#38618C]/10 to-[#35A7FF]/10 rounded-xl p-5 border border-[#38618C]/20">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-[#38618C] rounded-lg flex items-center justify-center flex-shrink-0">
@@ -367,59 +357,40 @@ export default function AllenwoodDashboard() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-[#1e2749]">5 Virtual Sessions Available</h4>
-                    <span className="text-xs bg-[#35A7FF] text-white px-2 py-1 rounded-full">Flexible Use</span>
+                    <h4 className="font-semibold text-[#1e2749]">5 Virtual Sessions Scheduled</h4>
+                    <span className="text-xs bg-amber-500 text-white px-2 py-1 rounded-full">Tentative</span>
                   </div>
                   <p className="text-sm text-gray-600 mb-4">
-                    Your remaining virtual sessions are yours to shape. Here are some ways other schools use them:
+                    Proposed dates for your remaining virtual sessions:
                   </p>
 
-                  <div className="grid grid-cols-2 gap-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>Office hours / drop-in support</span>
+                  <div className="space-y-2 mb-4">
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-6 h-6 bg-[#38618C]/10 rounded-full flex items-center justify-center text-xs font-bold text-[#38618C]">1</div>
+                      <span className="text-gray-700 font-medium">February 25, 2026</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>1:1 teacher coaching</span>
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-6 h-6 bg-[#38618C]/10 rounded-full flex items-center justify-center text-xs font-bold text-[#38618C]">2</div>
+                      <span className="text-gray-700 font-medium">March 11, 2026</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>Team Q&amp;A sessions</span>
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-6 h-6 bg-[#38618C]/10 rounded-full flex items-center justify-center text-xs font-bold text-[#38618C]">3</div>
+                      <span className="text-gray-700 font-medium">March 25, 2026</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>Teachable moments / mini PD</span>
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-6 h-6 bg-[#38618C]/10 rounded-full flex items-center justify-center text-xs font-bold text-[#38618C]">4</div>
+                      <span className="text-gray-700 font-medium">April 8, 2026</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>Reflection &amp; goal-setting</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>Survey &amp; metrics check-in</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>Strategy deep-dives</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <div className="w-1.5 h-1.5 bg-[#38618C] rounded-full"></div>
-                      <span>Leadership planning</span>
+                    <div className="flex items-center gap-3 text-sm">
+                      <div className="w-6 h-6 bg-[#38618C]/10 rounded-full flex items-center justify-center text-xs font-bold text-[#38618C]">5</div>
+                      <span className="text-gray-700 font-medium">April 15, 2026</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-[#38618C]/20">
-                    <p className="text-xs text-gray-500">Mix and match based on your team&apos;s needs</p>
-                    <a
-                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 text-sm font-medium text-[#38618C] hover:text-[#35A7FF]"
-                    >
-                      Schedule Now
-                      <ArrowRight className="w-4 h-4" />
-                    </a>
+                  <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                    <p className="text-xs text-amber-800">
+                      <span className="font-semibold">Note:</span> All dates are tentative and awaiting approval on March 2nd via TDI Team and Allenwood Leadership.
+                    </p>
                   </div>
                 </div>
               </div>
