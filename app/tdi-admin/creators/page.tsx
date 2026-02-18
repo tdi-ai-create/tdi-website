@@ -1047,10 +1047,10 @@ export default function CreatorStudioPage() {
                           <Link
                             key={creator.id}
                             href={`/tdi-admin/creators/${creator.id}`}
-                            className="flex items-center gap-2 group"
+                            className="flex items-start gap-2 group"
                           >
                             <div
-                              className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0 bg-green-500"
+                              className="w-7 h-7 rounded-full text-white flex items-center justify-center text-xs font-medium flex-shrink-0 bg-green-500 mt-0.5"
                             >
                               <Check className="w-4 h-4" />
                             </div>
@@ -1061,8 +1061,14 @@ export default function CreatorStudioPage() {
                               >
                                 {creator.name}
                               </p>
+                              {creator.post_launch_notes && (
+                                <p className="text-xs text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded mt-0.5 truncate flex items-center gap-1">
+                                  <Clock className="w-3 h-3 flex-shrink-0" />
+                                  <span className="truncate">{creator.post_launch_notes}</span>
+                                </p>
+                              )}
                             </div>
-                            <div className="text-xs text-gray-500 flex-shrink-0">
+                            <div className="text-xs text-gray-500 flex-shrink-0 mt-0.5">
                               {new Date(creator.published_date!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                             </div>
                           </Link>
