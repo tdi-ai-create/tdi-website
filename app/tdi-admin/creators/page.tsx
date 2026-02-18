@@ -1020,9 +1020,17 @@ export default function CreatorStudioPage() {
             {/* Recently Published */}
             <div className="bg-white rounded-xl border border-gray-200 p-5">
               {(() => {
+                // Include creators who are either:
+                // 1. Explicitly marked as published (publish_status === 'published')
+                // 2. Have all core milestones completed (progress.isComplete === true)
                 const published = dashboardData.creators
-                  .filter(c => c.publish_status === 'published' && c.published_date)
-                  .sort((a, b) => new Date(b.published_date!).getTime() - new Date(a.published_date!).getTime())
+                  .filter(c => c.publish_status === 'published' || c.progress?.isComplete === true)
+                  .sort((a, b) => {
+                    // Sort by published_date if available, otherwise lastActivityDate
+                    const dateA = a.published_date ? new Date(a.published_date) : new Date(a.lastActivityDate);
+                    const dateB = b.published_date ? new Date(b.published_date) : new Date(b.lastActivityDate);
+                    return dateB.getTime() - dateA.getTime();
+                  })
                   .slice(0, 5);
 
                 return (
@@ -1086,7 +1094,7 @@ export default function CreatorStudioPage() {
                               )}
                             </div>
                             <div className="text-xs text-gray-500 flex-shrink-0 mt-0.5">
-                              {new Date(creator.published_date!).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                              {new Date(creator.published_date || creator.lastActivityDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                             </div>
                           </Link>
                         ))}

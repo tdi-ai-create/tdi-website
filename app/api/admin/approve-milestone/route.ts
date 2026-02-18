@@ -109,6 +109,37 @@ export async function POST(request: Request) {
       }, { status: 404 });
     }
 
+    // 3b. Handle paired milestones that should auto-complete together
+    const pairedMilestones: Record<string, string> = {
+      'test_video_recorded': 'test_video_submitted',
+      'drive_folder_created': 'assets_submitted',
+    };
+
+    const pairedMilestoneId = pairedMilestones[milestoneId];
+    if (pairedMilestoneId) {
+      const { error: pairedError } = await supabase
+        .from('creator_milestones')
+        .update({
+          status: 'completed',
+          completed_at: completedAt,
+          completed_by: 'system:auto-paired',
+          submission_data: {
+            type: 'auto_completed',
+            paired_with: milestoneId,
+            completed_at: completedAt
+          },
+          updated_at: completedAt
+        })
+        .eq('creator_id', creatorId)
+        .eq('milestone_id', pairedMilestoneId);
+
+      if (pairedError) {
+        console.error('[approve-milestone] Error auto-completing paired milestone:', pairedError);
+      } else {
+        console.log('[approve-milestone] Auto-completed paired milestone:', pairedMilestoneId);
+      }
+    }
+
     // 4. Handle unlock logic
     let nextMilestoneName = null;
 
@@ -166,12 +197,26 @@ export async function POST(request: Request) {
       }
     } else if (milestone) {
       // Normal sequential completion: unlock next milestone in sequence
-      // First try to find next milestone in current phase
+      // Determine search starting point - if paired milestone, search from the higher sort_order
+      let searchFromSortOrder = milestone.sort_order;
+      if (pairedMilestoneId) {
+        const { data: pairedMs } = await supabase
+          .from('milestones')
+          .select('sort_order')
+          .eq('id', pairedMilestoneId)
+          .single();
+        if (pairedMs) {
+          searchFromSortOrder = Math.max(searchFromSortOrder, pairedMs.sort_order);
+        }
+      }
+
+      // First try to find next milestone in current phase, skipping deactivated ones
       let { data: nextMilestone } = await supabase
         .from('milestones')
         .select('*')
         .eq('phase_id', milestone.phase_id)
-        .gt('sort_order', milestone.sort_order)
+        .gt('sort_order', searchFromSortOrder)
+        .lt('sort_order', 98)  // Skip deactivated milestones (sort_order 98-99)
         .order('sort_order', { ascending: true })
         .limit(1)
         .maybeSingle();
@@ -191,11 +236,12 @@ export async function POST(request: Request) {
         const currentPhase = phases?.find(p => p.id === milestone.phase_id);
         const currentPhaseOrder = currentPhase?.sort_order ?? 0;
 
-        // Find milestones in subsequent phases
+        // Find milestones in subsequent phases, skipping deactivated ones
         const { data: futureMilestones } = await supabase
           .from('milestones')
           .select('*, phases!inner(sort_order)')
           .gt('phases.sort_order', currentPhaseOrder)
+          .lt('sort_order', 98)  // Skip deactivated milestones
           .order('phases(sort_order)', { ascending: true })
           .order('sort_order', { ascending: true });
 
@@ -212,6 +258,38 @@ export async function POST(request: Request) {
               nextMilestone = fm;
               break;
             }
+          }
+        }
+      }
+
+      // Auto-complete any deactivated milestones between current and next
+      if (nextMilestone && milestone.phase_id === nextMilestone.phase_id) {
+        const { data: deactivatedMilestones } = await supabase
+          .from('milestones')
+          .select('id')
+          .eq('phase_id', milestone.phase_id)
+          .gt('sort_order', searchFromSortOrder)
+          .lt('sort_order', nextMilestone.sort_order)
+          .gte('sort_order', 98);  // Get deactivated milestones in between
+
+        if (deactivatedMilestones && deactivatedMilestones.length > 0) {
+          for (const dm of deactivatedMilestones) {
+            await supabase
+              .from('creator_milestones')
+              .update({
+                status: 'completed',
+                completed_at: completedAt,
+                completed_by: 'system:auto-skipped',
+                submission_data: {
+                  type: 'auto_completed',
+                  reason: 'milestone_deactivated',
+                  completed_at: completedAt
+                },
+                updated_at: completedAt
+              })
+              .eq('creator_id', creatorId)
+              .eq('milestone_id', dm.id);
+            console.log('[approve-milestone] Auto-completed deactivated milestone:', dm.id);
           }
         }
       }

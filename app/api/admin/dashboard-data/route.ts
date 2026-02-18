@@ -185,9 +185,9 @@ export async function GET(request: NextRequest) {
         progressPercentage: c.progressPercentage,
       }));
 
-    // Recent activity (last 6 completed milestones)
+    // Recent activity (last 6 completed milestones, excluding system migrations)
     const recentCompletions = allMilestones
-      ?.filter((m) => m.status === 'completed' && m.completed_at)
+      ?.filter((m) => m.status === 'completed' && m.completed_at && m.completed_by !== 'system-migration')
       .sort((a, b) => new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime())
       .slice(0, 6)
       .map((m) => {

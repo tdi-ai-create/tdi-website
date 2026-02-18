@@ -17,6 +17,7 @@ interface EnrichedCreator {
   lastActivityDate: string;
   progressPercentage: number;
   created_at: string;
+  post_launch_notes?: string | null;
 }
 
 interface CreatorSwimlaneProps {
@@ -180,6 +181,14 @@ export default function CreatorSwimlane({ creators, filterPath, filterWaitingOn 
                           <p className="text-xs text-gray-600 truncate mb-1">
                             {creator.currentMilestoneName}
                           </p>
+                        )}
+
+                        {/* Post-launch notes for Published cards */}
+                        {phase.key === 'published' && creator.post_launch_notes && (
+                          <div className="flex items-center gap-1 text-[10px] text-amber-700 bg-amber-50 px-1.5 py-0.5 rounded mb-1">
+                            <Clock className="w-2.5 h-2.5 flex-shrink-0" />
+                            <span className="truncate">{creator.post_launch_notes}</span>
+                          </div>
                         )}
 
                         {/* Days in phase indicator */}

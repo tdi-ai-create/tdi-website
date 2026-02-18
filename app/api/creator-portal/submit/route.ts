@@ -251,6 +251,40 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: updateError.message }, { status: 500 });
     }
 
+    // 3b. Handle paired milestones that should auto-complete together
+    // These milestone pairs are merged in the UI but exist separately in the database
+    const pairedMilestones: Record<string, string> = {
+      'test_video_recorded': 'test_video_submitted',  // Record test video → also completes Submit test video
+      'drive_folder_created': 'assets_submitted',     // Create drive folder → also completes Assets submitted
+    };
+
+    const pairedMilestoneId = pairedMilestones[milestoneId];
+    if (pairedMilestoneId && (completionTypes.includes(submissionType) || submissionType === 'link')) {
+      // Auto-complete the paired milestone
+      const { error: pairedError } = await supabase
+        .from('creator_milestones')
+        .update({
+          status: 'completed',
+          completed_at: new Date().toISOString(),
+          completed_by: 'system:auto-paired',
+          submission_data: {
+            type: 'auto_completed',
+            paired_with: milestoneId,
+            completed_at: new Date().toISOString()
+          },
+          updated_at: new Date().toISOString()
+        })
+        .eq('creator_id', creatorId)
+        .eq('milestone_id', pairedMilestoneId);
+
+      if (pairedError) {
+        console.error('[submit] Error auto-completing paired milestone:', pairedError);
+        // Non-fatal, continue with progression
+      } else {
+        console.log('[submit] Auto-completed paired milestone:', pairedMilestoneId);
+      }
+    }
+
     // 4. If this is a completion type (not needing review), unlock next milestone
     if (completionTypes.includes(submissionType)) {
       // Get current milestone info
@@ -268,13 +302,30 @@ export async function POST(request: Request) {
         .single();
       const contentPath = creatorData?.content_path;
 
+      // Determine which milestone to start searching from
+      // If this milestone has a paired milestone, search from the paired one's sort_order
+      const searchFromMilestoneId = pairedMilestoneId || milestoneId;
+      let searchFromSortOrder = milestone?.sort_order ?? 0;
+
+      if (pairedMilestoneId) {
+        const { data: pairedMilestone } = await supabase
+          .from('milestones')
+          .select('sort_order')
+          .eq('id', pairedMilestoneId)
+          .single();
+        if (pairedMilestone) {
+          searchFromSortOrder = Math.max(searchFromSortOrder, pairedMilestone.sort_order);
+        }
+      }
+
       if (milestone) {
-        // Find next milestone in same phase
+        // Find next milestone in same phase, skipping deactivated ones (sort_order >= 98)
         let { data: nextMilestone } = await supabase
           .from('milestones')
-          .select('id')
+          .select('id, sort_order')
           .eq('phase_id', milestone.phase_id)
-          .gt('sort_order', milestone.sort_order)
+          .gt('sort_order', searchFromSortOrder)
+          .lt('sort_order', 98)  // Skip deactivated milestones
           .order('sort_order', { ascending: true })
           .limit(1)
           .maybeSingle();
@@ -291,11 +342,12 @@ export async function POST(request: Request) {
           const currentPhase = phases?.find(p => p.id === milestone.phase_id);
           const currentPhaseOrder = currentPhase?.sort_order ?? 0;
 
-          // Find milestones in subsequent phases
+          // Find milestones in subsequent phases, skipping deactivated ones
           const { data: futureMilestones } = await supabase
             .from('milestones')
             .select('*, phases!inner(sort_order)')
             .gt('phases.sort_order', currentPhaseOrder)
+            .lt('sort_order', 98)  // Skip deactivated milestones
             .order('phases(sort_order)', { ascending: true })
             .order('sort_order', { ascending: true });
 
