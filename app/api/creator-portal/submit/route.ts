@@ -79,10 +79,10 @@ export async function POST(request: Request) {
     }
 
     // 3. Update milestone status
-    // For confirmations, meeting_scheduled, preferences, path_selection, and form submissions, mark as complete
+    // For confirmations, meeting_scheduled, preferences, path_selection, form submissions, and create_again_choice, mark as complete
     // For change_request, mark as in_progress (pending team review)
     // For link submissions needing review, mark as waiting_approval
-    const completionTypes = ['confirmation', 'meeting_scheduled', 'preferences', 'path_selection', 'form', 'course_title'];
+    const completionTypes = ['confirmation', 'meeting_scheduled', 'preferences', 'path_selection', 'form', 'course_title', 'create_again_choice'];
     let newStatus = completionTypes.includes(submissionType) ? 'completed' : 'waiting_approval';
 
     // Change requests go back to in_progress as team needs to make updates
@@ -235,6 +235,122 @@ export async function POST(request: Request) {
         .eq('id', creatorId);
     }
 
+    // If create_again_choice submission, store the choice and handle project creation
+    if (submissionType === 'create_again_choice' && content.choice) {
+      const choice = content.choice as 'yes' | 'hold_off';
+      const chosenAt = new Date().toISOString();
+
+      submissionData = {
+        type: 'create_again_choice',
+        create_again_choice: choice,
+        chosen_at: chosenAt
+      };
+      updateData.metadata = {
+        choice,
+        chosen_at: chosenAt
+      };
+
+      // Get the creator's active project
+      const { data: activeProject } = await supabase
+        .from('creator_projects')
+        .select('id, project_number')
+        .eq('creator_id', creatorId)
+        .eq('status', 'active')
+        .order('project_number', { ascending: false })
+        .limit(1)
+        .single();
+
+      // Mark current project as completed
+      if (activeProject) {
+        await supabase
+          .from('creator_projects')
+          .update({
+            status: 'completed',
+            completed_at: chosenAt
+          })
+          .eq('id', activeProject.id);
+      }
+
+      // If creator chose "yes", create a new project
+      if (choice === 'yes') {
+        const newProjectNumber = (activeProject?.project_number || 1) + 1;
+
+        // Create new project
+        const { data: newProject } = await supabase
+          .from('creator_projects')
+          .insert({
+            creator_id: creatorId,
+            project_number: newProjectNumber,
+            status: 'active'
+          })
+          .select()
+          .single();
+
+        if (newProject) {
+          // Reset creator to onboarding phase and clear content-specific fields
+          await supabase
+            .from('creators')
+            .update({
+              current_phase: 'onboarding',
+              content_path: null,
+              course_title: null,
+              course_audience: null,
+              target_launch_month: null,
+              discount_code: null,
+              google_doc_link: null,
+              drive_folder_link: null,
+              marketing_doc_link: null,
+              course_url: null,
+              launch_date: null,
+              wants_video_editing: false,
+              wants_download_design: false,
+              active_project_id: newProject.id,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', creatorId);
+
+          // Get all milestones
+          const { data: milestones } = await supabase
+            .from('milestones')
+            .select('id, sort_order, phase_id')
+            .order('sort_order');
+
+          if (milestones) {
+            // Create fresh milestone records for the new project
+            // First milestone (intake_completed) is completed (admin added them)
+            // Second milestone (content_path_selection) is available
+            // Rest are locked
+            const sortedMilestones = milestones.sort((a, b) => {
+              const phaseOrder: Record<string, number> = {
+                onboarding: 0,
+                agreement: 1,
+                course_design: 2,
+                test_prep: 3,
+                production: 4,
+                launch: 5
+              };
+              const phaseCompare = phaseOrder[a.phase_id] - phaseOrder[b.phase_id];
+              if (phaseCompare !== 0) return phaseCompare;
+              return a.sort_order - b.sort_order;
+            });
+
+            const milestoneRecords = sortedMilestones.map((milestone, index) => ({
+              creator_id: creatorId,
+              milestone_id: milestone.id,
+              project_id: newProject.id,
+              status: index === 0 ? 'completed' : index === 1 ? 'available' : 'locked',
+              completed_at: index === 0 ? new Date().toISOString() : null,
+              completed_by: index === 0 ? 'system:returning-creator' : null
+            }));
+
+            await supabase
+              .from('creator_milestones')
+              .insert(milestoneRecords);
+          }
+        }
+      }
+    }
+
     // Add submission_data to update if we have it
     if (submissionData) {
       updateData.submission_data = submissionData;
@@ -377,6 +493,65 @@ export async function POST(request: Request) {
             .eq('status', 'locked');
         }
       }
+
+      // Special logic for create_again milestone
+      // It should only unlock when ALL other applicable milestones are completed or skipped
+      if (milestoneId !== 'create_again') {
+        // Check if all other milestones (excluding create_again) are completed
+        const { data: allCreatorMilestones } = await supabase
+          .from('creator_milestones')
+          .select('milestone_id, status, metadata')
+          .eq('creator_id', creatorId);
+
+        // Get all applicable milestones for this creator's content path
+        const { data: applicableMilestones } = await supabase
+          .from('milestones')
+          .select('id, applies_to, sort_order')
+          .lt('sort_order', 98); // Exclude deactivated milestones
+
+        if (allCreatorMilestones && applicableMilestones) {
+          const contentPathFilter = contentPath || 'course';
+
+          // Filter to only applicable milestones (based on content path)
+          const applicableMilestoneIds = new Set(
+            applicableMilestones
+              .filter(m => {
+                const appliesTo = m.applies_to as string[] | null;
+                if (!appliesTo || appliesTo.length === 0) {
+                  return contentPathFilter === 'course';
+                }
+                return appliesTo.includes(contentPathFilter);
+              })
+              .map(m => m.id)
+          );
+
+          // Check if all applicable milestones (except create_again) are completed or skipped
+          const applicableCreatorMilestones = allCreatorMilestones.filter(
+            cm => applicableMilestoneIds.has(cm.milestone_id) && cm.milestone_id !== 'create_again'
+          );
+
+          const allOthersComplete = applicableCreatorMilestones.every(cm => {
+            // Check if milestone is completed
+            if (cm.status === 'completed') return true;
+            // Check if milestone is marked as optional/skipped in metadata
+            const meta = cm.metadata as Record<string, unknown> | null;
+            if (meta?.is_optional === true || meta?.skipped === true) return true;
+            return false;
+          });
+
+          if (allOthersComplete) {
+            // Unlock the create_again milestone
+            await supabase
+              .from('creator_milestones')
+              .update({ status: 'available', updated_at: new Date().toISOString() })
+              .eq('creator_id', creatorId)
+              .eq('milestone_id', 'create_again')
+              .eq('status', 'locked');
+
+            console.log('[submit] All milestones complete - unlocked create_again milestone');
+          }
+        }
+      }
     }
 
     // 5. Fetch milestone info for notifications and notes
@@ -442,12 +617,44 @@ export async function POST(request: Request) {
           // Determine email subject based on type
           let emailSubject = `New Submission from ${creator.name}`;
           let emailHeading = 'New Submission Ready for Review';
+          let customEmailBody = '';
           if (submissionType === 'meeting_scheduled') {
             emailSubject = `📅 ${creator.name} scheduled a meeting`;
             emailHeading = 'Meeting Scheduled';
           } else if (submissionType === 'change_request') {
             emailSubject = `📝 ${creator.name} requested changes`;
             emailHeading = 'Change Request';
+          } else if (submissionType === 'create_again_choice') {
+            // Get content path for email
+            const { data: creatorInfo } = await supabase
+              .from('creators')
+              .select('content_path')
+              .eq('id', creatorId)
+              .single();
+            const pathLabels: Record<string, string> = {
+              blog: 'Blog',
+              download: 'Download',
+              course: 'Course'
+            };
+            const contentPathLabel = creatorInfo?.content_path ? pathLabels[creatorInfo.content_path] || creatorInfo.content_path : 'Content';
+            const choiceLabel = content.choice === 'yes' ? 'Wants to create again' : 'Holding off';
+
+            emailSubject = `[Creator Portal] ${creator.name} has completed their ${contentPathLabel} — ${choiceLabel}`;
+            emailHeading = `${creator.name} Finished Their ${contentPathLabel}`;
+            customEmailBody = `
+              <div style="background: ${content.choice === 'yes' ? '#ecfdf5' : '#fef9c3'}; border: 2px solid ${content.choice === 'yes' ? '#10b981' : '#eab308'}; border-radius: 8px; padding: 16px; margin: 16px 0;">
+                <p style="margin: 0; font-size: 14px; color: #666;">${content.choice === 'yes' ? '✓ Ready to Create Again' : '⏸ Holding Off'}</p>
+                <p style="margin: 8px 0 0 0; font-size: 18px; font-weight: 600; color: #1e2749;">
+                  ${content.choice === 'yes' ? 'A new project has been created for them and they\'re starting from the beginning.' : 'No new project was created. They can reach out if they change their mind.'}
+                </p>
+              </div>
+              <div style="background: #f8fafc; border-radius: 8px; padding: 16px; margin: 16px 0;">
+                <p style="margin: 0; font-weight: 600; color: #1e2749;">Next Step</p>
+                <p style="margin: 8px 0 0 0; color: #64748b;">
+                  Review their completed project and archive it when ready.
+                </p>
+              </div>
+            `;
           }
 
           await fetch('https://api.resend.com/emails', {
@@ -467,10 +674,11 @@ export async function POST(request: Request) {
                   <p><strong>Creator:</strong> ${creator.name} (${creator.email})</p>
                   <p><strong>Milestone:</strong> ${milestoneName}</p>
 
+                  ${customEmailBody || ''}
                   ${meetingInfo}
                   ${changeRequestInfo}
                   ${content.link ? `<p><strong>Submitted Link:</strong> <a href="${content.link}">${content.link}</a></p>` : ''}
-                  ${content.notes && !changeRequestInfo ? `<p><strong>Creator Notes:</strong> ${content.notes}</p>` : ''}
+                  ${content.notes && !changeRequestInfo && !customEmailBody ? `<p><strong>Creator Notes:</strong> ${content.notes}</p>` : ''}
 
                   <a href="https://www.teachersdeserveit.com/admin/creators/${creatorId}"
                      style="display: inline-block; background: #1e2749; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; margin-top: 16px;">
@@ -556,6 +764,13 @@ export async function POST(request: Request) {
         break;
       case 'change_request':
         autoNoteContent = `[Auto] Change request for ${milestoneName}: ${content.request}`;
+        break;
+      case 'create_again_choice':
+        if (content.choice === 'yes') {
+          autoNoteContent = `[Auto] Creator chose to create again - new project started`;
+        } else {
+          autoNoteContent = `[Auto] Creator chose to hold off on creating new content`;
+        }
         break;
     }
 

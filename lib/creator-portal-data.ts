@@ -3,6 +3,7 @@ import type {
   Creator,
   CreatorMilestone,
   CreatorNote,
+  CreatorProject,
   Phase,
   PhaseId,
   Milestone,
@@ -551,6 +552,17 @@ export async function getCreatorDashboardData(
     isComplete: corePercent === 100,
   };
 
+  // Get projects for this creator
+  const { data: projects } = await supabase
+    .from('creator_projects')
+    .select('*')
+    .eq('creator_id', creatorId)
+    .order('project_number', { ascending: false });
+
+  // Separate active and past projects
+  const activeProject = projects?.find(p => p.status === 'active') as CreatorProject | undefined;
+  const pastProjects = projects?.filter(p => p.status !== 'active') as CreatorProject[] | undefined;
+
   return {
     creator,
     phases: phasesWithMilestones,
@@ -560,6 +572,8 @@ export async function getCreatorDashboardData(
     progressPercentage,
     contentPath,
     progress,
+    activeProject,
+    pastProjects,
   };
 }
 

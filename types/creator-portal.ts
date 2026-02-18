@@ -48,6 +48,23 @@ export type PublishStatus = 'in_progress' | 'scheduled' | 'published';
 // Creator status types
 export type CreatorStatus = 'active' | 'archived';
 
+// Project status types
+export type ProjectStatus = 'active' | 'completed' | 'archived';
+
+// Creator project from database
+export interface CreatorProject {
+  id: string;
+  creator_id: string;
+  project_number: number;
+  content_path: ContentPath | null;
+  status: ProjectStatus;
+  project_title: string | null;
+  created_at: string;
+  completed_at: string | null;
+  archived_at: string | null;
+  archived_by: string | null;
+}
+
 // Creator from database
 export interface Creator {
   id: string;
@@ -97,6 +114,7 @@ export interface Creator {
   status: CreatorStatus;
   post_launch_notes: string | null;
   previous_project_id: string | null;
+  active_project_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -137,7 +155,10 @@ export interface AdminUser {
 
 // Submission data structure for different submission types
 export interface SubmissionData {
-  type: 'path_selection' | 'meeting_scheduled' | 'form' | 'link' | 'confirmation' | 'preferences' | 'change_request' | 'team_review' | 'course_title' | 'course_outline' | 'agreement';
+  type: 'path_selection' | 'meeting_scheduled' | 'form' | 'link' | 'confirmation' | 'preferences' | 'change_request' | 'team_review' | 'course_title' | 'course_outline' | 'agreement' | 'create_again_choice';
+  // Create again choice
+  create_again_choice?: 'yes' | 'hold_off';
+  chosen_at?: string;
   // Path selection
   content_path?: 'blog' | 'download' | 'course';
   selected_at?: string;
@@ -214,6 +235,9 @@ export interface CreatorDashboardData {
   contentPath: ContentPath | null;
   // New: core vs bonus progress
   progress?: ProgressBreakdown;
+  // Multi-project support
+  activeProject?: CreatorProject;
+  pastProjects?: CreatorProject[];
 }
 
 // Admin creator list item

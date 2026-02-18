@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Calendar, FileText, Upload, CheckCircle, ExternalLink, Send, Loader2, Eye, Mail, MessageSquare, PartyPopper, Copy, Check, AlertCircle, Link2, PenLine, GraduationCap, Package, BookOpen, ChevronDown, ChevronUp, Handshake, DollarSign } from 'lucide-react';
+import { Calendar, FileText, Upload, CheckCircle, ExternalLink, Send, Loader2, Eye, Mail, MessageSquare, PartyPopper, Copy, Check, AlertCircle, Link2, PenLine, GraduationCap, Package, BookOpen, ChevronDown, ChevronUp, Handshake, DollarSign, RefreshCw, Pause } from 'lucide-react';
 
 interface MilestoneActionProps {
   milestone: {
@@ -1365,6 +1365,94 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
           </div>
         </AdminPreviewWrapper>
       );
+
+    case 'create_again_choice': {
+      // Create With Us Again? - Final milestone choice
+      const contentPathLabels: Record<string, string> = {
+        blog: 'blog post',
+        download: 'digital download',
+        course: 'online course',
+      };
+      const contentPathLabel = creator?.content_path ? contentPathLabels[creator.content_path] || creator.content_path : 'content';
+
+      const handleCreateAgainChoice = async (choice: 'yes' | 'hold_off') => {
+        setIsSubmitting(true);
+        setError(null);
+
+        try {
+          const response = await fetch('/api/creator-portal/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              creatorId,
+              milestoneId: milestone.id,
+              submissionType: 'create_again_choice',
+              content: { choice },
+              notifyTeam: true
+            }),
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.success) {
+            onComplete();
+          } else {
+            setError(data.error || 'Failed to save your choice. Please try again.');
+          }
+        } catch (err) {
+          setError('Network error. Please try again.');
+          console.error('Create again choice error:', err);
+        } finally {
+          setIsSubmitting(false);
+        }
+      };
+
+      return (
+        <AdminPreviewWrapper actionLabel="Create With Us Again?">
+          <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-6 space-y-6">
+            <div className="text-center">
+              <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-3" />
+              <h3 className="text-xl font-bold text-green-800">
+                {config.heading || 'You Did It!'}
+              </h3>
+              <p className="text-green-700 mt-2">
+                Congratulations on completing your {contentPathLabel}! We&apos;d love to keep creating with you.
+              </p>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <button
+                onClick={() => !isAdminPreview && handleCreateAgainChoice('yes')}
+                disabled={isSubmitting || isAdminPreview}
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-[#1e2749] text-white rounded-lg hover:bg-[#2a3558] transition-colors disabled:opacity-50 font-medium"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-5 h-5" />
+                )}
+                {config.yes_label || 'Yes, I have more to share!'}
+              </button>
+              <button
+                onClick={() => !isAdminPreview && handleCreateAgainChoice('hold_off')}
+                disabled={isSubmitting || isAdminPreview}
+                className="flex items-center justify-center gap-2 px-6 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                <Pause className="w-5 h-5" />
+                {config.no_label || 'Hold off for now'}
+              </button>
+            </div>
+
+            {error && (
+              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 p-3 rounded-lg justify-center">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                {error}
+              </div>
+            )}
+          </div>
+        </AdminPreviewWrapper>
+      );
+    }
 
     default:
       // Default to a simple confirm button

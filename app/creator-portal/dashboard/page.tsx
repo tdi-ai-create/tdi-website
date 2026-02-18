@@ -9,9 +9,11 @@ import { CreatorDashboardHeader } from '@/components/creator-portal/CreatorDashb
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
 import { CourseDetailsPanel } from '@/components/creator-portal/CourseDetailsPanel';
 import { NotesPanel } from '@/components/creator-portal/NotesPanel';
+import { CompletionBanner } from '@/components/creator-portal/CompletionBanner';
+import { PastProjects } from '@/components/creator-portal/PastProjects';
 import TDIPortalLoader from '@/components/TDIPortalLoader';
 import LocationPromptModal from '@/components/creator-portal/LocationPromptModal';
-import type { CreatorDashboardData } from '@/types/creator-portal';
+import type { CreatorDashboardData, MilestoneWithStatus } from '@/types/creator-portal';
 
 // Component to handle search params (must be wrapped in Suspense)
 function SearchParamsHandler({
@@ -397,6 +399,30 @@ export default function CreatorDashboardPage() {
 
             {/* Main content */}
             <main className="container-wide py-8">
+              {/* Check if creator completed with "hold_off" choice */}
+              {(() => {
+                // Find the create_again milestone across all phases
+                const createAgainMilestone = dashboardData.phases
+                  .flatMap(p => p.milestones)
+                  .find((m: MilestoneWithStatus) => m.id === 'create_again');
+
+                // Check if completed with "hold_off" choice
+                const submissionData = createAgainMilestone?.submission_data;
+                const isHoldingOff = createAgainMilestone?.status === 'completed' &&
+                  submissionData?.create_again_choice === 'hold_off';
+
+                if (isHoldingOff) {
+                  return (
+                    <CompletionBanner
+                      creatorName={dashboardData.creator.name}
+                      contentPath={dashboardData.creator.content_path}
+                      creatorId={dashboardData.creator.id}
+                    />
+                  );
+                }
+                return null;
+              })()}
+
               {/* Dashboard header with progress */}
               <CreatorDashboardHeader
                 creator={dashboardData.creator}
@@ -438,6 +464,11 @@ export default function CreatorDashboardPage() {
                 <div className="space-y-6">
                   <CourseDetailsPanel creator={dashboardData.creator} />
                   <NotesPanel notes={dashboardData.notes} />
+
+                  {/* Past Projects (if any) */}
+                  {dashboardData.pastProjects && dashboardData.pastProjects.length > 0 && (
+                    <PastProjects projects={dashboardData.pastProjects} />
+                  )}
 
                   {/* TDI Contact Card */}
                   <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">

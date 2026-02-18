@@ -42,9 +42,12 @@ import {
   updateCreator,
   getCreatorNotes,
 } from '@/lib/creator-portal-data';
+import { ProjectArchiveBanner } from '@/components/admin/ProjectArchiveBanner';
+import { AdminPastProjects } from '@/components/admin/AdminPastProjects';
 import type {
   CreatorDashboardData,
   CreatorNote,
+  CreatorProject,
   MilestoneStatus,
   MilestoneWithStatus,
   PhaseWithMilestones,
@@ -335,6 +338,13 @@ export default function AdminCreatorDetailPage() {
   const [isUpdatingContentPath, setIsUpdatingContentPath] = useState(false);
   const [contentPathUpdatedAt, setContentPathUpdatedAt] = useState<string | null>(null);
 
+  // Archive banner state
+  const [archiveBannerDismissed, setArchiveBannerDismissed] = useState(false);
+
+  // Projects state
+  const [pastProjects, setPastProjects] = useState<CreatorProject[]>([]);
+  const [activeProject, setActiveProject] = useState<CreatorProject | undefined>(undefined);
+
   const loadData = useCallback(async () => {
     const data = await getCreatorDashboardData(creatorId);
     if (data) {
@@ -383,6 +393,12 @@ export default function AdminCreatorDetailPage() {
     const contentPathNote = notes.find(n => n.content.startsWith('Content path changed from'));
     if (contentPathNote) {
       setContentPathUpdatedAt(contentPathNote.created_at);
+    }
+
+    // Set projects from dashboard data
+    if (data) {
+      setActiveProject(data.activeProject);
+      setPastProjects(data.pastProjects || []);
     }
 
     setIsLoading(false);
@@ -1007,6 +1023,33 @@ export default function AdminCreatorDetailPage() {
           </div>
         )}
 
+        {/* Archive Banner - shown when create_again is completed */}
+        {!archiveBannerDismissed && (() => {
+          // Find the create_again milestone
+          const createAgainMilestone = phases
+            .flatMap(p => p.milestones)
+            .find((m: MilestoneWithStatus) => m.id === 'create_again');
+
+          if (createAgainMilestone && createAgainMilestone.status === 'completed') {
+            return (
+              <ProjectArchiveBanner
+                creatorId={creatorId}
+                creatorName={creator.name}
+                contentPath={creator.content_path}
+                createAgainMilestone={createAgainMilestone}
+                activeProject={activeProject}
+                adminEmail={adminEmail}
+                onArchived={() => {
+                  loadData();
+                  setArchiveBannerDismissed(true);
+                }}
+                onDismissed={() => setArchiveBannerDismissed(true)}
+              />
+            );
+          }
+          return null;
+        })()}
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main content - Milestones */}
           <div className="lg:col-span-2 space-y-4">
@@ -1363,6 +1406,16 @@ export default function AdminCreatorDetailPage() {
                 </div>
               )}
             </div>
+
+            {/* Past Projects */}
+            {pastProjects && pastProjects.length > 0 && (
+              <AdminPastProjects
+                projects={pastProjects}
+                creatorId={creatorId}
+                adminEmail={adminEmail}
+                onRestored={loadData}
+              />
+            )}
           </div>
         </div>
       </main>
