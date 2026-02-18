@@ -1807,137 +1807,495 @@ export default function CreatorStudioPage() {
 
       {/* ANALYTICS TAB */}
       {activeTab === 'analytics' && (
-        <div>
-          {/* Analytics Stat Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
-              <p className="text-sm text-gray-500 mb-1 font-medium">Avg Progress</p>
-              <p className="text-3xl font-bold text-indigo-600">{avgProgress}%</p>
-            </div>
-            <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
-              <p className="text-sm text-gray-500 mb-1 font-medium">Total Creators</p>
-              <p className="text-3xl font-bold text-indigo-600">{stats.total}</p>
-            </div>
-            <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
-              <p className="text-sm text-gray-500 mb-1 font-medium">Most Active (30d)</p>
-              <p className="text-xl font-bold truncate text-indigo-600">
-                {mostActiveCreator ? mostActiveCreator[0] : '-'}
-              </p>
-            </div>
-            <div className="bg-white rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
-              <p className="text-sm text-gray-500 mb-1 font-medium">Launched</p>
-              <p className="text-3xl font-bold text-green-600">{stats.launched}</p>
-            </div>
-          </div>
-
-          {/* Charts Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            {/* Creators by Phase */}
-            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">
-                Creators by Phase
-              </h3>
-              <div className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={phaseChartData} layout="vertical">
-                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
-                    <XAxis type="number" />
-                    <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 12 }} />
-                    <Tooltip />
-                    <Bar dataKey="count" fill={theme.primary} radius={[0, 4, 4, 0]} />
-                  </BarChart>
-                </ResponsiveContainer>
+        <div className="space-y-8">
+          {/* Loading State */}
+          {analyticsLoading && (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-indigo-600" />
+                <p className="text-gray-600">Loading analytics data...</p>
               </div>
             </div>
+          )}
 
-            {/* Content Path Distribution */}
-            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">
-                Content Path Distribution
-              </h3>
-              <div className="h-[250px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={pathChartData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={90}
-                      paddingAngle={2}
-                      dataKey="value"
-                      label={({ name, value }) => `${name}: ${value}`}
-                    >
-                      {pathChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
+          {/* Analytics Content */}
+          {!analyticsLoading && analyticsData && (
+            <>
+              {/* ==========================================
+                  SECTION 1: PIPELINE HEALTH
+                  ========================================== */}
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
+                  Pipeline Health
+                </h2>
 
-            {/* Stalled Creators */}
-            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">
-                Stalled Creators
-              </h3>
-              <div className="flex items-center justify-center h-[200px]">
-                <div className="text-center">
-                  <p className="text-5xl font-bold" style={{ color: stats.stalled > 0 ? '#F97316' : '#22C55E' }}>
-                    {stats.stalled}
-                  </p>
-                  <p className="text-sm text-gray-500 mt-2">creators inactive 14+ days</p>
-                  {stats.stalled > 0 && (
-                    <button
-                      onClick={() => handleStatCardClick('stalled')}
-                      className="mt-3 text-sm px-4 py-2 rounded-lg"
-                      style={{ backgroundColor: theme.light, color: theme.primary }}
-                    >
-                      View stalled creators
-                    </button>
-                  )}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                  {/* A. Creator Velocity — Average Time Per Phase */}
+                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                      Creator Velocity
+                    </h3>
+                    <p className="text-sm text-gray-500 mb-4">Average days spent in each phase</p>
+                    <div className="h-[280px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={analyticsData.phaseVelocity} layout="vertical">
+                          <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#f0f0f0" />
+                          <XAxis type="number" tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                          <YAxis dataKey="name" type="category" width={110} tick={{ fontSize: 12 }} tickLine={false} axisLine={false} />
+                          <Tooltip
+                            formatter={(value: number) => [`${value} days`, 'Avg Time']}
+                            contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                          />
+                          <Bar dataKey="avgDays" radius={[0, 8, 8, 0]}>
+                            {analyticsData.phaseVelocity.map((entry, index) => (
+                              <Cell key={`cell-${index}`} fill={entry.color} />
+                            ))}
+                          </Bar>
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <p className="text-xs text-gray-400 mt-2">
+                      Based on {analyticsData.phaseVelocity.reduce((sum, p) => sum + p.sampleSize, 0)} phase completions
+                    </p>
+                  </div>
+
+                  {/* B. Bottleneck Report */}
+                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                      Bottleneck Report
+                    </h3>
+                    <p className="text-sm text-gray-500 mb-4">Milestones where creators get stuck</p>
+                    {analyticsData.bottleneckReport.length === 0 ? (
+                      <p className="text-sm text-gray-400 py-8 text-center">No bottlenecks detected</p>
+                    ) : (
+                      <div className="overflow-x-auto max-h-[280px] overflow-y-auto">
+                        <table className="w-full text-sm">
+                          <thead className="sticky top-0 bg-white">
+                            <tr className="text-left text-xs text-gray-500 uppercase tracking-wider">
+                              <th className="pb-2 font-medium">Milestone</th>
+                              <th className="pb-2 font-medium">Phase</th>
+                              <th className="pb-2 font-medium text-right">Avg Days</th>
+                              <th className="pb-2 font-medium text-right">Stuck</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-50">
+                            {analyticsData.bottleneckReport.slice(0, 10).map((item) => (
+                              <tr
+                                key={item.id}
+                                className={item.currentlyStuck > 3 ? 'bg-amber-50' : ''}
+                              >
+                                <td className="py-2 pr-2 font-medium text-gray-900 truncate max-w-[150px]">
+                                  {item.name}
+                                </td>
+                                <td className="py-2 pr-2 text-gray-500 text-xs">
+                                  {item.phase}
+                                </td>
+                                <td className="py-2 text-right text-gray-600">
+                                  {item.avgDays}
+                                </td>
+                                <td className="py-2 text-right">
+                                  <span className={`font-semibold ${item.currentlyStuck > 3 ? 'text-amber-600' : 'text-gray-600'}`}>
+                                    {item.currentlyStuck}
+                                  </span>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* C. Content Path Breakdown */}
+                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                      Content Path Breakdown
+                    </h3>
+                    <div className="flex items-center gap-6">
+                      <div className="h-[200px] w-[200px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie
+                              data={analyticsData.contentPathBreakdown}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={50}
+                              outerRadius={80}
+                              paddingAngle={3}
+                              dataKey="value"
+                            >
+                              {analyticsData.contentPathBreakdown.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </Pie>
+                            <Tooltip
+                              formatter={(value: number, name: string) => [`${value} creators (${analyticsData.contentPathBreakdown.find(p => p.name === name)?.percent || 0}%)`, name]}
+                              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                            />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        {analyticsData.contentPathBreakdown.map((item) => (
+                          <div key={item.name} className="flex items-center gap-3">
+                            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
+                            <span className="text-sm text-gray-600 flex-1">{item.name}</span>
+                            <span className="text-sm font-semibold text-gray-900">{item.value}</span>
+                            <span className="text-xs text-gray-400 w-10 text-right">{item.percent}%</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Content Path Trends */}
+                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                      New Creators Over Time
+                    </h3>
+                    <div className="h-[200px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={analyticsData.contentPathTrends}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                          <XAxis dataKey="monthLabel" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+                          <YAxis tick={{ fontSize: 10 }} tickLine={false} axisLine={false} />
+                          <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                          <Bar dataKey="course" stackId="a" fill="#8B5CF6" radius={[0, 0, 0, 0]} name="Course" />
+                          <Bar dataKey="blog" stackId="a" fill="#3B82F6" name="Blog" />
+                          <Bar dataKey="download" stackId="a" fill="#22C55E" name="Download" />
+                          <Bar dataKey="notSet" stackId="a" fill="#9CA3AF" radius={[4, 4, 0, 0]} name="Not Set" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+
+                  {/* D. Creator Activity Heatmap */}
+                  <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                    <h3 className="text-lg font-semibold mb-2 text-gray-900">
+                      Creator Activity Heatmap
+                    </h3>
+                    <p className="text-sm text-gray-500 mb-4">Recent activity by creator (sorted by most dormant)</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-2 max-h-[300px] overflow-y-auto">
+                      {analyticsData.activityHeatmap.slice(0, 40).map((creator) => {
+                        const colors = {
+                          green: 'bg-green-500',
+                          yellow: 'bg-yellow-500',
+                          orange: 'bg-orange-500',
+                          red: 'bg-red-500',
+                        };
+                        const bgColors = {
+                          green: 'bg-green-50 hover:bg-green-100',
+                          yellow: 'bg-yellow-50 hover:bg-yellow-100',
+                          orange: 'bg-orange-50 hover:bg-orange-100',
+                          red: 'bg-red-50 hover:bg-red-100',
+                        };
+                        return (
+                          <Link
+                            key={creator.id}
+                            href={`/tdi-admin/creators/${creator.id}`}
+                            className={`p-2 rounded-xl ${bgColors[creator.activityLevel]} transition-colors cursor-pointer`}
+                          >
+                            <div className="flex items-center gap-2">
+                              <div className={`w-2 h-2 rounded-full ${colors[creator.activityLevel]}`} />
+                              <span className="text-xs font-medium text-gray-700 truncate">
+                                {creator.initials}
+                              </span>
+                            </div>
+                            <p className="text-[10px] text-gray-500 mt-1 truncate">{creator.name}</p>
+                            <p className="text-[10px] text-gray-400">{creator.daysSinceActivity}d</p>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                    <div className="flex items-center gap-4 mt-4 pt-3 border-t border-gray-100 text-xs text-gray-500">
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-green-500" /> 0-7 days</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-yellow-500" /> 8-14 days</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-orange-500" /> 15-30 days</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> 30+ days</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Progress Distribution */}
-            <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
-              <h3 className="text-lg font-semibold mb-4 text-gray-900">
-                Progress Distribution
-              </h3>
-              <div className="space-y-3">
-                {[
-                  { label: '0-25%', min: 0, max: 25 },
-                  { label: '26-50%', min: 26, max: 50 },
-                  { label: '51-75%', min: 51, max: 75 },
-                  { label: '76-99%', min: 76, max: 99 },
-                  { label: '100%', min: 100, max: 100 },
-                ].map((range) => {
-                  const count = dashboardData.creators.filter(
-                    c => c.progressPercentage >= range.min && c.progressPercentage <= range.max
-                  ).length;
-                  const percent = stats.total > 0 ? (count / stats.total) * 100 : 0;
-                  return (
-                    <div key={range.label} className="flex items-center gap-3">
-                      <span className="text-sm text-gray-600 w-16">{range.label}</span>
-                      <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full"
-                          style={{
-                            width: `${percent}%`,
-                            backgroundColor: range.min === 100 ? '#22C55E' : theme.primary,
-                          }}
-                        />
+              {/* ==========================================
+                  SECTION 2: CONVERSION & COMPLETION
+                  ========================================== */}
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
+                  Conversion & Completion
+                </h2>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                  {/* E. Time from Intake to Launch */}
+                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                      Time to Launch
+                    </h3>
+                    <p className="text-sm text-gray-500 mb-4">Total journey time for launched creators</p>
+                    {analyticsData.journeyTimes.length < 3 ? (
+                      <div className="flex items-center justify-center h-[200px]">
+                        <p className="text-sm text-gray-400 text-center">
+                          More data will appear as creators complete their journeys
+                        </p>
                       </div>
-                      <span className="text-sm font-medium w-8" style={{ color: '#2B3A67' }}>{count}</span>
+                    ) : (
+                      <div className="h-[250px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={analyticsData.journeyTimes.slice(0, 10)} layout="vertical">
+                            <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="#f0f0f0" />
+                            <XAxis type="number" tick={{ fontSize: 10 }} tickLine={false} axisLine={false} unit=" days" />
+                            <YAxis dataKey="name" type="category" width={100} tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+                            <Tooltip
+                              formatter={(value: number) => [`${value} days`, 'Journey Time']}
+                              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                            />
+                            <Bar dataKey="days" radius={[0, 8, 8, 0]}>
+                              {analyticsData.journeyTimes.slice(0, 10).map((entry, index) => (
+                                <Cell
+                                  key={`cell-${index}`}
+                                  fill={entry.contentPath === 'course' ? '#8B5CF6' : entry.contentPath === 'blog' ? '#3B82F6' : entry.contentPath === 'download' ? '#22C55E' : '#9CA3AF'}
+                                />
+                              ))}
+                            </Bar>
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* F. Completion Funnel */}
+                  <div className="bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                      Completion Funnel
+                    </h3>
+                    <p className="text-sm text-gray-500 mb-4">Creator progression through phases</p>
+                    <div className="space-y-2">
+                      {analyticsData.completionFunnel.map((stage, index) => {
+                        const colors = ['#6366F1', '#7C3AED', '#8B5CF6', '#A78BFA', '#C4B5FD', '#22C55E'];
+                        return (
+                          <div key={stage.phase} className="flex items-center gap-3">
+                            <div className="w-32 text-sm text-gray-600 truncate">{stage.name}</div>
+                            <div className="flex-1 h-8 bg-gray-100 rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full flex items-center justify-end px-3 transition-all duration-500"
+                                style={{
+                                  width: `${stage.percent}%`,
+                                  backgroundColor: colors[index] || '#6366F1',
+                                  minWidth: stage.count > 0 ? '50px' : '0',
+                                }}
+                              >
+                                {stage.count > 0 && (
+                                  <span className="text-white text-xs font-semibold">{stage.count}</span>
+                                )}
+                              </div>
+                            </div>
+                            <div className="w-12 text-right text-sm font-medium text-gray-600">
+                              {stage.percent}%
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                  );
-                })}
+                  </div>
+
+                  {/* G. Stalled Creator Alerts */}
+                  <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                          Stalled Creator Alerts
+                          {analyticsData.stalledCreators.length > 0 && (
+                            <span className="text-sm font-normal px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">
+                              {analyticsData.stalledCreators.length} creators
+                            </span>
+                          )}
+                        </h3>
+                        <p className="text-sm text-gray-500">Creators with no activity in 14+ days</p>
+                      </div>
+                      {analyticsData.stalledCreators.length > 0 && (
+                        <button
+                          onClick={() => handleCopyEmails(analyticsData.stalledCreators.map(c => c.email), 'stalledAnalytics')}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
+                            copiedSection === 'stalledAnalytics'
+                              ? 'bg-green-50 text-green-600 border border-green-200'
+                              : 'text-gray-500 hover:bg-gray-100 border border-gray-200'
+                          }`}
+                        >
+                          {copiedSection === 'stalledAnalytics' ? (
+                            <><Check className="w-3.5 h-3.5" /> Copied!</>
+                          ) : (
+                            <><Copy className="w-3.5 h-3.5" /> Copy Emails</>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                    {analyticsData.stalledCreators.length === 0 ? (
+                      <div className="flex items-center gap-2 text-green-600 py-4">
+                        <Check className="w-5 h-5" />
+                        <p className="text-sm">All caught up! No stalled creators.</p>
+                      </div>
+                    ) : (
+                      <div className="overflow-x-auto max-h-[300px] overflow-y-auto">
+                        <table className="w-full text-sm">
+                          <thead className="sticky top-0 bg-white">
+                            <tr className="text-left text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                              <th className="pb-2 font-medium">Creator</th>
+                              <th className="pb-2 font-medium">Content Path</th>
+                              <th className="pb-2 font-medium">Current Step</th>
+                              <th className="pb-2 font-medium text-right">Days Stalled</th>
+                              <th className="pb-2 font-medium text-right">Last Activity</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-gray-50">
+                            {analyticsData.stalledCreators.map((creator) => {
+                              const bgColor = {
+                                yellow: 'bg-yellow-50',
+                                orange: 'bg-orange-50',
+                                red: 'bg-red-50',
+                              };
+                              return (
+                                <tr
+                                  key={creator.id}
+                                  className={`${bgColor[creator.severity]} hover:brightness-95 cursor-pointer transition-all`}
+                                  onClick={() => window.location.href = `/tdi-admin/creators/${creator.id}`}
+                                >
+                                  <td className="py-3 pr-2">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center text-xs font-medium text-gray-600">
+                                        {creator.name.charAt(0).toUpperCase()}
+                                      </div>
+                                      <span className="font-medium text-gray-900">{creator.name}</span>
+                                    </div>
+                                  </td>
+                                  <td className="py-3 pr-2 text-gray-500 capitalize">
+                                    {creator.contentPath || 'Not set'}
+                                  </td>
+                                  <td className="py-3 pr-2 text-gray-600 truncate max-w-[200px]">
+                                    {creator.currentStep || '-'}
+                                  </td>
+                                  <td className="py-3 text-right font-semibold text-gray-700">
+                                    {creator.daysSinceActivity}
+                                  </td>
+                                  <td className="py-3 text-right text-gray-500">
+                                    {new Date(creator.lastActivityDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                                  </td>
+                                </tr>
+                              );
+                            })}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* ==========================================
+                  SECTION 3: OUTPUT & GROWTH
+                  ========================================== */}
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900 mb-4 pb-2 border-b border-gray-100">
+                  Output & Growth
+                </h2>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                  {/* H. Content Published Per Month */}
+                  <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                      Content Published Per Month
+                    </h3>
+                    <div className="h-[280px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={analyticsData.publishedPerMonth}>
+                          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+                          <XAxis dataKey="monthLabel" tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+                          <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
+                          <Tooltip contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }} />
+                          <Legend />
+                          <Bar dataKey="courses" fill="#8B5CF6" name="Courses" radius={[4, 4, 0, 0]} />
+                          <Bar dataKey="blogs" fill="#3B82F6" name="Blogs" radius={[4, 4, 0, 0]} />
+                          <Line type="monotone" dataKey="cumulativeCourses" stroke="#6366F1" strokeWidth={2} dot={false} name="Total Courses" />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+                    {analyticsData.publishedPerMonth.every(m => m.total === 0) && (
+                      <p className="text-sm text-gray-400 text-center mt-2">
+                        Track will build as more creators launch
+                      </p>
+                    )}
+                  </div>
+
+                  {/* I. Geographic Distribution */}
+                  <div className="lg:col-span-2 bg-white rounded-2xl p-6 shadow-[0_1px_3px_rgba(0,0,0,0.06),0_1px_2px_rgba(0,0,0,0.04)]">
+                    <h3 className="text-lg font-semibold mb-4 text-gray-900">
+                      Geographic Distribution
+                    </h3>
+                    {!analyticsData.geographicDistribution.hasData ? (
+                      <div className="text-center py-8">
+                        <MapPin className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                        <p className="text-sm text-gray-500">
+                          Geographic data will appear once creator locations are captured
+                        </p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          This can be added to the creator intake form
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2">
+                          <div className="space-y-2">
+                            {analyticsData.geographicDistribution.states.slice(0, 10).map((item, index) => (
+                              <div key={item.state} className="flex items-center gap-3">
+                                <span className="text-xs font-medium text-gray-400 w-4">{index + 1}</span>
+                                <span className="text-sm text-gray-700 w-24">{item.state}</span>
+                                <div className="flex-1 h-4 bg-gray-100 rounded-full overflow-hidden">
+                                  <div
+                                    className="h-full rounded-full bg-indigo-500"
+                                    style={{ width: `${item.percent}%` }}
+                                  />
+                                </div>
+                                <span className="text-sm font-medium text-gray-600 w-8 text-right">{item.count}</span>
+                                <span className="text-xs text-gray-400 w-10 text-right">{item.percent}%</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <div className="bg-indigo-50 rounded-xl p-4 text-center">
+                            <p className="text-3xl font-bold text-indigo-600">{analyticsData.geographicDistribution.withState}</p>
+                            <p className="text-sm text-gray-600">With Location</p>
+                          </div>
+                          <div className="bg-gray-50 rounded-xl p-4 text-center">
+                            <p className="text-3xl font-bold text-gray-400">{analyticsData.geographicDistribution.withoutState}</p>
+                            <p className="text-sm text-gray-500">Not Shared</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* Empty State */}
+          {!analyticsLoading && !analyticsData && (
+            <div className="flex items-center justify-center py-20">
+              <div className="text-center">
+                <BarChart3 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500">Failed to load analytics data</p>
+                <button
+                  onClick={() => {
+                    setAnalyticsData(null);
+                    setAnalyticsLoading(false);
+                  }}
+                  className="mt-3 text-sm text-indigo-600 hover:text-indigo-700"
+                >
+                  Try again
+                </button>
               </div>
             </div>
-          </div>
+          )}
         </div>
       )}
 

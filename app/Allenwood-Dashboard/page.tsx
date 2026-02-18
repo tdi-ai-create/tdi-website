@@ -1108,7 +1108,7 @@ export default function AllenwoodDashboard() {
                   </h4>
 
                   <div className="space-y-3">
-                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="text-gray-900 font-medium">K-2 Station Rotation Routines</p>
@@ -1116,9 +1116,9 @@ export default function AllenwoodDashboard() {
                         </div>
                         <span className="text-gray-500 text-xs whitespace-nowrap">~25 min</span>
                       </div>
-                    </div>
+                    </a>
 
-                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="text-gray-900 font-medium">Your Class Runs Smoother When the Flow Makes Sense</p>
@@ -1126,9 +1126,9 @@ export default function AllenwoodDashboard() {
                         </div>
                         <span className="text-gray-500 text-xs whitespace-nowrap">~25 min</span>
                       </div>
-                    </div>
+                    </a>
 
-                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="text-gray-900 font-medium">Classroom Management Toolkit</p>
@@ -1136,9 +1136,9 @@ export default function AllenwoodDashboard() {
                         </div>
                         <span className="text-gray-500 text-xs whitespace-nowrap">~30 min</span>
                       </div>
-                    </div>
+                    </a>
 
-                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                    <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="text-gray-900 font-medium">Building Strong Teacher-Para Partnerships</p>
@@ -1146,7 +1146,7 @@ export default function AllenwoodDashboard() {
                         </div>
                         <span className="text-gray-500 text-xs whitespace-nowrap">~30 min</span>
                       </div>
-                    </div>
+                    </a>
                   </div>
                 </div>
 
