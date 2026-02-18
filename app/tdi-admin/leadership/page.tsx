@@ -349,61 +349,121 @@ export default function LeadershipDashboardPage() {
         </p>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Updated to match Creator Studio design */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-          <div className="bg-white rounded-xl p-4 border border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: theme.light }}>
-                <Check className="w-5 h-5" style={{ color: theme.primary }} />
-              </div>
+          <div
+            className="bg-white rounded-xl p-5 transition-all duration-200 group"
+            style={{
+              backgroundColor: theme.light,
+              borderLeft: `3px solid ${theme.primary}`,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+            }}
+          >
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold" style={{ color: theme.primary }}>
+                <p
+                  className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.primary }}
+                >
                   {stats.activeCount}
                 </p>
-                <p className="text-xs text-gray-600">Active Partnerships</p>
+                <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                  Active Partnerships
+                </p>
+              </div>
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
+                style={{ backgroundColor: `${theme.primary}15` }}
+              >
+                <Check className="w-6 h-6" style={{ color: theme.primary }} />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-4 border border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: theme.light }}>
-                <Users className="w-5 h-5" style={{ color: theme.primary }} />
-              </div>
+          <div
+            className="bg-white rounded-xl p-5 transition-all duration-200 group"
+            style={{
+              backgroundColor: theme.light,
+              borderLeft: `3px solid ${theme.primary}`,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+            }}
+          >
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold" style={{ color: theme.primary }}>
+                <p
+                  className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.primary }}
+                >
                   {stats.totalEducators}
                 </p>
-                <p className="text-xs text-gray-600">Total Educators</p>
+                <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                  Total Educators
+                </p>
+              </div>
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
+                style={{ backgroundColor: `${theme.primary}15` }}
+              >
+                <Users className="w-6 h-6" style={{ color: theme.primary }} />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-4 border border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: theme.light }}>
-                <Clock className="w-5 h-5" style={{ color: theme.primary }} />
-              </div>
+          <div
+            className="bg-white rounded-xl p-5 transition-all duration-200 group"
+            style={{
+              backgroundColor: theme.light,
+              borderLeft: `3px solid ${theme.primary}`,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+            }}
+          >
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold" style={{ color: theme.primary }}>
+                <p
+                  className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.primary }}
+                >
                   {stats.pendingSetup}
                 </p>
-                <p className="text-xs text-gray-600">Pending Setup</p>
+                <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                  Pending Setup
+                </p>
+              </div>
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
+                style={{ backgroundColor: `${theme.primary}15` }}
+              >
+                <Clock className="w-6 h-6" style={{ color: theme.primary }} />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-4 border border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: theme.light }}>
-                <Mail className="w-5 h-5" style={{ color: theme.primary }} />
-              </div>
+          <div
+            className="bg-white rounded-xl p-5 transition-all duration-200 group"
+            style={{
+              backgroundColor: theme.light,
+              borderLeft: `3px solid ${theme.primary}`,
+              boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+            }}
+          >
+            <div className="flex items-center justify-between">
               <div>
-                <p className="text-2xl font-bold" style={{ color: theme.primary }}>
+                <p
+                  className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: theme.primary }}
+                >
                   {stats.awaitingAccept}
                 </p>
-                <p className="text-xs text-gray-600">Awaiting Accept</p>
+                <p className="text-sm text-gray-500 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                  Awaiting Accept
+                </p>
+              </div>
+              <div
+                className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
+                style={{ backgroundColor: `${theme.primary}15` }}
+              >
+                <Mail className="w-6 h-6" style={{ color: theme.primary }} />
               </div>
             </div>
           </div>
@@ -443,7 +503,10 @@ export default function LeadershipDashboardPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="bg-white rounded-xl border border-gray-200">
+      <div
+        className="bg-white rounded-xl border border-gray-100"
+        style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)' }}
+      >
         {/* =========== PARTNERSHIPS TAB =========== */}
         {activeTab === 'partnerships' && (
           <div>
@@ -480,10 +543,11 @@ export default function LeadershipDashboardPage() {
                   </button>
                   <Link
                     href="/admin/partnerships"
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg transition-colors"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg transition-all duration-200 hover:opacity-90"
                     style={{
-                      backgroundColor: '#2B3A67',
+                      backgroundColor: theme.primary,
                       color: 'white',
+                      fontFamily: "'DM Sans', sans-serif",
                     }}
                   >
                     <Plus className="w-4 h-4" />

@@ -101,19 +101,22 @@ function SectionCard({ title, description, features, href, icon: Icon, color }: 
   return (
     <Link
       href={href}
-      className="block bg-white rounded-xl p-6 border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200 transition-all group"
-      style={{ borderLeft: `4px solid ${theme.primary}` }}
+      className="block bg-white rounded-xl p-6 border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all duration-200 group"
+      style={{
+        boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+        borderLeft: `4px solid ${theme.primary}`,
+      }}
     >
       <div className="flex items-start justify-between mb-4">
         <div
-          className="w-12 h-12 rounded-lg flex items-center justify-center"
+          className="w-12 h-12 rounded-xl flex items-center justify-center"
           style={{ backgroundColor: theme.light }}
         >
           <Icon size={24} style={{ color: theme.primary }} />
         </div>
         <ChevronRight
           size={20}
-          className="text-gray-300 group-hover:text-gray-500 group-hover:translate-x-1 transition-all"
+          className="text-gray-300 group-hover:text-gray-500 group-hover:translate-x-1 transition-all duration-200"
         />
       </div>
       <h3

@@ -75,24 +75,48 @@ import {
 
 type Tab = 'accounts' | 'enrollments' | 'certificates' | 'reports' | 'analytics' | 'tips' | 'emails';
 
-// Stat Card Component
+// Stat Card Component - Updated to match Creator Studio design
 function StatCard({ label, value, icon: Icon, trend }: { label: string; value: string | number; icon: React.ElementType; trend?: 'up' | 'down' | null }) {
   return (
-    <div className="bg-white rounded-lg border border-gray-100 p-4">
-      <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: theme.light }}>
-          <Icon size={18} style={{ color: theme.primary }} />
-        </div>
+    <div
+      className="bg-white rounded-xl p-5 transition-all duration-200 group"
+      style={{
+        backgroundColor: theme.light,
+        borderLeft: `3px solid ${theme.primary}`,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+      }}
+    >
+      <div className="flex items-center justify-between">
         <div>
-          <p className="text-2xl font-bold" style={{ color: theme.primary }}>{value}</p>
-          <p className="text-sm text-gray-500">{label}</p>
+          <p
+            className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              color: theme.primary,
+            }}
+          >
+            {value}
+          </p>
+          <p
+            className="text-sm text-gray-500 font-medium"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            {label}
+          </p>
         </div>
-        {trend && (
-          <div className={`ml-auto ${trend === 'up' ? 'text-green-500' : 'text-red-500'}`}>
-            {trend === 'up' ? <TrendingUp size={16} /> : <TrendingDown size={16} />}
-          </div>
-        )}
+        <div
+          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
+          style={{ backgroundColor: `${theme.primary}15` }}
+        >
+          <Icon className="w-6 h-6" style={{ color: theme.primary }} />
+        </div>
       </div>
+      {trend && (
+        <div className={`mt-2 flex items-center gap-1 text-sm ${trend === 'up' ? 'text-green-500' : 'text-red-500'}`}>
+          {trend === 'up' ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+          <span>{trend === 'up' ? 'Trending up' : 'Trending down'}</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -226,7 +250,7 @@ function AccountsTab() {
             placeholder="Search by name or school..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
           />
         </div>
         <select
@@ -455,7 +479,7 @@ function EnrollmentsTab() {
             placeholder="Search by user or course..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
           />
         </div>
         <select
@@ -646,7 +670,7 @@ function CertificatesTab() {
             placeholder="Search by user, course, or verification code..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
           />
         </div>
         <button
@@ -877,27 +901,27 @@ function ReportsTab() {
             placeholder="State (e.g., TX, CA)"
             value={reportFilters.state}
             onChange={(e) => setReportFilters({ ...reportFilters, state: e.target.value })}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
           />
           <input
             type="text"
             placeholder="School/Organization"
             value={reportFilters.org}
             onChange={(e) => setReportFilters({ ...reportFilters, org: e.target.value })}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
           />
           <input
             type="date"
             value={reportFilters.dateFrom}
             onChange={(e) => setReportFilters({ ...reportFilters, dateFrom: e.target.value })}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
           />
           <span className="flex items-center text-gray-400">to</span>
           <input
             type="date"
             value={reportFilters.dateTo}
             onChange={(e) => setReportFilters({ ...reportFilters, dateTo: e.target.value })}
-            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+            className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
           />
           {(reportFilters.state || reportFilters.org || reportFilters.dateFrom || reportFilters.dateTo) && (
             <button
@@ -917,7 +941,7 @@ function ReportsTab() {
           <div
             key={report.id}
             className={`bg-white rounded-lg border p-5 transition-all ${
-              selectedReport === report.id ? 'border-[#5BBEC4] shadow-sm' : 'border-gray-200 hover:border-[#5BBEC4] hover:shadow-sm'
+              selectedReport === report.id ? 'border-[#0D9488] shadow-sm' : 'border-gray-200 hover:border-[#0D9488] hover:shadow-sm'
             }`}
           >
             <h3 className="font-semibold text-gray-900 mb-2" style={{ fontFamily: "'DM Sans', sans-serif" }}>
@@ -964,7 +988,7 @@ function ReportsTab() {
             <button
               onClick={() => downloadCSV(selectedReport)}
               className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2"
-              style={{ backgroundColor: '#5BBEC4' }}
+              style={{ backgroundColor: '#0D9488' }}
             >
               <Download size={14} />
               Download CSV
@@ -1071,7 +1095,7 @@ function ReportsTab() {
 }
 
 // Color palette for charts (Hub uses teal as primary, with complementary colors for contrast)
-const CHART_COLORS = ['#5BBEC4', '#1a6b69', '#3B82F6', '#16A34A', '#F59E0B', '#E8927C', '#6366F1', '#EC4899'];
+const CHART_COLORS = ['#0D9488', '#115E59', '#3B82F6', '#16A34A', '#F59E0B', '#E8927C', '#6366F1', '#EC4899'];
 
 // ANALYTICS TAB
 function AnalyticsTab() {
@@ -1225,25 +1249,25 @@ function AnalyticsTab() {
         {activeFilterCount > 0 && (
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid #F3F4F6' }}>
             {filters.state && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.1)', color: '#5BBEC4', fontSize: '12px', borderRadius: '9999px' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.1)', color: '#0D9488', fontSize: '12px', borderRadius: '9999px' }}>
                 State: {filters.state}
                 <button onClick={() => setFilters({ ...filters, state: '' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
             )}
             {filters.org && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.1)', color: '#5BBEC4', fontSize: '12px', borderRadius: '9999px' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.1)', color: '#0D9488', fontSize: '12px', borderRadius: '9999px' }}>
                 Org: {filters.org.length > 15 ? filters.org.slice(0, 15) + '...' : filters.org}
                 <button onClick={() => setFilters({ ...filters, org: '' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
             )}
             {filters.role !== 'all' && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.15)', color: '#1a6b69', fontSize: '12px', borderRadius: '9999px' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.15)', color: '#115E59', fontSize: '12px', borderRadius: '9999px' }}>
                 Role: {filters.role.replace('_', ' ')}
                 <button onClick={() => setFilters({ ...filters, role: 'all' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
             )}
             {filters.gradeLevel !== 'all' && (
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.15)', color: '#1a6b69', fontSize: '12px', borderRadius: '9999px' }}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 8px', backgroundColor: 'rgba(91, 190, 196, 0.15)', color: '#115E59', fontSize: '12px', borderRadius: '9999px' }}>
                 Grade: {filters.gradeLevel}
                 <button onClick={() => setFilters({ ...filters, gradeLevel: 'all' })} style={{ cursor: 'pointer', background: 'none', border: 'none', color: 'inherit', padding: 0 }}><X size={12} /></button>
               </span>
@@ -1364,7 +1388,7 @@ function AnalyticsTab() {
                     <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <Tooltip />
-                    <Line type="monotone" dataKey="value" stroke="#5BBEC4" strokeWidth={2} dot={{ fill: '#5BBEC4' }} name="Enrollments" />
+                    <Line type="monotone" dataKey="value" stroke="#0D9488" strokeWidth={2} dot={{ fill: '#0D9488' }} name="Enrollments" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -1468,7 +1492,7 @@ function AnalyticsTab() {
                       tickFormatter={(value) => value.length > 25 ? value.slice(0, 25) + '...' : value}
                     />
                     <Tooltip />
-                    <Bar dataKey="enrollments" fill="#5BBEC4" radius={[0, 4, 4, 0]} name="Enrollments" />
+                    <Bar dataKey="enrollments" fill="#0D9488" radius={[0, 4, 4, 0]} name="Enrollments" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -1586,7 +1610,7 @@ function AnalyticsTab() {
                       <XAxis dataKey="grade" tick={{ fontSize: 11 }} stroke="#9CA3AF" />
                       <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                       <Tooltip />
-                      <Bar dataKey="count" fill="#5BBEC4" radius={[4, 4, 0, 0]} name="Users" />
+                      <Bar dataKey="count" fill="#0D9488" radius={[4, 4, 0, 0]} name="Users" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -1652,7 +1676,7 @@ function AnalyticsTab() {
               <h3 className="font-semibold text-gray-900">Geographic Distribution</h3>
               <p className="text-sm text-gray-500">
                 Users located across {analytics?.totalStatesWithUsers || analytics?.stateDistribution?.length || 0} states
-                {filters.state && <span className="ml-2 text-[#5BBEC4]">(filtered to {filters.state})</span>}
+                {filters.state && <span className="ml-2 text-[#0D9488]">(filtered to {filters.state})</span>}
               </p>
             </div>
             {analytics?.stateDistribution?.length > 0 ? (
@@ -1678,7 +1702,7 @@ function AnalyticsTab() {
                           onClick={() => setFilters({ ...filters, state: filters.state === item.state ? '' : item.state })}
                           className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors ${
                             filters.state === item.state
-                              ? 'bg-[#5BBEC4]/10 border border-[#5BBEC4]'
+                              ? 'bg-[#0D9488]/10 border border-[#0D9488]'
                               : 'hover:bg-gray-50 border border-transparent'
                           }`}
                         >
@@ -1762,7 +1786,7 @@ function AnalyticsTab() {
             </div>
             <div className="bg-white rounded-lg border border-gray-200 p-5">
               <p className="text-sm text-gray-500 mb-1">Users Improved</p>
-              <p className="text-2xl font-bold" style={{ color: '#5BBEC4' }}>{stats.improvementRate || 0}%</p>
+              <p className="text-2xl font-bold" style={{ color: '#0D9488' }}>{stats.improvementRate || 0}%</p>
               <p className="text-xs text-gray-400">Lower stress score</p>
             </div>
             <div className="bg-white rounded-lg border border-gray-200 p-5">
@@ -1880,7 +1904,7 @@ function AnalyticsTab() {
                     <XAxis dataKey="month" tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <YAxis tick={{ fontSize: 12 }} stroke="#9CA3AF" />
                     <Tooltip />
-                    <Line type="monotone" dataKey="users" stroke="#5BBEC4" strokeWidth={2} dot={{ fill: '#5BBEC4' }} name="Active Users" />
+                    <Line type="monotone" dataKey="users" stroke="#0D9488" strokeWidth={2} dot={{ fill: '#0D9488' }} name="Active Users" />
                   </LineChart>
                 </ResponsiveContainer>
               </div>
@@ -1890,7 +1914,7 @@ function AnalyticsTab() {
           </div>
 
           {/* Peak Times Summary */}
-          <div className="bg-gradient-to-r from-[#5BBEC4]/10 to-[#1a6b69]/10 rounded-lg p-5 border border-[#5BBEC4]/20">
+          <div className="bg-gradient-to-r from-[#0D9488]/10 to-[#115E59]/10 rounded-lg p-5 border border-[#0D9488]/20">
             <h3 className="font-semibold text-gray-900 mb-3">Peak Activity Summary</h3>
             <div className="grid md:grid-cols-3 gap-4">
               <div>
@@ -1969,7 +1993,7 @@ function TipsTab() {
             placeholder="Enter a new tip..."
             value={newTip}
             onChange={(e) => setNewTip(e.target.value)}
-            className="w-full p-2 border border-gray-200 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+            className="w-full p-2 border border-gray-200 rounded text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
             rows={2}
           />
           <div className="flex items-center gap-2 mt-2">
@@ -2145,7 +2169,7 @@ function EmailsTab() {
             placeholder="Enter email address..."
             value={testEmail}
             onChange={(e) => setTestEmail(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5BBEC4]/50"
+            className="flex-1 px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#0D9488]/50"
           />
           <button
             className="px-4 py-2 rounded-lg text-sm font-medium text-white flex items-center gap-2"

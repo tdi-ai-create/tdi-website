@@ -215,7 +215,7 @@ export default function TeamManagementPage() {
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-[1200px] mx-auto">
+    <div className="p-4 md:p-8 max-w-[1200px] mx-auto" style={{ backgroundColor: '#FAFBFC', minHeight: '100vh' }}>
       {/* Page Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
@@ -240,14 +240,13 @@ export default function TeamManagementPage() {
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors"
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 hover:opacity-90"
           style={{
-            backgroundColor: theme.primary,
-            color: '#2B3A67',
+            backgroundColor: '#2B3A67',
+            color: 'white',
             fontFamily: "'DM Sans', sans-serif",
+            boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
           }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = theme.dark}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = theme.primary}
         >
           <Plus size={18} />
           Add Team Member
@@ -258,7 +257,11 @@ export default function TeamManagementPage() {
       {isLoading ? (
         <div className="space-y-4">
           {[1, 2, 3].map(i => (
-            <div key={i} className="bg-white rounded-xl p-6 border border-gray-100 animate-pulse">
+            <div
+              key={i}
+              className="bg-white rounded-xl p-6 border border-gray-100 animate-pulse"
+              style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)' }}
+            >
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-full bg-gray-200" />
                 <div className="flex-1">
@@ -274,8 +277,11 @@ export default function TeamManagementPage() {
           {teamMembers.map(member => (
             <div
               key={member.id}
-              className="bg-white rounded-xl p-6 border border-gray-100 shadow-sm"
-              style={{ opacity: member.is_active ? 1 : 0.6 }}
+              className="bg-white rounded-xl p-6 border border-gray-100 transition-all duration-200 hover:shadow-md"
+              style={{
+                opacity: member.is_active ? 1 : 0.6,
+                boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+              }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
