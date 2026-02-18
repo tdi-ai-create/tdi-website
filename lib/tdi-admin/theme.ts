@@ -10,30 +10,30 @@ export interface PortalTheme {
   name: 'hub' | 'creators' | 'leadership' | 'team';
 }
 
-// Theme definitions
+// Theme definitions - Updated accent colors per design spec
 export const PORTAL_THEMES = {
   hub: {
-    primary: '#5BBEC4',
-    light: '#E8F6F7',
-    dark: '#1a6b69',
+    primary: '#0D9488',      // Teal
+    light: '#F0FDFA',
+    dark: '#115E59',
     name: 'hub' as const,
   },
   creators: {
-    primary: '#9B7CB8',
+    primary: '#6B5CE7',      // Purple/Lavender
     light: '#F3EDF8',
-    dark: '#6B4E9B',
+    dark: '#5145B5',
     name: 'creators' as const,
   },
   leadership: {
-    primary: '#E8927C',
-    light: '#FDF0ED',
-    dark: '#C4624A',
+    primary: '#1E3A5F',      // Navy
+    light: '#EEF2F6',
+    dark: '#152A45',
     name: 'leadership' as const,
   },
   team: {
-    primary: '#E8B84B',
-    light: '#FFF8E7',
-    dark: '#B8860B',
+    primary: '#6B7280',      // Neutral grey
+    light: '#F9FAFB',
+    dark: '#4B5563',
     name: 'team' as const,
   },
 } as const;

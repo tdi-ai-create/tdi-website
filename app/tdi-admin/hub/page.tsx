@@ -43,38 +43,47 @@ interface StatCardProps {
 
 function StatCard({ icon: Icon, label, value, subtitle }: StatCardProps) {
   return (
-    <div className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm">
-      <div className="flex items-center gap-3 mb-2">
+    <div
+      className="bg-white rounded-xl p-5 transition-all duration-200 group"
+      style={{
+        backgroundColor: theme.light,
+        borderLeft: `3px solid ${theme.primary}`,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)',
+      }}
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <p
+            className="text-[28px] font-bold mb-1 transition-transform duration-200 group-hover:-translate-y-0.5"
+            style={{
+              fontFamily: "'DM Sans', sans-serif",
+              color: theme.primary,
+            }}
+          >
+            {typeof value === 'number' ? value.toLocaleString() : value}
+          </p>
+          <p
+            className="text-sm text-gray-500 font-medium"
+            style={{ fontFamily: "'DM Sans', sans-serif" }}
+          >
+            {label}
+          </p>
+          {subtitle && (
+            <p
+              className="text-xs text-gray-400 mt-1"
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
+            >
+              {subtitle}
+            </p>
+          )}
+        </div>
         <div
-          className="w-10 h-10 rounded-lg flex items-center justify-center"
-          style={{ backgroundColor: theme.light }}
+          className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-110"
+          style={{ backgroundColor: `${theme.primary}15` }}
         >
-          <Icon size={20} style={{ color: theme.primary }} />
+          <Icon className="w-6 h-6" style={{ color: theme.primary }} />
         </div>
       </div>
-      <p
-        className="font-bold text-2xl mb-1"
-        style={{
-          fontFamily: "'DM Sans', sans-serif",
-          color: theme.primary,
-        }}
-      >
-        {typeof value === 'number' ? value.toLocaleString() : value}
-      </p>
-      <p
-        className="text-sm text-gray-500"
-        style={{ fontFamily: "'DM Sans', sans-serif" }}
-      >
-        {label}
-      </p>
-      {subtitle && (
-        <p
-          className="text-xs text-gray-400 mt-1"
-          style={{ fontFamily: "'DM Sans', sans-serif" }}
-        >
-          {subtitle}
-        </p>
-      )}
     </div>
   );
 }
