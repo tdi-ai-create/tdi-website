@@ -1079,23 +1079,23 @@ export default function AllenwoodDashboard() {
                   </h4>
 
                   <div className="grid md:grid-cols-3 gap-3">
-                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
+                    <a href="https://tdi.thinkific.com/collections/downloads" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
                       <FileText className="w-5 h-5 text-green-500 mb-2" />
                       <p className="text-gray-900 font-medium text-sm">The Sentence Starter Guide</p>
                       <p className="text-gray-500 text-xs mt-1">We saw teachers using calm, clear phrasing. This takes it further.</p>
-                    </div>
+                    </a>
 
-                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
+                    <a href="https://tdi.thinkific.com/collections/downloads" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
                       <FileText className="w-5 h-5 text-green-500 mb-2" />
                       <p className="text-gray-900 font-medium text-sm">No-Hands-Up Help Systems</p>
                       <p className="text-gray-500 text-xs mt-1">Perfect for classrooms managing multiple adults and student needs.</p>
-                    </div>
+                    </a>
 
-                    <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
+                    <a href="https://tdi.thinkific.com/collections/downloads" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
                       <FileText className="w-5 h-5 text-green-500 mb-2" />
                       <p className="text-gray-900 font-medium text-sm">Daily Support Cheat Sheet</p>
                       <p className="text-gray-500 text-xs mt-1">Great for para consistency across all rooms.</p>
-                    </div>
+                    </a>
                   </div>
                 </div>
 
