@@ -254,13 +254,13 @@ export default function ASD4Dashboard() {
 
   // Progress tab data
   const topEngagedParas = [
-    { name: "Sandra DeLaGarza", logins: 4, lastActive: "Jan 23" },
-    { name: "Michele Gorostieta", logins: 3, lastActive: "Jan 30" },
-    { name: "Carmen Tirado", logins: 3, lastActive: "Jan 23" },
-    { name: "Michelle Alecksen", logins: 3, lastActive: "Jan 23" },
-    { name: "Leslie Olvera", logins: 3, lastActive: "Jan 20" },
-    { name: "J Perez", logins: 3, lastActive: "Jan 23" },
-    { name: "Jonathan Roeglin", logins: 2, lastActive: "Feb 2" },
+    { name: "Sandra DeLaGarza", email: "sdelagarza@asd4.org", logins: 4, lastActive: "Jan 23" },
+    { name: "Michele Gorostieta", email: "mgorostieta@asd4.org", logins: 3, lastActive: "Jan 30" },
+    { name: "Carmen Tirado", email: "ctirado@asd4.org", logins: 3, lastActive: "Jan 23" },
+    { name: "Michelle Alecksen", email: "malecksen@asd4.org", logins: 3, lastActive: "Jan 23" },
+    { name: "Leslie Olvera", email: "lolvera@asd4.org", logins: 3, lastActive: "Jan 20" },
+    { name: "J Perez", email: "jperez@asd4.org", logins: 3, lastActive: "Jan 23" },
+    { name: "Jonathan Roeglin", email: "jroeglin@asd4.org", logins: 2, lastActive: "Feb 2" },
   ];
 
   const topCourses = [
@@ -661,7 +661,7 @@ Thanks for everything you do.`;
   };
 
   // Generate "High Five" celebration email for top performers
-  const sendHighFiveEmail = (para: { name: string; logins: number; lastActive: string }) => {
+  const sendHighFiveEmail = (para: { name: string; email: string; logins: number; lastActive: string }) => {
     const firstName = para.name.split(' ')[0];
 
     const subject = 'Thank you for leading the way';
@@ -676,8 +676,7 @@ I know your time is limited and there's always more to do. The fact that you're 
 
 Thank you for setting the example. It matters more than you know.`;
 
-    // Email not available in this data shape — open blank Gmail for admin to fill in
-    openGmail({ subject, body });
+    openGmail({ to: para.email, subject, body });
   };
 
   const handleTabClick = (tabId: string) => {
