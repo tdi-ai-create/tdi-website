@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import { Tooltip } from '@/components/Tooltip';
+import { openGmail } from '@/lib/openGmail';
 import {
   Calendar,
   CheckCircle,
@@ -612,14 +613,13 @@ export default function ASD4Dashboard() {
     { name: "Georjina Mendiola", email: "gmendiola@asd4.org", school: "Wesley" },
   ];
 
-  // Generate individual nudge email
-  const generateNudgeEmail = (para: { name: string; email: string }) => {
+  // Send individual nudge email via Gmail
+  const sendNudgeEmail = (para: { name: string; email: string }) => {
     const firstName = para.name.split(' ')[0];
 
-    const subject = encodeURIComponent('Quick help getting into the TDI Learning Hub');
+    const subject = 'Quick help getting into the TDI Learning Hub';
 
-    const body = encodeURIComponent(
-`Hi ${firstName},
+    const body = `Hi ${firstName},
 
 I noticed you haven't had a chance to log into the TDI Learning Hub yet -  no worries, just wanted to make sure you have what you need.
 
@@ -630,20 +630,18 @@ Here's how to get in:
 2. Log in with your @asd4.org email
 3. Try "Paraprofessional Foundations" -  it's a quick win
 
-Let me know if you run into any issues and I'll help you out.`
-    );
+Let me know if you run into any issues and I'll help you out.`;
 
-    return `mailto:${para.email}?subject=${subject}&body=${body}`;
+    openGmail({ to: para.email, subject, body });
   };
 
   // Generate "Nudge All" bulk email (BCC for privacy)
-  const generateNudgeAllEmail = () => {
-    const allEmails = notLoggedInParas.map(p => p.email).join(',');
+  const sendNudgeAllEmail = () => {
+    const allEmails = notLoggedInParas.map(p => p.email);
 
-    const subject = encodeURIComponent('A quick note about the TDI Learning Hub');
+    const subject = 'A quick note about the TDI Learning Hub';
 
-    const body = encodeURIComponent(
-`Hi team,
+    const body = `Hi team,
 
 Quick check-in -  some of you haven't had a chance to log into the TDI Learning Hub yet, and I wanted to make sure you have what you need to get started.
 
@@ -656,35 +654,30 @@ Here's how to get in:
 
 If you'd like, we can do a quick 15-minute walkthrough at our next meeting. Just let me know.
 
-Thanks for everything you do.`
-    );
+Thanks for everything you do.`;
 
     // Using BCC for privacy so recipients don't see each other's emails
-    return `mailto:?bcc=${allEmails}&subject=${subject}&body=${body}`;
+    openGmail({ bcc: allEmails, subject, body });
   };
 
   // Generate "High Five" celebration email for top performers
-  const generateHighFiveEmail = (para: { name: string; logins: number; lastActive: string }) => {
+  const sendHighFiveEmail = (para: { name: string; logins: number; lastActive: string }) => {
     const firstName = para.name.split(' ')[0];
 
-    const subject = encodeURIComponent('Thank you for leading the way');
+    const subject = 'Thank you for leading the way';
 
-    const bodyText = [
-      `Hi ${firstName},`,
-      '',
-      'I was looking at our TDI Learning Hub progress and wanted to reach out personally.',
-      '',
-      `You've logged in ${para.logins} times and are one of our most active paras on the platform. That kind of dedication doesn't go unnoticed.`,
-      '',
-      'I know your time is limited and there\'s always more to do. The fact that you\'re investing in your own growth shows real commitment to our students and to yourself.',
-      '',
-      'Thank you for setting the example. It matters more than you know.'
-    ].join('\n');
+    const body = `Hi ${firstName},
 
-    const body = encodeURIComponent(bodyText);
+I was looking at our TDI Learning Hub progress and wanted to reach out personally.
 
-    // Email not available in this data shape — open blank mailto for admin to fill in
-    return `mailto:?subject=${subject}&body=${body}`;
+You've logged in ${para.logins} times and are one of our most active paras on the platform. That kind of dedication doesn't go unnoticed.
+
+I know your time is limited and there's always more to do. The fact that you're investing in your own growth shows real commitment to our students and to yourself.
+
+Thank you for setting the example. It matters more than you know.`;
+
+    // Email not available in this data shape — open blank Gmail for admin to fill in
+    openGmail({ subject, body });
   };
 
   const handleTabClick = (tabId: string) => {
@@ -1725,13 +1718,13 @@ Thanks for everything you do.`
                       {para.lastActive === 'Feb 2' && (
                         <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Recently Active</span>
                       )}
-                      <a
-                        href={generateHighFiveEmail(para)}
+                      <button
+                        onClick={() => sendHighFiveEmail(para)}
                         className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-medium rounded-full transition-colors"
                       >
                         <Award className="w-3 h-3" />
                         High Five
-                      </a>
+                      </button>
                     </div>
                   </div>
                 ))}
@@ -1822,13 +1815,13 @@ Thanks for everything you do.`
                   {/* Nudge All Button */}
                   <div className="flex justify-between items-center mb-3">
                     <span className="text-sm text-gray-500">Click &quot;Nudge&quot; to send a friendly reminder email</span>
-                    <a
-                      href={generateNudgeAllEmail()}
+                    <button
+                      onClick={() => sendNudgeAllEmail()}
                       className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors"
                     >
                       <Mail className="w-4 h-4" />
                       Nudge All ({notLoggedInParas.length})
-                    </a>
+                    </button>
                   </div>
 
                   <div className="bg-white rounded-lg overflow-hidden">
@@ -1848,13 +1841,13 @@ Thanks for everything you do.`
                             <td className="py-2 px-3 text-gray-900">{para.name}</td>
                             <td className="py-2 px-3 text-gray-500">{para.email}</td>
                             <td className="py-2 px-3 text-right">
-                              <a
-                                href={generateNudgeEmail(para)}
+                              <button
+                                onClick={() => sendNudgeEmail(para)}
                                 className="inline-flex items-center gap-1.5 px-3 py-1.5 text-amber-600 hover:text-white hover:bg-amber-500 border border-amber-300 hover:border-amber-500 rounded-lg text-xs font-medium transition-colors"
                               >
                                 <Send className="w-3 h-3" />
                                 Nudge
-                              </a>
+                              </button>
                             </td>
                           </tr>
                         ))}
@@ -2280,20 +2273,12 @@ Thanks for everything you do.`
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  const emails = notLoggedInParas.map(p => p.email).join(',');
-                                  const subject = encodeURIComponent(`Getting Started with the TDI Learning Hub`);
-                                  const body = encodeURIComponent(
-                                    `Hi ${school.name.split('(')[0].trim()} Team,\n\n` +
-                                    `I wanted to reach out because I noticed you haven't had a chance to log into the TDI Learning Hub yet.\n\n` +
-                                    `No pressure -  I know things get busy! But when you have 10-15 minutes, the Hub has some really practical resources.\n\n` +
-                                    `Here's how to get started:\n` +
-                                    `1. Go to tdi.thinkific.com\n` +
-                                    `2. Log in with your school email\n` +
-                                    `3. Start with "Paraprofessional Foundations" -  it's quick and practical\n\n` +
-                                    `Let me know if you need help!\n\n` +
-                                    `Leslie`
-                                  );
-                                  window.open(`mailto:${emails}?subject=${subject}&body=${body}`);
+                                  const emails = notLoggedInParas.map(p => p.email);
+                                  openGmail({
+                                    to: emails,
+                                    subject: 'Getting Started with the TDI Learning Hub',
+                                    body: `Hi ${school.name.split('(')[0].trim()} Team,\n\nI wanted to reach out because I noticed you haven't had a chance to log into the TDI Learning Hub yet.\n\nNo pressure -  I know things get busy! But when you have 10-15 minutes, the Hub has some really practical resources.\n\nHere's how to get started:\n1. Go to tdi.thinkific.com\n2. Log in with your school email\n3. Start with "Paraprofessional Foundations" -  it's quick and practical\n\nLet me know if you need help!\n\nLeslie`,
+                                  });
                                 }}
                                 className="inline-flex items-center gap-2 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors"
                               >
@@ -2306,16 +2291,12 @@ Thanks for everything you do.`
                               <button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  const emails = loggedInParas.map(p => p.email).join(',');
-                                  const subject = encodeURIComponent(`Keep up the great work! 🎉`);
-                                  const body = encodeURIComponent(
-                                    `Hi ${school.name.split('(')[0].trim()} Team,\n\n` +
-                                    `Just a quick note to say thank you for engaging with the TDI Learning Hub!\n\n` +
-                                    `Your growth mindset makes a difference for the students you support every day.\n\n` +
-                                    `Keep it up!\n` +
-                                    `Leslie`
-                                  );
-                                  window.open(`mailto:?bcc=${emails}&subject=${subject}&body=${body}`);
+                                  const emails = loggedInParas.map(p => p.email);
+                                  openGmail({
+                                    bcc: emails,
+                                    subject: 'Keep up the great work! 🎉',
+                                    body: `Hi ${school.name.split('(')[0].trim()} Team,\n\nJust a quick note to say thank you for engaging with the TDI Learning Hub!\n\nYour growth mindset makes a difference for the students you support every day.\n\nKeep it up!\nLeslie`,
+                                  });
                                 }}
                                 className="inline-flex items-center gap-2 px-3 py-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-medium rounded-lg transition-colors"
                               >
@@ -2327,8 +2308,11 @@ Thanks for everything you do.`
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                const emails = school.paras.map(p => p.email).join(',');
-                                window.open(`mailto:?bcc=${emails}&subject=${encodeURIComponent(`A note for the ${school.name.split('(')[0].trim()} team`)}`);
+                                const emails = school.paras.map(p => p.email);
+                                openGmail({
+                                  bcc: emails,
+                                  subject: `A note for the ${school.name.split('(')[0].trim()} team`,
+                                });
                               }}
                               className="inline-flex items-center gap-2 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg transition-colors"
                             >
@@ -2387,18 +2371,11 @@ Thanks for everything you do.`
                                           <button
                                             onClick={(e) => {
                                               e.stopPropagation();
-                                              const subject = encodeURIComponent(`Quick help getting into the TDI Learning Hub`);
-                                              const body = encodeURIComponent(
-                                                `Hi ${para.name.split(',')[0].split(' ')[0]},\n\n` +
-                                                `I noticed you haven't had a chance to log into the TDI Learning Hub yet.\n\n` +
-                                                `Here's how:\n` +
-                                                `1. Go to tdi.thinkific.com\n` +
-                                                `2. Log in with ${para.email}\n` +
-                                                `3. Start with "Paraprofessional Foundations"\n\n` +
-                                                `Let me know if you need help!\n\n` +
-                                                `Leslie`
-                                              );
-                                              window.open(`mailto:${para.email}?subject=${subject}&body=${body}`);
+                                              openGmail({
+                                                to: para.email,
+                                                subject: 'Quick help getting into the TDI Learning Hub',
+                                                body: `Hi ${para.name.split(',')[0].split(' ')[0]},\n\nI noticed you haven't had a chance to log into the TDI Learning Hub yet.\n\nHere's how:\n1. Go to tdi.thinkific.com\n2. Log in with ${para.email}\n3. Start with "Paraprofessional Foundations"\n\nLet me know if you need help!\n\nLeslie`,
+                                              });
                                             }}
                                             className="text-xs text-amber-600 hover:text-amber-800 font-medium underline"
                                           >
