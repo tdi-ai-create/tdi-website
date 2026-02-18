@@ -64,6 +64,10 @@ export default function AllenwoodDashboard() {
   const [showPolicy, setShowPolicy] = useState(false);
   const [engagementExpanded, setEngagementExpanded] = useState(false);
 
+  // Our Partnership tab - observation accordion states
+  const [obsDay1Open, setObsDay1Open] = useState(false);
+  const [obsDay2Open, setObsDay2Open] = useState(false);
+
   // 2026-27 Tab accordion states
   const [year2SupportOpen, setYear2SupportOpen] = useState(false);
   const [fundingOpen, setFundingOpen] = useState(false);
@@ -263,12 +267,11 @@ export default function AllenwoodDashboard() {
           <div className="flex justify-center gap-2 flex-wrap">
             {[
               { id: 'overview', label: 'Overview', icon: Eye },
-              { id: 'journey', label: 'Journey', icon: TrendingUp },
-              { id: 'progress', label: 'Progress', icon: Users },
+              { id: 'partnership', label: 'Our Partnership', icon: Heart },
               { id: 'blueprint', label: 'Blueprint', icon: Star },
-              { id: 'next-year', label: '2026-27', icon: Sparkles, glow: true },
+              { id: 'next-year', label: 'Next Year', icon: Sparkles, glow: true },
               { id: 'team', label: 'Team', icon: User },
-              { id: 'billing', label: 'Billing', icon: CreditCard, alert: true },
+              { id: 'billing', label: 'Contract Details', icon: CreditCard },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -322,10 +325,10 @@ export default function AllenwoodDashboard() {
               >
                 <div className="flex items-center gap-2 mb-1">
                   <AlertCircle className="w-4 h-4 text-orange-500" />
-                  <span className="text-xs text-gray-500 uppercase">Actions Needed</span>
+                  <span className="text-xs text-gray-500 uppercase">Up Next</span>
                 </div>
                 <div className="text-2xl font-bold text-orange-600">2</div>
-                <div className="text-xs text-orange-600 font-medium">Click to view ↓</div>
+                <div className="text-xs text-orange-600 font-medium">Items to schedule</div>
               </button>
 
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
@@ -434,7 +437,7 @@ export default function AllenwoodDashboard() {
                             {isOverdue(item.deadlineMonth, item.deadlineYear) ? (
                               <span className="text-red-700 font-bold">OVERDUE</span>
                             ) : (
-                              <span className="text-orange-500 font-medium">DUE BY {item.deadline}</span>
+                              <span className="text-orange-500 font-medium">Available through {item.deadline}</span>
                             )}
                           </div>
                         </div>
@@ -453,14 +456,6 @@ export default function AllenwoodDashboard() {
                           <Calendar className="w-4 h-4" />
                           {item.actionLabel}
                         </a>
-                        <button
-                          onClick={() => toggleComplete(item.id)}
-                          className="px-3 py-2 bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-700 text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
-                          title="Mark as complete"
-                        >
-                          <Check className="w-4 h-4" />
-                          Done
-                        </button>
                       </div>
                     </div>
                   ))}
@@ -515,7 +510,7 @@ export default function AllenwoodDashboard() {
                   onClick={() => handleTabChange('next-year')}
                   className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium whitespace-nowrap ml-4"
                 >
-                  See the plan
+                  See what Year 2 looks like
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>

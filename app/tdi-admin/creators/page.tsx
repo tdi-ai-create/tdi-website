@@ -25,7 +25,6 @@ import {
   Palette,
   MapPin,
   BarChart3,
-  Mail,
   DollarSign,
   TrendingUp,
   Calendar,
@@ -71,14 +70,13 @@ const USMapChart = dynamic(() => import('@/components/tdi-admin/USMapChart'), {
 });
 
 // Tab types
-type TabId = 'dashboard' | 'creators' | 'analytics' | 'communications' | 'payouts';
+type TabId = 'dashboard' | 'creators' | 'analytics' | 'payouts';
 
 // Tab configuration
 const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
   { id: 'creators', label: 'Creators', icon: Users },
   { id: 'analytics', label: 'Analytics', icon: TrendingUp },
-  { id: 'communications', label: 'Communications', icon: Mail },
   { id: 'payouts', label: 'Payouts', icon: DollarSign },
 ];
 
@@ -1897,27 +1895,6 @@ export default function CreatorStudioPage() {
                 })}
               </div>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* COMMUNICATIONS TAB */}
-      {activeTab === 'communications' && (
-        <div className="bg-white rounded-xl border border-gray-200 p-8">
-          <div className="text-center py-12">
-            <div
-              className="w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center"
-              style={{ backgroundColor: theme.light }}
-            >
-              <Mail className="w-8 h-8" style={{ color: theme.primary }} />
-            </div>
-            <h2 className="text-xl font-semibold mb-2" style={{ color: '#2B3A67' }}>
-              Communications Coming Soon
-            </h2>
-            <p className="text-gray-500 max-w-md mx-auto">
-              Email history and communication tools will be available here. Track emails sent to creators,
-              manage reminders, and view approval notifications.
-            </p>
           </div>
         </div>
       )}
