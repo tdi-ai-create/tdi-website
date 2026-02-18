@@ -1152,7 +1152,7 @@ export default function AllenwoodDashboard() {
                 </div>
 
                 {/* Autism Bundle */}
-                <div className="bg-purple-50 border border-purple-200 rounded-xl p-5 mb-4">
+                <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="block bg-purple-50 border border-purple-200 rounded-xl p-5 mb-4 hover:border-purple-400 transition-colors">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
                       <Sparkles className="w-6 h-6 text-purple-500" />
@@ -1167,10 +1167,10 @@ export default function AllenwoodDashboard() {
                       </p>
                     </div>
                   </div>
-                </div>
+                </a>
 
                 {/* Real Inclusion */}
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-5">
+                <a href="https://tdi.thinkific.com/" target="_blank" rel="noopener noreferrer" className="block bg-blue-50 border border-blue-200 rounded-xl p-5 hover:border-blue-400 transition-colors">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
                       <Users className="w-6 h-6 text-blue-500" />
@@ -1185,7 +1185,7 @@ export default function AllenwoodDashboard() {
                       </p>
                     </div>
                   </div>
-                </div>
+                </a>
               </div>
             </div>
           </div>
