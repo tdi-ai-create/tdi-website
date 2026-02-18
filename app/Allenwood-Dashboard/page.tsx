@@ -554,6 +554,137 @@ export default function AllenwoodDashboard() {
               </p>
             </div>
 
+            {/* Observation Day #1 Highlights */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div className="mb-6">
+                <h3 className="font-bold text-[#1e2749] text-xl mb-2">
+                  Observation Day #1 — October 15, 2025
+                </h3>
+                <p className="text-gray-600">
+                  We visited 11 classrooms and delivered personalized Love Notes to every teacher observed.
+                </p>
+              </div>
+
+              {/* What We Celebrated - 2x2 Grid */}
+              <div className="mb-8">
+                <h4 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-teal-500" />
+                  What We Celebrated
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Heart className="w-4 h-4 text-teal-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-800">Calm, Connected Classrooms</p>
+                        <p className="text-sm text-gray-600 mt-1">Teachers maintained warm, consistent environments where students felt safe and seen.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Users className="w-4 h-4 text-teal-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-800">Strong Teacher-Para Teamwork</p>
+                        <p className="text-sm text-gray-600 mt-1">Adults in the room worked as true partners — seamless transitions, shared responsibility.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Sparkles className="w-4 h-4 text-teal-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-800">Student Independence & Joy</p>
+                        <p className="text-sm text-gray-600 mt-1">Students showed self-regulation, engagement, and genuine excitement about learning.</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="w-8 h-8 bg-teal-100 rounded-full flex items-center justify-center flex-shrink-0">
+                        <Shield className="w-4 h-4 text-teal-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-800">Adaptability Under Pressure</p>
+                        <p className="text-sm text-gray-600 mt-1">When tech failed or schedules shifted, teachers pivoted without missing a beat.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Teacher Love Notes */}
+              <div className="mb-6">
+                <h4 className="font-semibold text-[#1e2749] mb-2">What We Saw in Your Classrooms</h4>
+                <p className="text-gray-600 text-sm mb-4">
+                  Every teacher received a personalized Love Note after our visit. Here&apos;s a glimpse of what we celebrated.
+                </p>
+
+                <div className="space-y-3">
+                  {/* Andrea Johnson */}
+                  <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
+                    <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Within five minutes I found myself wishing I could be one of your students. You&apos;ve built a classroom where kids feel excited, safe, and seen.&quot;</p>
+                    <p className="text-amber-600 text-sm mt-2 font-medium">— About Andrea Johnson&apos;s classroom</p>
+                  </div>
+
+                  {/* Yvette Whittaker */}
+                  <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
+                    <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Your color-coded station system had students moving with purpose. The countdowns kept everything calm and clear. When tech glitched, you pivoted to paper without missing a beat.&quot;</p>
+                    <p className="text-amber-600 text-sm mt-2 font-medium">— About Yvette Whittaker&apos;s classroom</p>
+                  </div>
+
+                  {/* Georgette Cruickshank */}
+                  <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
+                    <p className="text-gray-700 italic text-sm leading-relaxed">&quot;The alphabet sing-and-sign moment was absolutely adorable. Your space is clearly designed for movement and engagement. It feels like a room where learning lives.&quot;</p>
+                    <p className="text-amber-600 text-sm mt-2 font-medium">— About Georgette Cruickshank&apos;s classroom</p>
+                  </div>
+
+                  {/* Jasmin Taylor */}
+                  <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
+                    <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Your call-and-response routines were easy, fun, and consistent. Students responded quickly to your calm tone and respectful redirections.&quot;</p>
+                    <p className="text-amber-600 text-sm mt-2 font-medium">— About Jasmin Taylor&apos;s classroom</p>
+                  </div>
+
+                  {/* Alexander Summerlot */}
+                  <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
+                    <p className="text-gray-700 italic text-sm leading-relaxed">&quot;The laughter, smiles, and small celebrations showed genuine joy and connection. Your teamwork with the additional adults was seamless.&quot;</p>
+                    <p className="text-amber-600 text-sm mt-2 font-medium">— About Alexander Summerlot&apos;s classroom</p>
+                  </div>
+
+                  {/* Traci Wallace */}
+                  <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
+                    <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Low voice = high control. You modeled the volume you wanted, and students mirrored you. I&apos;d want to be a student in your classroom!&quot;</p>
+                    <p className="text-amber-600 text-sm mt-2 font-medium">— About Traci Wallace&apos;s classroom</p>
+                  </div>
+
+                  {/* Carlita Law */}
+                  <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
+                    <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Even with tech hiccups and parade prep, your calm, clear voice anchored the whole space. The playful maraca transition showed such intentional planning.&quot;</p>
+                    <p className="text-amber-600 text-sm mt-2 font-medium">— About Carlita Law&apos;s classroom</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Yvette Follow-Up Callout */}
+              <div className="bg-green-50 border border-green-200 rounded-xl p-4">
+                <div className="flex items-start gap-3">
+                  <MessageCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-green-800 font-medium">The conversation is already happening!</p>
+                    <p className="text-gray-600 text-sm mt-1">
+                      After our visit, Yvette reached out asking for more age-appropriate independent center activities for kindergarten. That&apos;s exactly the kind of engagement we love to see — and we delivered resources within days.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Section 2: Academic Context */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
               <h3 className="font-bold text-[#1e2749] text-lg mb-2">
