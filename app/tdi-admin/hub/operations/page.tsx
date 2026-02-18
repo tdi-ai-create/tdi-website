@@ -14,7 +14,6 @@ import {
   deleteTip,
   updateRequestStatus,
 } from '@/lib/hub/admin';
-import ExampleDataBanner from '@/components/tdi-admin/ExampleDataBanner';
 import dynamic from 'next/dynamic';
 
 // Hub theme colors
@@ -71,7 +70,65 @@ import {
   RefreshCw,
   GraduationCap,
   Heart,
+  Menu,
+  ChevronLeft,
+  LayoutGrid,
+  Clapperboard,
+  Settings,
+  Info,
 } from 'lucide-react';
+
+// Tab configuration for sidebar
+const SIDEBAR_TABS = [
+  { id: 'overview', label: 'Overview', icon: LayoutGrid, href: '/tdi-admin/hub' },
+  { id: 'operations', label: 'Operations', icon: BarChart3 },
+  { id: 'production', label: 'Production', icon: Clapperboard, href: '/tdi-admin/hub/production' },
+];
+
+// Sidebar Navigation Item Component
+function SidebarNavItem({
+  active,
+  href,
+  icon: Icon,
+  children,
+}: {
+  active: boolean;
+  href?: string;
+  icon: React.ElementType;
+  children: React.ReactNode;
+}) {
+  const content = (
+    <>
+      <Icon size={20} className={active ? '' : 'text-gray-400'} style={active ? { color: theme.primary } : undefined} />
+      <span className={active ? 'font-semibold' : ''}>{children}</span>
+    </>
+  );
+
+  const className = `w-full flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-all duration-200 text-left ${
+    active ? '' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+  }`;
+
+  const activeStyles = active
+    ? {
+        backgroundColor: `${theme.primary}10`,
+        color: theme.primary,
+      }
+    : undefined;
+
+  if (href) {
+    return (
+      <Link href={href} className={className} style={activeStyles}>
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <div className={className} style={activeStyles}>
+      {content}
+    </div>
+  );
+}
 
 type Tab = 'accounts' | 'enrollments' | 'certificates' | 'reports' | 'analytics' | 'tips' | 'emails';
 
@@ -2195,6 +2252,8 @@ function EmailsTab() {
 export default function HubOperationsPage() {
   const { permissions } = useTDIAdmin();
   const [activeTab, setActiveTab] = useState<Tab>('accounts');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showExampleNotice, setShowExampleNotice] = useState(true);
 
   const canViewEnrollments = hasPermission(permissions, 'learning_hub', 'view_enrollments');
   const canExportReports = hasPermission(permissions, 'learning_hub', 'export_reports');
@@ -2214,117 +2273,195 @@ export default function HubOperationsPage() {
   }, [canViewEnrollments, canExportReports, canViewAnalytics, canManageTips, canManageEmails, activeTab]);
 
   return (
-    <div className="p-4 md:p-8 max-w-[1400px] mx-auto">
-      {/* Example Data Banner */}
-      <ExampleDataBanner />
+    <div className="flex min-h-screen bg-[#FAFBFC]">
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-      {/* Page Header */}
-      <div className="mb-6">
-        <Link
-          href="/tdi-admin/hub"
-          className="inline-flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-4"
-        >
-          <ArrowLeft size={16} />
-          Back to Hub
-        </Link>
-        <h1
-          className="font-bold mb-2"
-          style={{
-            fontFamily: "'Source Serif 4', Georgia, serif",
-            fontSize: '28px',
-            color: '#2B3A67',
-            borderLeft: `4px solid ${theme.primary}`,
-            paddingLeft: '16px',
-          }}
-        >
-          Operations
-        </h1>
-        <p className="text-gray-500 pl-5" style={{ fontFamily: "'DM Sans', sans-serif" }}>
-          Manage accounts, enrollments, reports, and analytics.
-        </p>
-      </div>
+      {/* Sidebar */}
+      <aside
+        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-100 transform transition-transform duration-200 ease-in-out lg:transform-none ${
+          sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        }`}
+        style={{ boxShadow: '1px 0 3px rgba(0,0,0,0.03)' }}
+      >
+        <div className="flex flex-col h-full">
+          {/* Sidebar Header */}
+          <div className="flex items-center justify-between px-5 py-5 border-b border-gray-100">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-8 h-8 rounded-lg flex items-center justify-center"
+                style={{ backgroundColor: theme.primary }}
+              >
+                <BookOpen className="w-4 h-4 text-white" />
+              </div>
+              <span className="font-semibold text-gray-900">Learning Hub</span>
+            </div>
+            <button
+              onClick={() => setSidebarOpen(false)}
+              className="lg:hidden p-1 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
 
-      {/* Tab Bar */}
-      <div className="border-b border-gray-200 mb-6 overflow-x-auto">
-        <div className="flex gap-1 min-w-max">
-          <TabButton
-            active={activeTab === 'accounts'}
-            onClick={() => setActiveTab('accounts')}
-            disabled={!canViewEnrollments}
-          >
-            <Users size={16} className="mr-2 inline" />
-            Accounts
-          </TabButton>
-          <TabButton
-            active={activeTab === 'enrollments'}
-            onClick={() => setActiveTab('enrollments')}
-            disabled={!canViewEnrollments}
-          >
-            <BookOpen size={16} className="mr-2 inline" />
-            Enrollments
-          </TabButton>
-          <TabButton
-            active={activeTab === 'certificates'}
-            onClick={() => setActiveTab('certificates')}
-            disabled={!canManageCertificates}
-          >
-            <Award size={16} className="mr-2 inline" />
-            Certificates
-          </TabButton>
-          <TabButton
-            active={activeTab === 'reports'}
-            onClick={() => setActiveTab('reports')}
-            disabled={!canExportReports}
-          >
-            <FileText size={16} className="mr-2 inline" />
-            Reports
-          </TabButton>
-          <TabButton
-            active={activeTab === 'analytics'}
-            onClick={() => setActiveTab('analytics')}
-            disabled={!canViewAnalytics}
-          >
-            <BarChart3 size={16} className="mr-2 inline" />
-            Analytics
-          </TabButton>
-          <TabButton
-            active={activeTab === 'tips'}
-            onClick={() => setActiveTab('tips')}
-            disabled={!canManageTips}
-          >
-            <Lightbulb size={16} className="mr-2 inline" />
-            Tips & Requests
-          </TabButton>
-          <TabButton
-            active={activeTab === 'emails'}
-            onClick={() => setActiveTab('emails')}
-            disabled={!canManageEmails}
-          >
-            <Mail size={16} className="mr-2 inline" />
-            Emails
-          </TabButton>
+          {/* Navigation */}
+          <nav className="flex-1 px-3 py-4 space-y-1">
+            {SIDEBAR_TABS.map((tab) => (
+              <SidebarNavItem
+                key={tab.id}
+                active={tab.id === 'operations'}
+                href={tab.href}
+                icon={tab.icon}
+              >
+                {tab.label}
+              </SidebarNavItem>
+            ))}
+          </nav>
+
+          {/* Sidebar Footer */}
+          <div className="px-3 py-4 border-t border-gray-100">
+            <Link
+              href="/hub/admin"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-50 rounded-lg transition-colors"
+            >
+              <Settings size={16} />
+              Legacy Admin
+            </Link>
+          </div>
         </div>
-      </div>
+      </aside>
 
-      {/* Tab Content */}
-      <div>
-        {activeTab === 'accounts' && canViewEnrollments && <AccountsTab />}
-        {activeTab === 'enrollments' && canViewEnrollments && <EnrollmentsTab />}
-        {activeTab === 'certificates' && canManageCertificates && <CertificatesTab />}
-        {activeTab === 'reports' && canExportReports && <ReportsTab />}
-        {activeTab === 'analytics' && canViewAnalytics && <AnalyticsTab />}
-        {activeTab === 'tips' && canManageTips && <TipsTab />}
-        {activeTab === 'emails' && canManageEmails && <EmailsTab />}
+      {/* Main Content Area */}
+      <main className="flex-1 min-w-0">
+        {/* Top Header Bar */}
+        <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-sm border-b border-gray-100">
+          <div className="flex items-center justify-between px-6 py-4">
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setSidebarOpen(true)}
+                className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                <Menu className="w-5 h-5 text-gray-600" />
+              </button>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900 tracking-tight">
+                  Operations
+                </h1>
+                <p className="text-sm text-gray-500 mt-0.5">
+                  Manage accounts, enrollments, reports, and analytics
+                </p>
+              </div>
+            </div>
+          </div>
+        </header>
 
-        {/* No Permission State */}
-        {!canViewEnrollments && !canExportReports && !canViewAnalytics && !canManageTips && !canManageEmails && (
-          <EmptyState
-            icon={AlertCircle}
-            title="No Access"
-            description="You don't have permission to view any operations data. Contact your admin for access."
-          />
-        )}
-      </div>
+        {/* Page Content */}
+        <div className="px-6 py-6">
+          {/* Example Data Notice (subtle) */}
+          {showExampleNotice && (
+            <div className="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-amber-50 border border-amber-200 mb-6">
+              <Info size={16} className="text-amber-600 flex-shrink-0" />
+              <p className="text-sm text-amber-700 flex-1">
+                Viewing example data for demonstration purposes.
+              </p>
+              <button
+                onClick={() => setShowExampleNotice(false)}
+                className="p-1 rounded hover:bg-amber-100 transition-colors"
+                title="Dismiss"
+              >
+                <X size={14} className="text-amber-600" />
+              </button>
+            </div>
+          )}
+
+          {/* Tab Bar */}
+          <div className="border-b border-gray-200 mb-6 overflow-x-auto">
+            <div className="flex gap-1 min-w-max">
+              <TabButton
+                active={activeTab === 'accounts'}
+                onClick={() => setActiveTab('accounts')}
+                disabled={!canViewEnrollments}
+              >
+                <Users size={16} className="mr-2 inline" />
+                Accounts
+              </TabButton>
+              <TabButton
+                active={activeTab === 'enrollments'}
+                onClick={() => setActiveTab('enrollments')}
+                disabled={!canViewEnrollments}
+              >
+                <BookOpen size={16} className="mr-2 inline" />
+                Enrollments
+              </TabButton>
+              <TabButton
+                active={activeTab === 'certificates'}
+                onClick={() => setActiveTab('certificates')}
+                disabled={!canManageCertificates}
+              >
+                <Award size={16} className="mr-2 inline" />
+                Certificates
+              </TabButton>
+              <TabButton
+                active={activeTab === 'reports'}
+                onClick={() => setActiveTab('reports')}
+                disabled={!canExportReports}
+              >
+                <FileText size={16} className="mr-2 inline" />
+                Reports
+              </TabButton>
+              <TabButton
+                active={activeTab === 'analytics'}
+                onClick={() => setActiveTab('analytics')}
+                disabled={!canViewAnalytics}
+              >
+                <BarChart3 size={16} className="mr-2 inline" />
+                Analytics
+              </TabButton>
+              <TabButton
+                active={activeTab === 'tips'}
+                onClick={() => setActiveTab('tips')}
+                disabled={!canManageTips}
+              >
+                <Lightbulb size={16} className="mr-2 inline" />
+                Tips & Requests
+              </TabButton>
+              <TabButton
+                active={activeTab === 'emails'}
+                onClick={() => setActiveTab('emails')}
+                disabled={!canManageEmails}
+              >
+                <Mail size={16} className="mr-2 inline" />
+                Emails
+              </TabButton>
+            </div>
+          </div>
+
+          {/* Tab Content */}
+          <div>
+            {activeTab === 'accounts' && canViewEnrollments && <AccountsTab />}
+            {activeTab === 'enrollments' && canViewEnrollments && <EnrollmentsTab />}
+            {activeTab === 'certificates' && canManageCertificates && <CertificatesTab />}
+            {activeTab === 'reports' && canExportReports && <ReportsTab />}
+            {activeTab === 'analytics' && canViewAnalytics && <AnalyticsTab />}
+            {activeTab === 'tips' && canManageTips && <TipsTab />}
+            {activeTab === 'emails' && canManageEmails && <EmailsTab />}
+
+            {/* No Permission State */}
+            {!canViewEnrollments && !canExportReports && !canViewAnalytics && !canManageTips && !canManageEmails && (
+              <EmptyState
+                icon={AlertCircle}
+                title="No Access"
+                description="You don't have permission to view any operations data. Contact your admin for access."
+              />
+            )}
+          </div>
+        </div>
+      </main>
     </div>
   );
 }
