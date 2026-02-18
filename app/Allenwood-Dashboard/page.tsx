@@ -541,18 +541,19 @@ export default function AllenwoodDashboard() {
             <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 sticky top-28 z-30">
               <div className="flex gap-2 overflow-x-auto pb-1">
                 {[
-                  { id: 'our-goal', label: 'Our Goal' },
-                  { id: 'observations', label: 'Observations' },
-                  { id: 'hub-activity', label: 'Hub Activity' },
-                  { id: 'school-context', label: 'School Context' },
-                  { id: 'whats-ahead', label: "What's Ahead" },
-                  { id: 'resources', label: 'Resources' },
+                  { id: 'our-goal', label: 'Our Goal', dot: null },
+                  { id: 'observations', label: 'Observations', dot: 'bg-[#1e2749]' },
+                  { id: 'hub-activity', label: 'Hub Activity', dot: null },
+                  { id: 'school-context', label: 'School Context', dot: 'bg-teal-400' },
+                  { id: 'whats-ahead', label: "What's Ahead", dot: null },
+                  { id: 'resources', label: 'Resources', dot: 'bg-amber-400' },
                 ].map((section) => (
                   <button
                     key={section.id}
                     onClick={() => document.getElementById(section.id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                    className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-[#38618C] hover:bg-gray-50 rounded-lg whitespace-nowrap transition-colors"
+                    className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:text-[#38618C] hover:bg-gray-50 rounded-lg whitespace-nowrap transition-colors flex items-center gap-1.5"
                   >
+                    {section.dot && <span className={`w-2 h-2 rounded-full ${section.dot}`} />}
                     {section.label}
                   </button>
                 ))}
@@ -571,16 +572,16 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* SECTION 2: Observations */}
-            <div id="observations" className="scroll-mt-36">
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 className="font-bold text-[#1e2749] text-lg mb-2">Classroom Observations</h3>
-                <p className="text-gray-600 text-sm mb-6">
-                  On-campus visits with personalized Love Notes for every teacher observed
-                </p>
+            {/* SECTION 2: Observations - Navy Band */}
+            <div id="observations" className="scroll-mt-36 bg-[#1e2749] -mx-4 px-4 py-8 rounded-xl">
+              <h3 className="text-white text-xl font-bold mb-2">Classroom Observations</h3>
+              <p className="text-gray-300 text-sm mb-6">
+                On-campus visits with personalized Love Notes for every teacher observed
+              </p>
+              <div className="space-y-4">
 
                 {/* Observation Day 1 Accordion */}
-                <div className="border border-gray-200 rounded-xl mb-4 overflow-hidden">
+                <div className="bg-white border border-gray-200 rounded-xl mb-4 overflow-hidden shadow-sm">
                   <button
                     onClick={() => setObsDay1Open(!obsDay1Open)}
                     className="w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors text-left"
@@ -746,7 +747,7 @@ export default function AllenwoodDashboard() {
                 </div>
 
                 {/* Observation Day 2 Accordion */}
-                <div className="border border-gray-200 rounded-xl overflow-hidden">
+                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm">
                   <button
                     onClick={() => setObsDay2Open(!obsDay2Open)}
                     className="w-full flex items-center gap-3 p-4 hover:bg-gray-50 transition-colors text-left"
@@ -803,8 +804,8 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* SECTION 4: School Context */}
-            <div id="school-context" className="scroll-mt-36">
+            {/* SECTION 4: School Context - Teal Band */}
+            <div id="school-context" className="scroll-mt-36 bg-teal-50 -mx-4 px-4 py-8 rounded-xl">
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                 <h3 className="font-bold text-[#1e2749] text-lg mb-2">The Context Behind Our Partnership</h3>
                 <p className="text-gray-600 text-sm mb-6">
@@ -1060,8 +1061,8 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* SECTION 6: Resources */}
-            <div id="resources" className="scroll-mt-36">
+            {/* SECTION 6: Resources - Amber Band */}
+            <div id="resources" className="scroll-mt-36 bg-amber-50 -mx-4 px-4 py-8 rounded-xl">
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                 <h3 className="font-bold text-[#1e2749] text-lg mb-2">
                   Curated Starting Points for Your Team
