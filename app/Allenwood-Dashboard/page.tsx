@@ -588,10 +588,20 @@ export default function AllenwoodDashboard() {
                   >
                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
                     <div className="flex-1">
-                      <span className="font-medium text-teal-700">Observation Day 1</span>
-                      <span className="text-gray-500 text-sm ml-2">· 11 Classrooms · 11 Love Notes Delivered · October 15, 2025</span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-teal-700">Observation Day 1</span>
+                        <span className="text-gray-500 text-sm">· 11 Classrooms · 11 Love Notes Delivered · October 15, 2025</span>
+                      </div>
+                      {!obsDay1Open && (
+                        <p className="text-sm text-gray-400 mt-1 italic">See strengths we celebrated, Love Note samples, and growth opportunities...</p>
+                      )}
                     </div>
-                    <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${obsDay1Open ? 'rotate-180' : ''}`} />
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {!obsDay1Open && (
+                        <span className="text-xs bg-teal-100 text-teal-700 px-2 py-1 rounded-full font-medium">View details</span>
+                      )}
+                      <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${obsDay1Open ? 'rotate-180' : ''}`} />
+                    </div>
                   </button>
 
                   {obsDay1Open && (
@@ -754,10 +764,20 @@ export default function AllenwoodDashboard() {
                   >
                     <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
                     <div className="flex-1">
-                      <span className="font-medium text-teal-700">Observation Day 2</span>
-                      <span className="text-gray-500 text-sm ml-2">· February 18, 2026</span>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-teal-700">Observation Day 2</span>
+                        <span className="text-gray-500 text-sm">· February 18, 2026</span>
+                      </div>
+                      {!obsDay2Open && (
+                        <p className="text-sm text-gray-400 mt-1 italic">See what&apos;s planned for this visit...</p>
+                      )}
                     </div>
-                    <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${obsDay2Open ? 'rotate-180' : ''}`} />
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      {!obsDay2Open && (
+                        <span className="text-xs bg-teal-100 text-teal-700 px-2 py-1 rounded-full font-medium">View details</span>
+                      )}
+                      <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform duration-200 ${obsDay2Open ? 'rotate-180' : ''}`} />
+                    </div>
                   </button>
 
                   {obsDay2Open && (
