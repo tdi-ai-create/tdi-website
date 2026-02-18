@@ -1236,6 +1236,41 @@ export default function AllenwoodDashboard() {
               <p className="text-sm text-gray-500 mt-1">Prepared for Dr. Porter &amp; Allenwood Leadership</p>
             </div>
 
+            {/* ===== Quick-Glance Stat Cards ===== */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
+                <p className="text-3xl font-bold text-[#0ea5a0]">68</p>
+                <p className="text-sm text-gray-600 font-medium">Educators Supported</p>
+              </div>
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
+                <p className="text-3xl font-bold text-[#0ea5a0]">$704</p>
+                <p className="text-sm text-gray-600 font-medium">Per Staff Member</p>
+                <p className="text-xs text-gray-400 mt-1">$144 per student</p>
+              </div>
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
+                <p className="text-3xl font-bold text-[#22c55e]">3</p>
+                <p className="text-sm text-gray-600 font-medium">Funding Paths Ready</p>
+                <p className="text-xs text-gray-400 mt-1">Pre-written &amp; mapped</p>
+              </div>
+              <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
+                <p className="text-3xl font-bold text-[#22c55e]">90%</p>
+                <p className="text-sm text-gray-600 font-medium">Paperwork Done by TDI</p>
+                <p className="text-xs text-gray-400 mt-1">Your team picks a path</p>
+              </div>
+            </div>
+
+            {/* ===== The TDI Effect Card ===== */}
+            <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 mb-6 text-white">
+              <h3 className="text-xl font-bold mb-3">The TDI Effect</h3>
+              <p className="text-white/80 text-sm mb-4">What full-staff support looks like at schools like yours:</p>
+              <div className="flex flex-wrap gap-3">
+                <span className="bg-white/20 px-3 py-1.5 rounded-full text-sm font-medium">89% teacher satisfaction</span>
+                <span className="bg-white/20 px-3 py-1.5 rounded-full text-sm font-medium">4.8★ course ratings</span>
+                <span className="bg-white/20 px-3 py-1.5 rounded-full text-sm font-medium">Year-round support</span>
+                <span className="bg-white/20 px-3 py-1.5 rounded-full text-sm font-medium">Built by teachers</span>
+              </div>
+            </div>
+
             {/* ===== ACCORDION 1: Funding ===== */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <button
@@ -1527,6 +1562,19 @@ export default function AllenwoodDashboard() {
               )}
             </div>
 
+            {/* ===== Partner Testimonial ===== */}
+            <div className="bg-amber-50 rounded-xl p-6 border border-amber-200">
+              <div className="flex gap-4">
+                <div className="text-4xl text-amber-400">&ldquo;</div>
+                <div>
+                  <p className="text-gray-700 italic mb-3">
+                    The funding piece was what worried us most. TDI handled 90% of it - we just picked a path and signed. Our teachers had access within a week.
+                  </p>
+                  <p className="text-sm font-semibold text-[#1e2749]">— Principal, PGCPS Partner School</p>
+                </div>
+              </div>
+            </div>
+
             {/* ===== ACCORDION 2: Year 2 Support Plan ===== */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <button
@@ -1814,6 +1862,21 @@ export default function AllenwoodDashboard() {
                   </p>
                 </div>
               )}
+            </div>
+
+            {/* ===== Bottom CTA ===== */}
+            <div className="bg-gradient-to-r from-[#0ea5a0] to-[#38618C] rounded-xl p-6 text-center text-white">
+              <h3 className="text-xl font-bold mb-2">Ready to Move Forward?</h3>
+              <p className="text-white/90 mb-4">Your team picks a funding path. We handle the rest.</p>
+              <a
+                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-white text-[#1e2749] px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors"
+              >
+                <Calendar className="w-5 h-5" />
+                Schedule a Call with Rae
+              </a>
             </div>
           </div>
         )}
