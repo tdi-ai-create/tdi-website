@@ -15,6 +15,7 @@ import {
   FileSignature,
   Hourglass,
   HelpCircle,
+  Star,
 } from 'lucide-react';
 import type { PhaseWithMilestones, MilestoneWithStatus, MilestoneStatus, SubmissionData } from '@/types/creator-portal';
 import { MilestoneAction } from './MilestoneAction';
@@ -204,6 +205,10 @@ function MilestoneItem({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const milestoneTitle = (milestone as any).title || (milestone as any).name || '';
 
+  // Check if milestone is optional (bonus)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isOptional = (milestone as any).metadata?.is_optional === true;
+
   // Check if this is the "Sign Agreement" milestone
   const isAgreementMilestone =
     milestone.phase_id === 'agreement' &&
@@ -292,6 +297,12 @@ function MilestoneItem({
               {isCurrentAction && (
                 <span className="text-xs bg-[#ffba06] text-[#1e2749] px-2 py-0.5 rounded-full font-medium">
                   Your Next Step
+                </span>
+              )}
+              {isOptional && (
+                <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  <Star className="w-3 h-3" />
+                  Bonus
                 </span>
               )}
             </div>
