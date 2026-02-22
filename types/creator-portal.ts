@@ -71,6 +71,8 @@ export interface Creator {
   email: string;
   name: string;
   course_title: string | null;
+  course_description: string | null;
+  author_bio: string | null;
   course_audience: string | null;
   target_launch_month: string | null;
   discount_code: string | null;

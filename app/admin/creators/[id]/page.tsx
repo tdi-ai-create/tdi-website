@@ -265,12 +265,16 @@ export default function AdminCreatorDetailPage() {
   const [editedDetails, setEditedDetails] = useState<{
     content_path: 'blog' | 'download' | 'course' | null;
     course_title: string;
+    course_description: string;
+    author_bio: string;
     course_audience: string;
     target_launch_month: string;
     discount_code: string;
   }>({
     content_path: null,
     course_title: '',
+    course_description: '',
+    author_bio: '',
     course_audience: '',
     target_launch_month: '',
     discount_code: '',
@@ -352,6 +356,8 @@ export default function AdminCreatorDetailPage() {
       setEditedDetails({
         content_path: data.creator.content_path || null,
         course_title: data.creator.course_title || '',
+        course_description: data.creator.course_description || '',
+        author_bio: data.creator.author_bio || '',
         course_audience: data.creator.course_audience || '',
         target_launch_month: data.creator.target_launch_month || '',
         discount_code: data.creator.discount_code || '',
@@ -505,6 +511,8 @@ export default function AdminCreatorDetailPage() {
         // Now save any other details that may have changed
         const otherDetails = {
           course_title: editedDetails.course_title,
+          course_description: editedDetails.course_description,
+          author_bio: editedDetails.author_bio,
           course_audience: editedDetails.course_audience,
           target_launch_month: editedDetails.target_launch_month,
           discount_code: editedDetails.discount_code,
@@ -1244,6 +1252,34 @@ export default function AdminCreatorDetailPage() {
                   </div>
                   <div>
                     <label className="block text-xs text-gray-500 uppercase mb-1">
+                      Course Description
+                    </label>
+                    <textarea
+                      value={editedDetails.course_description}
+                      onChange={(e) =>
+                        setEditedDetails({ ...editedDetails, course_description: e.target.value })
+                      }
+                      rows={3}
+                      placeholder="Marketing description for the Thinkific course listing..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 uppercase mb-1">
+                      Author Bio
+                    </label>
+                    <textarea
+                      value={editedDetails.author_bio}
+                      onChange={(e) =>
+                        setEditedDetails({ ...editedDetails, author_bio: e.target.value })
+                      }
+                      rows={3}
+                      placeholder="Creator's bio for course listings and TDI website..."
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-gray-500 uppercase mb-1">
                       Target Audience
                     </label>
                     <input
@@ -1302,6 +1338,18 @@ export default function AdminCreatorDetailPage() {
                     <p className="text-xs text-gray-500 uppercase">Course Title</p>
                     <p className={creator.course_title ? 'text-[#1e2749] font-medium' : 'text-gray-400 italic'}>
                       {creator.course_title || 'Not set'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase">Course Description</p>
+                    <p className={creator.course_description ? 'text-[#1e2749] text-sm whitespace-pre-wrap' : 'text-gray-400 italic'}>
+                      {creator.course_description || 'Not set'}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 uppercase">Author Bio</p>
+                    <p className={creator.author_bio ? 'text-[#1e2749] text-sm whitespace-pre-wrap' : 'text-gray-400 italic'}>
+                      {creator.author_bio || 'Not set'}
                     </p>
                   </div>
                   <div>
