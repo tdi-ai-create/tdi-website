@@ -216,8 +216,12 @@ function MilestoneItem({
     milestoneTitle.toLowerCase().includes('agreement');
 
   // Check if this milestone is "Waiting on TDI Team"
+  // Note: Optional (bonus) milestones should NOT show as "Waiting on TDI"
+  // even if they require team action - they're optional and the creator
+  // hasn't committed to doing them yet
   const isWaitingOnTdi = milestone.requires_team_action &&
-    (milestone.status === 'available' || milestone.status === 'in_progress');
+    (milestone.status === 'available' || milestone.status === 'in_progress') &&
+    !isOptional;
 
   // Only highlight as current action if this phase is the action phase
   const isCurrentAction = isInActionPhase && isActionable && !milestone.requires_team_action;
