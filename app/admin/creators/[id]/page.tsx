@@ -32,6 +32,7 @@ import {
   GraduationCap,
   Star,
   MoreVertical,
+  Rocket,
 } from 'lucide-react';
 import { Tooltip } from '@/components/ui/Tooltip';
 import { supabase } from '@/lib/supabase';
@@ -344,6 +345,18 @@ export default function AdminCreatorDetailPage() {
 
   // Archive banner state
   const [archiveBannerDismissed, setArchiveBannerDismissed] = useState(false);
+
+  // Publish course modal state
+  const [showPublishModal, setShowPublishModal] = useState(false);
+  const [publishFormData, setPublishFormData] = useState({
+    courseUrl: '',
+    discountCode: '',
+    courseDescription: '',
+    authorBio: '',
+    markBlogAsOptional: true,
+    note: '',
+  });
+  const [isPublishing, setIsPublishing] = useState(false);
 
   // Projects state
   const [pastProjects, setPastProjects] = useState<CreatorProject[]>([]);
@@ -801,6 +814,64 @@ export default function AdminCreatorDetailPage() {
     }
   };
 
+  // Open publish course modal with pre-filled data
+  const handleOpenPublishModal = () => {
+    if (!creator) return;
+    setPublishFormData({
+      courseUrl: creator.course_url || '',
+      discountCode: creator.discount_code || '',
+      courseDescription: creator.course_description || '',
+      authorBio: creator.author_bio || '',
+      markBlogAsOptional: true,
+      note: '',
+    });
+    setShowPublishModal(true);
+  };
+
+  // Handle publish course submission
+  const handlePublishCourse = async () => {
+    if (!publishFormData.courseUrl.trim() || !publishFormData.discountCode.trim()) {
+      alert('Course URL and Discount Code are required');
+      return;
+    }
+
+    setIsPublishing(true);
+
+    try {
+      const response = await fetch('/api/admin/publish-course', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          courseUrl: publishFormData.courseUrl.trim(),
+          discountCode: publishFormData.discountCode.trim(),
+          courseDescription: publishFormData.courseDescription.trim() || null,
+          authorBio: publishFormData.authorBio.trim() || null,
+          markBlogAsOptional: publishFormData.markBlogAsOptional,
+          note: publishFormData.note.trim() || null,
+          adminEmail,
+        }),
+      });
+
+      const data = await response.json();
+      if (!data.success) throw new Error(data.error || 'Failed to publish course');
+
+      setShowPublishModal(false);
+      await loadData();
+
+      const bonusText = data.optionalBlogMilestones > 0
+        ? ` + ${data.optionalBlogMilestones} bonus milestones available`
+        : '';
+      setSuccessMessage(`${data.creatorName}'s course is now marked as published! Progress: 100% complete${bonusText}`);
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } catch (error) {
+      console.error('Error publishing course:', error);
+      alert('Error publishing course: ' + (error instanceof Error ? error.message : 'Unknown error'));
+    } finally {
+      setIsPublishing(false);
+    }
+  };
+
   const handleOpenActionModal = (
     milestoneId: string,
     milestoneTitle: string,
@@ -989,6 +1060,19 @@ export default function AdminCreatorDetailPage() {
               </div>
             </div>
           </div>
+
+          {/* Mark as Published button - only show for course creators who haven't launched */}
+          {creator.content_path === 'course' && progressPercentage < 100 && (
+            <div className="mt-4">
+              <button
+                onClick={handleOpenPublishModal}
+                className="inline-flex items-center gap-2 bg-[#ffba06] hover:bg-[#e5a800] text-[#1e2749] px-4 py-2 rounded-lg font-semibold transition-colors shadow-lg"
+              >
+                <Rocket className="w-5 h-5" />
+                Mark Course as Published
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Intake Form Responses - shown if available */}
@@ -2003,6 +2087,147 @@ export default function AdminCreatorDetailPage() {
                   <>
                     <Star className="w-4 h-4" />
                     {optionalMilestone.isCurrentlyOptional ? 'Mark as Required' : 'Mark as Optional'}
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Publish Course Modal */}
+      {showPublishModal && creator && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl p-6 max-w-lg w-full shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-start justify-between mb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-[#ffba06] flex items-center justify-center">
+                  <Rocket className="w-6 h-6 text-[#1e2749]" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-[#1e2749]">Mark Course as Published</h3>
+                  <p className="text-sm text-gray-500">{creator.name}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPublishModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+              <p className="text-sm text-green-800">
+                This will complete all remaining course milestones and mark the creator&apos;s course as launched.
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Course URL <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="url"
+                  value={publishFormData.courseUrl}
+                  onChange={(e) => setPublishFormData({ ...publishFormData, courseUrl: e.target.value })}
+                  placeholder="https://tdi.thinkific.com/courses/..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Discount Code <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={publishFormData.discountCode}
+                  onChange={(e) => setPublishFormData({ ...publishFormData, discountCode: e.target.value })}
+                  placeholder="e.g., THOMPSON"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg font-mono focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Course Description <span className="text-gray-400">(optional)</span>
+                </label>
+                <textarea
+                  value={publishFormData.courseDescription}
+                  onChange={(e) => setPublishFormData({ ...publishFormData, courseDescription: e.target.value })}
+                  rows={3}
+                  placeholder="Marketing description for the Thinkific listing..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Author Bio <span className="text-gray-400">(optional)</span>
+                </label>
+                <textarea
+                  value={publishFormData.authorBio}
+                  onChange={(e) => setPublishFormData({ ...publishFormData, authorBio: e.target.value })}
+                  rows={3}
+                  placeholder="Creator's bio for course listing and website..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent resize-none"
+                />
+              </div>
+
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={publishFormData.markBlogAsOptional}
+                    onChange={(e) => setPublishFormData({ ...publishFormData, markBlogAsOptional: e.target.checked })}
+                    className="mt-1 rounded border-gray-300 text-[#ffba06] focus:ring-[#ffba06]"
+                  />
+                  <div>
+                    <p className="text-sm font-medium text-amber-900">Mark blog milestones as optional</p>
+                    <p className="text-xs text-amber-700 mt-0.5">
+                      Blog steps will become &quot;bonus&quot; content and won&apos;t affect core progress
+                    </p>
+                  </div>
+                </label>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Note <span className="text-gray-400">(optional)</span>
+                </label>
+                <textarea
+                  value={publishFormData.note}
+                  onChange={(e) => setPublishFormData({ ...publishFormData, note: e.target.value })}
+                  rows={2}
+                  placeholder="Any additional notes for the audit trail..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#80a4ed] focus:border-transparent resize-none"
+                />
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowPublishModal(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handlePublishCourse}
+                disabled={isPublishing || !publishFormData.courseUrl.trim() || !publishFormData.discountCode.trim()}
+                className="flex-1 px-4 py-2 bg-[#ffba06] text-[#1e2749] rounded-lg hover:bg-[#e5a800] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-semibold transition-colors"
+              >
+                {isPublishing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Publishing...
+                  </>
+                ) : (
+                  <>
+                    <Rocket className="w-4 h-4" />
+                    Mark as Published
                   </>
                 )}
               </button>
