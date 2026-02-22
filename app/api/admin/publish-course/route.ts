@@ -63,12 +63,14 @@ export async function POST(request: Request) {
     const completedAt = new Date().toISOString();
     const adminName = adminEmail?.split('@')[0] || 'admin';
 
-    // Blog milestone IDs that should be marked as optional (not completed)
-    const blogMilestoneIds = [
+    // Milestone IDs that should be marked as optional (not completed)
+    // Blog milestones + create_again (post-launch options)
+    const optionalMilestoneIds = [
       'blog_pitch',
       'blog_topic_approved',
       'blog_drafted',
       'blog_published',
+      'create_again',
     ];
 
     // 2. Get all milestones that apply to courses
@@ -90,9 +92,9 @@ export async function POST(request: Request) {
       return !appliesTo || appliesTo.length === 0 || appliesTo.includes('course');
     });
 
-    // Separate blog and non-blog milestones
+    // Separate core milestones from optional ones (blog + create_again)
     const coreMilestoneIds = courseMilestones
-      .filter(m => !blogMilestoneIds.includes(m.id))
+      .filter(m => !optionalMilestoneIds.includes(m.id))
       .map(m => m.id);
 
     // 3. Get creator's current milestone statuses
@@ -147,20 +149,24 @@ export async function POST(request: Request) {
 
     console.log('[publish-course] Completed', completedCount, 'core milestones');
 
-    // 5. Mark blog milestones as optional if requested
-    let blogOptionalCount = 0;
+    // 5. Mark optional milestones (blog + create_again) as optional if requested
+    let optionalCount = 0;
     if (markBlogAsOptional) {
-      for (const milestoneId of blogMilestoneIds) {
+      for (const milestoneId of optionalMilestoneIds) {
         const existing = milestoneStatusMap.get(milestoneId);
         if (existing && existing.status !== 'completed') {
           const existingMetadata = (existing.metadata as Record<string, unknown>) || {};
+          const optionalReason = milestoneId === 'create_again'
+            ? 'Post-launch option — does not affect completion status'
+            : 'Course published — blog available as optional marketing support';
+
           const { error: optionalError } = await supabase
             .from('creator_milestones')
             .update({
               metadata: {
                 ...existingMetadata,
                 is_optional: true,
-                optional_reason: 'Course published — blog available as optional marketing support',
+                optional_reason: optionalReason,
                 optional_set_by: adminEmail,
                 optional_set_at: completedAt,
               },
@@ -169,13 +175,13 @@ export async function POST(request: Request) {
             .eq('id', existing.id);
 
           if (optionalError) {
-            console.error('[publish-course] Error marking blog optional:', milestoneId, optionalError);
+            console.error('[publish-course] Error marking optional:', milestoneId, optionalError);
           } else {
-            blogOptionalCount++;
+            optionalCount++;
           }
         }
       }
-      console.log('[publish-course] Marked', blogOptionalCount, 'blog milestones as optional');
+      console.log('[publish-course] Marked', optionalCount, 'milestones as optional (blog + create_again)');
     }
 
     // 6. Update creator details
@@ -217,7 +223,7 @@ export async function POST(request: Request) {
     }
     noteLines.push(`Milestones completed: ${completedCount}`);
     if (markBlogAsOptional) {
-      noteLines.push(`Blog milestones marked as optional: ${blogOptionalCount}`);
+      noteLines.push(`Optional milestones (blog + create_again): ${optionalCount}`);
     }
     if (note) {
       noteLines.push(`Note: ${note}`);
@@ -257,7 +263,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       success: true,
       completedMilestones: completedCount,
-      optionalBlogMilestones: blogOptionalCount,
+      optionalMilestones: optionalCount,
       creatorName: creator.name,
     });
   } catch (error: unknown) {
