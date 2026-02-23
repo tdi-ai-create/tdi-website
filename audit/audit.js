@@ -253,16 +253,31 @@ async function auditPage(page, pagePath) {
   }
 
   // 3. Images
+  // Wait for images to load before checking (handles lazy loading)
+  await page.waitForTimeout(1000);
+
   const images = await page.$$eval('img', imgs => imgs.map(img => ({
     src: img.src,
     alt: img.alt,
     hasAlt: img.hasAttribute('alt'),
     isDecorative: img.getAttribute('role') === 'presentation' || img.getAttribute('aria-hidden') === 'true',
     naturalWidth: img.naturalWidth,
+    complete: img.complete,
+    loading: img.loading, // 'lazy' or 'eager'
   })));
 
   const imagesWithoutAlt = images.filter(img => !img.isDecorative && !img.hasAlt);
-  const brokenImages = images.filter(img => img.naturalWidth === 0 && img.src);
+
+  // Only consider an image broken if it has fully loaded (complete=true) but has no dimensions
+  // Also ignore lazy-loaded images that haven't loaded yet
+  const brokenImages = images.filter(img => {
+    if (!img.src) return false;
+    // Skip data URLs and SVGs (they may report 0 width)
+    if (img.src.startsWith('data:') || img.src.endsWith('.svg')) return false;
+    // Only flag as broken if the image has completed loading but has no dimensions
+    if (img.complete && img.naturalWidth === 0) return true;
+    return false;
+  });
 
   if (imagesWithoutAlt.length > 0) {
     addCheck(pageResults, 'warning', 'images', `${imagesWithoutAlt.length} image(s) missing alt text`, imagesWithoutAlt.map(i => i.src));
@@ -270,8 +285,9 @@ async function auditPage(page, pagePath) {
     addCheck(pageResults, 'pass', 'images', `All ${images.length} images have alt text`);
   }
 
+  // Downgrade broken images to warning instead of error (can be false positives with lazy loading)
   if (brokenImages.length > 0) {
-    addCheck(pageResults, 'error', 'images', `${brokenImages.length} broken image(s)`, brokenImages.map(i => i.src));
+    addCheck(pageResults, 'warning', 'images', `${brokenImages.length} potentially broken image(s)`, brokenImages.map(i => i.src));
   }
 
   // 4. Links
