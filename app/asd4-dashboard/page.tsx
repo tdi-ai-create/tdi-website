@@ -264,16 +264,16 @@ export default function ASD4Dashboard() {
   ];
 
   const topCourses = [
-    { name: "Paraprofessional Foundations – Understanding Your Role & Impact", started: 19, completed70: 9, inProgress: 10, completionRate: 47, avgProgress: 10 },
-    { name: "Streamline Your Inbox: Effective Email Management", started: 13, completed70: 4, inProgress: 9, completionRate: 31, avgProgress: 5 },
-    { name: "Classroom Management Toolkit", started: 10, completed70: 5, inProgress: 5, completionRate: 50, avgProgress: 5 },
-    { name: "Differentiated Choice Boards", started: 10, completed70: 3, inProgress: 7, completionRate: 30, avgProgress: 4 },
+    { name: "Paraprofessional Foundations – Understanding Your Role & Impact", started: 26, completed70: 12, inProgress: 14, completionRate: 46, avgProgress: 14 },
+    { name: "Streamline Your Inbox: Effective Email Management for Educators", started: 16, completed70: 4, inProgress: 12, completionRate: 25, avgProgress: 6 },
+    { name: "Classroom Management Toolkit", started: 15, completed70: 6, inProgress: 9, completionRate: 40, avgProgress: 6 },
+    { name: "Differentiated Choice Boards: Empowering Student Choice and Mastery", started: 15, completed70: 3, inProgress: 12, completionRate: 20, avgProgress: 5 },
+    { name: "Boundaries Without Backlash", started: 12, completed70: 5, inProgress: 7, completionRate: 42, avgProgress: 5 },
+    { name: "Building Strong Teacher-Para Partnerships", started: 12, completed70: 4, inProgress: 8, completionRate: 33, avgProgress: 4 },
+    { name: "How to get the MOST out of the Teachers Deserve It Learning Hub", started: 12, completed70: 1, inProgress: 11, completionRate: 8, avgProgress: 2 },
     { name: "Understanding Student Needs & Modifications", started: 9, completed70: 5, inProgress: 4, completionRate: 56, avgProgress: 5 },
-    { name: "Calm Classrooms, Not Chaos", started: 6, completed70: 6, inProgress: 0, completionRate: 100, avgProgress: 5 },
-    { name: "Boundaries Without Backlash", started: 6, completed70: 4, inProgress: 2, completionRate: 67, avgProgress: 4 },
-    { name: "Building Strong Teacher-Para Partnerships", started: 6, completed70: 4, inProgress: 2, completionRate: 67, avgProgress: 4 },
-    { name: "Effective Small-Group & One-on-One Instruction", started: 6, completed70: 3, inProgress: 3, completionRate: 50, avgProgress: 3 },
-    { name: "De-Escalation Strategies for Unstructured Environments", started: 4, completed70: 3, inProgress: 1, completionRate: 75, avgProgress: 3 },
+    { name: "Connected Educators: Building Networks for Bite-Sized Professional Growth", started: 8, completed70: 1, inProgress: 7, completionRate: 13, avgProgress: 2 },
+    { name: "Calm Classrooms, Not Chaos", started: 7, completed70: 6, inProgress: 1, completionRate: 86, avgProgress: 5 },
   ];
 
   // School-level engagement data (with real course metrics and survey data)
@@ -815,7 +815,7 @@ Thank you for setting the example. It matters more than you know.`;
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">83%</div>
                 <div className="text-xs text-[#38618C] font-medium">94/113 logged in</div>
-                <div className="text-xs text-gray-400 mt-1">Goal: 100% before Observation Day 1</div>
+                <div className="text-xs text-gray-400 mt-1">Goal: 100% — Observation Day 1 is Feb 24</div>
               </div>
 
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
@@ -825,8 +825,8 @@ Thank you for setting the example. It matters more than you know.`;
                   <Tooltip text="Paras who have started at least one course in the Learning Hub." position="bottom" iconSize={12} />
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">20%</div>
-                <div className="text-xs text-[#38618C] font-medium">~25/113 started a course</div>
-                <div className="text-xs text-gray-400 mt-1">57 total course completions</div>
+                <div className="text-xs text-[#38618C] font-medium">~26/113 started a course</div>
+                <div className="text-xs text-gray-400 mt-1">63 total course completions</div>
               </div>
 
               <div
@@ -1413,14 +1413,14 @@ Thank you for setting the example. It matters more than you know.`;
             <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-8 text-white text-center">
               <div className="text-5xl font-bold mb-2 flex items-center justify-center gap-3">
                 <Trophy className="w-10 h-10" />
-                57
+                63
               </div>
               <div className="text-xl font-medium mb-1">Courses Completed</div>
               <div className="text-emerald-100 text-sm">
                 by your paraprofessionals -  and counting!
               </div>
               <div className="text-emerald-100 text-sm mt-2">
-                That&apos;s 57 strategies ready to use in classrooms tomorrow.
+                That&apos;s 63 strategies ready to use in classrooms tomorrow.
               </div>
             </div>
 
@@ -1667,12 +1667,12 @@ Thank you for setting the example. It matters more than you know.`;
                     </div>
                   </div>
                 </div>
-                <div className="text-3xl font-bold text-gray-900">57</div>
+                <div className="text-3xl font-bold text-gray-900">63</div>
                 <div className="text-sm text-gray-500 mb-3">total course completions</div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div className="bg-emerald-500 h-2 rounded-full" style={{width: '58%'}}></div>
+                  <div className="bg-emerald-500 h-2 rounded-full" style={{width: '64%'}}></div>
                 </div>
-                <div className="text-xs text-emerald-600 mt-2">across 18 courses</div>
+                <div className="text-xs text-emerald-600 mt-2">across 24 courses</div>
               </div>
             </div>
 
@@ -1748,7 +1748,7 @@ Thank you for setting the example. It matters more than you know.`;
                   <BookOpen className="w-5 h-5 text-blue-500" />
                   <h3 className="text-lg font-semibold text-gray-900">What&apos;s Resonating</h3>
                 </div>
-                <span className="text-xs text-gray-500">Top 10 courses · 13 of 33 have zero engagement</span>
+                <span className="text-xs text-gray-500">Top 10 courses by engagement</span>
               </div>
 
               <div className="space-y-3">
@@ -1780,6 +1780,9 @@ Thank you for setting the example. It matters more than you know.`;
                   <ChevronDown className={`w-4 h-4 transform transition-transform ${showAllCourses ? 'rotate-180' : ''}`} />
                 </button>
               )}
+              <div className="mt-4 pt-3 border-t border-gray-100 text-xs text-gray-400">
+                24 of 34 courses have engagement · 63 total completions · Data as of Feb 23, 2026
+              </div>
             </div>
 
             {/* Section 6: Needs Attention (Collapsible, Soft Tone) */}
@@ -2028,6 +2031,55 @@ Thank you for setting the example. It matters more than you know.`;
             <div className="bg-white rounded-xl p-4 border border-gray-200">
               <h3 className="text-lg font-bold text-gray-900">Building Spotlight — Here&apos;s What We&apos;re Noticing</h3>
               <p className="text-sm text-gray-500 mt-1">Celebrating wins and sharing progress across your district</p>
+            </div>
+
+            {/* District-Wide Top Courses */}
+            <div className="bg-white rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center gap-2 mb-4">
+                <BookOpen className="w-5 h-5 text-blue-500" />
+                <h3 className="text-lg font-bold text-gray-900">Learning Hub — Top Courses Across the District</h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-gray-200">
+                      <th className="text-left py-2 pr-4 font-medium text-gray-500">Course</th>
+                      <th className="text-right py-2 px-2 font-medium text-gray-500">Started</th>
+                      <th className="text-right py-2 pl-2 font-medium text-gray-500">Completed</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-2 pr-4 text-gray-700">Paraprofessional Foundations</td>
+                      <td className="py-2 px-2 text-right text-gray-600">26</td>
+                      <td className="py-2 pl-2 text-right text-emerald-600 font-medium">12</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-2 pr-4 text-gray-700">Streamline Your Inbox</td>
+                      <td className="py-2 px-2 text-right text-gray-600">16</td>
+                      <td className="py-2 pl-2 text-right text-emerald-600 font-medium">4</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-2 pr-4 text-gray-700">Classroom Management Toolkit</td>
+                      <td className="py-2 px-2 text-right text-gray-600">15</td>
+                      <td className="py-2 pl-2 text-right text-emerald-600 font-medium">6</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-2 pr-4 text-gray-700">Differentiated Choice Boards</td>
+                      <td className="py-2 px-2 text-right text-gray-600">15</td>
+                      <td className="py-2 pl-2 text-right text-emerald-600 font-medium">3</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2 pr-4 text-gray-700">Boundaries Without Backlash</td>
+                      <td className="py-2 px-2 text-right text-gray-600">12</td>
+                      <td className="py-2 pl-2 text-right text-emerald-600 font-medium">5</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div className="mt-4 pt-3 border-t border-gray-100 text-xs text-gray-400">
+                Top 5 courses by engagement across all 9 schools · 63 total completions district-wide · Per-school course data coming soon
+              </div>
             </div>
 
             {/* Schools Accordion */}
