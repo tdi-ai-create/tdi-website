@@ -352,7 +352,7 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Virtual Sessions - Scheduled Dates */}
+            {/* Virtual Sessions - Confirmed Dates */}
             <div className="bg-gradient-to-r from-[#38618C]/10 to-[#35A7FF]/10 rounded-xl p-5 border border-[#38618C]/20">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-[#38618C] rounded-lg flex items-center justify-center flex-shrink-0">
@@ -361,39 +361,39 @@ export default function AllenwoodDashboard() {
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-semibold text-[#1e2749]">5 Virtual Sessions Scheduled</h4>
-                    <span className="text-xs bg-amber-500 text-white px-2 py-1 rounded-full">Tentative</span>
+                    <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      Confirmed
+                    </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Proposed dates for your remaining virtual sessions:
+                  <p className="text-sm text-gray-600 mb-2">
+                    All sessions at <span className="font-medium">6:30 PM CT / 7:30 PM ET</span>
+                  </p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Each session: Update what&apos;s new in the hub, foster discussion around tools, and collect data to support teacher growth.
                   </p>
 
                   <div className="space-y-2 mb-4">
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-[#38618C]/10 rounded-full flex items-center justify-center text-xs font-bold text-[#38618C]">1</div>
+                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">1</div>
                       <span className="text-gray-700 font-medium">February 25, 2026</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-[#38618C]/10 rounded-full flex items-center justify-center text-xs font-bold text-[#38618C]">2</div>
+                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">2</div>
                       <span className="text-gray-700 font-medium">March 11, 2026</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-[#38618C]/10 rounded-full flex items-center justify-center text-xs font-bold text-[#38618C]">3</div>
+                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">3</div>
                       <span className="text-gray-700 font-medium">March 25, 2026</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-[#38618C]/10 rounded-full flex items-center justify-center text-xs font-bold text-[#38618C]">4</div>
+                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">4</div>
                       <span className="text-gray-700 font-medium">April 8, 2026</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-[#38618C]/10 rounded-full flex items-center justify-center text-xs font-bold text-[#38618C]">5</div>
+                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">5</div>
                       <span className="text-gray-700 font-medium">April 15, 2026</span>
                     </div>
-                  </div>
-
-                  <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
-                    <p className="text-xs text-amber-800">
-                      <span className="font-semibold">Note:</span> All dates are tentative and awaiting approval on March 2nd via TDI Team and Allenwood Leadership.
-                    </p>
                   </div>
                 </div>
               </div>
@@ -1018,7 +1018,7 @@ export default function AllenwoodDashboard() {
                 {/* Warm context note */}
                 <div className="bg-blue-50 rounded-xl p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#3B82F6', borderLeftStyle: 'solid' }}>
                   <p className="text-gray-700 text-sm">
-                    Hub engagement typically accelerates after the first virtual session when teachers get guided, protected time together. Your virtual sessions are tentatively scheduled - once your team experiences guided Hub time, this section will grow.
+                    Hub engagement typically accelerates after the first virtual session when teachers get guided, protected time together. Your 5 virtual sessions are confirmed starting February 25 - once your team experiences guided Hub time, this section will grow.
                   </p>
                 </div>
               </div>
