@@ -1010,6 +1010,30 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
+            {/* Virtual Session - Completed */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-semibold text-[#1e2749]">Virtual Session Completed</h4>
+                    <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      Complete
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    <span className="font-medium">September 17, 2025</span>
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Welcome &amp; onboarding session for new teachers - introduced the TDI Learning Hub and partnership goals.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Virtual Sessions - Confirmed Dates */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6">
               <div className="flex items-start gap-4">
