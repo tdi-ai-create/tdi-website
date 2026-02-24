@@ -105,6 +105,18 @@ export default function AllenwoodDashboard() {
   // Needs Attention items
   const needsAttentionItems = [
     {
+      id: 'funding-pd-meeting',
+      title: 'Leadership Meeting: Funding PD for Teachers',
+      description: 'Per Dr. Porter\'s request · Discuss funding professional development for teachers',
+      deadline: 'MARCH 2026',
+      deadlineMonth: 3,
+      deadlineYear: 2026,
+      actionLabel: 'Schedule Meeting',
+      actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat',
+      priority: 'asap',
+      recommendedWindow: 'March 3-17',
+    },
+    {
       id: 'spring-celebration',
       title: 'Spring Leadership Celebration',
       description: 'Celebrate wins + discuss Year 2 options · Complimentary',
@@ -325,7 +337,7 @@ export default function AllenwoodDashboard() {
                   <AlertCircle className="w-4 h-4 text-orange-500" />
                   <span className="text-xs text-gray-500 uppercase">Up Next</span>
                 </div>
-                <div className="text-2xl font-bold text-orange-600">2</div>
+                <div className="text-2xl font-bold text-orange-600">{needsAttentionItems.filter(item => !isComplete(item.id)).length}</div>
                 <div className="text-xs text-orange-600 font-medium">Items to schedule</div>
               </button>
 
@@ -347,6 +359,30 @@ export default function AllenwoodDashboard() {
                   <h4 className="font-semibold text-gray-800 mb-2">Recommendation: First Lesson Complete</h4>
                   <p className="text-sm text-gray-700">
                     Good news - your team&apos;s explorer just completed their first full lesson in &apos;Supporting Students Through Their Daily Schedule&apos; and has now spent time in 4 different courses including Teacher-Tested Hacks, Understanding Student Needs, and Parent Tools. That&apos;s real momentum from one person. A 5-minute walkthrough at your next team meeting showing where this explorer started could spark the same curiosity across the group.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Leadership Meeting - March 2 Confirmed */}
+            <div className="bg-gradient-to-r from-[#1e2749]/10 to-[#38618C]/10 rounded-xl p-5 border border-[#1e2749]/20">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-[#1e2749] rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Users className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-semibold text-[#1e2749]">Leadership Meeting: Mid-Year Success</h4>
+                    <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      Confirmed
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">
+                    <span className="font-medium">March 2, 2026</span> · 6:15 AM CT / 7:15 AM ET
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    Discuss mid-year wins, partnership progress, and next steps with Allenwood leadership.
                   </p>
                 </div>
               </div>
@@ -418,42 +454,64 @@ export default function AllenwoodDashboard() {
                   .map(item => (
                     <div
                       key={item.id}
-                      className={`rounded-lg p-4 flex items-center justify-between border transition-all ${
-                        isOverdue(item.deadlineMonth, item.deadlineYear)
+                      className={`rounded-lg p-4 border transition-all ${
+                        item.priority === 'asap'
+                          ? 'border-amber-400 bg-amber-50'
+                          : isOverdue(item.deadlineMonth, item.deadlineYear)
                           ? 'border-red-500 bg-red-50'
                           : 'bg-orange-50 border-orange-100'
                       }`}
                     >
-                      <div className="flex items-center gap-4">
-                        <Calendar className={`w-5 h-5 ${
-                          isOverdue(item.deadlineMonth, item.deadlineYear) ? 'text-red-700' : 'text-orange-500'
-                        }`} />
-                        <div>
-                          <div className="font-medium text-gray-800">{item.title}</div>
-                          <div className="text-sm text-gray-500">
-                            {item.description} ·{' '}
-                            {isOverdue(item.deadlineMonth, item.deadlineYear) ? (
-                              <span className="text-red-700 font-bold">OVERDUE</span>
-                            ) : (
-                              <span className="text-orange-500 font-medium">Available through {item.deadline}</span>
-                            )}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <Calendar className={`w-5 h-5 ${
+                            item.priority === 'asap' ? 'text-amber-600' :
+                            isOverdue(item.deadlineMonth, item.deadlineYear) ? 'text-red-700' : 'text-orange-500'
+                          }`} />
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <span className="font-medium text-gray-800">{item.title}</span>
+                              {item.priority === 'asap' && (
+                                <span className="text-xs bg-amber-500 text-white px-2 py-0.5 rounded-full font-medium">ASAP</span>
+                              )}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {item.description}
+                              {item.recommendedWindow && (
+                                <span className="block text-amber-700 font-medium mt-1">
+                                  Recommended: Schedule between {item.recommendedWindow}
+                                </span>
+                              )}
+                              {!item.recommendedWindow && (
+                                <>
+                                  {' · '}
+                                  {isOverdue(item.deadlineMonth, item.deadlineYear) ? (
+                                    <span className="text-red-700 font-bold">OVERDUE</span>
+                                  ) : (
+                                    <span className="text-orange-500 font-medium">Available through {item.deadline}</span>
+                                  )}
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                      <div className="flex items-center gap-2 ml-4">
-                        <a
-                          href={item.actionUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 ${
-                            isOverdue(item.deadlineMonth, item.deadlineYear)
-                              ? 'bg-red-700 text-white'
-                              : 'bg-orange-500 text-white hover:bg-orange-600'
-                          }`}
-                        >
-                          <Calendar className="w-4 h-4" />
-                          {item.actionLabel}
-                        </a>
+                        <div className="flex items-center gap-2 ml-4">
+                          <a
+                            href={item.actionUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 ${
+                              item.priority === 'asap'
+                                ? 'bg-amber-500 text-white hover:bg-amber-600'
+                                : isOverdue(item.deadlineMonth, item.deadlineYear)
+                                ? 'bg-red-700 text-white'
+                                : 'bg-orange-500 text-white hover:bg-orange-600'
+                            }`}
+                          >
+                            <Calendar className="w-4 h-4" />
+                            {item.actionLabel}
+                          </a>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1159,6 +1217,62 @@ export default function AllenwoodDashboard() {
                   <p>
                     The good news? Even 15 minutes with a targeted course or download can create immediate classroom impact.
                   </p>
+                </div>
+              </div>
+
+              {/* Upcoming Leadership Meetings */}
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
+                <h3 className="font-bold text-[#1e2749] text-lg mb-4 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-[#1e2749]" />
+                  Leadership Meetings
+                </h3>
+                <div className="space-y-4">
+                  {/* March 2 - Confirmed */}
+                  <div className="bg-emerald-50 rounded-xl p-4 border border-emerald-200">
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-gray-800">Mid-Year Success Discussion</span>
+                          <span className="text-xs bg-emerald-500 text-white px-2 py-0.5 rounded-full flex items-center gap-1">
+                            <Check className="w-3 h-3" />
+                            Confirmed
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          <span className="font-medium">March 2, 2026</span> · 6:15 AM CT / 7:15 AM ET
+                        </p>
+                        <p className="text-sm text-gray-500 mt-1">
+                          Discuss mid-year wins, partnership progress, and next steps with Allenwood leadership.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Funding PD Meeting - Needs Scheduling */}
+                  <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-gray-800">Funding PD for Teachers</span>
+                          <span className="text-xs bg-amber-500 text-white px-2 py-0.5 rounded-full">Needs Scheduling</span>
+                        </div>
+                        <p className="text-sm text-gray-600">
+                          Per Dr. Porter&apos;s request · Discuss funding professional development for teachers
+                        </p>
+                        <p className="text-sm text-amber-700 font-medium mt-2">
+                          Recommended: Schedule between March 3-17 to maintain momentum
+                        </p>
+                      </div>
+                      <a
+                        href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-4 px-3 py-2 bg-amber-500 text-white rounded-lg text-sm font-medium hover:bg-amber-600 whitespace-nowrap"
+                      >
+                        Schedule Meeting
+                      </a>
+                    </div>
+                  </div>
                 </div>
               </div>
 
