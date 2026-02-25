@@ -950,11 +950,11 @@ export default function WegoDashboard() {
                   <ul className="text-sm text-blue-700 space-y-1">
                     <li className="flex items-start gap-2">
                       <ArrowRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      Complete remaining virtual sessions
+                      Complete remaining on-site coaching sessions
                     </li>
                     <li className="flex items-start gap-2">
                       <ArrowRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                      Final observation day (Feb 25)
+                      Schedule Year 1 Celebration + Year 2 Planning
                     </li>
                     <li className="flex items-start gap-2">
                       <ArrowRight className="w-4 h-4 mt-0.5 flex-shrink-0" />
