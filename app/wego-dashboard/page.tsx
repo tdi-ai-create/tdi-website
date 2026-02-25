@@ -158,7 +158,7 @@ export default function WegoDashboard() {
               { id: 'blueprint', label: 'Blueprint', icon: Star },
               { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
               { id: 'team', label: 'Team', icon: User },
-              { id: 'billing', label: 'Billing', icon: CreditCard, alert: true },
+              { id: 'billing', label: 'Billing', icon: CreditCard },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -166,12 +166,10 @@ export default function WegoDashboard() {
                 className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                   activeTab === tab.id
                     ? 'bg-[#1e2749] text-white shadow-md'
-                    : tab.alert
-                    ? 'bg-amber-50 text-amber-700 ring-2 ring-amber-400 ring-offset-2 hover:bg-amber-100'
                     : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
                 }`}
               >
-                <tab.icon className={`w-4 h-4 ${tab.alert && activeTab !== tab.id ? 'text-amber-600' : ''}`} />
+                <tab.icon className="w-4 h-4" />
                 <span>{tab.label}</span>
                 {tab.badge && (
                   <span className="text-xs bg-[#35A7FF] text-white px-2 py-0.5 rounded-full">
@@ -2768,21 +2766,21 @@ export default function WegoDashboard() {
               </div>
             </div>
 
-            {/* Section 2: Pending Status Banner (Yellow) */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+            {/* Section 2: Paid Status Banner (Green) */}
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
               <div className="flex items-center justify-between flex-wrap gap-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-amber-100 rounded-full flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-amber-600" />
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
                   </div>
                   <div>
-                    <div className="font-semibold text-amber-800">Payment in Process</div>
-                    <div className="text-sm text-amber-600">We&apos;re awaiting your mailed check. Questions? Contact us below.</div>
+                    <div className="font-semibold text-green-800">Paid in Full</div>
+                    <div className="text-sm text-green-600">Thank you! Your payment has been received and processed.</div>
                   </div>
                 </div>
                 <a
-                  href="mailto:Billing@Teachersdeserveit.com?subject=Payment Status - West Chicago"
-                  className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+                  href="mailto:Billing@Teachersdeserveit.com?subject=Billing Question - West Chicago"
+                  className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
                 >
                   <Mail className="w-4 h-4" />
                   Contact TDI Billing Team
