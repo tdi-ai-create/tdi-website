@@ -237,15 +237,15 @@ export default function WegoDashboard() {
                 <div className="text-sm text-green-600 mt-1">Almost there!</div>
               </div>
 
-              {/* Obs Day 3 - BLUE */}
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 text-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Calendar className="w-6 h-6 text-blue-600" />
+              {/* Obs Day 3 - GREEN (Complete) */}
+              <div className="bg-green-50 border border-green-200 rounded-xl p-5 text-center">
+                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
                 </div>
-                <div className="text-lg font-bold text-blue-700">Obs Day 3</div>
-                <div className="text-blue-600 font-semibold">Feb 25, 2026</div>
-                <div className="text-sm text-blue-600 mt-1 flex items-center justify-center gap-1">
-                  <CheckCircle className="w-4 h-4" /> Scheduled
+                <div className="text-lg font-bold text-green-700">Obs Day 3</div>
+                <div className="text-green-600 font-semibold">Feb 25, 2026</div>
+                <div className="text-sm text-green-600 mt-1 flex items-center justify-center gap-1">
+                  <Check className="w-4 h-4" /> Complete
                 </div>
               </div>
 
@@ -299,15 +299,6 @@ export default function WegoDashboard() {
               </div>
 
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-[#38618C]">Feb 25</span>
-                    <span className="text-sm text-gray-700">Observation Day 3</span>
-                  </div>
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
-                    <Check className="w-3 h-3" /> Scheduled
-                  </span>
-                </div>
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-[#38618C]">Mar 16</span>
@@ -539,14 +530,6 @@ export default function WegoDashboard() {
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <div>
-                      <span className="font-medium text-[#1e2749]">Observation Day 3</span>
-                      <span className="text-gray-500 mx-2"> - </span>
-                      <span className="text-green-600 font-medium">February 25, 2026</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
-                    <div>
                       <span className="font-medium text-[#1e2749]">Virtual Session 4</span>
                       <span className="text-gray-500 mx-2"> - </span>
                       <span className="text-green-600 font-medium">March 16, 2026</span>
@@ -584,6 +567,7 @@ export default function WegoDashboard() {
                   'Hub Logins -  95% (18/19)',
                   'Observation Day 1 -  November 12, 2025',
                   'Observation Day 2 -  Complete',
+                  'Observation Day 3 -  February 25, 2026',
                   'Virtual Sessions 1-3 -  Complete',
                 ].map((item, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-green-700">
@@ -685,14 +669,14 @@ export default function WegoDashboard() {
 
                 {/* Milestone 4 */}
                 <div className="flex items-start gap-4">
-                  <div className="w-8 h-8 bg-[#35A7FF] rounded-full flex items-center justify-center flex-shrink-0">
-                    <Clock className="w-5 h-5 text-white" />
+                  <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
+                    <Check className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
                     <div className="font-medium text-[#1e2749]">Observation Day 3</div>
-                    <p className="text-sm text-gray-500">Final observation day scheduled for February 25, 2026</p>
+                    <p className="text-sm text-gray-500">Final observation day completed February 25, 2026</p>
                   </div>
-                  <span className="text-xs text-[#35A7FF] font-medium">Scheduled</span>
+                  <span className="text-xs text-green-600 font-medium">Complete</span>
                 </div>
 
                 {/* Milestone 5 */}
@@ -858,10 +842,6 @@ export default function WegoDashboard() {
                   <ul className="text-sm text-gray-700 space-y-2">
                     <li className="flex items-start gap-2">
                       <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                      <span><strong>Feb 25</strong> -  Observation Day 3</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
                       <span><strong>Mar 16</strong> -  Virtual Session 4</span>
                     </li>
                     <li className="flex items-start gap-2">
@@ -910,12 +890,139 @@ export default function WegoDashboard() {
 
               {/* Observation Day 3 */}
               <div className="flex items-start gap-4">
-                <Calendar className="w-6 h-6 text-blue-500 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
                 <div className="flex-1">
                   <p className="font-medium text-[#1e2749]">Observation Day 3 -  February 25, 2026</p>
-                  <p className="text-sm text-gray-500">Follow-up observations</p>
+                  <p className="text-sm text-gray-500">7 PAs signed up for observation</p>
                 </div>
-                <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-medium">SCHEDULED</span>
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">COMPLETE</span>
+              </div>
+            </div>
+
+            {/* Observation Day 3 Detail Card */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-5 h-5 text-[#38618C]" />
+                  <span className="font-semibold text-[#1e2749]">Observation Day 3 Details</span>
+                </div>
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">February 25, 2026</span>
+              </div>
+
+              {/* What We Did */}
+              <div className="mb-6">
+                <h4 className="font-medium text-[#1e2749] mb-3">What We Did</h4>
+                <ul className="space-y-2 text-sm text-gray-700">
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>7 PAs signed up for observation (voluntary sign-up model)</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>PA visits conducted with AP partners throughout the day</span>
+                  </li>
+                  <li className="flex items-start gap-2">
+                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span>Personalized follow-up &quot;Love Notes&quot; sent to each observed PA with targeted Learning Hub resources</span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* PAs Observed */}
+              <div className="mb-6">
+                <h4 className="font-medium text-[#1e2749] mb-3">PAs Observed</h4>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-gray-200">
+                        <th className="text-left py-2 pr-4 font-medium text-gray-500">Period</th>
+                        <th className="text-left py-2 px-2 font-medium text-gray-500">PA(s)</th>
+                        <th className="text-left py-2 pl-2 font-medium text-gray-500">Classroom</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr className="border-b border-gray-100">
+                        <td className="py-2 pr-4 text-gray-600">1st</td>
+                        <td className="py-2 px-2 text-gray-700">Cecilia Mantalaba</td>
+                        <td className="py-2 pl-2 text-gray-600">Rm. 1416</td>
+                      </tr>
+                      <tr className="border-b border-gray-100">
+                        <td className="py-2 pr-4 text-gray-600">2nd</td>
+                        <td className="py-2 px-2 text-gray-700">Lizz Nieto, Cristina Espino</td>
+                        <td className="py-2 pl-2 text-gray-600">Rm. 1182</td>
+                      </tr>
+                      <tr className="border-b border-gray-100">
+                        <td className="py-2 pr-4 text-gray-600">3rd</td>
+                        <td className="py-2 px-2 text-gray-700">Quinn Ricci</td>
+                        <td className="py-2 pl-2 text-gray-600">Rm. 1183</td>
+                      </tr>
+                      <tr className="border-b border-gray-100">
+                        <td className="py-2 pr-4 text-gray-600">6/7</td>
+                        <td className="py-2 px-2 text-gray-700">Rocio Mendoza, Thomas Nock</td>
+                        <td className="py-2 pl-2 text-gray-600">Step Center / 1183</td>
+                      </tr>
+                      <tr>
+                        <td className="py-2 pr-4 text-gray-600">8/9</td>
+                        <td className="py-2 px-2 text-gray-700">Curt Treu, Claudia Castellanos</td>
+                        <td className="py-2 pl-2 text-gray-600">Rm. 1411 / 1424</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Strengths & Growth */}
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                <div className="bg-green-50 rounded-xl p-4 border border-green-200">
+                  <h4 className="font-medium text-green-800 mb-3 flex items-center gap-2">
+                    <Star className="w-4 h-4" />
+                    Top Strengths Observed
+                  </h4>
+                  <ul className="space-y-2 text-sm text-green-700">
+                    <li>Strong student relationships across all PAs observed</li>
+                    <li>Active circulation and proximity - PAs moving through the room</li>
+                    <li>Quiet, respectful redirects that maintain instructional flow</li>
+                    <li>Outstanding teacher-PA partnerships (Lizz Nieto&apos;s co-teaching standout)</li>
+                    <li>PAs using encouraging, specific language with students</li>
+                  </ul>
+                </div>
+                <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
+                  <h4 className="font-medium text-amber-800 mb-3 flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4" />
+                    Growth Areas Identified
+                  </h4>
+                  <ul className="space-y-2 text-sm text-amber-700">
+                    <li>Hub engagement remains low - personalized follow-up emails sent</li>
+                    <li>Encouraging language shifts - from directive to invitational prompts</li>
+                    <li>Proactive anticipation of classroom needs</li>
+                  </ul>
+                </div>
+              </div>
+
+              {/* Love Notes Sent */}
+              <div className="bg-[#ffba06]/10 rounded-xl p-4 border border-[#ffba06]/30">
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="w-5 h-5 text-[#ffba06]" />
+                  <span className="font-medium text-[#1e2749]">Love Notes Sent</span>
+                </div>
+                <p className="text-sm text-gray-600 mt-2">Personalized emails with specific observations, Hub login links, and curated resource recommendations sent to each observed PA.</p>
+              </div>
+            </div>
+
+            {/* Scheduling Recommendation */}
+            <div className="bg-[#35A7FF]/5 border-l-4 border-[#35A7FF] rounded-r-xl p-5">
+              <div className="flex items-start gap-3">
+                <Lightbulb className="w-5 h-5 text-[#35A7FF] flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-[#1e2749] mb-2">Scheduling Insight</h4>
+                  <p className="text-sm text-gray-700 mb-3">
+                    Observation Day 3 had higher participation than Days 1 & 2 combined — the voluntary sign-up model + individual
+                    calendar invites helped boost engagement. Consider using this approach for future PD opportunities!
+                  </p>
+                  <p className="text-xs text-[#38618C] font-medium">
+                    Next step: Schedule your Year 1 Celebration + Year 2 Planning session
+                  </p>
+                </div>
               </div>
             </div>
 
