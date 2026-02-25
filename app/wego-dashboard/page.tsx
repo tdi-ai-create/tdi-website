@@ -811,7 +811,7 @@ export default function WegoDashboard() {
               <p className="text-white/80 text-sm">
                 Partnership Period: <span className="text-white font-semibold">September 2025 -  June 2026</span>
                 <span className="mx-2 text-white/40">|</span>
-                Hub Access Until: <span className="text-white font-semibold">June 2027</span>
+                Hub Access Until: <span className="text-white font-semibold">June 2026</span>
               </p>
             </div>
           </div>
@@ -2611,7 +2611,7 @@ export default function WegoDashboard() {
               <div className="mt-4 pt-4 border-t border-gray-100 text-center text-sm text-gray-600">
                 <span className="font-medium">Partnership Period:</span> September 2025 -  June 2026
                 <span className="mx-2">|</span>
-                <span className="font-medium">Hub Access Until:</span> June 2027
+                <span className="font-medium">Hub Access Until:</span> June 2026
               </div>
             </div>
           </div>
