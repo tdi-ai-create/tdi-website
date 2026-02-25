@@ -42,7 +42,9 @@ import {
   FileText,
   Info,
   HelpCircle,
-  Heart
+  Heart,
+  Headphones,
+  Play
 } from 'lucide-react';
 
 export default function WegoDashboard() {
@@ -128,6 +130,7 @@ export default function WegoDashboard() {
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">WEGO High School<br />District 94</h1>
             <p className="text-white/80 text-sm">West Chicago, Illinois | Partner Dashboard</p>
+            <p className="text-white/60 text-xs mt-1">Data updated February 25, 2026</p>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <div className="bg-white/10 px-3 py-2 rounded-lg text-center">
@@ -144,8 +147,7 @@ export default function WegoDashboard() {
           <div className="flex justify-center gap-2 flex-wrap">
             {[
               { id: 'overview', label: 'Overview', icon: Eye },
-              { id: 'journey', label: 'Journey', icon: TrendingUp },
-              { id: 'progress', label: 'Progress', icon: Users },
+              { id: 'journey-progress', label: 'Journey & Progress', icon: TrendingUp },
               { id: 'blueprint', label: 'Blueprint', icon: Star },
               { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
               { id: 'team', label: 'Team', icon: User },
@@ -203,16 +205,16 @@ export default function WegoDashboard() {
 
               <div
                 onClick={() => {
-                  document.getElementById('needs-attention-section')?.scrollIntoView({ behavior: 'smooth' });
+                  document.getElementById('action-items-section')?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#E07A5F] cursor-pointer hover:shadow-md transition-all"
+                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C] cursor-pointer hover:shadow-md transition-all"
               >
                 <div className="flex items-center gap-2 mb-1">
-                  <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
-                  <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
+                  <Target className="w-4 h-4 text-[#38618C]" />
+                  <span className="text-xs text-gray-500 uppercase">Action Items</span>
                 </div>
-                <div className="text-2xl font-bold text-[#E07A5F]">1</div>
-                <div className="text-xs text-[#E07A5F] font-medium">Year 1 Celebration</div>
+                <div className="text-2xl font-bold text-[#38618C]">1</div>
+                <div className="text-xs text-[#38618C] font-medium">Year 1 Celebration</div>
               </div>
 
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
@@ -260,6 +262,29 @@ export default function WegoDashboard() {
               </div>
             </div>
 
+            {/* What Your Team Is Saying - Enhanced & Elevated */}
+            <div className="bg-[#ffba06]/5 rounded-2xl p-6 border border-[#ffba06]/20">
+              <div className="flex items-center gap-2 mb-5">
+                <Quote className="w-6 h-6 text-[#ffba06]" />
+                <span className="text-lg font-bold text-[#1e2749]">What Your Team Is Saying</span>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                  <p className="text-lg text-[#1e2749] italic mb-3 leading-relaxed">&quot;Trust and shared goals to best serve students.&quot;</p>
+                  <p className="text-sm text-[#38618C] font-semibold"> -  Bob Talbot</p>
+                </div>
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                  <p className="text-lg text-[#1e2749] italic mb-3 leading-relaxed">&quot;The feedback step has been effective for me and enables me to provide better support to both teachers and students.&quot;</p>
+                  <p className="text-sm text-[#38618C] font-semibold"> -  Claudia Castellanos</p>
+                </div>
+                <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
+                  <p className="text-lg text-[#1e2749] italic mb-3 leading-relaxed">&quot;We all agreed this course was useful.&quot;</p>
+                  <p className="text-sm text-[#38618C] font-semibold"> -  Curt Treu&apos;s Subgroup</p>
+                </div>
+              </div>
+            </div>
+
             {/* Hours of Support Delivered */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
@@ -302,7 +327,7 @@ export default function WegoDashboard() {
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-[#38618C]">Mar 16</span>
-                    <span className="text-sm text-gray-700">Virtual Session 4</span>
+                    <span className="text-sm text-gray-700">On-Site Coaching 4</span>
                   </div>
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
                     <Check className="w-3 h-3" /> Scheduled
@@ -311,7 +336,7 @@ export default function WegoDashboard() {
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-[#38618C]">Apr 13</span>
-                    <span className="text-sm text-gray-700">Virtual Session 5</span>
+                    <span className="text-sm text-gray-700">On-Site Coaching 5</span>
                   </div>
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
                     <Check className="w-3 h-3" /> Scheduled
@@ -320,7 +345,7 @@ export default function WegoDashboard() {
                 <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center gap-3">
                     <span className="text-sm font-semibold text-[#38618C]">May 11</span>
-                    <span className="text-sm text-gray-700">Virtual Session 6</span>
+                    <span className="text-sm text-gray-700">On-Site Coaching 6</span>
                   </div>
                   <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
                     <Check className="w-3 h-3" /> Scheduled
@@ -348,25 +373,15 @@ export default function WegoDashboard() {
               </div>
             </div>
 
-            {/* What Your Team Is Saying */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <Quote className="w-5 h-5 text-[#ffba06]" />
-                <span className="font-semibold text-[#1e2749] uppercase tracking-wide">What Your Team Is Saying</span>
-              </div>
-
-              <div className="space-y-4">
-                <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#ffba06]">
-                  <p className="text-gray-700 italic mb-2">&quot;Trust and shared goals to best serve students.&quot;</p>
-                  <p className="text-sm text-[#38618C] font-medium"> -  Bob Talbot</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#ffba06]">
-                  <p className="text-gray-700 italic mb-2">&quot;The feedback step has been effective for me and enables me to provide better support to both teachers and students.&quot;</p>
-                  <p className="text-sm text-[#38618C] font-medium"> -  Claudia Castellanos</p>
-                </div>
-                <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-[#ffba06]">
-                  <p className="text-gray-700 italic mb-2">&quot;We all agreed this course was useful.&quot;</p>
-                  <p className="text-sm text-[#38618C] font-medium"> -  Curt Treu&apos;s Subgroup</p>
+            {/* How WEGO's Coaching Works - Subgroup Model */}
+            <div className="bg-[#35A7FF]/5 border-l-4 border-[#35A7FF] rounded-r-xl p-5">
+              <div className="flex items-start gap-3">
+                <Lightbulb className="w-5 h-5 text-[#35A7FF] flex-shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-semibold text-[#1e2749] mb-2">How WEGO&apos;s Coaching Works</h4>
+                  <p className="text-sm text-gray-700 mb-3">
+                    Unlike traditional PD, WEGO&apos;s PA team meets in subgroups every Monday (7:45-9:00 AM) with weekly email updates to leadership. Rae joins on-site monthly for group coaching. This ongoing embedded model is what drives 65% implementation vs the 10% industry average.
+                  </p>
                 </div>
               </div>
             </div>
@@ -386,10 +401,31 @@ export default function WegoDashboard() {
                 <div className="text-center">
                   <div className="text-2xl font-bold text-[#38618C]">83</div>
                   <div className="text-xs text-gray-600">Total Logins<br/>Since Oct</div>
+                  <div className="text-xs text-[#38618C] mt-1">~4.4 per PA</div>
                 </div>
                 <div className="text-center">
+                  {/* TODO: Rae to update February 2026 count */}
                   <div className="text-2xl font-bold text-[#38618C]">7</div>
                   <div className="text-xs text-gray-600">Active This<br/>Month</div>
+                </div>
+              </div>
+
+              {/* Engagement Depth - TODO: Rae to provide actual percentages */}
+              <div className="bg-gray-50 rounded-xl p-4 mb-4">
+                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Engagement Depth</div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-[#38618C]">TBD%</div>
+                    <div className="text-xs text-gray-500">Completed 1+ course</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-[#38618C]">TBD%</div>
+                    <div className="text-xs text-gray-500">Downloaded resources</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-[#38618C]">TBD%</div>
+                    <div className="text-xs text-gray-500">Active this month</div>
+                  </div>
                 </div>
               </div>
 
@@ -417,7 +453,7 @@ export default function WegoDashboard() {
                 </div>
               </div>
 
-              <div className="bg-[#35A7FF]/10 rounded-lg p-4 border border-[#35A7FF]/30">
+              <div className="bg-[#35A7FF]/10 rounded-lg p-4 border border-[#35A7FF]/30 mb-4">
                 <div className="flex items-start gap-2">
                   <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
                   <div>
@@ -427,19 +463,211 @@ export default function WegoDashboard() {
                 </div>
               </div>
 
-              <p className="text-sm text-gray-600 text-center mt-4">
-                7 PAs logged in this month (January 2026) -  momentum is building!
+              <p className="text-sm text-gray-600 text-center mb-4">
+                {/* TODO: Rae to update February 2026 count */}
+                7 PAs logged in this month (February 2026) -  momentum is building!
+              </p>
+
+              <div className="text-center">
+                <a
+                  href="https://tdi.thinkific.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-[#1e2749] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2d3a5c] transition-colors"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Open Learning Hub
+                </a>
+              </div>
+            </div>
+
+            {/* Leading Indicators */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-semibold text-[#1e2749] uppercase tracking-wide">Leading Indicators</span>
+                <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-3 py-1 rounded-full">
+                  Baseline: Feb 2026
+                </span>
+              </div>
+
+              <p className="text-sm text-gray-600 mb-4">
+                Research shows these indicators predict sustainable classroom change and student outcomes.
+              </p>
+
+              <div className="space-y-5">
+                {/* Teacher Stress */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Teacher Stress</span>
+                    <span className="text-xs text-gray-400">Lower is better</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-24 flex-shrink-0">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '15%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">8-9/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-24 flex-shrink-0">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '45%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {/* TODO: Rae to provide WEGO stress score */}
+                      <span className="text-xs text-gray-500 w-24 flex-shrink-0">WEGO</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Strategy Implementation */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Strategy Implementation</span>
+                    <span className="text-xs text-gray-400">Higher is better</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-24 flex-shrink-0">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '10%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">10%</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-24 flex-shrink-0">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '65%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">65%</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {/* TODO: Rae to provide WEGO implementation rate */}
+                      <span className="text-xs text-gray-500 w-24 flex-shrink-0">WEGO</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Retention Intent */}
+                <div>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-semibold text-[#1e2749]">Retention Intent</span>
+                    <span className="text-xs text-gray-400">Higher is better</span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-24 flex-shrink-0">Industry Avg</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '30%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">2-4/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-gray-500 w-24 flex-shrink-0">TDI Partners</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '60%' }}></div>
+                      </div>
+                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      {/* TODO: Rae to provide WEGO retention intent */}
+                      <span className="text-xs text-gray-500 w-24 flex-shrink-0">WEGO</span>
+                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
+                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
+                      </div>
+                      <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-400 text-center mt-6 pt-4 border-t border-gray-100">
+                Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys
               </p>
             </div>
 
-            {/* Needs Attention */}
-            <div id="needs-attention-section" className="bg-white rounded-xl p-5 shadow-sm">
+            {/* District-wide Movement */}
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-[#E07A5F]" />
-                  <span className="font-semibold text-[#1e2749] uppercase tracking-wide">Needs Attention</span>
+                  <Heart className="w-5 h-5 text-[#4ecdc4]" />
+                  <h3 className="text-lg font-bold text-[#1e2749]">District-wide Movement</h3>
                 </div>
-                <span className="text-sm text-orange-500 bg-orange-50 px-2 py-1 rounded-full">
+                <span className="text-xs text-gray-400">Updated Feb 25, 2026</span>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {/* TODO: Rae to confirm if WEGO-specific counts available, otherwise use TDI-wide numbers */}
+                <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#4ecdc4]/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-transparent hover:border-[#4ecdc4]/30">
+                  <Mail className="w-4 h-4 text-gray-400 group-hover:text-[#4ecdc4] flex-shrink-0 transition-colors" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-[#1e2749]">197</p>
+                    <p className="text-xs text-gray-500 truncate">Newsletter</p>
+                    <p className="text-xs text-[#1e2749] font-semibold mt-1 opacity-0 group-hover:opacity-100 transition-opacity">32% higher strategy adoption</p>
+                  </div>
+                </a>
+                <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#4ecdc4]/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-transparent hover:border-[#4ecdc4]/30">
+                  <BookOpen className="w-4 h-4 text-gray-400 group-hover:text-[#4ecdc4] flex-shrink-0 transition-colors" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-[#1e2749]">131</p>
+                    <p className="text-xs text-gray-500 truncate">Blog Readers</p>
+                    <p className="text-xs text-[#1e2749] font-semibold mt-1 opacity-0 group-hover:opacity-100 transition-opacity">2.5x more likely to try new strategies</p>
+                  </div>
+                </a>
+                <a href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#4ecdc4]/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-transparent hover:border-[#4ecdc4]/30">
+                  <Headphones className="w-4 h-4 text-gray-400 group-hover:text-[#4ecdc4] flex-shrink-0 transition-colors" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-[#1e2749]">78</p>
+                    <p className="text-xs text-gray-500 truncate">Podcast</p>
+                    <p className="text-xs text-[#1e2749] font-semibold mt-1 opacity-0 group-hover:opacity-100 transition-opacity">28% higher implementation rates</p>
+                  </div>
+                </a>
+                <a href="https://www.facebook.com/groups/tdimovement" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#4ecdc4]/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-transparent hover:border-[#4ecdc4]/30">
+                  <Users className="w-4 h-4 text-gray-400 group-hover:text-[#4ecdc4] flex-shrink-0 transition-colors" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-[#1e2749]">48</p>
+                    <p className="text-xs text-gray-500 truncate">Community</p>
+                    <p className="text-xs text-[#1e2749] font-semibold mt-1 opacity-0 group-hover:opacity-100 transition-opacity">45% report feeling less isolated</p>
+                  </div>
+                </a>
+                <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#4ecdc4]/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-transparent hover:border-[#4ecdc4]/30">
+                  <FileText className="w-4 h-4 text-gray-400 group-hover:text-[#4ecdc4] flex-shrink-0 transition-colors" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-[#1e2749]">361</p>
+                    <p className="text-xs text-gray-500 truncate">Resources</p>
+                    <p className="text-xs text-[#1e2749] font-semibold mt-1 opacity-0 group-hover:opacity-100 transition-opacity">3x more classroom tools used</p>
+                  </div>
+                </a>
+                <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer" className="group flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#4ecdc4]/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-transparent hover:border-[#4ecdc4]/30">
+                  <GraduationCap className="w-4 h-4 text-gray-400 group-hover:text-[#4ecdc4] flex-shrink-0 transition-colors" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-[#1e2749]">224</p>
+                    <p className="text-xs text-gray-500 truncate">Courses</p>
+                    <p className="text-xs text-[#1e2749] font-semibold mt-1 opacity-0 group-hover:opacity-100 transition-opacity">65% completion vs 10% industry avg</p>
+                  </div>
+                </a>
+              </div>
+            </div>
+
+            {/* Action Items */}
+            <div id="action-items-section" className="bg-white rounded-xl p-5 shadow-sm">
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2">
+                  <Target className="w-5 h-5 text-[#38618C]" />
+                  <span className="font-semibold text-[#1e2749] uppercase tracking-wide">Action Items</span>
+                </div>
+                <span className="text-sm text-[#38618C] bg-[#38618C]/10 px-2 py-1 rounded-full">
                   {needsAttentionItems.filter(item => !isComplete(item.id)).length} items
                 </span>
               </div>
@@ -530,7 +758,7 @@ export default function WegoDashboard() {
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <div>
-                      <span className="font-medium text-[#1e2749]">Virtual Session 4</span>
+                      <span className="font-medium text-[#1e2749]">On-Site Coaching 4</span>
                       <span className="text-gray-500 mx-2"> - </span>
                       <span className="text-green-600 font-medium">March 16, 2026</span>
                     </div>
@@ -538,7 +766,7 @@ export default function WegoDashboard() {
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <div>
-                      <span className="font-medium text-[#1e2749]">Virtual Session 5</span>
+                      <span className="font-medium text-[#1e2749]">On-Site Coaching 5</span>
                       <span className="text-gray-500 mx-2"> - </span>
                       <span className="text-green-600 font-medium">April 13, 2026</span>
                     </div>
@@ -546,7 +774,7 @@ export default function WegoDashboard() {
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <div>
-                      <span className="font-medium text-[#1e2749]">Virtual Session 6</span>
+                      <span className="font-medium text-[#1e2749]">On-Site Coaching 6</span>
                       <span className="text-gray-500 mx-2"> - </span>
                       <span className="text-green-600 font-medium">May 11, 2026</span>
                     </div>
@@ -568,7 +796,7 @@ export default function WegoDashboard() {
                   'Observation Day 1 -  November 12, 2025',
                   'Observation Day 2 -  Complete',
                   'Observation Day 3 -  February 25, 2026',
-                  'Virtual Sessions 1-3 -  Complete',
+                  'On-Site Coachings 1-3 -  Complete',
                 ].map((item, idx) => (
                   <div key={idx} className="flex items-center gap-2 text-green-700">
                     <Check className="w-4 h-4 flex-shrink-0" />
@@ -589,8 +817,8 @@ export default function WegoDashboard() {
           </div>
         )}
 
-        {/* JOURNEY TAB */}
-        {activeTab === 'journey' && (
+        {/* JOURNEY & PROGRESS TAB */}
+        {activeTab === 'journey-progress' && (
           <div className="space-y-6">
             <div className="text-center mb-6">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your Partnership Journey</h2>
@@ -661,7 +889,7 @@ export default function WegoDashboard() {
                     <Check className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <div className="font-medium text-[#1e2749]">Virtual Sessions 1-3</div>
+                    <div className="font-medium text-[#1e2749]">On-Site Coachings 1-3</div>
                     <p className="text-sm text-gray-500">Strategy sessions completed with your team</p>
                   </div>
                   <span className="text-xs text-green-600 font-medium">Complete</span>
@@ -736,15 +964,13 @@ export default function WegoDashboard() {
                 </div>
               </div>
             </div>
-          </div>
-        )}
 
-        {/* PROGRESS TAB */}
-        {activeTab === 'progress' && (
-          <div className="space-y-6">
-            <div className="text-center mb-6">
-              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Observation Data & Progress</h2>
-              <p className="text-gray-600">Tracking implementation through observation cycles</p>
+            {/* PROGRESS SECTION - Observation Data */}
+            <div className="border-t border-gray-200 pt-6 mt-8">
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-bold text-[#1e2749] mb-2">Observation Data & Progress</h2>
+                <p className="text-gray-600">Tracking implementation through observation cycles</p>
+              </div>
             </div>
 
             {/* Your Journey So Far - Visual Timeline */}
@@ -846,11 +1072,11 @@ export default function WegoDashboard() {
                   <ul className="text-sm text-gray-700 space-y-2">
                     <li className="flex items-start gap-2">
                       <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                      <span><strong>Mar 16</strong> -  Virtual Session 4</span>
+                      <span><strong>Mar 16</strong> -  On-Site Coaching 4</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                      <span><strong>Apr 13</strong> -  Virtual Session 5</span>
+                      <span><strong>Apr 13</strong> -  On-Site Coaching 5</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
@@ -858,7 +1084,7 @@ export default function WegoDashboard() {
                     </li>
                     <li className="flex items-start gap-2">
                       <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                      <span><strong>May 11</strong> -  Virtual Session 6 (Final)</span>
+                      <span><strong>May 11</strong> -  On-Site Coaching 6 (Final)</span>
                     </li>
                   </ul>
                 </div>
@@ -1502,6 +1728,221 @@ export default function WegoDashboard() {
                 </div>
               </div>
             </div>
+
+            {/* What We're Seeing Across 3 Visits - Observation Themes Synthesis */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Eye className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749]">What We&apos;re Seeing Across 3 Visits</span>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                <div className="bg-green-50 rounded-xl p-5 border border-green-200">
+                  <h4 className="font-semibold text-green-800 mb-3 flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4" />
+                    Consistent Strengths (Growing)
+                  </h4>
+                  <ul className="space-y-2 text-sm text-green-700">
+                    <li>Student relationships remain the #1 strength across all WEGO PAs</li>
+                    <li>Teacher-PA partnerships are strong and collaborative</li>
+                    <li>PAs are actively circulating and using proximity strategies</li>
+                    <li>Quiet, respectful redirects are the norm</li>
+                  </ul>
+                </div>
+                <div className="bg-amber-50 rounded-xl p-5 border border-amber-200">
+                  <h4 className="font-semibold text-amber-800 mb-3 flex items-center gap-2">
+                    <Target className="w-4 h-4" />
+                    Areas of Growth (Narrowing)
+                  </h4>
+                  <ul className="space-y-2 text-sm text-amber-700">
+                    <li>Hub engagement increasing from 0% (Day 1 baseline) to active exploration</li>
+                    <li>Shift from reactive to proactive support in classrooms</li>
+                    <li>Language moving from directive to encouraging/invitational</li>
+                    <li>PAs taking more ownership of instructional moments (leading slides, co-teaching)</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="bg-[#38618C]/5 rounded-xl p-4 border border-[#38618C]/20">
+                <div className="flex items-start gap-3">
+                  <Lightbulb className="w-5 h-5 text-[#38618C] flex-shrink-0 mt-0.5" />
+                  <div>
+                    <h4 className="font-semibold text-[#1e2749] mb-1">The Pattern</h4>
+                    <p className="text-sm text-gray-700">
+                      PAs with higher Hub engagement consistently demonstrate stronger instructional moves in classrooms.
+                      Every Love Note includes targeted Hub resources to close this loop.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* From Observation to Action */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <ArrowRight className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749]">From Observation to Action</span>
+              </div>
+
+              <p className="text-gray-600 mb-6">How observation insights map directly to Hub recommendations:</p>
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-[#1e2749]">Redirect language could be more encouraging/invitational</div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-[#35A7FF] flex-shrink-0" />
+                  <div className="flex-1">
+                    <a href="https://tdi.thinkific.com/collections/downloads" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-[#35A7FF] hover:underline">Teacher + Para Communication Kit (free download)</a>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-[#1e2749]">PAs want to deepen their role</div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-[#35A7FF] flex-shrink-0" />
+                  <div className="flex-1">
+                    <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-[#35A7FF] hover:underline">Empower Your Role as a Paraprofessional (course)</a>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                  <div className="flex-1">
+                    <div className="text-sm font-medium text-[#1e2749]">Strong partnerships that could go even deeper</div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-[#35A7FF] flex-shrink-0" />
+                  <div className="flex-1">
+                    <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-[#35A7FF] hover:underline">Building Strong Teacher-Para Partnerships (course)</a>
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-500 text-center mt-4 italic">
+                Every Love Note includes targeted resources based on what we actually observed in that PA&apos;s classroom - not generic recommendations.
+              </p>
+            </div>
+
+            {/* Love Notes Explainer */}
+            <div className="bg-[#ffba06]/5 rounded-xl p-6 border border-[#ffba06]/20">
+              <div className="flex items-center gap-2 mb-4">
+                <Heart className="w-5 h-5 text-[#ffba06]" />
+                <span className="font-semibold text-[#1e2749]">Love Notes - Personalized Coaching in Every Email</span>
+              </div>
+
+              <p className="text-gray-700 mb-4">
+                After each observation, every PA receives a personalized &quot;Love Note&quot; from Rae - a detailed email
+                celebrating specific strengths observed in their classroom, connecting them to targeted Hub resources,
+                and offering one actionable next step.
+              </p>
+
+              <div className="bg-white rounded-xl p-4 mb-4 border border-gray-100">
+                <div className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">Sample Excerpt (anonymized)</div>
+                <p className="text-gray-700 italic mb-3">
+                  &quot;Your redirects were quiet and respectful - you weren&apos;t disrupting the flow of instruction,
+                  and students responded well. That&apos;s a skill worth recognizing!&quot;
+                </p>
+                <p className="text-gray-700 italic">
+                  &quot;Your partnership with the teacher is outstanding. The fact that you&apos;re co-leading morning
+                  meeting discussions together - that&apos;s not just support, that&apos;s true collaboration.&quot;
+                </p>
+              </div>
+
+              <div className="flex items-center justify-center gap-6 text-center">
+                <div>
+                  <div className="text-2xl font-bold text-[#ffba06]">19</div>
+                  <div className="text-xs text-gray-500">Love Notes Sent</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-[#ffba06]">3</div>
+                  <div className="text-xs text-gray-500">Observation Days</div>
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-[#ffba06]">100%</div>
+                  <div className="text-xs text-gray-500">Personalized</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Curated Starting Points */}
+            <div className="bg-amber-50 rounded-xl p-6">
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+                <h3 className="font-bold text-[#1e2749] text-lg mb-2">
+                  Curated Starting Points for Your Team
+                </h3>
+                <p className="text-gray-600 text-sm mb-6">
+                  Based on our classroom observations, here are resources that align with what your PAs are already doing well and where small shifts could make a big difference.
+                </p>
+
+                {/* Quick-Win Downloads */}
+                <div className="mb-6">
+                  <h4 className="text-gray-900 font-semibold mb-3 flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-green-500" />
+                    Quick-Win Downloads
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">5 min or less</span>
+                  </h4>
+
+                  <div className="grid md:grid-cols-3 gap-3">
+                    <a href="https://tdi.thinkific.com/collections/downloads" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
+                      <FileText className="w-5 h-5 text-green-500 mb-2" />
+                      <p className="text-gray-900 font-medium text-sm">Teacher + Para Communication Kit</p>
+                      <p className="text-gray-500 text-xs mt-1">We saw strong partnerships. This kit adds shared language for even smoother collaboration.</p>
+                    </a>
+
+                    <a href="https://tdi.thinkific.com/collections/downloads" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
+                      <FileText className="w-5 h-5 text-green-500 mb-2" />
+                      <p className="text-gray-900 font-medium text-sm">PA Observation Guide</p>
+                      <p className="text-gray-500 text-xs mt-1">Help PAs know what to look for during instruction and how to share insights with their lead teacher.</p>
+                    </a>
+
+                    <a href="https://tdi.thinkific.com/collections/downloads" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-green-300 transition-colors">
+                      <FileText className="w-5 h-5 text-green-500 mb-2" />
+                      <p className="text-gray-900 font-medium text-sm">The Sentence Starter Guide</p>
+                      <p className="text-gray-500 text-xs mt-1">Ready-to-use language for parent communication, teacher collaboration, and leadership conversations.</p>
+                    </a>
+                  </div>
+                </div>
+
+                {/* Recommended First Courses */}
+                <div>
+                  <h4 className="text-gray-900 font-semibold mb-3 flex items-center gap-2">
+                    <Play className="w-4 h-4 text-blue-500" />
+                    Recommended First Courses
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">25-30 min each</span>
+                  </h4>
+
+                  <div className="space-y-3">
+                    <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="text-gray-900 font-medium">Empower Your Role as a Paraprofessional</p>
+                          <p className="text-gray-500 text-sm mt-1">Strategies for maximizing impact, classroom positioning, and taking initiative.</p>
+                        </div>
+                        <span className="text-gray-500 text-xs whitespace-nowrap">~25 min</span>
+                      </div>
+                    </a>
+
+                    <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="text-gray-900 font-medium">Building Strong Teacher-Para Partnerships</p>
+                          <p className="text-gray-500 text-sm mt-1">Deepens the collaboration your team is already modeling.</p>
+                        </div>
+                        <span className="text-gray-500 text-xs whitespace-nowrap">~30 min</span>
+                      </div>
+                    </a>
+
+                    <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer" className="block bg-gray-50 rounded-xl p-4 border border-gray-200 hover:border-blue-300 transition-colors">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="text-gray-900 font-medium">Calm Classroom Strategies</p>
+                          <p className="text-gray-500 text-sm mt-1">Already being explored by your team - great for managing energy and transitions.</p>
+                        </div>
+                        <span className="text-gray-500 text-xs whitespace-nowrap">~25 min</span>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
@@ -1854,7 +2295,7 @@ export default function WegoDashboard() {
                         <MessageSquare className="w-4 h-4 text-[#38618C]" />
                         <span className="text-xs font-medium text-[#38618C]">OCTOBER 2026</span>
                       </div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm">Virtual Session #1</h4>
+                      <h4 className="font-semibold text-[#1e2749] text-sm">On-Site Coaching #1</h4>
                       <p className="text-xs text-gray-600 mt-1">Co-planning strategies -  helping teachers and paras find time and systems for shared planning</p>
                     </div>
                   </div>
@@ -1899,7 +2340,7 @@ export default function WegoDashboard() {
                         <MessageSquare className="w-4 h-4 text-[#38618C]" />
                         <span className="text-xs font-medium text-[#38618C]">JANUARY 2027</span>
                       </div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm">Virtual Session #2</h4>
+                      <h4 className="font-semibold text-[#1e2749] text-sm">On-Site Coaching #2</h4>
                       <p className="text-xs text-gray-600 mt-1">Role clarity conversations -  clear expectations for teachers and paras working together</p>
                     </div>
                   </div>
@@ -1914,7 +2355,7 @@ export default function WegoDashboard() {
                         <MessageSquare className="w-4 h-4 text-[#1e2749]" />
                         <span className="text-xs font-medium text-[#1e2749]">FEBRUARY 2027</span>
                       </div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm">Virtual Session #3</h4>
+                      <h4 className="font-semibold text-[#1e2749] text-sm">On-Site Coaching #3</h4>
                       <p className="text-xs text-gray-600 mt-1">Communication frameworks -  tools for busy days when face-to-face planning isn&apos;t possible</p>
                     </div>
                   </div>
@@ -1929,7 +2370,7 @@ export default function WegoDashboard() {
                         <MessageSquare className="w-4 h-4 text-[#1e2749]" />
                         <span className="text-xs font-medium text-[#1e2749]">MARCH 2027</span>
                       </div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm">Virtual Session #4</h4>
+                      <h4 className="font-semibold text-[#1e2749] text-sm">On-Site Coaching #4</h4>
                       <p className="text-xs text-gray-600 mt-1">Para leadership development -  growing your strongest PAs into mentors and leaders</p>
                     </div>
                   </div>
@@ -1961,7 +2402,7 @@ export default function WegoDashboard() {
                   </div>
                   <div className="text-center p-3 bg-[#F5F5F5] rounded-lg">
                     <div className="text-2xl font-bold text-[#38618C]">4</div>
-                    <div className="text-xs text-gray-600">Virtual Sessions</div>
+                    <div className="text-xs text-gray-600">On-Site Coachings</div>
                   </div>
                   <div className="text-center p-3 bg-[#F5F5F5] rounded-lg">
                     <div className="text-2xl font-bold text-[#38618C]">3</div>
@@ -2160,7 +2601,7 @@ export default function WegoDashboard() {
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-[#38618C]">6</div>
-                  <div className="text-xs text-gray-500">Virtual Sessions</div>
+                  <div className="text-xs text-gray-500">On-Site Coachings</div>
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-[#38618C]">1</div>
