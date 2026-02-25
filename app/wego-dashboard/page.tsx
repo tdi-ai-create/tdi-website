@@ -2822,15 +2822,15 @@ export default function WegoDashboard() {
                   </a>
                 </div>
 
-                {/* Agreement 2: West Chicago CHS - PENDING */}
-                <div className="border border-amber-200 bg-amber-50/50 rounded-lg p-4">
+                {/* Agreement 2: West Chicago CHS - PAID */}
+                <div className="border border-gray-200 rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
                     <div>
                       <div className="font-medium text-[#1e2749]">Observation & Feedback Day</div>
                       <div className="text-sm text-gray-500">Signed December 1, 2025</div>
                     </div>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-800">
-                      Pending
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">
+                      Paid
                     </span>
                   </div>
                   <div className="text-sm text-gray-600 mb-3">
