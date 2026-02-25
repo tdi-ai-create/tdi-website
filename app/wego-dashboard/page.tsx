@@ -52,6 +52,13 @@ export default function WegoDashboard() {
   const [showAllLoveNotes, setShowAllLoveNotes] = useState(false);
   const [showPolicy, setShowPolicy] = useState(false);
 
+  // Observation accordion state
+  const [expandedObs, setExpandedObs] = useState<string | null>(null);
+
+  const toggleObsAccordion = (obsId: string) => {
+    setExpandedObs(prev => prev === obsId ? null : obsId);
+  };
+
   // Needs Attention completion state
   const [completedItems, setCompletedItems] = useState<string[]>([]);
 
@@ -1091,151 +1098,280 @@ export default function WegoDashboard() {
               </div>
             </div>
 
-            {/* Observation Timeline */}
+            {/* Observation Timeline - Accordion */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-6">
                 <Eye className="w-5 h-5 text-[#38618C]" />
                 <span className="font-semibold text-[#1e2749]">Observation Timeline</span>
+                <span className="text-xs text-gray-500 ml-auto">Click to expand details</span>
               </div>
 
-              {/* Observation Day 1 */}
-              <div className="flex items-start gap-4 mb-4">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="font-medium text-[#1e2749]">Observation Day 1 -  November 12, 2025</p>
-                  <p className="text-sm text-gray-500">8 of 19 PAs observed</p>
-                </div>
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">COMPLETE</span>
+              {/* Observation Day 1 - Accordion */}
+              <div className="border border-gray-200 rounded-lg mb-3 overflow-hidden">
+                <button
+                  onClick={() => toggleObsAccordion('day1')}
+                  className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors"
+                >
+                  <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
+                  <div className="flex-1 text-left">
+                    <p className="font-medium text-[#1e2749]">Observation Day 1 - November 12, 2025</p>
+                    <p className="text-sm text-gray-500">8 of 19 PAs observed</p>
+                  </div>
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">COMPLETE</span>
+                  {expandedObs === 'day1' ? (
+                    <ChevronUp className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  )}
+                </button>
+                {expandedObs === 'day1' && (
+                  <div className="border-t border-gray-200 p-4 bg-gray-50">
+                    {/* What We Did */}
+                    <div className="mb-4">
+                      <h4 className="font-medium text-[#1e2749] mb-3">What We Did</h4>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                          <span>First formal observation day with 8 PAs observed across classrooms</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                          <span>Baseline observations to establish starting points for each PA</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                          <span>Personalized &quot;Love Notes&quot; sent with Hub resource recommendations</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    {/* Featured Love Note - Isaac Spear */}
+                    <div className="bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-4 border border-[#ffba06]/30 mb-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Star className="w-4 h-4 text-[#ffba06]" />
+                        <span className="font-semibold text-[#1e2749]">Featured: Isaac Spear</span>
+                      </div>
+                      <p className="text-sm text-gray-700 italic mb-2">&quot;Textbook scaffolding! Goal review was outstanding - reviewed when work would be done, asked &apos;Do you have any questions?&apos;, gave reminders of next steps. Multi-modal support shows deep understanding.&quot;</p>
+                      <p className="text-xs text-[#35A7FF] font-medium">Recommended: Sentence Starter Guide</p>
+                    </div>
+
+                    {/* Strengths & Growth */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+                        <h5 className="font-medium text-green-800 text-sm mb-2">Strengths Observed</h5>
+                        <ul className="text-xs text-green-700 space-y-1">
+                          <li>Strong student relationships</li>
+                          <li>Effective use of AAC devices</li>
+                          <li>Clear goal review processes</li>
+                        </ul>
+                      </div>
+                      <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                        <h5 className="font-medium text-amber-800 text-sm mb-2">Growth Areas</h5>
+                        <ul className="text-xs text-amber-700 space-y-1">
+                          <li>Hub engagement (just launched)</li>
+                          <li>Proactive classroom anticipation</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Observation Day 2 */}
-              <div className="flex items-start gap-4 mb-4">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="font-medium text-[#1e2749]">Observation Day 2 -  December 3, 2025</p>
-                  <p className="text-sm text-gray-500">11 of 19 PAs observed</p>
-                </div>
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">COMPLETE</span>
+              {/* Observation Day 2 - Accordion */}
+              <div className="border border-gray-200 rounded-lg mb-3 overflow-hidden">
+                <button
+                  onClick={() => toggleObsAccordion('day2')}
+                  className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors"
+                >
+                  <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
+                  <div className="flex-1 text-left">
+                    <p className="font-medium text-[#1e2749]">Observation Day 2 - December 3, 2025</p>
+                    <p className="text-sm text-gray-500">11 of 19 PAs observed</p>
+                  </div>
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">COMPLETE</span>
+                  {expandedObs === 'day2' ? (
+                    <ChevronUp className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  )}
+                </button>
+                {expandedObs === 'day2' && (
+                  <div className="border-t border-gray-200 p-4 bg-gray-50">
+                    {/* What We Did */}
+                    <div className="mb-4">
+                      <h4 className="font-medium text-[#1e2749] mb-3">What We Did</h4>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                          <span>11 PAs observed - increased participation from Day 1</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                          <span>Focus on relationship-building and co-teaching partnerships</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                          <span>Personalized &quot;Love Notes&quot; sent with tailored Hub recommendations</span>
+                        </li>
+                      </ul>
+                    </div>
+
+                    {/* Featured Love Notes */}
+                    <div className="space-y-3 mb-4">
+                      <div className="bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-4 border border-[#ffba06]/30">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Star className="w-4 h-4 text-[#ffba06]" />
+                          <span className="font-semibold text-[#1e2749]">Quinn Ricci</span>
+                        </div>
+                        <p className="text-sm text-gray-700 italic">&quot;Leadership was seamless - even with a sub, you kept everything running smoothly. 15/10 for handling that student moment with warmth. &apos;Thank you for apologizing&apos; models exactly the kind of respect that builds trust.&quot;</p>
+                      </div>
+                      <div className="bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-4 border border-[#ffba06]/30">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Star className="w-4 h-4 text-[#ffba06]" />
+                          <span className="font-semibold text-[#1e2749]">Lizz Nieto</span>
+                          <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full ml-auto">All Star!</span>
+                        </div>
+                        <p className="text-sm text-gray-700 italic">&quot;Natural relationship-building in action - you leaned into conversation and bonded over TJ Maxx. Uses downtime with intention, not just filler.&quot;</p>
+                      </div>
+                    </div>
+
+                    {/* Strengths & Growth */}
+                    <div className="grid md:grid-cols-2 gap-4">
+                      <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+                        <h5 className="font-medium text-green-800 text-sm mb-2">Strengths Observed</h5>
+                        <ul className="text-xs text-green-700 space-y-1">
+                          <li>Leadership during teacher absences</li>
+                          <li>Natural relationship-building</li>
+                          <li>Warm communication styles</li>
+                          <li>Intentional use of downtime</li>
+                        </ul>
+                      </div>
+                      <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                        <h5 className="font-medium text-amber-800 text-sm mb-2">Growth Areas</h5>
+                        <ul className="text-xs text-amber-700 space-y-1">
+                          <li>Hub logins still building</li>
+                          <li>Expanding instructional strategies</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
-              {/* Observation Day 3 */}
-              <div className="flex items-start gap-4">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="font-medium text-[#1e2749]">Observation Day 3 -  February 25, 2026</p>
-                  <p className="text-sm text-gray-500">7 PAs signed up for observation</p>
-                </div>
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">COMPLETE</span>
-              </div>
-            </div>
+              {/* Observation Day 3 - Accordion */}
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <button
+                  onClick={() => toggleObsAccordion('day3')}
+                  className="w-full flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors"
+                >
+                  <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
+                  <div className="flex-1 text-left">
+                    <p className="font-medium text-[#1e2749]">Observation Day 3 - February 25, 2026</p>
+                    <p className="text-sm text-gray-500">7 PAs signed up for observation</p>
+                  </div>
+                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">COMPLETE</span>
+                  {expandedObs === 'day3' ? (
+                    <ChevronUp className="w-5 h-5 text-gray-400" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                  )}
+                </button>
+                {expandedObs === 'day3' && (
+                  <div className="border-t border-gray-200 p-4 bg-gray-50">
+                    {/* What We Did */}
+                    <div className="mb-4">
+                      <h4 className="font-medium text-[#1e2749] mb-3">What We Did</h4>
+                      <ul className="space-y-2 text-sm text-gray-700">
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                          <span>7 PAs signed up for observation (voluntary sign-up model)</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                          <span>PA visits conducted with AP partners throughout the day</span>
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                          <span>Personalized follow-up &quot;Love Notes&quot; sent to each observed PA with targeted Learning Hub resources</span>
+                        </li>
+                      </ul>
+                    </div>
 
-            {/* Observation Day 3 Detail Card */}
-            <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Eye className="w-5 h-5 text-[#38618C]" />
-                  <span className="font-semibold text-[#1e2749]">Observation Day 3 Details</span>
-                </div>
-                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">February 25, 2026</span>
-              </div>
+                    {/* PAs Observed */}
+                    <div className="mb-4">
+                      <h4 className="font-medium text-[#1e2749] mb-3">PAs Observed</h4>
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="border-b border-gray-200">
+                              <th className="text-left py-2 pr-4 font-medium text-gray-500">Period</th>
+                              <th className="text-left py-2 px-2 font-medium text-gray-500">PA(s)</th>
+                              <th className="text-left py-2 pl-2 font-medium text-gray-500">Classroom</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr className="border-b border-gray-100">
+                              <td className="py-2 pr-4 text-gray-600">1st</td>
+                              <td className="py-2 px-2 text-gray-700">Cecilia Mantalaba</td>
+                              <td className="py-2 pl-2 text-gray-600">Rm. 1416</td>
+                            </tr>
+                            <tr className="border-b border-gray-100">
+                              <td className="py-2 pr-4 text-gray-600">2nd</td>
+                              <td className="py-2 px-2 text-gray-700">Lizz Nieto, Cristina Espino</td>
+                              <td className="py-2 pl-2 text-gray-600">Rm. 1182</td>
+                            </tr>
+                            <tr className="border-b border-gray-100">
+                              <td className="py-2 pr-4 text-gray-600">3rd</td>
+                              <td className="py-2 px-2 text-gray-700">Quinn Ricci</td>
+                              <td className="py-2 pl-2 text-gray-600">Rm. 1183</td>
+                            </tr>
+                            <tr className="border-b border-gray-100">
+                              <td className="py-2 pr-4 text-gray-600">6/7</td>
+                              <td className="py-2 px-2 text-gray-700">Rocio Mendoza, Thomas Nock</td>
+                              <td className="py-2 pl-2 text-gray-600">Step Center / 1183</td>
+                            </tr>
+                            <tr>
+                              <td className="py-2 pr-4 text-gray-600">8/9</td>
+                              <td className="py-2 px-2 text-gray-700">Curt Treu, Claudia Castellanos</td>
+                              <td className="py-2 pl-2 text-gray-600">Rm. 1411 / 1424</td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
 
-              {/* What We Did */}
-              <div className="mb-6">
-                <h4 className="font-medium text-[#1e2749] mb-3">What We Did</h4>
-                <ul className="space-y-2 text-sm text-gray-700">
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span>7 PAs signed up for observation (voluntary sign-up model)</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span>PA visits conducted with AP partners throughout the day</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
-                    <span>Personalized follow-up &quot;Love Notes&quot; sent to each observed PA with targeted Learning Hub resources</span>
-                  </li>
-                </ul>
-              </div>
+                    {/* Strengths & Growth */}
+                    <div className="grid md:grid-cols-2 gap-4 mb-4">
+                      <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+                        <h5 className="font-medium text-green-800 text-sm mb-2">Top Strengths Observed</h5>
+                        <ul className="text-xs text-green-700 space-y-1">
+                          <li>Strong student relationships across all PAs</li>
+                          <li>Active circulation and proximity</li>
+                          <li>Quiet, respectful redirects</li>
+                          <li>Outstanding teacher-PA partnerships</li>
+                          <li>Encouraging, specific language</li>
+                        </ul>
+                      </div>
+                      <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                        <h5 className="font-medium text-amber-800 text-sm mb-2">Growth Areas Identified</h5>
+                        <ul className="text-xs text-amber-700 space-y-1">
+                          <li>Hub engagement remains low</li>
+                          <li>Encouraging language shifts</li>
+                          <li>Proactive anticipation of needs</li>
+                        </ul>
+                      </div>
+                    </div>
 
-              {/* PAs Observed */}
-              <div className="mb-6">
-                <h4 className="font-medium text-[#1e2749] mb-3">PAs Observed</h4>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b border-gray-200">
-                        <th className="text-left py-2 pr-4 font-medium text-gray-500">Period</th>
-                        <th className="text-left py-2 px-2 font-medium text-gray-500">PA(s)</th>
-                        <th className="text-left py-2 pl-2 font-medium text-gray-500">Classroom</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr className="border-b border-gray-100">
-                        <td className="py-2 pr-4 text-gray-600">1st</td>
-                        <td className="py-2 px-2 text-gray-700">Cecilia Mantalaba</td>
-                        <td className="py-2 pl-2 text-gray-600">Rm. 1416</td>
-                      </tr>
-                      <tr className="border-b border-gray-100">
-                        <td className="py-2 pr-4 text-gray-600">2nd</td>
-                        <td className="py-2 px-2 text-gray-700">Lizz Nieto, Cristina Espino</td>
-                        <td className="py-2 pl-2 text-gray-600">Rm. 1182</td>
-                      </tr>
-                      <tr className="border-b border-gray-100">
-                        <td className="py-2 pr-4 text-gray-600">3rd</td>
-                        <td className="py-2 px-2 text-gray-700">Quinn Ricci</td>
-                        <td className="py-2 pl-2 text-gray-600">Rm. 1183</td>
-                      </tr>
-                      <tr className="border-b border-gray-100">
-                        <td className="py-2 pr-4 text-gray-600">6/7</td>
-                        <td className="py-2 px-2 text-gray-700">Rocio Mendoza, Thomas Nock</td>
-                        <td className="py-2 pl-2 text-gray-600">Step Center / 1183</td>
-                      </tr>
-                      <tr>
-                        <td className="py-2 pr-4 text-gray-600">8/9</td>
-                        <td className="py-2 px-2 text-gray-700">Curt Treu, Claudia Castellanos</td>
-                        <td className="py-2 pl-2 text-gray-600">Rm. 1411 / 1424</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              {/* Strengths & Growth */}
-              <div className="grid md:grid-cols-2 gap-6 mb-6">
-                <div className="bg-green-50 rounded-xl p-4 border border-green-200">
-                  <h4 className="font-medium text-green-800 mb-3 flex items-center gap-2">
-                    <Star className="w-4 h-4" />
-                    Top Strengths Observed
-                  </h4>
-                  <ul className="space-y-2 text-sm text-green-700">
-                    <li>Strong student relationships across all PAs observed</li>
-                    <li>Active circulation and proximity - PAs moving through the room</li>
-                    <li>Quiet, respectful redirects that maintain instructional flow</li>
-                    <li>Outstanding teacher-PA partnerships (Lizz Nieto&apos;s co-teaching standout)</li>
-                    <li>PAs using encouraging, specific language with students</li>
-                  </ul>
-                </div>
-                <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
-                  <h4 className="font-medium text-amber-800 mb-3 flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4" />
-                    Growth Areas Identified
-                  </h4>
-                  <ul className="space-y-2 text-sm text-amber-700">
-                    <li>Hub engagement remains low - personalized follow-up emails sent</li>
-                    <li>Encouraging language shifts - from directive to invitational prompts</li>
-                    <li>Proactive anticipation of classroom needs</li>
-                  </ul>
-                </div>
-              </div>
-
-              {/* Love Notes Sent */}
-              <div className="bg-[#ffba06]/10 rounded-xl p-4 border border-[#ffba06]/30">
-                <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-[#ffba06]" />
-                  <span className="font-medium text-[#1e2749]">Love Notes Sent</span>
-                </div>
-                <p className="text-sm text-gray-600 mt-2">Personalized emails with specific observations, Hub login links, and curated resource recommendations sent to each observed PA.</p>
+                    {/* Love Notes Sent */}
+                    <div className="bg-[#ffba06]/10 rounded-lg p-3 border border-[#ffba06]/30">
+                      <div className="flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-[#ffba06]" />
+                        <span className="font-medium text-[#1e2749] text-sm">Love Notes Sent</span>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1">Personalized emails with specific observations, Hub login links, and curated resource recommendations sent to each observed PA.</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
