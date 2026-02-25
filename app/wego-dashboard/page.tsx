@@ -1793,20 +1793,7 @@ export default function WegoDashboard() {
                     <Users className="w-5 h-5 text-[#ffba06]" />
                     <span className="font-semibold text-[#1e2749]">Monthly (Full Group with Rae)</span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-3">All PAs meet together for themed discussion</p>
-                  <div className="bg-white rounded-lg p-3">
-                    <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">November Theme Options</div>
-                    <ul className="text-sm text-gray-700 space-y-1">
-                      <li className="flex items-center gap-2">
-                        <ArrowRight className="w-3 h-3 text-[#38618C]" />
-                        Student needs and modifications
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <ArrowRight className="w-3 h-3 text-[#38618C]" />
-                        Communication with students
-                      </li>
-                    </ul>
-                  </div>
+                  <p className="text-sm text-gray-600">All PAs meet together for themed discussion</p>
                 </div>
               </div>
 
