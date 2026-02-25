@@ -1460,8 +1460,8 @@ export default function WegoDashboard() {
                         <span className="font-bold text-[#1e2749]">Claudia Castellanos</span>
                         <span className="text-xs text-gray-500">Feb 25, 2026</span>
                       </div>
-                      <p className="text-sm text-gray-700 italic">&quot;A true classroom leader! Your quiet confidence and seamless support of students shows real growth. The way you anticipated needs before being asked - that&apos;s next-level PA work.&quot;</p>
-                      <div className="mt-2 text-xs text-[#35A7FF] font-medium">Recommended: Proactive Support Strategies</div>
+                      <p className="text-sm text-gray-700 italic">&quot;You were working with students at the board across multiple groups, giving directions for math equations - that&apos;s not just supporting, that&apos;s teaching. Your questioning was exceptional: &apos;7.5, so that means this is what?&apos; and &apos;Why is that?&apos; - you&apos;re consistently developing student reasoning.&quot;</p>
+                      <div className="mt-2 text-xs text-[#35A7FF] font-medium">Strength: Facilitating learning + developing student reasoning</div>
                     </div>
                   </div>
                 </div>
@@ -1477,8 +1477,8 @@ export default function WegoDashboard() {
                         <span className="font-bold text-[#1e2749]">Curt Treu</span>
                         <span className="text-xs text-gray-500">Feb 25, 2026</span>
                       </div>
-                      <p className="text-sm text-gray-700 italic">&quot;Your subgroup work is a model for the building! Students are engaged, focused, and clearly comfortable with you. The small group dynamic you&apos;ve built shows what intentional relationship-building looks like in action.&quot;</p>
-                      <div className="mt-2 text-xs text-[#35A7FF] font-medium">Recommended: Small Group Facilitation Guide</div>
+                      <p className="text-sm text-gray-700 italic">&quot;Your low, quiet voice is a real asset - small groups can hear you well, but you&apos;re not a distraction to others. That&apos;s a skill that takes awareness and practice, and you&apos;ve nailed it! You moved to other groups to check problems - you&apos;re scanning, circulating, and making sure multiple students are on track.&quot;</p>
+                      <div className="mt-2 text-xs text-[#35A7FF] font-medium">Strength: Strategic voice control + active circulation</div>
                     </div>
                   </div>
                 </div>
