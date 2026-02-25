@@ -2969,11 +2969,11 @@ Thank you for setting the example. It matters more than you know.`;
                   </div>
                 </div>
                 <a
-                  href="mailto:jevon@secureplusfinancial.com?subject=Payment Resolution - Addison School District 4"
+                  href="mailto:Billing@Teachersdeserveit.com?subject=Payment Resolution - Addison School District 4"
                   className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
                 >
                   <Mail className="w-4 h-4" />
-                  Contact Jevon Suralie
+                  Contact TDI Billing Team
                 </a>
               </div>
             </div>
@@ -3079,10 +3079,10 @@ Thank you for setting the example. It matters more than you know.`;
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="border border-gray-200 rounded-lg p-4">
                   <div className="text-sm text-gray-500 mb-1">Billing & Payment Questions</div>
-                  <div className="font-medium text-[#1e2749]">Jevon Suralie</div>
-                  <div className="text-sm text-gray-600 mb-3">Secure Plus Financial</div>
+                  <div className="font-medium text-[#1e2749]">TDI Billing Team</div>
+                  <div className="text-sm text-gray-600 mb-3">Teachers Deserve It</div>
                   <a
-                    href="mailto:jevon@secureplusfinancial.com?subject=Billing Question - Addison School District 4"
+                    href="mailto:Billing@Teachersdeserveit.com?subject=Billing Question - Addison School District 4"
                     className="inline-flex items-center gap-2 bg-[#1e2749] hover:bg-[#2a3a5c] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                   >
                     <Mail className="w-4 h-4" />
