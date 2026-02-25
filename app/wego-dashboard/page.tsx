@@ -454,25 +454,6 @@ export default function WegoDashboard() {
                 </div>
               </div>
 
-              {/* Engagement Depth - TODO: Rae to provide actual percentages */}
-              <div className="bg-gray-50 rounded-xl p-4 mb-4">
-                <div className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Engagement Depth</div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-[#38618C]">TBD%</div>
-                    <div className="text-xs text-gray-500">Completed 1+ course</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-[#38618C]">TBD%</div>
-                    <div className="text-xs text-gray-500">Downloaded resources</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-[#38618C]">TBD%</div>
-                    <div className="text-xs text-gray-500">Active this month</div>
-                  </div>
-                </div>
-              </div>
-
               <div className="space-y-3 mb-4">
                 <div className="flex items-start gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
                   <div className="w-3 h-3 bg-green-500 rounded-full mt-1 flex-shrink-0"></div>
