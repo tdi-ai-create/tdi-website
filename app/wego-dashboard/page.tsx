@@ -1448,6 +1448,40 @@ export default function WegoDashboard() {
                     </div>
                   </div>
                 </div>
+
+                {/* Claudia Castellanos Featured - Day 3 */}
+                <div className="bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-4 border border-[#ffba06]/30">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-[#ffba06] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Star className="w-4 h-4 text-[#1e2749]" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-[#1e2749]">Claudia Castellanos</span>
+                        <span className="text-xs text-gray-500">Feb 25, 2026</span>
+                      </div>
+                      <p className="text-sm text-gray-700 italic">&quot;A true classroom leader! Your quiet confidence and seamless support of students shows real growth. The way you anticipated needs before being asked - that&apos;s next-level PA work.&quot;</p>
+                      <div className="mt-2 text-xs text-[#35A7FF] font-medium">Recommended: Proactive Support Strategies</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Curt Treu Featured - Day 3 */}
+                <div className="bg-gradient-to-br from-[#ffba06]/10 to-[#ffba06]/5 rounded-xl p-4 border border-[#ffba06]/30">
+                  <div className="flex items-start gap-3">
+                    <div className="w-8 h-8 bg-[#ffba06] rounded-full flex items-center justify-center flex-shrink-0">
+                      <Star className="w-4 h-4 text-[#1e2749]" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-[#1e2749]">Curt Treu</span>
+                        <span className="text-xs text-gray-500">Feb 25, 2026</span>
+                      </div>
+                      <p className="text-sm text-gray-700 italic">&quot;Your subgroup work is a model for the building! Students are engaged, focused, and clearly comfortable with you. The small group dynamic you&apos;ve built shows what intentional relationship-building looks like in action.&quot;</p>
+                      <div className="mt-2 text-xs text-[#35A7FF] font-medium">Recommended: Small Group Facilitation Guide</div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* View All Love Notes - Expandable */}
@@ -1982,7 +2016,7 @@ export default function WegoDashboard() {
 
               <div className="flex items-center justify-center gap-6 text-center">
                 <div>
-                  <div className="text-2xl font-bold text-[#ffba06]">19</div>
+                  <div className="text-2xl font-bold text-[#ffba06]">21</div>
                   <div className="text-xs text-gray-500">Love Notes Sent</div>
                 </div>
                 <div>
