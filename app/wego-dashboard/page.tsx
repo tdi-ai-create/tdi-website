@@ -756,7 +756,7 @@ export default function WegoDashboard() {
 
               {/* Visual Timeline */}
               <div className="relative mb-8">
-                <div className="absolute top-4 left-0 right-0 h-1 bg-gradient-to-r from-green-400 via-[#35A7FF] to-gray-200 rounded-full"></div>
+                <div className="absolute top-4 left-0 right-0 h-1 bg-gradient-to-r from-green-400 via-green-400 via-80% to-gray-200 rounded-full"></div>
                 <div className="flex justify-between relative">
                   <div className="text-center">
                     <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow">
@@ -780,18 +780,18 @@ export default function WegoDashboard() {
                     <div className="text-xs text-gray-500">Subgroups</div>
                   </div>
                   <div className="text-center">
+                    <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow">
+                      <Check className="w-4 h-4 text-white" />
+                    </div>
+                    <div className="text-xs font-semibold text-[#1e2749]">Jan 2026</div>
+                    <div className="text-xs text-gray-500">Subgroups</div>
+                  </div>
+                  <div className="text-center">
                     <div className="w-8 h-8 bg-[#35A7FF] rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow animate-pulse">
                       <Star className="w-4 h-4 text-white" />
                     </div>
-                    <div className="text-xs font-semibold text-[#1e2749]">Jan 2026</div>
+                    <div className="text-xs font-semibold text-[#1e2749]">Feb 2026</div>
                     <div className="text-xs text-[#35A7FF]">You Are Here</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow">
-                      <Calendar className="w-4 h-4 text-gray-400" />
-                    </div>
-                    <div className="text-xs font-semibold text-gray-400">Feb 2026</div>
-                    <div className="text-xs text-gray-400">Obs Day 3</div>
                   </div>
                   <div className="text-center">
                     <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center mx-auto mb-2 border-4 border-white shadow">
@@ -830,6 +830,10 @@ export default function WegoDashboard() {
                     <li className="flex items-start gap-2">
                       <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
                       <span><strong>Jan 2026</strong> -  7 PAs active this month</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <span><strong>Feb 2026</strong> -  Obs Day 3 complete, 7 PAs observed</span>
                     </li>
                   </ul>
                 </div>
