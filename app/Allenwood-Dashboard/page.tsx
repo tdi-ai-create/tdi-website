@@ -1010,7 +1010,7 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Virtual Session - Completed */}
+            {/* Virtual Sessions - Completed */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6">
               <div className="flex items-start gap-4">
                 <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -1018,18 +1018,30 @@ export default function AllenwoodDashboard() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-[#1e2749]">Virtual Session Completed</h4>
+                    <h4 className="font-semibold text-[#1e2749]">2 Virtual Sessions Completed</h4>
                     <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
                       <Check className="w-3 h-3" />
                       Complete
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">
-                    <span className="font-medium">September 17, 2025</span>
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Welcome &amp; onboarding session for new teachers - introduced the TDI Learning Hub and partnership goals.
-                  </p>
+                  <div className="space-y-3">
+                    <div className="border-b border-gray-100 pb-3">
+                      <p className="text-sm text-gray-600 mb-1">
+                        <span className="font-medium">September 17, 2025</span>
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Welcome &amp; onboarding session for new teachers - introduced the TDI Learning Hub and partnership goals.
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-600 mb-1">
+                        <span className="font-medium">February 25, 2026</span>
+                      </p>
+                      <p className="text-sm text-gray-500">
+                        Updated what&apos;s new in the hub, fostered discussion around tools, and collected data to support teacher growth.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1042,7 +1054,7 @@ export default function AllenwoodDashboard() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-[#1e2749]">5 Virtual Sessions Scheduled</h4>
+                    <h4 className="font-semibold text-[#1e2749]">4 Virtual Sessions Scheduled</h4>
                     <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
                       <Check className="w-3 h-3" />
                       Confirmed
@@ -1058,22 +1070,18 @@ export default function AllenwoodDashboard() {
                   <div className="space-y-2">
                     <div className="flex items-center gap-3 text-sm">
                       <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">1</div>
-                      <span className="text-gray-700 font-medium">February 25, 2026</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">2</div>
                       <span className="text-gray-700 font-medium">March 11, 2026</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">3</div>
+                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">2</div>
                       <span className="text-gray-700 font-medium">March 25, 2026</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">4</div>
+                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">3</div>
                       <span className="text-gray-700 font-medium">April 8, 2026</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">5</div>
+                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">4</div>
                       <span className="text-gray-700 font-medium">April 15, 2026</span>
                     </div>
                   </div>
@@ -1100,7 +1108,7 @@ export default function AllenwoodDashboard() {
                 {/* Warm context note */}
                 <div className="bg-blue-50 rounded-xl p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#3B82F6', borderLeftStyle: 'solid' }}>
                   <p className="text-gray-700 text-sm">
-                    Hub engagement typically accelerates after the first virtual session when teachers get guided, protected time together. Your 5 virtual sessions are confirmed starting February 25 - once your team experiences guided Hub time, this section will grow.
+                    Hub engagement typically accelerates after virtual sessions when teachers get guided, protected time together. Your first session on February 25 is complete, with 4 more scheduled - as your team experiences more guided Hub time, this section will grow.
                   </p>
                 </div>
               </div>
