@@ -44,7 +44,9 @@ import {
   HelpCircle,
   Heart,
   Headphones,
-  Play
+  Play,
+  Globe,
+  ClipboardList
 } from 'lucide-react';
 
 export default function WegoDashboard() {
@@ -329,32 +331,69 @@ export default function WegoDashboard() {
               </div>
 
               <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-[#38618C]">Mar 16</span>
-                    <span className="text-sm text-gray-700">On-Site Coaching 4</span>
+                {/* Mar 16 - Virtual Session 4 with full details */}
+                <div className="bg-gray-50 rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between p-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-semibold text-[#38618C]">Mar 16</span>
+                      <span className="text-sm text-gray-700">Virtual Session 4</span>
+                    </div>
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                      <Check className="w-3 h-3" /> Scheduled
+                    </span>
                   </div>
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
-                    <Check className="w-3 h-3" /> Scheduled
-                  </span>
+                  <div className="px-3 pb-3 pt-1 border-t border-gray-200 bg-white">
+                    <p className="text-sm font-medium text-[#38618C] mb-1">Focus: Questioning & Feedback Skills</p>
+                    <p className="text-xs text-gray-600 mb-2">
+                      Interactive &quot;Game Time&quot; workshop where PAs practice asking better questions and giving stronger feedback to students in real time.
+                    </p>
+                    <div className="flex items-center gap-3 text-xs text-gray-500">
+                      <span className="flex items-center gap-1">
+                        <Globe className="w-3 h-3" />
+                        Available in English or Spanish
+                      </span>
+                      <a
+                        href="https://www.teachersdeserveit.com/paragametools"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#35A7FF] hover:underline"
+                      >
+                        Preview the tools
+                      </a>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-[#38618C]">Apr 13</span>
-                    <span className="text-sm text-gray-700">On-Site Coaching 5</span>
+
+                {/* Apr 13 - Virtual Session 5 */}
+                <div className="bg-gray-50 rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between p-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-semibold text-[#38618C]">Apr 13</span>
+                      <span className="text-sm text-gray-700">Virtual Session 5</span>
+                    </div>
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                      <Check className="w-3 h-3" /> Scheduled
+                    </span>
                   </div>
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
-                    <Check className="w-3 h-3" /> Scheduled
-                  </span>
+                  <div className="px-3 pb-3 pt-1 border-t border-gray-200 bg-white">
+                    <p className="text-sm text-gray-500">Focus: TBD</p>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-[#38618C]">May 11</span>
-                    <span className="text-sm text-gray-700">On-Site Coaching 6</span>
+
+                {/* May 11 - Virtual Session 6 */}
+                <div className="bg-gray-50 rounded-lg overflow-hidden">
+                  <div className="flex items-center justify-between p-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-sm font-semibold text-[#38618C]">May 11</span>
+                      <span className="text-sm text-gray-700">Virtual Session 6</span>
+                    </div>
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
+                      <Check className="w-3 h-3" /> Scheduled
+                    </span>
                   </div>
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium flex items-center gap-1">
-                    <Check className="w-3 h-3" /> Scheduled
-                  </span>
+                  <div className="px-3 pb-3 pt-1 border-t border-gray-200 bg-white">
+                    <p className="text-sm text-gray-500">Focus: TBD</p>
+                  </div>
                 </div>
                 <a
                   href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
@@ -484,6 +523,66 @@ export default function WegoDashboard() {
                   Open Learning Hub
                 </a>
               </div>
+            </div>
+
+            {/* Data Collection */}
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <ClipboardList className="w-5 h-5 text-[#38618C]" />
+                <span className="font-semibold text-[#1e2749] uppercase tracking-wide">Data Collection</span>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4 mb-4">
+                {/* Teacher Survey Card */}
+                <div className="border border-gray-200 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                    <span className="text-xs font-medium text-green-600">Live</span>
+                  </div>
+                  <h4 className="font-semibold text-[#1e2749] mb-1">Teacher Partnership Check-In</h4>
+                  <p className="text-xs text-gray-500 mb-2">~2 minutes · Click-through · Confidential</p>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Teachers share feedback on their PA partnership — what&apos;s working, where they&apos;d love more support, and how we can strengthen classroom collaboration.
+                  </p>
+                  <a
+                    href="https://www.teachersdeserveit.com/wego-survey/teacher"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-[#38618C] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#2d4a6b] transition-colors mb-2"
+                  >
+                    View Survey
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                  <p className="text-xs text-gray-500 italic">Send to teachers who work with PAs. Responses are visible only to the TDI team.</p>
+                </div>
+
+                {/* PA Survey Card */}
+                <div className="border border-gray-200 rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="w-2 h-2 bg-amber-500 rounded-full"></span>
+                    <span className="text-xs font-medium text-amber-600">Launching March 16</span>
+                  </div>
+                  <h4 className="font-semibold text-[#1e2749] mb-1">PA Check-In Survey</h4>
+                  <p className="text-xs text-gray-500 mb-2">~3 minutes · Click-through · Confidential</p>
+                  <p className="text-sm text-gray-600 mb-3">
+                    PAs share feedback on stress levels, daily challenges, what support they need most, and how likely they are to continue in their role next year.
+                  </p>
+                  <a
+                    href="https://www.teachersdeserveit.com/wego-survey/pa"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 bg-[#38618C] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#2d4a6b] transition-colors mb-2"
+                  >
+                    View Survey
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                  <p className="text-xs text-gray-500 italic">PAs will complete this during Virtual Session 4 on March 16.</p>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-600 text-center bg-gray-50 rounded-lg p-3">
+                Combined survey data will inform 2026-27 planning — including PA topics, areas to improve, and renewal recommendations.
+              </p>
             </div>
 
             {/* Leading Indicators */}
@@ -763,7 +862,7 @@ export default function WegoDashboard() {
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <div>
-                      <span className="font-medium text-[#1e2749]">On-Site Coaching 4</span>
+                      <span className="font-medium text-[#1e2749]">Virtual Session 4</span>
                       <span className="text-gray-500 mx-2"> - </span>
                       <span className="text-green-600 font-medium">March 16, 2026</span>
                     </div>
@@ -771,7 +870,7 @@ export default function WegoDashboard() {
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <div>
-                      <span className="font-medium text-[#1e2749]">On-Site Coaching 5</span>
+                      <span className="font-medium text-[#1e2749]">Virtual Session 5</span>
                       <span className="text-gray-500 mx-2"> - </span>
                       <span className="text-green-600 font-medium">April 13, 2026</span>
                     </div>
@@ -779,7 +878,7 @@ export default function WegoDashboard() {
                   <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50 border border-green-200">
                     <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <div>
-                      <span className="font-medium text-[#1e2749]">On-Site Coaching 6</span>
+                      <span className="font-medium text-[#1e2749]">Virtual Session 6</span>
                       <span className="text-gray-500 mx-2"> - </span>
                       <span className="text-green-600 font-medium">May 11, 2026</span>
                     </div>
@@ -1077,11 +1176,11 @@ export default function WegoDashboard() {
                   <ul className="text-sm text-gray-700 space-y-2">
                     <li className="flex items-start gap-2">
                       <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                      <span><strong>Mar 16</strong> -  On-Site Coaching 4</span>
+                      <span><strong>Mar 16</strong> -  Virtual Session 4</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                      <span><strong>Apr 13</strong> -  On-Site Coaching 5</span>
+                      <span><strong>Apr 13</strong> -  Virtual Session 5</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
@@ -1089,7 +1188,7 @@ export default function WegoDashboard() {
                     </li>
                     <li className="flex items-start gap-2">
                       <Calendar className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                      <span><strong>May 11</strong> -  On-Site Coaching 6 (Final)</span>
+                      <span><strong>May 11</strong> -  Virtual Session 6 (Final)</span>
                     </li>
                   </ul>
                 </div>
@@ -2161,6 +2260,40 @@ export default function WegoDashboard() {
               <p className="text-[#38618C] font-medium">
                 Your PAs completed &quot;Building Strong Teacher-Para Partnerships&quot; and gave it rave reviews. Year 2 gives their teachers the same foundation.
               </p>
+            </div>
+
+            {/* Survey Data Coming Soon */}
+            <div className="bg-[#35A7FF]/10 border border-[#35A7FF]/30 rounded-xl p-6">
+              <div className="flex items-start gap-3">
+                <BarChart3 className="w-6 h-6 text-[#35A7FF] flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-bold text-[#1e2749] mb-2">Survey Data Coming Soon</h3>
+                  <p className="text-sm text-gray-700 mb-4">
+                    Teacher and PA surveys are now collecting feedback that will shape Year 2 planning. Results will appear here once collection is complete.
+                  </p>
+                  <div className="text-sm text-gray-600">
+                    <p className="font-medium text-[#38618C] mb-2">What we&apos;re measuring:</p>
+                    <ul className="space-y-1">
+                      <li className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-[#35A7FF]" />
+                        PA stress levels & retention likelihood
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-[#35A7FF]" />
+                        Teacher-PA partnership quality
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-[#35A7FF]" />
+                        Top PD topics requested
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <Check className="w-4 h-4 text-[#35A7FF]" />
+                        Areas for targeted improvement
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* The Year 2 Plan */}
