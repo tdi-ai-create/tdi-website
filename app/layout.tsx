@@ -8,7 +8,6 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { EmailPopup } from "@/components/EmailPopup";
 import { SocialProofPopup } from "@/components/SocialProofPopup";
-import { NominatePopup } from "@/components/NominatePopup";
 import { MainSiteWrapper } from "@/components/layout/MainSiteWrapper";
 import { MomentModeProvider } from "@/components/hub/MomentModeContext";
 
@@ -81,7 +80,6 @@ export default function RootLayout({
             <Footer />
             <EmailPopup />
             <SocialProofPopup />
-            <NominatePopup />
           </MainSiteWrapper>
         </MomentModeProvider>
       </body>
