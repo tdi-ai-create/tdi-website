@@ -215,16 +215,19 @@ export default function ForSchoolsPage() {
             >
               Your PD Budget Deserves Better Results
             </h1>
-            <div className="space-y-4 mb-10">
-              <p className="text-lg md:text-xl" style={{ color: '#ffffff', opacity: 0.9 }}>
-                You are spending $15-20K a year on professional development.
-              </p>
-              <p className="text-lg md:text-xl" style={{ color: '#ffffff', opacity: 0.9 }}>
-                Your implementation rate is probably around 10%.
-              </p>
-              <p className="text-lg md:text-xl" style={{ color: '#ffffff', opacity: 0.9 }}>
-                That means 90% of your investment is not reaching classrooms.
-              </p>
+            <div className="flex flex-col md:flex-row gap-4 justify-center mb-10">
+              <div className="px-5 py-3 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
+                <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>$15-20K</span>
+                <span className="text-sm ml-2" style={{ color: '#ffffff', opacity: 0.9 }}>spent on PD yearly</span>
+              </div>
+              <div className="px-5 py-3 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
+                <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ef4444' }}>10%</span>
+                <span className="text-sm ml-2" style={{ color: '#ffffff', opacity: 0.9 }}>implementation rate</span>
+              </div>
+              <div className="px-5 py-3 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
+                <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ef4444' }}>90%</span>
+                <span className="text-sm ml-2" style={{ color: '#ffffff', opacity: 0.9 }}>not reaching classrooms</span>
+              </div>
             </div>
             <p className="text-xl md:text-2xl font-semibold mb-10" style={{ color: '#ffba06' }}>
               It is not your teachers. It is the model.
@@ -262,12 +265,20 @@ export default function ForSchoolsPage() {
 
             {/* Three Phases */}
             <div className="grid md:grid-cols-3 gap-6 mb-10">
-              <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
-                <div
-                  className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-3"
-                  style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
-                >
-                  PHASE 1
+              <div className="p-6 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow" style={{ borderTop: '4px solid #ffba06' }}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#fef3c7' }}>
+                    <svg className="w-5 h-5" fill="none" stroke="#f59e0b" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 16.121A3 3 0 1012.015 11L11 14H9c0 .768.293 1.536.879 2.121z" />
+                    </svg>
+                  </div>
+                  <div
+                    className="px-2 py-0.5 text-xs font-bold rounded"
+                    style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+                  >
+                    PHASE 1
+                  </div>
                 </div>
                 <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>Ignite</h3>
                 <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
@@ -275,12 +286,19 @@ export default function ForSchoolsPage() {
                 </p>
               </div>
 
-              <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
-                <div
-                  className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-3"
-                  style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}
-                >
-                  PHASE 2
+              <div className="p-6 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow" style={{ borderTop: '4px solid #80a4ed' }}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#dbeafe' }}>
+                    <svg className="w-5 h-5" fill="none" stroke="#3b82f6" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                    </svg>
+                  </div>
+                  <div
+                    className="px-2 py-0.5 text-xs font-bold rounded"
+                    style={{ backgroundColor: '#80a4ed', color: '#ffffff' }}
+                  >
+                    PHASE 2
+                  </div>
                 </div>
                 <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>Accelerate</h3>
                 <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
@@ -288,12 +306,19 @@ export default function ForSchoolsPage() {
                 </p>
               </div>
 
-              <div className="p-6 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
-                <div
-                  className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-3"
-                  style={{ backgroundColor: '#38618C', color: '#ffffff' }}
-                >
-                  PHASE 3
+              <div className="p-6 rounded-xl bg-white shadow-sm hover:shadow-md transition-shadow" style={{ borderTop: '4px solid #38618C' }}>
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: '#e0e7ff' }}>
+                    <svg className="w-5 h-5" fill="none" stroke="#4f46e5" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                  </div>
+                  <div
+                    className="px-2 py-0.5 text-xs font-bold rounded"
+                    style={{ backgroundColor: '#38618C', color: '#ffffff' }}
+                  >
+                    PHASE 3
+                  </div>
                 </div>
                 <h3 className="text-xl font-bold mb-3" style={{ color: '#1e2749' }}>Sustain</h3>
                 <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
@@ -331,17 +356,74 @@ export default function ForSchoolsPage() {
         style={{ backgroundColor: '#f8f9fa' }}
       >
         <div className="container-default">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-8" style={{ color: '#1e2749' }}>
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
               What Changes in Your Building
             </h2>
-            <div className="space-y-4">
-              <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
-                This is not about checking boxes. Here is what partner schools report within the first year:
-              </p>
-              <p className="text-lg leading-relaxed" style={{ color: '#1e2749', opacity: 0.85 }}>
-                Teachers build habits over months, not just inspiration for a day. Your admin team stops assembling compliance data manually - the dashboard builds the evidence as the partnership runs. Observation becomes something teachers look forward to, not dread. Every teacher pulls from the same aligned playbook instead of random internet resources. Leadership aligns on priorities before spending begins, not after.
-              </p>
+            <p className="text-center text-lg mb-12" style={{ color: '#1e2749', opacity: 0.7 }}>
+              This is not about checking boxes. Here is what partner schools report within the first year:
+            </p>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {/* Card 1 */}
+              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#f0f9ff' }}>
+                  <svg className="w-6 h-6" fill="none" stroke="#38618C" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </div>
+                <p className="font-semibold" style={{ color: '#1e2749' }}>
+                  Habits over months, not inspiration for a day
+                </p>
+              </div>
+
+              {/* Card 2 */}
+              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#f0f9ff' }}>
+                  <svg className="w-6 h-6" fill="none" stroke="#38618C" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <p className="font-semibold" style={{ color: '#1e2749' }}>
+                  Dashboard builds compliance data automatically
+                </p>
+              </div>
+
+              {/* Card 3 */}
+              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#f0f9ff' }}>
+                  <svg className="w-6 h-6" fill="none" stroke="#38618C" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </div>
+                <p className="font-semibold" style={{ color: '#1e2749' }}>
+                  Observations teachers look forward to
+                </p>
+              </div>
+
+              {/* Card 4 */}
+              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#f0f9ff' }}>
+                  <svg className="w-6 h-6" fill="none" stroke="#38618C" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                  </svg>
+                </div>
+                <p className="font-semibold" style={{ color: '#1e2749' }}>
+                  One aligned playbook, not random resources
+                </p>
+              </div>
+
+              {/* Card 5 */}
+              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow md:col-span-2 lg:col-span-1">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#f0f9ff' }}>
+                  <svg className="w-6 h-6" fill="none" stroke="#38618C" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                  </svg>
+                </div>
+                <p className="font-semibold" style={{ color: '#1e2749' }}>
+                  Leadership aligned before spending begins
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -354,22 +436,49 @@ export default function ForSchoolsPage() {
         style={{ backgroundColor: '#ffffff' }}
       >
         <div className="container-default">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-8" style={{ color: '#1e2749' }}>
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
               The Math
             </h2>
-            <div className="space-y-6">
-              <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
-                <strong style={{ color: '#1e2749' }}>65% implementation rate</strong> vs. the 10% industry average. That is 6.5x the classroom impact.
-              </p>
-              <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
-                If you are already spending $15-20K on PD that produces 10% implementation, a significant portion of that investment is not converting to classroom change. TDI partnerships start at $6,600 and deliver 6.5x the return.
-              </p>
-              <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
-                Retaining even one additional teacher saves $20-25K in replacement costs. <span style={{ opacity: 0.6 }}>(Learning Policy Institute, 2024; urban district average)</span>
-              </p>
+
+            {/* Big number comparison */}
+            <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 mb-12">
+              <div className="text-center">
+                <div className="text-6xl md:text-7xl font-bold" style={{ color: '#ef4444' }}>10%</div>
+                <div className="text-sm font-medium mt-2" style={{ color: '#1e2749', opacity: 0.6 }}>Industry Average</div>
+              </div>
+              <div className="flex items-center">
+                <svg className="w-8 h-8 md:w-12 md:h-12" fill="none" stroke="#1e2749" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </div>
+              <div className="text-center">
+                <div className="text-6xl md:text-7xl font-bold" style={{ color: '#22c55e' }}>65%</div>
+                <div className="text-sm font-medium mt-2" style={{ color: '#1e2749', opacity: 0.6 }}>With TDI</div>
+              </div>
             </div>
-            <div className="text-center mt-10">
+
+            <p className="text-center text-xl font-semibold mb-12" style={{ color: '#38618C' }}>
+              6.5x the classroom impact
+            </p>
+
+            {/* Stat badges */}
+            <div className="grid md:grid-cols-2 gap-6 mb-10">
+              <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#fef3c7', border: '2px solid #fbbf24' }}>
+                <div className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#1e2749' }}>$6,600</div>
+                <div className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>TDI partnerships start here</div>
+              </div>
+              <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f0fdf4', border: '2px solid #86efac' }}>
+                <div className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#1e2749' }}>$20-25K</div>
+                <div className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>Saved per retained teacher</div>
+              </div>
+            </div>
+
+            <p className="text-center text-sm mb-8" style={{ color: '#1e2749', opacity: 0.5 }}>
+              (Learning Policy Institute, 2024; urban district average)
+            </p>
+
+            <div className="text-center">
               <Link
                 href="/free-pd-plan"
                 className="inline-flex items-center gap-2 font-semibold transition-all hover:gap-3"
