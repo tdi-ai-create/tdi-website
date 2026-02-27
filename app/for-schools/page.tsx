@@ -621,9 +621,9 @@ export default function ForSchoolsPage() {
               Start the Conversation
             </Link>
           </div>
-          <p className="mt-8 text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>
+          <p className="mt-8 text-sm" style={{ color: '#ffffff' }}>
             Or email us at{' '}
-            <a href="mailto:hello@teachersdeserveit.com" className="underline hover:opacity-100">
+            <a href="mailto:hello@teachersdeserveit.com" className="underline" style={{ color: '#ffffff' }}>
               hello@teachersdeserveit.com
             </a>
           </p>
