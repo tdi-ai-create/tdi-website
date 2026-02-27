@@ -409,7 +409,7 @@ function LearningHubPanel() {
       <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
         <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>Built for Implementation,<br />Not Consumption</h3>
         <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
-          Most PD has a 10% implementation rate. Ours is 65%. The difference is in the design. Every course includes action steps, not just information. We measure what teachers do, not what they watch.
+          Research shows traditional PD produces a 5-10% classroom transfer rate (Joyce & Showers, 2002). TDI partners average 65%. The difference is sustained, phased support - not a single event.
         </p>
       </div>
 
@@ -604,6 +604,13 @@ function DashboardPanel() {
         </p>
       </div>
 
+      <p className="text-xs flex items-center gap-2" style={{ color: '#1e2749', opacity: 0.6 }}>
+        <svg className="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>
+        </svg>
+        All dashboard data is FERPA-compliant with role-based access. Superintendents see district-wide data. Principals see only their building. Individual teacher data is never displayed.
+      </p>
+
       {/* Dual CTA */}
       <div className="text-center space-y-3">
         <Link
@@ -781,6 +788,9 @@ function ResultsPanel() {
         </div>
         <p className="text-xs mt-2" style={{ color: '#1e2749', opacity: 0.5 }}>
           Based on verified survey data from TDI partner schools after 3-4 months.
+        </p>
+        <p className="text-xs mt-3 p-3 rounded" style={{ color: '#1e2749', opacity: 0.6, backgroundColor: '#f5f5f5' }}>
+          <strong>Research context:</strong> Joyce & Showers (1980, 2002) found that traditional &quot;sit-and-get&quot; PD produces 5-10% classroom transfer. Sustained coaching models produce 80-90%. TDI&apos;s 65% reflects real partner data within this research-backed range.
         </p>
       </div>
 

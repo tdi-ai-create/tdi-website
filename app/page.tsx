@@ -109,6 +109,9 @@ export default function Home() {
           { value: 21, label: 'States with Partner Schools' },
         ]}
       />
+      <p className="text-center text-sm py-2" style={{ backgroundColor: '#1e2749', color: '#ffffff', opacity: 0.9 }}>
+        80% of partner schools fund this through existing grants.
+      </p>
 
       {/* SECTION 5a: What Admins Are Saying */}
       <section className="py-12 md:py-16" style={{ backgroundColor: '#f5f5f5' }}>
@@ -391,10 +394,12 @@ export default function Home() {
                   Or schedule a call →
                 </Link>
               </div>
-              <p className="text-sm mt-4" style={{ color: '#1e2749', opacity: 0.6 }}>
-                80% of schools we work with secure external funding.{' '}
-                <Link href="/funding" className="underline">See how</Link>
-              </p>
+              <div className="mt-4 p-3 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>
+                <p className="text-sm font-medium" style={{ color: '#1e2749' }}>
+                  80% of partner schools secure external funding for TDI through Title II-A, Title IV-A, and state PD grants.{' '}
+                  <Link href="/funding" className="underline font-bold" style={{ color: '#38618C' }}>See your options →</Link>
+                </p>
+              </div>
               <p className="text-sm mt-2" style={{ color: '#1e2749', opacity: 0.6 }}>
                 Your data is protected.{' '}
                 <Link href="/security" className="underline">See our security practices</Link>
@@ -438,10 +443,12 @@ export default function Home() {
           {/* Calculator Component */}
           <TabbedCalculator />
 
-          <p className="text-center text-sm mt-4" style={{ color: '#ffffff', opacity: 0.6 }}>
-            80% of schools we work with secure external funding for PD.{' '}
-            <Link href="/funding" className="underline" style={{ color: '#ffffff' }}>See how</Link>
-          </p>
+          <div className="text-center mt-6 p-4 rounded-lg max-w-xl mx-auto" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
+            <p className="text-sm font-medium" style={{ color: '#ffffff' }}>
+              80% of partner schools secure external funding through Title II-A, Title IV-A, and state PD grants.{' '}
+              <Link href="/funding" className="underline font-bold" style={{ color: '#ffba06' }}>See your options →</Link>
+            </p>
+          </div>
         </div>
       </section>
 

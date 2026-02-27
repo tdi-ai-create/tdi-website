@@ -469,6 +469,7 @@ export default function AboutPage() {
             <div>
               <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>65%</p>
               <p className="text-sm md:text-base font-medium" style={{ color: '#1e2749' }}>Implementation Rate</p>
+              <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>vs. 10% industry average</p>
             </div>
             <div>
               <p className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>4.8/5</p>
@@ -477,7 +478,7 @@ export default function AboutPage() {
           </div>
 
           <p className="text-center text-sm mt-8 max-w-2xl mx-auto" style={{ color: '#1e2749', opacity: 0.8 }}>
-            Industry average PD implementation is just 10%.<br />Our teachers actually use what they learn because<br />it's built for Monday morning, not "someday."
+            The industry average for PD classroom transfer is just 5-10% (Joyce & Showers, 2002).<br />Our partners average 65% because TDI is built for Monday morning, not &quot;someday.&quot;
           </p>
         </div>
       </section>
