@@ -298,8 +298,14 @@ function InPersonPanel() {
         <h2 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: '#1e2749' }}>
           What Happens When<br />We Visit Your School
         </h2>
+        {/* Pain */}
+        <p className="text-lg mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
+          Most observation processes feel punitive. Teachers dread walkthroughs because they only hear what is wrong. Trust erodes. Morale drops. The teachers you most want to keep are the ones most affected by this.
+        </p>
+        <hr className="my-4 border-gray-200" />
+        {/* Feature */}
         <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
-          Our on-campus days happen while students are in session. We are in real classrooms, watching real teaching, and giving real feedback. This is not a sit-and-get workshop in the library.
+          TDI visits are different. Our on-campus days happen while students are in session. We are in real classrooms, watching real teaching, and giving real, affirming feedback. This is not a sit-and-get workshop in the library.
         </p>
       </div>
 
@@ -347,9 +353,15 @@ function InPersonPanel() {
           </p>
         </div>
 
-        <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-          This is what teachers tell us they remember months later. Not the PD slides. The moment someone noticed what they were doing right.
-        </p>
+        {/* Love Notes Callout */}
+        <div className="p-5 rounded-r-xl" style={{ borderLeft: '4px solid #35A7FF', backgroundColor: '#f0f9ff' }}>
+          <p className="text-base mb-3" style={{ color: '#1e2749' }}>
+            Love Notes are what teachers tell us they remember months later. Not the PD slides. Not the data. The moment someone noticed what they were doing right.
+          </p>
+          <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+            We have never seen another PD provider do this. It is impossible to replicate without genuine care for the people in your building.
+          </p>
+        </div>
       </div>
 
       {/* Dual CTA */}
@@ -382,8 +394,14 @@ function LearningHubPanel() {
         <h2 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: '#1e2749' }}>
           On-Demand Support for Every Educator
         </h2>
+        {/* Pain */}
+        <p className="text-lg mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
+          Teachers are Googling random strategies, pulling things from Pinterest, and none of it connects to what your school is actually working on. Every classroom ends up doing something different.
+        </p>
+        <hr className="my-4 border-gray-200" />
+        {/* Feature */}
         <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
-          The Learning Hub is not about watching videos and checking boxes. It is about finding the right strategy for the challenge you are facing today and using it tomorrow.
+          The Learning Hub changes that. It is not about watching videos and checking boxes. It is about finding the right strategy for the challenge you are facing today and using it tomorrow - from a vetted, aligned resource library.
         </p>
       </div>
 
@@ -483,10 +501,16 @@ function DashboardPanel() {
     <div className="space-y-8">
       <div>
         <h2 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: '#1e2749' }}>
-          See Your School's Progress in Real Time
+          See Your School&apos;s Progress in Real Time
         </h2>
+        {/* Pain */}
+        <p className="text-lg mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
+          Right now you are probably pulling PD evidence together manually - spreadsheets, emails, walkthrough notes - spending 20+ hours before every board meeting. And when the state asks for your improvement plan documentation, it is another scramble.
+        </p>
+        <hr className="my-4 border-gray-200" />
+        {/* Feature */}
         <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
-          As a school leader, you need to show your superintendent and board that this investment is working. The Leadership Dashboard gives you the data to do that.
+          The Leadership Dashboard changes that. It gives you board-ready evidence that builds itself as the partnership runs. No end-of-year scramble.
         </p>
       </div>
 
@@ -794,6 +818,14 @@ function ResultsPanel() {
         </p>
       </div>
 
+      {/* Financial Context */}
+      <div className="p-5 rounded-xl" style={{ backgroundColor: '#f0fdf4', border: '1px solid #86efac' }}>
+        <h3 className="font-bold mb-2" style={{ color: '#1e2749' }}>What This Means for Your Budget</h3>
+        <p className="text-sm" style={{ color: '#1e2749', opacity: 0.85 }}>
+          If your school currently spends $15-20K annually on professional development that produces a 10% implementation rate, a significant portion of that investment is not converting to classroom change. TDI partnerships start at $6,600 and deliver 6.5x the implementation - meaning your PD dollars actually reach students.
+        </p>
+      </div>
+
       <div>
         <h3 className="text-xl font-bold mb-4" style={{ color: '#1e2749' }}>What School Leaders Say</h3>
         <div className="space-y-4">
@@ -814,6 +846,40 @@ function ResultsPanel() {
             </p>
           </div>
         </div>
+      </div>
+
+      {/* Funding Your Partnership */}
+      <div>
+        <h3 className="text-xl font-bold mb-4" style={{ color: '#1e2749' }}>Funding Your Partnership</h3>
+        <p className="mb-4" style={{ color: '#1e2749', opacity: 0.8 }}>
+          80% of TDI partner schools secure external funding for their partnership. Here is how our most common services map to federal and state funding:
+        </p>
+        <ul className="space-y-2 mb-4">
+          <li className="flex items-center gap-2 text-sm" style={{ color: '#1e2749' }}>
+            <svg className="w-4 h-4 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            <span><strong>The TDI Blueprint (Full Partnership)</strong> - Title II-A, Title IV-A, State PD Grants</span>
+          </li>
+          <li className="flex items-center gap-2 text-sm" style={{ color: '#1e2749' }}>
+            <svg className="w-4 h-4 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            <span><strong>Learning Hub</strong> - Title II-A, State PD Grants</span>
+          </li>
+          <li className="flex items-center gap-2 text-sm" style={{ color: '#1e2749' }}>
+            <svg className="w-4 h-4 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            <span><strong>In-Person Observations</strong> - Title II-A, Title IV-A, State PD Grants</span>
+          </li>
+        </ul>
+        <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
+          <Link href="/funding" className="font-semibold underline" style={{ color: '#35A7FF' }}>See the full funding guide for all services →</Link>
+        </p>
+        <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
+          Some districts may still have unspent ESSER funds available through September 2026. Check with your business office.
+        </p>
+        <p className="text-sm mb-3" style={{ color: '#1e2749', opacity: 0.7 }}>
+          Need help writing the grant language? Your TDI partner can provide alignment documentation and evidence summaries for your application.
+        </p>
+        <p className="text-sm font-medium" style={{ color: '#1e2749' }}>
+          TDI partnerships start at $6,600 depending on school size and scope.
+        </p>
       </div>
 
       <div className="p-4 rounded-lg" style={{ backgroundColor: '#f0f9ff', border: '1px solid #80a4ed' }}>

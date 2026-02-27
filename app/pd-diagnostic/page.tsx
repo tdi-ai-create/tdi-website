@@ -107,6 +107,7 @@ const resultData: Record<string, {
   predicts: string;
   implications: string[];
   anchorId: string;
+  financialContext: string;
 }> = {
   A: {
     name: "Compliance-Focused PD",
@@ -119,6 +120,7 @@ const resultData: Record<string, {
       "ROI on PD spending is difficult to demonstrate"
     ],
     anchorId: "compliance",
+    financialContext: "Schools in this category typically see 5-10% PD implementation. If your PD budget is $15-20K, roughly 75% of that investment may not be converting to sustained classroom change.",
   },
   B: {
     name: "Inspiration-Driven PD",
@@ -131,6 +133,7 @@ const resultData: Record<string, {
       "Burnout risk remains high despite PD investment"
     ],
     anchorId: "inspiration",
+    financialContext: "Event-driven PD creates energy but not habits. Most schools in this category see implementation fade within 4-6 weeks. The investment generates inspiration, but not sustained change.",
   },
   C: {
     name: "Fragmented Growth",
@@ -143,6 +146,7 @@ const resultData: Record<string, {
       "Difficult to build consistent school-wide culture"
     ],
     anchorId: "fragmented",
+    financialContext: "When some teams get great support and others do not, the gap widens. Schools in this category often see strong pockets of success alongside growing frustration in teams that have not received the same level of support yet. Closing that gap is where TDI starts.",
   },
   D: {
     name: "Embedded Practice",
@@ -155,6 +159,7 @@ const resultData: Record<string, {
       "Opportunity to become a model for other schools"
     ],
     anchorId: "embedded",
+    financialContext: "You are doing the hard work - and TDI can help you protect and scale what is working so it survives staff turnover and leadership transitions.",
   }
 };
 
@@ -793,6 +798,20 @@ export default function PDDiagnosticPage() {
                   <h3 className="font-semibold text-white mb-3">What This Commonly Predicts</h3>
                   <p className="text-white/80">
                     {resultData[resultType].predicts}
+                  </p>
+                </div>
+
+                {/* Financial Context */}
+                <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6 mb-8 text-left">
+                  <h3 className="font-semibold mb-3" style={{ color: '#1e2749' }}>The Budget Reality</h3>
+                  <p className="text-sm mb-4" style={{ color: '#1e2749', opacity: 0.85 }}>
+                    {resultData[resultType].financialContext}
+                  </p>
+                  <p className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>
+                    80% of TDI partner schools secure external funding.{' '}
+                    <Link href="/funding" className="font-semibold underline" style={{ color: '#35A7FF' }}>
+                      Explore options →
+                    </Link>
                   </p>
                 </div>
 

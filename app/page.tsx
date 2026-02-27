@@ -28,26 +28,39 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 2: Problem + Solution Section */}
+      {/* SECTION 2A: Pain Section (For School Leaders) */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-default">
+          <div className="max-w-3xl mx-auto text-center">
+            <span className="inline-block text-xs font-semibold uppercase tracking-wide px-3 py-1 rounded-full mb-4" style={{ backgroundColor: '#1e2749', color: '#ffffff' }}>
+              For School Leaders
+            </span>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6" style={{ color: '#1e2749' }}>
+              Your PD Budget Deserves<br />Better Math
+            </h2>
+            <p className="text-lg mb-4" style={{ color: '#1e2749', opacity: 0.85 }}>
+              Most schools spend $15-20K a year on professional development that produces a 10% implementation rate. That means 90% of your investment never reaches a classroom.
+            </p>
+            <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
+              The problem is not your teachers. It is the model. The research on why has been clear for decades - one-day workshops were never designed to change practice.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* SECTION 2B: Solution Section */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#ffffff' }}>
         <div className="container-default">
-          {/* Problem */}
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6" style={{ color: '#1e2749' }}>
-              Traditional PD<br />Wastes Time and Money
-            </h2>
-            <p className="text-lg" style={{ color: '#1e2749', opacity: 0.8 }}>
-              Someone who hasn't been in a classroom in years reads PowerPoints at you for three hours. You nod along, check your phone under the table, and forget everything by Monday.
-            </p>
-            <p className="text-lg mt-4" style={{ color: '#1e2749', opacity: 0.8 }}>
-              Teachers deserve better. So do the leaders trying to support them.
+            <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
+              TDI&apos;s sustained partnership model delivers <strong>65% implementation</strong> - 6.5x the industry average - because it is built for what actually changes behavior: phased support, real-time coaching, and accountability that feels like partnership, not surveillance.
             </p>
           </div>
 
           {/* Divider */}
           <div className="flex items-center justify-center gap-4 mb-12">
             <div className="h-px w-16" style={{ backgroundColor: '#ffba06' }}></div>
-            <span className="text-sm font-semibold uppercase tracking-wide" style={{ color: '#ffba06' }}>Here's the difference</span>
+            <span className="text-sm font-semibold uppercase tracking-wide" style={{ color: '#ffba06' }}>Here&apos;s the difference</span>
             <div className="h-px w-16" style={{ backgroundColor: '#ffba06' }}></div>
           </div>
 
@@ -61,7 +74,7 @@ export default function Home() {
             </p>
           </div>
 
-          {/* Three Differentiators */}
+          {/* Three Differentiators - PFAB Rewrite */}
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="bg-gray-50 rounded-xl p-6 text-center flex flex-col items-center hover:shadow-lg transition-shadow">
               <div className="w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4" style={{ backgroundColor: '#ffba06' }}>
@@ -69,9 +82,9 @@ export default function Home() {
                   <path d="M13 10V3L4 14h7v7l9-11h-7z"/>
                 </svg>
               </div>
-              <h4 className="font-bold mb-3" style={{ color: '#1e2749' }}>Action-Focused Strategies</h4>
+              <h4 className="font-bold mb-3" style={{ color: '#1e2749' }}>Strategies That Get Used, Not Filed Away</h4>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Real tools you can use Monday morning. We present theory and help teachers see exactly how to apply it to their classroom in real time.
+                Teachers do not just hear ideas - they change what happens in their classrooms. TDI&apos;s 65% implementation rate means strategies move from session to classroom within days, not months.
               </p>
             </div>
             <div className="bg-gray-50 rounded-xl p-6 text-center flex flex-col items-center hover:shadow-lg transition-shadow">
@@ -80,9 +93,9 @@ export default function Home() {
                   <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
                 </svg>
               </div>
-              <h4 className="font-bold mb-3" style={{ color: '#1e2749' }}>Bottom-Up Approach</h4>
+              <h4 className="font-bold mb-3" style={{ color: '#1e2749' }}>Built From the Classroom Up</h4>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                A PD model that isn't just created by admins but actually asks teachers what they need. Customized support for individual departments or groups of staff. Daily, easy-to-digest learning happens all year round.
+                Teachers tell us what they need. Partner schools get custom resources built to order - not recycled content from five years ago. Every department, every role, every challenge gets support that is specific to them.
               </p>
             </div>
             <div className="bg-gray-50 rounded-xl p-6 text-center flex flex-col items-center hover:shadow-lg transition-shadow">
@@ -91,10 +104,13 @@ export default function Home() {
                   <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                 </svg>
               </div>
-              <h4 className="font-bold mb-3" style={{ color: '#1e2749' }}>Wellness Built In</h4>
+              <h4 className="font-bold mb-3" style={{ color: '#1e2749' }}>Wellness That Drives Retention</h4>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
-                Where most PD fails, TDI leans in. We focus on the whole teacher, which supports better student outcomes in addition to curriculum and teaching theory.
+                When teacher stress drops measurably, your strongest educators recommit. TDI partners report stronger morale, greater trust, and measurable retention improvement within the first year.
               </p>
+              <span className="inline-block mt-3 text-xs px-2 py-1 rounded-full" style={{ backgroundColor: '#f0fdf4', color: '#15803d', border: '1px solid #86efac' }}>
+                Stress: 8-9/10 → 5-7/10
+              </span>
             </div>
           </div>
         </div>
