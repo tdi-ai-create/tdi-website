@@ -691,7 +691,7 @@ export default function ForSchoolsPage() {
                   <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                 </svg>
                 <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
-                  Need help writing the grant language? Your TDI partner can provide alignment documentation and evidence summaries.
+                  We find the funding, write the grant, and build the evidence your application needs. Our team researches federal, state, and local funding sources - including Title II-A, Title IV-A, private foundations, corporate education grants, and community-based funding opportunities most schools never find on their own. We draft the alignment language, assemble your documentation, and walk you through the submission. That is why 80% of our partner schools secure external funding.
                 </p>
               </div>
             </div>
