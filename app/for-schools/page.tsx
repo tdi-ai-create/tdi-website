@@ -174,10 +174,34 @@ export default function ForSchoolsPage() {
       {/* SECTION 1: Hero (Pain) */}
       <section
         id="section-hero"
-        className="py-16 md:py-24"
-        style={{ backgroundColor: '#1e2749' }}
+        className="relative py-20 md:py-32 overflow-hidden"
       >
-        <div className="container-default">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage: "url('/images/hero-for-schools.webp')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+          }}
+        />
+        {/* Gradient Overlay */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background: 'linear-gradient(180deg, rgba(30, 39, 73, 0.92) 0%, rgba(30, 39, 73, 0.85) 50%, rgba(30, 39, 73, 0.95) 100%)',
+          }}
+        />
+        {/* Subtle texture overlay */}
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 25% 25%, #ffffff 1px, transparent 1px)',
+            backgroundSize: '50px 50px',
+          }}
+        />
+        <div className="container-default relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <span
               className="inline-block text-xs font-semibold uppercase tracking-wide px-3 py-1 rounded-full mb-6"
@@ -222,7 +246,7 @@ export default function ForSchoolsPage() {
       {/* SECTION 2: Feature (What You Get) */}
       <section
         id="section-feature"
-        className="py-16 md:py-20"
+        className="py-20 md:py-28"
         style={{ backgroundColor: '#ffffff' }}
       >
         <div className="container-default">
@@ -303,8 +327,8 @@ export default function ForSchoolsPage() {
       {/* SECTION 3: Advantage (What Changes) */}
       <section
         id="section-advantage"
-        className="py-16 md:py-20"
-        style={{ backgroundColor: '#f5f5f5' }}
+        className="py-20 md:py-28"
+        style={{ backgroundColor: '#f8f9fa' }}
       >
         <div className="container-default">
           <div className="max-w-3xl mx-auto">
@@ -326,7 +350,7 @@ export default function ForSchoolsPage() {
       {/* SECTION 4: Benefit (The Math) */}
       <section
         id="section-benefit"
-        className="py-16 md:py-20"
+        className="py-20 md:py-28"
         style={{ backgroundColor: '#ffffff' }}
       >
         <div className="container-default">
@@ -364,17 +388,25 @@ export default function ForSchoolsPage() {
       {/* SECTION 5: Mid-Page CTA */}
       <section
         id="section-midcta"
-        className="py-12 md:py-16"
-        style={{ backgroundColor: '#80a4ed' }}
+        className="py-16 md:py-20 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #38618C 0%, #80a4ed 100%)' }}
       >
-        <div className="container-default text-center">
+        {/* Subtle pattern overlay */}
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 50% 50%, #ffffff 1px, transparent 1px)',
+            backgroundSize: '30px 30px',
+          }}
+        />
+        <div className="container-default text-center relative z-10">
           <h2 className="text-2xl md:text-3xl font-bold mb-6" style={{ color: '#ffffff' }}>
             Ready to see the numbers for your school?
           </h2>
           <Link
             href="/free-pd-plan"
-            className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
-            style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
+            className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 hover:shadow-lg"
+            style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
           >
             Get Your Free PD Plan
           </Link>
@@ -384,8 +416,8 @@ export default function ForSchoolsPage() {
       {/* SECTION 6: Proof (Verified Results) */}
       <section
         id="section-proof"
-        className="py-16 md:py-20"
-        style={{ backgroundColor: '#ffffff' }}
+        className="py-20 md:py-28"
+        style={{ backgroundColor: '#f8f9fa' }}
       >
         <div className="container-default">
           <div className="max-w-4xl mx-auto">
@@ -394,7 +426,7 @@ export default function ForSchoolsPage() {
             </h2>
 
             {/* Results Table */}
-            <div className="rounded-xl overflow-hidden mb-4" style={{ border: '1px solid #e5e7eb' }}>
+            <div className="rounded-xl overflow-hidden mb-4 shadow-sm" style={{ border: '1px solid #e5e7eb' }}>
               <div className="grid grid-cols-3 text-sm font-bold" style={{ backgroundColor: '#1e2749', color: '#ffffff' }}>
                 <div className="p-3 border-r border-white/20">Before TDI</div>
                 <div className="p-3 border-r border-white/20">After TDI</div>
@@ -430,7 +462,7 @@ export default function ForSchoolsPage() {
             {/* Partner Success Stories - Stat Cards */}
             <div className="grid md:grid-cols-3 gap-6">
               {/* Card 1: Stress Score */}
-              <div className="p-6 rounded-xl h-full" style={{ backgroundColor: '#f5f5f5' }}>
+              <div className="p-6 rounded-xl h-full bg-white shadow-md hover:shadow-lg transition-shadow" style={{ borderLeft: '4px solid #38618C' }}>
                 <div className="text-3xl font-bold mb-2" style={{ color: '#38618C' }}>
                   8.2 → 5.4
                 </div>
@@ -443,7 +475,7 @@ export default function ForSchoolsPage() {
               </div>
 
               {/* Card 2: Implementation */}
-              <div className="p-6 rounded-xl h-full" style={{ backgroundColor: '#f5f5f5' }}>
+              <div className="p-6 rounded-xl h-full bg-white shadow-md hover:shadow-lg transition-shadow" style={{ borderLeft: '4px solid #38618C' }}>
                 <div className="text-3xl font-bold mb-2" style={{ color: '#38618C' }}>
                   12% → 58%
                 </div>
@@ -456,7 +488,7 @@ export default function ForSchoolsPage() {
               </div>
 
               {/* Card 3: Retention */}
-              <div className="p-6 rounded-xl h-full" style={{ backgroundColor: '#f5f5f5' }}>
+              <div className="p-6 rounded-xl h-full bg-white shadow-md hover:shadow-lg transition-shadow" style={{ borderLeft: '4px solid #38618C' }}>
                 <div className="text-3xl font-bold mb-2" style={{ color: '#38618C' }}>
                   0 departures
                 </div>
@@ -475,30 +507,56 @@ export default function ForSchoolsPage() {
       {/* SECTION 7: Funding */}
       <section
         id="section-funding"
-        className="py-16 md:py-20"
-        style={{ backgroundColor: '#f5f5f5' }}
+        className="py-20 md:py-28"
+        style={{ backgroundColor: '#ffffff' }}
       >
         <div className="container-default">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-8" style={{ color: '#1e2749' }}>
-              80% of Partner Schools Secure External Funding
-            </h2>
-            <div className="space-y-4 mb-8">
-              <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
-                TDI services qualify under Title II-A, Title IV-A, and most state professional development grants. We help you identify which sources apply and provide alignment language for your application.
-              </p>
-              <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
-                Some districts may still have unspent ESSER funds available through September 2026. Check with your business office.
-              </p>
-              <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
-                Need help writing the grant language? Your TDI partner can provide alignment documentation and evidence summaries.
-              </p>
+            {/* Heading with icon */}
+            <div className="flex items-center justify-center gap-3 mb-8">
+              <div className="w-12 h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: '#f0fdf4' }}>
+                <svg className="w-6 h-6" fill="none" stroke="#22c55e" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold" style={{ color: '#1e2749' }}>
+                80% of Partner Schools Secure External Funding
+              </h2>
             </div>
+
+            {/* Content with checkmarks */}
+            <div className="space-y-4 mb-8">
+              <div className="flex items-start gap-3">
+                <svg className="w-5 h-5 mt-1 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
+                  TDI services qualify under Title II-A, Title IV-A, and most state professional development grants. We help you identify which sources apply and provide alignment language for your application.
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <svg className="w-5 h-5 mt-1 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
+                  Some districts may still have unspent ESSER funds available through September 2026. Check with your business office.
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <svg className="w-5 h-5 mt-1 flex-shrink-0" fill="#22c55e" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <p className="text-lg" style={{ color: '#1e2749', opacity: 0.85 }}>
+                  Need help writing the grant language? Your TDI partner can provide alignment documentation and evidence summaries.
+                </p>
+              </div>
+            </div>
+
             <div className="text-center">
               <Link
                 href="/funding"
-                className="inline-flex items-center gap-2 font-semibold transition-all hover:gap-3"
-                style={{ color: '#35A7FF' }}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all hover:gap-3"
+                style={{ backgroundColor: '#f0fdf4', color: '#15803d' }}
               >
                 Explore Funding Options
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -513,8 +571,8 @@ export default function ForSchoolsPage() {
       {/* SECTION 8: Objections FAQ */}
       <section
         id="section-faq"
-        className="py-16 md:py-20"
-        style={{ backgroundColor: '#ffffff' }}
+        className="py-20 md:py-28"
+        style={{ backgroundColor: '#f8f9fa' }}
       >
         <div className="container-default">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
@@ -530,26 +588,42 @@ export default function ForSchoolsPage() {
       {/* SECTION 9: Final CTA */}
       <section
         id="section-finalcta"
-        className="py-16 md:py-20"
-        style={{ backgroundColor: '#80a4ed' }}
+        className="py-20 md:py-28 relative overflow-hidden"
+        style={{ background: 'linear-gradient(135deg, #1e2749 0%, #2d3a5f 50%, #1e2749 100%)' }}
       >
-        <div className="container-default text-center">
+        {/* Subtle animated gradient overlay */}
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage: 'radial-gradient(ellipse at 30% 20%, #38618C 0%, transparent 50%), radial-gradient(ellipse at 70% 80%, #80a4ed 0%, transparent 50%)',
+          }}
+        />
+        <div className="container-default text-center relative z-10">
           <h2 className="text-2xl md:text-4xl font-bold mb-4" style={{ color: '#ffffff' }}>
             Ready to Start the Conversation?
           </h2>
-          <p className="text-lg mb-8 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
+          <p className="text-lg mb-10 max-w-2xl mx-auto" style={{ color: '#ffffff', opacity: 0.9 }}>
             No pressure. No pitch. Just a conversation about what is possible for your school.
           </p>
-          <Link
-            href="/free-pd-plan"
-            className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105"
-            style={{ backgroundColor: '#1e2749', color: '#ffffff' }}
-          >
-            Get Your Free PD Plan
-          </Link>
-          <p className="mt-6 text-sm" style={{ color: '#ffffff', opacity: 0.8 }}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <Link
+              href="/free-pd-plan"
+              className="inline-block px-8 py-4 rounded-lg font-bold text-lg transition-all hover:scale-105 hover:shadow-lg"
+              style={{ backgroundColor: '#ffba06', color: '#1e2749' }}
+            >
+              Get Your Free PD Plan
+            </Link>
+            <Link
+              href="/contact"
+              className="inline-block px-8 py-4 rounded-lg font-bold text-lg border-2 transition-all hover:bg-white/10"
+              style={{ borderColor: 'rgba(255, 255, 255, 0.5)', color: '#ffffff' }}
+            >
+              Start the Conversation
+            </Link>
+          </div>
+          <p className="mt-8 text-sm" style={{ color: '#ffffff', opacity: 0.7 }}>
             Or email us at{' '}
-            <a href="mailto:hello@teachersdeserveit.com" className="underline">
+            <a href="mailto:hello@teachersdeserveit.com" className="underline hover:opacity-100">
               hello@teachersdeserveit.com
             </a>
           </p>
