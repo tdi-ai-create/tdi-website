@@ -216,17 +216,17 @@ export default function ForSchoolsPage() {
               Your PD Budget Deserves Better Results
             </h1>
             <div className="flex flex-col md:flex-row gap-4 justify-center mb-10">
-              <div className="px-5 py-3 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
-                <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>$15-20K</span>
-                <span className="text-sm ml-2" style={{ color: '#ffffff', opacity: 0.9 }}>spent on PD yearly</span>
+              <div className="px-6 py-4 rounded-lg text-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
+                <div className="text-2xl md:text-3xl font-bold" style={{ color: '#ffba06' }}>$15-20K</div>
+                <div className="text-sm" style={{ color: '#ffffff', opacity: 0.9 }}>spent on PD yearly</div>
               </div>
-              <div className="px-5 py-3 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
-                <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ef4444' }}>10%</span>
-                <span className="text-sm ml-2" style={{ color: '#ffffff', opacity: 0.9 }}>implementation rate</span>
+              <div className="px-6 py-4 rounded-lg text-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
+                <div className="text-2xl md:text-3xl font-bold" style={{ color: '#ef4444' }}>10%</div>
+                <div className="text-sm" style={{ color: '#ffffff', opacity: 0.9 }}>implementation rate</div>
               </div>
-              <div className="px-5 py-3 rounded-lg" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
-                <span className="text-2xl md:text-3xl font-bold" style={{ color: '#ef4444' }}>90%</span>
-                <span className="text-sm ml-2" style={{ color: '#ffffff', opacity: 0.9 }}>not reaching classrooms</span>
+              <div className="px-6 py-4 rounded-lg text-center" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
+                <div className="text-2xl md:text-3xl font-bold" style={{ color: '#ef4444' }}>90%</div>
+                <div className="text-sm" style={{ color: '#ffffff', opacity: 0.9 }}>not reaching classrooms</div>
               </div>
             </div>
             <p className="text-xl md:text-2xl font-semibold mb-10" style={{ color: '#ffba06' }}>
