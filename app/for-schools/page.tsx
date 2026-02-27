@@ -414,7 +414,7 @@ export default function ForSchoolsPage() {
               </div>
 
               {/* Card 5 */}
-              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow md:col-span-2 lg:col-span-1">
+              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
                 <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#f0f9ff' }}>
                   <svg className="w-6 h-6" fill="none" stroke="#38618C" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -422,6 +422,18 @@ export default function ForSchoolsPage() {
                 </div>
                 <p className="font-semibold" style={{ color: '#1e2749' }}>
                   Leadership aligned before spending begins
+                </p>
+              </div>
+
+              {/* Card 6 */}
+              <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#f0f9ff' }}>
+                  <svg className="w-6 h-6" fill="none" stroke="#38618C" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
+                <p className="font-semibold" style={{ color: '#1e2749' }}>
+                  Stress and burnout data you can track
                 </p>
               </div>
             </div>
@@ -436,43 +448,66 @@ export default function ForSchoolsPage() {
         style={{ backgroundColor: '#ffffff' }}
       >
         <div className="container-default">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-4" style={{ color: '#1e2749' }}>
               The Math
             </h2>
-
-            {/* Big number comparison */}
-            <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 mb-12">
-              <div className="text-center">
-                <div className="text-6xl md:text-7xl font-bold" style={{ color: '#ef4444' }}>10%</div>
-                <div className="text-sm font-medium mt-2" style={{ color: '#1e2749', opacity: 0.6 }}>Industry Average</div>
-              </div>
-              <div className="flex items-center">
-                <svg className="w-8 h-8 md:w-12 md:h-12" fill="none" stroke="#1e2749" viewBox="0 0 24 24" strokeWidth={2} aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </div>
-              <div className="text-center">
-                <div className="text-6xl md:text-7xl font-bold" style={{ color: '#22c55e' }}>65%</div>
-                <div className="text-sm font-medium mt-2" style={{ color: '#1e2749', opacity: 0.6 }}>With TDI</div>
-              </div>
-            </div>
-
-            <p className="text-center text-xl font-semibold mb-12" style={{ color: '#38618C' }}>
-              6.5x the classroom impact
+            <p className="text-center text-lg mb-12" style={{ color: '#1e2749', opacity: 0.7 }}>
+              Compare your current PD investment to a TDI partnership.
             </p>
 
-            {/* Stat badges */}
-            <div className="grid md:grid-cols-2 gap-6 mb-10">
-              <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#fef3c7', border: '2px solid #fbbf24' }}>
-                <div className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#1e2749' }}>$6,600</div>
-                <div className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>TDI partnerships start here</div>
+            {/* Side-by-side comparison */}
+            <div className="grid md:grid-cols-2 gap-6 md:gap-8 mb-10">
+              {/* Traditional PD */}
+              <div className="p-8 rounded-2xl" style={{ backgroundColor: '#fef2f2', border: '2px solid #fecaca' }}>
+                <h3 className="text-xl font-bold mb-6 text-center" style={{ color: '#991b1b' }}>Traditional PD</h3>
+                <div className="space-y-5">
+                  <div className="flex items-center justify-between">
+                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Annual cost</span>
+                    <span className="text-xl font-bold" style={{ color: '#1e2749' }}>$15-20K</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Implementation rate</span>
+                    <span className="text-xl font-bold" style={{ color: '#ef4444' }}>10%</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Retention tracking</span>
+                    <span className="text-xl font-bold" style={{ color: '#1e2749' }}>None</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Sustained coaching</span>
+                    <span className="text-xl font-bold" style={{ color: '#1e2749' }}>Rare</span>
+                  </div>
+                </div>
               </div>
-              <div className="p-6 rounded-xl text-center" style={{ backgroundColor: '#f0fdf4', border: '2px solid #86efac' }}>
-                <div className="text-3xl md:text-4xl font-bold mb-2" style={{ color: '#1e2749' }}>$20-25K</div>
-                <div className="text-sm" style={{ color: '#1e2749', opacity: 0.8 }}>Saved per retained teacher</div>
+
+              {/* TDI Partnership */}
+              <div className="p-8 rounded-2xl" style={{ backgroundColor: '#f0fdf4', border: '2px solid #86efac' }}>
+                <h3 className="text-xl font-bold mb-6 text-center" style={{ color: '#166534' }}>TDI Partnership</h3>
+                <div className="space-y-5">
+                  <div className="flex items-center justify-between">
+                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Starting at</span>
+                    <span className="text-xl font-bold" style={{ color: '#1e2749' }}>$6,600</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Implementation rate</span>
+                    <span className="text-xl font-bold" style={{ color: '#22c55e' }}>65%</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Retention savings</span>
+                    <span className="text-xl font-bold" style={{ color: '#1e2749' }}>$20-25K/teacher</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span style={{ color: '#1e2749', opacity: 0.8 }}>Sustained coaching</span>
+                    <span className="text-xl font-bold" style={{ color: '#22c55e' }}>Built-in</span>
+                  </div>
+                </div>
               </div>
             </div>
+
+            <p className="text-center text-lg font-semibold mb-6" style={{ color: '#38618C' }}>
+              6.5x the classroom impact at a fraction of the cost
+            </p>
 
             <p className="text-center text-sm mb-8" style={{ color: '#1e2749', opacity: 0.5 }}>
               (Learning Policy Institute, 2024; urban district average)
