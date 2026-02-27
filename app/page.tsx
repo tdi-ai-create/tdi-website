@@ -461,8 +461,8 @@ export default function Home() {
 
           <div className="text-center mt-6 p-4 rounded-lg max-w-xl mx-auto" style={{ backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(4px)' }}>
             <p className="text-sm font-medium" style={{ color: '#ffffff' }}>
-              80% of partner schools secure external funding through Title II-A, Title IV-A, and state PD grants.{' '}
-              <Link href="/funding" className="underline font-bold" style={{ color: '#ffba06' }}>See your options →</Link>
+              TDI partnerships start at $6,600. Most schools offset 50-80% through Title II-A, IV-A, or state PD grants.{' '}
+              <Link href="/funding" className="underline font-bold" style={{ color: '#ffba06' }}>See your funding options →</Link>
             </p>
           </div>
         </div>

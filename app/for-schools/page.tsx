@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { CoursesSection } from '@/components/CoursesSection';
 import { BeforeAfterStats } from '@/components/BeforeAfterStats';
+import { SchoolLeadersFAQ } from '@/components/SchoolLeadersFAQ';
 
 export const metadata = {
   title: 'For Schools | Teachers Deserve It',
@@ -290,6 +291,36 @@ export default function ForSchoolsPage() {
               </p>
               <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Julie H.</p>
               <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Principal, MI</p>
+            </div>
+          </div>
+
+          {/* What Teachers Are Saying */}
+          <div className="mt-12">
+            <h3 className="text-2xl font-bold text-center mb-8" style={{ color: '#1e2749' }}>
+              What Teachers Are Saying
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+              <div className="p-6 rounded-xl" style={{ backgroundColor: '#ffffff' }}>
+                <p className="mb-4 italic" style={{ color: '#1e2749' }}>
+                  "I finally feel like I have strategies that work AND time to breathe."
+                </p>
+                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Sarah K.</p>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>5th Grade Teacher</p>
+              </div>
+              <div className="p-6 rounded-xl" style={{ backgroundColor: '#ffffff' }}>
+                <p className="mb-4 italic" style={{ color: '#1e2749' }}>
+                  "I went from spending 12 hours a week planning to 6. TDI changed everything."
+                </p>
+                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>TDI Partner Teacher</p>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Illinois</p>
+              </div>
+              <div className="p-6 rounded-xl" style={{ backgroundColor: '#ffffff' }}>
+                <p className="mb-4 italic" style={{ color: '#1e2749' }}>
+                  "The strategies actually work in my classroom. That's rare for PD."
+                </p>
+                <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>5th Grade Teacher</p>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>California</p>
+              </div>
             </div>
           </div>
         </div>
@@ -814,6 +845,9 @@ export default function ForSchoolsPage() {
           </div>
         </div>
       </section>
+
+      {/* 11.5 School Leaders FAQ */}
+      <SchoolLeadersFAQ />
 
       {/* 12. Final CTA */}
       <section className="py-16 md:py-20" style={{ backgroundColor: '#80a4ed' }}>

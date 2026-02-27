@@ -826,6 +826,48 @@ function ResultsPanel() {
         </p>
       </div>
 
+      {/* From Our Partner Schools - Stat Cards */}
+      <div>
+        <h3 className="text-xl font-bold mb-4" style={{ color: '#1e2749' }}>From Our Partner Schools</h3>
+        <div className="grid md:grid-cols-3 gap-4">
+          {/* Stress Score Card */}
+          <div className="p-5 rounded-xl" style={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}>
+            <div className="text-2xl font-bold mb-1" style={{ color: '#38618C' }}>
+              8.2 → 5.4
+            </div>
+            <div className="text-sm font-medium mb-2" style={{ color: '#1e2749' }}>Teacher Stress Score</div>
+            <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+              A 6-school district in Illinois reduced average teacher stress scores within one academic year of their Ignite partnership.
+            </p>
+          </div>
+
+          {/* Implementation Card */}
+          <div className="p-5 rounded-xl" style={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}>
+            <div className="text-2xl font-bold mb-1" style={{ color: '#38618C' }}>
+              12% → 34% → 58%
+            </div>
+            <div className="text-sm font-medium mb-2" style={{ color: '#1e2749' }}>Strategy Implementation</div>
+            <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+              A K-8 school in the Midwest grew implementation across their first Ignite semester and continued through Year 2 in Accelerate.
+            </p>
+          </div>
+
+          {/* Retention Card */}
+          <div className="p-5 rounded-xl" style={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}>
+            <div className="text-2xl font-bold mb-1" style={{ color: '#38618C' }}>
+              0 voluntary departures
+            </div>
+            <div className="text-sm font-medium mb-2" style={{ color: '#1e2749' }}>Teacher Retention</div>
+            <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
+              A rural elementary school reported zero voluntary teacher departures in the year following their TDI partnership, after losing 4 the previous year.
+            </p>
+          </div>
+        </div>
+        <p className="text-xs mt-3 text-center" style={{ color: '#1e2749', opacity: 0.5 }}>
+          Placeholder data shown. Real anonymized partner data coming soon.
+        </p>
+      </div>
+
       <div>
         <h3 className="text-xl font-bold mb-4" style={{ color: '#1e2749' }}>What School Leaders Say</h3>
         <div className="space-y-4">
@@ -1217,6 +1259,39 @@ export default function HowWePartnerPage() {
                   </svg>
                 </a>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* What Teachers Are Saying */}
+      <section className="py-16 md:py-20" style={{ backgroundColor: '#f5f5f5' }}>
+        <div className="container-default">
+          <h2 className="text-3xl md:text-4xl font-bold text-center mb-12" style={{ color: '#1e2749' }}>
+            What Teachers Are Saying
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+            <div className="p-6 rounded-xl" style={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}>
+              <p className="mb-4 italic" style={{ color: '#1e2749' }}>
+                "I went from spending 12 hours a week planning to 6. I want that for every teacher I know."
+              </p>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>TDI Partner Teacher</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Illinois</p>
+            </div>
+            <div className="p-6 rounded-xl" style={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}>
+              <p className="mb-4 italic" style={{ color: '#1e2749' }}>
+                "For the first time in 15 years, I'm excited about professional development."
+              </p>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>Middle School Teacher</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>Florida</p>
+            </div>
+            <div className="p-6 rounded-xl" style={{ backgroundColor: '#ffffff', border: '1px solid #e5e7eb' }}>
+              <p className="mb-4 italic" style={{ color: '#1e2749' }}>
+                "The strategies actually work in my classroom. That's rare for PD."
+              </p>
+              <p className="font-semibold text-sm" style={{ color: '#1e2749' }}>5th Grade Teacher</p>
+              <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>California</p>
             </div>
           </div>
         </div>

@@ -984,6 +984,12 @@ export default function ExampleDashboard() {
               <span className="text-white/60">Status:</span>
               <span className="ml-2 font-semibold text-[#38618C] bg-white px-2 py-0.5 rounded">Phase 2 - ACCELERATE</span>
             </div>
+            <Tooltip content="This data supports board presentations, Title II-A/IV-A grant renewals, and state accountability documentation.">
+              <div className="bg-white/10 px-3 py-1.5 rounded-lg flex items-center gap-2 cursor-help hover:bg-white/20 transition-colors">
+                <Lock className="w-3.5 h-3.5 text-white/80" />
+                <span className="font-semibold text-white">Board & Grant Ready</span>
+              </div>
+            </Tooltip>
           </div>
         </div>
       </section>
