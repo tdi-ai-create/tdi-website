@@ -430,54 +430,42 @@ export default function ForSchoolsPage() {
             {/* Partner Success Stories - Stat Cards */}
             <div className="grid md:grid-cols-3 gap-6">
               {/* Card 1: Stress Score */}
-              <div className="flex gap-4 p-5 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
-                <div className="flex-shrink-0">
-                  <div className="text-2xl font-bold" style={{ color: '#38618C' }}>
-                    8.2 → 5.4
-                  </div>
+              <div className="p-6 rounded-xl h-full" style={{ backgroundColor: '#f5f5f5' }}>
+                <div className="text-3xl font-bold mb-2" style={{ color: '#38618C' }}>
+                  8.2 → 5.4
                 </div>
-                <div>
-                  <div className="text-sm font-semibold mb-1" style={{ color: '#1e2749' }}>
-                    Teacher Stress Score
-                  </div>
-                  <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
-                    A 6-school district in Illinois reduced average teacher stress scores within one academic year of their Ignite partnership.
-                  </p>
+                <div className="text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                  Teacher Stress Score
                 </div>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  A 6-school district in Illinois reduced average teacher stress scores within one academic year of their Ignite partnership.
+                </p>
               </div>
 
               {/* Card 2: Implementation */}
-              <div className="flex gap-4 p-5 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
-                <div className="flex-shrink-0">
-                  <div className="text-2xl font-bold" style={{ color: '#38618C' }}>
-                    12% → 58%
-                  </div>
+              <div className="p-6 rounded-xl h-full" style={{ backgroundColor: '#f5f5f5' }}>
+                <div className="text-3xl font-bold mb-2" style={{ color: '#38618C' }}>
+                  12% → 58%
                 </div>
-                <div>
-                  <div className="text-sm font-semibold mb-1" style={{ color: '#1e2749' }}>
-                    Strategy Implementation
-                  </div>
-                  <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
-                    A K-8 school in the Midwest grew implementation across their first Ignite semester and continued through Year 2 in Accelerate.
-                  </p>
+                <div className="text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                  Strategy Implementation
                 </div>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  A K-8 school in the Midwest grew implementation across their first Ignite semester and continued through Year 2 in Accelerate.
+                </p>
               </div>
 
               {/* Card 3: Retention */}
-              <div className="flex gap-4 p-5 rounded-xl" style={{ backgroundColor: '#f5f5f5' }}>
-                <div className="flex-shrink-0">
-                  <div className="text-2xl font-bold" style={{ color: '#38618C' }}>
-                    0 departures
-                  </div>
+              <div className="p-6 rounded-xl h-full" style={{ backgroundColor: '#f5f5f5' }}>
+                <div className="text-3xl font-bold mb-2" style={{ color: '#38618C' }}>
+                  0 departures
                 </div>
-                <div>
-                  <div className="text-sm font-semibold mb-1" style={{ color: '#1e2749' }}>
-                    Teacher Retention
-                  </div>
-                  <p className="text-xs" style={{ color: '#1e2749', opacity: 0.7 }}>
-                    A rural elementary school reported zero voluntary teacher departures in the year following their TDI partnership, after losing 4 the previous year.
-                  </p>
+                <div className="text-sm font-semibold mb-2" style={{ color: '#1e2749' }}>
+                  Teacher Retention
                 </div>
+                <p className="text-sm" style={{ color: '#1e2749', opacity: 0.7 }}>
+                  A rural elementary school reported zero voluntary teacher departures in the year following their TDI partnership, after losing 4 the previous year.
+                </p>
               </div>
             </div>
           </div>
