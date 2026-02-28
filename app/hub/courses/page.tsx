@@ -31,6 +31,8 @@ interface Course {
   estimated_minutes: number;
   thumbnail_url?: string;
   is_published: boolean;
+  access_tier?: string;
+  is_free_rotating?: boolean;
 }
 
 interface Enrollment {
@@ -64,7 +66,7 @@ export default function CourseCatalogPage() {
         // Fetch all published courses
         const { data: courseData } = await supabase
           .from('hub_courses')
-          .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url, is_published')
+          .select('id, slug, title, description, category, pd_hours, estimated_minutes, thumbnail_url, is_published, access_tier, is_free_rotating')
           .eq('is_published', true)
           .order('created_at', { ascending: false });
 

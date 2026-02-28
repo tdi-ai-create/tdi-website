@@ -47,6 +47,8 @@ import {
   Clapperboard,
   Settings,
   Info,
+  RefreshCw,
+  Sparkles,
 } from 'lucide-react';
 
 // Tab configuration for sidebar
@@ -59,7 +61,7 @@ const SIDEBAR_TABS = [
 // Hub theme colors
 const theme = PORTAL_THEMES.hub;
 
-type Tab = 'courses' | 'quick-wins' | 'media' | 'calendar' | 'feedback';
+type Tab = 'courses' | 'quick-wins' | 'media' | 'calendar' | 'feedback' | 'free-rotation';
 
 // Sidebar Navigation Item Component
 function SidebarNavItem({
@@ -665,6 +667,311 @@ function FeedbackTab() {
   );
 }
 
+// FREE ROTATION TAB
+function FreeRotationTab() {
+  const [courses, setCourses] = useState<any[]>([]);
+  const [quickWins, setQuickWins] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [updating, setUpdating] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function load() {
+      const supabase = getSupabase();
+
+      // Fetch courses with their rotation status
+      const { data: courseData } = await supabase
+        .from('hub_courses')
+        .select('id, title, slug, is_free_rotating, free_rotation_start, access_tier, is_published')
+        .eq('is_published', true)
+        .order('title');
+
+      // Fetch quick wins with their rotation status
+      const { data: quickWinData } = await supabase
+        .from('hub_quick_wins')
+        .select('id, title, slug, is_free_rotating, free_rotation_start, access_tier, is_published')
+        .eq('is_published', true)
+        .order('title');
+
+      setCourses(courseData || []);
+      setQuickWins(quickWinData || []);
+      setIsLoading(false);
+    }
+    load();
+  }, []);
+
+  const toggleFreeRotation = async (type: 'course' | 'quick_win', id: string, currentValue: boolean) => {
+    setUpdating(id);
+    const supabase = getSupabase();
+    const table = type === 'course' ? 'hub_courses' : 'hub_quick_wins';
+
+    const updateData = currentValue
+      ? { is_free_rotating: false, free_rotation_start: null }
+      : { is_free_rotating: true, free_rotation_start: new Date().toISOString() };
+
+    const { error } = await supabase
+      .from(table)
+      .update(updateData)
+      .eq('id', id);
+
+    if (!error) {
+      if (type === 'course') {
+        setCourses(prev => prev.map(c => c.id === id ? { ...c, ...updateData } : c));
+      } else {
+        setQuickWins(prev => prev.map(qw => qw.id === id ? { ...qw, ...updateData } : qw));
+      }
+    }
+    setUpdating(null);
+  };
+
+  const freeRotatingCourses = courses.filter(c => c.is_free_rotating);
+  const freeRotatingQuickWins = quickWins.filter(qw => qw.is_free_rotating);
+  const totalFreeRotating = freeRotatingCourses.length + freeRotatingQuickWins.length;
+
+  const tierColors: Record<string, string> = {
+    'free_rotating': 'bg-green-100 text-green-700',
+    'essentials': 'bg-blue-100 text-blue-700',
+    'professional': 'bg-purple-100 text-purple-700',
+    'all_access': 'bg-amber-100 text-amber-700',
+  };
+
+  if (isLoading) {
+    return <div className="py-8 text-center text-gray-500">Loading content...</div>;
+  }
+
+  return (
+    <div>
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4 mb-8">
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-green-50">
+              <Sparkles size={24} className="text-green-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>{totalFreeRotating}</p>
+              <p className="text-sm text-gray-500">Currently Free</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center bg-blue-50">
+              <BookOpen size={24} className="text-blue-600" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>{freeRotatingCourses.length}</p>
+              <p className="text-sm text-gray-500">Free Courses</p>
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-lg border border-gray-200 p-5">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#FFF8E7' }}>
+              <Zap size={24} style={{ color: theme.primary }} />
+            </div>
+            <div>
+              <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>{freeRotatingQuickWins.length}</p>
+              <p className="text-sm text-gray-500">Free Quick Wins</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Info Banner */}
+      <div className="flex items-start gap-3 p-4 rounded-lg bg-blue-50 border border-blue-100 mb-6">
+        <Info size={20} className="text-blue-600 flex-shrink-0 mt-0.5" />
+        <div>
+          <p className="text-sm text-blue-900 font-medium">Free Rotation</p>
+          <p className="text-sm text-blue-700 mt-0.5">
+            Content marked as &ldquo;Free This Week&rdquo; is accessible to all users, regardless of their membership tier.
+            Use this to give free users a taste of premium content.
+          </p>
+        </div>
+      </div>
+
+      {/* Currently Free Section */}
+      {totalFreeRotating > 0 && (
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Sparkles size={18} className="text-green-600" />
+            Currently Free
+          </h3>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {[...freeRotatingCourses.map(c => ({ ...c, type: 'course' as const })),
+              ...freeRotatingQuickWins.map(qw => ({ ...qw, type: 'quick_win' as const }))].map((item) => (
+              <div key={`${item.type}-${item.id}`} className="bg-white rounded-lg border-2 border-green-200 p-4">
+                <div className="flex items-start justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    {item.type === 'course' ? (
+                      <BookOpen size={16} className="text-blue-500" />
+                    ) : (
+                      <Zap size={16} className="text-amber-500" />
+                    )}
+                    <span className="text-xs font-medium text-gray-500 uppercase">
+                      {item.type === 'course' ? 'Course' : 'Quick Win'}
+                    </span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                    Free
+                  </span>
+                </div>
+                <p className="font-medium text-gray-900 mb-2">{item.title}</p>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-gray-500">
+                    Since {item.free_rotation_start ? new Date(item.free_rotation_start).toLocaleDateString() : 'N/A'}
+                  </span>
+                  <button
+                    onClick={() => toggleFreeRotation(item.type, item.id, true)}
+                    disabled={updating === item.id}
+                    className="px-3 py-1 text-xs font-medium rounded-lg border border-red-200 text-red-600 hover:bg-red-50 disabled:opacity-50"
+                  >
+                    {updating === item.id ? 'Updating...' : 'Remove'}
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Available Content Sections */}
+      <div className="space-y-8">
+        {/* Courses */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <BookOpen size={18} className="text-blue-600" />
+            Courses ({courses.length})
+          </h3>
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-[#FAFAF8]">
+                <tr>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Course</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Access Tier</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {courses.map((course, i) => (
+                  <tr key={course.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAF8]'}>
+                    <td className="px-4 py-3">
+                      <p className="text-sm font-medium text-gray-900">{course.title}</p>
+                      <p className="text-xs text-gray-500">{course.slug}</p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${tierColors[course.access_tier] || 'bg-gray-100 text-gray-600'}`}>
+                        {course.access_tier?.replace('_', ' ') || 'Unknown'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      {course.is_free_rotating ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                          <Sparkles size={12} />
+                          Free This Week
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-500">Paid</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => toggleFreeRotation('course', course.id, course.is_free_rotating)}
+                        disabled={updating === course.id}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 ${
+                          course.is_free_rotating
+                            ? 'border border-red-200 text-red-600 hover:bg-red-50'
+                            : 'text-white hover:opacity-90'
+                        }`}
+                        style={!course.is_free_rotating ? { backgroundColor: theme.primary } : undefined}
+                      >
+                        {updating === course.id ? 'Updating...' : course.is_free_rotating ? 'Remove from Free' : 'Make Free'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {courses.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
+                      No published courses yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Quick Wins */}
+        <div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Zap size={18} className="text-amber-600" />
+            Quick Wins ({quickWins.length})
+          </h3>
+          <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-[#FAFAF8]">
+                <tr>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Quick Win</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Access Tier</th>
+                  <th className="text-left px-4 py-3 text-xs font-medium text-gray-500 uppercase">Status</th>
+                  <th className="text-right px-4 py-3 text-xs font-medium text-gray-500 uppercase">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {quickWins.map((qw, i) => (
+                  <tr key={qw.id} className={i % 2 === 0 ? 'bg-white' : 'bg-[#FAFAF8]'}>
+                    <td className="px-4 py-3">
+                      <p className="text-sm font-medium text-gray-900">{qw.title}</p>
+                      <p className="text-xs text-gray-500">{qw.slug}</p>
+                    </td>
+                    <td className="px-4 py-3">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${tierColors[qw.access_tier] || 'bg-gray-100 text-gray-600'}`}>
+                        {qw.access_tier?.replace('_', ' ') || 'Unknown'}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      {qw.is_free_rotating ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                          <Sparkles size={12} />
+                          Free This Week
+                        </span>
+                      ) : (
+                        <span className="text-xs text-gray-500">Paid</span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <button
+                        onClick={() => toggleFreeRotation('quick_win', qw.id, qw.is_free_rotating)}
+                        disabled={updating === qw.id}
+                        className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 ${
+                          qw.is_free_rotating
+                            ? 'border border-red-200 text-red-600 hover:bg-red-50'
+                            : 'text-white hover:opacity-90'
+                        }`}
+                        style={!qw.is_free_rotating ? { backgroundColor: theme.primary } : undefined}
+                      >
+                        {updating === qw.id ? 'Updating...' : qw.is_free_rotating ? 'Remove from Free' : 'Make Free'}
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+                {quickWins.length === 0 && (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-8 text-center text-gray-500">
+                      No published Quick Wins yet.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ============= MAIN PAGE COMPONENT =============
 
 export default function HubProductionPage() {
@@ -837,6 +1144,14 @@ export default function HubProductionPage() {
                 <Star size={16} className="mr-2 inline" />
                 Feedback & Ratings
               </TabButton>
+              <TabButton
+                active={activeTab === 'free-rotation'}
+                onClick={() => setActiveTab('free-rotation')}
+                disabled={!canManageContent}
+              >
+                <RefreshCw size={16} className="mr-2 inline" />
+                Free Rotation
+              </TabButton>
             </div>
           </div>
 
@@ -847,6 +1162,7 @@ export default function HubProductionPage() {
             {activeTab === 'media' && canManageContent && <MediaTab />}
             {activeTab === 'calendar' && canManageContent && <CalendarTab />}
             {activeTab === 'feedback' && canViewAnalytics && <FeedbackTab />}
+            {activeTab === 'free-rotation' && canManageContent && <FreeRotationTab />}
 
             {/* No Permission State */}
             {!canManageCourses && !canManageQuickWins && !canManageContent && !canViewAnalytics && (

@@ -25,6 +25,8 @@ interface QuickWin {
   estimated_minutes: number;
   content_type: 'download' | 'activity' | 'video';
   course_slug?: string;
+  access_tier?: string;
+  is_free_rotating?: boolean;
 }
 
 export default function QuickWinsPage() {
@@ -61,6 +63,8 @@ export default function QuickWinsPage() {
             category: qw.category || 'Classroom Tools',
             estimated_minutes: qw.duration_minutes || 5,
             content_type: qw.quick_win_type || 'activity',
+            access_tier: qw.access_tier,
+            is_free_rotating: qw.is_free_rotating,
           }));
           setQuickWins(formattedQuickWins);
         }

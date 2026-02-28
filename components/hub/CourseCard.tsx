@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Check } from 'lucide-react';
+import { Check, Lock, Sparkles } from 'lucide-react';
+import { useMembership, ContentAccess } from '@/lib/hub/use-membership';
 
 // Category colors
 const CATEGORY_COLORS: Record<string, string> = {
@@ -23,6 +24,8 @@ interface CourseCardProps {
     pd_hours: number;
     estimated_minutes: number;
     thumbnail_url?: string;
+    access_tier?: string;
+    is_free_rotating?: boolean;
   };
   enrollment?: {
     status: 'active' | 'completed';
@@ -42,6 +45,15 @@ export default function CourseCard({
   const isCompleted = enrollment?.status === 'completed';
   const isEnrolled = !!enrollment;
   const progress = enrollment?.progress_percentage || 0;
+
+  // Check access using membership hook
+  const { canAccess } = useMembership();
+  const contentAccess: ContentAccess = {
+    access_tier: course.access_tier || 'all_access',
+    is_free_rotating: course.is_free_rotating,
+  };
+  const hasAccess = canAccess(contentAccess);
+  const isFreeRotating = course.is_free_rotating;
 
   return (
     <div className="hub-card p-0 overflow-hidden flex flex-col">
@@ -71,6 +83,18 @@ export default function CourseCard({
           className="absolute bottom-0 left-0 right-0 h-1"
           style={{ backgroundColor: categoryColor }}
         />
+        {/* Tier badge */}
+        {isFreeRotating ? (
+          <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-500 text-white shadow-sm">
+            <Sparkles size={12} />
+            Free This Week
+          </span>
+        ) : !hasAccess && course.access_tier && course.access_tier !== 'free_rotating' ? (
+          <span className="absolute top-2 right-2 inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-800/80 text-white shadow-sm">
+            <Lock size={12} />
+            {course.access_tier === 'essentials' ? 'Essentials' : course.access_tier === 'professional' ? 'Professional' : 'All-Access'}
+          </span>
+        ) : null}
       </div>
 
       {/* Body */}
@@ -165,6 +189,19 @@ export default function CourseCard({
               Continue ({progress}%)
             </Link>
           </div>
+        ) : !hasAccess ? (
+          <Link
+            href="/hub/membership"
+            className="block w-full text-center py-2 rounded-lg font-medium transition-colors border-2"
+            style={{
+              borderColor: '#6B7280',
+              color: '#6B7280',
+              fontFamily: "'DM Sans', sans-serif",
+            }}
+          >
+            <Lock size={14} className="inline mr-1.5 -mt-0.5" />
+            Upgrade to Access
+          </Link>
         ) : (
           <button
             onClick={() => onEnroll?.(course.id)}
