@@ -384,7 +384,7 @@ export default function TDIPortalLoader({ portal, onComplete }: TDIPortalLoaderP
           The quick scribble a teacher leaves on student work. An h that says &ldquo;I see you&rdquo; wrapped in a circle that says &ldquo;I&rsquo;ve got you.&rdquo; One stroke. Never lifts.
         </p>
         <a
-          href="/about#symbol"
+          href="/about#our-symbol"
           className="inline-block mt-3 text-sm underline decoration-1 underline-offset-2"
           style={{ color: 'rgba(255, 255, 255, 0.25)' }}
         >

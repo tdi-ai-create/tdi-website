@@ -463,7 +463,7 @@ function BookPanel() {
 
       <div className="text-center">
         <a
-          href="https://www.amazon.com/stores/Rae-Hughart/author/B07B52NR1F"
+          href="https://amzn.to/3NbZDUF"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg border-2"

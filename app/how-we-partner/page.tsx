@@ -734,7 +734,7 @@ function BookPanel() {
       {/* Amazon Link */}
       <div className="text-center mb-6">
         <a
-          href="https://www.amazon.com/stores/Rae-Hughart/author/B07B52NR1F"
+          href="https://amzn.to/3NbZDUF"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block px-6 py-3 rounded-lg font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg border-2"
@@ -1159,7 +1159,7 @@ export default function HowWePartnerPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
             <Link
-              href="/for-schools#calculator"
+              href="/calculator"
               className="block p-6 rounded-xl bg-white transition-all hover:shadow-lg hover:scale-[1.02]"
             >
               <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ backgroundColor: '#ffba06' }}>

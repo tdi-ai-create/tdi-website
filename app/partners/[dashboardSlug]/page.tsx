@@ -4589,7 +4589,7 @@ export default function PartnerDashboard() {
                 </p>
                 {/* Animated symbol below tagline */}
                 <Link
-                  href="/about#symbol"
+                  href="/about#our-symbol"
                   className="inline-block mt-2"
                   aria-label="The story behind the TDI symbol"
                 >
