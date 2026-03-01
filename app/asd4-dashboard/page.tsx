@@ -2250,40 +2250,8 @@ Thank you for setting the example. It matters more than you know.`;
                             </div>
                           )}
 
-                          {/* Not Logged In List */}
-                          {notLoggedInParas.length > 0 && (
-                            <div className="py-4 border-t border-gray-100">
-                              <h5 className="text-sm font-semibold text-amber-700 uppercase tracking-wide mb-2">
-                                Not Logged In ({notLoggedInParas.length})
-                              </h5>
-                              <ul className="text-sm text-gray-600 space-y-1">
-                                {notLoggedInParas.map((para, i) => (
-                                  <li key={i}>• {para.name.split(',').reverse().join(' ').trim()}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
                           {/* Action Buttons Row */}
                           <div className="flex flex-wrap items-center gap-3 py-3 border-t border-gray-100">
-                            {notLoggedInParas.length > 0 && (
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  const emails = notLoggedInParas.map(p => p.email);
-                                  openGmail({
-                                    to: emails,
-                                    subject: 'Getting Started with the TDI Learning Hub',
-                                    body: `Hi ${school.name.split('(')[0].trim()} Team,\n\nI wanted to reach out because I noticed you haven't had a chance to log into the TDI Learning Hub yet.\n\nNo pressure -  I know things get busy! But when you have 10-15 minutes, the Hub has some really practical resources.\n\nHere's how to get started:\n1. Go to tdi.thinkific.com\n2. Log in with your school email\n3. Start with "Paraprofessional Foundations" -  it's quick and practical\n\nLet me know if you need help!\n\nLeslie`,
-                                  });
-                                }}
-                                className="inline-flex items-center gap-2 px-3 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors"
-                              >
-                                <Mail className="w-4 h-4" />
-                                Nudge {notLoggedInParas.length} Not Logged In
-                              </button>
-                            )}
-
                             {loggedInParas.length > 0 && (
                               <button
                                 onClick={(e) => {
@@ -2354,39 +2322,6 @@ Thank you for setting the example. It matters more than you know.`;
                                   </div>
                                 </div>
 
-                                {/* Not Logged In */}
-                                {notLoggedInParas.length > 0 ? (
-                                  <div className="bg-amber-50 rounded-lg p-4">
-                                    <h6 className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-3 flex items-center gap-2">
-                                      <AlertCircle className="w-3 h-3" />
-                                      Not Logged In ({notLoggedInParas.length})
-                                    </h6>
-                                    <div className="space-y-1 max-h-40 overflow-y-auto">
-                                      {notLoggedInParas.map((para, i) => (
-                                        <div key={i} className="text-sm text-gray-700 flex justify-between items-center">
-                                          <span>{para.name}</span>
-                                          <button
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              openGmail({
-                                                to: para.email,
-                                                subject: 'Quick help getting into the TDI Learning Hub',
-                                                body: `Hi ${para.name.split(',')[0].split(' ')[0]},\n\nI noticed you haven't had a chance to log into the TDI Learning Hub yet.\n\nHere's how:\n1. Go to tdi.thinkific.com\n2. Log in with ${para.email}\n3. Start with "Paraprofessional Foundations"\n\nLet me know if you need help!\n\nLeslie`,
-                                              });
-                                            }}
-                                            className="text-xs text-amber-600 hover:text-amber-800 font-medium underline"
-                                          >
-                                            Nudge
-                                          </button>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <div className="bg-emerald-50 rounded-lg p-4 flex items-center justify-center">
-                                    <p className="text-emerald-600 font-medium">🎉 Everyone&apos;s logged in!</p>
-                                  </div>
-                                )}
                               </div>
                             </div>
                           )}
