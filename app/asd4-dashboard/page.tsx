@@ -203,7 +203,7 @@ export default function ASD4Dashboard() {
   const upcomingSessions = [
     {
       title: "Observation Day",
-      date: "February 24, 2026",
+      date: "March 3, 2026",
       time: "7:30 AM - 3:00 PM",
       format: "In-Person",
       location: "District Schools",
@@ -815,7 +815,7 @@ Thank you for setting the example. It matters more than you know.`;
                 </div>
                 <div className="text-2xl font-bold text-[#1e2749]">83%</div>
                 <div className="text-xs text-[#38618C] font-medium">94/113 logged in</div>
-                <div className="text-xs text-gray-400 mt-1">Goal: 100% — Observation Day 1 is Feb 24</div>
+                <div className="text-xs text-gray-400 mt-1">Goal: 100% — Observation Day 1 is March 3</div>
               </div>
 
               <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
