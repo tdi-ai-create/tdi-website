@@ -130,28 +130,6 @@ export default function ASD4Dashboard() {
       priority: 'now',
       external: true,
       showCalendar: true
-    },
-    {
-      id: 'unrostered-accounts',
-      title: 'Confirm 6 Unrostered Hub Accounts',
-      description: '6 accounts are active in the Learning Hub but were not on the paraprofessional roster provided by leadership.',
-      deadline: 'MARCH 2026',
-      actionLabel: 'Email Rae to Confirm',
-      actionUrl: 'mailto:rae@teachersdeserveit.com?subject=ASD4%20Dashboard%20-%20Unrostered%20Account%20Confirmation',
-      icon: AlertCircle,
-      priority: 'now',
-      external: true,
-      showCalendar: false,
-      confirmedAccounts: [
-        'Elizabeth Herrera (eherrera@asd4.org) — attended Feb 13',
-        'Amanda Leveille (aleveille@asd4.org) — attended Feb 13',
-        'Giulia Bucaro (gbucaro@asd4.org) — attended Feb 13',
-        'Jennifer Perez (jperez@asd4.org) — attended Feb 13, name listed as "J Perez"'
-      ],
-      unconfirmedAccounts: [
-        'Maria Cortez (mcortez@asd4.org)',
-        'J G (jgonzalez@asd4.org) — name incomplete'
-      ]
     }
   ];
 
@@ -264,16 +242,16 @@ export default function ASD4Dashboard() {
   ];
 
   const topCourses = [
-    { name: "Paraprofessional Foundations – Understanding Your Role & Impact", started: 26, completed70: 12, inProgress: 14, completionRate: 46, avgProgress: 14 },
-    { name: "Streamline Your Inbox: Effective Email Management for Educators", started: 16, completed70: 4, inProgress: 12, completionRate: 25, avgProgress: 6 },
-    { name: "Classroom Management Toolkit", started: 15, completed70: 6, inProgress: 9, completionRate: 40, avgProgress: 6 },
-    { name: "Differentiated Choice Boards: Empowering Student Choice and Mastery", started: 15, completed70: 3, inProgress: 12, completionRate: 20, avgProgress: 5 },
-    { name: "Boundaries Without Backlash", started: 12, completed70: 5, inProgress: 7, completionRate: 42, avgProgress: 5 },
+    { name: "Paraprofessional Foundations – Understanding Your Role & Impact", started: 27, completed70: 13, inProgress: 14, completionRate: 48, avgProgress: 15 },
+    { name: "Classroom Management Toolkit", started: 16, completed70: 7, inProgress: 9, completionRate: 44, avgProgress: 7 },
+    { name: "Differentiated Choice Boards: Empowering Student Choice and Mastery", started: 16, completed70: 5, inProgress: 11, completionRate: 31, avgProgress: 6 },
+    { name: "Streamline Your Inbox: Effective Email Management for Educators", started: 16, completed70: 5, inProgress: 11, completionRate: 31, avgProgress: 6 },
+    { name: "Boundaries Without Backlash", started: 15, completed70: 9, inProgress: 6, completionRate: 60, avgProgress: 8 },
+    { name: "How to get the MOST out of the Teachers Deserve It Learning Hub", started: 13, completed70: 2, inProgress: 11, completionRate: 15, avgProgress: 2 },
     { name: "Building Strong Teacher-Para Partnerships", started: 12, completed70: 4, inProgress: 8, completionRate: 33, avgProgress: 4 },
-    { name: "How to get the MOST out of the Teachers Deserve It Learning Hub", started: 12, completed70: 1, inProgress: 11, completionRate: 8, avgProgress: 2 },
+    { name: "Connected Educators: Building Networks for Bite-Sized Professional Growth", started: 9, completed70: 2, inProgress: 7, completionRate: 22, avgProgress: 3 },
     { name: "Understanding Student Needs & Modifications", started: 9, completed70: 5, inProgress: 4, completionRate: 56, avgProgress: 5 },
-    { name: "Connected Educators: Building Networks for Bite-Sized Professional Growth", started: 8, completed70: 1, inProgress: 7, completionRate: 13, avgProgress: 2 },
-    { name: "Calm Classrooms, Not Chaos", started: 7, completed70: 6, inProgress: 1, completionRate: 86, avgProgress: 5 },
+    { name: "Maximize Impact: One-on-One Student Conferences", started: 8, completed70: 4, inProgress: 4, completionRate: 50, avgProgress: 4 },
   ];
 
   // School-level engagement data (with real course metrics and survey data)
@@ -299,7 +277,6 @@ export default function ASD4Dashboard() {
       paras: [
         { name: 'Delgado, Beatriz', email: 'bdelgado@asd4.org', loggedIn: true },
         { name: 'Garcia, Claudia', email: 'cgarcia@asd4.org', loggedIn: true },
-        { name: 'Mendiola, Georjina', email: 'gmendiola@asd4.org', loggedIn: false },
         { name: 'Simone, Patricia', email: 'psimone@asd4.org', loggedIn: true },
         { name: 'Padilla, Jayla', email: 'japadilla@asd4.org', loggedIn: true },
         { name: 'Tirado, Carmen', email: 'ctirado@asd4.org', loggedIn: true },
@@ -311,6 +288,7 @@ export default function ASD4Dashboard() {
         { name: 'Boucekkine, Beata', email: 'bboucekkine@asd4.org', loggedIn: true },
         { name: 'Figueroa, Iliana', email: 'ifsanchez@asd4.org', loggedIn: true },
         { name: 'Padilla, Jackie', email: 'jpadilla@asd4.org', loggedIn: true },
+        { name: 'Perez, Jennifer', email: 'jperez@asd4.org', loggedIn: true },
       ],
     },
     {
@@ -345,6 +323,8 @@ export default function ASD4Dashboard() {
         { name: 'Zarate, Claudia', email: 'czarate@asd4.org', loggedIn: true },
         { name: 'Sanchez, Maria', email: 'msanchez@asd4.org', loggedIn: true },
         { name: 'Zaborowski, Samantha', email: 'szaborowski@asd4.org', loggedIn: true },
+        { name: 'Herrera, Elizabeth', email: 'eherrera@asd4.org', loggedIn: true },
+        { name: 'Cortez, Maria', email: 'mcortez@asd4.org', loggedIn: false },
       ],
     },
     {
@@ -362,11 +342,12 @@ export default function ASD4Dashboard() {
       survey: { responses: 10, asking: 4.10, feedback: 4.00, limitedData: false },
       implementation: { asking: 89, feedback: 56 },
       medals: [
+        { type: 'gold', label: '100% Login Rate' },
         { type: 'gold', label: 'Confidence Leader: Feedback (4.00)' },
         { type: 'gold', label: 'Above 90% Club' },
         { type: 'silver', label: 'High Confidence: Asking (4.10)' },
       ],
-      note: 'Lincoln has the highest feedback confidence across all schools.',
+      note: 'Lincoln has 100% login rate and the highest feedback confidence across all schools.',
       paras: [
         { name: 'Hawkins, Michelina', email: 'mhawkins@asd4.org', loggedIn: true },
         { name: 'Aguilar, Denys', email: 'daguilar@asd4.org', loggedIn: true },
@@ -375,7 +356,6 @@ export default function ASD4Dashboard() {
         { name: 'Montalvo, Jazzleen', email: 'jmontalvo@asd4.org', loggedIn: true },
         { name: 'Ortiz, Maria', email: 'mortiz@asd4.org', loggedIn: true },
         { name: 'Torres, Manuela', email: 'matorres@asd4.org', loggedIn: true },
-        { name: 'Bezdicek, Michelle', email: 'mbezdicek@asd4.org', loggedIn: false },
         { name: 'Arredondo, Gregoria', email: 'garredondo@asd4.org', loggedIn: true },
         { name: 'Marinelli, Rosemarie', email: 'rmarinelli@asd4.org', loggedIn: true },
         { name: 'Iturbe Vaszquez, Xochitl', email: 'xiturbevazquez@asd4.org', loggedIn: true },
@@ -412,6 +392,7 @@ export default function ASD4Dashboard() {
         { name: 'Umana, Melvi', email: 'mumana@asd4.org', loggedIn: true },
         { name: 'Wheeler, Michelle', email: 'mwheeler@asd4.org', loggedIn: true },
         { name: 'Schlesser, Patricia', email: 'pschlesser@asd4.org', loggedIn: false },
+        { name: 'Leveille, Amanda', email: 'aleveille@asd4.org', loggedIn: true },
       ],
     },
     {
@@ -509,7 +490,6 @@ export default function ASD4Dashboard() {
         { name: 'Hoppensteadt, Emilia', email: 'ehoppensteadt@asd4.org', loggedIn: true },
         { name: 'Marquez, Maribel', email: 'mmarquez@asd4.org', loggedIn: false },
         { name: 'Martinez, Giselle', email: 'gmartinez@asd4.org', loggedIn: true },
-        { name: 'Nicieja, Monika', email: 'mnicieja@asd4.org', loggedIn: false },
         { name: 'Perez, Mariela', email: 'maperez@asd4.org', loggedIn: true },
         { name: 'Roman, Abigail', email: 'aroman@asd4.org', loggedIn: true },
         { name: 'Samayoa, Yadira', email: 'ysamayoa@asd4.org', loggedIn: true },
@@ -555,7 +535,6 @@ export default function ASD4Dashboard() {
       ],
       note: 'ELC has the strongest feedback implementation in the district at 90%. Login rate is lower — a dedicated walkthrough session would help close the gap.',
       paras: [
-        { name: 'Tinajero Monroy, Melany', email: 'mtinajero@asd4.org', loggedIn: false },
         { name: 'Katherine De La Cruz', email: 'kdelacruz@asd4.org', loggedIn: true },
         { name: 'Melanie Diaz', email: 'mdiaz@asd4.org', loggedIn: true },
         { name: 'Rosa Torres', email: 'rtorres@asd4.org', loggedIn: true },
@@ -584,8 +563,7 @@ export default function ASD4Dashboard() {
   ];
 
   const notLoggedInParas = [
-    // ELC (6)
-    { name: "Melany Tinajero Monroy", email: "mtinajero@asd4.org", school: "ELC" },
+    // ELC (5)
     { name: "Yasmin Villa Casillas", email: "yvillacasillas@asd4.org", school: "ELC" },
     { name: "Giselle Galvan", email: "ggalvan@asd4.org", school: "ELC" },
     { name: "Irma Robles", email: "irobles@asd4.org", school: "ELC" },
@@ -596,21 +574,17 @@ export default function ASD4Dashboard() {
     { name: "Natalia Villalobos", email: "nvillalobos@asd4.org", school: "Lake Park" },
     { name: "Aysha Chaudary", email: "achaudary@asd4.org", school: "Lake Park" },
     { name: "Mary Falco", email: "mfalco@asd4.org", school: "Lake Park" },
-    // Army Trail (3)
+    // Army Trail (2)
     { name: "Kristine Colbert", email: "kcolbert@asd4.org", school: "Army Trail" },
     { name: "Maribel Marquez", email: "mmarquez@asd4.org", school: "Army Trail" },
-    { name: "Monika Nicieja", email: "mnicieja@asd4.org", school: "Army Trail" },
     // Stone (2)
     { name: "Brittany Lanzo", email: "blanzo@asd4.org", school: "Stone" },
     { name: "Patricia Schlesser", email: "pschlesser@asd4.org", school: "Stone" },
     // Fullerton (1)
     { name: "Nancy Gremo", email: "ngremo@asd4.org", school: "Fullerton" },
-    // Indian Trail (1)
+    // Indian Trail (2)
     { name: "Mirela Hodo", email: "mhodo@asd4.org", school: "Indian Trail" },
-    // Lincoln (1)
-    { name: "Michelle Bezdicek", email: "mbezdicek@asd4.org", school: "Lincoln" },
-    // Wesley (1)
-    { name: "Georjina Mendiola", email: "gmendiola@asd4.org", school: "Wesley" },
+    { name: "Maria Cortez", email: "mcortez@asd4.org", school: "Indian Trail" },
   ];
 
   // Send individual nudge email via Gmail
@@ -803,7 +777,7 @@ Thank you for setting the example. It matters more than you know.`;
                   <span className="text-xs text-gray-500 uppercase">Paras Enrolled</span>
                   <Tooltip text="Total paraprofessionals with Learning Hub access." position="bottom" iconSize={12} />
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">113/113</div>
+                <div className="text-2xl font-bold text-[#1e2749]">114/114</div>
                 <div className="text-xs text-[#38618C] font-medium">Hub Access</div>
               </div>
 
@@ -813,8 +787,8 @@ Thank you for setting the example. It matters more than you know.`;
                   <span className="text-xs text-gray-500 uppercase">Hub Logins</span>
                   <Tooltip text="Percentage of enrolled paras who have logged into the Learning Hub at least once. Industry average is ~40%." position="bottom" iconSize={12} />
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">83%</div>
-                <div className="text-xs text-[#38618C] font-medium">94/113 logged in</div>
+                <div className="text-2xl font-bold text-[#1e2749]">85%</div>
+                <div className="text-xs text-[#38618C] font-medium">97/114 logged in</div>
                 <div className="text-xs text-gray-400 mt-1">Goal: 100% — Observation Day 1 is March 3</div>
               </div>
 
@@ -824,9 +798,9 @@ Thank you for setting the example. It matters more than you know.`;
                   <span className="text-xs text-gray-500 uppercase">Course Engagement</span>
                   <Tooltip text="Paras who have started at least one course in the Learning Hub." position="bottom" iconSize={12} />
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">20%</div>
-                <div className="text-xs text-[#38618C] font-medium">~26/113 started a course</div>
-                <div className="text-xs text-gray-400 mt-1">63 total course completions</div>
+                <div className="text-2xl font-bold text-[#1e2749]">24%</div>
+                <div className="text-xs text-[#38618C] font-medium">~27/114 started a course</div>
+                <div className="text-xs text-gray-400 mt-1">91 total course completions</div>
               </div>
 
               <div
@@ -926,17 +900,17 @@ Thank you for setting the example. It matters more than you know.`;
                 </div>
                 <div>
                   <p className="font-semibold text-green-800">Exec Session 1 Complete</p>
-                  <p className="text-sm text-green-600">1/2 Exec · 5 sessions scheduled · 94 paras logged in</p>
+                  <p className="text-sm text-green-600">1/2 Exec · 5 sessions scheduled · 97 paras logged in</p>
                 </div>
               </div>
 
-              {/* Card 2: 19 Paras Remaining */}
+              {/* Card 2: 17 Paras Remaining */}
               <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-4">
                 <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <Lightbulb className="w-6 h-6 text-amber-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-amber-800">19 Paras Remaining</p>
+                  <p className="font-semibold text-amber-800">17 Paras Remaining</p>
                   <p className="text-sm text-amber-600">Try a walkthrough at your next meeting</p>
                 </div>
               </div>
@@ -1026,34 +1000,6 @@ Thank you for setting the example. It matters more than you know.`;
                               </button>
                             </div>
                           </div>
-                          {/* Show confirmed/unconfirmed accounts for unrostered item */}
-                          {item.confirmedAccounts && item.unconfirmedAccounts && (
-                            <div className="mt-4 pt-3 border-t border-gray-200">
-                              <div className="mb-4">
-                                <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-2">4 attended Feb 13 session — confirm school assignments:</p>
-                                <ul className="text-sm text-gray-600 space-y-1">
-                                  {item.confirmedAccounts.map((account: string, idx: number) => (
-                                    <li key={idx} className="flex items-start gap-1">
-                                      <span className="text-emerald-500">•</span>
-                                      <span>{account}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                              <div>
-                                <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide mb-2">2 additional accounts need confirmation:</p>
-                                <ul className="text-sm text-gray-600 space-y-1">
-                                  {item.unconfirmedAccounts.map((account: string, idx: number) => (
-                                    <li key={idx} className="flex items-start gap-1">
-                                      <span className="text-amber-500">•</span>
-                                      <span>{account}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                              <p className="text-xs text-gray-500 mt-3 italic">Please confirm school assignments and whether these should be added to the official roster.</p>
-                            </div>
-                          )}
                         </div>
                       ))}
                   </div>
@@ -1781,7 +1727,7 @@ Thank you for setting the example. It matters more than you know.`;
                 </button>
               )}
               <div className="mt-4 pt-3 border-t border-gray-100 text-xs text-gray-400">
-                24 of 34 courses have engagement · 63 total completions · Data as of Feb 23, 2026
+                29 of 35 courses have engagement · 91 total completions · Data as of March 1, 2026
               </div>
             </div>
 
@@ -2008,7 +1954,7 @@ Thank you for setting the example. It matters more than you know.`;
           <div className="space-y-6">
             {/* Summary Stats */}
             <div className="bg-white rounded-xl p-4 border border-gray-200 mb-4">
-              <div className="text-lg font-bold text-gray-900">9 schools · 113 paras · 94 logged in (83%)</div>
+              <div className="text-lg font-bold text-gray-900">9 schools · 114 paras · 97 logged in (85%)</div>
               <div className="text-sm text-gray-500 mt-1">Top performers: Ardmore (100%), Wesley (93%), Fullerton & Indian Trail (92%)</div>
               <div className="text-sm text-amber-600 mt-1">Needs attention: Lake Park (67%), ELC (75%)</div>
             </div>
@@ -2051,34 +1997,34 @@ Thank you for setting the example. It matters more than you know.`;
                   <tbody>
                     <tr className="border-b border-gray-100">
                       <td className="py-2 pr-4 text-gray-700">Paraprofessional Foundations</td>
-                      <td className="py-2 px-2 text-right text-gray-600">26</td>
-                      <td className="py-2 pl-2 text-right text-emerald-600 font-medium">12</td>
+                      <td className="py-2 px-2 text-right text-gray-600">27</td>
+                      <td className="py-2 pl-2 text-right text-emerald-600 font-medium">13</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-2 pr-4 text-gray-700">Classroom Management Toolkit</td>
+                      <td className="py-2 px-2 text-right text-gray-600">16</td>
+                      <td className="py-2 pl-2 text-right text-emerald-600 font-medium">7</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-2 pr-4 text-gray-700">Differentiated Choice Boards</td>
+                      <td className="py-2 px-2 text-right text-gray-600">16</td>
+                      <td className="py-2 pl-2 text-right text-emerald-600 font-medium">5</td>
                     </tr>
                     <tr className="border-b border-gray-100">
                       <td className="py-2 pr-4 text-gray-700">Streamline Your Inbox</td>
                       <td className="py-2 px-2 text-right text-gray-600">16</td>
-                      <td className="py-2 pl-2 text-right text-emerald-600 font-medium">4</td>
-                    </tr>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-2 pr-4 text-gray-700">Classroom Management Toolkit</td>
-                      <td className="py-2 px-2 text-right text-gray-600">15</td>
-                      <td className="py-2 pl-2 text-right text-emerald-600 font-medium">6</td>
-                    </tr>
-                    <tr className="border-b border-gray-100">
-                      <td className="py-2 pr-4 text-gray-700">Differentiated Choice Boards</td>
-                      <td className="py-2 px-2 text-right text-gray-600">15</td>
-                      <td className="py-2 pl-2 text-right text-emerald-600 font-medium">3</td>
+                      <td className="py-2 pl-2 text-right text-emerald-600 font-medium">5</td>
                     </tr>
                     <tr>
                       <td className="py-2 pr-4 text-gray-700">Boundaries Without Backlash</td>
-                      <td className="py-2 px-2 text-right text-gray-600">12</td>
-                      <td className="py-2 pl-2 text-right text-emerald-600 font-medium">5</td>
+                      <td className="py-2 px-2 text-right text-gray-600">15</td>
+                      <td className="py-2 pl-2 text-right text-emerald-600 font-medium">9</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               <div className="mt-4 pt-3 border-t border-gray-100 text-xs text-gray-400">
-                Top 5 courses by engagement across all 9 schools · 63 total completions district-wide · Per-school course data coming soon
+                Top 5 courses by engagement across all 9 schools · 91 total completions district-wide · Per-school course data coming soon · Data as of March 1, 2026
               </div>
             </div>
 
