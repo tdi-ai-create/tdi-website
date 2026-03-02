@@ -45,7 +45,6 @@ import { copyToClipboard } from '@/lib/tdi-admin/clipboard';
 // Creators theme colors
 const theme = PORTAL_THEMES.creators;
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
-import { CreatorDashboardHeader } from '@/components/creator-portal/CreatorDashboardHeader';
 import { CourseDetailsPanel } from '@/components/creator-portal/CourseDetailsPanel';
 import { NotesPanel } from '@/components/creator-portal/NotesPanel';
 import {
@@ -729,17 +728,8 @@ export default function TDIAdminCreatorDetailPage() {
         </div>
       </div>
 
-      {/* Creator Dashboard Header - shown in creator view mode */}
-      {viewMode === 'creator' && (
-        <div className="mb-8">
-          <CreatorDashboardHeader
-            creator={creator}
-            completedMilestones={completedMilestones}
-            totalMilestones={totalMilestones}
-            progressPercentage={progressPercentage}
-          />
-        </div>
-      )}
+      {/* Note: CreatorDashboardHeader removed from admin view to avoid double header
+          The "Viewing as" banner below provides sufficient context for admin preview */}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main content - Milestones */}
