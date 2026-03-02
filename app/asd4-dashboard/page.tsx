@@ -174,6 +174,18 @@ export default function ASD4Dashboard() {
       ],
       status: "complete" as const,
       practiceReps: 54
+    },
+    {
+      title: "Virtual Session 1",
+      date: "March 2, 2026",
+      format: "Virtual",
+      duration: "45-Minute Session",
+      focusAreas: [
+        "Partnership check-in and progress review",
+        "Strategy adjustments based on observation data",
+        "Growth Group formation planning"
+      ],
+      status: "complete" as const
     }
   ];
 
@@ -189,18 +201,6 @@ export default function ASD4Dashboard() {
         "Classroom observation of para-student interactions",
         "Strategy implementation check-ins",
         "Real-time coaching feedback"
-      ],
-      status: "scheduled" as const
-    },
-    {
-      title: "Virtual Session 1",
-      date: "March 2, 2026",
-      time: "7:30 - 8:15 AM",
-      format: "Virtual",
-      focusAreas: [
-        "Observation debrief and reflection",
-        "Strategy adjustments based on observation data",
-        "Growth Group formation planning"
       ],
       status: "scheduled" as const
     },
