@@ -159,8 +159,8 @@ const statusConfig: Record<
 // Special config for "Waiting on TDI" status
 const waitingOnTdiConfig = {
   icon: Hourglass,
-  color: 'text-amber-600',
-  bg: 'bg-amber-100',
+  color: 'text-[#8B7355]',
+  bg: 'bg-[#F7F4EF]',
   label: 'Waiting on TDI',
   helper: 'Our team will complete this step and update your portal',
 };
@@ -239,27 +239,27 @@ function MilestoneItem({
     const emailBody = encodeURIComponent(`Hi Rachel,\n\nI wanted to check in on my progress. I'm currently waiting on: ${milestoneTitle}\n\nThanks!`);
 
     return (
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+      <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center mt-0.5">
-            <Hourglass className="w-4 h-4 text-amber-600" />
+          <div className="flex-shrink-0 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center mt-0.5">
+            <Hourglass className="w-4 h-4 text-slate-500" />
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-start justify-between gap-2">
               <h4 className="font-medium text-[#1e2749]">{milestoneTitle}</h4>
-              <span className="flex-shrink-0 text-xs px-2 py-1 rounded-full bg-amber-100 text-amber-700 font-medium">
+              <span className="flex-shrink-0 text-xs px-2 py-1 rounded-full bg-slate-100 text-slate-600 font-medium">
                 Waiting on TDI
               </span>
             </div>
             {milestone.description && (
               <p className="text-sm text-gray-600 mt-1">{milestone.description}</p>
             )}
-            <p className="text-sm text-amber-700 mt-2">
+            <p className="text-sm text-slate-600 mt-2">
               Our team is working on this -  we&apos;ll update your portal once complete.
             </p>
             <a
               href={`mailto:rachel@teachersdeserveit.com?subject=${emailSubject}&body=${emailBody}`}
-              className="text-sm text-amber-600 hover:text-amber-800 underline mt-2 inline-block"
+              className="text-sm text-slate-500 hover:text-slate-700 underline mt-2 inline-block"
             >
               Taking longer than expected? Let us know →
             </a>
@@ -283,7 +283,7 @@ function MilestoneItem({
           : 'bg-white border-gray-200 hover:border-[#80a4ed]'
       }`}
     >
-      <div className={`flex-shrink-0 w-8 h-8 rounded-full ${isCurrentAction ? 'bg-[#ffba06]' : config.bg} flex items-center justify-center`}>
+      <div className={`flex-shrink-0 w-8 h-8 rounded-full ${isCurrentAction ? 'bg-[#C4A052]' : config.bg} flex items-center justify-center`}>
         <Icon className={`w-4 h-4 ${isCurrentAction ? 'text-[#1e2749]' : config.color}`} />
       </div>
 
@@ -299,12 +299,12 @@ function MilestoneItem({
                 {milestoneTitle}
               </h4>
               {isCurrentAction && (
-                <span className="text-xs bg-[#ffba06] text-[#1e2749] px-2 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-[#C4A052] text-white px-2 py-0.5 rounded-full font-medium">
                   Your Next Step
                 </span>
               )}
               {isOptional && (
-                <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="text-xs bg-[#F7F4EF] text-[#8B7355] px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Star className="w-3 h-3" />
                   Bonus
                 </span>
@@ -544,11 +544,11 @@ function PhaseCard({
           <div
             className={`w-10 h-10 rounded-full flex items-center justify-center ${
               isActionPhase
-                ? 'bg-[#ffba06]'
+                ? 'bg-[#C4A052]'
                 : phase.isComplete
                 ? 'bg-green-500'
                 : phase.isCurrentPhase
-                ? 'bg-[#80a4ed]'
+                ? 'bg-slate-400'
                 : 'bg-gray-300'
             }`}
           >
@@ -564,11 +564,11 @@ function PhaseCard({
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-[#1e2749]">{phase.name}</h3>
               {isActionPhase ? (
-                <span className="text-xs bg-[#ffba06] text-[#1e2749] px-2 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-[#C4A052] text-white px-2 py-0.5 rounded-full font-medium">
                   Action Needed
                 </span>
               ) : phase.isCurrentPhase ? (
-                <span className="text-xs bg-[#80a4ed] text-white px-2 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-slate-400 text-white px-2 py-0.5 rounded-full font-medium">
                   Current Phase
                 </span>
               ) : null}

@@ -65,7 +65,7 @@ export function CourseDetailsPanel({ creator }: CourseDetailsPanelProps) {
                       detail.isEmpty
                         ? 'text-gray-400 italic'
                         : detail.isCode
-                        ? 'font-mono bg-[#ffba06]/20 px-2 py-1 rounded text-[#1e2749] inline-block'
+                        ? 'font-mono bg-[#C4A052]/20 px-2 py-1 rounded text-[#1e2749] inline-block'
                         : 'text-[#1e2749] font-medium'
                     }`}
                   >
@@ -115,8 +115,8 @@ export function CourseDetailsPanel({ creator }: CourseDetailsPanelProps) {
                 rel="noopener noreferrer"
                 className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-[#80a4ed]/10 transition-colors group"
               >
-                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center">
-                  <FolderOpen className="w-4 h-4 text-yellow-600" />
+                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-[#F7F4EF] flex items-center justify-center">
+                  <FolderOpen className="w-4 h-4 text-[#8B7355]" />
                 </div>
                 <div className="flex-grow min-w-0">
                   <p className="text-sm font-medium text-[#1e2749] group-hover:text-[#80a4ed]">
