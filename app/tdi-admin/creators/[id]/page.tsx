@@ -933,6 +933,7 @@ export default function TDIAdminCreatorDetailPage() {
               <PhaseProgress
                 phases={phases}
                 creator={creator}
+                creatorId={creatorId}
                 isAdminPreview={true}
               />
             </div>
