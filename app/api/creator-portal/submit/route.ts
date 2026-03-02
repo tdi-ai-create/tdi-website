@@ -485,9 +485,15 @@ export async function POST(request: Request) {
         }
 
         if (nextMilestone) {
+          // Clear completion data when unlocking to ensure clean state
           await supabase
             .from('creator_milestones')
-            .update({ status: 'available', updated_at: new Date().toISOString() })
+            .update({
+              status: 'available',
+              completed_at: null,
+              completed_by: null,
+              updated_at: new Date().toISOString(),
+            })
             .eq('creator_id', creatorId)
             .eq('milestone_id', nextMilestone.id)
             .eq('status', 'locked');
@@ -540,10 +546,15 @@ export async function POST(request: Request) {
           });
 
           if (allOthersComplete) {
-            // Unlock the create_again milestone
+            // Unlock the create_again milestone - clear completion data for clean state
             await supabase
               .from('creator_milestones')
-              .update({ status: 'available', updated_at: new Date().toISOString() })
+              .update({
+                status: 'available',
+                completed_at: null,
+                completed_by: null,
+                updated_at: new Date().toISOString(),
+              })
               .eq('creator_id', creatorId)
               .eq('milestone_id', 'create_again')
               .eq('status', 'locked');

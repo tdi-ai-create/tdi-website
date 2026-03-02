@@ -182,9 +182,15 @@ export async function POST(request: Request) {
 
             if (canUnlock) {
               console.log('[approve-milestone] Unlocking milestone:', ms.id);
+              // Clear completion data when unlocking to ensure clean state
               await supabase
                 .from('creator_milestones')
-                .update({ status: 'available' })
+                .update({
+                  status: 'available',
+                  completed_at: null,
+                  completed_by: null,
+                  updated_at: new Date().toISOString(),
+                })
                 .eq('creator_id', creatorId)
                 .eq('milestone_id', ms.id);
 
@@ -295,9 +301,15 @@ export async function POST(request: Request) {
       }
 
       if (nextMilestone) {
+        // Clear completion data when unlocking to ensure clean state
         await supabase
           .from('creator_milestones')
-          .update({ status: 'available' })
+          .update({
+            status: 'available',
+            completed_at: null,
+            completed_by: null,
+            updated_at: new Date().toISOString(),
+          })
           .eq('creator_id', creatorId)
           .eq('milestone_id', nextMilestone.id)
           .eq('status', 'locked');
