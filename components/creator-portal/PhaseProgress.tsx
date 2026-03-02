@@ -142,8 +142,8 @@ const statusConfig: Record<
   },
   available: {
     icon: Circle,
-    color: 'text-[#D4AF37]',
-    bg: 'bg-[#FFF9E6]',
+    color: 'text-[#1e2749]',
+    bg: 'bg-slate-100',
     label: 'Ready for You',
     helper: 'This step is ready for you to complete',
   },
@@ -159,8 +159,8 @@ const statusConfig: Record<
 // Special config for "Waiting on TDI" status
 const waitingOnTdiConfig = {
   icon: Hourglass,
-  color: 'text-[#8B7355]',
-  bg: 'bg-[#F7F4EF]',
+  color: 'text-slate-500',
+  bg: 'bg-slate-100',
   label: 'Waiting on TDI',
   helper: 'Our team will complete this step and update your portal',
 };
@@ -279,12 +279,12 @@ function MilestoneItem({
           : milestone.status === 'waiting_approval'
           ? 'bg-orange-50/50 border-orange-200'
           : isCurrentAction
-          ? 'bg-gradient-to-r from-[#FFFDF7] to-[#FFF9E6] border-[#D4AF37] border-2 shadow-[0_0_20px_rgba(212,175,55,0.35)]'
-          : 'bg-white border-gray-200 hover:border-[#80a4ed] hover:shadow-md'
+          ? 'bg-white border-[#1e2749] border-2 shadow-sm'
+          : 'bg-white border-gray-200 hover:border-slate-400 hover:shadow-sm'
       }`}
     >
-      <div className={`flex-shrink-0 w-8 h-8 rounded-full ${isCurrentAction ? 'bg-[#D4AF37]' : config.bg} flex items-center justify-center`}>
-        <Icon className={`w-4 h-4 ${isCurrentAction ? 'text-[#1e2749]' : config.color}`} />
+      <div className={`flex-shrink-0 w-8 h-8 rounded-full ${isCurrentAction ? 'bg-[#1e2749]' : config.bg} flex items-center justify-center`}>
+        <Icon className={`w-4 h-4 ${isCurrentAction ? 'text-white' : config.color}`} />
       </div>
 
       <div className="flex-grow min-w-0">
@@ -299,12 +299,12 @@ function MilestoneItem({
                 {milestoneTitle}
               </h4>
               {isCurrentAction && (
-                <span className="text-xs bg-[#D4AF37] text-white px-2 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-[#1e2749] text-white px-2 py-0.5 rounded-full font-medium">
                   Your Next Step
                 </span>
               )}
               {isOptional && (
-                <span className="text-xs bg-[#F7F4EF] text-[#8B7355] px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="text-xs bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full flex items-center gap-1">
                   <Star className="w-3 h-3" />
                   Bonus
                 </span>
@@ -544,12 +544,12 @@ function PhaseCard({
           <div
             className={`w-10 h-10 rounded-full flex items-center justify-center ${
               isActionPhase
-                ? 'bg-[#D4AF37]'
+                ? 'bg-[#1e2749]'
                 : phase.isComplete
-                ? 'bg-green-500'
+                ? 'bg-[#1e2749]'
                 : phase.isCurrentPhase
                 ? 'bg-slate-400'
-                : 'bg-gray-300'
+                : 'bg-slate-300'
             }`}
           >
             {phase.isComplete ? (
@@ -564,7 +564,7 @@ function PhaseCard({
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-[#1e2749]">{phase.name}</h3>
               {isActionPhase ? (
-                <span className="text-xs bg-[#D4AF37] text-white px-2 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-[#1e2749] text-white px-2 py-0.5 rounded-full font-medium">
                   Action Needed
                 </span>
               ) : phase.isCurrentPhase ? (

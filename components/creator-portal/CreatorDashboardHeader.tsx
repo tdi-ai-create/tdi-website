@@ -35,7 +35,7 @@ export function CreatorDashboardHeader({
     <div className="bg-gradient-to-r from-[#1e2749] to-[#2a3459] rounded-2xl p-6 md:p-8 text-white">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
         <div className="flex-grow">
-          <div className="flex items-center gap-2 text-[#D4AF37] mb-2">
+          <div className="flex items-center gap-2 text-white/80 mb-2">
             <Sparkles className="w-5 h-5" />
             <span className="text-sm font-medium">Creator Portal</span>
           </div>
@@ -89,7 +89,7 @@ export function CreatorDashboardHeader({
                 cx={circleSize / 2}
                 cy={circleSize / 2}
                 r={radius}
-                stroke="#D4AF37"
+                stroke="white"
                 strokeWidth={strokeWidth}
                 fill="none"
                 strokeLinecap="round"
