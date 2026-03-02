@@ -830,15 +830,15 @@ Thank you for setting the example. It matters more than you know.`;
                 <div className="text-xs text-gray-400 mt-1">Goal: 100% — Observation Day 1 is March 3</div>
               </div>
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
+              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-emerald-500">
                 <div className="flex items-center gap-2 mb-1">
-                  <BookOpen className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-xs text-gray-500 uppercase">Course Engagement</span>
-                  <Tooltip text="Paras who have started at least one course in the Learning Hub." position="bottom" iconSize={12} />
+                  <Trophy className="w-4 h-4 text-emerald-500" />
+                  <span className="text-xs text-gray-500 uppercase">Course Completions</span>
+                  <Tooltip text="Total courses completed by paras — each one represents strategies ready to use in classrooms." position="bottom" iconSize={12} />
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">24%</div>
-                <div className="text-xs text-[#38618C] font-medium">~27/114 started a course</div>
-                <div className="text-xs text-gray-400 mt-1">91 total course completions</div>
+                <div className="text-2xl font-bold text-emerald-600">91</div>
+                <div className="text-xs text-emerald-600 font-medium">courses completed</div>
+                <div className="text-xs text-gray-400 mt-1">27+ paras exploring courses</div>
               </div>
 
               <div
