@@ -325,8 +325,8 @@ export default function AllenwoodDashboard() {
                   <CheckCircle className="w-4 h-4 text-green-500" />
                   <span className="text-xs text-gray-500 uppercase">Hub Logins</span>
                 </div>
-                <div className="text-2xl font-bold text-green-600">82%</div>
-                <div className="text-xs text-green-600 font-medium">9/11 Logged In</div>
+                <div className="text-2xl font-bold text-green-600">100%</div>
+                <div className="text-xs text-green-600 font-medium">11/11 Logged In</div>
               </div>
 
               <button
