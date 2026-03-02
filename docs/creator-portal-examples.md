@@ -6,6 +6,7 @@ This document contains examples and templates to help creators understand expect
 
 ## Table of Contents
 
+0. [Content Path Examples (Live)](#0-content-path-examples-live)
 1. [Course Outline Examples](#1-course-outline-examples)
 2. [Learning Objectives Examples](#2-learning-objectives-examples)
 3. [Download Definition Examples](#3-download-definition-examples)
@@ -17,6 +18,68 @@ This document contains examples and templates to help creators understand expect
 9. [Blog Draft Example](#9-blog-draft-example)
 10. [Branding Package Overview](#10-branding-package-overview)
 11. [Before & After: Outline Improvement](#11-before--after-outline-improvement)
+
+---
+
+## 0. Content Path Examples (Live)
+
+When choosing your content path, it helps to see real examples of what each option looks like when finished. Here are live examples from TDI creators:
+
+### Blog Post Example
+
+**"The Loneliness Nobody Warned You About"** by Rae Hughart
+
+See how a TDI blog post connects with educators through storytelling and practical insights:
+
+[View Blog Post Example](https://raehughart.substack.com/p/the-loneliness-nobody-warned-you)
+
+**What to notice:**
+- Personal, relatable hook that draws readers in
+- Authentic voice and storytelling
+- Practical takeaways educators can use
+- Connection to broader TDI themes
+
+---
+
+### Digital Download Example
+
+See what a finished TDI digital download looks like - the design, format, and level of polish:
+
+[View Download Example](https://tdi.thinkific.com/products/digital_downloads/new-digital-download-67)
+
+**What to notice:**
+- Professional design and branding
+- Clear, actionable content
+- Easy to implement for educators
+- Value that stands alone
+
+---
+
+### Online Course Example
+
+Explore a complete TDI course to see the full learning experience - modules, lessons, downloads, and production quality:
+
+[View Course Example](https://tdi.thinkific.com/products/courses/new-course-21)
+
+**To access the full course for free:** Use code **"Free Month"** at checkout
+
+**What to notice:**
+- Module and lesson structure
+- Video production quality and style
+- How downloads complement the content
+- The learner experience from start to finish
+
+---
+
+### Choosing Your Path
+
+| Path | What You Create | Includes | Revenue |
+|------|-----------------|----------|---------|
+| **Blog** | One published blog post | Blog only | Exposure |
+| **Download** | Downloadable resource | Download + Blog | Exposure |
+| **Course** | Full online course | Course + Download + Blog | Revenue share |
+
+Each path builds on the previous - downloads include blog promotion, and courses include both downloads and blog content.
 
 ---
 
@@ -1549,6 +1612,7 @@ TOTAL RUNTIME: ~90 minutes
 
 | When You Reach This Milestone... | Reference This Section |
 |----------------------------------|----------------------|
+| Choose Your Content Path | [Content Path Examples](#0-content-path-examples-live) |
 | Draft Course Outline | [Course Outline Examples](#1-course-outline-examples) |
 | Write Learning Objectives | [Learning Objectives Examples](#2-learning-objectives-examples) |
 | Define Your Download | [Download Definition Examples](#3-download-definition-examples) |

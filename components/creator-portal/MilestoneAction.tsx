@@ -415,6 +415,75 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
     }
   };
 
+  // Milestone-specific examples and help
+  const milestoneExamples: Record<string, { tip?: string; exampleUrl?: string; exampleLabel?: string }> = {
+    outline_drafted: {
+      tip: 'Your outline should include module titles, lesson names, time estimates, and learning objectives for each module.',
+      exampleUrl: '/docs/creator-portal-examples#1-course-outline-examples',
+      exampleLabel: 'See outline examples'
+    },
+    outline_finalized: {
+      tip: 'Make sure you\'ve incorporated feedback from your outline review meeting.',
+      exampleUrl: '/docs/creator-portal-examples#11-before--after-outline-improvement',
+      exampleLabel: 'See before/after example'
+    },
+    test_video_recorded: {
+      tip: 'Record a 1-2 minute test video showing your setup. We\'ll check lighting, audio, and framing.',
+      exampleUrl: '/docs/creator-portal-examples#5-test-video-guidelines',
+      exampleLabel: 'See quality checklist'
+    },
+    test_video_submitted: {
+      tip: 'Upload to Google Drive or Loom and share the link. We\'ll review within 2-3 business days.',
+      exampleUrl: '/docs/creator-portal-examples#5-test-video-guidelines',
+      exampleLabel: 'See quality checklist'
+    },
+    download_defined: {
+      tip: 'Describe your resource: what is it, who is it for, and what will educators walk away with?',
+      exampleUrl: '/docs/creator-portal-examples#3-download-definition-examples',
+      exampleLabel: 'See download definition examples'
+    },
+    download_drafted: {
+      tip: 'Create your download content in a Google Doc. We\'ll handle the design!',
+      exampleUrl: '/docs/creator-portal-examples#4-download-draft-examples',
+      exampleLabel: 'See draft format examples'
+    },
+    blog_pitch: {
+      tip: 'Pitch a topic that showcases your expertise. Include the hook, key points, and how it connects to your content.',
+      exampleUrl: '/docs/creator-portal-examples#8-blog-pitch-examples',
+      exampleLabel: 'See blog pitch examples'
+    },
+    blog_drafted: {
+      tip: 'Aim for 800-1200 words with clear headings and practical takeaways.',
+      exampleUrl: '/docs/creator-portal-examples#9-blog-draft-example',
+      exampleLabel: 'See blog draft example'
+    },
+    drive_folder_created: {
+      tip: 'Create a Google Drive folder and share it with rachel@teachersdeserveit.com',
+      exampleUrl: '/docs/creator-portal-examples#7-asset-folder-structure',
+      exampleLabel: 'See folder structure'
+    },
+    assets_submitted: {
+      tip: 'Upload all videos, downloads, and assets to your shared Drive folder.',
+      exampleUrl: '/docs/creator-portal-examples#7-asset-folder-structure',
+      exampleLabel: 'See asset checklist'
+    },
+    recording_started: {
+      tip: 'Before you start, review our recording tips to ensure high-quality videos.',
+      exampleUrl: '/docs/creator-portal-examples#6-recording-tips-guide',
+      exampleLabel: 'See recording tips'
+    },
+    course_guide_reviewed: {
+      tip: 'Choose whether you want TDI to edit your videos and design your downloads.',
+    },
+    branding_confirmed: {
+      tip: 'Review your course thumbnail, marketing graphics, and description copy.',
+      exampleUrl: '/docs/creator-portal-examples#10-branding-package-overview',
+      exampleLabel: 'See what to look for'
+    }
+  };
+
+  const currentExample = milestoneExamples[milestone.id];
+
   // Get icon for content path
   const getPathIcon = (pathValue: string) => {
     switch (pathValue) {
@@ -573,6 +642,26 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   {config.label || 'Submit Your Work'}
                 </h3>
 
+                {/* Contextual help for this milestone */}
+                {currentExample && (currentExample.tip || currentExample.exampleUrl) && (
+                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-4">
+                    {currentExample.tip && (
+                      <p className="text-sm text-blue-800 mb-2">{currentExample.tip}</p>
+                    )}
+                    {currentExample.exampleUrl && (
+                      <a
+                        href={currentExample.exampleUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-sm text-[#80a4ed] hover:text-[#1e2749] font-medium"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        {currentExample.exampleLabel || 'View examples'}
+                      </a>
+                    )}
+                  </div>
+                )}
+
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -644,7 +733,26 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
     case 'confirm':
       return (
         <AdminPreviewWrapper actionLabel={config.label || 'Mark Complete'}>
-          <div className="flex flex-col items-start gap-2">
+          <div className="flex flex-col items-start gap-3">
+            {/* Contextual help for this milestone */}
+            {currentExample && (currentExample.tip || currentExample.exampleUrl) && (
+              <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 max-w-sm">
+                {currentExample.tip && (
+                  <p className="text-sm text-blue-800 mb-2">{currentExample.tip}</p>
+                )}
+                {currentExample.exampleUrl && (
+                  <a
+                    href={currentExample.exampleUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-sm text-[#80a4ed] hover:text-[#1e2749] font-medium"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    {currentExample.exampleLabel || 'View examples'}
+                  </a>
+                )}
+              </div>
+            )}
             <button
               onClick={() => !isAdminPreview && handleConfirm()}
               disabled={isSubmitting || isAdminPreview}
@@ -1060,29 +1168,66 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                     </p>
                   </div>
 
-                  {/* Path Descriptions */}
+                  {/* Path Descriptions with Example Links */}
                   <div className="grid gap-3">
                     <div className="bg-white rounded-lg p-3 border border-gray-100">
-                      <p className="font-medium text-[#1e2749] text-sm mb-1">Blog Post</p>
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="font-medium text-[#1e2749] text-sm">Blog Post</p>
+                        <a
+                          href="https://raehughart.substack.com/p/the-loneliness-nobody-warned-you"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] text-[#80a4ed] hover:text-[#1e2749] flex items-center gap-1"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          View Example
+                        </a>
+                      </div>
                       <p className="text-xs text-gray-600 leading-relaxed">
                         Write and publish a blog post on the TDI platform. Great for getting your voice out there and building your presence in the education community.
                       </p>
                     </div>
 
                     <div className="bg-white rounded-lg p-3 border border-gray-100">
-                      <p className="font-medium text-[#1e2749] text-sm mb-1">Digital Download</p>
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="font-medium text-[#1e2749] text-sm">Digital Download</p>
+                        <a
+                          href="https://tdi.thinkific.com/products/digital_downloads/new-digital-download-67"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] text-[#80a4ed] hover:text-[#1e2749] flex items-center gap-1"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          View Example
+                        </a>
+                      </div>
                       <p className="text-xs text-gray-600 leading-relaxed">
                         Create a downloadable resource for educators. <span className="font-medium text-[#38618C]">This path includes a blog post</span> to support your launch.
                       </p>
                     </div>
 
                     <div className="bg-white rounded-lg p-3 border border-green-100 ring-1 ring-green-200">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="font-medium text-[#1e2749] text-sm">Online Course</span>
-                        <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium">REVENUE</span>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium text-[#1e2749] text-sm">Online Course</span>
+                          <span className="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded-full font-medium">REVENUE</span>
+                        </div>
+                        <a
+                          href="https://tdi.thinkific.com/products/courses/new-course-21"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] text-[#80a4ed] hover:text-[#1e2749] flex items-center gap-1"
+                          title="Use code 'Free Month' for free access"
+                        >
+                          <ExternalLink className="w-3 h-3" />
+                          View Example
+                        </a>
                       </div>
                       <p className="text-xs text-gray-600 leading-relaxed">
                         Build a full online course with video modules. <span className="font-medium text-[#38618C]">This path includes a digital download and blog post</span> to support your launch. You&apos;ll earn ongoing revenue with every enrollment.
+                      </p>
+                      <p className="text-[10px] text-green-700 mt-1">
+                        Tip: Use code <span className="font-mono font-medium">&quot;Free Month&quot;</span> to preview the example course for free.
                       </p>
                     </div>
                   </div>
@@ -1186,6 +1331,26 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                 <h3 className="text-lg font-semibold text-[#1e2749] mb-4">
                   {config.label || 'Submit Information'}
                 </h3>
+
+                {/* Contextual help for this milestone */}
+                {currentExample && (currentExample.tip || currentExample.exampleUrl) && (
+                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-3 mb-4">
+                    {currentExample.tip && (
+                      <p className="text-sm text-blue-800 mb-2">{currentExample.tip}</p>
+                    )}
+                    {currentExample.exampleUrl && (
+                      <a
+                        href={currentExample.exampleUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 text-sm text-[#80a4ed] hover:text-[#1e2749] font-medium"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        {currentExample.exampleLabel || 'View examples'}
+                      </a>
+                    )}
+                  </div>
+                )}
 
                 <div className="space-y-4">
                   {(config.fields || []).map((field: { name: string; label: string; type: string; placeholder?: string; options?: string[]; required: boolean }) => (

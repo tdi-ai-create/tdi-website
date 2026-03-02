@@ -28,11 +28,17 @@ export async function POST(request: NextRequest) {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    // Update milestone back to 'available'
+    // Update milestone back to 'available' and CLEAR all completion data
+    // This prevents the "Completed on X" display when milestone is reopened
     const { error: updateError } = await supabase
       .from('creator_milestones')
       .update({
         status: 'available',
+        completed_at: null,
+        completed_by: null,
+        submission_data: null,
+        metadata: null,
+        notes: null,
         updated_at: new Date().toISOString(),
       })
       .eq('creator_id', creatorId)
