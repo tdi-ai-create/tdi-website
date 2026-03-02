@@ -45,6 +45,9 @@ import { copyToClipboard } from '@/lib/tdi-admin/clipboard';
 // Creators theme colors
 const theme = PORTAL_THEMES.creators;
 import { PhaseProgress } from '@/components/creator-portal/PhaseProgress';
+import { CreatorDashboardHeader } from '@/components/creator-portal/CreatorDashboardHeader';
+import { CourseDetailsPanel } from '@/components/creator-portal/CourseDetailsPanel';
+import { NotesPanel } from '@/components/creator-portal/NotesPanel';
 import {
   getCreatorDashboardData,
   updateCreator,
@@ -726,6 +729,18 @@ export default function TDIAdminCreatorDetailPage() {
         </div>
       </div>
 
+      {/* Creator Dashboard Header - shown in creator view mode */}
+      {viewMode === 'creator' && (
+        <div className="mb-8">
+          <CreatorDashboardHeader
+            creator={creator}
+            completedMilestones={completedMilestones}
+            totalMilestones={totalMilestones}
+            progressPercentage={progressPercentage}
+          />
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main content - Milestones */}
         <div className="lg:col-span-2 space-y-4">
@@ -936,6 +951,65 @@ export default function TDIAdminCreatorDetailPage() {
 
         {/* Sidebar */}
         <div className="space-y-6">
+          {viewMode === 'creator' ? (
+            <>
+              {/* Creator View Sidebar - mirrors what creators see */}
+              <CourseDetailsPanel creator={creator} />
+              <NotesPanel notes={allNotes.filter(n => n.visible_to_creator)} />
+
+              {/* Admin Actions Panel - always accessible */}
+              <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl border border-gray-200 p-5">
+                <h3
+                  className="font-semibold mb-4 flex items-center gap-2"
+                  style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
+                >
+                  <Users className="w-4 h-4" style={{ color: theme.primary }} />
+                  Admin Actions
+                </h3>
+                <div className="space-y-3">
+                  {/* Quick Edit Button */}
+                  {canEdit && (
+                    <button
+                      onClick={() => {
+                        setViewMode('admin');
+                        setIsEditingDetails(true);
+                      }}
+                      className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+                      style={{ color: '#2B3A67' }}
+                    >
+                      <PenLine className="w-4 h-4" />
+                      Edit Course Details
+                    </button>
+                  )}
+
+                  {/* Publish Actions */}
+                  {canEdit && creator.publish_status !== 'published' && (
+                    <button
+                      onClick={() => setShowPublishModal(true)}
+                      className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg transition-colors"
+                      style={{ backgroundColor: theme.primary, color: '#2B3A67' }}
+                    >
+                      <Rocket className="w-4 h-4" />
+                      {creator.publish_status === 'scheduled' ? 'Change Schedule' : 'Publish'}
+                    </button>
+                  )}
+
+                  {/* Add Note */}
+                  {canEdit && (
+                    <button
+                      onClick={() => setViewMode('admin')}
+                      className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium rounded-lg border border-gray-300 bg-white hover:bg-gray-50 transition-colors"
+                      style={{ color: '#2B3A67' }}
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add Note
+                    </button>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
           {/* Course Details Card */}
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center justify-between mb-4">
@@ -1486,6 +1560,8 @@ export default function TDIAdminCreatorDetailPage() {
               </div>
             )}
           </div>
+            </>
+          )}
         </div>
       </div>
 
