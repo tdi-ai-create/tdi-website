@@ -36,6 +36,11 @@ import {
   Sparkles,
   History,
   ExternalLink,
+  Settings,
+  Mail,
+  User,
+  Folder,
+  Activity,
 } from 'lucide-react';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission, hasPermission } from '@/lib/tdi-admin/permissions';
@@ -175,6 +180,13 @@ export default function TDIAdminCreatorDetailPage() {
   const [showStartNewProjectModal, setShowStartNewProjectModal] = useState(false);
   const [isStartingNewProject, setIsStartingNewProject] = useState(false);
 
+  // Creator Settings state
+  const [isSettingsExpanded, setIsSettingsExpanded] = useState(false);
+  const [editingField, setEditingField] = useState<string | null>(null);
+  const [editFieldValue, setEditFieldValue] = useState('');
+  const [isSavingField, setIsSavingField] = useState(false);
+  const [fieldError, setFieldError] = useState<string | null>(null);
+
   // Previous projects state
   const [previousProjects, setPreviousProjects] = useState<Array<{
     id: string;
@@ -306,6 +318,54 @@ export default function TDIAdminCreatorDetailPage() {
     } finally {
       setIsSavingWebsite(false);
     }
+  };
+
+  const handleSaveCreatorField = async (field: string, value: string) => {
+    if (!canEdit) return;
+    setIsSavingField(true);
+    setFieldError(null);
+    try {
+      const response = await fetch('/api/admin/update-creator', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          creatorId,
+          field,
+          value: value || null,
+          adminEmail,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        setFieldError(result.error || 'Failed to update');
+        return;
+      }
+
+      await loadData();
+      setEditingField(null);
+      setEditFieldValue('');
+      setSuccessMessage(`${field.charAt(0).toUpperCase() + field.slice(1).replace('_', ' ')} updated!`);
+      setTimeout(() => setSuccessMessage(null), 3000);
+    } catch (error) {
+      console.error('Error saving field:', error);
+      setFieldError('Failed to save changes');
+    } finally {
+      setIsSavingField(false);
+    }
+  };
+
+  const startEditingField = (field: string, currentValue: string | null | undefined) => {
+    setEditingField(field);
+    setEditFieldValue(currentValue || '');
+    setFieldError(null);
+  };
+
+  const cancelEditingField = () => {
+    setEditingField(null);
+    setEditFieldValue('');
+    setFieldError(null);
   };
 
   const handlePublishStatusUpdate = async (action: string) => {
@@ -1113,6 +1173,239 @@ export default function TDIAdminCreatorDetailPage() {
                     {creator.target_launch_month || 'Not set'}
                   </p>
                 </div>
+              </div>
+            )}
+          </div>
+
+          {/* Creator Settings Card */}
+          <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <button
+              onClick={() => setIsSettingsExpanded(!isSettingsExpanded)}
+              className="w-full flex items-center justify-between p-5 hover:bg-gray-50 transition-colors"
+            >
+              <h3
+                className="font-semibold flex items-center gap-2"
+                style={{ fontFamily: "'DM Sans', sans-serif", color: '#2B3A67' }}
+              >
+                <Settings className="w-4 h-4" style={{ color: theme.primary }} />
+                Creator Settings
+              </h3>
+              {isSettingsExpanded ? (
+                <ChevronUp className="w-4 h-4 text-gray-400" />
+              ) : (
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              )}
+            </button>
+
+            {isSettingsExpanded && (
+              <div className="px-5 pb-5 space-y-4 border-t border-gray-100 pt-4">
+                {/* Email Field */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1">
+                      <Mail className="w-3 h-3" />
+                      Email
+                    </label>
+                    {editingField !== 'email' && canEdit && (
+                      <button
+                        onClick={() => startEditingField('email', creator.email)}
+                        className="text-xs text-[#1e2749] hover:underline"
+                      >
+                        Edit
+                      </button>
+                    )}
+                  </div>
+                  {editingField === 'email' ? (
+                    <div className="space-y-2">
+                      <input
+                        type="email"
+                        value={editFieldValue}
+                        onChange={(e) => setEditFieldValue(e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e2749] focus:border-transparent"
+                        placeholder="email@example.com"
+                      />
+                      {fieldError && <p className="text-xs text-red-600">{fieldError}</p>}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleSaveCreatorField('email', editFieldValue)}
+                          disabled={isSavingField}
+                          className="flex-1 px-3 py-1.5 text-xs font-medium rounded-lg text-white bg-[#1e2749] hover:bg-[#2a3558] disabled:opacity-50"
+                        >
+                          {isSavingField ? 'Saving...' : 'Save'}
+                        </button>
+                        <button
+                          onClick={cancelEditingField}
+                          className="px-3 py-1.5 text-xs text-gray-600 hover:text-gray-800"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm font-medium" style={{ color: '#2B3A67' }}>
+                      {creator.email}
+                    </p>
+                  )}
+                </div>
+
+                {/* Name Field */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1">
+                      <User className="w-3 h-3" />
+                      Name
+                    </label>
+                    {editingField !== 'name' && canEdit && (
+                      <button
+                        onClick={() => startEditingField('name', creator.name)}
+                        className="text-xs text-[#1e2749] hover:underline"
+                      >
+                        Edit
+                      </button>
+                    )}
+                  </div>
+                  {editingField === 'name' ? (
+                    <div className="space-y-2">
+                      <input
+                        type="text"
+                        value={editFieldValue}
+                        onChange={(e) => setEditFieldValue(e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e2749] focus:border-transparent"
+                        placeholder="Creator name"
+                      />
+                      {fieldError && <p className="text-xs text-red-600">{fieldError}</p>}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleSaveCreatorField('name', editFieldValue)}
+                          disabled={isSavingField}
+                          className="flex-1 px-3 py-1.5 text-xs font-medium rounded-lg text-white bg-[#1e2749] hover:bg-[#2a3558] disabled:opacity-50"
+                        >
+                          {isSavingField ? 'Saving...' : 'Save'}
+                        </button>
+                        <button
+                          onClick={cancelEditingField}
+                          className="px-3 py-1.5 text-xs text-gray-600 hover:text-gray-800"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm font-medium" style={{ color: '#2B3A67' }}>
+                      {creator.name}
+                    </p>
+                  )}
+                </div>
+
+                {/* Content Path Field */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1">
+                      <Folder className="w-3 h-3" />
+                      Content Path
+                    </label>
+                    {editingField !== 'content_path' && canEdit && (
+                      <button
+                        onClick={() => startEditingField('content_path', creator.content_path || '')}
+                        className="text-xs text-[#1e2749] hover:underline"
+                      >
+                        Edit
+                      </button>
+                    )}
+                  </div>
+                  {editingField === 'content_path' ? (
+                    <div className="space-y-2">
+                      <select
+                        value={editFieldValue}
+                        onChange={(e) => setEditFieldValue(e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e2749] focus:border-transparent"
+                      >
+                        <option value="">Not set</option>
+                        <option value="blog">Blog Post</option>
+                        <option value="download">Digital Download</option>
+                        <option value="course">Learning Hub Course</option>
+                      </select>
+                      {fieldError && <p className="text-xs text-red-600">{fieldError}</p>}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleSaveCreatorField('content_path', editFieldValue)}
+                          disabled={isSavingField}
+                          className="flex-1 px-3 py-1.5 text-xs font-medium rounded-lg text-white bg-[#1e2749] hover:bg-[#2a3558] disabled:opacity-50"
+                        >
+                          {isSavingField ? 'Saving...' : 'Save'}
+                        </button>
+                        <button
+                          onClick={cancelEditingField}
+                          className="px-3 py-1.5 text-xs text-gray-600 hover:text-gray-800"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm font-medium" style={{ color: '#2B3A67' }}>
+                      {creator.content_path === 'blog' ? 'Blog Post' :
+                       creator.content_path === 'download' ? 'Digital Download' :
+                       creator.content_path === 'course' ? 'Learning Hub Course' : 'Not set'}
+                    </p>
+                  )}
+                </div>
+
+                {/* Status Field */}
+                <div className="space-y-1">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-medium text-gray-500 uppercase tracking-wide flex items-center gap-1">
+                      <Activity className="w-3 h-3" />
+                      Status
+                    </label>
+                    {editingField !== 'status' && canEdit && (
+                      <button
+                        onClick={() => startEditingField('status', creator.status)}
+                        className="text-xs text-[#1e2749] hover:underline"
+                      >
+                        Edit
+                      </button>
+                    )}
+                  </div>
+                  {editingField === 'status' ? (
+                    <div className="space-y-2">
+                      <select
+                        value={editFieldValue}
+                        onChange={(e) => setEditFieldValue(e.target.value)}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1e2749] focus:border-transparent"
+                      >
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                        <option value="paused">Paused</option>
+                        <option value="completed">Completed</option>
+                      </select>
+                      {fieldError && <p className="text-xs text-red-600">{fieldError}</p>}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleSaveCreatorField('status', editFieldValue)}
+                          disabled={isSavingField}
+                          className="flex-1 px-3 py-1.5 text-xs font-medium rounded-lg text-white bg-[#1e2749] hover:bg-[#2a3558] disabled:opacity-50"
+                        >
+                          {isSavingField ? 'Saving...' : 'Save'}
+                        </button>
+                        <button
+                          onClick={cancelEditingField}
+                          className="px-3 py-1.5 text-xs text-gray-600 hover:text-gray-800"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm font-medium capitalize" style={{ color: '#2B3A67' }}>
+                      {creator.status}
+                    </p>
+                  )}
+                </div>
+
+                <p className="text-xs text-gray-400 pt-2 border-t border-gray-100">
+                  Changes are logged automatically for audit purposes.
+                </p>
               </div>
             )}
           </div>
