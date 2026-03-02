@@ -153,11 +153,19 @@ async function checkMilestoneConsistency() {
   } else if (issuesFound > 0) {
     console.log('\nRun with --fix to automatically fix data consistency issues.');
   }
+
+  return issuesFound;
 }
 
 async function main() {
   try {
-    await checkMilestoneConsistency();
+    const issuesFound = await checkMilestoneConsistency();
+
+    // Exit with error code if issues found and not in fix mode
+    // This allows CI/scheduled jobs to alert on issues
+    if (issuesFound > 0 && !shouldFix) {
+      process.exit(1);
+    }
   } catch (error) {
     console.error('Error:', error);
     process.exit(1);
