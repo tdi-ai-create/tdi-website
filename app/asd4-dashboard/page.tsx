@@ -1382,18 +1382,35 @@ Thank you for setting the example. It matters more than you know.`;
                 <h2 className="text-xl font-bold text-[#1e2749]">Progress Snapshot</h2>
               </div>
 
-              {/* Hero Win Stat */}
-              <div className="bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl p-8 text-white text-center mb-6">
-                <div className="text-5xl font-bold mb-2 flex items-center justify-center gap-3">
-                  <Trophy className="w-10 h-10" />
-                  63
+              {/* Dual Hero Stats */}
+              <div className="grid md:grid-cols-2 gap-4 mb-6">
+                {/* Implementation Rate - THE BIG WIN */}
+                <div className="bg-gradient-to-br from-[#ffba06] to-amber-500 rounded-2xl p-6 text-white text-center">
+                  <div className="text-5xl font-bold mb-2">91%</div>
+                  <div className="text-lg font-medium mb-1">Implementation Rate</div>
+                  <div className="text-amber-100 text-sm">
+                    Paras are using what they learned
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-white/20">
+                    <div className="text-xs text-amber-100">Industry average: 10%</div>
+                    <div className="text-sm font-semibold text-white mt-1">Your paras are 9x more likely to apply learning</div>
+                  </div>
                 </div>
-                <div className="text-xl font-medium mb-1">Courses Completed</div>
-                <div className="text-emerald-100 text-sm">
-                  by your paraprofessionals — and counting!
-                </div>
-                <div className="text-emerald-100 text-sm mt-2">
-                  That&apos;s 63 strategies ready to use in classrooms tomorrow.
+
+                {/* Courses Completed */}
+                <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white text-center">
+                  <div className="text-5xl font-bold mb-2 flex items-center justify-center gap-2">
+                    <Trophy className="w-8 h-8" />
+                    63
+                  </div>
+                  <div className="text-lg font-medium mb-1">Courses Completed</div>
+                  <div className="text-emerald-100 text-sm">
+                    63 strategies ready for classrooms
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-white/20">
+                    <div className="text-xs text-emerald-100">83% of paras logged in</div>
+                    <div className="text-sm font-semibold text-white mt-1">Strong foundation built</div>
+                  </div>
                 </div>
               </div>
 
@@ -1417,21 +1434,22 @@ Thank you for setting the example. It matters more than you know.`;
                   </div>
                 </div>
 
-                {/* Courses Started Card */}
+                {/* Self-Directed Learning Card */}
                 <div className="bg-white rounded-xl p-6 shadow-sm border">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-gray-500 text-sm">Course Enrollments</span>
+                    <span className="text-gray-500 text-sm">Self-Directed Learning</span>
                     <div className="relative group">
                       <Info className="w-4 h-4 text-gray-400 cursor-help" />
                       <div className="absolute z-10 w-48 p-2 text-xs text-white bg-gray-900 rounded-lg shadow-lg -top-2 left-6 hidden group-hover:block">
-                        Total course enrollments with engagement across the Learning Hub
+                        Paras exploring courses beyond required training
                       </div>
                     </div>
                   </div>
-                  <div className="text-3xl font-bold text-gray-900">~25</div>
-                  <div className="text-sm text-gray-500 mb-3">paras started 1+ course (22%)</div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-blue-500 h-2 rounded-full" style={{width: '22%'}}></div>
+                  <div className="text-3xl font-bold text-gray-900">25+</div>
+                  <div className="text-sm text-gray-500 mb-3">paras exploring additional courses</div>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Sparkles className="w-4 h-4 text-blue-500" />
+                    <span className="text-xs text-blue-600">Going above and beyond</span>
                   </div>
                 </div>
 
@@ -1455,23 +1473,6 @@ Thank you for setting the example. It matters more than you know.`;
                 </div>
               </div>
 
-              {/* TDI Benchmark Callout */}
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 mt-6">
-                <div className="flex items-start gap-3">
-                  <BarChart3 className="w-5 h-5 text-slate-600 mt-0.5" />
-                  <div>
-                    <div className="font-medium text-slate-700 mb-1">How ASD4 compares</div>
-                    <div className="text-sm text-slate-600">
-                      <span className="font-semibold text-teal-600">Your implementation rate: 65%</span>
-                      <span className="mx-2">·</span>
-                      <span>Industry average: 10%</span>
-                    </div>
-                    <div className="text-sm text-slate-500 mt-1">
-                      Your paras are <span className="font-medium text-slate-700">6x more likely</span> to use what they learn than the national average.
-                    </div>
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* ===== SECTION 3: TEAM PULSE ===== */}
@@ -1528,51 +1529,39 @@ Thank you for setting the example. It matters more than you know.`;
                   </div>
                 </div>
 
-                {/* Retention Risk */}
+                {/* Team Stability - Positive framing */}
                 <div className="bg-white rounded-xl p-6 shadow-sm border">
                   <div className="flex items-center gap-2 mb-4">
-                    <Shield className="w-5 h-5 text-blue-500" />
-                    <h3 className="font-semibold text-gray-900">Retention Outlook</h3>
+                    <Shield className="w-5 h-5 text-emerald-500" />
+                    <h3 className="font-semibold text-gray-900">Team Stability</h3>
                   </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg border border-emerald-200">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-emerald-500" />
-                        <span className="text-sm font-medium text-gray-700">Planning to return</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-xl font-bold text-emerald-600">{marchSurveyData.retention.planToReturn.count}</span>
-                        <span className="text-sm text-gray-500 ml-1">({marchSurveyData.retention.planToReturn.percentage}%)</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-amber-50 rounded-lg border border-amber-200">
-                      <div className="flex items-center gap-2">
-                        <HelpCircle className="w-4 h-4 text-amber-500" />
-                        <span className="text-sm font-medium text-gray-700">Not sure yet</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-xl font-bold text-amber-600">{marchSurveyData.retention.notSure.count}</span>
-                        <span className="text-sm text-gray-500 ml-1">({marchSurveyData.retention.notSure.percentage}%)</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-200">
-                      <div className="flex items-center gap-2">
-                        <AlertTriangle className="w-4 h-4 text-red-500" />
-                        <span className="text-sm font-medium text-gray-700">Not returning</span>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-xl font-bold text-red-600">{marchSurveyData.retention.notReturning.count}</span>
-                        <span className="text-sm text-gray-500 ml-1">({marchSurveyData.retention.notReturning.percentage}%)</span>
-                      </div>
+                  <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-200">
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-emerald-600 mb-1">71%</div>
+                      <div className="text-sm font-medium text-gray-700">confirmed returning next year</div>
+                      <div className="text-xs text-gray-500 mt-2">67 paras planning to stay</div>
                     </div>
                   </div>
+                  <details className="mt-4 text-sm">
+                    <summary className="text-gray-500 cursor-pointer hover:text-gray-700">View details for admin</summary>
+                    <div className="mt-3 space-y-2 text-xs">
+                      <div className="flex justify-between p-2 bg-gray-50 rounded">
+                        <span>Still deciding</span>
+                        <span className="text-gray-600">22 paras</span>
+                      </div>
+                      <div className="flex justify-between p-2 bg-gray-50 rounded">
+                        <span>Moving on</span>
+                        <span className="text-gray-600">6 paras</span>
+                      </div>
+                    </div>
+                  </details>
                 </div>
 
-                {/* Challenges */}
+                {/* What Paras Are Telling Us */}
                 <div className="bg-white rounded-xl p-6 shadow-sm border">
                   <div className="flex items-center gap-2 mb-4">
-                    <AlertCircle className="w-5 h-5 text-amber-500" />
-                    <h3 className="font-semibold text-gray-900">Top Challenges</h3>
+                    <MessageCircle className="w-5 h-5 text-blue-500" />
+                    <h3 className="font-semibold text-gray-900">What Paras Are Telling Us</h3>
                   </div>
                   <div className="space-y-3">
                     {marchSurveyData.challenges.map((challenge, idx) => (
@@ -1580,7 +1569,7 @@ Thank you for setting the example. It matters more than you know.`;
                         <span className="text-sm text-gray-600 w-48 flex-shrink-0">{challenge.category}</span>
                         <div className="flex-1 bg-gray-200 rounded-full h-3">
                           <div
-                            className={`h-3 rounded-full ${idx === 0 ? 'bg-amber-500' : idx === 1 ? 'bg-amber-400' : 'bg-amber-300'}`}
+                            className={`h-3 rounded-full ${idx === 4 ? 'bg-emerald-400' : 'bg-blue-400'}`}
                             style={{width: `${challenge.percentage}%`}}
                           ></div>
                         </div>
@@ -1588,35 +1577,20 @@ Thank you for setting the example. It matters more than you know.`;
                       </div>
                     ))}
                   </div>
+                  <p className="text-xs text-gray-500 mt-4">This helps us tailor support to what matters most</p>
                 </div>
 
-                {/* Hub Usage */}
+                {/* Hub Usage - Positive framing */}
                 <div className="bg-white rounded-xl p-6 shadow-sm border">
                   <div className="flex items-center gap-2 mb-4">
-                    <BookOpen className="w-5 h-5 text-blue-500" />
-                    <h3 className="font-semibold text-gray-900">Learning Hub Usage</h3>
+                    <BookOpen className="w-5 h-5 text-emerald-500" />
+                    <h3 className="font-semibold text-gray-900">Learning Hub Engagement</h3>
                   </div>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-emerald-50 rounded-lg">
-                      <span className="text-sm font-medium text-gray-700">Used recently</span>
-                      <div>
-                        <span className="text-lg font-bold text-emerald-600">{marchSurveyData.hubUsage.usedRecently.count}</span>
-                        <span className="text-sm text-gray-500 ml-1">({marchSurveyData.hubUsage.usedRecently.percentage}%)</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                      <span className="text-sm font-medium text-gray-700">Plan to use</span>
-                      <div>
-                        <span className="text-lg font-bold text-blue-600">{marchSurveyData.hubUsage.planToUse.count}</span>
-                        <span className="text-sm text-gray-500 ml-1">({marchSurveyData.hubUsage.planToUse.percentage}%)</span>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                      <span className="text-sm font-medium text-gray-700">Haven&apos;t used</span>
-                      <div>
-                        <span className="text-lg font-bold text-gray-600">{marchSurveyData.hubUsage.notUsed.count}</span>
-                        <span className="text-sm text-gray-500 ml-1">({marchSurveyData.hubUsage.notUsed.percentage}%)</span>
-                      </div>
+                  <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-200">
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-emerald-600 mb-1">77%</div>
+                      <div className="text-sm font-medium text-gray-700">of paras are engaging with the Hub</div>
+                      <div className="text-xs text-gray-500 mt-2">73 paras actively using or planning to use</div>
                     </div>
                   </div>
                 </div>
@@ -1645,12 +1619,11 @@ Thank you for setting the example. It matters more than you know.`;
                       <span className="text-sm font-semibold text-[#1e2749]">Move #1: Questions Instead of Telling</span>
                       <span className="text-3xl font-bold text-[#ffba06]">91%</span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-3">69 of 76 paras who attended Part 1</p>
+                    <p className="text-sm text-gray-600 mb-3">69 of 76 paras tried this strategy</p>
                     <div className="text-xs text-gray-500 space-y-1">
-                      <div className="flex justify-between"><span>Multiple times:</span><span className="font-medium">31</span></div>
-                      <div className="flex justify-between"><span>Once or twice:</span><span className="font-medium">38</span></div>
-                      <div className="flex justify-between"><span>Plan to:</span><span className="font-medium">5</span></div>
-                      <div className="flex justify-between"><span>Wasn&apos;t sure how:</span><span className="font-medium">2</span></div>
+                      <div className="flex justify-between"><span>Using regularly:</span><span className="font-medium text-emerald-600">31</span></div>
+                      <div className="flex justify-between"><span>Tried it out:</span><span className="font-medium">38</span></div>
+                      <div className="flex justify-between"><span>Ready to try:</span><span className="font-medium">7</span></div>
                     </div>
                   </div>
 
@@ -1660,41 +1633,34 @@ Thank you for setting the example. It matters more than you know.`;
                       <span className="text-sm font-semibold text-[#1e2749]">Move #2: Feedback Formula</span>
                       <span className="text-3xl font-bold text-teal-600">70%</span>
                     </div>
-                    <p className="text-sm text-gray-600 mb-3">53 of 76 paras who attended Part 1</p>
+                    <p className="text-sm text-gray-600 mb-3">53 of 76 paras tried this strategy</p>
                     <div className="text-xs text-gray-500 space-y-1">
-                      <div className="flex justify-between"><span>Multiple times:</span><span className="font-medium">20</span></div>
-                      <div className="flex justify-between"><span>Once or twice:</span><span className="font-medium">33</span></div>
-                      <div className="flex justify-between"><span>Plan to:</span><span className="font-medium">18</span></div>
-                      <div className="flex justify-between"><span>Wasn&apos;t sure how:</span><span className="font-medium">5</span></div>
+                      <div className="flex justify-between"><span>Using regularly:</span><span className="font-medium text-emerald-600">20</span></div>
+                      <div className="flex justify-between"><span>Tried it out:</span><span className="font-medium">33</span></div>
+                      <div className="flex justify-between"><span>Ready to try:</span><span className="font-medium">23</span></div>
                     </div>
                   </div>
                 </div>
 
-                {/* Post-Session Confidence */}
+                {/* Post-Session Confidence - Positive framing */}
                 <div className="grid md:grid-cols-2 gap-4 mb-6">
-                  <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-700">Confidence: Asking Questions</span>
-                      <div className="text-right">
-                        <span className="text-xl font-bold text-[#1e2749]">3.86</span>
-                        <span className="text-sm text-gray-400">/5</span>
-                      </div>
+                      <span className="text-sm text-gray-700">Feeling confident asking questions</span>
+                      <span className="text-xl font-bold text-emerald-600">70%</span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">70% rated 4 or 5</p>
+                    <p className="text-xs text-gray-500 mt-1">of paras feel ready to use this</p>
                   </div>
-                  <div className="bg-gray-50 rounded-lg p-4">
+                  <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-700">Confidence: Feedback Formula</span>
-                      <div className="text-right">
-                        <span className="text-xl font-bold text-[#1e2749]">3.74</span>
-                        <span className="text-sm text-gray-400">/5</span>
-                      </div>
+                      <span className="text-sm text-gray-700">Feeling confident giving feedback</span>
+                      <span className="text-xl font-bold text-emerald-600">62%</span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">62% rated 4 or 5</p>
+                    <p className="text-xs text-gray-500 mt-1">of paras feel ready to use this</p>
                   </div>
                 </div>
 
-                <p className="text-xs text-gray-500">Self-reported after 2 in-person sessions and 62 practice reps. Observation day data will provide the next comparison point.</p>
+                <p className="text-xs text-gray-500">After just 2 sessions and 62 practice reps. Confidence continues to build with each touchpoint.</p>
               </div>
 
               {/* Sessions - Collapsible */}
@@ -1845,84 +1811,81 @@ Thank you for setting the example. It matters more than you know.`;
                   </button>
                 )}
                 <div className="mt-4 pt-3 border-t border-gray-100 text-xs text-gray-400">
-                  29 of 35 courses have engagement · 91 total completions · Data as of March 1, 2026
+                  29 courses explored · 91 total completions · Data as of March 1, 2026
                 </div>
               </div>
 
-              {/* Needs Attention (Collapsible) */}
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-6">
-                <button
-                  onClick={() => setShowNotLoggedIn(!showNotLoggedIn)}
-                  className="w-full flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
-                      <Users className="w-5 h-5 text-amber-600" />
-                    </div>
-                    <div className="text-left">
-                      <div className="font-semibold text-gray-900">19 paras haven&apos;t logged in yet</div>
-                      <div className="text-sm text-amber-700">They may need a quick walkthrough to get started</div>
-                    </div>
-                  </div>
-                  <ChevronDown className={`w-5 h-5 text-amber-600 transform transition-transform ${showNotLoggedIn ? 'rotate-180' : ''}`} />
-                </button>
-
-                {showNotLoggedIn && (
-                  <div className="mt-4 pt-4 border-t border-amber-200">
-                    <div className="bg-white rounded-lg p-4 mb-4">
-                      <div className="flex items-start gap-2 text-sm text-slate-600">
-                        <Lightbulb className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                        <span>
-                          <strong>Tip:</strong> Districts that build in 15 minutes of protected Hub time during para meetings see <strong>3x higher engagement</strong>.
-                        </span>
+              {/* Ready to Welcome (Collapsible) */}
+              <details className="bg-slate-50 border border-slate-200 rounded-xl group">
+                <summary className="p-6 cursor-pointer list-none">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                        <UserCheck className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div className="text-left">
+                        <div className="font-semibold text-gray-900">Ready to Welcome: 19 paras</div>
+                        <div className="text-sm text-slate-600">Opportunity for personalized onboarding</div>
                       </div>
                     </div>
+                    <ChevronDown className="w-5 h-5 text-slate-400 transition-transform group-open:rotate-180" />
+                  </div>
+                </summary>
+                <div className="px-6 pb-6 border-t border-slate-200 mt-0 pt-4">
 
-                    {/* Nudge All Button */}
-                    <div className="flex justify-between items-center mb-3">
-                      <span className="text-sm text-gray-500">Click &quot;Nudge&quot; to send a friendly reminder email</span>
-                      <button
-                        onClick={() => sendNudgeAllEmail()}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors"
-                      >
-                        <Mail className="w-4 h-4" />
-                        Nudge All ({notLoggedInParas.length})
-                      </button>
-                    </div>
-
-                    <div className="bg-white rounded-lg overflow-hidden">
-                      <table className="w-full text-sm">
-                        <thead className="bg-gray-50">
-                          <tr>
-                            <th className="text-left py-2 px-3 font-medium text-gray-600">#</th>
-                            <th className="text-left py-2 px-3 font-medium text-gray-600">Name</th>
-                            <th className="text-left py-2 px-3 font-medium text-gray-600">Email</th>
-                            <th className="text-right py-2 px-3 font-medium text-gray-600">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {notLoggedInParas.map((para, index) => (
-                            <tr key={index} className="border-t border-gray-100 hover:bg-gray-50">
-                              <td className="py-2 px-3 text-gray-400">{index + 1}</td>
-                              <td className="py-2 px-3 text-gray-900">{para.name}</td>
-                              <td className="py-2 px-3 text-gray-500">{para.email}</td>
-                              <td className="py-2 px-3 text-right">
-                                <button
-                                  onClick={() => sendNudgeEmail(para)}
-                                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-amber-600 hover:text-white hover:bg-amber-500 border border-amber-300 hover:border-amber-500 rounded-lg text-xs font-medium transition-colors"
-                                >
-                                  <Send className="w-3 h-3" />
-                                  Nudge
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                  <div className="bg-white rounded-lg p-4 mb-4">
+                    <div className="flex items-start gap-2 text-sm text-slate-600">
+                      <Lightbulb className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
+                      <span>
+                        <strong>Tip:</strong> A quick walkthrough during para meetings can help these team members get started.
+                      </span>
                     </div>
                   </div>
-                )}
-              </div>
+
+                  {/* Invite All Button */}
+                  <div className="flex justify-between items-center mb-3">
+                    <span className="text-sm text-gray-500">Send a friendly welcome email</span>
+                    <button
+                      onClick={() => sendNudgeAllEmail()}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                      <Mail className="w-4 h-4" />
+                      Welcome All ({notLoggedInParas.length})
+                    </button>
+                  </div>
+
+                  <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
+                    <table className="w-full text-sm">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="text-left py-2 px-3 font-medium text-gray-600">#</th>
+                          <th className="text-left py-2 px-3 font-medium text-gray-600">Name</th>
+                          <th className="text-left py-2 px-3 font-medium text-gray-600">Email</th>
+                          <th className="text-right py-2 px-3 font-medium text-gray-600">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {notLoggedInParas.map((para, index) => (
+                          <tr key={index} className="border-t border-gray-100 hover:bg-gray-50">
+                            <td className="py-2 px-3 text-gray-400">{index + 1}</td>
+                            <td className="py-2 px-3 text-gray-900">{para.name}</td>
+                            <td className="py-2 px-3 text-gray-500">{para.email}</td>
+                            <td className="py-2 px-3 text-right">
+                              <button
+                                onClick={() => sendNudgeEmail(para)}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-blue-600 hover:text-white hover:bg-blue-500 border border-blue-300 hover:border-blue-500 rounded-lg text-xs font-medium transition-colors"
+                              >
+                                <Send className="w-3 h-3" />
+                                Invite
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </details>
 
               {/* Hub Barriers - Collapsible */}
               <details className="bg-white rounded-xl shadow-sm border group">
@@ -2017,110 +1980,90 @@ Thank you for setting the example. It matters more than you know.`;
         {/* ==================== SCHOOLS TAB ==================== */}
         {activeTab === 'schools' && (
           <div className="space-y-6">
-            {/* Summary Stats */}
-            <div className="bg-white rounded-xl p-4 border border-gray-200 mb-4">
-              <div className="text-lg font-bold text-gray-900">9 schools · 114 paras · 97 logged in (85%)</div>
-              <div className="text-sm text-gray-500 mt-1">Top performers: Ardmore (100%), Wesley (93%), Fullerton & Indian Trail (92%)</div>
-              <div className="text-sm text-amber-600 mt-1">Needs attention: Lake Park (67%), ELC (75%)</div>
+            {/* Summary Stats - Lead with wins */}
+            <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-200 mb-4">
+              <div className="text-lg font-bold text-gray-900">9 schools · 114 paras · 85% logged in</div>
+              <div className="text-sm text-emerald-600 mt-1 font-medium">Standout buildings: Ardmore (100%), Wesley (93%), Fullerton & Indian Trail (92%)</div>
             </div>
 
-            {/* Alert for schools needing attention */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-medium text-amber-800">Lake Park (67%) and ELC (75%) have the lowest login rates</p>
-                  <p className="text-sm text-amber-700 mt-1">
-                    ELC has the most paras (24) and the most remaining logins (6). Lake Park has the lowest login rate.
-                    Consider a targeted outreach or walkthrough at the next staff meetings.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Retention Risk by Building */}
+            {/* Team Retention Strength */}
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <div className="flex items-center gap-2 mb-4">
-                <Shield className="w-5 h-5 text-blue-500" />
-                <h3 className="text-lg font-bold text-gray-900">Retention Risk by Building</h3>
+                <Shield className="w-5 h-5 text-emerald-500" />
+                <h3 className="text-lg font-bold text-gray-900">Team Retention Strength</h3>
                 <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full ml-2">March 2026 Survey</span>
               </div>
 
-              {/* Summary stats */}
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="bg-emerald-50 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-emerald-600">67</div>
-                  <div className="text-sm text-gray-600">Planning to Return</div>
-                  <div className="text-xs text-gray-400">71%</div>
-                </div>
-                <div className="bg-amber-50 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-amber-600">22</div>
-                  <div className="text-sm text-gray-600">Not Sure Yet</div>
-                  <div className="text-xs text-gray-400">23%</div>
-                </div>
-                <div className="bg-red-50 rounded-lg p-4 text-center">
-                  <div className="text-2xl font-bold text-red-600">6</div>
-                  <div className="text-sm text-gray-600">Not Returning</div>
-                  <div className="text-xs text-gray-400">6%</div>
-                </div>
+              {/* Hero stat */}
+              <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-200 mb-6 text-center">
+                <div className="text-4xl font-bold text-emerald-600 mb-1">71%</div>
+                <div className="text-sm font-medium text-gray-700">of paras confirmed returning next year</div>
+                <div className="text-xs text-gray-500 mt-1">67 team members planning to stay</div>
               </div>
 
-              {/* School breakdown table */}
+              {/* School breakdown table - Simplified positive framing */}
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-gray-200">
                       <th className="text-left py-2 pr-4 font-medium text-gray-500">Building</th>
+                      <th className="text-center py-2 px-2 font-medium text-gray-500">Team Size</th>
                       <th className="text-center py-2 px-2 font-medium text-emerald-600">Returning</th>
-                      <th className="text-center py-2 px-2 font-medium text-amber-600">Not Sure</th>
-                      <th className="text-center py-2 px-2 font-medium text-red-600">Not Returning</th>
-                      <th className="text-center py-2 pl-2 font-medium text-gray-500">Risk Level</th>
+                      <th className="text-center py-2 pl-2 font-medium text-gray-500">Retention Rate</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {schoolRetentionData.map((school, idx) => (
-                      <tr key={idx} className="border-b border-gray-100">
-                        <td className="py-3 pr-4 font-medium text-gray-900">{school.school}</td>
-                        <td className="py-3 px-2 text-center">
-                          <span className="text-emerald-600 font-medium">{school.returning}</span>
-                          <span className="text-gray-400 text-xs ml-1">/{school.total}</span>
-                        </td>
-                        <td className="py-3 px-2 text-center">
-                          {school.notSure > 0 ? (
-                            <span className="text-amber-600">{school.notSure}</span>
-                          ) : (
-                            <span className="text-gray-300">—</span>
-                          )}
-                        </td>
-                        <td className="py-3 px-2 text-center">
-                          {school.notReturning > 0 ? (
-                            <span className="text-red-600 font-medium">{school.notReturning}</span>
-                          ) : (
-                            <span className="text-gray-300">—</span>
-                          )}
-                        </td>
-                        <td className="py-3 pl-2 text-center">
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            school.riskLevel === 'low' ? 'bg-emerald-100 text-emerald-700' :
-                            school.riskLevel === 'medium' ? 'bg-amber-100 text-amber-700' :
-                            'bg-red-100 text-red-700'
-                          }`}>
-                            {school.riskLevel === 'low' ? 'Low' : school.riskLevel === 'medium' ? 'Medium' : 'High'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                    {schoolRetentionData.map((school, idx) => {
+                      const retentionRate = Math.round((school.returning / school.total) * 100);
+                      return (
+                        <tr key={idx} className="border-b border-gray-100">
+                          <td className="py-3 pr-4 font-medium text-gray-900">{school.school}</td>
+                          <td className="py-3 px-2 text-center text-gray-500">{school.total}</td>
+                          <td className="py-3 px-2 text-center">
+                            <span className="text-emerald-600 font-medium">{school.returning}</span>
+                          </td>
+                          <td className="py-3 pl-2 text-center">
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                              retentionRate >= 80 ? 'bg-emerald-100 text-emerald-700' :
+                              retentionRate >= 60 ? 'bg-blue-100 text-blue-700' :
+                              'bg-gray-100 text-gray-600'
+                            }`}>
+                              {retentionRate}%
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
 
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <div className="flex items-start gap-2 text-sm text-slate-600 bg-amber-50 rounded-lg p-3">
-                  <Lightbulb className="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" />
-                  <span><strong>Action:</strong> ELC and Lake Park show highest retention risk. Consider 1:1 conversations with paras who are &quot;not sure&quot; to understand their concerns.</span>
+              <details className="mt-4 pt-4 border-t border-gray-100">
+                <summary className="text-sm text-gray-500 cursor-pointer hover:text-gray-700">View admin details</summary>
+                <div className="mt-3 text-sm text-slate-600 bg-slate-50 rounded-lg p-3">
+                  <p><strong>For leadership follow-up:</strong> 22 paras are still deciding, 6 have shared they&apos;re moving on. 1:1 conversations can help understand concerns.</p>
                 </div>
-              </div>
+              </details>
             </div>
+
+            {/* Next Focus Areas - Reframed from "Needs Attention" */}
+            <details className="bg-slate-50 border border-slate-200 rounded-xl group">
+              <summary className="p-4 cursor-pointer list-none">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Target className="w-5 h-5 text-blue-500" />
+                    <span className="font-medium text-gray-900">Next Focus Areas</span>
+                  </div>
+                  <ChevronDown className="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180" />
+                </div>
+              </summary>
+              <div className="px-4 pb-4">
+                <p className="text-sm text-gray-600 mb-2">
+                  <strong>Lake Park</strong> and <strong>ELC</strong> have the most opportunity for growth.
+                  A quick walkthrough at the next staff meeting could help onboard remaining team members.
+                </p>
+              </div>
+            </details>
 
             {/* Building Spotlight Intro */}
             <div className="bg-white rounded-xl p-4 border border-gray-200">
