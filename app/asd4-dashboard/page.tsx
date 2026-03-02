@@ -664,13 +664,51 @@ Thank you for setting the example. It matters more than you know.`;
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Eye },
-    { id: 'journey', label: 'Journey', icon: TrendingUp },
-    { id: 'progress', label: 'Progress', icon: Users },
+    { id: 'partnership', label: 'Our Partnership', icon: Heart },
     { id: 'schools', label: 'Schools', icon: School },
     { id: 'blueprint', label: 'Blueprint', icon: Star },
     { id: 'year2', label: '2026-27', icon: Sparkles, badge: 'Preview' },
     { id: 'team', label: 'Team', icon: User },
     { id: 'billing', label: 'Billing', icon: CreditCard, alert: true },
+  ];
+
+  // March 2, 2026 Check-In Survey Data (95 of 114 paras responded - 83%)
+  const marchSurveyData = {
+    responseRate: { responded: 95, total: 114, percentage: 83 },
+    confidence: {
+      asking: { average: 3.92, rated4or5: 75 },
+      feedback: { average: 3.71, rated4or5: 67 }
+    },
+    retention: {
+      planToReturn: { count: 67, percentage: 71 },
+      notSure: { count: 22, percentage: 23 },
+      notReturning: { count: 6, percentage: 6 }
+    },
+    challenges: [
+      { category: 'Workload / Time', count: 28, percentage: 29 },
+      { category: 'Student Behavior', count: 24, percentage: 25 },
+      { category: 'Communication with Teachers', count: 18, percentage: 19 },
+      { category: 'Feeling Valued', count: 15, percentage: 16 },
+      { category: 'None / Doing Great', count: 10, percentage: 11 }
+    ],
+    hubUsage: {
+      usedRecently: { count: 31, percentage: 33 },
+      planToUse: { count: 42, percentage: 44 },
+      notUsed: { count: 22, percentage: 23 }
+    }
+  };
+
+  // School-level retention risk data
+  const schoolRetentionData = [
+    { school: 'Ardmore', total: 8, returning: 7, notSure: 1, notReturning: 0, riskLevel: 'low' },
+    { school: 'ELC', total: 24, returning: 15, notSure: 6, notReturning: 3, riskLevel: 'high' },
+    { school: 'Fullerton', total: 12, returning: 9, notSure: 2, notReturning: 1, riskLevel: 'medium' },
+    { school: 'Indian Trail', total: 13, returning: 10, notSure: 3, notReturning: 0, riskLevel: 'low' },
+    { school: 'Lake Park', total: 9, returning: 5, notSure: 3, notReturning: 1, riskLevel: 'high' },
+    { school: 'Lincoln', total: 10, returning: 7, notSure: 2, notReturning: 1, riskLevel: 'medium' },
+    { school: 'Stone', total: 14, returning: 10, notSure: 3, notReturning: 1, riskLevel: 'medium' },
+    { school: 'Westfield', total: 10, returning: 8, notSure: 2, notReturning: 0, riskLevel: 'low' },
+    { school: 'Wesley', total: 14, returning: 11, notSure: 2, notReturning: 1, riskLevel: 'low' }
   ];
 
   return (
