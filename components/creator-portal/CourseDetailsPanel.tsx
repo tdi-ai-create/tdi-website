@@ -65,7 +65,7 @@ export function CourseDetailsPanel({ creator }: CourseDetailsPanelProps) {
                       detail.isEmpty
                         ? 'text-gray-400 italic'
                         : detail.isCode
-                        ? 'font-mono bg-[#C4A052]/20 px-2 py-1 rounded text-[#1e2749] inline-block'
+                        ? 'font-mono bg-[#D4AF37]/20 px-2 py-1 rounded text-[#1e2749] inline-block'
                         : 'text-[#1e2749] font-medium'
                     }`}
                   >

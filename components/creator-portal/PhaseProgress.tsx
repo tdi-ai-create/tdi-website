@@ -142,8 +142,8 @@ const statusConfig: Record<
   },
   available: {
     icon: Circle,
-    color: 'text-[#80a4ed]',
-    bg: 'bg-blue-50',
+    color: 'text-[#D4AF37]',
+    bg: 'bg-[#FFF9E6]',
     label: 'Ready for You',
     helper: 'This step is ready for you to complete',
   },
@@ -279,11 +279,11 @@ function MilestoneItem({
           : milestone.status === 'waiting_approval'
           ? 'bg-orange-50/50 border-orange-200'
           : isCurrentAction
-          ? 'bg-[#fef9eb] border-[#F5A623] border-2 shadow-md'
-          : 'bg-white border-gray-200 hover:border-[#80a4ed]'
+          ? 'bg-gradient-to-r from-[#FFFDF7] to-[#FFF9E6] border-[#D4AF37] border-2 shadow-[0_0_20px_rgba(212,175,55,0.35)]'
+          : 'bg-white border-gray-200 hover:border-[#80a4ed] hover:shadow-md'
       }`}
     >
-      <div className={`flex-shrink-0 w-8 h-8 rounded-full ${isCurrentAction ? 'bg-[#C4A052]' : config.bg} flex items-center justify-center`}>
+      <div className={`flex-shrink-0 w-8 h-8 rounded-full ${isCurrentAction ? 'bg-[#D4AF37]' : config.bg} flex items-center justify-center`}>
         <Icon className={`w-4 h-4 ${isCurrentAction ? 'text-[#1e2749]' : config.color}`} />
       </div>
 
@@ -299,7 +299,7 @@ function MilestoneItem({
                 {milestoneTitle}
               </h4>
               {isCurrentAction && (
-                <span className="text-xs bg-[#C4A052] text-white px-2 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-[#D4AF37] text-white px-2 py-0.5 rounded-full font-medium">
                   Your Next Step
                 </span>
               )}
@@ -323,7 +323,7 @@ function MilestoneItem({
           </div>
 
           <span
-            className={`flex-shrink-0 text-xs px-2 py-1 rounded-full ${config.bg} ${config.color}`}
+            className={`flex-shrink-0 text-xs px-2.5 py-1 rounded-full font-medium ${config.bg} ${config.color}`}
           >
             {config.label}
           </span>
@@ -544,7 +544,7 @@ function PhaseCard({
           <div
             className={`w-10 h-10 rounded-full flex items-center justify-center ${
               isActionPhase
-                ? 'bg-[#C4A052]'
+                ? 'bg-[#D4AF37]'
                 : phase.isComplete
                 ? 'bg-green-500'
                 : phase.isCurrentPhase
@@ -564,7 +564,7 @@ function PhaseCard({
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-[#1e2749]">{phase.name}</h3>
               {isActionPhase ? (
-                <span className="text-xs bg-[#C4A052] text-white px-2 py-0.5 rounded-full font-medium">
+                <span className="text-xs bg-[#D4AF37] text-white px-2 py-0.5 rounded-full font-medium">
                   Action Needed
                 </span>
               ) : phase.isCurrentPhase ? (

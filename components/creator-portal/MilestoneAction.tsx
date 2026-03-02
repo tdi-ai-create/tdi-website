@@ -556,7 +556,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                       value={scheduledDate}
                       onChange={(e) => setScheduledDate(e.target.value)}
                       min={new Date().toISOString().split('T')[0]}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A052] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
                     />
                   </div>
 
@@ -568,7 +568,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                       type="time"
                       value={scheduledTime}
                       onChange={(e) => setScheduledTime(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A052] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
                     />
                   </div>
 
@@ -581,7 +581,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                       onChange={(e) => setNotes(e.target.value)}
                       placeholder="Anything you want to discuss or questions you have?"
                       rows={2}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A052] focus:border-transparent resize-none"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent resize-none"
                     />
                   </div>
 
@@ -674,7 +674,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                       value={link}
                       onChange={(e) => setLink(e.target.value)}
                       placeholder={config.placeholder || 'Paste your link here'}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A052] focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
                     />
                   </div>
 
@@ -687,7 +687,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                       onChange={(e) => setNotes(e.target.value)}
                       placeholder="Any questions or things you'd like feedback on?"
                       rows={3}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A052] focus:border-transparent resize-none"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent resize-none"
                     />
                   </div>
 
@@ -1003,7 +1003,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                     onChange={(e) => setChangeRequest(e.target.value)}
                     placeholder="Describe the changes you'd like..."
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A052] focus:border-transparent resize-none mb-4"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent resize-none mb-4"
                   />
 
                   {error && (
@@ -1263,15 +1263,15 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   disabled={isSubmitting || isAdminPreview}
                   className={`relative flex items-start gap-4 p-5 rounded-xl border-2 transition-all text-left ${
                     selectedPath === option.value
-                      ? 'border-[#C4A052] bg-[#FDFBF7] ring-2 ring-[#C4A052] ring-offset-2'
+                      ? 'border-[#D4AF37] bg-gradient-to-r from-[#FFFDF7] to-[#FFF9E6] shadow-[0_0_25px_rgba(212,175,55,0.4)]'
                       : option.value === 'course'
-                        ? 'border-green-200 bg-green-50/30 hover:border-green-300 hover:shadow-md'
-                        : 'border-slate-200 bg-white hover:border-slate-400 hover:shadow-md'
+                        ? 'border-green-200 bg-green-50/30 hover:border-green-300 hover:shadow-lg'
+                        : 'border-slate-200 bg-white hover:border-[#D4AF37] hover:shadow-lg'
                   } ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
                   <div className={`flex-shrink-0 w-14 h-14 rounded-xl flex items-center justify-center ${
                     selectedPath === option.value
-                      ? 'bg-[#C4A052] text-white'
+                      ? 'bg-[#D4AF37] text-white'
                       : option.value === 'course'
                         ? 'bg-green-100 text-green-700'
                         : 'bg-slate-100 text-[#1e2749]'
@@ -1296,7 +1296,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   </div>
                   {selectedPath === option.value && isSubmitting && (
                     <div className="absolute top-4 right-4">
-                      <Loader2 className="w-5 h-5 animate-spin text-[#C4A052]" />
+                      <Loader2 className="w-5 h-5 animate-spin text-[#D4AF37]" />
                     </div>
                   )}
                 </button>
@@ -1365,13 +1365,13 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                           onChange={(e) => setFormData(prev => ({ ...prev, [field.name]: e.target.value }))}
                           placeholder={field.placeholder}
                           rows={3}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A052] focus:border-transparent resize-none"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent resize-none"
                         />
                       ) : field.type === 'select' ? (
                         <select
                           value={formData[field.name] || ''}
                           onChange={(e) => setFormData(prev => ({ ...prev, [field.name]: e.target.value }))}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A052] focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
                         >
                           <option value="">Select an option...</option>
                           {(field.options || []).map((opt: string) => (
@@ -1384,7 +1384,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                           value={formData[field.name] || ''}
                           onChange={(e) => setFormData(prev => ({ ...prev, [field.name]: e.target.value }))}
                           placeholder={field.placeholder}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A052] focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
                         />
                       )}
                     </div>
@@ -1446,7 +1446,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   onChange={(e) => setLink(e.target.value)}
                   placeholder={config.placeholder || 'Paste your link here'}
                   disabled={isAdminPreview}
-                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A052] focus:border-transparent"
+                  className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
                 />
               </div>
               <button
@@ -1474,7 +1474,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                 placeholder={config.notes_placeholder || 'Any notes for the team? (optional)'}
                 disabled={isAdminPreview}
                 rows={2}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A052] focus:border-transparent resize-none text-sm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent resize-none text-sm"
               />
             )}
             {error && (
@@ -1500,7 +1500,7 @@ export function MilestoneAction({ milestone, creatorId, onComplete, isAdminPrevi
                   onChange={(e) => setTextInput(e.target.value)}
                   placeholder={config.placeholder || 'Enter your response'}
                   disabled={isAdminPreview}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#C4A052] focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#D4AF37] focus:border-transparent"
                 />
               </div>
               <button
