@@ -578,9 +578,7 @@ export default function ASD4Dashboard() {
         { para: "Gregoria Arredondo", resource: "Supporting English Learners + Bilingual Reference Cards", reason: "Connects directly to the bilingual scaffolding she's already providing" },
         { para: "Michelina Hawkins", resource: "1:1 Student Support Toolkit", reason: "Process-focused feedback is strong — build out 1:1 repertoire" }
       ],
-      quotes: [
-        { text: "Principal Dohman stopped me in the hallway to say Rose handled that fire drill transition like a pro. The kids just followed her.", author: "Observed during visit", context: "Noted by Rae during informal walkthrough" }
-      ],
+      quotes: [] as { text: string; author: string; context: string }[],
       themes: {
         strengths: [
           "Strong questioning skills — paras guiding thinking rather than giving answers",
@@ -2477,18 +2475,20 @@ Thank you for setting the example. It matters more than you know.`;
                                           </div>
                                         </div>
 
-                                        {/* Quotes */}
-                                        <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Highlights from Visit</h6>
-                                          <div className="space-y-3">
-                                            {observationResults.lincoln.quotes.map((q, qIdx) => (
-                                              <blockquote key={qIdx} className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
-                                                <p className="text-sm italic text-gray-700">&quot;{q.text}&quot;</p>
-                                                <p className="text-xs text-gray-500 mt-2">— {q.author}</p>
-                                              </blockquote>
-                                            ))}
+                                        {/* Quotes - only show if there are any */}
+                                        {observationResults.lincoln.quotes.length > 0 && (
+                                          <div>
+                                            <h6 className="font-semibold text-gray-800 mb-3">Highlights from Visit</h6>
+                                            <div className="space-y-3">
+                                              {observationResults.lincoln.quotes.map((q, qIdx) => (
+                                                <blockquote key={qIdx} className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
+                                                  <p className="text-sm italic text-gray-700">&quot;{q.text}&quot;</p>
+                                                  <p className="text-xs text-gray-500 mt-2">— {q.author}</p>
+                                                </blockquote>
+                                              ))}
+                                            </div>
                                           </div>
-                                        </div>
+                                        )}
 
                                         {/* Building Themes */}
                                         <div>
