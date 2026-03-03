@@ -381,8 +381,8 @@ export default function ASD4Dashboard() {
         growthOpportunity: "Feedback specificity — paras are encouraging (\"There you go!\") but can level up to Notice → Name → Next Step for more targeted student growth"
       },
       teacherHighlights: [
-        { teacher: "Seidenfuss", room: "Rm 23", grade: "4th Grade Math", note: "Well-paced, student-centered lesson that created real space for meaningful small group para work alongside whole-class instruction." },
-        { teacher: "Roseberg", room: "Rm 29", grade: "", note: "Warm, structured classroom environment where students were engaged and systems were in place for the para to jump right in and support." }
+        { teacher: "Seidenfuss", note: "Well-paced, student-centered lesson that created real space for meaningful small group para work alongside whole-class instruction." },
+        { teacher: "Roseberg", note: "Warm, structured classroom environment where students were engaged and systems were in place for the para to jump right in and support." }
       ],
       parasHighlighted: [
         { name: "Jonnathan Roeglin", highlights: ["Guiding questions in small group math", "Strong room awareness"] },
@@ -2064,7 +2064,7 @@ Thank you for setting the example. It matters more than you know.`;
                                           <div className="bg-blue-50 rounded-lg p-4 space-y-3">
                                             {observationResults.fullerton.teacherHighlights.map((t, tIdx) => (
                                               <div key={tIdx} className="border-b border-blue-100 last:border-0 pb-2 last:pb-0">
-                                                <p className="font-medium text-gray-900">{t.teacher} ({t.room}{t.grade ? `, ${t.grade}` : ''})</p>
+                                                <p className="font-medium text-gray-900">{t.teacher}</p>
                                                 <p className="text-sm text-gray-600">{t.note}</p>
                                               </div>
                                             ))}
