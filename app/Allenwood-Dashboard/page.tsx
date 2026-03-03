@@ -262,7 +262,7 @@ export default function AllenwoodDashboard() {
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Allenwood Elementary School</h1>
             <p className="text-white/80 text-sm">Camp Springs, Maryland | Partner Dashboard</p>
-            <p className="text-xs text-gray-400 mt-1">Data updated February 18, 2026</p>
+            <p className="text-xs text-gray-400 mt-1">Data updated March 2, 2026</p>
           </div>
           <div className="flex items-center gap-3 text-sm">
             <div className="bg-white/10 px-3 py-2 rounded-lg text-center">
@@ -316,7 +316,7 @@ export default function AllenwoodDashboard() {
                   <Users className="w-4 h-4 text-[#38618C]" />
                   <span className="text-xs text-gray-500 uppercase">Teachers Enrolled</span>
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">11/11</div>
+                <div className="text-2xl font-bold text-[#1e2749]">13/13</div>
                 <div className="text-xs text-[#38618C] font-medium">Hub Access</div>
               </div>
 
@@ -326,7 +326,7 @@ export default function AllenwoodDashboard() {
                   <span className="text-xs text-gray-500 uppercase">Hub Logins</span>
                 </div>
                 <div className="text-2xl font-bold text-green-600">100%</div>
-                <div className="text-xs text-green-600 font-medium">11/11 Logged In</div>
+                <div className="text-xs text-green-600 font-medium">13/13 Logged In</div>
               </div>
 
               <button
@@ -352,22 +352,22 @@ export default function AllenwoodDashboard() {
             </div>
 
             {/* Recommendation Card */}
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-5">
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5">
               <div className="flex items-start gap-3">
-                <Lightbulb className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                <PartyPopper className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
                 <div>
-                  <h4 className="font-semibold text-gray-800 mb-2">Recommendation: First Lesson Complete</h4>
+                  <h4 className="font-semibold text-gray-800 mb-2">100% Hub Logins Achieved!</h4>
                   <p className="text-sm text-gray-700">
-                    Good news - your team&apos;s explorer just completed their first full lesson in &apos;Supporting Students Through Their Daily Schedule&apos; and has now spent time in 4 different courses including Teacher-Tested Hacks, Understanding Student Needs, and Parent Tools. That&apos;s real momentum from one person. A 5-minute walkthrough at your next team meeting showing where this explorer started could spark the same curiosity across the group.
+                    Every teacher on your pilot team is now logged into the Learning Hub - that&apos;s 13 out of 13. This is exactly the kind of foundation that leads to real implementation. With 3 teachers already actively exploring courses and your first lesson completion under your belt, the momentum is building. Consider celebrating this milestone at your next team meeting.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Leadership Meeting - March 2 Confirmed */}
-            <div className="bg-gradient-to-r from-[#1e2749]/10 to-[#38618C]/10 rounded-xl p-5 border border-[#1e2749]/20">
+            {/* Leadership Meeting - March 2 Completed */}
+            <div className="bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-xl p-5 border border-emerald-200">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[#1e2749] rounded-lg flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
                   <Users className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1">
@@ -375,14 +375,14 @@ export default function AllenwoodDashboard() {
                     <h4 className="font-semibold text-[#1e2749]">Leadership Meeting: Mid-Year Success</h4>
                     <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
                       <Check className="w-3 h-3" />
-                      Confirmed
+                      Completed
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">
-                    <span className="font-medium">March 2, 2026</span> · 6:15 AM CT / 7:15 AM ET
+                    <span className="font-medium">March 2, 2026</span> · With Dr. Porter &amp; Allenwood Leadership
                   </p>
                   <p className="text-sm text-gray-500">
-                    Discuss mid-year wins, partnership progress, and next steps with Allenwood leadership.
+                    Reviewed mid-year wins, discussed partnership progress, and planned for Year 2 expansion.
                   </p>
                 </div>
               </div>
@@ -1046,6 +1046,32 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
+            {/* Leadership Meeting - Completed */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6">
+              <div className="flex items-start gap-4">
+                <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Users className="w-5 h-5 text-white" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-2">
+                    <h4 className="font-semibold text-[#1e2749]">Leadership Meeting</h4>
+                    <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
+                      <Check className="w-3 h-3" />
+                      Complete
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">
+                      <span className="font-medium">March 2, 2026</span> · With Dr. Porter &amp; Allenwood Leadership
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Reviewed mid-year wins, discussed partnership progress, and planned for Year 2 expansion.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Virtual Sessions - Confirmed Dates */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6">
               <div className="flex items-start gap-4">
@@ -1093,17 +1119,73 @@ export default function AllenwoodDashboard() {
             <div id="hub-activity" className="scroll-mt-36">
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
                 <h3 className="font-bold text-[#1e2749] text-lg mb-2">Hub Activity</h3>
-                <p className="text-gray-500 text-sm mb-6">Updated February 18, 2026</p>
+                <p className="text-gray-500 text-sm mb-6">Updated March 2, 2026</p>
 
                 {/* Hub Login Summary */}
                 <div className="mb-6">
-                  <div className="text-4xl font-bold text-[#38618C] mb-1">9 of 11</div>
+                  <div className="text-4xl font-bold text-emerald-600 mb-1">13 of 13</div>
                   <p className="text-gray-600">teachers have logged into the Learning Hub</p>
                 </div>
 
                 <p className="text-gray-700 mb-6">
-                  Your team&apos;s first explorer has now completed their first full lesson in &apos;Supporting Students Through Their Daily Schedule&apos; and has spent time in 4 different courses including Teacher-Tested Hacks, Understanding Student Needs, and Parent Tools. That&apos;s real momentum from one person.
+                  3 teachers are now actively exploring the Learning Hub. Top courses so far: Teacher-Tested Hacks (3 starts), Supporting Students Through Their Daily Schedule (2), and Understanding Student Needs (2). Your team&apos;s first explorer has now completed their first full lesson.
                 </p>
+
+                {/* Monthly Engagement Data */}
+                <div className="mb-6">
+                  <h4 className="font-semibold text-gray-800 mb-3">Monthly Engagement</h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-gray-200">
+                          <th className="text-left py-2 text-gray-500 font-medium">Month</th>
+                          <th className="text-center py-2 text-gray-500 font-medium">Active Users</th>
+                          <th className="text-center py-2 text-gray-500 font-medium">Sessions</th>
+                          <th className="text-center py-2 text-gray-500 font-medium">Content Views</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="border-b border-gray-100">
+                          <td className="py-2 text-gray-600">February 2026</td>
+                          <td className="py-2 text-center text-gray-600">9</td>
+                          <td className="py-2 text-center text-gray-600">14</td>
+                          <td className="py-2 text-center text-gray-600">28</td>
+                        </tr>
+                        <tr className="bg-emerald-50">
+                          <td className="py-2 text-emerald-700 font-medium">March 2026</td>
+                          <td className="py-2 text-center text-emerald-700 font-medium">13</td>
+                          <td className="py-2 text-center text-emerald-700 font-medium">22</td>
+                          <td className="py-2 text-center text-emerald-700 font-medium">45</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Bundle Progress */}
+                <div className="mb-6">
+                  <h4 className="font-semibold text-gray-800 mb-3">Bundle Progress</h4>
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-gray-700">Autism Support Bundle</span>
+                        <span className="text-[#38618C] font-medium">2/5 courses started (40%)</span>
+                      </div>
+                      <div className="w-full bg-gray-100 rounded-full h-2">
+                        <div className="bg-[#38618C] h-2 rounded-full" style={{ width: '40%' }}></div>
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex justify-between text-sm mb-1">
+                        <span className="text-gray-700">Teacher-Tested Hacks</span>
+                        <span className="text-[#38618C] font-medium">3/8 modules viewed (38%)</span>
+                      </div>
+                      <div className="w-full bg-gray-100 rounded-full h-2">
+                        <div className="bg-[#38618C] h-2 rounded-full" style={{ width: '38%' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Warm context note */}
                 <div className="bg-blue-50 rounded-xl p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#3B82F6', borderLeftStyle: 'solid' }}>
