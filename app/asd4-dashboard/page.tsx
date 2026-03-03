@@ -396,8 +396,109 @@ export default function ASD4Dashboard() {
     },
     lakePark: {
       school: "Lake Park",
-      status: "pending",
-      stats: null
+      status: "complete",
+      stats: {
+        parasObserved: 4,
+        informalObservations: 1,
+        appreciationVisits: 0,
+        followUpEmails: 5,
+        principalEmail: true,
+        principalName: "Cristina Villalobos",
+        sameDayResponses: 0
+      },
+      movesObserved: [
+        {
+          move: "Ask Don't Tell",
+          color: "orange",
+          examples: [
+            { para: "Maribel Ontiveros", example: "Asked guiding questions in Spanish and English to clarify directions and encourage effort - questioning to build understanding, not just translating answers" },
+            { para: "Natalia Villalobos", example: "\"Are you ready to paint?\" and playful prompts like \"Hop hop with your sponge!\" - using questions and engagement cues to keep students active" }
+          ]
+        },
+        {
+          move: "Feedback & Encouragement",
+          color: "teal",
+          examples: [
+            { para: "Maribel Ontiveros", example: "\"Oh very nice!\" \"Muy bonito!\" - frequent, genuine affirmations that students visibly responded to" },
+            { para: "Mary Falco", example: "\"See! Easy! Easy peasy lemon squeezy!\" followed by \"Nice job!\" - made practice feel doable, not overwhelming" },
+            { para: "Natalia Villalobos", example: "\"Good working, Julian!\" \"Yea! Keep going!\" - specific, timely praise tied to student effort" },
+            { para: "Ruby Medina", example: "Modeled painting by holding student's hand and walking through it - encouragement through guided practice" }
+          ]
+        },
+        {
+          move: "Positioning & Proximity",
+          color: "blue",
+          examples: [
+            { para: "Maribel Ontiveros", example: "Sitting with students during activity instead of hovering - communicating partnership, not surveillance" },
+            { para: "Mary Falco", example: "Actively involved during OT transition - walking, participating, rolling the large wheel with student. Not supervising; engaged alongside." },
+            { para: "Ruby Medina", example: "Working closely with Angelo, individualized and intentional support at his level" },
+            { para: "Shelly Mayer", example: "Moved to table to read with student who connected with a book - met the student where his interest was" }
+          ]
+        },
+        {
+          move: "Redirection",
+          color: "purple",
+          examples: [
+            { para: "Mary Falco", example: "Steady redirection without frustration - consistency that builds independence over time" },
+            { para: "Natalia Villalobos", example: "Patient with student struggling to sit still - calm redirection without escalation" },
+            { para: "Ruby Medina", example: "\"Do you want to sit over here?\" - offered choice while still guiding the situation. Respectful redirection." },
+            { para: "Shelly Mayer", example: "\"Please put that back\" - clear, calm re-engagement during a behavior choice. No escalation in an intensive intervention setting." }
+          ]
+        },
+        {
+          move: "Proactive Regulation",
+          color: "green",
+          examples: [
+            { para: "Maribel Ontiveros", example: "Paused the group for a quick stretch when hands got tired during coloring - prevented dysregulation before it started" },
+            { para: "Mary Falco", example: "Used timer + motivating words during practice activities - structure and positivity combined to keep students focused" },
+            { para: "Shelly Mayer", example: "Comforted an upset student across the room with \"You're okay\" and a hand hold - calm, physical reassurance for a dysregulated student" }
+          ]
+        },
+        {
+          move: "Bilingual Support",
+          color: "pink",
+          examples: [
+            { para: "Maribel Ontiveros", example: "Seamlessly switching between English and Spanish to clarify directions, encourage effort, and ensure understanding - bilingual scaffolding in a Resource setting" }
+          ]
+        },
+        {
+          move: "Teacher-Para Collaboration",
+          color: "cyan",
+          examples: [
+            { para: "Maribel Ontiveros", example: "Checked in with teacher to clarify activity questions before redirecting students - ensured accurate information before guiding" },
+            { para: "Mary Falco", example: "Quiet voice in hallway and during transitions - awareness of the larger learning environment beyond her own group" }
+          ]
+        }
+      ],
+      hubResources: [
+        { para: "Maribel Ontiveros", resource: "Directions & Redirection Quick Reference", reason: "Pairs with the bilingual support she's already giving - streamline reminders" },
+        { para: "Mary Falco", resource: "Practice & Feedback Quick Reference", reason: "Connects to her literacy center work - tighten practice moments" },
+        { para: "Natalia Villalobos", resource: "Engagement & Active Participation Quick Reference", reason: "Pairs with hands-on learning facilitation - build on balance of fun and focus" },
+        { para: "Shelly Mayer", resource: "SpEd Para Toolkit", reason: "Built for intensive intervention work - engagement, redirection, building independence" }
+      ],
+      quotes: [],
+      themes: {
+        strengths: [
+          "Strong bilingual support - seamless English/Spanish scaffolding in Resource settings",
+          "Patience and calm regulation across every observation - no escalation, even with challenging behaviors",
+          "Proactive behavior management - stretching, choice-based redirection, timers, proximity",
+          "Encouragement is frequent and genuine across the building",
+          "Clear, chunked directions - especially strong in Resource and small group settings",
+          "Active engagement - paras are IN it with students, not passively supervising"
+        ],
+        growthOpportunity: "Feedback specificity - lots of genuine encouragement that could level up to Notice → Name → Next Step. Also: initiative with disengaged students - leading with a question before giving space."
+      },
+      teacherHighlights: [
+        { teacher: "Blue Pod Teachers", note: "Well-structured, student-centered classroom environments that allowed paras to jump in and do meaningful work alongside instruction." },
+        { teacher: "Resource Team Culture", note: "Multiple Resource rooms showed strong systems already in place - paras could engage immediately because routines and expectations were established." }
+      ],
+      parasHighlighted: [
+        { name: "Maribel Ontiveros", highlights: ["Bilingual scaffolding", "Proactive regulation", "Teacher collaboration"] },
+        { name: "Mary Falco", highlights: ["Literacy center engagement", "Timer use", "Quiet voice awareness"] },
+        { name: "Natalia Villalobos", highlights: ["Chunked directions", "Playful engagement", "Calm patience"] },
+        { name: "Ruby Medina", highlights: ["Individualized support", "Choice-based redirection", "Hands-on modeling"] },
+        { name: "Shelly Mayer", highlights: ["Comforted dysregulated student", "Read with student at interest"] }
+      ]
     },
     lincoln: {
       school: "Lincoln",
@@ -1839,8 +1940,8 @@ Thank you for setting the example. It matters more than you know.`;
                 <p className="text-xs text-gray-500">After just 2 sessions and 62 practice reps. Confidence continues to build with each touchpoint.</p>
               </div>
 
-              {/* Sessions - Collapsible */}
-              <details className="bg-white rounded-xl shadow-sm border group">
+              {/* Sessions - Always Open */}
+              <details open className="bg-white rounded-xl shadow-sm border group">
                 <summary className="p-6 cursor-pointer list-none">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -1876,7 +1977,7 @@ Thank you for setting the example. It matters more than you know.`;
                                       <span className="text-sm text-gray-500">— {session.date}</span>
                                     </div>
                                     <p className="text-sm text-gray-600 mb-2">
-                                      3 Buildings Visited · 4 Paras Observed · 7 Follow-Up Emails · 14% Same-Day Response
+                                      3 Buildings Visited · 13 Paras Observed · 12 Follow-Up Emails · 2 Principal Emails
                                     </p>
                                     <blockquote className="text-sm italic text-gray-600 border-l-2 border-emerald-400 pl-3">
                                       &quot;I wish I could meet all my students&apos; many needs every day.&quot;
@@ -1902,15 +2003,15 @@ Thank you for setting the example. It matters more than you know.`;
                                         <p className="text-xs text-gray-600">Buildings Visited</p>
                                       </div>
                                       <div className="bg-emerald-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-emerald-700">4</p>
+                                        <p className="text-2xl font-bold text-emerald-700">13</p>
                                         <p className="text-xs text-gray-600">Paras Observed</p>
                                       </div>
                                       <div className="bg-emerald-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-emerald-700">7</p>
+                                        <p className="text-2xl font-bold text-emerald-700">12</p>
                                         <p className="text-xs text-gray-600">Follow-Up Emails</p>
                                       </div>
                                       <div className="bg-emerald-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-emerald-700">7</p>
+                                        <p className="text-2xl font-bold text-emerald-700">11</p>
                                         <p className="text-xs text-gray-600">Hub Resources Matched</p>
                                       </div>
                                     </div>
@@ -2074,12 +2175,118 @@ Thank you for setting the example. It matters more than you know.`;
                                       </div>
                                     )}
 
-                                    {/* Lake Park Placeholder */}
+                                    {/* Lake Park Content */}
                                     {expandedObsBuilding === 'lakePark' && (
-                                      <div className="bg-gray-50 rounded-lg p-8 text-center">
-                                        <Clock className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                                        <p className="text-gray-600 font-medium">Data Being Processed</p>
-                                        <p className="text-sm text-gray-500">Lake Park observation notes will be added after processing is complete.</p>
+                                      <div className="space-y-6">
+                                        {/* Overview Stats */}
+                                        <div className="bg-gray-50 rounded-lg p-4">
+                                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                            <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 1 informal</span></div>
+                                            <div><span className="text-gray-500">Follow-Ups:</span> <span className="font-medium">5 personalized emails</span></div>
+                                            <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Cristina Villalobos</span></div>
+                                            <div><span className="text-gray-500">Same-Day Response:</span> <span className="font-medium">Pending</span></div>
+                                          </div>
+                                        </div>
+
+                                        {/* Moves Observed */}
+                                        <div>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Moves Observed in Action</h6>
+                                          <div className="space-y-4">
+                                            {observationResults.lakePark.movesObserved.map((move, moveIdx) => (
+                                              <div key={moveIdx} className="border border-gray-200 rounded-lg overflow-hidden">
+                                                <div className={`px-4 py-2 font-medium text-sm flex items-center gap-2 ${
+                                                  move.color === 'orange' ? 'bg-orange-50 text-orange-800' :
+                                                  move.color === 'teal' ? 'bg-teal-50 text-teal-800' :
+                                                  move.color === 'blue' ? 'bg-blue-50 text-blue-800' :
+                                                  move.color === 'purple' ? 'bg-purple-50 text-purple-800' :
+                                                  move.color === 'green' ? 'bg-green-50 text-green-800' :
+                                                  move.color === 'pink' ? 'bg-pink-50 text-pink-800' :
+                                                  'bg-cyan-50 text-cyan-800'
+                                                }`}>
+                                                  <Check className="w-4 h-4" />
+                                                  {move.move}
+                                                </div>
+                                                <div className="p-3 space-y-2">
+                                                  {move.examples.map((ex, exIdx) => (
+                                                    <div key={exIdx} className="text-sm border-b border-gray-100 last:border-0 pb-2 last:pb-0">
+                                                      <span className="font-medium text-gray-900">{ex.para}:</span>
+                                                      <span className="text-gray-600 ml-1">{ex.example}</span>
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+
+                                        {/* Hub Resources */}
+                                        <div>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Hub Resources Recommended</h6>
+                                          <div className="overflow-x-auto">
+                                            <table className="w-full text-sm">
+                                              <thead>
+                                                <tr className="border-b border-gray-200 bg-gray-50">
+                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Para</th>
+                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Resource</th>
+                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Why</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                {observationResults.lakePark.hubResources.map((r, rIdx) => (
+                                                  <tr key={rIdx} className="border-b border-gray-100">
+                                                    <td className="py-2 px-3 font-medium text-gray-900">{r.para}</td>
+                                                    <td className="py-2 px-3 text-blue-600">{r.resource}</td>
+                                                    <td className="py-2 px-3 text-gray-600">{r.reason}</td>
+                                                  </tr>
+                                                ))}
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        </div>
+
+                                        {/* Quotes Placeholder */}
+                                        <div>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Direct Quotes from Paras</h6>
+                                          <div className="bg-gray-50 rounded-lg p-4 text-center text-sm text-gray-500">
+                                            Awaiting responses from Lake Park paras
+                                          </div>
+                                        </div>
+
+                                        {/* Building Themes */}
+                                        <div>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Building-Level Themes</h6>
+                                          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                                            <div>
+                                              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Strengths</p>
+                                              <ul className="space-y-1">
+                                                {observationResults.lakePark.themes.strengths.map((s, sIdx) => (
+                                                  <li key={sIdx} className="text-sm text-gray-700 flex items-start gap-2">
+                                                    <Check className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                                    {s}
+                                                  </li>
+                                                ))}
+                                              </ul>
+                                            </div>
+                                            <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                                              <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Opportunity</p>
+                                              <p className="text-sm text-gray-700">{observationResults.lakePark.themes.growthOpportunity}</p>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        {/* Teacher Highlights */}
+                                        <div>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Teacher Collaboration Highlights</h6>
+                                          <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+                                            {observationResults.lakePark.teacherHighlights.map((t, tIdx) => (
+                                              <div key={tIdx} className="border-b border-blue-100 last:border-0 pb-2 last:pb-0">
+                                                <p className="font-medium text-gray-900">{t.teacher}</p>
+                                                <p className="text-sm text-gray-600">{t.note}</p>
+                                              </div>
+                                            ))}
+                                            <p className="text-xs text-gray-500 mt-2">Principal Cristina Villalobos was emailed same-day with these highlights and provided the Staff Celebration Playbook resource.</p>
+                                          </div>
+                                        </div>
                                       </div>
                                     )}
 
@@ -2731,8 +2938,85 @@ Thank you for setting the example. It matters more than you know.`;
                             </details>
                           )}
 
-                          {/* Lake Park / Lincoln Placeholder Notes */}
-                          {(school.name === 'Lake Park' || school.name === 'Lincoln') && (
+                          {/* Lake Park Observation Notes */}
+                          {school.name === 'Lake Park' && observationResults.lakePark.status === 'complete' && (
+                            <details className="py-3 border-b border-gray-100">
+                              <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
+                                <ClipboardList className="w-4 h-4 text-emerald-600" />
+                                Observation Day Notes — March 3, 2026
+                                <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
+                              </summary>
+                              <div className="mt-3 space-y-3">
+                                {/* Stats Row */}
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                                    <p className="font-bold text-gray-900">5</p>
+                                    <p className="text-xs text-gray-500">Paras Observed</p>
+                                  </div>
+                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                                    <p className="font-bold text-gray-900">5</p>
+                                    <p className="text-xs text-gray-500">Follow-Up Emails</p>
+                                  </div>
+                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                                    <p className="font-bold text-gray-900">Yes</p>
+                                    <p className="text-xs text-gray-500">Principal Email</p>
+                                  </div>
+                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                                    <p className="font-bold text-gray-500">Pending</p>
+                                    <p className="text-xs text-gray-500">Responses</p>
+                                  </div>
+                                </div>
+
+                                {/* Key Themes */}
+                                <div className="bg-emerald-50 rounded-lg p-3">
+                                  <p className="text-xs font-semibold text-emerald-700 uppercase mb-2">Key Themes</p>
+                                  <ul className="text-sm text-gray-700 space-y-1">
+                                    <li className="flex items-start gap-1.5">
+                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      Strong bilingual support - seamless English/Spanish scaffolding
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      Patience and calm regulation across every observation
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      Proactive behavior management (stretching, choice-based redirection)
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      Encouragement is frequent and genuine building-wide
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      Active engagement - paras are IN it with students
+                                    </li>
+                                  </ul>
+                                </div>
+
+                                {/* Growth Areas */}
+                                <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                                  <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Areas</p>
+                                  <p className="text-sm text-gray-700">Feedback specificity - transition from general praise to Notice → Name → Next Step. Initiative with disengaged students - lead with a question before giving space.</p>
+                                </div>
+
+                                {/* Paras Highlighted */}
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Paras Highlighted</p>
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {observationResults.lakePark.parasHighlighted.map((p, pIdx) => (
+                                      <span key={pIdx} className="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-full">
+                                        {p.name}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            </details>
+                          )}
+
+                          {/* Lincoln Placeholder Notes */}
+                          {school.name === 'Lincoln' && (
                             <details className="py-3 border-b border-gray-100">
                               <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-700">
                                 <ClipboardList className="w-4 h-4 text-gray-400" />
