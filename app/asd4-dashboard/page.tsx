@@ -476,7 +476,9 @@ export default function ASD4Dashboard() {
         { para: "Natalia Villalobos", resource: "Engagement & Active Participation Quick Reference", reason: "Pairs with hands-on learning facilitation - build on balance of fun and focus" },
         { para: "Shelly Mayer", resource: "SpEd Para Toolkit", reason: "Built for intensive intervention work - engagement, redirection, building independence" }
       ],
-      quotes: [],
+      quotes: [
+        { text: "Thank you so much for taking the time to observe me and give me such wonderful feedback. I'm really enjoying the learning tools and can't wait to try them with my students!", author: "Maribel Ontiveros", context: "Email reply after receiving observation follow-up" }
+      ],
       themes: {
         strengths: [
           "Strong bilingual support - seamless English/Spanish scaffolding in Resource settings",
@@ -502,8 +504,103 @@ export default function ASD4Dashboard() {
     },
     lincoln: {
       school: "Lincoln",
-      status: "pending",
-      stats: null
+      status: "complete",
+      stats: {
+        parasObserved: 4,
+        informalObservations: 3,
+        appreciationVisits: 2,
+        followUpEmails: 8,
+        principalEmail: true,
+        principalName: "Paul Dohman",
+        sameDayResponses: 1
+      },
+      movesObserved: [
+        {
+          move: "Ask Don't Tell",
+          color: "orange",
+          examples: [
+            { para: "Rose Marinelli", example: "Repeated the question rather than giving the answer during math work — \"What do we do first?\" — guiding student thinking" },
+            { para: "Gregoria Arredondo", example: "Asked clarifying questions during reading support to check comprehension before moving on" }
+          ]
+        },
+        {
+          move: "Feedback & Encouragement",
+          color: "teal",
+          examples: [
+            { para: "Rose Marinelli", example: "\"You got it!\" after student self-corrected — celebrating effort, not just accuracy" },
+            { para: "Carlos Chavez", example: "High-fives and verbal praise throughout small group math — consistent, genuine encouragement" },
+            { para: "Michelina Hawkins", example: "\"I like how you're thinking through this\" — process-focused feedback during 1:1 support" }
+          ]
+        },
+        {
+          move: "Positioning & Proximity",
+          color: "blue",
+          examples: [
+            { para: "Rose Marinelli", example: "Kneeling beside student desk during independent work — at their level, not hovering" },
+            { para: "Carlos Chavez", example: "Circulating during math centers, checking in with multiple groups while staying mobile" },
+            { para: "Gregoria Arredondo", example: "Positioned at small table in back corner to minimize distraction while providing support" }
+          ]
+        },
+        {
+          move: "Redirection",
+          color: "purple",
+          examples: [
+            { para: "Rose Marinelli", example: "Gentle tap on desk to refocus wandering student — non-verbal, non-disruptive" },
+            { para: "Michelina Hawkins", example: "\"Let's come back to this\" when student went off-topic — calm, consistent re-engagement" }
+          ]
+        },
+        {
+          move: "Teacher-Para Collaboration",
+          color: "green",
+          examples: [
+            { para: "Carlos Chavez", example: "Quick whispered check-in with teacher during transition — ensuring alignment without disrupting flow" },
+            { para: "Gregoria Arredondo", example: "Picked up seamlessly when teacher shifted to whole-class instruction — no verbal cue needed" }
+          ]
+        },
+        {
+          move: "Bilingual Support",
+          color: "pink",
+          examples: [
+            { para: "Gregoria Arredondo", example: "Clarified directions in Spanish for EL student, then switched back to English for follow-up questions — seamless code-switching" }
+          ]
+        },
+        {
+          move: "Leading Under Pressure",
+          color: "cyan",
+          examples: [
+            { para: "Rose Marinelli", example: "Principal Dohman observed Rose leading a student group during an unexpected fire drill transition — calm, organized, students followed her lead without hesitation" }
+          ]
+        }
+      ],
+      hubResources: [
+        { para: "Rose Marinelli", resource: "Feedback Framework Quick Reference", reason: "Already encouraging — next step is Notice → Name → Next Step specificity" },
+        { para: "Carlos Chavez", resource: "Small Group Facilitation Guide", reason: "Strong circulation — formalize small group check-in strategies" },
+        { para: "Gregoria Arredondo", resource: "Supporting English Learners + Bilingual Reference Cards", reason: "Connects directly to the bilingual scaffolding she's already providing" },
+        { para: "Michelina Hawkins", resource: "1:1 Student Support Toolkit", reason: "Process-focused feedback is strong — build out 1:1 repertoire" }
+      ],
+      quotes: [
+        { text: "Principal Dohman stopped me in the hallway to say Rose handled that fire drill transition like a pro. The kids just followed her.", author: "Observed during visit", context: "Noted by Rae during informal walkthrough" }
+      ],
+      themes: {
+        strengths: [
+          "Strong questioning skills — paras guiding thinking rather than giving answers",
+          "Genuine encouragement throughout building — high-fives, verbal praise, process-focused feedback",
+          "Effective positioning — paras at student level, circulating, minimizing distraction",
+          "Seamless teacher-para collaboration — transitions happen without verbal cues",
+          "Calm leadership under pressure — Rose's fire drill moment was exceptional"
+        ],
+        growthOpportunity: "Feedback specificity — transition from general praise to Notice → Name → Next Step. Some paras could also benefit from more proactive engagement with disengaged students."
+      },
+      teacherHighlights: [
+        { teacher: "4th Grade Team", note: "Well-organized classrooms with clear systems that allowed paras to jump in and contribute meaningfully." },
+        { teacher: "Resource Room", note: "Structured support environment where paras could focus on individual student needs without whole-class disruption." }
+      ],
+      parasHighlighted: [
+        { name: "Rose Marinelli", highlights: ["Guiding questions", "Fire drill leadership", "Non-verbal redirection"] },
+        { name: "Carlos Chavez", highlights: ["High-fives and praise", "Math center circulation", "Teacher collaboration"] },
+        { name: "Gregoria Arredondo", highlights: ["Bilingual scaffolding", "Seamless transitions", "Back-corner positioning"] },
+        { name: "Michelina Hawkins", highlights: ["Process-focused feedback", "1:1 support", "Calm redirection"] }
+      ]
     }
   };
 
@@ -1977,7 +2074,7 @@ Thank you for setting the example. It matters more than you know.`;
                                       <span className="text-sm text-gray-500">— {session.date}</span>
                                     </div>
                                     <p className="text-sm text-gray-600 mb-2">
-                                      3 Buildings Visited · 13 Paras Observed · 12 Follow-Up Emails · 2 Principal Emails
+                                      3 Buildings Visited · 17 Paras Contacted · 20 Follow-Up Emails Sent · 2 Same-Day Replies
                                     </p>
                                     <blockquote className="text-sm italic text-gray-600 border-l-2 border-emerald-400 pl-3">
                                       &quot;I wish I could meet all my students&apos; many needs every day.&quot;
@@ -2006,16 +2103,29 @@ Thank you for setting the example. It matters more than you know.`;
                                         <p className="text-xs text-gray-600">Buildings Visited</p>
                                       </div>
                                       <div className="bg-emerald-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-emerald-700">13</p>
-                                        <p className="text-xs text-gray-600">Paras Observed</p>
+                                        <p className="text-2xl font-bold text-emerald-700">17</p>
+                                        <p className="text-xs text-gray-600">Paras Contacted</p>
+                                        <p className="text-[10px] text-gray-400">12 formal · 3 informal · 2 appreciation</p>
                                       </div>
                                       <div className="bg-emerald-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-emerald-700">12</p>
+                                        <p className="text-2xl font-bold text-emerald-700">20</p>
                                         <p className="text-xs text-gray-600">Follow-Up Emails</p>
+                                        <p className="text-[10px] text-gray-400">17 para + 3 principal</p>
                                       </div>
                                       <div className="bg-emerald-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-emerald-700">11</p>
+                                        <p className="text-2xl font-bold text-emerald-700">15</p>
                                         <p className="text-xs text-gray-600">Hub Resources Matched</p>
+                                      </div>
+                                    </div>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
+                                      <div className="bg-blue-50 rounded-lg p-3 text-center">
+                                        <p className="text-2xl font-bold text-blue-700">3</p>
+                                        <p className="text-xs text-gray-600">Principals</p>
+                                        <p className="text-[10px] text-gray-400">Bolton · Villalobos · Dohman</p>
+                                      </div>
+                                      <div className="bg-amber-50 rounded-lg p-3 text-center">
+                                        <p className="text-2xl font-bold text-amber-700">2</p>
+                                        <p className="text-xs text-gray-600">Same-Day Replies</p>
                                       </div>
                                     </div>
                                   </div>
@@ -2247,11 +2357,16 @@ Thank you for setting the example. It matters more than you know.`;
                                           </div>
                                         </div>
 
-                                        {/* Quotes Placeholder */}
+                                        {/* Quotes */}
                                         <div>
                                           <h6 className="font-semibold text-gray-800 mb-3">Direct Quotes from Paras</h6>
-                                          <div className="bg-gray-50 rounded-lg p-4 text-center text-sm text-gray-500">
-                                            Awaiting responses from Lake Park paras
+                                          <div className="space-y-3">
+                                            {observationResults.lakePark.quotes.map((q, qIdx) => (
+                                              <blockquote key={qIdx} className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
+                                                <p className="text-sm italic text-gray-700">&quot;{q.text}&quot;</p>
+                                                <p className="text-xs text-gray-500 mt-2">— {q.author} <span className="text-gray-400">({q.context})</span></p>
+                                              </blockquote>
+                                            ))}
                                           </div>
                                         </div>
 
@@ -2293,12 +2408,123 @@ Thank you for setting the example. It matters more than you know.`;
                                       </div>
                                     )}
 
-                                    {/* Lincoln Placeholder */}
+                                    {/* Lincoln Content */}
                                     {expandedObsBuilding === 'lincoln' && (
-                                      <div className="bg-gray-50 rounded-lg p-8 text-center">
-                                        <Clock className="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                                        <p className="text-gray-600 font-medium">Data Being Processed</p>
-                                        <p className="text-sm text-gray-500">Lincoln observation notes will be added after processing is complete.</p>
+                                      <div className="space-y-6">
+                                        {/* Overview Stats */}
+                                        <div className="bg-gray-50 rounded-lg p-4">
+                                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                            <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 3 informal, 2 appreciation</span></div>
+                                            <div><span className="text-gray-500">Follow-Ups:</span> <span className="font-medium">8 personalized emails</span></div>
+                                            <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Paul Dohman</span></div>
+                                            <div><span className="text-gray-500">Same-Day Response:</span> <span className="font-medium">1 reply</span></div>
+                                          </div>
+                                        </div>
+
+                                        {/* Moves Observed */}
+                                        <div>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Moves Observed in Action</h6>
+                                          <div className="space-y-4">
+                                            {observationResults.lincoln.movesObserved.map((move, moveIdx) => (
+                                              <div key={moveIdx} className="border border-gray-200 rounded-lg overflow-hidden">
+                                                <div className={`px-4 py-2 font-medium text-sm flex items-center gap-2 ${
+                                                  move.color === 'orange' ? 'bg-orange-50 text-orange-800' :
+                                                  move.color === 'teal' ? 'bg-teal-50 text-teal-800' :
+                                                  move.color === 'blue' ? 'bg-blue-50 text-blue-800' :
+                                                  move.color === 'purple' ? 'bg-purple-50 text-purple-800' :
+                                                  move.color === 'green' ? 'bg-green-50 text-green-800' :
+                                                  move.color === 'pink' ? 'bg-pink-50 text-pink-800' :
+                                                  'bg-cyan-50 text-cyan-800'
+                                                }`}>
+                                                  <Check className="w-4 h-4" />
+                                                  {move.move}
+                                                </div>
+                                                <div className="p-3 space-y-2">
+                                                  {move.examples.map((ex, exIdx) => (
+                                                    <div key={exIdx} className="text-sm border-b border-gray-100 last:border-0 pb-2 last:pb-0">
+                                                      <span className="font-medium text-gray-900">{ex.para}:</span>
+                                                      <span className="text-gray-600 ml-1">{ex.example}</span>
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+
+                                        {/* Hub Resources */}
+                                        <div>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Hub Resources Recommended</h6>
+                                          <div className="overflow-x-auto">
+                                            <table className="w-full text-sm">
+                                              <thead>
+                                                <tr className="border-b border-gray-200 bg-gray-50">
+                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Para</th>
+                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Resource</th>
+                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Why</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                {observationResults.lincoln.hubResources.map((r, rIdx) => (
+                                                  <tr key={rIdx} className="border-b border-gray-100">
+                                                    <td className="py-2 px-3 font-medium text-gray-900">{r.para}</td>
+                                                    <td className="py-2 px-3 text-blue-600">{r.resource}</td>
+                                                    <td className="py-2 px-3 text-gray-600">{r.reason}</td>
+                                                  </tr>
+                                                ))}
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        </div>
+
+                                        {/* Quotes */}
+                                        <div>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Highlights from Visit</h6>
+                                          <div className="space-y-3">
+                                            {observationResults.lincoln.quotes.map((q, qIdx) => (
+                                              <blockquote key={qIdx} className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
+                                                <p className="text-sm italic text-gray-700">&quot;{q.text}&quot;</p>
+                                                <p className="text-xs text-gray-500 mt-2">— {q.author}</p>
+                                              </blockquote>
+                                            ))}
+                                          </div>
+                                        </div>
+
+                                        {/* Building Themes */}
+                                        <div>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Building-Level Themes</h6>
+                                          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                                            <div>
+                                              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Strengths</p>
+                                              <ul className="space-y-1">
+                                                {observationResults.lincoln.themes.strengths.map((s, sIdx) => (
+                                                  <li key={sIdx} className="text-sm text-gray-700 flex items-start gap-2">
+                                                    <Check className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                                    {s}
+                                                  </li>
+                                                ))}
+                                              </ul>
+                                            </div>
+                                            <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                                              <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Opportunity</p>
+                                              <p className="text-sm text-gray-700">{observationResults.lincoln.themes.growthOpportunity}</p>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        {/* Teacher Highlights */}
+                                        <div>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Teacher Collaboration Highlights</h6>
+                                          <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+                                            {observationResults.lincoln.teacherHighlights.map((t, tIdx) => (
+                                              <div key={tIdx} className="border-b border-blue-100 last:border-0 pb-2 last:pb-0">
+                                                <p className="font-medium text-gray-900">{t.teacher}</p>
+                                                <p className="text-sm text-gray-600">{t.note}</p>
+                                              </div>
+                                            ))}
+                                            <p className="text-xs text-gray-500 mt-2">Principal Paul Dohman was emailed same-day with these highlights and provided the Staff Celebration Playbook resource.</p>
+                                          </div>
+                                        </div>
                                       </div>
                                     )}
                                   </div>
@@ -3018,17 +3244,79 @@ Thank you for setting the example. It matters more than you know.`;
                             </details>
                           )}
 
-                          {/* Lincoln Placeholder Notes */}
-                          {school.name === 'Lincoln' && (
+                          {/* Lincoln Observation Notes */}
+                          {school.name === 'Lincoln' && observationResults.lincoln.status === 'complete' && (
                             <details className="py-3 border-b border-gray-100">
-                              <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-700">
-                                <ClipboardList className="w-4 h-4 text-gray-400" />
+                              <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
+                                <ClipboardList className="w-4 h-4 text-emerald-600" />
                                 Observation Day Notes — March 3, 2026
-                                <span className="ml-2 text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">Processing</span>
+                                <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
                               </summary>
-                              <div className="mt-3 bg-gray-50 rounded-lg p-4 text-center">
-                                <Clock className="w-6 h-6 text-gray-400 mx-auto mb-1" />
-                                <p className="text-sm text-gray-500">Observation notes will be added after data processing is complete.</p>
+                              <div className="mt-3 space-y-3">
+                                {/* Stats Row */}
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                                    <p className="font-bold text-gray-900">9</p>
+                                    <p className="text-xs text-gray-500">Paras Contacted</p>
+                                  </div>
+                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                                    <p className="font-bold text-gray-900">8</p>
+                                    <p className="text-xs text-gray-500">Follow-Up Emails</p>
+                                  </div>
+                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                                    <p className="font-bold text-gray-900">Yes</p>
+                                    <p className="text-xs text-gray-500">Principal Email</p>
+                                  </div>
+                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                                    <p className="font-bold text-emerald-600">1</p>
+                                    <p className="text-xs text-gray-500">Same-Day Reply</p>
+                                  </div>
+                                </div>
+
+                                {/* Key Themes */}
+                                <div className="bg-emerald-50 rounded-lg p-3">
+                                  <p className="text-xs font-semibold text-emerald-700 uppercase mb-2">Key Themes</p>
+                                  <ul className="text-sm text-gray-700 space-y-1">
+                                    <li className="flex items-start gap-1.5">
+                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      Strong questioning skills — guiding thinking rather than giving answers
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      Genuine encouragement — high-fives, process-focused feedback
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      Effective positioning — at student level, circulating
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      Seamless teacher-para collaboration
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      Calm leadership under pressure — fire drill moment
+                                    </li>
+                                  </ul>
+                                </div>
+
+                                {/* Growth Areas */}
+                                <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                                  <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Areas</p>
+                                  <p className="text-sm text-gray-700">Feedback specificity - transition from general praise to Notice → Name → Next Step. More proactive engagement with disengaged students.</p>
+                                </div>
+
+                                {/* Paras Highlighted */}
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Paras Highlighted</p>
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {observationResults.lincoln.parasHighlighted.map((p, pIdx) => (
+                                      <span key={pIdx} className="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-full">
+                                        {p.name}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
                               </div>
                             </details>
                           )}
