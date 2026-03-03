@@ -3091,77 +3091,110 @@ Thank you for setting the example. It matters more than you know.`;
                             </div>
                           )}
 
-                          {/* Observation Day Notes */}
+                          {/* Observation Day Notes - Fullerton */}
                           {school.name === 'Fullerton' && observationResults.fullerton.status === 'complete' && (
                             <details className="py-3 border-b border-gray-100">
-                              <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
-                                <ClipboardList className="w-4 h-4 text-emerald-600" />
-                                Observation Day Notes — March 3, 2026
-                                <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
+                              <summary className="cursor-pointer">
+                                <div className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
+                                  <ClipboardList className="w-4 h-4 text-emerald-600" />
+                                  Observation Day — March 3, 2026
+                                  <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
+                                  <ChevronDown className="w-4 h-4 ml-auto transition-transform group-open:rotate-180" />
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1 ml-6">7 paras contacted · 7 emails sent · &quot;I wish I could meet all my students&apos; many needs every day.&quot;</p>
                               </summary>
-                              <div className="mt-3 space-y-3">
-                                {/* Stats Row */}
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
-                                    <p className="font-bold text-gray-900">8</p>
-                                    <p className="text-xs text-gray-500">Paras Observed</p>
-                                  </div>
-                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
-                                    <p className="font-bold text-gray-900">7</p>
-                                    <p className="text-xs text-gray-500">Follow-Up Emails</p>
-                                  </div>
-                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
-                                    <p className="font-bold text-gray-900">Yes</p>
-                                    <p className="text-xs text-gray-500">Principal Email</p>
-                                  </div>
-                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
-                                    <p className="font-bold text-emerald-600">1</p>
-                                    <p className="text-xs text-gray-500">Same-Day Response</p>
+                              <div className="mt-4 space-y-4">
+                                {/* 1. At a Glance */}
+                                <div className="bg-gray-50 rounded-lg p-4">
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">At a Glance</p>
+                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                    <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 2 informal, 2 appreciation</span></div>
+                                    <div><span className="text-gray-500">Follow-Up Emails:</span> <span className="font-medium">7 personalized same-day</span></div>
+                                    <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Bryan Bolton</span></div>
+                                    <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium text-emerald-600">1 (Scott Nyquist — 5 min)</span></div>
                                   </div>
                                 </div>
 
-                                {/* Key Themes */}
-                                <div className="bg-emerald-50 rounded-lg p-3">
-                                  <p className="text-xs font-semibold text-emerald-700 uppercase mb-2">Key Themes</p>
-                                  <ul className="text-sm text-gray-700 space-y-1">
-                                    <li className="flex items-start gap-1.5">
-                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      Strong questioning skills (Move #1) across multiple paras
-                                    </li>
-                                    <li className="flex items-start gap-1.5">
-                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      Patient, persistent support with disengaged students
-                                    </li>
-                                    <li className="flex items-start gap-1.5">
-                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      Natural teacher-para collaboration
-                                    </li>
-                                    <li className="flex items-start gap-1.5">
-                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      Bilingual scaffolding with EL students
-                                    </li>
-                                    <li className="flex items-start gap-1.5">
-                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      Intentional positioning (crouching, proximity, quiet voice)
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                {/* Growth Area */}
-                                <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
-                                  <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Area</p>
-                                  <p className="text-sm text-gray-700">Feedback specificity — encourage transition from general praise to Notice → Name → Next Step formula</p>
-                                </div>
-
-                                {/* Paras Highlighted */}
+                                {/* 2. Standout Moments */}
                                 <div>
-                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Paras Highlighted</p>
-                                  <div className="flex flex-wrap gap-1.5">
-                                    {observationResults.fullerton.parasHighlighted.map((p, pIdx) => (
-                                      <span key={pIdx} className="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-full">
-                                        {p.name}
-                                      </span>
-                                    ))}
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Standout Moments</p>
+                                  <div className="space-y-3">
+                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
+                                      <p className="font-semibold text-gray-900">Jonnathan Roeglin</p>
+                                      <p className="text-sm text-gray-600 mt-1">Asked &quot;How do we make this into a fraction?&quot; during small group work — guiding students to think, not giving answers. Crouched down to student level. Scanned and redirected other students while running his own group. Positioned in back during whole-class instruction to support teacher — seamless partnership.</p>
+                                    </div>
+                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
+                                      <p className="font-semibold text-gray-900">Esperanza Garcia <span className="text-xs font-normal text-gray-500">(Bilingual)</span></p>
+                                      <p className="text-sm text-gray-600 mt-1">Working 1:1 in Spanish with a student in a fully Spanish classroom. Quiet voice, non-disruptive. Reading directions and asking questions to get her student thinking. Patient and kind when student seemed distracted — redirected back to slides without frustration.</p>
+                                    </div>
+                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
+                                      <p className="font-semibold text-gray-900">Kristina Orellana</p>
+                                      <p className="text-sm text-gray-600 mt-1">Prepped materials before the lesson. Encouraged students during counting: &quot;There you go!&quot; Checked in with teacher quietly during a video. <span className="font-medium text-emerald-700">THE MOMENT:</span> A sleepy, disengaged student — she sat with him, quietly redirected, repeated questions until he had an answer, then guided him to raise his hand and share with the full class. Building confidence.</p>
+                                    </div>
+                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
+                                      <p className="font-semibold text-gray-900">Fatema Bakhrani <span className="text-xs font-normal text-gray-500">(Informal)</span></p>
+                                      <p className="text-sm text-gray-600 mt-1">Guiding questions: &quot;What letter is missing from &apos;house&apos;?&quot; Re-reading worksheet directions step by step. Grabbed a new pencil mid-transition to keep momentum.</p>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* 3. Para Voices */}
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Para Voices</p>
+                                  <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
+                                    <p className="text-sm italic text-gray-700">&quot;I wish I could meet all my students&apos; many needs every day.&quot;</p>
+                                    <p className="text-xs text-gray-500 mt-2">— Scott Nyquist, Fullerton</p>
+                                    <p className="text-xs text-emerald-600 mt-1">Replied 5 minutes after receiving email</p>
+                                  </blockquote>
+                                </div>
+
+                                {/* 4. Building Themes */}
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Building Themes</p>
+                                  <div className="bg-emerald-50 rounded-lg p-4 mb-3">
+                                    <p className="text-xs font-semibold text-emerald-700 uppercase mb-2">Strengths</p>
+                                    <ul className="text-sm text-gray-700 space-y-1">
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Strong questioning skills (Move #1) across multiple paras
+                                      </li>
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Patient, persistent support with disengaged students
+                                      </li>
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Natural teacher-para collaboration
+                                      </li>
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Bilingual scaffolding with EL students
+                                      </li>
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Intentional positioning — crouching, proximity, quiet voice
+                                      </li>
+                                    </ul>
+                                  </div>
+                                  <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                                    <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Opportunity</p>
+                                    <p className="text-sm text-gray-700">Feedback specificity — paras are encouraging (&quot;There you go!&quot;) but can level up to Notice → Name → Next Step for more targeted student growth</p>
+                                  </div>
+                                </div>
+
+                                {/* 5. Teacher Shoutouts */}
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Teacher Shoutouts</p>
+                                  <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+                                    <div>
+                                      <p className="font-semibold text-gray-900">Seidenfuss</p>
+                                      <p className="text-sm text-gray-600">Student-centered math lesson that created real space for meaningful small group para work alongside whole-class instruction.</p>
+                                    </div>
+                                    <div>
+                                      <p className="font-semibold text-gray-900">Roseberg</p>
+                                      <p className="text-sm text-gray-600">Warm, structured environment with systems in place for para support to happen immediately.</p>
+                                    </div>
+                                    <p className="text-xs text-gray-500 italic pt-2 border-t border-blue-100">Principal Bryan Bolton emailed same-day with highlights and Staff Celebration Playbook resource.</p>
                                   </div>
                                 </div>
                               </div>
@@ -3171,74 +3204,118 @@ Thank you for setting the example. It matters more than you know.`;
                           {/* Lake Park Observation Notes */}
                           {school.name === 'Lake Park' && observationResults.lakePark.status === 'complete' && (
                             <details className="py-3 border-b border-gray-100">
-                              <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
-                                <ClipboardList className="w-4 h-4 text-emerald-600" />
-                                Observation Day Notes — March 3, 2026
-                                <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
+                              <summary className="cursor-pointer">
+                                <div className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
+                                  <ClipboardList className="w-4 h-4 text-emerald-600" />
+                                  Observation Day — March 3, 2026
+                                  <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
+                                  <ChevronDown className="w-4 h-4 ml-auto transition-transform group-open:rotate-180" />
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1 ml-6">5 paras contacted · 5 emails sent · &quot;I feel appreciated and continue to give my best to help my kiddos.&quot;</p>
                               </summary>
-                              <div className="mt-3 space-y-3">
-                                {/* Stats Row */}
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
-                                    <p className="font-bold text-gray-900">5</p>
-                                    <p className="text-xs text-gray-500">Paras Observed</p>
-                                  </div>
-                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
-                                    <p className="font-bold text-gray-900">5</p>
-                                    <p className="text-xs text-gray-500">Follow-Up Emails</p>
-                                  </div>
-                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
-                                    <p className="font-bold text-gray-900">Yes</p>
-                                    <p className="text-xs text-gray-500">Principal Email</p>
-                                  </div>
-                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
-                                    <p className="font-bold text-gray-500">Pending</p>
-                                    <p className="text-xs text-gray-500">Responses</p>
+                              <div className="mt-4 space-y-4">
+                                {/* 1. At a Glance */}
+                                <div className="bg-gray-50 rounded-lg p-4">
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">At a Glance</p>
+                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                    <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 1 informal encouragement</span></div>
+                                    <div><span className="text-gray-500">Follow-Up Emails:</span> <span className="font-medium">5 personalized same-day</span></div>
+                                    <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Cristina Villalobos</span></div>
+                                    <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium text-emerald-600">1 (Maribel Ontiveros)</span></div>
                                   </div>
                                 </div>
 
-                                {/* Key Themes */}
-                                <div className="bg-emerald-50 rounded-lg p-3">
-                                  <p className="text-xs font-semibold text-emerald-700 uppercase mb-2">Key Themes</p>
-                                  <ul className="text-sm text-gray-700 space-y-1">
-                                    <li className="flex items-start gap-1.5">
-                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      Strong bilingual support - seamless English/Spanish scaffolding
-                                    </li>
-                                    <li className="flex items-start gap-1.5">
-                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      Patience and calm regulation across every observation
-                                    </li>
-                                    <li className="flex items-start gap-1.5">
-                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      Proactive behavior management (stretching, choice-based redirection)
-                                    </li>
-                                    <li className="flex items-start gap-1.5">
-                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      Encouragement is frequent and genuine building-wide
-                                    </li>
-                                    <li className="flex items-start gap-1.5">
-                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      Active engagement - paras are IN it with students
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                {/* Growth Areas */}
-                                <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
-                                  <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Areas</p>
-                                  <p className="text-sm text-gray-700">Feedback specificity - transition from general praise to Notice → Name → Next Step. Initiative with disengaged students - lead with a question before giving space.</p>
-                                </div>
-
-                                {/* Paras Highlighted */}
+                                {/* 2. Standout Moments */}
                                 <div>
-                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Paras Highlighted</p>
-                                  <div className="flex flex-wrap gap-1.5">
-                                    {observationResults.lakePark.parasHighlighted.map((p, pIdx) => (
-                                      <span key={pIdx} className="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-full">
-                                        {p.name}
-                                      </span>
-                                    ))}
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Standout Moments</p>
+                                  <div className="space-y-3">
+                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
+                                      <p className="font-semibold text-gray-900">Maribel Ontiveros <span className="text-xs font-normal text-gray-500">(Resource)</span></p>
+                                      <p className="text-sm text-gray-600 mt-1">Sitting WITH students during activity, not hovering. Seamlessly switching between English and Spanish to clarify directions and encourage effort. Checked in with teacher before redirecting. Paused group for a stretch when hands got tired — preventing dysregulation before it started. &quot;Oh very nice!&quot; &quot;Muy bonito!&quot;</p>
+                                    </div>
+                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
+                                      <p className="font-semibold text-gray-900">Mary Falco <span className="text-xs font-normal text-gray-500">(Resource)</span></p>
+                                      <p className="text-sm text-gray-600 mt-1">Jumped into literacy centers with zero downtime. &quot;See! Easy! Easy peasy lemon squeezy!&quot; Made practice feel doable. Used timer + motivating words. Actively participated during OT transition — walking, rolling the wheel WITH the student. Quiet voice in hallways.</p>
+                                    </div>
+                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
+                                      <p className="font-semibold text-gray-900">Natalia Villalobos <span className="text-xs font-normal text-gray-500">(Small Group Art)</span></p>
+                                      <p className="text-sm text-gray-600 mt-1">Clear expectations: &quot;We are going to do dots in the corner for snow!&quot; Sweet, calm voice. &quot;Hop hop with your sponge!&quot; Playful engagement without losing structure. Chunked directions. Patient with student struggling to sit still.</p>
+                                    </div>
+                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
+                                      <p className="font-semibold text-gray-900">Ruby Medina <span className="text-xs font-normal text-gray-500">(Informal)</span></p>
+                                      <p className="text-sm text-gray-600 mt-1">Working closely with Angelo — intentional, individualized support. &quot;Do you want to sit over here?&quot; — choice-based redirection. Modeled painting by holding student&apos;s hand. Patient and calm throughout.</p>
+                                    </div>
+                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
+                                      <p className="font-semibold text-gray-900">Shelly Mayer <span className="text-xs font-normal text-gray-500">(Intensive Intervention)</span></p>
+                                      <p className="text-sm text-gray-600 mt-1">Comforted upset student across room: &quot;You&apos;re okay&quot; with hand hold. Noticed student connected with a book — moved to table to read together. Growth area: leading with a question before giving space with disengaged students.</p>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* 3. Para Voices */}
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Para Voices</p>
+                                  <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
+                                    <p className="text-sm italic text-gray-700">&quot;Thank you so much for taking the time to observe me and for such kind and encouraging words. I feel appreciated and continue to give my best to help my kiddos.&quot;</p>
+                                    <p className="text-xs text-gray-500 mt-2">— Maribel Ontiveros, Lake Park (Resource)</p>
+                                    <p className="text-xs text-emerald-600 mt-1">Replied same day</p>
+                                  </blockquote>
+                                </div>
+
+                                {/* 4. Building Themes */}
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Building Themes</p>
+                                  <div className="bg-emerald-50 rounded-lg p-4 mb-3">
+                                    <p className="text-xs font-semibold text-emerald-700 uppercase mb-2">Strengths</p>
+                                    <ul className="text-sm text-gray-700 space-y-1">
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Strong bilingual support — seamless English/Spanish scaffolding
+                                      </li>
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Patience and calm regulation across every observation
+                                      </li>
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Proactive behavior management — stretching, choice-based redirection, timers
+                                      </li>
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Encouragement is frequent and genuine building-wide
+                                      </li>
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Clear, chunked directions — especially in Resource and small group
+                                      </li>
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Active engagement — paras IN it with students, not supervising
+                                      </li>
+                                    </ul>
+                                  </div>
+                                  <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                                    <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Opportunities</p>
+                                    <ul className="text-sm text-gray-700 space-y-1">
+                                      <li>→ Feedback specificity — level up from &quot;Nice job!&quot; to Notice → Name → Next Step</li>
+                                      <li>→ Initiative with disengaged students — lead with a question before giving space</li>
+                                    </ul>
+                                  </div>
+                                </div>
+
+                                {/* 5. Teaching Staff Highlights */}
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Teaching Staff Highlights</p>
+                                  <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+                                    <div>
+                                      <p className="font-semibold text-gray-900">Blue Pod Teachers</p>
+                                      <p className="text-sm text-gray-600">Well-structured, student-centered environments that allowed paras to do meaningful work alongside instruction. Classroom design was clearly intentional.</p>
+                                    </div>
+                                    <div>
+                                      <p className="font-semibold text-gray-900">Resource Team Culture</p>
+                                      <p className="text-sm text-gray-600">Strong systems already in place. Paras could engage immediately because routines and expectations were established.</p>
+                                    </div>
+                                    <p className="text-xs text-gray-500 italic pt-2 border-t border-blue-100">Principal Cristina Villalobos emailed same-day with highlights and Staff Celebration Playbook resource.</p>
                                   </div>
                                 </div>
                               </div>
@@ -3248,74 +3325,112 @@ Thank you for setting the example. It matters more than you know.`;
                           {/* Lincoln Observation Notes */}
                           {school.name === 'Lincoln' && observationResults.lincoln.status === 'complete' && (
                             <details className="py-3 border-b border-gray-100">
-                              <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
-                                <ClipboardList className="w-4 h-4 text-emerald-600" />
-                                Observation Day Notes — March 3, 2026
-                                <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
+                              <summary className="cursor-pointer">
+                                <div className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
+                                  <ClipboardList className="w-4 h-4 text-emerald-600" />
+                                  Observation Day — March 3, 2026
+                                  <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
+                                  <ChevronDown className="w-4 h-4 ml-auto transition-transform group-open:rotate-180" />
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1 ml-6">4 paras observed · 4 emails sent · Carlos Chavez reading group &quot;felt like a master class&quot;</p>
                               </summary>
-                              <div className="mt-3 space-y-3">
-                                {/* Stats Row */}
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
-                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
-                                    <p className="font-bold text-gray-900">9</p>
-                                    <p className="text-xs text-gray-500">Paras Contacted</p>
-                                  </div>
-                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
-                                    <p className="font-bold text-gray-900">8</p>
-                                    <p className="text-xs text-gray-500">Follow-Up Emails</p>
-                                  </div>
-                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
-                                    <p className="font-bold text-gray-900">Yes</p>
-                                    <p className="text-xs text-gray-500">Principal Email</p>
-                                  </div>
-                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
-                                    <p className="font-bold text-emerald-600">1</p>
-                                    <p className="text-xs text-gray-500">Same-Day Reply</p>
+                              <div className="mt-4 space-y-4">
+                                {/* 1. At a Glance */}
+                                <div className="bg-gray-50 rounded-lg p-4">
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">At a Glance</p>
+                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                    <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal</span></div>
+                                    <div><span className="text-gray-500">Follow-Up Emails:</span> <span className="font-medium">4 personalized same-day</span></div>
+                                    <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Kara Dohman</span></div>
+                                    <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium text-gray-500">[update as replies come in]</span></div>
                                   </div>
                                 </div>
 
-                                {/* Key Themes */}
-                                <div className="bg-emerald-50 rounded-lg p-3">
-                                  <p className="text-xs font-semibold text-emerald-700 uppercase mb-2">Key Themes</p>
-                                  <ul className="text-sm text-gray-700 space-y-1">
-                                    <li className="flex items-start gap-1.5">
-                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      Strong questioning skills — guiding thinking rather than giving answers
-                                    </li>
-                                    <li className="flex items-start gap-1.5">
-                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      Genuine encouragement — high-fives, process-focused feedback
-                                    </li>
-                                    <li className="flex items-start gap-1.5">
-                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      Effective positioning — at student level, circulating
-                                    </li>
-                                    <li className="flex items-start gap-1.5">
-                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      Seamless teacher-para collaboration
-                                    </li>
-                                    <li className="flex items-start gap-1.5">
-                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                      Calm leadership under pressure — fire drill moment
-                                    </li>
-                                  </ul>
-                                </div>
-
-                                {/* Growth Areas */}
-                                <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
-                                  <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Areas</p>
-                                  <p className="text-sm text-gray-700">Feedback specificity - transition from general praise to Notice → Name → Next Step. More proactive engagement with disengaged students.</p>
-                                </div>
-
-                                {/* Paras Highlighted */}
+                                {/* 2. Standout Moments */}
                                 <div>
-                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Paras Highlighted</p>
-                                  <div className="flex flex-wrap gap-1.5">
-                                    {observationResults.lincoln.parasHighlighted.map((p, pIdx) => (
-                                      <span key={pIdx} className="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-full">
-                                        {p.name}
-                                      </span>
-                                    ))}
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Standout Moments</p>
+                                  <div className="space-y-3">
+                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
+                                      <p className="font-semibold text-gray-900">Rose Marinelli <span className="text-xs font-normal text-gray-500">(w/ Valdes)</span></p>
+                                      <p className="text-sm text-gray-600 mt-1">Sitting on the floor with students during the lesson — right there with them. &quot;See, if you have a pizza...&quot; — made fractions real. Nodding along as students answered. Whispering redirections. Asked teacher about shading rule for accuracy. Got supplies during transition before students needed them. &quot;Let&apos;s work for 10 minutes, and then we can take a break. Does that sound good?&quot; <span className="italic text-gray-500">Also: her granddaughter was born later that day. She showed up fully anyway.</span></p>
+                                    </div>
+                                    <div className="bg-white border border-emerald-200 rounded-lg p-3 ring-1 ring-emerald-100">
+                                      <p className="font-semibold text-gray-900">Carlos Chavez <span className="text-xs font-normal text-gray-500">(w/ Savaglio)</span> <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">⭐ STANDOUT</span></p>
+                                      <p className="text-sm text-gray-600 mt-1">Running a small reading group that felt like a real lesson. &quot;Let&apos;s read the title and make a prediction.&quot; Questions everywhere — the right kind. &quot;And then we end our sentence with a what?&quot; Validated thinking: &quot;Good idea!&quot; &quot;I like that thought!&quot; Sounded out words alongside students. Summarized sections to check understanding — a strategy many certified teachers don&apos;t do consistently. <span className="font-medium text-emerald-700">This wasn&apos;t support. This was teaching.</span></p>
+                                    </div>
+                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
+                                      <p className="font-semibold text-gray-900">Gregoria Arredondo <span className="text-xs font-normal text-gray-500">(Teacher in Meeting)</span></p>
+                                      <p className="text-sm text-gray-600 mt-1">Teacher in meeting, other para at lunch. Running the room solo. &quot;Do you want me to help you with...?&quot; Turned casual play into language-building. Managed transitions: &quot;OK students, we can have 5 minutes of free time before we...&quot; Bilingual directions. Handled nurse visit. Facilitated art activity. Problem-solving in real time. <span className="text-amber-600">Growth: go-to questions for redirecting disengaged students.</span></p>
+                                    </div>
+                                    <div className="bg-white border border-gray-200 rounded-lg p-3">
+                                      <p className="font-semibold text-gray-900">Michelina (Lina) Hawkins <span className="text-xs font-normal text-gray-500">(Post-Lunch)</span></p>
+                                      <p className="text-sm text-gray-600 mt-1">Returned from lunch, immediately checked in with other para for handoff. &quot;How&apos;s Alise doing? She was tired earlier.&quot; Strong rapport: &quot;6, 7? That was from last year!&quot; &quot;Who wants to sit at my table?&quot; — students chose her. Asked real questions: &quot;What do you think we should do with these?&quot; <span className="text-amber-600">Growth: anchoring strategies for whole-group redirection.</span></p>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* 3. Para Voices */}
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Para Voices</p>
+                                  <div className="bg-gray-50 rounded-lg p-4 text-center text-sm text-gray-500 italic">
+                                    To be updated as Lincoln replies come in
+                                  </div>
+                                </div>
+
+                                {/* 4. Building Themes */}
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Building Themes</p>
+                                  <div className="bg-emerald-50 rounded-lg p-4 mb-3">
+                                    <p className="text-xs font-semibold text-emerald-700 uppercase mb-2">Strengths</p>
+                                    <ul className="text-sm text-gray-700 space-y-1">
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Strong questioning — real-world examples, predictions, comprehension checks
+                                      </li>
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Genuine student relationships — trust, humor, students choosing to work with paras
+                                      </li>
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Paras stepping into leadership when teachers unavailable
+                                      </li>
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Positioning and proximity — sitting on floors, working alongside students
+                                      </li>
+                                      <li className="flex items-start gap-1.5">
+                                        <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                        Investment in content accuracy — paras asking teachers clarifying questions
+                                      </li>
+                                    </ul>
+                                  </div>
+                                  <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                                    <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Opportunities</p>
+                                    <ul className="text-sm text-gray-700 space-y-1">
+                                      <li>→ Classroom management support for paras leading rooms independently — go-to questions for whole-group redirection</li>
+                                      <li>→ Feedback specificity — ready to level up from encouragement to Notice → Name → Next Step</li>
+                                    </ul>
+                                  </div>
+                                </div>
+
+                                {/* 5. Teaching Staff Highlights */}
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Teaching Staff Highlights</p>
+                                  <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+                                    <div>
+                                      <p className="font-semibold text-gray-900">Savaglio</p>
+                                      <p className="text-sm text-gray-600">Classroom structured to give the para real ownership of instruction. The reading group felt like a master class because the design trusted the para with meaningful work.</p>
+                                    </div>
+                                    <div>
+                                      <p className="font-semibold text-gray-900">Valdes</p>
+                                      <p className="text-sm text-gray-600">Well-paced lesson that created natural space for the para to sit with students, support with real-world examples, and redirect quietly.</p>
+                                    </div>
+                                    <div>
+                                      <p className="font-semibold text-gray-900">Para Leadership Moment (Gillen)</p>
+                                      <p className="text-sm text-gray-600">Two paras ran the classroom independently while the teacher was in a meeting. Managed transitions, gave bilingual directions, redirected students. An enormous ask — and they stepped up.</p>
+                                    </div>
+                                    <p className="text-xs text-gray-500 italic pt-2 border-t border-blue-100">Principal Kara Dohman emailed same-day with highlights and Staff Celebration Playbook resource.</p>
                                   </div>
                                 </div>
                               </div>
