@@ -73,6 +73,8 @@ export default function ASD4Dashboard() {
   const tabContentRef = useRef<HTMLDivElement>(null);
   const [expandedSchool, setExpandedSchool] = useState<string | null>(null);
   const [showRoster, setShowRoster] = useState<string | null>(null);
+  const [observationExpanded, setObservationExpanded] = useState(false);
+  const [expandedObsBuilding, setExpandedObsBuilding] = useState<string | null>('fullerton');
 
   // Needs Attention completion state with localStorage persistence
   // Only 2 items remain in Needs Attention - Virtual Session 4 and Executive Session 2
@@ -186,24 +188,40 @@ export default function ASD4Dashboard() {
         "Growth Group formation planning"
       ],
       status: "complete" as const
-    }
-  ];
-
-  // Upcoming/Scheduled sessions data
-  const upcomingSessions = [
+    },
     {
       title: "Observation Day",
       date: "March 3, 2026",
-      time: "7:30 AM - 3:00 PM",
       format: "In-Person",
-      location: "District Schools",
+      duration: "Full Day (7:30 AM - 3:00 PM)",
       focusAreas: [
         "Classroom observation of para-student interactions",
         "Strategy implementation check-ins",
         "Real-time coaching feedback"
       ],
-      status: "scheduled" as const
-    },
+      status: "complete" as const,
+      observationStats: {
+        buildingsVisited: 3,
+        parasObserved: 4,
+        informalObservations: 2,
+        appreciationVisits: 2,
+        followUpEmails: 7,
+        principalEmails: 1,
+        sameDayResponses: 1,
+        sameDayResponseRate: 14,
+        hubResourcesMatched: 7
+      },
+      highlightQuote: {
+        text: "I wish I could meet all my students' many needs every day.",
+        author: "Scott Nyquist",
+        school: "Fullerton",
+        context: "Replied 5 minutes after receiving observation follow-up email"
+      }
+    }
+  ];
+
+  // Upcoming/Scheduled sessions data
+  const upcomingSessions = [
     {
       title: "Virtual Session 2",
       date: "April 6, 2026",
@@ -273,6 +291,120 @@ export default function ASD4Dashboard() {
       ]
     }
   ];
+
+  // Observation Day Results - March 3, 2026
+  const observationResults = {
+    fullerton: {
+      school: "Fullerton",
+      status: "complete",
+      stats: {
+        parasObserved: 4,
+        informalObservations: 2,
+        appreciationVisits: 2,
+        followUpEmails: 7,
+        principalEmail: true,
+        principalName: "Bryan Bolton",
+        sameDayResponses: 1
+      },
+      movesObserved: [
+        {
+          move: "Ask Don't Tell",
+          color: "orange",
+          examples: [
+            { para: "Jonnathan Roeglin", example: "Asked \"How do we make this into a fraction?\" during small group math — guiding students to think through the problem instead of giving the answer" },
+            { para: "Fatema Bakhrani", example: "Asked \"What letter is missing from 'house'?\" — direct questioning to get student thinking while re-reading worksheet directions together" },
+            { para: "Esperanza Garcia", example: "Reading directions and asking questions in Spanish to get her student thinking, not just translating answers" }
+          ]
+        },
+        {
+          move: "Feedback & Encouragement",
+          color: "teal",
+          examples: [
+            { para: "Kristina Orellana", example: "Encouraged a sleepy, disengaged student with repeated questions, then guided him to raise his hand and answer for the full class — building confidence, not just compliance" },
+            { para: "Kristina Orellana", example: "\"There you go!\" — positive reinforcement during counting activity, encouraging participation" }
+          ]
+        },
+        {
+          move: "Positioning & Proximity",
+          color: "blue",
+          examples: [
+            { para: "Jonnathan Roeglin", example: "Crouching down to student level during small group work instead of standing over — sending the message \"I'm here WITH you\"" },
+            { para: "Esperanza Garcia", example: "Working in the back of the room with quiet voice — supporting her student without disrupting whole-class instruction" },
+            { para: "Kristina Orellana", example: "Sat with disengaged student in back of room rather than calling him out — proximity as a redirection tool" }
+          ]
+        },
+        {
+          move: "Redirection",
+          color: "purple",
+          examples: [
+            { para: "Jonnathan Roeglin", example: "Scanning the room and redirecting off-task students to keep them on track during independent work time, even while running his own small group" },
+            { para: "Esperanza Garcia", example: "Patiently redirecting a distracted student back to questions on the screen — persistence without frustration" },
+            { para: "Kristina Orellana", example: "Quietly redirecting during math transition by sitting alongside the student" }
+          ]
+        },
+        {
+          move: "Teacher-Para Collaboration",
+          color: "green",
+          examples: [
+            { para: "Jonnathan Roeglin", example: "Positioned in back during whole-class lesson to listen, support, and interact with teacher — \"thumbs up if...\" — seamless classroom partnership" },
+            { para: "Kristina Orellana", example: "Checked in with classroom teacher quietly during a video to get an update without disrupting the lesson flow" }
+          ]
+        },
+        {
+          move: "Bilingual Support",
+          color: "pink",
+          examples: [
+            { para: "Esperanza Garcia", example: "Reading and speaking entirely in Spanish with 1:1 student in a fully Spanish classroom — meeting the student in their language to make content accessible" }
+          ]
+        }
+      ],
+      hubResources: [
+        { para: "Jonnathan Roeglin", resource: "Feedback Framework Quick Reference", reason: "Strong questioning already — next step is pairing questions with Notice → Name → Next Step feedback" },
+        { para: "Esperanza Garcia", resource: "Supporting English Learners + Bilingual Reference Cards", reason: "Directly connects to the bilingual scaffolding work she's already doing" },
+        { para: "Kristina Orellana", resource: "PA Quick Wins Menu", reason: "Already doing high-impact moves naturally — quick-grab reference for more" },
+        { para: "Fatema Bakhrani", resource: "Feedback Framework Quick Reference", reason: "Good guiding questions observed — feedback formula is the natural next layer" },
+        { para: "Mary Dunkel", resource: "Para Quick-Start Confidence Kit", reason: "Clean starting point for Hub engagement" },
+        { para: "Scott Nyquist", resource: "\"What Should I Be Doing Right Now?\" Para Guide", reason: "Practical role-affirming reference" },
+        { para: "Evely Castillo", resource: "Para Quick-Start Confidence Kit", reason: "Accessible starting point for continued growth" }
+      ],
+      quotes: [
+        { text: "I wish I could meet all my students' many needs every day.", author: "Scott Nyquist", context: "Replied 5 minutes after receiving observation follow-up email" }
+      ],
+      themes: {
+        strengths: [
+          "Strong questioning skills across multiple paras — Move #1 is landing",
+          "Patience and persistence with disengaged or distracted students",
+          "Natural teacher-para collaboration happening without prompting",
+          "Bilingual scaffolding actively supporting EL students",
+          "Paras positioning themselves intentionally (crouching, back of room, sitting alongside)"
+        ],
+        growthOpportunity: "Feedback specificity — paras are encouraging (\"There you go!\") but can level up to Notice → Name → Next Step for more targeted student growth"
+      },
+      teacherHighlights: [
+        { teacher: "Seidenfuss", room: "Rm 23", grade: "4th Grade Math", note: "Well-paced, student-centered lesson that created real space for meaningful small group para work alongside whole-class instruction." },
+        { teacher: "Roseberg", room: "Rm 29", grade: "", note: "Warm, structured classroom environment where students were engaged and systems were in place for the para to jump right in and support." }
+      ],
+      parasHighlighted: [
+        { name: "Jonnathan Roeglin", highlights: ["Guiding questions in small group math", "Strong room awareness"] },
+        { name: "Esperanza Garcia", highlights: ["Bilingual 1:1 support", "Patient redirection"] },
+        { name: "Kristina Orellana", highlights: ["Encouraged disengaged student to answer for full class"] },
+        { name: "Fatema Bakhrani", highlights: ["Direct questioning during worksheet support"] },
+        { name: "Mary Dunkel", highlights: ["Engaged, present support with student"] },
+        { name: "Scott Nyquist", highlights: ["\"I wish I could meet all my students' many needs every day\""] },
+        { name: "Evely Castillo", highlights: ["Appreciated for commitment to team"] }
+      ]
+    },
+    lakePark: {
+      school: "Lake Park",
+      status: "pending",
+      stats: null
+    },
+    lincoln: {
+      school: "Lincoln",
+      status: "pending",
+      stats: null
+    }
+  };
 
   // Progress tab data
   const topEngagedParas = [
@@ -1727,26 +1859,266 @@ Thank you for setting the example. It matters more than you know.`;
                     </h4>
                     <div className="space-y-3">
                       {completedSessions.map((session, idx) => (
-                        <div key={idx} className={`bg-emerald-50 rounded-lg p-4 border ${
-                          session.reportUrl ? 'border-emerald-300' : 'border-emerald-200'
-                        }`}>
-                          <div className="flex items-start justify-between gap-3">
-                            <div>
-                              <h5 className="font-semibold text-gray-900">{session.title}</h5>
-                              <p className="text-sm text-gray-500">{session.date} · {session.format}</p>
-                            </div>
-                            {session.reportUrl && (
-                              <a
-                                href={session.reportUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                        <div key={idx}>
+                          {session.title === "Observation Day" ? (
+                            /* ===== EXPANDABLE OBSERVATION DAY CARD ===== */
+                            <div className="bg-emerald-50 rounded-xl border border-emerald-300 overflow-hidden">
+                              {/* Collapsed Header - Always Visible */}
+                              <button
+                                onClick={() => setObservationExpanded(!observationExpanded)}
+                                className="w-full p-4 text-left hover:bg-emerald-100 transition-colors"
                               >
-                                <FileText className="w-3 h-3" />
-                                View Report
-                              </a>
-                            )}
-                          </div>
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <Check className="w-5 h-5 text-emerald-600" />
+                                      <h5 className="font-semibold text-gray-900">{session.title}</h5>
+                                      <span className="text-sm text-gray-500">— {session.date}</span>
+                                    </div>
+                                    <p className="text-sm text-gray-600 mb-2">
+                                      3 Buildings Visited · 4 Paras Observed · 7 Follow-Up Emails · 14% Same-Day Response
+                                    </p>
+                                    <blockquote className="text-sm italic text-gray-600 border-l-2 border-emerald-400 pl-3">
+                                      &quot;I wish I could meet all my students&apos; many needs every day.&quot;
+                                      <span className="block text-xs text-gray-500 mt-1 not-italic">— Scott Nyquist, Fullerton</span>
+                                    </blockquote>
+                                  </div>
+                                  <ChevronDown className={`w-5 h-5 text-emerald-600 transition-transform ${observationExpanded ? 'rotate-180' : ''}`} />
+                                </div>
+                              </button>
+
+                              {/* Expanded Content */}
+                              {observationExpanded && (
+                                <div className="border-t border-emerald-200 p-4 space-y-6 bg-white">
+                                  {/* Day at a Glance */}
+                                  <div>
+                                    <h6 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                      <BarChart3 className="w-4 h-4 text-emerald-600" />
+                                      Day at a Glance
+                                    </h6>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                      <div className="bg-emerald-50 rounded-lg p-3 text-center">
+                                        <p className="text-2xl font-bold text-emerald-700">3</p>
+                                        <p className="text-xs text-gray-600">Buildings Visited</p>
+                                      </div>
+                                      <div className="bg-emerald-50 rounded-lg p-3 text-center">
+                                        <p className="text-2xl font-bold text-emerald-700">4</p>
+                                        <p className="text-xs text-gray-600">Paras Observed</p>
+                                      </div>
+                                      <div className="bg-emerald-50 rounded-lg p-3 text-center">
+                                        <p className="text-2xl font-bold text-emerald-700">7</p>
+                                        <p className="text-xs text-gray-600">Follow-Up Emails</p>
+                                      </div>
+                                      <div className="bg-emerald-50 rounded-lg p-3 text-center">
+                                        <p className="text-2xl font-bold text-emerald-700">7</p>
+                                        <p className="text-xs text-gray-600">Hub Resources Matched</p>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Building Sections */}
+                                  <div>
+                                    <h6 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                      <Building className="w-4 h-4 text-blue-600" />
+                                      Building Details
+                                    </h6>
+
+                                    {/* Building Tabs */}
+                                    <div className="flex gap-2 mb-4 border-b border-gray-200">
+                                      <button
+                                        onClick={() => setExpandedObsBuilding('fullerton')}
+                                        className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                                          expandedObsBuilding === 'fullerton'
+                                            ? 'border-emerald-600 text-emerald-700'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                                        }`}
+                                      >
+                                        Fullerton
+                                      </button>
+                                      <button
+                                        onClick={() => setExpandedObsBuilding('lakePark')}
+                                        className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                                          expandedObsBuilding === 'lakePark'
+                                            ? 'border-emerald-600 text-emerald-700'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                                        }`}
+                                      >
+                                        Lake Park
+                                      </button>
+                                      <button
+                                        onClick={() => setExpandedObsBuilding('lincoln')}
+                                        className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+                                          expandedObsBuilding === 'lincoln'
+                                            ? 'border-emerald-600 text-emerald-700'
+                                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                                        }`}
+                                      >
+                                        Lincoln
+                                      </button>
+                                    </div>
+
+                                    {/* Fullerton Content */}
+                                    {expandedObsBuilding === 'fullerton' && (
+                                      <div className="space-y-6">
+                                        {/* Overview Stats */}
+                                        <div className="bg-gray-50 rounded-lg p-4">
+                                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+                                            <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 2 informal, 2 appreciation</span></div>
+                                            <div><span className="text-gray-500">Follow-Ups:</span> <span className="font-medium">7 personalized emails</span></div>
+                                            <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Bryan Bolton</span></div>
+                                            <div><span className="text-gray-500">Same-Day Response:</span> <span className="font-medium">1 (Scott Nyquist - 5 min)</span></div>
+                                          </div>
+                                        </div>
+
+                                        {/* Moves Observed */}
+                                        <div>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Moves Observed in Action</h6>
+                                          <div className="space-y-4">
+                                            {observationResults.fullerton.movesObserved.map((move, moveIdx) => (
+                                              <div key={moveIdx} className="border border-gray-200 rounded-lg overflow-hidden">
+                                                <div className={`px-4 py-2 font-medium text-sm flex items-center gap-2 ${
+                                                  move.color === 'orange' ? 'bg-orange-50 text-orange-800' :
+                                                  move.color === 'teal' ? 'bg-teal-50 text-teal-800' :
+                                                  move.color === 'blue' ? 'bg-blue-50 text-blue-800' :
+                                                  move.color === 'purple' ? 'bg-purple-50 text-purple-800' :
+                                                  move.color === 'green' ? 'bg-green-50 text-green-800' :
+                                                  'bg-pink-50 text-pink-800'
+                                                }`}>
+                                                  <Check className="w-4 h-4" />
+                                                  {move.move}
+                                                </div>
+                                                <div className="p-3 space-y-2">
+                                                  {move.examples.map((ex, exIdx) => (
+                                                    <div key={exIdx} className="text-sm border-b border-gray-100 last:border-0 pb-2 last:pb-0">
+                                                      <span className="font-medium text-gray-900">{ex.para}:</span>
+                                                      <span className="text-gray-600 ml-1">{ex.example}</span>
+                                                    </div>
+                                                  ))}
+                                                </div>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        </div>
+
+                                        {/* Hub Resources */}
+                                        <div>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Hub Resources Recommended</h6>
+                                          <div className="overflow-x-auto">
+                                            <table className="w-full text-sm">
+                                              <thead>
+                                                <tr className="border-b border-gray-200 bg-gray-50">
+                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Para</th>
+                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Resource</th>
+                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Why</th>
+                                                </tr>
+                                              </thead>
+                                              <tbody>
+                                                {observationResults.fullerton.hubResources.map((r, rIdx) => (
+                                                  <tr key={rIdx} className="border-b border-gray-100">
+                                                    <td className="py-2 px-3 font-medium text-gray-900">{r.para}</td>
+                                                    <td className="py-2 px-3 text-blue-600">{r.resource}</td>
+                                                    <td className="py-2 px-3 text-gray-600">{r.reason}</td>
+                                                  </tr>
+                                                ))}
+                                              </tbody>
+                                            </table>
+                                          </div>
+                                        </div>
+
+                                        {/* Quotes */}
+                                        <div>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Direct Quotes from Paras</h6>
+                                          {observationResults.fullerton.quotes.map((q, qIdx) => (
+                                            <blockquote key={qIdx} className="bg-emerald-50 border-l-4 border-emerald-400 p-4 rounded-r-lg">
+                                              <p className="text-gray-700 italic">&quot;{q.text}&quot;</p>
+                                              <footer className="text-sm text-gray-500 mt-2">— {q.author}, Fullerton<br/><span className="text-xs">{q.context}</span></footer>
+                                            </blockquote>
+                                          ))}
+                                        </div>
+
+                                        {/* Building Themes */}
+                                        <div>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Building-Level Themes</h6>
+                                          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+                                            <div>
+                                              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Strengths</p>
+                                              <ul className="space-y-1">
+                                                {observationResults.fullerton.themes.strengths.map((s, sIdx) => (
+                                                  <li key={sIdx} className="text-sm text-gray-700 flex items-start gap-2">
+                                                    <Check className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                                    {s}
+                                                  </li>
+                                                ))}
+                                              </ul>
+                                            </div>
+                                            <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                                              <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Opportunity</p>
+                                              <p className="text-sm text-gray-700">{observationResults.fullerton.themes.growthOpportunity}</p>
+                                            </div>
+                                          </div>
+                                        </div>
+
+                                        {/* Teacher Highlights */}
+                                        <div>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Teacher Collaboration Highlights</h6>
+                                          <div className="bg-blue-50 rounded-lg p-4 space-y-3">
+                                            {observationResults.fullerton.teacherHighlights.map((t, tIdx) => (
+                                              <div key={tIdx} className="border-b border-blue-100 last:border-0 pb-2 last:pb-0">
+                                                <p className="font-medium text-gray-900">{t.teacher} ({t.room}{t.grade ? `, ${t.grade}` : ''})</p>
+                                                <p className="text-sm text-gray-600">{t.note}</p>
+                                              </div>
+                                            ))}
+                                            <p className="text-xs text-gray-500 mt-2">Principal Bryan Bolton was emailed same-day with these highlights and provided the Staff Celebration Playbook resource.</p>
+                                          </div>
+                                        </div>
+                                      </div>
+                                    )}
+
+                                    {/* Lake Park Placeholder */}
+                                    {expandedObsBuilding === 'lakePark' && (
+                                      <div className="bg-gray-50 rounded-lg p-8 text-center">
+                                        <Clock className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                                        <p className="text-gray-600 font-medium">Data Being Processed</p>
+                                        <p className="text-sm text-gray-500">Lake Park observation notes will be added after processing is complete.</p>
+                                      </div>
+                                    )}
+
+                                    {/* Lincoln Placeholder */}
+                                    {expandedObsBuilding === 'lincoln' && (
+                                      <div className="bg-gray-50 rounded-lg p-8 text-center">
+                                        <Clock className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                                        <p className="text-gray-600 font-medium">Data Being Processed</p>
+                                        <p className="text-sm text-gray-500">Lincoln observation notes will be added after processing is complete.</p>
+                                      </div>
+                                    )}
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            /* Standard completed session card */
+                            <div className={`bg-emerald-50 rounded-lg p-4 border ${
+                              session.reportUrl ? 'border-emerald-300' : 'border-emerald-200'
+                            }`}>
+                              <div className="flex items-start justify-between gap-3">
+                                <div>
+                                  <h5 className="font-semibold text-gray-900">{session.title}</h5>
+                                  <p className="text-sm text-gray-500">{session.date} · {session.format}</p>
+                                </div>
+                                {session.reportUrl && (
+                                  <a
+                                    href={session.reportUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
+                                  >
+                                    <FileText className="w-3 h-3" />
+                                    View Report
+                                  </a>
+                                )}
+                              </div>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -1761,48 +2133,9 @@ Thank you for setting the example. It matters more than you know.`;
                       </h4>
                       <div className="space-y-3">
                         {upcomingSessions.map((session, idx) => (
-                          <div key={idx}>
-                            {session.title === "Observation Day" ? (
-                              <details className="bg-blue-50 rounded-lg border border-blue-200">
-                                <summary className="p-4 cursor-pointer hover:bg-blue-100 transition-colors rounded-lg">
-                                  <div className="inline">
-                                    <span className="font-semibold text-gray-900">{session.title}</span>
-                                    <span className="text-sm text-blue-600 ml-2">{session.date} · {session.time} · {session.format}</span>
-                                  </div>
-                                </summary>
-                                <div className="px-4 pb-4 space-y-4">
-                                  {observationSchedule.map((stop, stopIdx) => (
-                                    <div key={stopIdx} className="bg-white rounded-lg p-4 border border-gray-200">
-                                      <div className="flex items-center justify-between mb-3">
-                                        <div className="flex items-center gap-2">
-                                          <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">Stop {stop.stopNumber}</span>
-                                          <span className="font-semibold text-gray-900">{stop.school}</span>
-                                        </div>
-                                        <span className="text-sm text-gray-500">{stop.timeRange}</span>
-                                      </div>
-                                      <div className="space-y-2">
-                                        {stop.observations.map((obs, obsIdx) => (
-                                          <div key={obsIdx} className="flex items-start gap-3 text-sm py-1.5 border-b border-gray-100 last:border-0">
-                                            <span className="text-gray-500 font-mono text-xs w-24 flex-shrink-0">{obs.time}</span>
-                                            <span className="font-medium text-gray-900 w-36 flex-shrink-0">{obs.para}</span>
-                                            <span className="text-gray-600 w-20 flex-shrink-0">{obs.teacher}</span>
-                                            <span className="text-gray-400 text-xs">{obs.note}</span>
-                                          </div>
-                                        ))}
-                                      </div>
-                                    </div>
-                                  ))}
-                                  <div className="text-xs text-gray-500 bg-amber-50 border border-amber-200 rounded-lg p-3">
-                                    <strong>Note:</strong> Lake Park schedule updated based on para schedules from Janet Diaz (3/2/26). Sandi DeLaGarza moved to 10:55-11:15 to observe during her confirmed Goodman window.
-                                  </div>
-                                </div>
-                              </details>
-                            ) : (
-                              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                                <h5 className="font-semibold text-gray-900">{session.title}</h5>
-                                <p className="text-sm text-blue-600">{session.date} · {session.time} · {session.format}</p>
-                              </div>
-                            )}
+                          <div key={idx} className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                            <h5 className="font-semibold text-gray-900">{session.title}</h5>
+                            <p className="text-sm text-blue-600">{session.date} · {session.time} · {session.format}</p>
                           </div>
                         ))}
                       </div>
@@ -2319,6 +2652,98 @@ Thank you for setting the example. It matters more than you know.`;
                                 </span>
                               ))}
                             </div>
+                          )}
+
+                          {/* Observation Day Notes */}
+                          {school.name === 'Fullerton' && observationResults.fullerton.status === 'complete' && (
+                            <details className="py-3 border-b border-gray-100">
+                              <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
+                                <ClipboardList className="w-4 h-4 text-emerald-600" />
+                                Observation Day Notes — March 3, 2026
+                                <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
+                              </summary>
+                              <div className="mt-3 space-y-3">
+                                {/* Stats Row */}
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
+                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                                    <p className="font-bold text-gray-900">8</p>
+                                    <p className="text-xs text-gray-500">Paras Observed</p>
+                                  </div>
+                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                                    <p className="font-bold text-gray-900">7</p>
+                                    <p className="text-xs text-gray-500">Follow-Up Emails</p>
+                                  </div>
+                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                                    <p className="font-bold text-gray-900">Yes</p>
+                                    <p className="text-xs text-gray-500">Principal Email</p>
+                                  </div>
+                                  <div className="bg-gray-50 rounded-lg p-2 text-center">
+                                    <p className="font-bold text-emerald-600">1</p>
+                                    <p className="text-xs text-gray-500">Same-Day Response</p>
+                                  </div>
+                                </div>
+
+                                {/* Key Themes */}
+                                <div className="bg-emerald-50 rounded-lg p-3">
+                                  <p className="text-xs font-semibold text-emerald-700 uppercase mb-2">Key Themes</p>
+                                  <ul className="text-sm text-gray-700 space-y-1">
+                                    <li className="flex items-start gap-1.5">
+                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      Strong questioning skills (Move #1) across multiple paras
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      Patient, persistent support with disengaged students
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      Natural teacher-para collaboration
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      Bilingual scaffolding with EL students
+                                    </li>
+                                    <li className="flex items-start gap-1.5">
+                                      <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
+                                      Intentional positioning (crouching, proximity, quiet voice)
+                                    </li>
+                                  </ul>
+                                </div>
+
+                                {/* Growth Area */}
+                                <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+                                  <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Area</p>
+                                  <p className="text-sm text-gray-700">Feedback specificity — encourage transition from general praise to Notice → Name → Next Step formula</p>
+                                </div>
+
+                                {/* Paras Highlighted */}
+                                <div>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Paras Highlighted</p>
+                                  <div className="flex flex-wrap gap-1.5">
+                                    {observationResults.fullerton.parasHighlighted.map((p, pIdx) => (
+                                      <span key={pIdx} className="bg-blue-50 text-blue-700 text-xs px-2 py-1 rounded-full">
+                                        {p.name}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            </details>
+                          )}
+
+                          {/* Lake Park / Lincoln Placeholder Notes */}
+                          {(school.name === 'Lake Park' || school.name === 'Lincoln') && (
+                            <details className="py-3 border-b border-gray-100">
+                              <summary className="cursor-pointer flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-700">
+                                <ClipboardList className="w-4 h-4 text-gray-400" />
+                                Observation Day Notes — March 3, 2026
+                                <span className="ml-2 text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">Processing</span>
+                              </summary>
+                              <div className="mt-3 bg-gray-50 rounded-lg p-4 text-center">
+                                <Clock className="w-6 h-6 text-gray-400 mx-auto mb-1" />
+                                <p className="text-sm text-gray-500">Observation notes will be added after data processing is complete.</p>
+                              </div>
+                            </details>
                           )}
 
                           {/* HERO: What This School Is Learning */}
