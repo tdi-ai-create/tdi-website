@@ -230,6 +230,50 @@ export default function ASD4Dashboard() {
     }
   ];
 
+  // Observation Day Schedule - March 3, 2026
+  const observationSchedule = [
+    {
+      school: "Fullerton",
+      timeRange: "8:30 - 10:25 AM",
+      stopNumber: 1,
+      observations: [
+        { time: "8:30 - 8:50", para: "Para 1", teacher: "TBD", note: "Schedule pending" },
+        { time: "8:50 - 9:10", para: "Para 2", teacher: "TBD", note: "Schedule pending" },
+        { time: "9:10 - 9:30", para: "Para 3", teacher: "TBD", note: "Schedule pending" },
+        { time: "9:30 - 9:50", para: "Para 4", teacher: "TBD", note: "Schedule pending" },
+        { time: "9:50 - 10:10", para: "Para 5", teacher: "TBD", note: "Schedule pending" },
+        { time: "10:10 - 10:25", para: "Para 6", teacher: "TBD", note: "Quick pop-in" },
+      ]
+    },
+    {
+      school: "Lake Park",
+      timeRange: "10:30 - 11:40 AM",
+      stopNumber: 2,
+      observations: [
+        { time: "10:35 - 10:55", para: "Maribel Ontiveros", teacher: "Arroyo", note: "With Arroyo 10:15-10:45, transitions to Garcia at 11:00" },
+        { time: "10:55 - 11:15", para: "Sandi DeLaGarza", teacher: "Goodman", note: "With Goodman 10:15-11:15 - confirmed schedule" },
+        { time: "11:15 - 11:25", para: "Mary Falco", teacher: "Marshall", note: "With Marshall 11:00-11:30 - confirmed schedule" },
+        { time: "11:25 - 11:35", para: "Shelly Mayer", teacher: "Lukic", note: "Rotations - flex slot" },
+        { time: "11:35 - 11:40", para: "Natalia Villalobos", teacher: "Room 62", note: "Quick pop-in" },
+      ]
+    },
+    {
+      school: "Lincoln",
+      timeRange: "12:20 - 3:00 PM",
+      stopNumber: 3,
+      observations: [
+        { time: "12:20 - 12:40", para: "Para 1", teacher: "TBD", note: "Schedule pending" },
+        { time: "12:40 - 1:00", para: "Para 2", teacher: "TBD", note: "Schedule pending" },
+        { time: "1:00 - 1:20", para: "Para 3", teacher: "TBD", note: "Schedule pending" },
+        { time: "1:20 - 1:40", para: "Para 4", teacher: "TBD", note: "Schedule pending" },
+        { time: "1:40 - 2:00", para: "Para 5", teacher: "TBD", note: "Schedule pending" },
+        { time: "2:00 - 2:20", para: "Para 6", teacher: "TBD", note: "Schedule pending" },
+        { time: "2:20 - 2:40", para: "Para 7", teacher: "TBD", note: "Schedule pending" },
+        { time: "2:40 - 3:00", para: "Para 8", teacher: "TBD", note: "Quick pop-in" },
+      ]
+    }
+  ];
+
   // Progress tab data
   const topEngagedParas = [
     { name: "Sandra DeLaGarza", email: "sdelagarza@asd4.org", logins: 4, lastActive: "Jan 23" },
@@ -1717,9 +1761,48 @@ Thank you for setting the example. It matters more than you know.`;
                       </h4>
                       <div className="space-y-3">
                         {upcomingSessions.map((session, idx) => (
-                          <div key={idx} className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                            <h5 className="font-semibold text-gray-900">{session.title}</h5>
-                            <p className="text-sm text-blue-600">{session.date} · {session.time} · {session.format}</p>
+                          <div key={idx}>
+                            {session.title === "Observation Day" ? (
+                              <details className="bg-blue-50 rounded-lg border border-blue-200">
+                                <summary className="p-4 cursor-pointer hover:bg-blue-100 transition-colors rounded-lg">
+                                  <div className="inline">
+                                    <span className="font-semibold text-gray-900">{session.title}</span>
+                                    <span className="text-sm text-blue-600 ml-2">{session.date} · {session.time} · {session.format}</span>
+                                  </div>
+                                </summary>
+                                <div className="px-4 pb-4 space-y-4">
+                                  {observationSchedule.map((stop, stopIdx) => (
+                                    <div key={stopIdx} className="bg-white rounded-lg p-4 border border-gray-200">
+                                      <div className="flex items-center justify-between mb-3">
+                                        <div className="flex items-center gap-2">
+                                          <span className="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded">Stop {stop.stopNumber}</span>
+                                          <span className="font-semibold text-gray-900">{stop.school}</span>
+                                        </div>
+                                        <span className="text-sm text-gray-500">{stop.timeRange}</span>
+                                      </div>
+                                      <div className="space-y-2">
+                                        {stop.observations.map((obs, obsIdx) => (
+                                          <div key={obsIdx} className="flex items-start gap-3 text-sm py-1.5 border-b border-gray-100 last:border-0">
+                                            <span className="text-gray-500 font-mono text-xs w-24 flex-shrink-0">{obs.time}</span>
+                                            <span className="font-medium text-gray-900 w-36 flex-shrink-0">{obs.para}</span>
+                                            <span className="text-gray-600 w-20 flex-shrink-0">{obs.teacher}</span>
+                                            <span className="text-gray-400 text-xs">{obs.note}</span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  ))}
+                                  <div className="text-xs text-gray-500 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                                    <strong>Note:</strong> Lake Park schedule updated based on para schedules from Janet Diaz (3/2/26). Sandi DeLaGarza moved to 10:55-11:15 to observe during her confirmed Goodman window.
+                                  </div>
+                                </div>
+                              </details>
+                            ) : (
+                              <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                                <h5 className="font-semibold text-gray-900">{session.title}</h5>
+                                <p className="text-sm text-blue-600">{session.date} · {session.time} · {session.format}</p>
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
