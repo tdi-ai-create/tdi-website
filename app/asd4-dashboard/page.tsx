@@ -1984,7 +1984,10 @@ Thank you for setting the example. It matters more than you know.`;
                                       <span className="block text-xs text-gray-500 mt-1 not-italic">— Scott Nyquist, Fullerton</span>
                                     </blockquote>
                                   </div>
-                                  <ChevronDown className={`w-5 h-5 text-emerald-600 transition-transform ${observationExpanded ? 'rotate-180' : ''}`} />
+                                  <div className="flex items-center gap-1 text-emerald-600">
+                                    <span className="text-xs font-medium">{observationExpanded ? 'Close' : 'View details'}</span>
+                                    <ChevronDown className={`w-4 h-4 transition-transform ${observationExpanded ? 'rotate-180' : ''}`} />
+                                  </div>
                                 </div>
                               </button>
 
