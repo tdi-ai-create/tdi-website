@@ -511,7 +511,7 @@ export default function ASD4Dashboard() {
         appreciationVisits: 2,
         followUpEmails: 8,
         principalEmail: true,
-        principalName: "Paul Dohman",
+        principalName: "Kara Dohman",
         sameDayResponses: 1
       },
       movesObserved: [
@@ -590,8 +590,9 @@ export default function ASD4Dashboard() {
         growthOpportunity: "Feedback specificity — transition from general praise to Notice → Name → Next Step. Some paras could also benefit from more proactive engagement with disengaged students."
       },
       teacherHighlights: [
-        { teacher: "4th Grade Team", note: "Well-organized classrooms with clear systems that allowed paras to jump in and contribute meaningfully." },
-        { teacher: "Resource Room", note: "Structured support environment where paras could focus on individual student needs without whole-class disruption." }
+        { teacher: "Savaglio", note: "Classroom structured to give the para real ownership of small group instruction. The reading group felt like a master class because the design trusted the para with meaningful work." },
+        { teacher: "Valdes", note: "Well-paced fraction lesson that created natural space for the para to sit with students, support with real-world examples, and redirect quietly without disrupting the flow." },
+        { teacher: "Para Leadership Moment (Gillen)", note: "Two paras ran the classroom independently while the teacher was in a meeting. Managed transitions, gave bilingual directions, redirected students, and problem-solved in real time." }
       ],
       parasHighlighted: [
         { name: "Rose Marinelli", highlights: ["Guiding questions", "Fire drill leadership", "Non-verbal redirection"] },
@@ -2414,7 +2415,7 @@ Thank you for setting the example. It matters more than you know.`;
                                           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
                                             <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 3 informal, 2 appreciation</span></div>
                                             <div><span className="text-gray-500">Follow-Ups:</span> <span className="font-medium">8 personalized emails</span></div>
-                                            <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Paul Dohman</span></div>
+                                            <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Kara Dohman</span></div>
                                             <div><span className="text-gray-500">Same-Day Response:</span> <span className="font-medium">1 reply</span></div>
                                           </div>
                                         </div>
@@ -2522,7 +2523,7 @@ Thank you for setting the example. It matters more than you know.`;
                                                 <p className="text-sm text-gray-600">{t.note}</p>
                                               </div>
                                             ))}
-                                            <p className="text-xs text-gray-500 mt-2">Principal Paul Dohman was emailed same-day with these highlights and provided the Staff Celebration Playbook resource.</p>
+                                            <p className="text-xs text-gray-500 mt-2">Principal Kara Dohman was emailed same-day with these highlights and provided the Staff Celebration Playbook resource.</p>
                                           </div>
                                         </div>
                                       </div>
