@@ -304,7 +304,7 @@ export default function ASD4Dashboard() {
         followUpEmails: 7,
         principalEmail: true,
         principalName: "Bryan Bolton",
-        sameDayResponses: 1
+        sameDayResponses: 2
       },
       movesObserved: [
         {
@@ -365,10 +365,11 @@ export default function ASD4Dashboard() {
         { para: "Fatema Bakhrani", resource: "Feedback Framework Quick Reference", reason: "Good guiding questions observed — feedback formula is the natural next layer" },
         { para: "Mary Dunkel", resource: "Para Quick-Start Confidence Kit", reason: "Clean starting point for Hub engagement" },
         { para: "Scott Nyquist", resource: "\"What Should I Be Doing Right Now?\" Para Guide", reason: "Practical role-affirming reference" },
-        { para: "Evely Castillo", resource: "Para Quick-Start Confidence Kit", reason: "Accessible starting point for continued growth" }
+        { para: "Evely Castillo", resource: "De-Escalation Strategies + Calm Response Scripts", reason: "Updated same-day after she replied requesting de-escalation support" }
       ],
       quotes: [
-        { text: "I wish I could meet all my students' many needs every day.", author: "Scott Nyquist", context: "Replied 5 minutes after receiving observation follow-up email" }
+        { text: "I wish I could meet all my students' many needs every day.", author: "Scott Nyquist", context: "Replied 5 minutes after receiving observation follow-up email" },
+        { text: "One thing I wish was easier is helping a student de-escalate instead of escalating the situation more. I still struggle somewhat in that aspect.", author: "Evely Castillo", context: "Reached out on her own — was not formally observed but replied with a specific skill request after receiving an appreciation email", selfInitiated: true }
       ],
       themes: {
         strengths: [
@@ -404,7 +405,7 @@ export default function ASD4Dashboard() {
         followUpEmails: 5,
         principalEmail: true,
         principalName: "Cristina Villalobos",
-        sameDayResponses: 0
+        sameDayResponses: 2
       },
       movesObserved: [
         {
@@ -477,7 +478,8 @@ export default function ASD4Dashboard() {
         { para: "Shelly Mayer", resource: "SpEd Para Toolkit", reason: "Built for intensive intervention work - engagement, redirection, building independence" }
       ],
       quotes: [
-        { text: "Thank you so much for taking the time to observe me and give me such wonderful feedback. I'm really enjoying the learning tools and can't wait to try them with my students!", author: "Maribel Ontiveros", context: "Email reply after receiving observation follow-up" }
+        { text: "Thank you so much for taking the time to observe me and give me such wonderful feedback. I'm really enjoying the learning tools and can't wait to try them with my students!", author: "Maribel Ontiveros", context: "Email reply after receiving observation follow-up" },
+        { text: "Our staff is truly committed to our students and works very well together as a team. It means a great deal to have that work acknowledged.", author: "Cristina Villalobos, Principal, Lake Park Elementary", context: "Replied same day after receiving observation highlights email" }
       ],
       themes: {
         strengths: [
@@ -2075,7 +2077,7 @@ Thank you for setting the example. It matters more than you know.`;
                                       <span className="text-sm text-gray-500">— {session.date}</span>
                                     </div>
                                     <p className="text-sm text-gray-600 mb-2">
-                                      3 Buildings Visited · 17 Paras Contacted · 20 Follow-Up Emails Sent · 3 Same-Day Replies
+                                      3 Buildings Visited · 17 Paras Contacted · 20 Follow-Up Emails Sent · 5 Same-Day Replies
                                     </p>
                                     <blockquote className="text-sm italic text-gray-600 border-l-2 border-emerald-400 pl-3">
                                       &quot;I wish I could meet all my students&apos; many needs every day.&quot;
@@ -2125,9 +2127,9 @@ Thank you for setting the example. It matters more than you know.`;
                                         <p className="text-[10px] text-gray-400">Bolton · Villalobos · Dohman</p>
                                       </div>
                                       <div className="bg-amber-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-amber-700">3</p>
+                                        <p className="text-2xl font-bold text-amber-700">5</p>
                                         <p className="text-xs text-gray-600">Same-Day Replies</p>
-                                        <p className="text-[10px] text-gray-400">Scott · Maribel · Kara (Principal)</p>
+                                        <p className="text-[10px] text-gray-400">Scott · Evely · Maribel · Cristina · Kara</p>
                                       </div>
                                     </div>
                                   </div>
@@ -2182,7 +2184,7 @@ Thank you for setting the example. It matters more than you know.`;
                                             <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 2 informal, 2 appreciation</span></div>
                                             <div><span className="text-gray-500">Follow-Ups:</span> <span className="font-medium">7 personalized emails</span></div>
                                             <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Bryan Bolton</span></div>
-                                            <div><span className="text-gray-500">Same-Day Response:</span> <span className="font-medium">1 (Scott Nyquist - 5 min)</span></div>
+                                            <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium">2 (Scott Nyquist, Evely Castillo)</span></div>
                                           </div>
                                         </div>
 
@@ -2241,15 +2243,20 @@ Thank you for setting the example. It matters more than you know.`;
                                           </div>
                                         </div>
 
-                                        {/* Quotes */}
+                                        {/* Voices from the Field */}
                                         <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Direct Quotes from Paras</h6>
-                                          {observationResults.fullerton.quotes.map((q, qIdx) => (
-                                            <blockquote key={qIdx} className="bg-emerald-50 border-l-4 border-emerald-400 p-4 rounded-r-lg">
-                                              <p className="text-gray-700 italic">&quot;{q.text}&quot;</p>
-                                              <footer className="text-sm text-gray-500 mt-2">— {q.author}, Fullerton<br/><span className="text-xs">{q.context}</span></footer>
-                                            </blockquote>
-                                          ))}
+                                          <h6 className="font-semibold text-gray-800 mb-3">Voices from the Field</h6>
+                                          <div className="space-y-3">
+                                            {observationResults.fullerton.quotes.map((q: { text: string; author: string; context: string; selfInitiated?: boolean }, qIdx: number) => (
+                                              <blockquote key={qIdx} className={`rounded-lg p-4 border-l-4 ${q.selfInitiated ? 'bg-purple-50 border-purple-400' : 'bg-emerald-50 border-emerald-400'}`}>
+                                                {q.selfInitiated && (
+                                                  <span className="inline-block text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full mb-2">💬 Reached out on her own</span>
+                                                )}
+                                                <p className="text-gray-700 italic">&quot;{q.text}&quot;</p>
+                                                <footer className="text-sm text-gray-500 mt-2">— {q.author}, Fullerton<br/><span className="text-xs">{q.context}</span></footer>
+                                              </blockquote>
+                                            ))}
+                                          </div>
                                         </div>
 
                                         {/* Building Themes */}
@@ -2299,7 +2306,7 @@ Thank you for setting the example. It matters more than you know.`;
                                             <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 1 informal</span></div>
                                             <div><span className="text-gray-500">Follow-Ups:</span> <span className="font-medium">5 personalized emails</span></div>
                                             <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Cristina Villalobos</span></div>
-                                            <div><span className="text-gray-500">Same-Day Response:</span> <span className="font-medium">Pending</span></div>
+                                            <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium">2 (Maribel Ontiveros, Cristina Villalobos)</span></div>
                                           </div>
                                         </div>
 
@@ -2359,14 +2366,15 @@ Thank you for setting the example. It matters more than you know.`;
                                           </div>
                                         </div>
 
-                                        {/* Quotes */}
+                                        {/* Voices from the Field */}
                                         <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Direct Quotes from Paras</h6>
+                                          <h6 className="font-semibold text-gray-800 mb-3">Voices from the Field</h6>
                                           <div className="space-y-3">
                                             {observationResults.lakePark.quotes.map((q, qIdx) => (
-                                              <blockquote key={qIdx} className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
+                                              <blockquote key={qIdx} className={`rounded-lg p-4 border-l-4 ${q.author.includes('Principal') ? 'bg-blue-50 border-blue-400' : 'bg-emerald-50 border-emerald-400'}`}>
                                                 <p className="text-sm italic text-gray-700">&quot;{q.text}&quot;</p>
-                                                <p className="text-xs text-gray-500 mt-2">— {q.author} <span className="text-gray-400">({q.context})</span></p>
+                                                <p className="text-xs text-gray-500 mt-2">— {q.author}</p>
+                                                <p className={`text-xs mt-1 ${q.author.includes('Principal') ? 'text-blue-600' : 'text-emerald-600'}`}>{q.context}</p>
                                               </blockquote>
                                             ))}
                                           </div>
@@ -3114,7 +3122,7 @@ Thank you for setting the example. It matters more than you know.`;
                                     <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 2 informal, 2 appreciation</span></div>
                                     <div><span className="text-gray-500">Follow-Up Emails:</span> <span className="font-medium">7 personalized same-day</span></div>
                                     <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Bryan Bolton</span></div>
-                                    <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium text-emerald-600">1 (Scott Nyquist — 5 min)</span></div>
+                                    <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium text-emerald-600">2 (Scott Nyquist, Evely Castillo)</span></div>
                                   </div>
                                 </div>
 
@@ -3141,14 +3149,22 @@ Thank you for setting the example. It matters more than you know.`;
                                   </div>
                                 </div>
 
-                                {/* 3. Para Voices */}
+                                {/* 3. Voices from the Field */}
                                 <div>
-                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Para Voices</p>
-                                  <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
-                                    <p className="text-sm italic text-gray-700">&quot;I wish I could meet all my students&apos; many needs every day.&quot;</p>
-                                    <p className="text-xs text-gray-500 mt-2">— Scott Nyquist, Fullerton</p>
-                                    <p className="text-xs text-emerald-600 mt-1">Replied 5 minutes after receiving email</p>
-                                  </blockquote>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Voices from the Field</p>
+                                  <div className="space-y-3">
+                                    <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
+                                      <p className="text-sm italic text-gray-700">&quot;I wish I could meet all my students&apos; many needs every day.&quot;</p>
+                                      <p className="text-xs text-gray-500 mt-2">— Scott Nyquist, Fullerton</p>
+                                      <p className="text-xs text-emerald-600 mt-1">Replied 5 minutes after receiving email</p>
+                                    </blockquote>
+                                    <blockquote className="bg-purple-50 rounded-lg p-4 border-l-4 border-purple-400">
+                                      <span className="inline-block text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full mb-2">💬 Reached out on her own</span>
+                                      <p className="text-sm italic text-gray-700">&quot;One thing I wish was easier is helping a student de-escalate instead of escalating the situation more. I still struggle somewhat in that aspect.&quot;</p>
+                                      <p className="text-xs text-gray-500 mt-2">— Evely Castillo, Fullerton</p>
+                                      <p className="text-xs text-purple-600 mt-1">Was not formally observed but reached out with a specific skill request after receiving an appreciation email. Matched with De-Escalation Strategies + Calm Response Scripts.</p>
+                                    </blockquote>
+                                  </div>
                                 </div>
 
                                 {/* 4. Building Themes */}
@@ -3224,7 +3240,7 @@ Thank you for setting the example. It matters more than you know.`;
                                     <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 1 informal encouragement</span></div>
                                     <div><span className="text-gray-500">Follow-Up Emails:</span> <span className="font-medium">5 personalized same-day</span></div>
                                     <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Cristina Villalobos</span></div>
-                                    <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium text-emerald-600">1 (Maribel Ontiveros)</span></div>
+                                    <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium text-emerald-600">2 (Maribel Ontiveros, Cristina Villalobos)</span></div>
                                   </div>
                                 </div>
 
@@ -3255,14 +3271,21 @@ Thank you for setting the example. It matters more than you know.`;
                                   </div>
                                 </div>
 
-                                {/* 3. Para Voices */}
+                                {/* 3. Voices from the Field */}
                                 <div>
-                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Para Voices</p>
-                                  <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
-                                    <p className="text-sm italic text-gray-700">&quot;Thank you so much for taking the time to observe me and for such kind and encouraging words. I feel appreciated and continue to give my best to help my kiddos.&quot;</p>
-                                    <p className="text-xs text-gray-500 mt-2">— Maribel Ontiveros, Lake Park (Resource)</p>
-                                    <p className="text-xs text-emerald-600 mt-1">Replied same day</p>
-                                  </blockquote>
+                                  <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Voices from the Field</p>
+                                  <div className="space-y-3">
+                                    <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
+                                      <p className="text-sm italic text-gray-700">&quot;Thank you so much for taking the time to observe me and for such kind and encouraging words. I feel appreciated and continue to give my best to help my kiddos.&quot;</p>
+                                      <p className="text-xs text-gray-500 mt-2">— Maribel Ontiveros, Lake Park (Resource)</p>
+                                      <p className="text-xs text-emerald-600 mt-1">Replied same day</p>
+                                    </blockquote>
+                                    <blockquote className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
+                                      <p className="text-sm italic text-gray-700">&quot;Our staff is truly committed to our students and works very well together as a team. It means a great deal to have that work acknowledged.&quot;</p>
+                                      <p className="text-xs text-gray-500 mt-2">— Cristina Villalobos, Principal, Lake Park Elementary</p>
+                                      <p className="text-xs text-blue-600 mt-1">Replied same day after receiving observation highlights email</p>
+                                    </blockquote>
+                                  </div>
                                 </div>
 
                                 {/* 4. Building Themes */}
