@@ -515,7 +515,7 @@ export default function ASD4Dashboard() {
         followUpEmails: 8,
         principalEmail: true,
         principalName: "Kara Dohman",
-        sameDayResponses: 1
+        sameDayResponses: 2
       },
       movesObserved: [
         {
@@ -577,12 +577,13 @@ export default function ASD4Dashboard() {
       ],
       hubResources: [
         { para: "Rose Marinelli", resource: "Feedback Framework Quick Reference", reason: "Already encouraging — next step is Notice → Name → Next Step specificity" },
-        { para: "Carlos Chavez", resource: "Small Group Facilitation Guide", reason: "Strong circulation — formalize small group check-in strategies" },
+        { para: "Carlos Chavez", resource: "Small Group Facilitation Guide + Differentiated Choice Boards*", reason: "Strong circulation — formalize small group check-in strategies" },
         { para: "Gregoria Arredondo", resource: "Supporting English Learners + Bilingual Reference Cards", reason: "Connects directly to the bilingual scaffolding she's already providing" },
         { para: "Michelina Hawkins", resource: "1:1 Student Support Toolkit", reason: "Process-focused feedback is strong — build out 1:1 repertoire" }
       ],
       quotes: [
-        { text: "They are great people and hard workers! So glad you got to visit!", author: "Kara Dohman, Principal, Lincoln Elementary", context: "Replied same day after receiving observation highlights email" }
+        { text: "They are great people and hard workers! So glad you got to visit!", author: "Kara Dohman, Principal, Lincoln Elementary", context: "Replied same day after receiving observation highlights email" },
+        { text: "I would not be such a good paraeducator without the support of my coworkers and staff, Lincoln is such an amazing place!", author: "Carlos Chavez, Lincoln (Standout Observation)", context: "Replied next morning with a specific growth request: differentiating support for students with varying needs", standout: true }
       ],
       themes: {
         strengths: [
@@ -2078,7 +2079,7 @@ Thank you for setting the example. It matters more than you know.`;
                                       <span className="text-sm text-gray-500">— {session.date}</span>
                                     </div>
                                     <p className="text-sm text-gray-600 mb-2">
-                                      3 Buildings Visited · 17 Paras Contacted · 20 Follow-Up Emails Sent · 6 Same-Day Replies
+                                      3 Buildings Visited · 17 Paras Contacted · 20 Follow-Up Emails Sent · 7 Same-Day Replies
                                     </p>
                                     <blockquote className="text-sm italic text-gray-600 border-l-2 border-emerald-400 pl-3">
                                       &quot;I wish I could meet all my students&apos; many needs every day.&quot;
@@ -2128,10 +2129,43 @@ Thank you for setting the example. It matters more than you know.`;
                                         <p className="text-[10px] text-gray-400">Bolton · Villalobos · Dohman</p>
                                       </div>
                                       <div className="bg-amber-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-amber-700">6</p>
+                                        <p className="text-2xl font-bold text-amber-700">7</p>
                                         <p className="text-xs text-gray-600">Same-Day Replies</p>
-                                        <p className="text-[10px] text-gray-400">Scott · Evely · Maribel · Ruby · Cristina · Kara</p>
+                                        <p className="text-[10px] text-gray-400">Scott · Evely · Maribel · Ruby · Cristina · Kara · Carlos</p>
                                       </div>
+                                    </div>
+                                  </div>
+
+                                  {/* Internal Amplification Highlight */}
+                                  <div className="bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl p-5 border-2 border-teal-200">
+                                    <h6 className="font-bold text-teal-800 mb-3 flex items-center gap-2">
+                                      <span className="text-lg">🔄</span>
+                                      INTERNAL AMPLIFICATION — The Partnership Loop in Action
+                                    </h6>
+                                    <p className="text-sm text-gray-700 mb-4">
+                                      After Rae sent Carlos Chavez&apos;s observation follow-up email, here&apos;s what happened organically — without TDI prompting it:
+                                    </p>
+                                    <ol className="space-y-3 mb-4">
+                                      <li className="flex items-start gap-3 text-sm">
+                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center text-xs font-bold">1</span>
+                                        <span className="text-gray-700"><strong className="text-gray-900">Janet Diaz</strong> (district admin) forwarded the email to Principal Kara Dohman with a note: <em>&quot;I will be sharing the specific emails from Rae in terms of the observations she completed of paras today.&quot;</em></span>
+                                      </li>
+                                      <li className="flex items-start gap-3 text-sm">
+                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center text-xs font-bold">2</span>
+                                        <span className="text-gray-700"><strong className="text-gray-900">Kara</strong> forwarded it to Carlos with: <em>&quot;Way to go Carlos! Keep up the amazing work!!&quot;</em></span>
+                                      </li>
+                                      <li className="flex items-start gap-3 text-sm">
+                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center text-xs font-bold">3</span>
+                                        <span className="text-gray-700"><strong className="text-gray-900">Carlos</strong> replied to all three — Rae, Janet, AND Kara — with pride, gratitude, and a specific growth request.</span>
+                                      </li>
+                                    </ol>
+                                    <div className="bg-white/60 rounded-lg p-3 border border-teal-100">
+                                      <p className="text-sm text-teal-800 font-medium mb-2">
+                                        This is the loop: TDI observes → TDI celebrates → District amplifies → Principal celebrates → Para feels seen → Para engages deeper.
+                                      </p>
+                                      <p className="text-xs text-teal-700">
+                                        <strong>Janet is forwarding observation emails to principals on her own.</strong> The partnership is embedded, not just tolerated.
+                                      </p>
                                     </div>
                                   </div>
 
@@ -2496,6 +2530,7 @@ Thank you for setting the example. It matters more than you know.`;
                                                 ))}
                                               </tbody>
                                             </table>
+                                            <p className="text-xs text-gray-500 italic mt-2 border-t border-gray-100 pt-2">* Carlos Chavez&apos;s resource was expanded after his reply — added Differentiated Choice Boards alongside the original Small Group Facilitation Guide, based on his request for help differentiating support across varying student needs.</p>
                                           </div>
                                         </div>
 
@@ -2504,10 +2539,18 @@ Thank you for setting the example. It matters more than you know.`;
                                           <div>
                                             <h6 className="font-semibold text-gray-800 mb-3">Voices from the Field</h6>
                                             <div className="space-y-3">
-                                              {observationResults.lincoln.quotes.map((q, qIdx) => (
-                                                <blockquote key={qIdx} className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
+                                              {observationResults.lincoln.quotes.map((q: { text: string; author: string; context: string; standout?: boolean }, qIdx: number) => (
+                                                <blockquote key={qIdx} className={`rounded-lg p-4 border-l-4 ${
+                                                  q.standout ? 'bg-emerald-50 border-emerald-400 ring-1 ring-emerald-100' :
+                                                  q.author.includes('Principal') ? 'bg-blue-50 border-blue-400' :
+                                                  'bg-emerald-50 border-emerald-400'
+                                                }`}>
+                                                  {q.standout && (
+                                                    <span className="inline-block text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full mb-2">⭐ Standout Observation</span>
+                                                  )}
                                                   <p className="text-sm italic text-gray-700">&quot;{q.text}&quot;</p>
                                                   <p className="text-xs text-gray-500 mt-2">— {q.author}</p>
+                                                  <p className={`text-xs mt-1 ${q.standout ? 'text-emerald-600' : q.author.includes('Principal') ? 'text-blue-600' : 'text-gray-500'}`}>{q.context}</p>
                                                 </blockquote>
                                               ))}
                                             </div>
@@ -3386,7 +3429,7 @@ Thank you for setting the example. It matters more than you know.`;
                                     <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal</span></div>
                                     <div><span className="text-gray-500">Follow-Up Emails:</span> <span className="font-medium">4 personalized same-day</span></div>
                                     <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Kara Dohman</span></div>
-                                    <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium text-emerald-600">1 (Kara Dohman — Principal)</span></div>
+                                    <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium text-emerald-600">2 (Kara Dohman — Principal, Carlos Chavez)</span></div>
                                   </div>
                                 </div>
 
@@ -3416,11 +3459,19 @@ Thank you for setting the example. It matters more than you know.`;
                                 {/* 3. Voices from the Field */}
                                 <div>
                                   <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Voices from the Field</p>
-                                  <blockquote className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
-                                    <p className="text-sm italic text-gray-700">&quot;They are great people and hard workers! So glad you got to visit!&quot;</p>
-                                    <p className="text-xs text-gray-500 mt-2">— Kara Dohman, Principal, Lincoln Elementary</p>
-                                    <p className="text-xs text-blue-600 mt-1">Replied same day after receiving observation highlights email</p>
-                                  </blockquote>
+                                  <div className="space-y-3">
+                                    <blockquote className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
+                                      <p className="text-sm italic text-gray-700">&quot;They are great people and hard workers! So glad you got to visit!&quot;</p>
+                                      <p className="text-xs text-gray-500 mt-2">— Kara Dohman, Principal, Lincoln Elementary</p>
+                                      <p className="text-xs text-blue-600 mt-1">Replied same day after receiving observation highlights email</p>
+                                    </blockquote>
+                                    <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400 ring-1 ring-emerald-100">
+                                      <span className="inline-block text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full mb-2">⭐ Standout Observation</span>
+                                      <p className="text-sm italic text-gray-700">&quot;I would not be such a good paraeducator without the support of my coworkers and staff, Lincoln is such an amazing place!&quot;</p>
+                                      <p className="text-xs text-gray-500 mt-2">— Carlos Chavez, Lincoln</p>
+                                      <p className="text-xs text-emerald-600 mt-1">Replied next morning with a specific growth request: differentiating support for students with varying needs</p>
+                                    </blockquote>
+                                  </div>
                                 </div>
 
                                 {/* 4. Building Themes */}
