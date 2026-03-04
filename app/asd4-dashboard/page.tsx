@@ -304,7 +304,7 @@ export default function ASD4Dashboard() {
         followUpEmails: 7,
         principalEmail: true,
         principalName: "Bryan Bolton",
-        sameDayResponses: 2
+        sameDayResponses: 4
       },
       movesObserved: [
         {
@@ -359,7 +359,7 @@ export default function ASD4Dashboard() {
         }
       ],
       hubResources: [
-        { para: "Jonnathan Roeglin", resource: "Feedback Framework Quick Reference", reason: "Strong questioning already — next step is pairing questions with Notice → Name → Next Step feedback" },
+        { para: "Jonnathan Roeglin", resource: "Feedback Framework Quick Reference + No-Hands-Up Help Systems*", reason: "Strong questioning already — next step is pairing questions with Notice → Name → Next Step feedback" },
         { para: "Esperanza Garcia", resource: "Supporting English Learners + Bilingual Reference Cards", reason: "Directly connects to the bilingual scaffolding work she's already doing" },
         { para: "Kristina Orellana", resource: "PA Quick Wins Menu", reason: "Already doing high-impact moves naturally — quick-grab reference for more" },
         { para: "Fatema Bakhrani", resource: "Feedback Framework Quick Reference", reason: "Good guiding questions observed — feedback formula is the natural next layer" },
@@ -369,7 +369,9 @@ export default function ASD4Dashboard() {
       ],
       quotes: [
         { text: "I wish I could meet all my students' many needs every day.", author: "Scott Nyquist", context: "Replied 5 minutes after receiving observation follow-up email" },
-        { text: "One thing I wish was easier is helping a student de-escalate instead of escalating the situation more. I still struggle somewhat in that aspect.", author: "Evely Castillo", context: "Reached out on her own — was not formally observed but replied with a specific skill request after receiving an appreciation email", selfInitiated: true }
+        { text: "One thing I wish was easier is helping a student de-escalate instead of escalating the situation more. I still struggle somewhat in that aspect.", author: "Evely Castillo", context: "Reached out on her own — was not formally observed but replied with a specific skill request after receiving an appreciation email", selfInitiated: true },
+        { text: "Thank you for taking your time to come by and stop to observe me. Thank you for your comments and suggestions. I will take a look at the resources you shared with me.", author: "Esperanza Garcia, Fullerton (Bilingual Support)", context: "Replied next morning. Committed to exploring Hub resources." },
+        { text: "I'm glad that you were able to stop by and observe. One thing I wish was easier is being able to bounce around between groups of students who all need help at the same time.", author: "Jonnathan Roeglin, Fullerton (Formally Observed)", context: "Replied next morning with a specific growth request: managing multiple groups simultaneously. Matched with No-Hands-Up Help Systems resource.", growthRequest: true }
       ],
       themes: {
         strengths: [
@@ -2079,7 +2081,7 @@ Thank you for setting the example. It matters more than you know.`;
                                       <span className="text-sm text-gray-500">— {session.date}</span>
                                     </div>
                                     <p className="text-sm text-gray-600 mb-2">
-                                      3 Buildings Visited · 17 Paras Contacted · 20 Follow-Up Emails Sent · 7 Same-Day Replies
+                                      3 Buildings Visited · 17 Paras Contacted · 20 Follow-Up Emails Sent · 9 Same-Day Replies
                                     </p>
                                     <blockquote className="text-sm italic text-gray-600 border-l-2 border-emerald-400 pl-3">
                                       &quot;I wish I could meet all my students&apos; many needs every day.&quot;
@@ -2129,9 +2131,9 @@ Thank you for setting the example. It matters more than you know.`;
                                         <p className="text-[10px] text-gray-400">Bolton · Villalobos · Dohman</p>
                                       </div>
                                       <div className="bg-amber-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-amber-700">7</p>
+                                        <p className="text-2xl font-bold text-amber-700">9</p>
                                         <p className="text-xs text-gray-600">Same-Day Replies</p>
-                                        <p className="text-[10px] text-gray-400">Scott · Evely · Maribel · Ruby · Cristina · Kara · Carlos</p>
+                                        <p className="text-[10px] text-gray-400">Scott · Evely · Maribel · Ruby · Cristina · Kara · Carlos · Esperanza · Jonnathan</p>
                                       </div>
                                     </div>
                                   </div>
@@ -2165,6 +2167,42 @@ Thank you for setting the example. It matters more than you know.`;
                                       </p>
                                       <p className="text-xs text-teal-700">
                                         <strong>Janet is forwarding observation emails to principals on her own.</strong> The partnership is embedded, not just tolerated.
+                                      </p>
+                                    </div>
+                                  </div>
+
+                                  {/* Emerging Coaching Themes */}
+                                  <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-5 border-2 border-amber-200">
+                                    <h6 className="font-bold text-amber-800 mb-3 flex items-center gap-2">
+                                      <span className="text-lg">💡</span>
+                                      WHAT PARAS ARE ASKING FOR — Themes from Observation Day Replies
+                                    </h6>
+                                    <p className="text-sm text-gray-700 mb-4">
+                                      When asked &quot;What&apos;s on your &apos;I wish this was easier&apos; list?&quot;, paras responded with specific, coachable requests:
+                                    </p>
+                                    <div className="space-y-4">
+                                      <div className="bg-white/70 rounded-lg p-4 border border-amber-100">
+                                        <p className="text-xs font-bold text-amber-700 uppercase mb-2">De-Escalation</p>
+                                        <p className="text-sm italic text-gray-700 mb-2">&quot;Helping a student de-escalate instead of escalating the situation more.&quot;</p>
+                                        <p className="text-xs text-gray-500">— Evely Castillo, Fullerton</p>
+                                        <p className="text-xs text-amber-600 mt-1 font-medium">Matched: De-Escalation Strategies + Calm Response Scripts</p>
+                                      </div>
+                                      <div className="bg-white/70 rounded-lg p-4 border border-amber-100">
+                                        <p className="text-xs font-bold text-amber-700 uppercase mb-2">Differentiating Support</p>
+                                        <p className="text-sm italic text-gray-700 mb-2">&quot;Having a more concrete plan. I have a wide range of students that all have varying needs.&quot;</p>
+                                        <p className="text-xs text-gray-500">— Carlos Chavez, Lincoln</p>
+                                        <p className="text-xs text-amber-600 mt-1 font-medium">Matched: Effective Small-Group Instruction + Differentiated Choice Boards</p>
+                                      </div>
+                                      <div className="bg-white/70 rounded-lg p-4 border border-amber-100">
+                                        <p className="text-xs font-bold text-amber-700 uppercase mb-2">Managing Multiple Groups</p>
+                                        <p className="text-sm italic text-gray-700 mb-2">&quot;Being able to bounce around between groups of students who all need help at the same time.&quot;</p>
+                                        <p className="text-xs text-gray-500">— Jonnathan Roeglin, Fullerton</p>
+                                        <p className="text-xs text-amber-600 mt-1 font-medium">Matched: No-Hands-Up Help Systems</p>
+                                      </div>
+                                    </div>
+                                    <div className="bg-white/60 rounded-lg p-3 border border-amber-100 mt-4">
+                                      <p className="text-sm text-amber-800 font-medium">
+                                        These themes are being used to shape content for Virtual Sessions 2 (April 6) and 3 (April 20).
                                       </p>
                                     </div>
                                   </div>
@@ -2219,7 +2257,7 @@ Thank you for setting the example. It matters more than you know.`;
                                             <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 2 informal, 2 appreciation</span></div>
                                             <div><span className="text-gray-500">Follow-Ups:</span> <span className="font-medium">7 personalized emails</span></div>
                                             <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Bryan Bolton</span></div>
-                                            <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium">2 (Scott Nyquist, Evely Castillo)</span></div>
+                                            <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium">4 (Scott, Evely, Esperanza, Jonnathan)</span></div>
                                           </div>
                                         </div>
 
@@ -2275,6 +2313,7 @@ Thank you for setting the example. It matters more than you know.`;
                                                 ))}
                                               </tbody>
                                             </table>
+                                            <p className="text-xs text-gray-500 italic mt-2 border-t border-gray-100 pt-2">* Jonnathan Roeglin&apos;s resource was expanded after his reply — added No-Hands-Up Help Systems alongside the original Feedback Framework Quick Reference, based on his request for help managing multiple groups of students simultaneously.</p>
                                           </div>
                                         </div>
 
@@ -2282,13 +2321,21 @@ Thank you for setting the example. It matters more than you know.`;
                                         <div>
                                           <h6 className="font-semibold text-gray-800 mb-3">Voices from the Field</h6>
                                           <div className="space-y-3">
-                                            {observationResults.fullerton.quotes.map((q: { text: string; author: string; context: string; selfInitiated?: boolean }, qIdx: number) => (
-                                              <blockquote key={qIdx} className={`rounded-lg p-4 border-l-4 ${q.selfInitiated ? 'bg-purple-50 border-purple-400' : 'bg-emerald-50 border-emerald-400'}`}>
+                                            {observationResults.fullerton.quotes.map((q: { text: string; author: string; context: string; selfInitiated?: boolean; growthRequest?: boolean }, qIdx: number) => (
+                                              <blockquote key={qIdx} className={`rounded-lg p-4 border-l-4 ${
+                                                q.selfInitiated ? 'bg-purple-50 border-purple-400' :
+                                                q.growthRequest ? 'bg-emerald-50 border-emerald-400 ring-1 ring-emerald-100' :
+                                                'bg-emerald-50 border-emerald-400'
+                                              }`}>
                                                 {q.selfInitiated && (
                                                   <span className="inline-block text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full mb-2">💬 Reached out on her own</span>
                                                 )}
-                                                <p className="text-gray-700 italic">&quot;{q.text}&quot;</p>
-                                                <footer className="text-sm text-gray-500 mt-2">— {q.author}, Fullerton<br/><span className="text-xs">{q.context}</span></footer>
+                                                {q.growthRequest && (
+                                                  <span className="inline-block text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full mb-2">🎯 Specific growth request</span>
+                                                )}
+                                                <p className="text-sm text-gray-700 italic">&quot;{q.text}&quot;</p>
+                                                <p className="text-xs text-gray-500 mt-2">— {q.author}</p>
+                                                <p className={`text-xs mt-1 ${q.selfInitiated ? 'text-purple-600' : q.growthRequest ? 'text-emerald-600' : 'text-gray-500'}`}>{q.context}</p>
                                               </blockquote>
                                             ))}
                                           </div>
@@ -3167,7 +3214,7 @@ Thank you for setting the example. It matters more than you know.`;
                                   <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
                                   <ChevronDown className="w-4 h-4 ml-auto transition-transform group-open:rotate-180" />
                                 </div>
-                                <p className="text-xs text-gray-500 mt-1 ml-6">7 paras contacted · 7 emails sent · &quot;I wish I could meet all my students&apos; many needs every day.&quot;</p>
+                                <p className="text-xs text-gray-500 mt-1 ml-6">7 paras contacted · 7 emails sent · 4 replies with specific growth requests</p>
                               </summary>
                               <div className="mt-4 space-y-4">
                                 {/* 1. At a Glance */}
@@ -3177,7 +3224,7 @@ Thank you for setting the example. It matters more than you know.`;
                                     <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 2 informal, 2 appreciation</span></div>
                                     <div><span className="text-gray-500">Follow-Up Emails:</span> <span className="font-medium">7 personalized same-day</span></div>
                                     <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Bryan Bolton</span></div>
-                                    <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium text-emerald-600">2 (Scott Nyquist, Evely Castillo)</span></div>
+                                    <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium text-emerald-600">4 (Scott, Evely, Esperanza, Jonnathan)</span></div>
                                   </div>
                                 </div>
 
@@ -3218,6 +3265,17 @@ Thank you for setting the example. It matters more than you know.`;
                                       <p className="text-sm italic text-gray-700">&quot;One thing I wish was easier is helping a student de-escalate instead of escalating the situation more. I still struggle somewhat in that aspect.&quot;</p>
                                       <p className="text-xs text-gray-500 mt-2">— Evely Castillo, Fullerton</p>
                                       <p className="text-xs text-purple-600 mt-1">Was not formally observed but reached out with a specific skill request after receiving an appreciation email. Matched with De-Escalation Strategies + Calm Response Scripts.</p>
+                                    </blockquote>
+                                    <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
+                                      <p className="text-sm italic text-gray-700">&quot;Thank you for taking your time to come by and stop to observe me. Thank you for your comments and suggestions. I will take a look at the resources you shared with me.&quot;</p>
+                                      <p className="text-xs text-gray-500 mt-2">— Esperanza Garcia, Fullerton (Bilingual Support)</p>
+                                      <p className="text-xs text-emerald-600 mt-1">Replied next morning. Committed to exploring Hub resources.</p>
+                                    </blockquote>
+                                    <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400 ring-1 ring-emerald-100">
+                                      <span className="inline-block text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full mb-2">🎯 Specific growth request</span>
+                                      <p className="text-sm italic text-gray-700">&quot;I&apos;m glad that you were able to stop by and observe. One thing I wish was easier is being able to bounce around between groups of students who all need help at the same time.&quot;</p>
+                                      <p className="text-xs text-gray-500 mt-2">— Jonnathan Roeglin, Fullerton</p>
+                                      <p className="text-xs text-emerald-600 mt-1">Replied next morning with a specific growth request: managing multiple groups simultaneously. Matched with No-Hands-Up Help Systems resource.</p>
                                     </blockquote>
                                   </div>
                                 </div>
