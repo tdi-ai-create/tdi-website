@@ -496,9 +496,9 @@ export default function StPeterChanelDashboard() {
       ],
       inProgress: [
         { label: 'Hub engagement — 28 staff actively using the Hub', detail: '100% of contracted seats + 3 additional' },
-        { label: 'Strategy implementation — 21% tried strategies', detail: '2x the 10% industry average' },
-        { label: 'Growth Group: Instructional Design', detail: '~9 teachers — virtual session pending' },
-        { label: 'Growth Group: Class Management', detail: '~11 teachers — virtual session pending' },
+        { label: 'Strategy implementation tracking', detail: '21% tried strategies — 2x industry average' },
+        { label: 'Growth Group: Instructional Design — virtual session pending', detail: '~9 teachers' },
+        { label: 'Growth Group: Class Management — virtual session pending', detail: '~11 teachers' },
       ],
       comingSoon: [
         { label: 'Spring Leadership Recap', date: 'Due April 2026' },
