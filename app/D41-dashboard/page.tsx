@@ -162,6 +162,95 @@ export default function D41Dashboard() {
     { title: 'Supporting Students Through Their Daily Schedule', category: 'Skills', recommended: false },
   ];
 
+  // ===================== OVERVIEW DATA =====================
+  const overviewData = {
+    // ZONE 1 - Snapshot
+    stats: {
+      educatorsEnrolled: { value: 6, total: 10, label: 'Seats Active', sublabel: '6 of 10 memberships in use' },
+      deliverables: { completed: 2, total: 2, label: 'Deliverables', sublabel: 'Hub access fully activated' },
+      hubEngagement: { percent: 60, raw: '6/10', label: 'Seat Utilization', sublabel: '6 members actively learning' },
+      phase: { name: 'Hub', number: 1, total: 1, label: 'Partnership Type', sublabel: 'All-Access Membership' },
+    },
+
+    // Partnership Health
+    health: {
+      status: 'Building',
+      statusColor: 'yellow',
+      details: [
+        '6 of 10 seats active and learning',
+        '20 different courses being explored by your team',
+        '4 seats ready to activate — paid for and waiting',
+        'TDI here to support whenever you need us',
+      ],
+    },
+
+    // ZONE 2A - Timeline
+    timeline: {
+      done: [
+        { label: '10 All-Access memberships activated', date: 'Oct 7, 2025' },
+        { label: 'Hub access live — team onboarded', date: 'Oct 2025' },
+        { label: '6 members actively using the Hub', date: 'Ongoing since Jan 2026' },
+        { label: '20 courses explored across your team', date: 'As of Mar 2026' },
+      ],
+      inProgress: [
+        { label: 'Active Hub learning across 6 team members', detail: 'Your educators are exploring independently' },
+        { label: '4 seats ready to activate', detail: 'Reach out to TDI to assign to more staff' },
+      ],
+      comingSoon: [
+        { label: 'Activate your remaining 4 seats', date: 'Anytime — seats are paid for' },
+        { label: 'Membership renewal', date: 'When ready — TDI will reach out' },
+        { label: 'Expand to full partnership', date: 'Ask TDI about IGNITE options' },
+      ],
+    },
+
+    // ZONE 2B - Investment value mirror
+    investment: {
+      perEducator: '$100',
+      perEducatorSublabel: 'per seat — a full year of on-demand professional learning',
+      implementationRate: '20',
+      implementationSublabel: 'courses your team is actively exploring',
+      coursesCompleted: 6,
+      coursesCompletedSublabel: 'educators growing their practice right now',
+      retentionStat: '85%',
+      retentionSublabel: 'of TDI Hub members continue to Year 2',
+    },
+
+    // ZONE 2C - Quick win counter
+    quickWin: {
+      count: 20,
+      line1: '20 different TDI courses are being explored by your Glen Ellyn team.',
+      line2: 'Your educators are showing up and learning — on their own schedule.',
+    },
+
+    // ZONE 3 - Actions
+    actions: {
+      nextToUnlock: [
+        {
+          label: 'Activate your remaining 4 seats',
+          detail: 'You have 4 paid memberships ready to go — share access with more team members today',
+          owner: 'partner',
+          cta: 'Contact TDI to assign seats',
+          ctaHref: 'mailto:rae@teachersdeserveit.com?subject=D41%20Seat%20Activation',
+        },
+      ],
+      tdiHandling: [
+        {
+          label: 'Hub content refreshed regularly',
+          detail: 'New courses and resources added — your team always has something new to explore',
+        },
+        {
+          label: 'TDI available whenever you need us',
+          detail: 'Questions about usage, adding seats, or exploring a full partnership — just reach out',
+        },
+      ],
+      alreadyInMotion: [
+        { label: '10 All-Access memberships active', date: 'Since Oct 7, 2025', status: 'complete' },
+        { label: '6 team members learning in the Hub', date: 'Ongoing', status: 'scheduled' },
+        { label: '20 courses being explored', date: 'Growing every week', status: 'scheduled' },
+      ],
+    },
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F5F5] overflow-x-hidden">
       {/* Navigation */}
@@ -243,190 +332,294 @@ export default function D41Dashboard() {
       {/* Tab Content */}
       <div ref={tabContentRef} className="max-w-5xl mx-auto px-4 py-6">
 
-        {/* OVERVIEW TAB */}
+        {/* ==================== OVERVIEW TAB ==================== */}
         {activeTab === 'overview' && (
-          <div className="space-y-6">
-            {/* Quick Stats - Reframed */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
-                <div className="flex items-center gap-2 mb-1">
-                  <Users className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-xs text-gray-500 uppercase">Team Access</span>
-                </div>
-                <div className="text-2xl font-bold text-[#1e2749]">10</div>
-                <div className="text-xs text-[#38618C] font-medium">All-Access Memberships</div>
-              </div>
+          <div className="space-y-8 pb-8">
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#35A7FF]">
-                <div className="flex items-center gap-2 mb-1">
-                  <UserCheck className="w-4 h-4 text-[#35A7FF]" />
-                  <span className="text-xs text-gray-500 uppercase">Accounts Active</span>
-                </div>
-                <div className="text-2xl font-bold text-[#1e2749]">5<span className="text-lg font-normal text-gray-400">/10</span></div>
-                <div className="text-xs text-[#35A7FF] font-medium">5 more available to assign</div>
-              </div>
+            {/* ─── ZONE 1: PARTNERSHIP SNAPSHOT ─── */}
+            <div className="space-y-4">
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-green-500">
-                <div className="flex items-center gap-2 mb-1">
-                  <Activity className="w-4 h-4 text-green-500" />
-                  <span className="text-xs text-gray-500 uppercase">First Login</span>
-                </div>
-                <div className="text-2xl font-bold text-green-600">✓</div>
-                <div className="text-xs text-green-600 font-medium">Oct 30, 2025</div>
-              </div>
+              {/* Stat Cards Row */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
-                <div className="flex items-center gap-2 mb-1">
-                  <BookOpen className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-xs text-gray-500 uppercase">Courses Available</span>
-                </div>
-                <div className="text-2xl font-bold text-[#1e2749]">32</div>
-                <div className="text-xs text-[#38618C] font-medium">Full library access</div>
-              </div>
-            </div>
-
-            {/* Get Your Team Started */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 mb-4">
-                <Zap className="w-5 h-5 text-[#35A7FF]" />
-                <span className="font-semibold text-[#1e2749]">Get Your Team Started</span>
-              </div>
-
-              <p className="text-sm text-gray-600 mb-4">
-                One team member has logged in -  here&apos;s how to help the rest of your paraprofessionals get started with the Learning Hub.
-              </p>
-
-              <div className="grid sm:grid-cols-3 gap-3">
-                {/* Quick Action 1 */}
-                <a
-                  href="https://tdi.thinkific.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-[#35A7FF] text-white rounded-lg p-4 hover:bg-[#2589db] transition-all text-center"
-                >
-                  <Laptop className="w-6 h-6 mx-auto mb-2" />
-                  <span className="text-sm font-semibold block">Access Hub</span>
-                  <span className="text-xs opacity-80">Share with team</span>
-                </a>
-
-                {/* Quick Action 2 */}
+                {/* Seats Active */}
                 <button
-                  onClick={() => {
-                    navigator.clipboard.writeText('https://tdi.thinkific.com');
-                  }}
-                  className="bg-gray-100 text-[#1e2749] rounded-lg p-4 hover:bg-gray-200 transition-all text-center"
+                  onClick={() => setActiveTab('progress')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
                 >
-                  <Link className="w-6 h-6 mx-auto mb-2" />
-                  <span className="text-sm font-semibold block">Copy Link</span>
-                  <span className="text-xs text-gray-500">For team emails</span>
+                  <div className="flex items-center justify-between mb-3">
+                    <Users className="w-5 h-5 text-[#1A6B6B]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#1A6B6B] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#1A6B6B] mb-1">
+                    {overviewData.stats.educatorsEnrolled.value}/{overviewData.stats.educatorsEnrolled.total}
+                  </div>
+                  <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{overviewData.stats.educatorsEnrolled.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.educatorsEnrolled.sublabel}</div>
                 </button>
 
-                {/* Quick Action 3 */}
+                {/* Deliverables */}
                 <button
                   onClick={() => setActiveTab('resources')}
-                  className="bg-gray-100 text-[#1e2749] rounded-lg p-4 hover:bg-gray-200 transition-all text-center"
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
                 >
-                  <FileText className="w-6 h-6 mx-auto mb-2" />
-                  <span className="text-sm font-semibold block">First Course</span>
-                  <span className="text-xs text-gray-500">Recommended start</span>
+                  <div className="flex items-center justify-between mb-3">
+                    <CheckCircle className="w-5 h-5 text-[#F5C542]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#1A6B6B] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#B8860B] mb-1">
+                    {overviewData.stats.deliverables.completed}/{overviewData.stats.deliverables.total}
+                  </div>
+                  <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{overviewData.stats.deliverables.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.deliverables.sublabel}</div>
+                  {/* Mini progress bar */}
+                  <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#F5C542] rounded-full transition-all"
+                      style={{ width: `${(overviewData.stats.deliverables.completed / overviewData.stats.deliverables.total) * 100}%` }}
+                    />
+                  </div>
+                </button>
+
+                {/* Seat Utilization */}
+                <button
+                  onClick={() => setActiveTab('progress')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <BookOpen className="w-5 h-5 text-[#1A6B6B]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#1A6B6B] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#1A6B6B] mb-1">{overviewData.stats.hubEngagement.percent}%</div>
+                  <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{overviewData.stats.hubEngagement.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.hubEngagement.raw} logged in</div>
+                  {/* Mini progress bar */}
+                  <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#1A6B6B] rounded-full transition-all"
+                      style={{ width: `${overviewData.stats.hubEngagement.percent}%` }}
+                    />
+                  </div>
+                </button>
+
+                {/* Partnership Type */}
+                <button
+                  onClick={() => setActiveTab('next-steps')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <Target className="w-5 h-5 text-[#1B2A4A]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#1A6B6B] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#1B2A4A] mb-1">{overviewData.stats.phase.name}</div>
+                  <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{overviewData.stats.phase.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.phase.sublabel}</div>
+                  {/* Phase progress dots */}
+                  <div className="mt-3 flex gap-1.5">
+                    {Array.from({ length: overviewData.stats.phase.total }).map((_, i) => (
+                      <div
+                        key={i}
+                        className={`h-1.5 flex-1 rounded-full ${i < overviewData.stats.phase.number ? 'bg-[#1B2A4A]' : 'bg-gray-100'}`}
+                      />
+                    ))}
+                  </div>
                 </button>
               </div>
 
-              <div className="mt-4 p-3 bg-amber-50 border border-amber-100 rounded-lg">
-                <p className="text-sm text-amber-800">
-                  <strong>Tip:</strong> Teams that introduce the Hub at a staff meeting see 5x higher engagement in the first month.
-                </p>
+              {/* Partnership Health Indicator - YELLOW for Building */}
+              <div className="bg-white rounded-2xl px-6 py-4 shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center gap-3">
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500 shadow-sm shadow-yellow-200" />
+                  <span className="text-sm font-bold text-[#1B2A4A]">Partnership Momentum:</span>
+                  <span className="text-sm font-bold text-yellow-600">{overviewData.health.status}</span>
+                </div>
+                <div className="hidden md:block w-px h-4 bg-gray-200" />
+                <div className="flex flex-wrap gap-x-4 gap-y-1">
+                  {overviewData.health.details.map((d, i) => (
+                    <span key={i} className="text-xs text-gray-500">{d}</span>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Understanding Engagement */}
-            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100">
-              <div className="flex items-center gap-2 mb-4">
-                <BarChart3 className="w-5 h-5 text-[#38618C]" />
-                <span className="font-semibold text-[#1e2749]">Understanding PD Engagement</span>
-              </div>
+            {/* ─── ZONE 2A: DONE / IN PROGRESS / COMING SOON ─── */}
+            <div>
+              <h3 className="text-base font-bold text-[#1B2A4A] mb-4">Partnership Timeline</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-              <p className="text-sm text-gray-600 mb-4">
-                Research shows that on-demand professional development -  without coaching support -  typically sees about 10% of strategies implemented in classrooms. This is true across the industry, not unique to any district.
-              </p>
-
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  <p className="text-xs text-gray-500 font-medium uppercase mb-3">Hub Access</p>
-                  <p className="text-sm text-gray-600">Self-directed learning with full course library. Great for building awareness and exploring strategies.</p>
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <span className="text-xs text-gray-500">Typical implementation: </span>
-                    <span className="text-sm font-semibold text-gray-700">~10%</span>
+                {/* Done */}
+                <div className="bg-green-50 rounded-2xl p-5 border border-green-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-bold text-green-700">Done</span>
+                    <span className="ml-auto text-xs text-green-600 font-medium bg-green-100 px-2 py-0.5 rounded-full">
+                      {overviewData.timeline.done.length} completed
+                    </span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {overviewData.timeline.done.map((item, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400 mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{item.date}</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
-                <div className="bg-[#38618C]/5 border border-[#38618C]/20 rounded-lg p-4">
-                  <p className="text-xs text-[#38618C] font-medium uppercase mb-3">Hub + Coaching</p>
-                  <p className="text-sm text-gray-600">Personalized observations, feedback, and accountability. Strategies are tailored to each educator&apos;s classroom.</p>
-                  <div className="mt-3 pt-3 border-t border-[#38618C]/20">
-                    <span className="text-xs text-[#38618C]">TDI partner implementation: </span>
-                    <span className="text-sm font-semibold text-[#38618C]">65%</span>
+                {/* In Progress */}
+                <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-4 h-4 rounded-full border-2 border-amber-500 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    </div>
+                    <span className="text-sm font-bold text-amber-700">In Progress</span>
+                    <span className="ml-auto text-xs text-amber-600 font-medium bg-amber-100 px-2 py-0.5 rounded-full">
+                      {overviewData.timeline.inProgress.length} active
+                    </span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {overviewData.timeline.inProgress.map((item, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{item.detail}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Coming Soon */}
+                <div className="bg-[#E8F5F5] rounded-2xl p-5 border border-[#1A6B6B]/15">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Calendar className="w-4 h-4 text-[#1A6B6B]" />
+                    <span className="text-sm font-bold text-[#1A6B6B]">Coming Soon</span>
+                    <span className="ml-auto text-xs text-[#1A6B6B] font-medium bg-[#1A6B6B]/10 px-2 py-0.5 rounded-full">
+                      {overviewData.timeline.comingSoon.length} ahead
+                    </span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {overviewData.timeline.comingSoon.map((item, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#1A6B6B]/50 mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{item.date}</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
-
-              <div className="mt-4 flex justify-end">
-                <button
-                  onClick={() => setActiveTab('next-steps')}
-                  className="text-sm text-[#35A7FF] hover:underline flex items-center gap-1"
-                >
-                  Learn about coaching options <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
             </div>
 
-            {/* Partnership Goals */}
-            <div className="bg-white rounded-xl p-5 shadow-sm">
-              <div className="flex items-center gap-2 mb-2">
-                <Target className="w-5 h-5 text-[#38618C]" />
-                <span className="font-semibold text-[#1e2749]">D41 Partnership Goals</span>
-              </div>
-              <p className="text-sm text-gray-500 mb-4">Identified during our planning conversations</p>
-
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="bg-[#1e2749] text-white rounded-lg p-4">
-                  <GraduationCap className="w-5 h-5 mb-2 text-[#35A7FF]" />
-                  <h4 className="font-semibold mb-1">Student Language Growth</h4>
-                  <p className="text-sm opacity-80">Support literacy curriculum rollout with effective small-group instruction</p>
+            {/* ─── ZONE 2B: YOUR INVESTMENT, BY THE NUMBERS ─── */}
+            <div>
+              <div className="bg-[#E8F5F5] rounded-2xl p-1 border border-[#1A6B6B]/15">
+                <div className="px-5 pt-5 pb-3">
+                  <h3 className="text-base font-bold text-[#1B2A4A]">Your Investment, By The Numbers</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">What this membership delivers — in impact and value</p>
                 </div>
-
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  <ClipboardList className="w-5 h-5 mb-2 text-[#38618C]" />
-                  <h4 className="font-semibold text-[#1e2749] mb-1">Instructional Consistency</h4>
-                  <p className="text-sm text-gray-600">Build shared practices across all paraprofessionals districtwide</p>
-                </div>
-
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                  <HandHelping className="w-5 h-5 mb-2 text-[#35A7FF]" />
-                  <h4 className="font-semibold text-[#1e2749] mb-1">Para - Teacher Collaboration</h4>
-                  <p className="text-sm text-gray-600">Strengthen communication and partnership between teachers and paras</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#1A6B6B]/10 rounded-xl overflow-hidden">
+                  {[
+                    { value: overviewData.investment.perEducator, label: 'per seat', sub: overviewData.investment.perEducatorSublabel },
+                    { value: overviewData.investment.implementationRate, label: 'courses explored', sub: overviewData.investment.implementationSublabel },
+                    { value: overviewData.investment.coursesCompleted, label: 'educators active', sub: overviewData.investment.coursesCompletedSublabel },
+                    { value: overviewData.investment.retentionStat, label: 'renew to Year 2', sub: overviewData.investment.retentionSublabel },
+                  ].map((stat, i) => (
+                    <div key={i} className="bg-white px-5 py-4">
+                      <div className="text-2xl font-bold text-[#1A6B6B] mb-0.5">{stat.value}</div>
+                      <div className="text-xs font-semibold text-[#1B2A4A] mb-1">{stat.label}</div>
+                      <div className="text-xs text-gray-400 leading-snug">{stat.sub}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {/* Looking Ahead */}
-            <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
-              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                  <h3 className="font-bold text-lg mb-1">When You&apos;re Ready to Go Deeper</h3>
-                  <p className="text-sm text-white/80 max-w-lg">
-                    TDI&apos;s IGNITE phase adds on-site observations, personalized feedback, and measurable outcomes - 
-                    with no sub coverage required. Many districts explore this after building Hub familiarity.
-                  </p>
+            {/* ─── ZONE 2C: QUICK WIN COUNTER ─── */}
+            <div className="bg-[#FDF8E7] rounded-2xl p-6 border border-[#F5C542]/30 text-center">
+              <div className="text-3xl mb-2">🎉</div>
+              <div className="text-lg font-bold text-[#1B2A4A] mb-1">{overviewData.quickWin.line1}</div>
+              <div className="text-sm text-gray-500">{overviewData.quickWin.line2}</div>
+            </div>
+
+            {/* ─── ZONE 3: ACTIONS ─── */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {/* Next to Unlock */}
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-[#1B2A4A] mb-4 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-amber-500" />
+                  Next to Unlock
+                </h3>
+                <div className="space-y-3">
+                  {overviewData.actions.nextToUnlock.map((item, i) => (
+                    <div key={i} className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{item.label}</div>
+                          <div className="text-xs text-gray-500 leading-snug">{item.detail}</div>
+                        </div>
+                        <span className="text-xs font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full flex-shrink-0">
+                          Partner action
+                        </span>
+                      </div>
+                      {item.cta && (
+                        <a
+                          href={item.ctaHref}
+                          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#1A6B6B] hover:underline"
+                        >
+                          {item.cta} <ArrowRight className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                  {overviewData.actions.tdiHandling.map((item, i) => (
+                    <div key={i} className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{item.label}</div>
+                          <div className="text-xs text-gray-500 leading-snug">{item.detail}</div>
+                        </div>
+                        <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full flex-shrink-0">
+                          TDI handling
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <button
-                  onClick={() => setActiveTab('next-steps')}
-                  className="bg-white/10 hover:bg-white/20 text-white border border-white/30 px-5 py-2.5 rounded-lg font-semibold text-sm transition-all whitespace-nowrap"
-                >
-                  Explore Options
-                </button>
+              </div>
+
+              {/* Already In Motion */}
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-[#1B2A4A] mb-4 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-green-500" />
+                  Already In Motion
+                </h3>
+                <div className="space-y-3">
+                  {overviewData.actions.alreadyInMotion.map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 bg-green-50 rounded-xl p-4 border border-green-100">
+                      <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-3.5 h-3.5 text-green-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-[#1B2A4A]">{item.label}</div>
+                        <div className="text-xs text-gray-500">{item.date}</div>
+                      </div>
+                      <span className="ml-auto text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full flex-shrink-0">
+                        {item.status === 'complete' ? 'Complete' : 'Active'}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
+
           </div>
         )}
 
