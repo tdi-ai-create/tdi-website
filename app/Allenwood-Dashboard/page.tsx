@@ -230,6 +230,111 @@ export default function AllenwoodDashboard() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // ===================== OVERVIEW DATA =====================
+  const overviewData = {
+    // ZONE 1 - Snapshot
+    stats: {
+      educatorsEnrolled: { value: 13, total: 13, label: 'Teachers Enrolled', sublabel: 'All seats filled' },
+      deliverables: { completed: 7, total: 11, label: 'Deliverables', sublabel: 'completed vs. contracted' },
+      hubEngagement: { percent: 100, raw: '13/13', label: 'Hub Engagement', sublabel: '100% logged in' },
+      phase: { name: 'IGNITE', number: 1, total: 3, label: 'Current Phase', sublabel: 'Phase 1 of 3' },
+    },
+
+    // Partnership Health
+    health: {
+      status: 'Strong',
+      statusColor: 'green',
+      details: [
+        'Hub engagement at 100% — all 13 teachers active',
+        '2 observations + 2 virtual sessions complete',
+        '4 virtual sessions already scheduled through April',
+        'Leadership meeting held March 2 — Year 2 discussions underway',
+      ],
+    },
+
+    // ZONE 2A - Timeline
+    timeline: {
+      done: [
+        { label: 'Virtual Session 1 — Hub onboarding + partnership goals', date: 'Sep 17, 2025' },
+        { label: 'Observation Day 1 — 11 classrooms, 11 Love Notes delivered', date: 'Oct 15, 2025' },
+        { label: 'Hub access activated — all 13 teachers enrolled', date: 'Fall 2025' },
+        { label: '100% Hub login milestone achieved', date: 'Feb 2026' },
+        { label: 'Virtual Session 2 — Hub update, tools discussion, data collection', date: 'Feb 25, 2026' },
+        { label: 'Observation Day 2 — 10 classrooms, Love Notes delivered', date: 'Feb 18, 2026' },
+        { label: 'Leadership Meeting — mid-year wins, Year 2 expansion planning', date: 'Mar 2, 2026' },
+      ],
+      inProgress: [
+        { label: 'Hub engagement — 13/13 teachers active', detail: '14 courses being explored, up from 4 last month' },
+        { label: 'Top course: Calm Classrooms, Not Chaos', detail: '3 teachers engaged' },
+        { label: 'Funding strategy discussion with Dr. Porter', detail: 'Meeting March 10 — 9AM ET' },
+        { label: 'Year 2 expansion conversations underway', detail: 'Discussed at March 2 leadership meeting' },
+      ],
+      comingSoon: [
+        { label: 'Funding Meeting with Dr. Porter', date: 'March 10, 2026 — 9AM ET (Tomorrow)' },
+        { label: 'Virtual Session 3', date: 'March 11, 2026 — 7:30PM ET' },
+        { label: 'Virtual Session 4', date: 'March 25, 2026 — 7:30PM ET' },
+        { label: 'Virtual Session 5', date: 'April 8, 2026 — 7:30PM ET' },
+        { label: 'Virtual Session 6', date: 'April 15, 2026 — 7:30PM ET' },
+        { label: 'Spring Leadership Celebration', date: 'Available through May 2026' },
+      ],
+    },
+
+    // ZONE 2B - Investment value mirror
+    investment: {
+      perEducator: '$592',
+      perEducatorSublabel: 'per teacher — less than a one-day sub',
+      implementationRate: '100%',
+      implementationSublabel: 'hub login rate — every teacher active',
+      coursesCompleted: 21,
+      coursesCompletedSublabel: 'classrooms received Love Notes this partnership',
+      retentionStat: '4x',
+      retentionSublabel: 'course exploration growth since last month',
+    },
+
+    // ZONE 2C - Quick win counter
+    quickWin: {
+      count: 21,
+      line1: '21 Allenwood classrooms have received personalized Love Notes this partnership.',
+      line2: 'Every teacher observed — seen, celebrated, and growing.',
+    },
+
+    // ZONE 3 - Actions
+    actions: {
+      nextToUnlock: [
+        {
+          label: 'Funding Meeting with Dr. Porter',
+          detail: 'Tomorrow — March 10, 2026 at 9AM ET. Discuss funding PD for teacher expansion.',
+          owner: 'both',
+          cta: 'TDI is prepared — meeting confirmed',
+          ctaHref: '',
+        },
+        {
+          label: 'Schedule Spring Leadership Celebration',
+          detail: 'Celebrate wins + discuss Year 2 options — complimentary, available through May 2026',
+          owner: 'partner',
+          cta: 'Schedule via Calendly',
+          ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+        },
+      ],
+      tdiHandling: [
+        {
+          label: 'Virtual Sessions 3-6 — TDI preparing content',
+          detail: 'All 4 sessions confirmed through April 15',
+        },
+        {
+          label: 'Year 2 proposal in progress',
+          detail: 'Following March 10 funding conversation',
+        },
+      ],
+      alreadyInMotion: [
+        { label: 'Virtual Session 3', date: 'March 11, 2026 — 7:30PM ET', status: 'scheduled' },
+        { label: 'Virtual Session 4', date: 'March 25, 2026 — 7:30PM ET', status: 'scheduled' },
+        { label: 'Virtual Session 5', date: 'April 8, 2026 — 7:30PM ET', status: 'scheduled' },
+        { label: 'Virtual Session 6', date: 'April 15, 2026 — 7:30PM ET', status: 'scheduled' },
+      ],
+    },
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F5F5] overflow-x-hidden">
       {/* Compact Navigation - matches WEGO */}
@@ -306,244 +411,299 @@ export default function AllenwoodDashboard() {
 
       {/* Tab Content */}
       <div className="max-w-5xl mx-auto px-4 py-6">
-        {/* OVERVIEW TAB */}
+        {/* ==================== OVERVIEW TAB ==================== */}
         {activeTab === 'overview' && (
-          <div className="space-y-6">
-            {/* Quick Stats - matches WEGO */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
-                <div className="flex items-center gap-2 mb-1">
-                  <Users className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-xs text-gray-500 uppercase">Teachers Enrolled</span>
-                </div>
-                <div className="text-2xl font-bold text-[#1e2749]">13/13</div>
-                <div className="text-xs text-[#38618C] font-medium">Hub Access</div>
+          <div className="space-y-8 pb-8">
+
+            {/* ─── ZONE 1: PARTNERSHIP SNAPSHOT ─── */}
+            <div className="space-y-4">
+
+              {/* Stat Cards Row */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+                {/* Teachers Enrolled */}
+                <button
+                  onClick={() => setActiveTab('progress')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <Users className="w-5 h-5 text-[#1A6B6B]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#1A6B6B] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#1A6B6B] mb-1">
+                    {overviewData.stats.educatorsEnrolled.value}/{overviewData.stats.educatorsEnrolled.total}
+                  </div>
+                  <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{overviewData.stats.educatorsEnrolled.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.educatorsEnrolled.sublabel}</div>
+                </button>
+
+                {/* Deliverables */}
+                <button
+                  onClick={() => setActiveTab('partnership')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <CheckCircle className="w-5 h-5 text-[#F5C542]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#1A6B6B] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#B8860B] mb-1">
+                    {overviewData.stats.deliverables.completed}/{overviewData.stats.deliverables.total}
+                  </div>
+                  <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{overviewData.stats.deliverables.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.deliverables.sublabel}</div>
+                  {/* Mini progress bar */}
+                  <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#F5C542] rounded-full transition-all"
+                      style={{ width: `${(overviewData.stats.deliverables.completed / overviewData.stats.deliverables.total) * 100}%` }}
+                    />
+                  </div>
+                </button>
+
+                {/* Hub Engagement */}
+                <button
+                  onClick={() => setActiveTab('progress')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <BookOpen className="w-5 h-5 text-[#1A6B6B]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#1A6B6B] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#1A6B6B] mb-1">{overviewData.stats.hubEngagement.percent}%</div>
+                  <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{overviewData.stats.hubEngagement.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.hubEngagement.raw} logged in</div>
+                  {/* Mini progress bar */}
+                  <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#1A6B6B] rounded-full transition-all"
+                      style={{ width: `${overviewData.stats.hubEngagement.percent}%` }}
+                    />
+                  </div>
+                </button>
+
+                {/* Current Phase */}
+                <button
+                  onClick={() => setActiveTab('next-year')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <Target className="w-5 h-5 text-[#1B2A4A]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#1A6B6B] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#1B2A4A] mb-1">{overviewData.stats.phase.name}</div>
+                  <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{overviewData.stats.phase.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.phase.sublabel}</div>
+                  {/* Phase progress dots */}
+                  <div className="mt-3 flex gap-1.5">
+                    {Array.from({ length: overviewData.stats.phase.total }).map((_, i) => (
+                      <div
+                        key={i}
+                        className={`h-1.5 flex-1 rounded-full ${i < overviewData.stats.phase.number ? 'bg-[#1B2A4A]' : 'bg-gray-100'}`}
+                      />
+                    ))}
+                  </div>
+                </button>
               </div>
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-green-500">
-                <div className="flex items-center gap-2 mb-1">
-                  <CheckCircle className="w-4 h-4 text-green-500" />
-                  <span className="text-xs text-gray-500 uppercase">Hub Logins</span>
+              {/* Partnership Health Indicator */}
+              <div className="bg-white rounded-2xl px-6 py-4 shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center gap-3">
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-sm shadow-green-200" />
+                  <span className="text-sm font-bold text-[#1B2A4A]">Partnership Momentum:</span>
+                  <span className="text-sm font-bold text-green-600">{overviewData.health.status}</span>
                 </div>
-                <div className="text-2xl font-bold text-green-600">100%</div>
-                <div className="text-xs text-green-600 font-medium">13/13 Logged In</div>
-              </div>
-
-              <button
-                onClick={() => document.getElementById('next-steps-section')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-orange-500 text-left hover:shadow-md transition-shadow cursor-pointer w-full"
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <AlertCircle className="w-4 h-4 text-orange-500" />
-                  <span className="text-xs text-gray-500 uppercase">Up Next</span>
+                <div className="hidden md:block w-px h-4 bg-gray-200" />
+                <div className="flex flex-wrap gap-x-4 gap-y-1">
+                  {overviewData.health.details.map((d, i) => (
+                    <span key={i} className="text-xs text-gray-500">{d}</span>
+                  ))}
                 </div>
-                <div className="text-2xl font-bold text-orange-600">{needsAttentionItems.filter(item => !isComplete(item.id)).length}</div>
-                <div className="text-xs text-orange-600 font-medium">Items to schedule</div>
-              </button>
-
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
-                <div className="flex items-center gap-2 mb-1">
-                  <TrendingUp className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-xs text-gray-500 uppercase">Current Phase</span>
-                </div>
-                <div className="text-2xl font-bold text-[#1e2749]">IGNITE</div>
-                <div className="text-xs text-[#38618C] font-medium">Phase 1</div>
               </div>
             </div>
 
-            {/* Recommendation Card */}
-            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-5">
-              <div className="flex items-start gap-3">
-                <PartyPopper className="w-5 h-5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <h4 className="font-semibold text-gray-800 mb-2">100% Hub Logins Achieved!</h4>
-                  <p className="text-sm text-gray-700">
-                    Huge win - 100% of your team has now logged into the Hub! Activity is growing too, with 14 courses showing exploration (up from 4 last month) and your first course completion. Your upcoming virtual sessions are the perfect time to spotlight what staff are discovering and build on this momentum.
-                  </p>
-                </div>
-              </div>
-            </div>
+            {/* ─── ZONE 2A: DONE / IN PROGRESS / COMING SOON ─── */}
+            <div>
+              <h3 className="text-base font-bold text-[#1B2A4A] mb-4">Partnership Timeline</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-            {/* Leadership Meeting - March 2 Completed */}
-            <div className="bg-gradient-to-r from-emerald-50 to-emerald-100 rounded-xl p-5 border border-emerald-200">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Users className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-[#1e2749]">Leadership Meeting: Mid-Year Success</h4>
-                    <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
-                      <Check className="w-3 h-3" />
-                      Completed
+                {/* Done */}
+                <div className="bg-green-50 rounded-2xl p-5 border border-green-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-bold text-green-700">Done</span>
+                    <span className="ml-auto text-xs text-green-600 font-medium bg-green-100 px-2 py-0.5 rounded-full">
+                      {overviewData.timeline.done.length} completed
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mb-2">
-                    <span className="font-medium">March 2, 2026</span> · With Dr. Porter &amp; Allenwood Leadership
-                  </p>
-                  <p className="text-sm text-gray-500">
-                    Reviewed mid-year wins, discussed partnership progress, and planned for Year 2 expansion.
-                  </p>
+                  <div className="space-y-2.5">
+                    {overviewData.timeline.done.map((item, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400 mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{item.date}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* In Progress */}
+                <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-4 h-4 rounded-full border-2 border-amber-500 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    </div>
+                    <span className="text-sm font-bold text-amber-700">In Progress</span>
+                    <span className="ml-auto text-xs text-amber-600 font-medium bg-amber-100 px-2 py-0.5 rounded-full">
+                      {overviewData.timeline.inProgress.length} active
+                    </span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {overviewData.timeline.inProgress.map((item, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{item.detail}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Coming Soon */}
+                <div className="bg-[#E8F5F5] rounded-2xl p-5 border border-[#1A6B6B]/15">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Calendar className="w-4 h-4 text-[#1A6B6B]" />
+                    <span className="text-sm font-bold text-[#1A6B6B]">Coming Soon</span>
+                    <span className="ml-auto text-xs text-[#1A6B6B] font-medium bg-[#1A6B6B]/10 px-2 py-0.5 rounded-full">
+                      {overviewData.timeline.comingSoon.length} ahead
+                    </span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {overviewData.timeline.comingSoon.map((item, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#1A6B6B]/50 mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{item.date}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Next Steps - Dynamic with completion toggle */}
-            <div id="next-steps-section" className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-gray-800 flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-orange-500" />
-                  Next Steps
-                </h3>
-                <span className="text-sm text-orange-500 bg-orange-50 px-2 py-1 rounded-full">
-                  {needsAttentionItems.filter(item => !isComplete(item.id)).length} items
-                </span>
+            {/* ─── ZONE 2B: YOUR INVESTMENT, BY THE NUMBERS ─── */}
+            <div>
+              <div className="bg-[#E8F5F5] rounded-2xl p-1 border border-[#1A6B6B]/15">
+                <div className="px-5 pt-5 pb-3">
+                  <h3 className="text-base font-bold text-[#1B2A4A]">Your Investment, By The Numbers</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">What this partnership delivers — in impact and value</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#1A6B6B]/10 rounded-xl overflow-hidden">
+                  {[
+                    { value: overviewData.investment.perEducator, label: 'per teacher', sub: overviewData.investment.perEducatorSublabel },
+                    { value: overviewData.investment.implementationRate, label: 'hub login rate', sub: overviewData.investment.implementationSublabel },
+                    { value: overviewData.investment.coursesCompleted, label: 'Love Notes delivered', sub: overviewData.investment.coursesCompletedSublabel },
+                    { value: overviewData.investment.retentionStat, label: 'course growth', sub: overviewData.investment.retentionSublabel },
+                  ].map((stat, i) => (
+                    <div key={i} className="bg-white px-5 py-4">
+                      <div className="text-2xl font-bold text-[#1A6B6B] mb-0.5">{stat.value}</div>
+                      <div className="text-xs font-semibold text-[#1B2A4A] mb-1">{stat.label}</div>
+                      <div className="text-xs text-gray-400 leading-snug">{stat.sub}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
+            </div>
 
-              {/* Active Items */}
-              <div className="space-y-3">
-                {needsAttentionItems
-                  .filter(item => !isComplete(item.id))
-                  .map(item => (
-                    <div
-                      key={item.id}
-                      className={`rounded-lg p-4 border transition-all ${
-                        item.priority === 'asap'
-                          ? 'border-amber-400 bg-amber-50'
-                          : isOverdue(item.deadlineMonth, item.deadlineYear)
-                          ? 'border-red-500 bg-red-50'
-                          : 'bg-orange-50 border-orange-100'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <Calendar className={`w-5 h-5 ${
-                            item.priority === 'asap' ? 'text-amber-600' :
-                            isOverdue(item.deadlineMonth, item.deadlineYear) ? 'text-red-700' : 'text-orange-500'
-                          }`} />
-                          <div>
-                            <div className="flex items-center gap-2">
-                              <span className="font-medium text-gray-800">{item.title}</span>
-                              {item.priority === 'asap' && (
-                                <span className="text-xs bg-amber-500 text-white px-2 py-0.5 rounded-full font-medium">ASAP</span>
-                              )}
-                            </div>
-                            <div className="text-sm text-gray-500">
-                              {item.description}
-                              {item.recommendedWindow && (
-                                <span className="block text-amber-700 font-medium mt-1">
-                                  Recommended: Schedule between {item.recommendedWindow}
-                                </span>
-                              )}
-                              {!item.recommendedWindow && (
-                                <>
-                                  {' · '}
-                                  {isOverdue(item.deadlineMonth, item.deadlineYear) ? (
-                                    <span className="text-red-700 font-bold">OVERDUE</span>
-                                  ) : (
-                                    <span className="text-orange-500 font-medium">Available through {item.deadline}</span>
-                                  )}
-                                </>
-                              )}
-                            </div>
-                          </div>
+            {/* ─── ZONE 2C: QUICK WIN COUNTER ─── */}
+            <div className="bg-[#FDF8E7] rounded-2xl p-6 border border-[#F5C542]/30 text-center">
+              <div className="text-3xl mb-2">🎉</div>
+              <div className="text-lg font-bold text-[#1B2A4A] mb-1">{overviewData.quickWin.line1}</div>
+              <div className="text-sm text-gray-500">{overviewData.quickWin.line2}</div>
+            </div>
+
+            {/* ─── ZONE 3: ACTIONS ─── */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {/* Next to Unlock */}
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-[#1B2A4A] mb-4 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-amber-500" />
+                  Next to Unlock
+                </h3>
+                <div className="space-y-3">
+                  {overviewData.actions.nextToUnlock.map((item, i) => (
+                    <div key={i} className={`rounded-xl p-4 border ${item.owner === 'both' ? 'bg-purple-50 border-purple-100' : 'bg-amber-50 border-amber-100'}`}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{item.label}</div>
+                          <div className="text-xs text-gray-500 leading-snug">{item.detail}</div>
                         </div>
-                        <div className="flex items-center gap-2 ml-4">
-                          <a
-                            href={item.actionUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 ${
-                              item.priority === 'asap'
-                                ? 'bg-amber-500 text-white hover:bg-amber-600'
-                                : isOverdue(item.deadlineMonth, item.deadlineYear)
-                                ? 'bg-red-700 text-white'
-                                : 'bg-orange-500 text-white hover:bg-orange-600'
-                            }`}
-                          >
-                            <Calendar className="w-4 h-4" />
-                            {item.actionLabel}
-                          </a>
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${item.owner === 'both' ? 'bg-purple-100 text-purple-700' : 'bg-amber-100 text-amber-700'}`}>
+                          {item.owner === 'both' ? 'Joint action' : 'Partner action'}
+                        </span>
+                      </div>
+                      {item.cta && item.ctaHref && (
+                        <a
+                          href={item.ctaHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#1A6B6B] hover:underline"
+                        >
+                          {item.cta} <ArrowRight className="w-3 h-3" />
+                        </a>
+                      )}
+                      {item.cta && !item.ctaHref && (
+                        <div className="mt-3 text-xs font-medium text-green-600">{item.cta}</div>
+                      )}
+                    </div>
+                  ))}
+                  {overviewData.actions.tdiHandling.map((item, i) => (
+                    <div key={i} className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{item.label}</div>
+                          <div className="text-xs text-gray-500 leading-snug">{item.detail}</div>
                         </div>
+                        <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full flex-shrink-0">
+                          TDI handling
+                        </span>
                       </div>
                     </div>
                   ))}
+                </div>
               </div>
 
-              {/* Completed Items */}
-              {needsAttentionItems.filter(item => isComplete(item.id)).length > 0 && (
-                <div className="mt-6 pt-4 border-t border-gray-200">
-                  <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
-                    Completed ({needsAttentionItems.filter(item => isComplete(item.id)).length})
-                  </div>
-                  <div className="space-y-2">
-                    {needsAttentionItems
-                      .filter(item => isComplete(item.id))
-                      .map(item => (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg opacity-60"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
-                              <Check className="w-4 h-4 text-emerald-600" />
-                            </div>
-                            <span className="text-gray-500 line-through">{item.title}</span>
-                          </div>
-                          <button
-                            onClick={() => toggleComplete(item.id)}
-                            className="text-xs text-gray-400 hover:text-gray-600 underline"
-                          >
-                            Undo
-                          </button>
-                        </div>
-                      ))}
-                  </div>
+              {/* Already In Motion */}
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-[#1B2A4A] mb-4 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-green-500" />
+                  Already In Motion
+                </h3>
+                <div className="space-y-3">
+                  {overviewData.actions.alreadyInMotion.map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 bg-green-50 rounded-xl p-4 border border-green-100">
+                      <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-3.5 h-3.5 text-green-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-[#1B2A4A]">{item.label}</div>
+                        <div className="text-xs text-gray-500">{item.date}</div>
+                      </div>
+                      <span className="ml-auto text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full flex-shrink-0">
+                        Scheduled
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              )}
-
-            </div>
-
-            {/* Looking Ahead Teaser */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="text-sm text-blue-600 font-medium mb-1">Looking Ahead: Phase 2 - ACCELERATE</p>
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2">Full Staff Support for 68 Educators</h3>
-                  <p className="text-sm text-gray-600">
-                    Your pilot team of 13 built the foundation. Year 2 brings TDI support to all 68 teachers and paraprofessionals - and we help you fund it.
-                  </p>
-                  <p className="text-sm text-blue-600 mt-2 font-medium">
-                    Your complete funding strategy is ready with 4 paths to explore.
-                  </p>
-                </div>
-                <button
-                  onClick={() => handleTabChange('next-year')}
-                  className="flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium whitespace-nowrap ml-4"
-                >
-                  See the Plan
-                  <ArrowRight className="w-4 h-4" />
-                </button>
               </div>
             </div>
 
-            {/* Partnership Footer with CTA */}
-            <div className="bg-[#1e2749] text-white rounded-xl p-6">
-              <div className="flex justify-between items-center">
-                <div>
-                  <p className="font-semibold">Teachers Deserve It</p>
-                  <p className="text-sm text-gray-300">Partner Dashboard for Allenwood Elementary</p>
-                </div>
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white text-[#1e2749] px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-100"
-                >
-                  Schedule a Call
-                </a>
-              </div>
-            </div>
           </div>
         )}
 
