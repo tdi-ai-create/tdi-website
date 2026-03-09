@@ -1425,28 +1425,51 @@ Thank you for setting the example. It matters more than you know.`;
     title,
     icon,
     defaultOpen = false,
+    accent = 'gray',
     children,
   }: {
     title: string;
     icon: React.ReactNode;
     defaultOpen?: boolean;
+    accent?: 'teal' | 'amber' | 'green' | 'blue' | 'purple' | 'yellow' | 'rose' | 'indigo' | 'orange' | 'gray';
     children: React.ReactNode;
   }) => {
     const [open, setOpen] = useState(defaultOpen);
+
+    const accentStyles: Record<string, { border: string; headerBg: string; iconBg: string }> = {
+      teal: { border: 'border-l-4 border-l-teal-500', headerBg: 'bg-teal-50/50', iconBg: 'bg-teal-100' },
+      amber: { border: 'border-l-4 border-l-amber-500', headerBg: 'bg-amber-50/50', iconBg: 'bg-amber-100' },
+      green: { border: 'border-l-4 border-l-green-500', headerBg: 'bg-green-50/50', iconBg: 'bg-green-100' },
+      blue: { border: 'border-l-4 border-l-blue-500', headerBg: 'bg-blue-50/50', iconBg: 'bg-blue-100' },
+      purple: { border: 'border-l-4 border-l-purple-500', headerBg: 'bg-purple-50/50', iconBg: 'bg-purple-100' },
+      yellow: { border: 'border-l-4 border-l-yellow-500', headerBg: 'bg-yellow-50/50', iconBg: 'bg-yellow-100' },
+      rose: { border: 'border-l-4 border-l-rose-500', headerBg: 'bg-rose-50/50', iconBg: 'bg-rose-100' },
+      indigo: { border: 'border-l-4 border-l-indigo-500', headerBg: 'bg-indigo-50/50', iconBg: 'bg-indigo-100' },
+      orange: { border: 'border-l-4 border-l-orange-500', headerBg: 'bg-orange-50/50', iconBg: 'bg-orange-100' },
+      gray: { border: '', headerBg: 'bg-white', iconBg: 'bg-gray-100' },
+    };
+
+    const style = accentStyles[accent] || accentStyles.gray;
+
     return (
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className={`bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden ${style.border}`}>
         <button
           onClick={() => setOpen(!open)}
-          className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
+          className={`w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50/50 transition-colors ${style.headerBg}`}
         >
-          <div className="flex items-center gap-2">
-            {icon}
-            <span className="text-sm font-semibold text-gray-900">{title}</span>
+          <div className="flex items-center gap-3">
+            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${style.iconBg}`}>
+              {icon}
+            </div>
+            <span className="text-base font-semibold text-gray-900">{title}</span>
           </div>
-          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-400">Click to {open ? 'collapse' : 'expand'}</span>
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+          </div>
         </button>
         {open && (
-          <div className="px-6 pb-6 pt-2 border-t border-gray-100">
+          <div className="px-6 pb-6 pt-4 border-t border-gray-100">
             {children}
           </div>
         )}
@@ -1951,7 +1974,8 @@ Thank you for setting the example. It matters more than you know.`;
               <CollapsibleSection
                 title="School Snapshot"
                 icon={<Building className="w-4 h-4 text-blue-600" />}
-                defaultOpen={false}
+                defaultOpen={true}
+                accent="blue"
               >
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                   <SnapshotStat label="District" value={partnershipData.snapshot.districtName} />
@@ -1973,7 +1997,8 @@ Thank you for setting the example. It matters more than you know.`;
             <CollapsibleSection
               title="Your Partnership Journey"
               icon={<Star className="w-4 h-4 text-yellow-600" />}
-              defaultOpen={false}
+              defaultOpen={true}
+              accent="yellow"
             >
               <div className="space-y-3">
                 {partnershipData.journey.phases.map((phase) => (
@@ -2030,7 +2055,8 @@ Thank you for setting the example. It matters more than you know.`;
             <CollapsibleSection
               title="Sessions + Leadership Meetings"
               icon={<Calendar className="w-4 h-4 text-green-600" />}
-              defaultOpen={false}
+              defaultOpen={true}
+              accent="green"
             >
               {/* Milestone Timeline — only renders when 4+ milestones */}
               {partnershipData.sessions.milestones.length >= 4 && (
@@ -2167,7 +2193,8 @@ Thank you for setting the example. It matters more than you know.`;
               <CollapsibleSection
                 title="Progress Snapshot"
                 icon={<TrendingUp className="w-4 h-4 text-amber-600" />}
-                defaultOpen={false}
+                defaultOpen={true}
+                accent="amber"
               >
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div className="bg-amber-50 rounded-lg p-4 border border-amber-100">
@@ -2207,7 +2234,8 @@ Thank you for setting the example. It matters more than you know.`;
               <CollapsibleSection
                 title="Team Pulse"
                 icon={<Heart className="w-4 h-4 text-purple-600" />}
-                defaultOpen={false}
+                defaultOpen={true}
+                accent="purple"
               >
                 {/* Survey cards rendered here when data exists */}
                 <p className="text-sm text-gray-500">Survey data will appear here after the first check-in is collected.</p>
@@ -2224,7 +2252,8 @@ Thank you for setting the example. It matters more than you know.`;
               <CollapsibleSection
                 title="What We're Learning"
                 icon={<BookOpen className="w-4 h-4 text-indigo-600" />}
-                defaultOpen={false}
+                defaultOpen={true}
+                accent="indigo"
               >
                 <div className="space-y-4">
                   {partnershipData.learning.moves.map((move) => (
@@ -2263,7 +2292,8 @@ Thank you for setting the example. It matters more than you know.`;
               <CollapsibleSection
                 title="Staff Champions"
                 icon={<Star className="w-4 h-4 text-yellow-500" />}
-                defaultOpen={false}
+                defaultOpen={true}
+                accent="yellow"
               >
                 <p className="text-xs text-gray-500 mb-4 italic">{partnershipData.champions.highFiveInstructions}</p>
                 <div className="space-y-2">
@@ -2297,7 +2327,8 @@ Thank you for setting the example. It matters more than you know.`;
               <CollapsibleSection
                 title="What's Resonating"
                 icon={<Lightbulb className="w-4 h-4 text-orange-500" />}
-                defaultOpen={false}
+                defaultOpen={true}
+                accent="orange"
               >
                 <p className="text-xs text-gray-500 mb-4">{partnershipData.resonating.totalCoursesStarted} courses being actively explored across your team.{' '}
                   <a href={partnershipData.resonating.hubLink} target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">View in Hub →</a>
@@ -2327,7 +2358,8 @@ Thank you for setting the example. It matters more than you know.`;
               <CollapsibleSection
                 title="Your Team's Top Ask"
                 icon={<MessageCircle className="w-4 h-4 text-rose-500" />}
-                defaultOpen={false}
+                defaultOpen={true}
+                accent="rose"
               >
                 {/* Content populated from survey barrier data */}
                 <p className="text-sm text-gray-500">Staff feedback will appear here after the first survey check-in.</p>
