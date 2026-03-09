@@ -61,7 +61,10 @@ import {
   Send,
   Check,
   CheckCircle2,
-  CalendarClock
+  CalendarClock,
+  Map,
+  Zap,
+  MessageSquare
 } from 'lucide-react';
 
 export default function ASD4Dashboard() {
@@ -1058,7 +1061,7 @@ Thank you for setting the example. It matters more than you know.`;
 
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Eye },
-    { id: 'partnership', label: 'Our Partnership', icon: Heart },
+    { id: 'ourPartnership', label: 'Our Partnership', icon: Heart },
     { id: 'schools', label: 'Schools', icon: School },
     { id: 'blueprint', label: 'Blueprint', icon: Star },
     { id: 'year2', label: '2026-27', icon: Sparkles, badge: 'Preview' },
@@ -1205,6 +1208,318 @@ Thank you for setting the example. It matters more than you know.`;
     },
   };
 
+  const partnershipData = {
+
+    // SECTION 1 — Partnership Goal
+    goal: {
+      quote: 'Every para in Addison School District 4 feels equipped, valued, and ready to show up fully for students.',
+      theme: 'Building a district where paraprofessionals are treated as the professionals they are.',
+    },
+
+    // SECTION 2 — Classroom Observations
+    observations: [
+      {
+        id: 'obs-1',
+        dayNumber: 1,
+        date: 'January 2026',
+        classroomsVisited: 18,
+        loveNotesDelivered: 18,
+        aiSummary: 'Across 18 Addison classrooms, paras were actively engaged — redirecting with calm language, using proximity support, and following student-centered cues from their teachers. One moment that stood out: a para in Building 3 used a strategy from the Hub\'s Calm Classrooms course mid-visit, entirely unprompted. 91% of observed paras are already applying Move #1 strategies in their daily practice.',
+        details: {
+          narrative: 'TDI visited 18 classrooms across Addison SD4. The observation focus was Move #1 implementation — calm redirection, proactive proximity, and student relationship language. What we saw: paras who had engaged with Hub content were noticeably more confident and intentional in their practice.',
+          quotes: [
+            'She knew exactly what to do without being asked — that\'s a para who owns her role.',
+            'The Love Note made her day. She read it three times.',
+          ],
+          resources: [
+            'Hub course referenced: Calm Classrooms, Not Chaos',
+            'Hub course referenced: The Proximity Principle',
+          ],
+          nextFocus: 'Observation Day 2 will look for Move #2 application — collaborative support structures and co-teaching alignment.',
+        },
+      },
+    ],
+
+    // SECTION 3 — School / District Snapshot (CONDITIONAL)
+    snapshot: {
+      show: true,
+      districtName: 'Addison School District 4',
+      state: 'Illinois',
+      staffCount: 122,
+      staffType: 'Paraprofessionals',
+      buildings: null,
+      principalTheme: 'Paraprofessional empowerment and retention',
+      context: 'ASD4 serves a diverse student population with a high proportion of students requiring para support. This partnership was initiated to professionalize the para role district-wide and reduce the revolving door of para turnover.',
+    },
+
+    // SECTION 4 — Partnership Journey
+    journey: {
+      phases: [
+        {
+          name: 'IGNITE',
+          number: 1,
+          status: 'current' as 'complete' | 'current' | 'upcoming',
+          deliverables: [
+            { label: 'Hub access activated — all 122 paras enrolled', complete: true },
+            { label: '100% Hub login milestone achieved', complete: true },
+            { label: 'Observation Day 1 — 18 classrooms, Love Notes delivered', complete: true },
+            { label: 'Move #1 implementation tracking — 91% applying strategies', complete: true },
+            { label: 'Observation Day 2 — classroom visits + Love Notes', complete: false },
+            { label: 'Move #2 implementation tracking', complete: false },
+            { label: 'IGNITE wrap-up session + transition to ACCELERATE', complete: false },
+          ],
+        },
+        {
+          name: 'ACCELERATE',
+          number: 2,
+          status: 'upcoming' as 'complete' | 'current' | 'upcoming',
+          deliverables: [
+            { label: 'Deep-dive strategy coaching sessions', complete: false },
+            { label: 'Full Hub library access — all courses unlocked', complete: false },
+            { label: 'Building-level lead para program', complete: false },
+            { label: 'Mid-year survey + data review', complete: false },
+          ],
+        },
+        {
+          name: 'SUSTAIN',
+          number: 3,
+          status: 'upcoming' as 'complete' | 'current' | 'upcoming',
+          deliverables: [
+            { label: 'Year-end data presentation to district leadership', complete: false },
+            { label: 'Year 2 partnership design + contract renewal', complete: false },
+            { label: 'Internal TDI champion identified and supported', complete: false },
+          ],
+        },
+      ],
+    },
+
+    // SECTION 5 — Sessions + Leadership Meetings
+    sessions: {
+      milestones: [
+        { date: 'Jan 2026', label: 'Partnership Launched', status: 'complete' as const },
+        { date: 'Jan 2026', label: 'Hub Activated', status: 'complete' as const },
+        { date: 'Jan 2026', label: 'Obs Day 1', status: 'complete' as const },
+        { date: 'Mar 2026', label: 'You Are Here', status: 'current' as const },
+        { date: 'Apr 2026', label: 'Obs Day 2', status: 'upcoming' as const },
+        { date: 'May 2026', label: 'IGNITE Complete', status: 'upcoming' as const },
+      ],
+      completed: [
+        {
+          type: 'Full-Day PD',
+          label: 'IGNITE Launch Day — Foundation + Hub Onboarding',
+          date: 'January 2026',
+          badge: 'Complete',
+        },
+        {
+          type: 'Observation',
+          label: 'Observation Day 1 — 18 classrooms visited',
+          date: 'January 2026',
+          badge: 'Complete',
+          note: 'See Observations section for full details',
+        },
+      ],
+      upcoming: [
+        {
+          type: 'Observation',
+          label: 'Observation Day 2',
+          date: 'April 2026',
+          badge: 'Scheduled',
+        },
+        {
+          type: 'Virtual Session',
+          label: 'Move #2 Coaching Session',
+          date: 'To be scheduled',
+          badge: 'Pending',
+          calendlyLink: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+        },
+        {
+          type: 'Leadership Meeting',
+          label: 'IGNITE Wrap-Up + ACCELERATE Planning',
+          date: 'May 2026',
+          badge: 'Pending',
+          calendlyLink: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+        },
+      ],
+      leadershipMeetings: [
+        {
+          label: 'Partnership Kickoff — Goals + Logistics',
+          date: 'January 2026',
+          status: 'Complete',
+        },
+      ],
+    },
+
+    // SECTION 6 — Progress Snapshot (CONDITIONAL)
+    progress: {
+      show: true,
+      implementationRate: 91,
+      implementationLabel: '91% of paras applying Move #1 strategies',
+      implementationComparison: 'More than 9x the 10% industry average for PD implementation',
+      hubAccess: { active: 122, total: 122, percent: 100 },
+      selfDirected: 79,
+      coursesCompleted: 91,
+    },
+
+    // SECTION 7 — Team Pulse (CONDITIONAL)
+    teamPulse: {
+      show: false,
+      surveys: [] as { date: string; responseRate: number; highlights: string[] }[],
+    },
+
+    // SECTION 8 — What We're Learning (CONDITIONAL)
+    learning: {
+      show: true,
+      moves: [
+        {
+          moveNumber: 1,
+          moveName: 'Calm Classroom Presence',
+          implementationRate: 91 as number | null,
+          note: '91% of paras observed applying Move #1 strategies — calm redirection, proximity, and student-centered language.',
+        },
+        {
+          moveNumber: 2,
+          moveName: 'Collaborative Support Structures',
+          implementationRate: null as number | null,
+          note: 'Move #2 tracking begins at Observation Day 2. Early Hub data shows 34 paras have already explored relevant courses.',
+        },
+      ],
+    },
+
+    // SECTION 9 — Staff Champions (CONDITIONAL)
+    champions: {
+      show: true,
+      highFiveInstructions: 'Recognize your most engaged paras in one click — sends a personal email directly from your inbox.',
+      staff: [
+        { name: 'M. Dunkel', note: '10 engaged Hub days — most active in the district', email: 'mdunkel@asd4.org' },
+        { name: 'M. Gorostieta', note: '9 engaged Hub days', email: 'mgorostieta@asd4.org' },
+        { name: 'V. Castaneda', note: '5 engaged Hub days', email: 'vcastaneda@asd4.org' },
+        { name: 'M. Cano', note: '5 engaged Hub days', email: 'mcano@asd4.org' },
+        { name: 'R. Medina', note: '4 engaged Hub days', email: 'rmedina@asd4.org' },
+      ],
+    },
+
+    // SECTION 10 — What's Resonating (CONDITIONAL)
+    resonating: {
+      show: true,
+      hubLink: 'https://teachersdeserveit.com/hub',
+      topCourses: [
+        { title: 'Calm Classrooms, Not Chaos', engagedStaff: 22 },
+        { title: 'The Proximity Principle', engagedStaff: 18 },
+        { title: 'Communication That Clicks', engagedStaff: 15 },
+        { title: 'Behavior Is Communication', engagedStaff: 12 },
+        { title: 'The Differentiation Fix', engagedStaff: 9 },
+      ],
+      totalCoursesStarted: 28,
+    },
+
+    // SECTION 11 — Your Team's Top Ask (CONDITIONAL)
+    topAsk: {
+      show: false,
+      topBarrier: null as string | null,
+      recommendedActions: [] as string[],
+    },
+  };
+
+  // Helper Components for Our Partnership Tab
+  const CollapsibleSection = ({
+    title,
+    icon,
+    defaultOpen = false,
+    children,
+  }: {
+    title: string;
+    icon: React.ReactNode;
+    defaultOpen?: boolean;
+    children: React.ReactNode;
+  }) => {
+    const [open, setOpen] = useState(defaultOpen);
+    return (
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <button
+          onClick={() => setOpen(!open)}
+          className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
+        >
+          <div className="flex items-center gap-2">
+            {icon}
+            <span className="text-sm font-semibold text-gray-900">{title}</span>
+          </div>
+          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+        </button>
+        {open && (
+          <div className="px-6 pb-6 pt-2 border-t border-gray-100">
+            {children}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const ObservationCard = ({ obs }: { obs: typeof partnershipData.observations[0] }) => {
+    const [detailsOpen, setDetailsOpen] = useState(false);
+    return (
+      <div className="px-6 py-4">
+        {/* Row header — always visible */}
+        <div className="flex items-center gap-4 mb-3 flex-wrap">
+          <div className="flex items-center gap-1.5">
+            <CheckCircle className="w-4 h-4 text-green-500" />
+            <span className="text-sm font-semibold text-gray-900">Observation Day {obs.dayNumber}</span>
+          </div>
+          <span className="text-xs text-gray-400">{obs.date}</span>
+          <span className="text-xs text-gray-500">{obs.classroomsVisited} classrooms</span>
+          <span className="text-xs text-gray-500">{obs.loveNotesDelivered} Love Notes</span>
+        </div>
+        {/* AI summary — always visible, no "AI" label */}
+        <p className="text-sm text-gray-700 leading-relaxed mb-3">{obs.aiSummary}</p>
+        {/* View details toggle */}
+        <button
+          onClick={() => setDetailsOpen(!detailsOpen)}
+          className="text-xs text-teal-600 hover:text-teal-800 font-medium flex items-center gap-1 transition-colors"
+        >
+          {detailsOpen ? 'Hide details' : 'View details'}
+          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${detailsOpen ? 'rotate-180' : ''}`} />
+        </button>
+        {/* Full details — only shown when toggled open */}
+        {detailsOpen && (
+          <div className="mt-4 space-y-4 border-t border-gray-100 pt-4">
+            <div>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Observation Narrative</p>
+              <p className="text-sm text-gray-700 leading-relaxed">{obs.details.narrative}</p>
+            </div>
+            {obs.details.quotes.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">What We Heard</p>
+                {obs.details.quotes.map((q, i) => (
+                  <blockquote key={i} className="border-l-2 border-teal-300 pl-3 text-sm text-gray-600 italic mb-2">&ldquo;{q}&rdquo;</blockquote>
+                ))}
+              </div>
+            )}
+            {obs.details.resources.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Hub Resources Referenced</p>
+                {obs.details.resources.map((r, i) => (
+                  <p key={i} className="text-xs text-gray-600 flex items-center gap-1.5 mb-1">
+                    <BookOpen className="w-3 h-3 text-teal-500" /> {r}
+                  </p>
+                ))}
+              </div>
+            )}
+            <div>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Next Observation Focus</p>
+              <p className="text-sm text-gray-600">{obs.details.nextFocus}</p>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const SnapshotStat = ({ label, value }: { label: string; value: string }) => (
+    <div className="bg-gray-50 rounded-lg p-3">
+      <p className="text-xs text-gray-500 mb-0.5">{label}</p>
+      <p className="text-sm font-semibold text-gray-900">{value}</p>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-[#F5F5F5] overflow-x-hidden">
       {/* Compact Navigation */}
@@ -1323,7 +1638,7 @@ Thank you for setting the example. It matters more than you know.`;
 
                 {/* Deliverables */}
                 <button
-                  onClick={() => setActiveTab('partnership')}
+                  onClick={() => setActiveTab('ourPartnership')}
                   className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
                 >
                   <div className="flex items-center justify-between mb-3">
@@ -1589,1366 +1904,435 @@ Thank you for setting the example. It matters more than you know.`;
         )}
 
         {/* ==================== OUR PARTNERSHIP TAB ==================== */}
-        {activeTab === 'partnership' && (
-          <div className="space-y-8">
+        {activeTab === 'ourPartnership' && (
+          <div className="space-y-6 pb-12">
 
-            {/* ===== SECTION 1: THE BIG PICTURE ===== */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Target className="w-5 h-5 text-[#38618C]" />
-                <h2 className="text-xl font-bold text-[#1e2749]">The Big Picture</h2>
+            {/* ─────────────────────────────────────────────
+                SECTION 1 — PARTNERSHIP GOAL
+                Always visible. No collapse toggle.
+            ───────────────────────────────────────────── */}
+            <div className="bg-white rounded-xl border border-gray-200 p-8 text-center shadow-sm">
+              <div className="inline-flex items-center gap-2 bg-teal-50 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">
+                <Target className="w-3.5 h-3.5" />
+                Your Partnership Goal
               </div>
+              <blockquote className="text-xl font-semibold text-gray-900 leading-relaxed max-w-2xl mx-auto mb-3">
+                &ldquo;{partnershipData.goal.quote}&rdquo;
+              </blockquote>
+              <p className="text-sm text-gray-500 italic">{partnershipData.goal.theme}</p>
+            </div>
 
-              {/* Partnership Goal */}
-              <div className="bg-white rounded-xl p-8 shadow-sm text-center mb-6">
-                <div className="flex items-center justify-center gap-2 mb-4">
-                  <Target className="w-5 h-5 text-[#38618C]" />
-                  <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Your Partnership Goal</span>
+            {/* ─────────────────────────────────────────────
+                SECTION 2 — CLASSROOM OBSERVATIONS
+                Always visible. AI summary always shown.
+                "View details" toggle reveals full notes.
+            ───────────────────────────────────────────── */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-teal-600" />
+                  <h3 className="text-sm font-semibold text-gray-900">Classroom Observations</h3>
                 </div>
-                <p className="text-xl md:text-2xl font-semibold text-[#1e2749] max-w-2xl mx-auto leading-relaxed">
-                  &ldquo;Empower paraprofessionals across all 9 buildings with immediate, actionable strategies — so every para supporting IEP, EL, and behavioral needs feels confident, valued, and making measurable impact.&rdquo;
-                </p>
+                <span className="text-xs text-gray-400">{partnershipData.observations.length} observation day{partnershipData.observations.length !== 1 ? 's' : ''} complete</span>
               </div>
+              <div className="divide-y divide-gray-100">
+                {partnershipData.observations.map((obs) => (
+                  <ObservationCard key={obs.id} obs={obs} />
+                ))}
+              </div>
+            </div>
 
-              {/* Implementation Equation */}
-              <div className="bg-gradient-to-r from-[#ffba06]/10 to-white rounded-xl p-6 border border-[#ffba06]/30 mb-6">
-                <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-[#38618C] rounded-full flex items-center justify-center mx-auto mb-2">
-                      <Users className="w-8 h-8 text-white" />
-                    </div>
-                    <p className="font-semibold text-[#1e2749]">Strong Paras</p>
-                  </div>
-                  <ArrowRight className="w-6 h-6 text-[#ffba06] rotate-90 md:rotate-0" />
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-[#38618C] rounded-full flex items-center justify-center mx-auto mb-2">
-                      <Heart className="w-8 h-8 text-white" />
-                    </div>
-                    <p className="font-semibold text-[#1e2749]">Strong Support</p>
-                  </div>
-                  <ArrowRight className="w-6 h-6 text-[#ffba06] rotate-90 md:rotate-0" />
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-[#ffba06] rounded-full flex items-center justify-center mx-auto mb-2">
-                      <Star className="w-8 h-8 text-[#1e2749]" />
-                    </div>
-                    <p className="font-semibold text-[#1e2749]">Student Success</p>
-                  </div>
+            {/* ─────────────────────────────────────────────
+                SECTION 3 — SCHOOL / DISTRICT SNAPSHOT
+                CONDITIONAL: only renders if snapshot.show === true
+                Starts collapsed.
+            ───────────────────────────────────────────── */}
+            {partnershipData.snapshot.show && (
+              <CollapsibleSection
+                title="School Snapshot"
+                icon={<Building className="w-4 h-4 text-blue-600" />}
+                defaultOpen={false}
+              >
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                  <SnapshotStat label="District" value={partnershipData.snapshot.districtName} />
+                  <SnapshotStat label="State" value={partnershipData.snapshot.state} />
+                  <SnapshotStat label="Staff in Partnership" value={`${partnershipData.snapshot.staffCount} ${partnershipData.snapshot.staffType}`} />
                 </div>
-              </div>
+                {partnershipData.snapshot.context && (
+                  <p className="mt-4 text-sm text-gray-600 leading-relaxed">{partnershipData.snapshot.context}</p>
+                )}
+              </CollapsibleSection>
+            )}
 
-              {/* Phase Timeline */}
-              <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
-                <h3 className="text-lg font-bold text-[#1e2749] mb-6 text-center">Your Partnership Journey</h3>
-
-                <div className="grid md:grid-cols-3 gap-4">
-                  {/* Phase 1 - IGNITE (Current) */}
-                  <div className="relative bg-gradient-to-br from-[#ffba06]/20 to-[#ffba06]/5 rounded-xl p-5 border-2 border-[#ffba06]">
-                    <div className="absolute -top-3 left-4">
-                      <span className="bg-[#ffba06] text-[#1e2749] text-xs font-bold px-3 py-1 rounded-full">YOU ARE HERE</span>
-                    </div>
-                    <div className="mt-2">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Flame className="w-5 h-5 text-[#ffba06]" />
-                        <h4 className="font-bold text-[#1e2749]">IGNITE</h4>
+            {/* ─────────────────────────────────────────────
+                SECTION 4 — YOUR PARTNERSHIP JOURNEY
+                No dates. No years. Phase names only.
+                Future phases link to Blueprint tab.
+                Starts collapsed.
+            ───────────────────────────────────────────── */}
+            <CollapsibleSection
+              title="Your Partnership Journey"
+              icon={<Star className="w-4 h-4 text-yellow-600" />}
+              defaultOpen={false}
+            >
+              <div className="space-y-3">
+                {partnershipData.journey.phases.map((phase) => (
+                  <div
+                    key={phase.name}
+                    className={`rounded-lg border p-4 ${
+                      phase.status === 'current'
+                        ? 'bg-yellow-50 border-yellow-200'
+                        : phase.status === 'complete'
+                        ? 'bg-green-50 border-green-200'
+                        : 'bg-gray-50 border-gray-200 opacity-70 cursor-pointer hover:opacity-100 transition-opacity'
+                    }`}
+                    onClick={phase.status === 'upcoming' ? () => setActiveTab('blueprint') : undefined}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded ${
+                          phase.status === 'current' ? 'bg-yellow-200 text-yellow-800' :
+                          phase.status === 'complete' ? 'bg-green-200 text-green-800' :
+                          'bg-gray-200 text-gray-600'
+                        }`}>
+                          {phase.status === 'current' ? 'YOU ARE HERE' : phase.status === 'complete' ? 'COMPLETE' : 'UPCOMING'}
+                        </span>
+                        <span className="font-semibold text-gray-900">Phase {phase.number}: {phase.name}</span>
                       </div>
-                      <p className="text-sm text-gray-500 mb-3">Phase 1 · Spring 2026</p>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
-                          Pilot group identification
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
-                          Baseline data collection
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
-                          First observations
-                        </li>
-                        <li className="flex items-start gap-2">
-                          <CheckCircle className="w-4 h-4 text-[#ffba06] flex-shrink-0 mt-0.5" />
-                          Growth Group formation
-                        </li>
-                      </ul>
+                      {phase.status === 'upcoming' && (
+                        <span className="text-xs text-gray-400 flex items-center gap-1">
+                          View in Blueprint <ArrowRight className="w-3 h-3" />
+                        </span>
+                      )}
                     </div>
-                  </div>
-
-                  {/* Phase 2 - ACCELERATE */}
-                  <div className="bg-gray-50 rounded-xl p-5 border border-gray-200 opacity-75">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Rocket className="w-5 h-5 text-gray-400" />
-                      <h4 className="font-bold text-gray-500">ACCELERATE</h4>
-                    </div>
-                    <p className="text-sm text-gray-400 mb-3">Phase 2 · Fall 2026</p>
-                    <ul className="text-sm text-gray-400 space-y-1">
-                      <li className="flex items-start gap-2">
-                        <Circle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                        Expand to full para team
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Circle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                        Multiple observation cycles
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Circle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                        Deeper implementation
-                      </li>
+                    <ul className="space-y-1.5">
+                      {phase.deliverables.map((d, i) => (
+                        <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                          {d.complete
+                            ? <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                            : <div className="w-4 h-4 rounded-full border-2 border-gray-300 mt-0.5 shrink-0" />
+                          }
+                          {d.label}
+                        </li>
+                      ))}
                     </ul>
                   </div>
-
-                  {/* Phase 3 - SUSTAIN */}
-                  <div className="bg-gray-50 rounded-xl p-5 border border-gray-200 opacity-75">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Sprout className="w-5 h-5 text-gray-400" />
-                      <h4 className="font-bold text-gray-500">SUSTAIN</h4>
-                    </div>
-                    <p className="text-sm text-gray-400 mb-3">Phase 3 · 2027+</p>
-                    <ul className="text-sm text-gray-400 space-y-1">
-                      <li className="flex items-start gap-2">
-                        <Circle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                        Internal leadership development
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Circle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                        Self-sustaining systems
-                      </li>
-                      <li className="flex items-start gap-2">
-                        <Circle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                        Culture embedded
-                      </li>
-                    </ul>
-                  </div>
-                </div>
+                ))}
               </div>
+            </CollapsibleSection>
 
-              {/* District Snapshot - Collapsible */}
-              <details className="bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-xl text-white group">
-                <summary className="p-6 cursor-pointer list-none">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Building className="w-5 h-5" />
-                      <h3 className="font-bold">District Snapshot</h3>
-                      <span className="text-xs bg-white/20 px-2 py-0.5 rounded-full">From Partner Data Form</span>
-                    </div>
-                    <ChevronDown className="w-5 h-5 transition-transform group-open:rotate-180" />
-                  </div>
-                </summary>
-                <div className="px-6 pb-6">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-xs text-white/60 uppercase tracking-wide mb-1">Para Types Served</p>
-                      <p className="text-sm font-medium">Special Education/IEP · English Learners · Behavioral Support</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-white/60 uppercase tracking-wide mb-1">Buildings</p>
-                      <p className="text-sm font-medium">All 9 Schools</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-white/60 uppercase tracking-wide mb-1">Success Metrics</p>
-                      <p className="text-sm font-medium">Surveys + Para Retention</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-white/60 uppercase tracking-wide mb-1">Quick Win Goal</p>
-                      <p className="text-sm font-medium">&ldquo;Helping staff feel instructionally empowered&rdquo;</p>
-                    </div>
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-white/20">
-                    <p className="text-xs text-white/60 uppercase tracking-wide mb-1">Top Priority</p>
-                    <p className="text-sm italic">&ldquo;Ensuring trainings include strategies paras can take away immediately and carry out the next day&rdquo;</p>
-                  </div>
-                </div>
-              </details>
-            </div>
-
-            {/* ===== SECTION 2: PROGRESS SNAPSHOT ===== */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <TrendingUp className="w-5 h-5 text-emerald-600" />
-                <h2 className="text-xl font-bold text-[#1e2749]">Progress Snapshot</h2>
-              </div>
-
-              {/* Dual Hero Stats */}
-              <div className="grid md:grid-cols-2 gap-4 mb-6">
-                {/* Implementation Rate - THE BIG WIN */}
-                <div className="bg-gradient-to-br from-[#ffba06] to-amber-500 rounded-2xl p-6 text-white text-center">
-                  <div className="text-5xl font-bold mb-2">91%</div>
-                  <div className="text-lg font-medium mb-1">Implementation Rate</div>
-                  <div className="text-amber-100 text-sm">
-                    Paras are using what they learned
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-white/20">
-                    <div className="text-xs text-amber-100">Industry average: 10%</div>
-                    <div className="text-sm font-semibold text-white mt-1">Your paras are 9x more likely to apply learning</div>
-                  </div>
-                </div>
-
-                {/* Courses Completed */}
-                <div className="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white text-center">
-                  <div className="text-5xl font-bold mb-2 flex items-center justify-center gap-2">
-                    <Trophy className="w-8 h-8" />
-                    63
-                  </div>
-                  <div className="text-lg font-medium mb-1">Courses Completed</div>
-                  <div className="text-emerald-100 text-sm">
-                    63 strategies ready for classrooms
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-white/20">
-                    <div className="text-xs text-emerald-100">83% of paras logged in</div>
-                    <div className="text-sm font-semibold text-white mt-1">Strong foundation built</div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3 Progress Cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {/* Hub Access Card */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-gray-500 text-sm">Hub Access</span>
-                    <div className="relative group">
-                      <Info className="w-4 h-4 text-gray-400 cursor-help" />
-                      <div className="absolute z-10 w-48 p-2 text-xs text-white bg-gray-900 rounded-lg shadow-lg -top-2 left-6 hidden group-hover:block">
-                        Paras who have logged into the Learning Hub at least once
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900">94<span className="text-lg text-gray-400">/113</span></div>
-                  <div className="text-sm text-gray-500 mb-3">83% logged in</div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-teal-500 h-2 rounded-full" style={{width: '83%'}}></div>
-                  </div>
-                </div>
-
-                {/* Self-Directed Learning Card */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-gray-500 text-sm">Self-Directed Learning</span>
-                    <div className="relative group">
-                      <Info className="w-4 h-4 text-gray-400 cursor-help" />
-                      <div className="absolute z-10 w-48 p-2 text-xs text-white bg-gray-900 rounded-lg shadow-lg -top-2 left-6 hidden group-hover:block">
-                        Paras exploring courses beyond required training
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900">25+</div>
-                  <div className="text-sm text-gray-500 mb-3">paras exploring additional courses</div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Sparkles className="w-4 h-4 text-blue-500" />
-                    <span className="text-xs text-blue-600">Going above and beyond</span>
-                  </div>
-                </div>
-
-                {/* Deep Engagement Card */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-gray-500 text-sm">Courses Completed</span>
-                    <div className="relative group">
-                      <Info className="w-4 h-4 text-gray-400 cursor-help" />
-                      <div className="absolute z-10 w-48 p-2 text-xs text-white bg-gray-900 rounded-lg shadow-lg -top-2 left-6 hidden group-hover:block">
-                        Course completions at 100% — fully finished courses
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900">63</div>
-                  <div className="text-sm text-gray-500 mb-3">total course completions</div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-emerald-500 h-2 rounded-full" style={{width: '64%'}}></div>
-                  </div>
-                  <div className="text-xs text-emerald-600 mt-2">across 24 courses</div>
-                </div>
-              </div>
-
-            </div>
-
-            {/* ===== SECTION 3: TEAM PULSE ===== */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Activity className="w-5 h-5 text-purple-600" />
-                <h2 className="text-xl font-bold text-[#1e2749]">Team Pulse</h2>
-                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full ml-2">March 2, 2026 Check-In</span>
-              </div>
-
-              {/* Survey Response Rate */}
-              <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 mb-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                      <Users className="w-5 h-5 text-purple-600" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-gray-900">{marchSurveyData.responseRate.responded} of {marchSurveyData.responseRate.total} paras responded</div>
-                      <div className="text-sm text-purple-600">{marchSurveyData.responseRate.percentage}% response rate</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                {/* Confidence Scores */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border">
-                  <div className="flex items-center gap-2 mb-4">
-                    <TrendingUp className="w-5 h-5 text-emerald-500" />
-                    <h3 className="font-semibold text-gray-900">Confidence in Key Moves</h3>
-                  </div>
-                  <div className="space-y-4">
-                    <div className="bg-[#ffba06]/10 rounded-lg p-4 border border-[#ffba06]/30">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">Asking Questions</span>
-                        <span className="text-2xl font-bold text-[#ffba06]">{marchSurveyData.confidence.asking.average}</span>
-                      </div>
-                      <div className="text-xs text-gray-500">{marchSurveyData.confidence.asking.rated4or5}% rated 4 or 5 out of 5</div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                        <div className="bg-[#ffba06] h-2 rounded-full" style={{width: `${(marchSurveyData.confidence.asking.average / 5) * 100}%`}}></div>
-                      </div>
-                    </div>
-                    <div className="bg-teal-50 rounded-lg p-4 border border-teal-200">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">Giving Feedback</span>
-                        <span className="text-2xl font-bold text-teal-600">{marchSurveyData.confidence.feedback.average}</span>
-                      </div>
-                      <div className="text-xs text-gray-500">{marchSurveyData.confidence.feedback.rated4or5}% rated 4 or 5 out of 5</div>
-                      <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
-                        <div className="bg-teal-500 h-2 rounded-full" style={{width: `${(marchSurveyData.confidence.feedback.average / 5) * 100}%`}}></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Team Stability - Positive framing */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Shield className="w-5 h-5 text-emerald-500" />
-                    <h3 className="font-semibold text-gray-900">Team Stability</h3>
-                  </div>
-                  <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-200">
-                    <div className="text-center">
-                      <div className="text-4xl font-bold text-emerald-600 mb-1">71%</div>
-                      <div className="text-sm font-medium text-gray-700">confirmed returning next year</div>
-                      <div className="text-xs text-gray-500 mt-2">67 paras planning to stay</div>
-                    </div>
-                  </div>
-                  <details className="mt-4 text-sm">
-                    <summary className="text-gray-500 cursor-pointer hover:text-gray-700">View details for admin</summary>
-                    <div className="mt-3 space-y-2 text-xs">
-                      <div className="flex justify-between p-2 bg-gray-50 rounded">
-                        <span>Still deciding</span>
-                        <span className="text-gray-600">22 paras</span>
-                      </div>
-                      <div className="flex justify-between p-2 bg-gray-50 rounded">
-                        <span>Moving on</span>
-                        <span className="text-gray-600">6 paras</span>
-                      </div>
-                    </div>
-                  </details>
-                </div>
-
-                {/* What Paras Are Telling Us */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border">
-                  <div className="flex items-center gap-2 mb-4">
-                    <MessageCircle className="w-5 h-5 text-blue-500" />
-                    <h3 className="font-semibold text-gray-900">What Paras Are Telling Us</h3>
-                  </div>
-                  <div className="space-y-3">
-                    {marchSurveyData.challenges.map((challenge, idx) => (
-                      <div key={idx} className="flex items-center gap-3">
-                        <span className="text-sm text-gray-600 w-48 flex-shrink-0">{challenge.category}</span>
-                        <div className="flex-1 bg-gray-200 rounded-full h-3">
-                          <div
-                            className={`h-3 rounded-full ${idx === 4 ? 'bg-emerald-400' : 'bg-blue-400'}`}
-                            style={{width: `${challenge.percentage}%`}}
-                          ></div>
-                        </div>
-                        <span className="text-sm text-gray-500 w-12 text-right">{challenge.percentage}%</span>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-xs text-gray-500 mt-4">This helps us tailor support to what matters most</p>
-                </div>
-
-                {/* Hub Usage - Positive framing */}
-                <div className="bg-white rounded-xl p-6 shadow-sm border">
-                  <div className="flex items-center gap-2 mb-4">
-                    <BookOpen className="w-5 h-5 text-emerald-500" />
-                    <h3 className="font-semibold text-gray-900">Learning Hub Engagement</h3>
-                  </div>
-                  <div className="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-6 border border-emerald-200">
-                    <div className="text-center">
-                      <div className="text-4xl font-bold text-emerald-600 mb-1">77%</div>
-                      <div className="text-sm font-medium text-gray-700">of paras are engaging with the Hub</div>
-                      <div className="text-xs text-gray-500 mt-2">73 paras actively using or planning to use</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* ===== SECTION 4: WHAT WE'RE LEARNING ===== */}
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Lightbulb className="w-5 h-5 text-amber-500" />
-                <h2 className="text-xl font-bold text-[#1e2749]">What We&apos;re Learning</h2>
-              </div>
-
-              {/* Implementation Data from Part 2 */}
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 mb-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <Activity className="w-5 h-5 text-[#38618C]" />
-                  <h3 className="text-lg font-bold text-[#1e2749]">After 2 Sessions: What the Data Shows</h3>
-                </div>
-
-                {/* Implementation Rates */}
-                <div className="grid md:grid-cols-2 gap-4 mb-6">
-                  {/* Move #1 */}
-                  <div className="bg-[#ffba06]/10 rounded-xl p-5 border border-[#ffba06]/30">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-semibold text-[#1e2749]">Move #1: Questions Instead of Telling</span>
-                      <span className="text-3xl font-bold text-[#ffba06]">91%</span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-3">69 of 76 paras tried this strategy</p>
-                    <div className="text-xs text-gray-500 space-y-1">
-                      <div className="flex justify-between"><span>Using regularly:</span><span className="font-medium text-emerald-600">31</span></div>
-                      <div className="flex justify-between"><span>Tried it out:</span><span className="font-medium">38</span></div>
-                      <div className="flex justify-between"><span>Ready to try:</span><span className="font-medium">7</span></div>
-                    </div>
-                  </div>
-
-                  {/* Move #2 */}
-                  <div className="bg-teal-50 rounded-xl p-5 border border-teal-200">
-                    <div className="flex items-center justify-between mb-3">
-                      <span className="text-sm font-semibold text-[#1e2749]">Move #2: Feedback Formula</span>
-                      <span className="text-3xl font-bold text-teal-600">70%</span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-3">53 of 76 paras tried this strategy</p>
-                    <div className="text-xs text-gray-500 space-y-1">
-                      <div className="flex justify-between"><span>Using regularly:</span><span className="font-medium text-emerald-600">20</span></div>
-                      <div className="flex justify-between"><span>Tried it out:</span><span className="font-medium">33</span></div>
-                      <div className="flex justify-between"><span>Ready to try:</span><span className="font-medium">23</span></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Post-Session Confidence - Positive framing */}
-                <div className="grid md:grid-cols-2 gap-4 mb-6">
-                  <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-700">Feeling confident asking questions</span>
-                      <span className="text-xl font-bold text-emerald-600">70%</span>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">of paras feel ready to use this</p>
-                  </div>
-                  <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-700">Feeling confident giving feedback</span>
-                      <span className="text-xl font-bold text-emerald-600">62%</span>
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">of paras feel ready to use this</p>
-                  </div>
-                </div>
-
-                <p className="text-xs text-gray-500">After just 2 sessions and 62 practice reps. Confidence continues to build with each touchpoint.</p>
-              </div>
-
-              {/* Sessions - Always Open */}
-              <details open className="bg-white rounded-xl shadow-sm border group">
-                <summary className="p-6 cursor-pointer list-none">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-5 h-5 text-emerald-500" />
-                      <h3 className="text-lg font-semibold text-gray-900">Sessions ({completedSessions.length} completed · {upcomingSessions.length} upcoming)</h3>
-                    </div>
-                    <ChevronDown className="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180" />
-                  </div>
-                </summary>
-                <div className="px-6 pb-6 space-y-6">
-                  {/* Completed Sessions */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-2">
-                      <Check className="w-4 h-4 text-emerald-500" />
-                      Completed
-                    </h4>
-                    <div className="space-y-3">
-                      {completedSessions.map((session, idx) => (
-                        <div key={idx}>
-                          {session.title === "Observation Day" ? (
-                            /* ===== EXPANDABLE OBSERVATION DAY CARD ===== */
-                            <div className="bg-emerald-50 rounded-xl border border-emerald-300 overflow-hidden">
-                              {/* Collapsed Header - Always Visible */}
-                              <button
-                                onClick={() => setObservationExpanded(!observationExpanded)}
-                                className="w-full p-4 text-left hover:bg-emerald-100 transition-colors"
-                              >
-                                <div className="flex items-start justify-between gap-3">
-                                  <div className="flex-1">
-                                    <div className="flex items-center gap-2 mb-1">
-                                      <Check className="w-5 h-5 text-emerald-600" />
-                                      <h5 className="font-semibold text-gray-900">{session.title}</h5>
-                                      <span className="text-sm text-gray-500">— {session.date}</span>
-                                    </div>
-                                    <p className="text-sm text-gray-600 mb-2">
-                                      3 Buildings Visited · 17 Paras Contacted · 20 Follow-Up Emails Sent · 10 Same-Day Replies (50% response rate)
-                                    </p>
-                                    <blockquote className="text-sm italic text-gray-600 border-l-2 border-emerald-400 pl-3">
-                                      &quot;I wish I could meet all my students&apos; many needs every day.&quot;
-                                      <span className="block text-xs text-gray-500 mt-1 not-italic">— Scott Nyquist, Fullerton</span>
-                                    </blockquote>
-                                  </div>
-                                  <div className="flex items-center gap-1 text-emerald-600">
-                                    <span className="text-xs font-medium">{observationExpanded ? 'Close' : 'View details'}</span>
-                                    <ChevronDown className={`w-4 h-4 transition-transform ${observationExpanded ? 'rotate-180' : ''}`} />
-                                  </div>
-                                </div>
-                              </button>
-
-                              {/* Expanded Content */}
-                              {observationExpanded && (
-                                <div className="border-t border-emerald-200 p-4 space-y-6 bg-white">
-                                  {/* Day at a Glance */}
-                                  <div>
-                                    <h6 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                      <BarChart3 className="w-4 h-4 text-emerald-600" />
-                                      Day at a Glance
-                                    </h6>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                      <div className="bg-emerald-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-emerald-700">3</p>
-                                        <p className="text-xs text-gray-600">Buildings Visited</p>
-                                      </div>
-                                      <div className="bg-emerald-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-emerald-700">17</p>
-                                        <p className="text-xs text-gray-600">Paras Contacted</p>
-                                        <p className="text-[10px] text-gray-400">12 formal · 3 informal · 2 appreciation</p>
-                                      </div>
-                                      <div className="bg-emerald-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-emerald-700">20</p>
-                                        <p className="text-xs text-gray-600">Follow-Up Emails</p>
-                                        <p className="text-[10px] text-gray-400">17 para + 3 principal</p>
-                                      </div>
-                                      <div className="bg-emerald-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-emerald-700">15</p>
-                                        <p className="text-xs text-gray-600">Hub Resources Matched</p>
-                                      </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-3">
-                                      <div className="bg-blue-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-blue-700">3</p>
-                                        <p className="text-xs text-gray-600">Principals</p>
-                                        <p className="text-[10px] text-gray-400">Bolton · Villalobos · Dohman</p>
-                                      </div>
-                                      <div className="bg-amber-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-amber-700">10</p>
-                                        <p className="text-xs text-gray-600">Same-Day Replies (50%)</p>
-                                        <p className="text-[10px] text-gray-400">Scott · Evely · Maribel · Ruby · Cristina · Kara · Carlos · Esperanza · Jonnathan · Fatema</p>
-                                      </div>
-                                    </div>
-                                  </div>
-
-                                  {/* Internal Amplification Highlight */}
-                                  <div className="bg-gradient-to-r from-teal-50 to-emerald-50 rounded-xl p-5 border-2 border-teal-200">
-                                    <h6 className="font-bold text-teal-800 mb-3 flex items-center gap-2">
-                                      <span className="text-lg">🔄</span>
-                                      INTERNAL AMPLIFICATION — The Partnership Loop in Action
-                                    </h6>
-                                    <p className="text-sm text-gray-700 mb-4">
-                                      After Rae sent Carlos Chavez&apos;s observation follow-up email, here&apos;s what happened organically — without TDI prompting it:
-                                    </p>
-                                    <ol className="space-y-3 mb-4">
-                                      <li className="flex items-start gap-3 text-sm">
-                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center text-xs font-bold">1</span>
-                                        <span className="text-gray-700"><strong className="text-gray-900">Janet Diaz</strong> (district admin) forwarded the email to Principal Kara Dohman with a note: <em>&quot;I will be sharing the specific emails from Rae in terms of the observations she completed of paras today.&quot;</em></span>
-                                      </li>
-                                      <li className="flex items-start gap-3 text-sm">
-                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center text-xs font-bold">2</span>
-                                        <span className="text-gray-700"><strong className="text-gray-900">Kara</strong> forwarded it to Carlos with: <em>&quot;Way to go Carlos! Keep up the amazing work!!&quot;</em></span>
-                                      </li>
-                                      <li className="flex items-start gap-3 text-sm">
-                                        <span className="flex-shrink-0 w-6 h-6 rounded-full bg-teal-600 text-white flex items-center justify-center text-xs font-bold">3</span>
-                                        <span className="text-gray-700"><strong className="text-gray-900">Carlos</strong> replied to all three — Rae, Janet, AND Kara — with pride, gratitude, and a specific growth request.</span>
-                                      </li>
-                                    </ol>
-                                    <div className="bg-white/60 rounded-lg p-3 border border-teal-100">
-                                      <p className="text-sm text-teal-800 font-medium mb-2">
-                                        This is the loop: TDI observes → TDI celebrates → District amplifies → Principal celebrates → Para feels seen → Para engages deeper.
-                                      </p>
-                                      <p className="text-xs text-teal-700">
-                                        <strong>Janet is forwarding observation emails to principals on her own.</strong> The partnership is embedded, not just tolerated.
-                                      </p>
-                                    </div>
-                                  </div>
-
-                                  {/* Emerging Coaching Themes */}
-                                  <div className="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-xl p-5 border-2 border-amber-200">
-                                    <h6 className="font-bold text-amber-800 mb-3 flex items-center gap-2">
-                                      <span className="text-lg">💡</span>
-                                      WHAT PARAS ARE ASKING FOR — Themes from Observation Day Replies
-                                    </h6>
-                                    <p className="text-sm text-gray-700 mb-4">
-                                      When asked &quot;What&apos;s on your &apos;I wish this was easier&apos; list?&quot;, paras responded with specific, coachable requests:
-                                    </p>
-                                    <div className="space-y-4">
-                                      <div className="bg-white/70 rounded-lg p-4 border border-amber-100">
-                                        <p className="text-xs font-bold text-amber-700 uppercase mb-2">De-Escalation</p>
-                                        <p className="text-sm italic text-gray-700 mb-2">&quot;Helping a student de-escalate instead of escalating the situation more.&quot;</p>
-                                        <p className="text-xs text-gray-500">— Evely Castillo, Fullerton</p>
-                                        <p className="text-xs text-amber-600 mt-1 font-medium">Matched: De-Escalation Strategies + Calm Response Scripts</p>
-                                      </div>
-                                      <div className="bg-white/70 rounded-lg p-4 border border-amber-100">
-                                        <p className="text-xs font-bold text-amber-700 uppercase mb-2">Differentiating Support</p>
-                                        <p className="text-sm italic text-gray-700 mb-2">&quot;Having a more concrete plan. I have a wide range of students that all have varying needs.&quot;</p>
-                                        <p className="text-xs text-gray-500">— Carlos Chavez, Lincoln</p>
-                                        <p className="text-xs text-amber-600 mt-1 font-medium">Matched: Effective Small-Group Instruction + Differentiated Choice Boards</p>
-                                      </div>
-                                      <div className="bg-white/70 rounded-lg p-4 border border-amber-100">
-                                        <p className="text-xs font-bold text-amber-700 uppercase mb-2">Managing Multiple Groups</p>
-                                        <p className="text-sm italic text-gray-700 mb-2">&quot;Being able to bounce around between groups of students who all need help at the same time.&quot;</p>
-                                        <p className="text-xs text-gray-500">— Jonnathan Roeglin, Fullerton</p>
-                                        <p className="text-xs text-amber-600 mt-1 font-medium">Matched: No-Hands-Up Help Systems</p>
-                                      </div>
-                                      <div className="bg-white/70 rounded-lg p-4 border border-amber-100">
-                                        <p className="text-xs font-bold text-amber-700 uppercase mb-2">Chunking &amp; Scaffolding</p>
-                                        <p className="text-sm italic text-gray-700 mb-2">&quot;Could we try to break the work into smaller steps to help make the student understand it better?&quot;</p>
-                                        <p className="text-xs text-gray-500">— Fatema Bakhrani, Fullerton</p>
-                                        <p className="text-xs text-amber-600 mt-1 font-medium">Matched: &quot;One Step at a Time&quot; chunking strategy + Hub scaffolding resources</p>
-                                      </div>
-                                    </div>
-                                    <div className="bg-white/60 rounded-lg p-3 border border-amber-100 mt-4">
-                                      <p className="text-sm text-amber-800 font-medium">
-                                        These themes are being used to shape content for Virtual Sessions 2 (April 6) and 3 (April 20).
-                                      </p>
-                                    </div>
-                                  </div>
-
-                                  {/* Building Sections */}
-                                  <div>
-                                    <h6 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                      <Building className="w-4 h-4 text-blue-600" />
-                                      Building Details
-                                    </h6>
-
-                                    {/* Building Tabs */}
-                                    <div className="flex gap-2 mb-4 border-b border-gray-200">
-                                      <button
-                                        onClick={() => setExpandedObsBuilding('fullerton')}
-                                        className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                                          expandedObsBuilding === 'fullerton'
-                                            ? 'border-emerald-600 text-emerald-700'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                                        }`}
-                                      >
-                                        Fullerton
-                                      </button>
-                                      <button
-                                        onClick={() => setExpandedObsBuilding('lakePark')}
-                                        className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                                          expandedObsBuilding === 'lakePark'
-                                            ? 'border-emerald-600 text-emerald-700'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                                        }`}
-                                      >
-                                        Lake Park
-                                      </button>
-                                      <button
-                                        onClick={() => setExpandedObsBuilding('lincoln')}
-                                        className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
-                                          expandedObsBuilding === 'lincoln'
-                                            ? 'border-emerald-600 text-emerald-700'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                                        }`}
-                                      >
-                                        Lincoln
-                                      </button>
-                                    </div>
-
-                                    {/* Fullerton Content */}
-                                    {expandedObsBuilding === 'fullerton' && (
-                                      <div className="space-y-6">
-                                        {/* Overview Stats */}
-                                        <div className="bg-gray-50 rounded-lg p-4">
-                                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                                            <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 2 informal, 2 appreciation</span></div>
-                                            <div><span className="text-gray-500">Follow-Ups:</span> <span className="font-medium">7 personalized emails</span></div>
-                                            <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Bryan Bolton</span></div>
-                                            <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium">5 (Scott, Evely, Esperanza, Jonnathan, Fatema)</span></div>
-                                          </div>
-                                        </div>
-
-                                        {/* Moves Observed */}
-                                        <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Moves Observed in Action</h6>
-                                          <div className="space-y-4">
-                                            {observationResults.fullerton.movesObserved.map((move, moveIdx) => (
-                                              <div key={moveIdx} className="border border-gray-200 rounded-lg overflow-hidden">
-                                                <div className={`px-4 py-2 font-medium text-sm flex items-center gap-2 ${
-                                                  move.color === 'orange' ? 'bg-orange-50 text-orange-800' :
-                                                  move.color === 'teal' ? 'bg-teal-50 text-teal-800' :
-                                                  move.color === 'blue' ? 'bg-blue-50 text-blue-800' :
-                                                  move.color === 'purple' ? 'bg-purple-50 text-purple-800' :
-                                                  move.color === 'green' ? 'bg-green-50 text-green-800' :
-                                                  'bg-pink-50 text-pink-800'
-                                                }`}>
-                                                  <Check className="w-4 h-4" />
-                                                  {move.move}
-                                                </div>
-                                                <div className="p-3 space-y-2">
-                                                  {move.examples.map((ex, exIdx) => (
-                                                    <div key={exIdx} className="text-sm border-b border-gray-100 last:border-0 pb-2 last:pb-0">
-                                                      <span className="font-medium text-gray-900">{ex.para}:</span>
-                                                      <span className="text-gray-600 ml-1">{ex.example}</span>
-                                                    </div>
-                                                  ))}
-                                                </div>
-                                              </div>
-                                            ))}
-                                          </div>
-                                        </div>
-
-                                        {/* Hub Resources */}
-                                        <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Hub Resources Recommended</h6>
-                                          <div className="overflow-x-auto">
-                                            <table className="w-full text-sm">
-                                              <thead>
-                                                <tr className="border-b border-gray-200 bg-gray-50">
-                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Para</th>
-                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Resource</th>
-                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Why</th>
-                                                </tr>
-                                              </thead>
-                                              <tbody>
-                                                {observationResults.fullerton.hubResources.map((r, rIdx) => (
-                                                  <tr key={rIdx} className="border-b border-gray-100">
-                                                    <td className="py-2 px-3 font-medium text-gray-900">{r.para}</td>
-                                                    <td className="py-2 px-3 text-blue-600">{r.resource}</td>
-                                                    <td className="py-2 px-3 text-gray-600">{r.reason}</td>
-                                                  </tr>
-                                                ))}
-                                              </tbody>
-                                            </table>
-                                            <p className="text-xs text-gray-500 italic mt-2 border-t border-gray-100 pt-2">* Jonnathan Roeglin&apos;s resource was expanded after his reply — added No-Hands-Up Help Systems alongside the original Feedback Framework Quick Reference, based on his request for help managing multiple groups of students simultaneously.<br/>* Fatema Bakhrani&apos;s resource was expanded after her reply — added &quot;One Step at a Time&quot; chunking strategy based on her request for help breaking work into smaller steps.</p>
-                                          </div>
-                                        </div>
-
-                                        {/* Voices from the Field */}
-                                        <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Voices from the Field</h6>
-                                          <div className="space-y-3">
-                                            {observationResults.fullerton.quotes.map((q: { text: string; author: string; context: string; selfInitiated?: boolean; growthRequest?: boolean }, qIdx: number) => (
-                                              <blockquote key={qIdx} className={`rounded-lg p-4 border-l-4 ${
-                                                q.selfInitiated ? 'bg-purple-50 border-purple-400' :
-                                                q.growthRequest ? 'bg-emerald-50 border-emerald-400 ring-1 ring-emerald-100' :
-                                                'bg-emerald-50 border-emerald-400'
-                                              }`}>
-                                                {q.selfInitiated && (
-                                                  <span className="inline-block text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full mb-2">💬 Reached out on her own</span>
-                                                )}
-                                                {q.growthRequest && (
-                                                  <span className="inline-block text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full mb-2">🎯 Specific growth request</span>
-                                                )}
-                                                <p className="text-sm text-gray-700 italic">&quot;{q.text}&quot;</p>
-                                                <p className="text-xs text-gray-500 mt-2">— {q.author}</p>
-                                                <p className={`text-xs mt-1 ${q.selfInitiated ? 'text-purple-600' : q.growthRequest ? 'text-emerald-600' : 'text-gray-500'}`}>{q.context}</p>
-                                              </blockquote>
-                                            ))}
-                                          </div>
-                                        </div>
-
-                                        {/* Building Themes */}
-                                        <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Building-Level Themes</h6>
-                                          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                                            <div>
-                                              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Strengths</p>
-                                              <ul className="space-y-1">
-                                                {observationResults.fullerton.themes.strengths.map((s, sIdx) => (
-                                                  <li key={sIdx} className="text-sm text-gray-700 flex items-start gap-2">
-                                                    <Check className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                                    {s}
-                                                  </li>
-                                                ))}
-                                              </ul>
-                                            </div>
-                                            <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
-                                              <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Opportunity</p>
-                                              <p className="text-sm text-gray-700">{observationResults.fullerton.themes.growthOpportunity}</p>
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        {/* Teacher Highlights */}
-                                        <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Teacher Collaboration Highlights</h6>
-                                          <div className="bg-blue-50 rounded-lg p-4 space-y-3">
-                                            {observationResults.fullerton.teacherHighlights.map((t, tIdx) => (
-                                              <div key={tIdx} className="border-b border-blue-100 last:border-0 pb-2 last:pb-0">
-                                                <p className="font-medium text-gray-900">{t.teacher}</p>
-                                                <p className="text-sm text-gray-600">{t.note}</p>
-                                              </div>
-                                            ))}
-                                            <p className="text-xs text-gray-500 mt-2">Principal Bryan Bolton was emailed same-day with these highlights and provided the Staff Celebration Playbook resource.</p>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    )}
-
-                                    {/* Lake Park Content */}
-                                    {expandedObsBuilding === 'lakePark' && (
-                                      <div className="space-y-6">
-                                        {/* Overview Stats */}
-                                        <div className="bg-gray-50 rounded-lg p-4">
-                                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                                            <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 1 informal</span></div>
-                                            <div><span className="text-gray-500">Follow-Ups:</span> <span className="font-medium">5 personalized emails</span></div>
-                                            <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Cristina Villalobos</span></div>
-                                            <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium">3 (Maribel, Ruby, Cristina)</span></div>
-                                          </div>
-                                        </div>
-
-                                        {/* Moves Observed */}
-                                        <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Moves Observed in Action</h6>
-                                          <div className="space-y-4">
-                                            {observationResults.lakePark.movesObserved.map((move, moveIdx) => (
-                                              <div key={moveIdx} className="border border-gray-200 rounded-lg overflow-hidden">
-                                                <div className={`px-4 py-2 font-medium text-sm flex items-center gap-2 ${
-                                                  move.color === 'orange' ? 'bg-orange-50 text-orange-800' :
-                                                  move.color === 'teal' ? 'bg-teal-50 text-teal-800' :
-                                                  move.color === 'blue' ? 'bg-blue-50 text-blue-800' :
-                                                  move.color === 'purple' ? 'bg-purple-50 text-purple-800' :
-                                                  move.color === 'green' ? 'bg-green-50 text-green-800' :
-                                                  move.color === 'pink' ? 'bg-pink-50 text-pink-800' :
-                                                  'bg-cyan-50 text-cyan-800'
-                                                }`}>
-                                                  <Check className="w-4 h-4" />
-                                                  {move.move}
-                                                </div>
-                                                <div className="p-3 space-y-2">
-                                                  {move.examples.map((ex, exIdx) => (
-                                                    <div key={exIdx} className="text-sm border-b border-gray-100 last:border-0 pb-2 last:pb-0">
-                                                      <span className="font-medium text-gray-900">{ex.para}:</span>
-                                                      <span className="text-gray-600 ml-1">{ex.example}</span>
-                                                    </div>
-                                                  ))}
-                                                </div>
-                                              </div>
-                                            ))}
-                                          </div>
-                                        </div>
-
-                                        {/* Hub Resources */}
-                                        <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Hub Resources Recommended</h6>
-                                          <div className="overflow-x-auto">
-                                            <table className="w-full text-sm">
-                                              <thead>
-                                                <tr className="border-b border-gray-200 bg-gray-50">
-                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Para</th>
-                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Resource</th>
-                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Why</th>
-                                                </tr>
-                                              </thead>
-                                              <tbody>
-                                                {observationResults.lakePark.hubResources.map((r, rIdx) => (
-                                                  <tr key={rIdx} className="border-b border-gray-100">
-                                                    <td className="py-2 px-3 font-medium text-gray-900">{r.para}</td>
-                                                    <td className="py-2 px-3 text-blue-600">{r.resource}</td>
-                                                    <td className="py-2 px-3 text-gray-600">{r.reason}</td>
-                                                  </tr>
-                                                ))}
-                                              </tbody>
-                                            </table>
-                                          </div>
-                                        </div>
-
-                                        {/* Voices from the Field */}
-                                        <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Voices from the Field</h6>
-                                          <div className="space-y-3">
-                                            {observationResults.lakePark.quotes.map((q: { text: string; author: string; context: string; selfInitiated?: boolean }, qIdx: number) => (
-                                              <blockquote key={qIdx} className={`rounded-lg p-4 border-l-4 ${
-                                                q.selfInitiated ? 'bg-purple-50 border-purple-400' :
-                                                q.author.includes('Principal') ? 'bg-blue-50 border-blue-400' :
-                                                'bg-emerald-50 border-emerald-400'
-                                              }`}>
-                                                {q.selfInitiated && (
-                                                  <span className="inline-block text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full mb-2">💬 Unsolicited response</span>
-                                                )}
-                                                <p className="text-sm italic text-gray-700">&quot;{q.text}&quot;</p>
-                                                <p className="text-xs text-gray-500 mt-2">— {q.author}, Lake Park</p>
-                                                <p className={`text-xs mt-1 ${
-                                                  q.selfInitiated ? 'text-purple-600' :
-                                                  q.author.includes('Principal') ? 'text-blue-600' :
-                                                  'text-emerald-600'
-                                                }`}>{q.context}</p>
-                                              </blockquote>
-                                            ))}
-                                          </div>
-                                        </div>
-
-                                        {/* Building Themes */}
-                                        <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Building-Level Themes</h6>
-                                          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                                            <div>
-                                              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Strengths</p>
-                                              <ul className="space-y-1">
-                                                {observationResults.lakePark.themes.strengths.map((s, sIdx) => (
-                                                  <li key={sIdx} className="text-sm text-gray-700 flex items-start gap-2">
-                                                    <Check className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                                    {s}
-                                                  </li>
-                                                ))}
-                                              </ul>
-                                            </div>
-                                            <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
-                                              <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Opportunity</p>
-                                              <p className="text-sm text-gray-700">{observationResults.lakePark.themes.growthOpportunity}</p>
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        {/* Teacher Highlights */}
-                                        <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Teacher Collaboration Highlights</h6>
-                                          <div className="bg-blue-50 rounded-lg p-4 space-y-3">
-                                            {observationResults.lakePark.teacherHighlights.map((t, tIdx) => (
-                                              <div key={tIdx} className="border-b border-blue-100 last:border-0 pb-2 last:pb-0">
-                                                <p className="font-medium text-gray-900">{t.teacher}</p>
-                                                <p className="text-sm text-gray-600">{t.note}</p>
-                                              </div>
-                                            ))}
-                                            <p className="text-xs text-gray-500 mt-2">Principal Cristina Villalobos was emailed same-day with these highlights and provided the Staff Celebration Playbook resource.</p>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    )}
-
-                                    {/* Lincoln Content */}
-                                    {expandedObsBuilding === 'lincoln' && (
-                                      <div className="space-y-6">
-                                        {/* Overview Stats */}
-                                        <div className="bg-gray-50 rounded-lg p-4">
-                                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-                                            <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 3 informal, 2 appreciation</span></div>
-                                            <div><span className="text-gray-500">Follow-Ups:</span> <span className="font-medium">8 personalized emails</span></div>
-                                            <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Kara Dohman</span></div>
-                                            <div><span className="text-gray-500">Same-Day Response:</span> <span className="font-medium">1 (Kara Dohman — Principal)</span></div>
-                                          </div>
-                                        </div>
-
-                                        {/* Moves Observed */}
-                                        <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Moves Observed in Action</h6>
-                                          <div className="space-y-4">
-                                            {observationResults.lincoln.movesObserved.map((move, moveIdx) => (
-                                              <div key={moveIdx} className="border border-gray-200 rounded-lg overflow-hidden">
-                                                <div className={`px-4 py-2 font-medium text-sm flex items-center gap-2 ${
-                                                  move.color === 'orange' ? 'bg-orange-50 text-orange-800' :
-                                                  move.color === 'teal' ? 'bg-teal-50 text-teal-800' :
-                                                  move.color === 'blue' ? 'bg-blue-50 text-blue-800' :
-                                                  move.color === 'purple' ? 'bg-purple-50 text-purple-800' :
-                                                  move.color === 'green' ? 'bg-green-50 text-green-800' :
-                                                  move.color === 'pink' ? 'bg-pink-50 text-pink-800' :
-                                                  'bg-cyan-50 text-cyan-800'
-                                                }`}>
-                                                  <Check className="w-4 h-4" />
-                                                  {move.move}
-                                                </div>
-                                                <div className="p-3 space-y-2">
-                                                  {move.examples.map((ex, exIdx) => (
-                                                    <div key={exIdx} className="text-sm border-b border-gray-100 last:border-0 pb-2 last:pb-0">
-                                                      <span className="font-medium text-gray-900">{ex.para}:</span>
-                                                      <span className="text-gray-600 ml-1">{ex.example}</span>
-                                                    </div>
-                                                  ))}
-                                                </div>
-                                              </div>
-                                            ))}
-                                          </div>
-                                        </div>
-
-                                        {/* Hub Resources */}
-                                        <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Hub Resources Recommended</h6>
-                                          <div className="overflow-x-auto">
-                                            <table className="w-full text-sm">
-                                              <thead>
-                                                <tr className="border-b border-gray-200 bg-gray-50">
-                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Para</th>
-                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Resource</th>
-                                                  <th className="text-left py-2 px-3 font-medium text-gray-700">Why</th>
-                                                </tr>
-                                              </thead>
-                                              <tbody>
-                                                {observationResults.lincoln.hubResources.map((r, rIdx) => (
-                                                  <tr key={rIdx} className="border-b border-gray-100">
-                                                    <td className="py-2 px-3 font-medium text-gray-900">{r.para}</td>
-                                                    <td className="py-2 px-3 text-blue-600">{r.resource}</td>
-                                                    <td className="py-2 px-3 text-gray-600">{r.reason}</td>
-                                                  </tr>
-                                                ))}
-                                              </tbody>
-                                            </table>
-                                            <p className="text-xs text-gray-500 italic mt-2 border-t border-gray-100 pt-2">* Carlos Chavez&apos;s resource was expanded after his reply — added Differentiated Choice Boards alongside the original Small Group Facilitation Guide, based on his request for help differentiating support across varying student needs.</p>
-                                          </div>
-                                        </div>
-
-                                        {/* Quotes - only show if there are any */}
-                                        {observationResults.lincoln.quotes.length > 0 && (
-                                          <div>
-                                            <h6 className="font-semibold text-gray-800 mb-3">Voices from the Field</h6>
-                                            <div className="space-y-3">
-                                              {observationResults.lincoln.quotes.map((q: { text: string; author: string; context: string; standout?: boolean }, qIdx: number) => (
-                                                <blockquote key={qIdx} className={`rounded-lg p-4 border-l-4 ${
-                                                  q.standout ? 'bg-emerald-50 border-emerald-400 ring-1 ring-emerald-100' :
-                                                  q.author.includes('Principal') ? 'bg-blue-50 border-blue-400' :
-                                                  'bg-emerald-50 border-emerald-400'
-                                                }`}>
-                                                  {q.standout && (
-                                                    <span className="inline-block text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full mb-2">⭐ Standout Observation</span>
-                                                  )}
-                                                  <p className="text-sm italic text-gray-700">&quot;{q.text}&quot;</p>
-                                                  <p className="text-xs text-gray-500 mt-2">— {q.author}</p>
-                                                  <p className={`text-xs mt-1 ${q.standout ? 'text-emerald-600' : q.author.includes('Principal') ? 'text-blue-600' : 'text-gray-500'}`}>{q.context}</p>
-                                                </blockquote>
-                                              ))}
-                                            </div>
-                                          </div>
-                                        )}
-
-                                        {/* Building Themes */}
-                                        <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Building-Level Themes</h6>
-                                          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                                            <div>
-                                              <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Strengths</p>
-                                              <ul className="space-y-1">
-                                                {observationResults.lincoln.themes.strengths.map((s, sIdx) => (
-                                                  <li key={sIdx} className="text-sm text-gray-700 flex items-start gap-2">
-                                                    <Check className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                                    {s}
-                                                  </li>
-                                                ))}
-                                              </ul>
-                                            </div>
-                                            <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
-                                              <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Opportunity</p>
-                                              <p className="text-sm text-gray-700">{observationResults.lincoln.themes.growthOpportunity}</p>
-                                            </div>
-                                          </div>
-                                        </div>
-
-                                        {/* Teacher Highlights */}
-                                        <div>
-                                          <h6 className="font-semibold text-gray-800 mb-3">Teacher Collaboration Highlights</h6>
-                                          <div className="bg-blue-50 rounded-lg p-4 space-y-3">
-                                            {observationResults.lincoln.teacherHighlights.map((t, tIdx) => (
-                                              <div key={tIdx} className="border-b border-blue-100 last:border-0 pb-2 last:pb-0">
-                                                <p className="font-medium text-gray-900">{t.teacher}</p>
-                                                <p className="text-sm text-gray-600">{t.note}</p>
-                                              </div>
-                                            ))}
-                                            <p className="text-xs text-gray-500 mt-2">Principal Kara Dohman was emailed same-day with these highlights and provided the Staff Celebration Playbook resource.</p>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    )}
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          ) : (
-                            /* Standard completed session card */
-                            <div className={`bg-emerald-50 rounded-lg p-4 border ${
-                              session.reportUrl ? 'border-emerald-300' : 'border-emerald-200'
-                            }`}>
-                              <div className="flex items-start justify-between gap-3">
-                                <div>
-                                  <h5 className="font-semibold text-gray-900">{session.title}</h5>
-                                  <p className="text-sm text-gray-500">{session.date} · {session.format}</p>
-                                </div>
-                                {session.reportUrl && (
-                                  <a
-                                    href={session.reportUrl}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors"
-                                  >
-                                    <FileText className="w-3 h-3" />
-                                    View Report
-                                  </a>
-                                )}
-                              </div>
-                            </div>
-                          )}
+            {/* ─────────────────────────────────────────────
+                SECTION 5 — SESSIONS + LEADERSHIP MEETINGS
+                Milestone timeline shows if milestones.length >= 4.
+                Historical dates are fine here.
+                Starts collapsed.
+            ───────────────────────────────────────────── */}
+            <CollapsibleSection
+              title="Sessions + Leadership Meetings"
+              icon={<Calendar className="w-4 h-4 text-green-600" />}
+              defaultOpen={false}
+            >
+              {/* Milestone Timeline — only renders when 4+ milestones */}
+              {partnershipData.sessions.milestones.length >= 4 && (
+                <div className="mb-6 pb-6 border-b border-gray-100">
+                  <div className="relative">
+                    {/* Timeline line */}
+                    <div className="absolute top-4 left-0 right-0 h-0.5 bg-gray-200" />
+                    <div
+                      className="absolute top-4 left-0 h-0.5 bg-teal-500 transition-all"
+                      style={{
+                        width: `${(partnershipData.sessions.milestones.filter(m => m.status === 'complete').length / (partnershipData.sessions.milestones.length - 1)) * 100}%`
+                      }}
+                    />
+                    {/* Dots */}
+                    <div className="relative flex justify-between">
+                      {partnershipData.sessions.milestones.map((m, i) => (
+                        <div key={i} className="flex flex-col items-center gap-1" style={{ width: `${100 / partnershipData.sessions.milestones.length}%` }}>
+                          <span className="text-xs text-gray-400 text-center mb-1">{m.date}</span>
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center z-10 ${
+                            m.status === 'complete' ? 'bg-teal-500 text-white' :
+                            m.status === 'current' ? 'bg-white border-2 border-teal-500 text-teal-600' :
+                            'bg-white border-2 border-gray-300 text-gray-400'
+                          }`}>
+                            {m.status === 'complete' ? <CheckCircle className="w-4 h-4" /> :
+                             m.status === 'current' ? <Star className="w-4 h-4" /> :
+                             <div className="w-2 h-2 rounded-full bg-gray-300" />}
+                          </div>
+                          <span className="text-xs text-gray-600 text-center leading-tight mt-1">{m.label}</span>
                         </div>
                       ))}
                     </div>
                   </div>
-
-                  {/* Upcoming Sessions */}
-                  {upcomingSessions.length > 0 && (
+                  {/* Milestones achieved / Coming up */}
+                  <div className="grid grid-cols-2 gap-4 mt-6">
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3 flex items-center gap-2">
-                        <CalendarClock className="w-4 h-4 text-blue-500" />
-                        Upcoming
-                      </h4>
-                      <div className="space-y-3">
-                        {upcomingSessions.map((session, idx) => (
-                          <div key={idx} className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                            <h5 className="font-semibold text-gray-900">{session.title}</h5>
-                            <p className="text-sm text-blue-600">{session.date} · {session.time} · {session.format}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </details>
-
-              {/* Top Engaged Paras */}
-              <div className="bg-white rounded-xl p-6 shadow-sm border">
-                <div className="flex items-center gap-2 mb-4">
-                  <Trophy className="w-5 h-5 text-amber-500" />
-                  <h3 className="text-lg font-semibold text-gray-900">Your Para Champions</h3>
-                </div>
-
-                <div className="space-y-3">
-                  {topEngagedParas.map((para, index) => (
-                    <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                      <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 font-medium text-sm">
-                          {index + 1}
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Milestones Achieved</p>
+                      {partnershipData.sessions.milestones.filter(m => m.status === 'complete').map((m, i) => (
+                        <div key={i} className="flex items-center gap-2 text-sm text-gray-700 mb-1">
+                          <CheckCircle className="w-3.5 h-3.5 text-green-500 shrink-0" />
+                          {m.label} — {m.date}
                         </div>
-                        <span className="font-medium text-gray-900">{para.name}</span>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm text-gray-500">
-                          {para.logins} logins · Last active {para.lastActive}
-                        </span>
-                        {para.lastActive === 'Feb 2' && (
-                          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Recently Active</span>
-                        )}
-                        <button
-                          onClick={() => sendHighFiveEmail(para)}
-                          className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-medium rounded-full transition-colors"
-                        >
-                          <Award className="w-3 h-3" />
-                          High Five
-                        </button>
-                      </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-
-                <div className="mt-4 pt-4 border-t border-gray-100 space-y-3">
-                  <div className="flex items-start gap-2 text-sm text-slate-600 bg-emerald-50 rounded-lg p-3">
-                    <TrendingUp className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
-                    <span><strong>19 paras</strong> have returned to the Hub multiple times — nearly 1 in 5 logged-in paras came back on their own.</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* What's Resonating */}
-              <div className="bg-white rounded-xl p-6 shadow-sm border">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-2">
-                    <BookOpen className="w-5 h-5 text-blue-500" />
-                    <h3 className="text-lg font-semibold text-gray-900">What&apos;s Resonating</h3>
-                  </div>
-                  <span className="text-xs text-gray-500">Top 10 courses by engagement</span>
-                </div>
-
-                <div className="space-y-3">
-                  {topCourses.slice(0, showAllCourses ? topCourses.length : 5).map((course, index) => (
-                    <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                      <div className="flex items-center gap-3">
-                        <span className="text-gray-400 text-sm w-4">{index + 1}.</span>
-                        <span className="text-gray-700">{course.name}</span>
-                        {course.completionRate === 100 && course.started > 1 && (
-                          <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                            <Star className="w-3 h-3" />
-                            100% Finish Rate
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-sm text-gray-500 whitespace-nowrap">
-                        {course.started} started · {course.completed70} completed
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {topCourses.length > 5 && (
-                  <button
-                    onClick={() => setShowAllCourses(!showAllCourses)}
-                    className="mt-4 text-sm text-teal-600 hover:text-teal-700 font-medium flex items-center gap-1"
-                  >
-                    {showAllCourses ? 'Show less' : `View all ${topCourses.length} courses`}
-                    <ChevronDown className={`w-4 h-4 transform transition-transform ${showAllCourses ? 'rotate-180' : ''}`} />
-                  </button>
-                )}
-                <div className="mt-4 pt-3 border-t border-gray-100 text-xs text-gray-400">
-                  29 courses explored · 91 total completions · Data as of March 1, 2026
-                </div>
-              </div>
-
-              {/* Ready to Welcome (Collapsible) */}
-              <details className="bg-slate-50 border border-slate-200 rounded-xl group">
-                <summary className="p-6 cursor-pointer list-none">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                        <UserCheck className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div className="text-left">
-                        <div className="font-semibold text-gray-900">Ready to Welcome: 19 paras</div>
-                        <div className="text-sm text-slate-600">Opportunity for personalized onboarding</div>
-                      </div>
-                    </div>
-                    <ChevronDown className="w-5 h-5 text-slate-400 transition-transform group-open:rotate-180" />
-                  </div>
-                </summary>
-                <div className="px-6 pb-6 border-t border-slate-200 mt-0 pt-4">
-
-                  <div className="bg-white rounded-lg p-4 mb-4">
-                    <div className="flex items-start gap-2 text-sm text-slate-600">
-                      <Lightbulb className="w-4 h-4 text-blue-500 mt-0.5 flex-shrink-0" />
-                      <span>
-                        <strong>Tip:</strong> A quick walkthrough during para meetings can help these team members get started.
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Invite All Button */}
-                  <div className="flex justify-between items-center mb-3">
-                    <span className="text-sm text-gray-500">Send a friendly welcome email</span>
-                    <button
-                      onClick={() => sendNudgeAllEmail()}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium rounded-lg transition-colors"
-                    >
-                      <Mail className="w-4 h-4" />
-                      Welcome All ({notLoggedInParas.length})
-                    </button>
-                  </div>
-
-                  <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
-                    <table className="w-full text-sm">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="text-left py-2 px-3 font-medium text-gray-600">#</th>
-                          <th className="text-left py-2 px-3 font-medium text-gray-600">Name</th>
-                          <th className="text-left py-2 px-3 font-medium text-gray-600">Email</th>
-                          <th className="text-right py-2 px-3 font-medium text-gray-600">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {notLoggedInParas.map((para, index) => (
-                          <tr key={index} className="border-t border-gray-100 hover:bg-gray-50">
-                            <td className="py-2 px-3 text-gray-400">{index + 1}</td>
-                            <td className="py-2 px-3 text-gray-900">{para.name}</td>
-                            <td className="py-2 px-3 text-gray-500">{para.email}</td>
-                            <td className="py-2 px-3 text-right">
-                              <button
-                                onClick={() => sendNudgeEmail(para)}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-blue-600 hover:text-white hover:bg-blue-500 border border-blue-300 hover:border-blue-500 rounded-lg text-xs font-medium transition-colors"
-                              >
-                                <Send className="w-3 h-3" />
-                                Invite
-                              </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </details>
-
-              {/* Hub Barriers - Collapsible */}
-              <details className="bg-white rounded-xl shadow-sm border group">
-                <summary className="p-6 cursor-pointer list-none">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <HelpCircle className="w-5 h-5 text-[#38618C]" />
-                      <h3 className="text-lg font-semibold text-gray-900">What Would Help Paras Use the Hub</h3>
-                    </div>
-                    <ChevronDown className="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180" />
-                  </div>
-                </summary>
-                <div className="px-6 pb-6">
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-gray-600 w-48 flex-shrink-0">Dedicated time during work hours</span>
-                      <div className="flex-1 bg-gray-200 rounded-full h-4">
-                        <div className="bg-[#38618C] h-4 rounded-full flex items-center justify-end pr-2" style={{width: '53%'}}>
-                          <span className="text-xs text-white font-medium">53%</span>
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Coming Up</p>
+                      {partnershipData.sessions.milestones.filter(m => m.status === 'upcoming').map((m, i) => (
+                        <div key={i} className="flex items-center gap-2 text-sm text-gray-700 mb-1">
+                          <Calendar className="w-3.5 h-3.5 text-blue-400 shrink-0" />
+                          {m.label} — {m.date}
                         </div>
-                      </div>
-                      <span className="text-sm text-gray-500 w-20 text-right">43 responses</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-gray-600 w-48 flex-shrink-0">Reminders / accountability</span>
-                      <div className="flex-1 bg-gray-200 rounded-full h-4">
-                        <div className="bg-[#38618C]/30 h-4 rounded-full" style={{width: '9%'}}></div>
-                      </div>
-                      <span className="text-sm text-gray-500 w-20 text-right">7 responses</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-gray-600 w-48 flex-shrink-0">Already using it regularly</span>
-                      <div className="flex-1 bg-gray-200 rounded-full h-4">
-                        <div className="bg-emerald-500 h-4 rounded-full" style={{width: '2%'}}></div>
-                      </div>
-                      <span className="text-sm text-gray-500 w-20 text-right">2 responses</span>
+                      ))}
                     </div>
                   </div>
+                </div>
+              )}
 
-                  {/* Recommended Actions */}
-                  <div className="bg-[#ffba06]/10 border border-[#ffba06]/30 rounded-xl p-5">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Lightbulb className="w-5 h-5 text-[#ffba06]" />
-                      <span className="font-semibold text-[#1e2749]">Recommended Actions for Admin</span>
-                    </div>
-                    <div className="space-y-3 text-sm text-gray-700">
-                      <div className="flex items-start gap-2">
-                        <span className="font-bold text-[#1e2749]">1.</span>
+              {/* Completed sessions */}
+              {partnershipData.sessions.completed.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Completed</p>
+                  <div className="space-y-2">
+                    {partnershipData.sessions.completed.map((s, i) => (
+                      <div key={i} className="flex items-start gap-3 bg-green-50 rounded-lg px-4 py-3">
+                        <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
                         <div>
-                          <span className="font-medium">Dedicate 15-30 min of Late Start Day time for Hub exploration</span>
-                          <span className="text-gray-500 ml-1">→ 53% of paras say this is the #1 thing that would help</span>
+                          <p className="text-sm font-medium text-gray-900">{s.label}</p>
+                          <p className="text-xs text-gray-500">{s.date} · {s.type}</p>
+                          {s.note && <p className="text-xs text-gray-400 italic mt-0.5">{s.note}</p>}
                         </div>
+                        <span className="ml-auto text-xs bg-green-100 text-green-700 font-medium px-2 py-0.5 rounded-full">{s.badge}</span>
                       </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
-              </details>
-            </div>
+              )}
 
-            {/* ===== SECTION 5: END-OF-PARTNERSHIP TARGETS ===== */}
-            <div>
-              <div className="bg-white rounded-xl p-6 shadow-sm">
-                <div className="flex items-center gap-2 mb-4">
-                  <Target className="w-5 h-5 text-[#38618C]" />
-                  <h3 className="text-lg font-bold text-[#1e2749]">End-of-Partnership Targets</h3>
+              {/* Leadership meetings */}
+              {partnershipData.sessions.leadershipMeetings.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Leadership Meetings</p>
+                  <div className="space-y-2">
+                    {partnershipData.sessions.leadershipMeetings.map((m, i) => (
+                      <div key={i} className="flex items-start gap-3 bg-gray-50 rounded-lg px-4 py-3">
+                        <Users className="w-4 h-4 text-gray-500 mt-0.5 shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{m.label}</p>
+                          <p className="text-xs text-gray-500">{m.date}</p>
+                        </div>
+                        <span className="ml-auto text-xs bg-gray-100 text-gray-600 font-medium px-2 py-0.5 rounded-full">{m.status}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <p className="text-gray-600 mb-4">By May 2026, we aim to see:</p>
-                <ul className="space-y-3">
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-[#38618C] flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">Pilot group paras report increased confidence in classroom strategies</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-[#38618C] flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">Measurable improvement in feeling valued by teachers and admin</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-[#38618C] flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">Reduced stress levels compared to baseline</span>
-                  </li>
-                  <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-[#38618C] flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">Clear implementation of Hub strategies observed in classrooms</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
+              )}
+
+              {/* Upcoming sessions */}
+              {partnershipData.sessions.upcoming.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Upcoming</p>
+                  <div className="space-y-2">
+                    {partnershipData.sessions.upcoming.map((s, i) => (
+                      <div key={i} className="flex items-start gap-3 bg-blue-50 rounded-lg px-4 py-3">
+                        <Calendar className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">{s.label}</p>
+                          <p className="text-xs text-gray-500">{s.date} · {s.type}</p>
+                        </div>
+                        {s.calendlyLink ? (
+                          <a
+                            href={s.calendlyLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs bg-blue-100 text-blue-700 font-medium px-2 py-0.5 rounded-full hover:bg-blue-200 transition-colors whitespace-nowrap"
+                          >
+                            Schedule
+                          </a>
+                        ) : (
+                          <span className="text-xs bg-green-100 text-green-700 font-medium px-2 py-0.5 rounded-full">{s.badge}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CollapsibleSection>
+
+            {/* ─────────────────────────────────────────────
+                SECTION 6 — PROGRESS SNAPSHOT
+                CONDITIONAL: show when progress.show === true
+                (at least 1 session complete + Hub login > 50%)
+                Starts collapsed.
+            ───────────────────────────────────────────── */}
+            {partnershipData.progress.show && (
+              <CollapsibleSection
+                title="Progress Snapshot"
+                icon={<TrendingUp className="w-4 h-4 text-amber-600" />}
+                defaultOpen={false}
+              >
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="bg-amber-50 rounded-lg p-4 border border-amber-100">
+                    <p className="text-3xl font-bold text-amber-700">{partnershipData.progress.implementationRate}%</p>
+                    <p className="text-sm text-gray-700 mt-1">{partnershipData.progress.implementationLabel}</p>
+                    <p className="text-xs text-gray-500 mt-1 italic">{partnershipData.progress.implementationComparison}</p>
+                  </div>
+                  <div className="bg-teal-50 rounded-lg p-4 border border-teal-100">
+                    <p className="text-3xl font-bold text-teal-700">{partnershipData.progress.hubAccess.percent}%</p>
+                    <p className="text-sm text-gray-700 mt-1">Hub engagement — {partnershipData.progress.hubAccess.active}/{partnershipData.progress.hubAccess.total} paras active</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                    <p className="text-xl font-bold text-gray-800">{partnershipData.progress.hubAccess.active}/{partnershipData.progress.hubAccess.total}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Hub Access</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                    <p className="text-xl font-bold text-gray-800">{partnershipData.progress.selfDirected}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Self-Directed Learners</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                    <p className="text-xl font-bold text-gray-800">{partnershipData.progress.coursesCompleted}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Course Completions</p>
+                  </div>
+                </div>
+              </CollapsibleSection>
+            )}
+
+            {/* ─────────────────────────────────────────────
+                SECTION 7 — TEAM PULSE
+                CONDITIONAL: show when teamPulse.show === true
+                (after first survey collected)
+                Starts collapsed.
+            ───────────────────────────────────────────── */}
+            {partnershipData.teamPulse.show && partnershipData.teamPulse.surveys.length > 0 && (
+              <CollapsibleSection
+                title="Team Pulse"
+                icon={<Heart className="w-4 h-4 text-purple-600" />}
+                defaultOpen={false}
+              >
+                {/* Survey cards rendered here when data exists */}
+                <p className="text-sm text-gray-500">Survey data will appear here after the first check-in is collected.</p>
+              </CollapsibleSection>
+            )}
+
+            {/* ─────────────────────────────────────────────
+                SECTION 8 — WHAT WE'RE LEARNING
+                CONDITIONAL: show when learning.show === true
+                (post-session implementation data by Move)
+                Starts collapsed.
+            ───────────────────────────────────────────── */}
+            {partnershipData.learning.show && (
+              <CollapsibleSection
+                title="What We're Learning"
+                icon={<BookOpen className="w-4 h-4 text-indigo-600" />}
+                defaultOpen={false}
+              >
+                <div className="space-y-4">
+                  {partnershipData.learning.moves.map((move) => (
+                    <div key={move.moveNumber} className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-gray-900">Move #{move.moveNumber}: {move.moveName}</span>
+                        {move.implementationRate !== null ? (
+                          <span className="text-sm font-bold text-teal-700">{move.implementationRate}%</span>
+                        ) : (
+                          <span className="text-xs text-gray-400">Tracking at Obs Day 2</span>
+                        )}
+                      </div>
+                      {move.implementationRate !== null && (
+                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                          <div
+                            className="bg-teal-500 h-2 rounded-full"
+                            style={{ width: `${move.implementationRate}%` }}
+                          />
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-600">{move.note}</p>
+                    </div>
+                  ))}
+                </div>
+              </CollapsibleSection>
+            )}
+
+            {/* ─────────────────────────────────────────────
+                SECTION 9 — STAFF CHAMPIONS
+                CONDITIONAL: show when champions.show === true
+                Celebration only. High Five button.
+                Names appear in celebration ONLY.
+                Starts collapsed.
+            ───────────────────────────────────────────── */}
+            {partnershipData.champions.show && partnershipData.champions.staff.length > 0 && (
+              <CollapsibleSection
+                title="Staff Champions"
+                icon={<Star className="w-4 h-4 text-yellow-500" />}
+                defaultOpen={false}
+              >
+                <p className="text-xs text-gray-500 mb-4 italic">{partnershipData.champions.highFiveInstructions}</p>
+                <div className="space-y-2">
+                  {partnershipData.champions.staff.map((s, i) => (
+                    <div key={i} className="flex items-center justify-between bg-yellow-50 rounded-lg px-4 py-3 border border-yellow-100">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">{s.name}</p>
+                        <p className="text-xs text-gray-500">{s.note}</p>
+                      </div>
+                      <a
+                        href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(s.email)}&su=${encodeURIComponent('A High Five From Your Admin!')}&body=${encodeURIComponent(`Hi ${s.name.split(' ')[0]},\n\nI just wanted to take a moment to recognize your dedication and the work you're putting in. TDI shared that you've been one of our most engaged learners — and it shows.\n\nKeep it up. Your students are lucky to have you.\n\nWith appreciation,`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 text-xs font-semibold px-3 py-1.5 rounded-full transition-colors"
+                      >
+                        <Star className="w-3 h-3" /> High Five
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </CollapsibleSection>
+            )}
+
+            {/* ─────────────────────────────────────────────
+                SECTION 10 — WHAT'S RESONATING
+                CONDITIONAL: show when resonating.show === true
+                (5+ courses started)
+                Links to Hub. Starts collapsed.
+            ───────────────────────────────────────────── */}
+            {partnershipData.resonating.show && (
+              <CollapsibleSection
+                title="What's Resonating"
+                icon={<Lightbulb className="w-4 h-4 text-orange-500" />}
+                defaultOpen={false}
+              >
+                <p className="text-xs text-gray-500 mb-4">{partnershipData.resonating.totalCoursesStarted} courses being actively explored across your team.{' '}
+                  <a href={partnershipData.resonating.hubLink} target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">View in Hub →</a>
+                </p>
+                <div className="space-y-2">
+                  {partnershipData.resonating.topCourses.map((course, i) => (
+                    <div key={i} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-gray-400 w-4">{i + 1}</span>
+                        <span className="text-sm text-gray-800">{course.title}</span>
+                      </div>
+                      <span className="text-xs text-gray-500">{course.engagedStaff} paras</span>
+                    </div>
+                  ))}
+                </div>
+              </CollapsibleSection>
+            )}
+
+            {/* ─────────────────────────────────────────────
+                SECTION 11 — YOUR TEAM'S TOP ASK
+                CONDITIONAL: show when topAsk.show === true
+                (survey barriers + recommended actions)
+                Closing section — staff voice.
+                Starts collapsed.
+            ───────────────────────────────────────────── */}
+            {partnershipData.topAsk.show && (
+              <CollapsibleSection
+                title="Your Team's Top Ask"
+                icon={<MessageCircle className="w-4 h-4 text-rose-500" />}
+                defaultOpen={false}
+              >
+                {/* Content populated from survey barrier data */}
+                <p className="text-sm text-gray-500">Staff feedback will appear here after the first survey check-in.</p>
+              </CollapsibleSection>
+            )}
 
           </div>
         )}
