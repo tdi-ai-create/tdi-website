@@ -223,6 +223,18 @@ export default function ASD4Dashboard() {
   // Upcoming/Scheduled sessions data
   const upcomingSessions = [
     {
+      title: "Observation Day 2",
+      date: "March 19, 2026",
+      time: "Half Day",
+      format: "In-Person",
+      focusAreas: [
+        "Follow-up observations",
+        "Check on growth areas",
+        "Additional para connections"
+      ],
+      status: "scheduled" as const
+    },
+    {
       title: "Virtual Session 2",
       date: "April 6, 2026",
       time: "7:30 - 8:15 AM",
@@ -231,6 +243,18 @@ export default function ASD4Dashboard() {
         "Mid-partnership progress review",
         "Growth Group updates and wins",
         "Implementation support"
+      ],
+      status: "scheduled" as const
+    },
+    {
+      title: "Executive Impact Session 2",
+      date: "April 9, 2026",
+      time: "8:00 - 9:00 AM",
+      format: "Leadership Meeting",
+      focusAreas: [
+        "Current outcomes review",
+        "End-of-year metrics discussion",
+        "Partnership continuation conversation"
       ],
       status: "scheduled" as const
     },
@@ -304,7 +328,7 @@ export default function ASD4Dashboard() {
         followUpEmails: 7,
         principalEmail: true,
         principalName: "Bryan Bolton",
-        sameDayResponses: 4
+        sameDayResponses: 5
       },
       movesObserved: [
         {
@@ -362,7 +386,7 @@ export default function ASD4Dashboard() {
         { para: "Jonnathan Roeglin", resource: "Feedback Framework Quick Reference + No-Hands-Up Help Systems*", reason: "Strong questioning already — next step is pairing questions with Notice → Name → Next Step feedback" },
         { para: "Esperanza Garcia", resource: "Supporting English Learners + Bilingual Reference Cards", reason: "Directly connects to the bilingual scaffolding work she's already doing" },
         { para: "Kristina Orellana", resource: "PA Quick Wins Menu", reason: "Already doing high-impact moves naturally — quick-grab reference for more" },
-        { para: "Fatema Bakhrani", resource: "Feedback Framework Quick Reference", reason: "Good guiding questions observed — feedback formula is the natural next layer" },
+        { para: "Fatema Bakhrani", resource: "Feedback Framework Quick Reference + 'One Step at a Time' Chunking Strategy*", reason: "Good guiding questions observed — feedback formula is the natural next layer" },
         { para: "Mary Dunkel", resource: "Para Quick-Start Confidence Kit", reason: "Clean starting point for Hub engagement" },
         { para: "Scott Nyquist", resource: "\"What Should I Be Doing Right Now?\" Para Guide", reason: "Practical role-affirming reference" },
         { para: "Evely Castillo", resource: "De-Escalation Strategies + Calm Response Scripts", reason: "Updated same-day after she replied requesting de-escalation support" }
@@ -371,7 +395,8 @@ export default function ASD4Dashboard() {
         { text: "I wish I could meet all my students' many needs every day.", author: "Scott Nyquist", context: "Replied 5 minutes after receiving observation follow-up email" },
         { text: "One thing I wish was easier is helping a student de-escalate instead of escalating the situation more. I still struggle somewhat in that aspect.", author: "Evely Castillo", context: "Reached out on her own — was not formally observed but replied with a specific skill request after receiving an appreciation email", selfInitiated: true },
         { text: "Thank you for taking your time to come by and stop to observe me. Thank you for your comments and suggestions. I will take a look at the resources you shared with me.", author: "Esperanza Garcia, Fullerton (Bilingual Support)", context: "Replied next morning. Committed to exploring Hub resources." },
-        { text: "I'm glad that you were able to stop by and observe. One thing I wish was easier is being able to bounce around between groups of students who all need help at the same time.", author: "Jonnathan Roeglin, Fullerton (Formally Observed)", context: "Replied next morning with a specific growth request: managing multiple groups simultaneously. Matched with No-Hands-Up Help Systems resource.", growthRequest: true }
+        { text: "I'm glad that you were able to stop by and observe. One thing I wish was easier is being able to bounce around between groups of students who all need help at the same time.", author: "Jonnathan Roeglin, Fullerton (Formally Observed)", context: "Replied next morning with a specific growth request: managing multiple groups simultaneously. Matched with No-Hands-Up Help Systems resource.", growthRequest: true },
+        { text: "Could we try to maybe break the work into smaller steps to help make the student understand it better? What is an easier strategy to help them understand?", author: "Fatema Bakhrani, Fullerton (Informal Observation)", context: "Replied with a specific strategy request: chunking and scaffolding. Matched with 'One Step at a Time' chunking strategy.", growthRequest: true }
       ],
       themes: {
         strengths: [
@@ -2081,7 +2106,7 @@ Thank you for setting the example. It matters more than you know.`;
                                       <span className="text-sm text-gray-500">— {session.date}</span>
                                     </div>
                                     <p className="text-sm text-gray-600 mb-2">
-                                      3 Buildings Visited · 17 Paras Contacted · 20 Follow-Up Emails Sent · 9 Same-Day Replies
+                                      3 Buildings Visited · 17 Paras Contacted · 20 Follow-Up Emails Sent · 10 Same-Day Replies (50% response rate)
                                     </p>
                                     <blockquote className="text-sm italic text-gray-600 border-l-2 border-emerald-400 pl-3">
                                       &quot;I wish I could meet all my students&apos; many needs every day.&quot;
@@ -2131,9 +2156,9 @@ Thank you for setting the example. It matters more than you know.`;
                                         <p className="text-[10px] text-gray-400">Bolton · Villalobos · Dohman</p>
                                       </div>
                                       <div className="bg-amber-50 rounded-lg p-3 text-center">
-                                        <p className="text-2xl font-bold text-amber-700">9</p>
-                                        <p className="text-xs text-gray-600">Same-Day Replies</p>
-                                        <p className="text-[10px] text-gray-400">Scott · Evely · Maribel · Ruby · Cristina · Kara · Carlos · Esperanza · Jonnathan</p>
+                                        <p className="text-2xl font-bold text-amber-700">10</p>
+                                        <p className="text-xs text-gray-600">Same-Day Replies (50%)</p>
+                                        <p className="text-[10px] text-gray-400">Scott · Evely · Maribel · Ruby · Cristina · Kara · Carlos · Esperanza · Jonnathan · Fatema</p>
                                       </div>
                                     </div>
                                   </div>
@@ -2199,6 +2224,12 @@ Thank you for setting the example. It matters more than you know.`;
                                         <p className="text-xs text-gray-500">— Jonnathan Roeglin, Fullerton</p>
                                         <p className="text-xs text-amber-600 mt-1 font-medium">Matched: No-Hands-Up Help Systems</p>
                                       </div>
+                                      <div className="bg-white/70 rounded-lg p-4 border border-amber-100">
+                                        <p className="text-xs font-bold text-amber-700 uppercase mb-2">Chunking &amp; Scaffolding</p>
+                                        <p className="text-sm italic text-gray-700 mb-2">&quot;Could we try to break the work into smaller steps to help make the student understand it better?&quot;</p>
+                                        <p className="text-xs text-gray-500">— Fatema Bakhrani, Fullerton</p>
+                                        <p className="text-xs text-amber-600 mt-1 font-medium">Matched: &quot;One Step at a Time&quot; chunking strategy + Hub scaffolding resources</p>
+                                      </div>
                                     </div>
                                     <div className="bg-white/60 rounded-lg p-3 border border-amber-100 mt-4">
                                       <p className="text-sm text-amber-800 font-medium">
@@ -2257,7 +2288,7 @@ Thank you for setting the example. It matters more than you know.`;
                                             <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 2 informal, 2 appreciation</span></div>
                                             <div><span className="text-gray-500">Follow-Ups:</span> <span className="font-medium">7 personalized emails</span></div>
                                             <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Bryan Bolton</span></div>
-                                            <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium">4 (Scott, Evely, Esperanza, Jonnathan)</span></div>
+                                            <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium">5 (Scott, Evely, Esperanza, Jonnathan, Fatema)</span></div>
                                           </div>
                                         </div>
 
@@ -2313,7 +2344,7 @@ Thank you for setting the example. It matters more than you know.`;
                                                 ))}
                                               </tbody>
                                             </table>
-                                            <p className="text-xs text-gray-500 italic mt-2 border-t border-gray-100 pt-2">* Jonnathan Roeglin&apos;s resource was expanded after his reply — added No-Hands-Up Help Systems alongside the original Feedback Framework Quick Reference, based on his request for help managing multiple groups of students simultaneously.</p>
+                                            <p className="text-xs text-gray-500 italic mt-2 border-t border-gray-100 pt-2">* Jonnathan Roeglin&apos;s resource was expanded after his reply — added No-Hands-Up Help Systems alongside the original Feedback Framework Quick Reference, based on his request for help managing multiple groups of students simultaneously.<br/>* Fatema Bakhrani&apos;s resource was expanded after her reply — added &quot;One Step at a Time&quot; chunking strategy based on her request for help breaking work into smaller steps.</p>
                                           </div>
                                         </div>
 
@@ -3214,7 +3245,7 @@ Thank you for setting the example. It matters more than you know.`;
                                   <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
                                   <ChevronDown className="w-4 h-4 ml-auto transition-transform group-open:rotate-180" />
                                 </div>
-                                <p className="text-xs text-gray-500 mt-1 ml-6">7 paras contacted · 7 emails sent · 4 replies with specific growth requests</p>
+                                <p className="text-xs text-gray-500 mt-1 ml-6">7 paras contacted · 7 emails sent · 5 replies with specific growth requests</p>
                               </summary>
                               <div className="mt-4 space-y-4">
                                 {/* 1. At a Glance */}
@@ -3224,7 +3255,7 @@ Thank you for setting the example. It matters more than you know.`;
                                     <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal, 2 informal, 2 appreciation</span></div>
                                     <div><span className="text-gray-500">Follow-Up Emails:</span> <span className="font-medium">7 personalized same-day</span></div>
                                     <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Bryan Bolton</span></div>
-                                    <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium text-emerald-600">4 (Scott, Evely, Esperanza, Jonnathan)</span></div>
+                                    <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium text-emerald-600">5 (Scott, Evely, Esperanza, Jonnathan, Fatema)</span></div>
                                   </div>
                                 </div>
 
@@ -3276,6 +3307,12 @@ Thank you for setting the example. It matters more than you know.`;
                                       <p className="text-sm italic text-gray-700">&quot;I&apos;m glad that you were able to stop by and observe. One thing I wish was easier is being able to bounce around between groups of students who all need help at the same time.&quot;</p>
                                       <p className="text-xs text-gray-500 mt-2">— Jonnathan Roeglin, Fullerton</p>
                                       <p className="text-xs text-emerald-600 mt-1">Replied next morning with a specific growth request: managing multiple groups simultaneously. Matched with No-Hands-Up Help Systems resource.</p>
+                                    </blockquote>
+                                    <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400 ring-1 ring-emerald-100">
+                                      <span className="inline-block text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full mb-2">🎯 Specific growth request</span>
+                                      <p className="text-sm italic text-gray-700">&quot;Could we try to maybe break the work into smaller steps to help make the student understand it better? What is an easier strategy to help them understand?&quot;</p>
+                                      <p className="text-xs text-gray-500 mt-2">— Fatema Bakhrani, Fullerton (Informal Observation)</p>
+                                      <p className="text-xs text-emerald-600 mt-1">Replied with a specific strategy request: chunking and scaffolding. Matched with &quot;One Step at a Time&quot; chunking strategy.</p>
                                     </blockquote>
                                   </div>
                                 </div>
