@@ -1142,6 +1142,9 @@ Thank you for setting the example. It matters more than you know.`;
       ],
       inProgress: [
         { label: 'Hub engagement — 122 of 122 paras active', detail: '100% logged in' },
+        { label: 'Move #1 implementation tracking', detail: '91% across pilot group' },
+        { label: 'Move #2 implementation tracking', detail: '70% across pilot group' },
+        { label: 'March survey analysis — 95/122 responded', detail: '78% response rate' },
       ],
       comingSoon: [
         { label: 'Observation Day 2', date: 'Mar 19, 2026' },

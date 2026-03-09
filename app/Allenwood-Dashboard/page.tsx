@@ -265,8 +265,8 @@ export default function AllenwoodDashboard() {
       ],
       inProgress: [
         { label: 'Hub engagement — 13/13 teachers active', detail: '14 courses being explored, up from 4 last month' },
-        { label: 'Top course: Calm Classrooms, Not Chaos', detail: '3 teachers engaged' },
         { label: 'Funding strategy discussion with Dr. Porter', detail: 'Meeting March 10 — 9AM ET' },
+        { label: 'Virtual Sessions 3-6 — TDI preparing content', detail: 'All 4 sessions confirmed through April 15' },
         { label: 'Year 2 expansion conversations underway', detail: 'Discussed at March 2 leadership meeting' },
       ],
       comingSoon: [
