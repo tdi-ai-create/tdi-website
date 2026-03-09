@@ -1082,7 +1082,7 @@ export default function ExampleDashboard() {
         <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl md:text-3xl font-bold">Motown District 360</h1>
+              <h1 className="text-2xl md:text-3xl font-bold whitespace-nowrap">Motown District 360</h1>
               <Tooltip content="Preview with sample data. Your dashboard shows your real metrics.">
                 <span></span>
               </Tooltip>
