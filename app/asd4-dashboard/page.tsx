@@ -77,7 +77,7 @@ export default function ASD4Dashboard() {
   const [expandedObsBuilding, setExpandedObsBuilding] = useState<string | null>('fullerton');
 
   // Needs Attention completion state with localStorage persistence
-  // Only 2 items remain in Needs Attention - Virtual Session 4 and Executive Session 2
+  // Only 1 item remains in Needs Attention - Virtual Session 4
   const permanentlyComplete: string[] = [];
   const [completedItems, setCompletedItems] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
@@ -117,18 +117,6 @@ export default function ASD4Dashboard() {
       actionLabel: 'Book Your Session',
       actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat',
       icon: Monitor,
-      priority: 'now',
-      external: true,
-      showCalendar: true
-    },
-    {
-      id: 'executive-session-2',
-      title: 'Schedule Executive Session 2',
-      description: 'End-of-partnership leadership review — preference: Early May',
-      deadline: 'MAY 2026',
-      actionLabel: 'Book Your Session',
-      actionUrl: 'https://calendly.com/rae-teachersdeserveit/partnership-school-observation-day-request-clone',
-      icon: Briefcase,
       priority: 'now',
       external: true,
       showCalendar: true
