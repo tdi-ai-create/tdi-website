@@ -939,6 +939,116 @@ export default function ExampleDashboard() {
     return { bg: '#9CA3AF', text: 'white', badge: 'Locked' };
   };
 
+  const overviewData = {
+    // ZONE 1 - Snapshot
+    stats: {
+      educatorsEnrolled: { value: 255, total: 255, label: 'Staff Enrolled', sublabel: '187 teachers + 68 paras across 6 buildings' },
+      deliverables: { completed: 8, total: 14, label: 'Deliverables', sublabel: 'completed vs. contracted' },
+      hubEngagement: { percent: 87, raw: '223/255', label: 'Hub Engagement', sublabel: '223 staff actively learning' },
+      phase: { name: 'ACCELERATE', number: 2, total: 3, label: 'Current Phase', sublabel: 'Phase 2 of 3' },
+    },
+
+    // Partnership Health
+    health: {
+      status: 'Strong',
+      statusColor: 'green',
+      details: [
+        '87% Hub engagement across all 6 buildings',
+        'Retention intent 9.8/10 — staff choosing to stay',
+        'Strategy implementation 2x the national average',
+        'Year 2 expansion conversations underway',
+      ],
+    },
+
+    // ZONE 2A - Timeline
+    timeline: {
+      done: [
+        { label: 'Partnership launched — 255 staff enrolled across 6 buildings', date: 'Sep 2025' },
+        { label: 'Hub access activated — all buildings onboarded', date: 'Sep 2025' },
+        { label: 'Baseline survey complete — 255/255 staff responded (100%)', date: 'Oct 2025' },
+        { label: 'Para Pilot Observation Day — Love Notes delivered', date: 'Nov 2025' },
+        { label: 'Teacher Pilot Observation Day — Love Notes delivered', date: 'Dec 2025' },
+        { label: 'Virtual Session 1 — Para Cohort (district-wide)', date: 'Jan 2026' },
+        { label: 'Virtual Session 2 — Teacher Cohort (Harmony + Crescendo)', date: 'Feb 2026' },
+        { label: 'Mid-year leadership recap — all 6 building principals', date: 'Feb 2026' },
+      ],
+      inProgress: [
+        { label: 'Hub engagement — 223/255 staff active across 6 buildings', detail: '87% and growing — goal: 100% by spring obs' },
+        { label: 'Strategy implementation tracking', detail: '21% district-wide — 2x the 10% national average' },
+        { label: 'Spring observation day coordination', detail: 'Para + Teacher Pilot Groups — April 2026' },
+        { label: 'Year 2 district expansion planning', detail: 'Discussions underway with district leadership' },
+      ],
+      comingSoon: [
+        { label: 'Spring Leadership Recap — District Team', date: 'Due April 2026' },
+        { label: 'Virtual Session: Teacher Cohort (Harmony + Crescendo)', date: 'Due May 2026' },
+        { label: 'Virtual Session: Para Cohort (District-wide)', date: 'Due May 2026' },
+        { label: 'Spring Observation Days — Para + Teacher Pilot Groups', date: 'Due April 2026' },
+        { label: 'Year 2 Expansion Proposal', date: 'Spring 2026' },
+      ],
+    },
+
+    // ZONE 2B - Investment value mirror
+    investment: {
+      perEducator: '$299',
+      perEducatorSublabel: 'per educator — less than a one-day sub, district-wide',
+      implementationRate: '9.8',
+      implementationSublabel: 'out of 10 — staff retention intent (industry avg: 2-4)',
+      coursesCompleted: 6.0,
+      coursesCompletedSublabel: 'avg stress score — well below industry average of 8-9',
+      retentionStat: '21%',
+      retentionSublabel: 'strategy implementation — 2x the 10% national average',
+    },
+
+    // ZONE 2C - Quick win counter
+    quickWin: {
+      count: 223,
+      line1: '223 of 255 Motown District educators have logged into the TDI Learning Hub.',
+      line2: '87% engagement across 6 buildings — and growing every week.',
+    },
+
+    // ZONE 3 - Actions
+    actions: {
+      nextToUnlock: [
+        {
+          label: 'Schedule Spring Leadership Recap',
+          detail: 'Review district-wide progress across all 6 buildings + set goals for 2026-27 — due April 2026',
+          owner: 'partner',
+          cta: 'Schedule via Calendly',
+          ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+        },
+        {
+          label: 'Schedule Virtual Session — Teacher Cohort',
+          detail: 'Harmony + Crescendo focus: differentiation strategies from recent observations — due May 2026',
+          owner: 'partner',
+          cta: 'Schedule via Calendly',
+          ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+        },
+        {
+          label: 'Schedule Virtual Session — Para Cohort',
+          detail: 'District-wide focus: teacher-para collaboration from pilot group feedback — due May 2026',
+          owner: 'partner',
+          cta: 'Schedule via Calendly',
+          ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+        },
+      ],
+      tdiHandling: [
+        {
+          label: 'Spring Observation Day prep — Para + Teacher Pilot Groups',
+          detail: 'TDI coordinating with building leads for classroom walk-throughs — April 2026',
+        },
+        {
+          label: 'Year 2 district expansion proposal',
+          detail: 'TDI preparing full proposal for 2026-27 — to be presented at Spring Leadership Recap',
+        },
+      ],
+      alreadyInMotion: [
+        { label: 'All 6 buildings Hub-active', date: '223/255 staff engaged', status: 'scheduled' },
+        { label: 'Spring Observation Days — both cohorts', date: 'April 2026', status: 'scheduled' },
+        { label: 'Year 2 expansion conversations', date: 'Underway with district leadership', status: 'scheduled' },
+      ],
+    },
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F5F5] overflow-x-hidden">
       {/* Confetti celebration for gold medal schools */}
@@ -982,12 +1092,12 @@ export default function ExampleDashboard() {
           <div className="flex items-center gap-3 text-sm">
             <div className="bg-white/10 px-3 py-1.5 rounded-lg">
               <span className="text-white/60">Status:</span>
-              <span className="ml-2 font-semibold text-[#38618C] bg-white px-2 py-0.5 rounded">Phase 2 - ACCELERATE</span>
+              <span className="ml-2 font-semibold text-[#38618C] bg-white px-2 py-0.5 rounded whitespace-nowrap">Phase 2 - ACCELERATE</span>
             </div>
             <Tooltip content="This data supports board presentations, Title II-A/IV-A grant renewals, and state accountability documentation.">
               <div className="bg-white/10 px-3 py-1.5 rounded-lg flex items-center gap-2 cursor-help hover:bg-white/20 transition-colors">
                 <Lock className="w-3.5 h-3.5 text-white/80" />
-                <span className="font-semibold text-white">Board & Grant Ready</span>
+                <span className="font-semibold text-white whitespace-nowrap">Board & Grant Ready</span>
               </div>
             </Tooltip>
           </div>
