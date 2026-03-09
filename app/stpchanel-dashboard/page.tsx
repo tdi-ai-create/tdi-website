@@ -464,19 +464,19 @@ export default function StPeterChanelDashboard() {
   const overviewData = {
     // ZONE 1 - Snapshot
     stats: {
-      educatorsEnrolled: { value: 28, total: 25, label: 'Staff Engaged', sublabel: '112% — above contracted seats' },
+      educatorsEnrolled: { value: 25, total: 25, label: 'Staff Enrolled', sublabel: '28 active — 3 above contracted' },
       deliverables: { completed: 8, total: 10, label: 'Deliverables', sublabel: 'completed vs. contracted' },
-      hubEngagement: { percent: 100, raw: '28/25', label: 'Hub Engagement', sublabel: 'all contracted staff active' },
+      hubEngagement: { percent: 100, raw: '25/25', label: 'Hub Engagement', sublabel: 'all contracted staff active' },
       phase: { name: 'ACCELERATE', number: 2, total: 3, label: 'Current Phase', sublabel: 'Phase 2 of 3' },
     },
 
-    // Partnership Health — TDI sets this manually
+    // Partnership Health
     health: {
       status: 'On Track',
-      statusColor: 'blue',   // green | blue | yellow | red
+      statusColor: 'blue',
       details: [
         'Hub engagement at 100% — all contracted staff active',
-        'Both observations complete',
+        'Retention intent 9.8/10 — nearly every teacher returning',
         'Partner engaged — supporting capacity through spring',
         '3 sessions remaining to schedule',
       ],
@@ -485,20 +485,20 @@ export default function StPeterChanelDashboard() {
     // ZONE 2A - Timeline
     timeline: {
       done: [
-        { label: 'Partnership kickoff — Foundation phase', date: 'Fall 2025' },
-        { label: 'Hub access activated — all 25 staff enrolled', date: 'Fall 2025' },
-        { label: 'Observation Day 1 — classroom visits + Love Notes', date: 'Fall 2025' },
-        { label: 'Observation Day 2 — classroom visits + Love Notes', date: 'Winter 2025-26' },
-        { label: 'Growth Group: Instructional Design — sessions completed', date: 'Winter 2025-26' },
-        { label: 'Growth Group: Class Management — sessions completed', date: 'Winter 2025-26' },
+        { label: 'Partnership kickoff — Initial Observations', date: 'Sep 30, 2025' },
+        { label: 'Hub access activated — all 25 staff enrolled', date: 'Sep 2025' },
+        { label: 'Growth Groups formed — Instructional Design (9) + Class Management (11)', date: 'Oct 2025' },
+        { label: 'On-Site Visit + Group Sessions — 100% Hub engagement achieved', date: 'Jan 14, 2026' },
+        { label: 'Teacher survey complete — 19/19 responded (100%)', date: 'Jan 14, 2026' },
+        { label: '25 Love Notes delivered — all staff observed', date: 'Jan 14, 2026' },
         { label: 'Phase 1 complete — moved to ACCELERATE', date: 'Early 2026' },
         { label: 'Phase 2 launched — full staff implementation', date: '2026' },
       ],
       inProgress: [
         { label: 'Hub engagement — 28 staff actively using the Hub', detail: '100% of contracted seats + 3 additional' },
-        { label: 'Top course: Calm Classrooms, Not Chaos', detail: '13 staff engaged' },
-        { label: 'Classroom Management Toolkit', detail: '6 staff engaged' },
-        { label: 'Communication that Clicks', detail: '5 staff engaged' },
+        { label: 'Strategy implementation — 21% tried strategies', detail: '2x the 10% industry average' },
+        { label: 'Growth Group: Instructional Design', detail: '~9 teachers — virtual session pending' },
+        { label: 'Growth Group: Class Management', detail: '~11 teachers — virtual session pending' },
       ],
       comingSoon: [
         { label: 'Spring Leadership Recap', date: 'Due April 2026' },
@@ -511,19 +511,19 @@ export default function StPeterChanelDashboard() {
     investment: {
       perEducator: '$446',
       perEducatorSublabel: 'per educator — less than a one-day sub',
-      implementationRate: '100%',
-      implementationSublabel: 'hub engagement — all contracted staff active',
-      coursesCompleted: 22,
-      coursesCompletedSublabel: 'staff with tracked course engagement',
-      retentionStat: '85%',
-      retentionSublabel: 'of TDI partners continue to Year 2',
+      implementationRate: '21%',
+      implementationSublabel: 'strategy implementation — 2x the 10% industry average',
+      coursesCompleted: 9.8,
+      coursesCompletedSublabel: 'out of 10 — teacher retention intent score',
+      retentionStat: '6.0',
+      retentionSublabel: 'avg stress score — well below industry average of 8-9',
     },
 
     // ZONE 2C - Quick win counter
     quickWin: {
-      count: 28,
-      line1: '28 educators are actively using the TDI Learning Hub at St. Peter Chanel.',
-      line2: 'That\'s 3 more than contracted — your staff is showing up on their own.',
+      count: 19,
+      line1: '19 of 19 SPC teachers responded to the partnership survey — 100% voice.',
+      line2: 'Retention intent: 9.8/10. Nearly every teacher plans to return next year.',
     },
 
     // ZONE 3 - Actions
@@ -538,14 +538,14 @@ export default function StPeterChanelDashboard() {
         },
         {
           label: 'Schedule Virtual Session — Instructional Design Group',
-          detail: 'Included in contract — due May 2026',
+          detail: '~9 teachers focused on lesson flow, time management, differentiation — due May 2026',
           owner: 'partner',
           cta: 'Schedule via Calendly',
           ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
         },
         {
           label: 'Schedule Virtual Session — Class Management Group',
-          detail: 'Included in contract — due May 2026',
+          detail: '~11 teachers focused on routines, engagement, checking for understanding — due May 2026',
           owner: 'partner',
           cta: 'Schedule via Calendly',
           ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
@@ -554,13 +554,13 @@ export default function StPeterChanelDashboard() {
       tdiHandling: [
         {
           label: 'Spring Leadership Recap Prep',
-          detail: 'TDI preparing progress summary for April session',
+          detail: 'TDI preparing full impact summary — stress, retention, implementation data',
         },
       ],
       alreadyInMotion: [
-        { label: 'Both observations complete', date: 'Done', status: 'complete' },
-        { label: 'All 25 contracted seats filled', date: 'Done — plus 3 additional', status: 'complete' },
-        { label: 'Growth Groups running', date: 'Instructional Design + Class Management', status: 'scheduled' },
+        { label: 'Both observations complete — 25 Love Notes delivered', date: 'Done', status: 'complete' },
+        { label: 'Teacher survey — 19/19 responded, 9.8/10 retention intent', date: 'Jan 14, 2026', status: 'complete' },
+        { label: 'Growth Groups active — Instructional Design + Class Management', date: 'Ongoing', status: 'scheduled' },
       ],
     },
   };
