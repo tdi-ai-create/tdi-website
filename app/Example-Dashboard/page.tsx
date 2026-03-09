@@ -1142,952 +1142,293 @@ export default function ExampleDashboard() {
       {/* Tab Content */}
       <div id="tab-content-area" className="max-w-5xl mx-auto px-4 py-6">
         
-        {/* OVERVIEW TAB */}
+        {/* ==================== OVERVIEW TAB ==================== */}
         {activeTab === 'overview' && (
-          <div className="space-y-6">
-            {/* Your Metrics, Your Way - Top of Overview */}
-            <div className="bg-gradient-to-r from-[#1e2749]/5 to-[#4ecdc4]/5 rounded-xl p-4 border border-[#4ecdc4]/20">
-              <div className="flex items-start gap-3">
-                <BarChart3 className="w-5 h-5 text-[#4ecdc4] mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-[#1e2749]">
-                    Your Metrics, Your Way
-                  </p>
-                  <p className="text-xs text-gray-600 mt-1">
-                    All progress data can be tied to state assessment results, district-specific benchmarks, or TDI survey metrics - whichever tells your school&apos;s story best. Your TDI partner will customize this with you during onboarding.
-                  </p>
-                </div>
-              </div>
-            </div>
+          <div className="space-y-8 pb-8">
 
-            {/* Quick Stats with Expandable Details */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {/* Staff Enrolled */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div
-                  onClick={() => navigateToSection('implementation', 'progress-hub-engagement')}
-                  className="p-4 cursor-pointer hover:bg-gray-50 transition-all"
+            {/* ─── ZONE 1: PARTNERSHIP SNAPSHOT ─── */}
+            <div className="space-y-4">
+
+              {/* Stat Cards Row */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+
+                {/* Staff Enrolled */}
+                <button
+                  onClick={() => setActiveTab('progress')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#38618C]/20 transition-all group"
                 >
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <Users className="w-4 h-4 text-[#38618C]" />
-                      <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
-                    </div>
-                    <div className="text-2xl font-bold text-[#1e2749]">255</div>
-                    <div className="text-xs text-[#38618C] font-medium">across 6 schools</div>
+                  <div className="flex items-center justify-between mb-3">
+                    <Users className="w-5 h-5 text-[#38618C]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#38618C] transition-colors" />
                   </div>
-                </div>
-                <button
-                  onClick={(e) => { e.stopPropagation(); toggleSection('hero-staff'); }}
-                  className="w-full flex items-center justify-between px-4 py-2 text-xs text-gray-400 hover:text-gray-600 transition-colors border-t border-gray-100">
-                  <span>Per-building breakdown</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openSections['hero-staff'] ? 'rotate-180' : ''}`} />
+                  <div className="text-3xl font-bold text-[#38618C] mb-1">
+                    {overviewData.stats.educatorsEnrolled.value}/{overviewData.stats.educatorsEnrolled.total}
+                  </div>
+                  <p className="text-xs font-medium text-gray-500 uppercase tracking-wide">{overviewData.stats.educatorsEnrolled.label}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">{overviewData.stats.educatorsEnrolled.sublabel}</p>
                 </button>
-                {openSections['hero-staff'] && (
-                  <div className="px-4 pb-3 space-y-1.5 text-xs text-gray-500">
-                    <div className="flex justify-between"><span>Harmony Elementary</span><span className="font-medium text-[#1e2749]">42</span></div>
-                    <div className="flex justify-between"><span>Crescendo High School</span><span className="font-medium text-[#1e2749]">67</span></div>
-                    <div className="flex justify-between"><span>Motown ELC</span><span className="font-medium text-[#1e2749]">28</span></div>
-                    <div className="flex justify-between"><span>Motown Middle School</span><span className="font-medium text-[#1e2749]">53</span></div>
-                    <div className="flex justify-between"><span>Rhythm Academy</span><span className="font-medium text-[#1e2749]">38</span></div>
-                    <div className="flex justify-between"><span>Bridges Alternative</span><span className="font-medium text-[#1e2749]">27</span></div>
-                  </div>
-                )}
-              </div>
 
-              {/* Observations */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div
-                  onClick={() => navigateToSection('implementation', 'progress-observations')}
-                  className="p-4 cursor-pointer hover:bg-gray-50 transition-all"
+                {/* Deliverables */}
+                <button
+                  onClick={() => setActiveTab('blueprint')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#38618C]/20 transition-all group"
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <Eye className="w-4 h-4 text-[#38618C]" />
-                        <span className="text-xs text-gray-500 uppercase">Observations</span>
-                      </div>
-                      <div className="text-2xl font-bold text-[#1e2749]">2<span className="text-lg font-normal text-gray-400">/4</span></div>
-                    </div>
-                    {/* Mini progress bar */}
-                    <div className="w-16">
-                      <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#4ecdc4] rounded-full" style={{width: '50%'}}></div>
-                      </div>
-                      <p className="text-xs text-gray-400 text-right mt-0.5">50%</p>
-                    </div>
+                  <div className="flex items-center justify-between mb-3">
+                    <CheckCircle className="w-5 h-5 text-[#4ecdc4]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#38618C] transition-colors" />
                   </div>
-                </div>
-                <button
-                  onClick={(e) => { e.stopPropagation(); toggleSection('hero-obs'); }}
-                  className="w-full flex items-center justify-between px-4 py-2 text-xs text-gray-400 hover:text-gray-600 transition-colors border-t border-gray-100">
-                  <span>Para Pilot + Teacher Pilot</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openSections['hero-obs'] ? 'rotate-180' : ''}`} />
+                  <div className="text-3xl font-bold text-[#4ecdc4] mb-1">
+                    {overviewData.stats.deliverables.completed}/{overviewData.stats.deliverables.total}
+                  </div>
+                  <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{overviewData.stats.deliverables.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.deliverables.sublabel}</div>
+                  {/* Mini progress bar */}
+                  <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#4ecdc4] rounded-full transition-all"
+                      style={{ width: `${(overviewData.stats.deliverables.completed / overviewData.stats.deliverables.total) * 100}%` }}
+                    />
+                  </div>
                 </button>
-                {openSections['hero-obs'] && (
-                  <div className="px-4 pb-3 space-y-1.5 text-xs text-gray-500">
-                    <div className="flex justify-between"><span>Para Pilot Observation</span><span className="text-green-500 font-medium">✓ Complete</span></div>
-                    <div className="flex justify-between"><span>Teacher Pilot Observation</span><span className="text-green-500 font-medium">✓ Complete</span></div>
-                    <div className="flex justify-between"><span>Spring Para Observation</span><span className="text-amber-500 font-medium">April 2026</span></div>
-                    <div className="flex justify-between"><span>Spring Teacher Observation</span><span className="text-amber-500 font-medium">April 2026</span></div>
-                  </div>
-                )}
-              </div>
 
-              {/* Needs Attention */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div
-                  onClick={() => {
-                    const el = document.getElementById('action-items-section');
-                    if (el) scrollToElement(el);
-                  }}
-                  className="p-4 cursor-pointer hover:bg-gray-50 transition-all"
+                {/* Hub Engagement */}
+                <button
+                  onClick={() => setActiveTab('progress')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#38618C]/20 transition-all group"
                 >
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <AlertCircle className="w-4 h-4 text-amber-500" />
-                      <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
-                    </div>
-                    <div className="text-2xl font-bold text-amber-500">4</div>
-                    <div className="text-xs text-amber-600 font-medium">Items pending</div>
+                  <div className="flex items-center justify-between mb-3">
+                    <BookOpen className="w-5 h-5 text-[#38618C]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#38618C] transition-colors" />
                   </div>
-                </div>
-                <button
-                  onClick={(e) => { e.stopPropagation(); toggleSection('hero-attention'); }}
-                  className="w-full flex items-center justify-between px-4 py-2 text-xs text-gray-400 hover:text-gray-600 transition-colors border-t border-gray-100">
-                  <span>Next: Spring Leadership</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openSections['hero-attention'] ? 'rotate-180' : ''}`} />
+                  <div className="text-3xl font-bold text-[#38618C] mb-1">{overviewData.stats.hubEngagement.percent}%</div>
+                  <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{overviewData.stats.hubEngagement.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.hubEngagement.sublabel}</div>
+                  {/* Mini progress bar */}
+                  <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#38618C] rounded-full transition-all"
+                      style={{ width: `${overviewData.stats.hubEngagement.percent}%` }}
+                    />
+                  </div>
                 </button>
-                {openSections['hero-attention'] && (
-                  <div className="px-4 pb-3 space-y-1.5 text-xs text-gray-500">
-                    <div className="flex justify-between"><span>Spring Leadership Recap</span><span className="text-amber-500">April 2026</span></div>
-                    <div className="flex justify-between"><span>Spring Observations</span><span className="text-amber-500">To schedule</span></div>
-                    <div className="flex justify-between"><span>Spring Survey</span><span className="text-amber-500">April 2026</span></div>
-                    <div className="flex justify-between"><span>Virtual Session #4</span><span className="text-amber-500">To schedule</span></div>
-                  </div>
-                )}
-              </div>
 
-              {/* Current Phase */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <div
-                  onClick={() => navigateToSection('journey', 'journey-phases')}
-                  className="p-4 cursor-pointer hover:bg-gray-50 transition-all"
+                {/* Current Phase */}
+                <button
+                  onClick={() => setActiveTab('blueprint')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#38618C]/20 transition-all group"
                 >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <TrendingUp className="w-4 h-4 text-[#38618C]" />
-                        <Tooltip content="Coaching cycles, observation days, and data-driven adjustments.">
-                          <span className="text-xs text-gray-500 uppercase">Current Phase</span>
-                        </Tooltip>
-                      </div>
-                      <div className="text-2xl font-bold text-[#1e2749]">Phase 2</div>
-                      <div className="text-xs text-[#38618C] font-medium">ACCELERATE</div>
-                    </div>
-                    {/* Phase indicator */}
-                    <div className="flex gap-1">
-                      <div className="w-3 h-3 rounded-full bg-gray-300"></div>
-                      <div className="w-3 h-3 rounded-full bg-[#38618C]"></div>
-                      <div className="w-3 h-3 rounded-full bg-gray-200"></div>
-                    </div>
+                  <div className="flex items-center justify-between mb-3">
+                    <Target className="w-5 h-5 text-[#1e2749]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#38618C] transition-colors" />
                   </div>
-                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden mt-3">
-                    <div className="h-full bg-[#38618C] rounded-full" style={{width: '66%'}}></div>
-                  </div>
-                  <div className="text-xs text-gray-400 mt-1">Phase 2 of 3 · 66%</div>
-                </div>
-                <button
-                  onClick={(e) => { e.stopPropagation(); toggleSection('hero-phase'); }}
-                  className="w-full flex items-center justify-between px-4 py-2 text-xs text-gray-400 hover:text-gray-600 transition-colors border-t border-gray-100">
-                  <span>Phase details</span>
-                  <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openSections['hero-phase'] ? 'rotate-180' : ''}`} />
-                </button>
-                {openSections['hero-phase'] && (
-                  <div className="px-4 pb-3 text-xs text-gray-500">
-                    <p className="mb-2">Deepening implementation through coaching cycles, observations, and data-driven adjustments.</p>
-                    <button
-                      onClick={() => navigateToSection('journey', 'journey-phases')}
-                      className="text-[#4ecdc4] font-medium hover:underline">
-                      View full journey →
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Leading Indicators Preview */}
-            <div id="leading-indicators" className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <BarChart3 className="w-5 h-5 text-[#4ecdc4]" />
-                  <h3 className="text-base font-bold text-[#1e2749]">Leading Indicators</h3>
-                </div>
-                <span className="text-xs text-[#4ecdc4] font-medium cursor-pointer hover:underline" onClick={() => navigateToSection('progress', 'leading-indicators')}>View full details →</span>
-              </div>
-
-              {/* Enhanced indicator rows */}
-              <div className="space-y-4">
-                {/* Teacher Stress */}
-                <div
-                  className="cursor-pointer hover:bg-gray-50 rounded-lg p-3 -mx-3 transition-colors"
-                  onClick={() => navigateToSection('journey', 'leading-indicators')}>
-                  <div className="flex items-center flex-wrap gap-2 mb-2">
-                    <span className="text-sm font-semibold text-[#1e2749]">Teacher Stress</span>
-                    <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">↓ Lower is better</span>
-                    <span className="text-xs px-2 py-0.5 bg-green-50 text-green-600 rounded-full font-medium">✓ Better than industry</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 text-xs">
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">Industry</span>
-                        <span className="text-red-400 font-medium">8-9/10</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: '87%'}}></div></div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">TDI Partners</span>
-                        <span className="text-[#1e2749] font-medium">5-7/10</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '60%'}}></div></div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">Motown 360</span>
-                        <span className="text-[#4ecdc4] font-medium">6.0/10</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#4ecdc4] rounded-full" style={{width: '60%'}}></div></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Strategy Implementation */}
-                <div
-                  className="cursor-pointer hover:bg-gray-50 rounded-lg p-3 -mx-3 transition-colors"
-                  onClick={() => navigateToSection('journey', 'leading-indicators')}>
-                  <div className="flex items-center flex-wrap gap-2 mb-2">
-                    <span className="text-sm font-semibold text-[#1e2749]">Strategy Implementation</span>
-                    <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">↑ Higher is better</span>
-                    <span className="text-xs px-2 py-0.5 bg-amber-50 text-amber-600 rounded-full font-medium">↑ Growing - above industry</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 text-xs">
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">Industry</span>
-                        <span className="text-red-400 font-medium">10%</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: '10%'}}></div></div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">TDI Partners</span>
-                        <span className="text-[#1e2749] font-medium">65%</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '65%'}}></div></div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">Motown 360</span>
-                        <span className="text-[#4ecdc4] font-medium">21%</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#4ecdc4] rounded-full" style={{width: '21%'}}></div></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Retention Intent */}
-                <div
-                  className="cursor-pointer hover:bg-gray-50 rounded-lg p-3 -mx-3 transition-colors"
-                  onClick={() => navigateToSection('journey', 'leading-indicators')}>
-                  <div className="flex items-center flex-wrap gap-2 mb-2">
-                    <span className="text-sm font-semibold text-[#1e2749]">Retention Intent</span>
-                    <span className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">↑ Higher is better</span>
-                    <span className="text-xs px-2 py-0.5 bg-green-50 text-green-600 rounded-full font-medium">★ Exceptional</span>
-                  </div>
-                  <div className="grid grid-cols-3 gap-4 text-xs">
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">Industry</span>
-                        <span className="text-red-400 font-medium">2-4/10</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-red-300 rounded-full" style={{width: '30%'}}></div></div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">TDI Partners</span>
-                        <span className="text-[#1e2749] font-medium">5-7/10</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#1e2749] rounded-full" style={{width: '60%'}}></div></div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between mb-1">
-                        <span className="text-gray-500">Motown 360</span>
-                        <span className="text-[#4ecdc4] font-medium">9.8/10</span>
-                      </div>
-                      <div className="h-1.5 bg-gray-100 rounded-full"><div className="h-full bg-[#4ecdc4] rounded-full" style={{width: '98%'}}></div></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Grading Alignment (TBD) */}
-                <div className="rounded-lg p-3 -mx-3 bg-gray-50/50">
-                  <div className="flex items-center flex-wrap gap-2 mb-2">
-                    <span className="text-sm font-semibold text-gray-400">Grading Alignment</span>
-                    <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-500 rounded-full font-medium">Collecting after Spring assessment</span>
-                  </div>
-                  <p className="text-xs text-gray-400">Measures alignment between classroom grades and standardized test performance</p>
-                </div>
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
-                <p className="text-xs text-gray-500">Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys</p>
-                <button className="text-xs text-[#4ecdc4] font-medium hover:underline"
-                  onClick={() => navigateToSection('journey', 'leading-indicators')}>
-                  See full breakdown →
-                </button>
-              </div>
-            </div>
-
-            {/* Building Spotlight - Awards + Insights merged */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <Trophy className="w-5 h-5 text-amber-500" />
-                  <h3 className="text-base font-bold text-[#1e2749]">Building Spotlight</h3>
-                </div>
-                <span className="text-xs text-gray-500">Here&apos;s what we&apos;re noticing</span>
-              </div>
-              <p className="text-xs text-gray-500 mb-5">Celebrating wins and sharing ideas across your district</p>
-
-              <div className="space-y-2">
-                {[
-                  {
-                    id: 'spotlight-harmony',
-                    school: 'Harmony Elementary',
-                    staffInfo: '40 staff · K-5 · Champion: Ms. Rivera',
-                    medals: [
-                      { type: '🥇', award: 'Most Engaged', value: '95%' },
-                      { type: '🥇', award: 'Implementation', value: '34%' },
-                      { type: '🥈', award: 'Top Learners', value: '68%' },
-                      { type: '🥈', award: 'Wellness Leader', value: '5.2/10' },
-                      { type: '🥈', award: 'Retention', value: '9.5/10' },
-                      { type: '🥈', award: 'Movement Leader', value: '38' },
-                    ],
-                    insightType: 'celebrate',
-                    bgColor: 'bg-green-50',
-                    borderColor: 'border-green-100',
-                    insightText: "Harmony is leading the district with 2 golds and 4 silvers. Ms. Rivera's PLC structure gives teachers protected time to engage with Hub content - it's clearly working.",
-                    ctaButtons: [
-                      { label: "🎉 Congratulate Harmony's Team", style: 'bg-green-500 text-white hover:bg-green-600' },
-                      { label: '☕ Send Ms. Rivera a Coffee', style: 'bg-white text-green-600 border border-green-200 hover:bg-green-50' },
-                      { label: '💡 Suggest Ms. Rivera Present at Recap', style: 'bg-white text-[#1e2749] border border-gray-200 hover:bg-gray-50' },
-                    ],
-                    links: [
-                      { label: 'Listen: Ep. 12 "Building PLC Culture"', url: 'https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274', icon: 'Headphones' },
-                    ],
-                  },
-                  {
-                    id: 'spotlight-crescendo',
-                    school: 'Crescendo Middle',
-                    staffInfo: '38 staff · 6-8 · Champion: Mr. Okafor',
-                    medals: [
-                      { type: '🥇', award: 'Top Learners', value: '72%' },
-                      { type: '🥇', award: 'Movement Leader', value: '42' },
-                      { type: '🥈', award: 'Most Engaged', value: '91%' },
-                      { type: '🥈', award: 'Implementation', value: '28%' },
-                      { type: '🥈', award: 'Resource Champion', value: '76' },
-                      { type: '🥉', award: 'Wellness Leader', value: '5.8/10' },
-                    ],
-                    insightType: 'praise',
-                    bgColor: 'bg-blue-50',
-                    borderColor: 'border-blue-100',
-                    insightText: "Crescendo is solid across the board - 2 golds, 3 silvers, and 1 bronze. Mr. Okafor's team is the highest course-completing group in the district. Keep the momentum going.",
-                    ctaButtons: [],
-                    links: [],
-                  },
-                  {
-                    id: 'spotlight-melody',
-                    school: 'Melody Primary',
-                    staffInfo: '30 staff · PreK-2 · Champion: Mrs. Patel',
-                    medals: [
-                      { type: '🥇', award: 'Wellness Leader', value: '5.0/10' },
-                      { type: '🥉', award: 'Top Learners', value: '61%' },
-                      { type: '🥉', award: 'Implementation Champ', value: '22%' },
-                      { type: '🥉', award: 'Most Likely to Stay', value: '9.1/10' },
-                    ],
-                    insightType: 'celebrate',
-                    bgColor: 'bg-green-50',
-                    borderColor: 'border-green-100',
-                    insightText: "Melody has the lowest stress in the district at 5.0/10 - something is working here. Mrs. Patel's approach to staff wellness is worth exploring and sharing with other buildings.",
-                    ctaButtons: [
-                      { label: "🌟 Spotlight Melody's Wellness Approach", style: 'bg-green-500 text-white hover:bg-green-600' },
-                    ],
-                    links: [],
-                  },
-                  {
-                    id: 'spotlight-rhythm',
-                    school: 'Rhythm Academy',
-                    staffInfo: '42 staff · K-8 · Champion: Not yet assigned',
-                    medals: [
-                      { type: '🥇', award: 'Resource Champion', value: '92' },
-                      { type: '🥉', award: 'Most Engaged', value: '88%' },
-                    ],
-                    insightType: 'action',
-                    bgColor: 'bg-amber-50',
-                    borderColor: 'border-amber-100',
-                    insightText: "Rhythm leads the district in resource downloads (92!) but doesn't have a TDI Champion yet - that's the #1 lever for turning downloads into classroom practice. We'd also suggest scheduling the observation for early April to maximize the feedback window.",
-                    ctaButtons: [
-                      { label: 'Suggest a Champion for Rhythm →', style: 'bg-[#1e2749] text-white hover:bg-[#2a3a6b]' },
-                      { label: 'Suggest Observation Timing →', style: 'bg-white text-[#1e2749] border border-gray-200 hover:bg-gray-50' },
-                    ],
-                    links: [
-                      { label: 'Read: "Why TDI Champions Matter"', url: 'https://raehughart.substack.com', icon: 'BookOpen' },
-                    ],
-                  },
-                  {
-                    id: 'spotlight-cadence',
-                    school: 'Cadence K-8',
-                    staffInfo: '43 staff · K-8 · Champion: Dr. Nguyen',
-                    medals: [
-                      { type: '🥇', award: 'Most Likely to Stay', value: '9.8/10' },
-                      { type: '🥉', award: 'Resource Champion', value: '68' },
-                    ],
-                    insightType: 'suggestion',
-                    bgColor: 'bg-blue-50',
-                    borderColor: 'border-blue-100',
-                    insightText: "Cadence has the highest retention intent in the district (9.8/10!) and solid Hub logins, but course completion drops off at 55%. Something to consider: ask Dr. Nguyen to add a 15-minute 'Hub Focus' block to PLC meetings. Districts doing this see 30-40% completion jumps within one month.",
-                    ctaButtons: [
-                      { label: 'Share PLC Integration Idea →', style: 'bg-[#1e2749] text-white hover:bg-[#2a3a6b]' },
-                    ],
-                    links: [],
-                  },
-                  {
-                    id: 'spotlight-tempo',
-                    school: 'Tempo High',
-                    staffInfo: '45 staff · 9-12 · Champion: Coach Williams',
-                    medals: [
-                      { type: '🥉', award: 'Movement Leader', value: '35' },
-                    ],
-                    insightType: 'priority',
-                    bgColor: 'bg-amber-50',
-                    borderColor: 'border-amber-100',
-                    insightText: "Tempo has the lowest Hub engagement (82%) and highest stress (7.1/10) in the district. High school staff often carry more pressure from class sizes and testing demands. We'd suggest prioritizing the 'Burnout Prevention' and 'Joy-Finding' modules, and having Coach Williams lead a wellness check-in at the next staff meeting using TDI's 'Energy Audit' activity.",
-                    ctaButtons: [
-                      { label: 'Suggest Wellness Resources for Tempo →', style: 'bg-[#1e2749] text-white hover:bg-[#2a3a6b]' },
-                      { label: 'Suggest a Champion Check-in →', style: 'bg-white text-[#1e2749] border border-gray-200 hover:bg-gray-50' },
-                    ],
-                    links: [
-                      { label: 'Listen: "When the Job Feels Too Heavy"', url: 'https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274', icon: 'Headphones' },
-                      { label: 'Read: "Finding Joy in the Hard Seasons"', url: 'https://raehughart.substack.com', icon: 'BookOpen' },
-                    ],
-                  },
-                ].map((building) => (
-                  <div key={building.id} className={`rounded-xl border overflow-hidden ${building.borderColor}`}>
-                    {/* Collapsed header - always visible */}
-                    <button onClick={() => toggleSection(building.id)}
-                      className={`w-full p-4 flex items-start justify-between text-left hover:brightness-95 transition-all ${building.bgColor}`}>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-sm font-bold text-[#1e2749]">{building.school}</span>
-                          {/* Medal pills - compact, inline */}
-                          {building.medals.slice(0, 3).map((m, i) => (
-                            <span key={i} className="text-xs px-1.5 py-0.5 bg-white/70 rounded-full font-medium text-gray-600">
-                              {m.type} {m.award}
-                            </span>
-                          ))}
-                          {building.medals.length > 3 && (
-                            <span className="text-xs text-gray-400">+{building.medals.length - 3} more</span>
-                          )}
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1">{building.staffInfo}</p>
-                      </div>
-                      <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 ml-2 mt-1 transition-transform ${openSections[building.id] ? 'rotate-180' : ''}`} />
-                    </button>
-
-                    {/* Expanded detail */}
-                    {openSections[building.id] && (
-                      <div className="px-4 pb-4 bg-white border-t border-gray-100">
-                        {/* All medals */}
-                        {building.medals.length > 3 && (
-                          <div className="flex flex-wrap gap-1.5 mt-3 mb-3">
-                            {building.medals.map((m, i) => (
-                              <span key={i} className="text-xs px-2 py-1 bg-gray-50 rounded-full font-medium text-gray-600">
-                                {m.type} {m.award}: {m.value}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* Insight text */}
-                        <p className="text-sm text-gray-600 leading-relaxed mt-3 break-words">{building.insightText}</p>
-
-                        {/* TDI resource links */}
-                        {building.links.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-3">
-                            {building.links.map((link, i) => (
-                              <a key={i} href={link.url} target="_blank" rel="noopener noreferrer"
-                                className="text-xs text-[#4ecdc4] hover:underline flex items-center gap-1">
-                                <span>🎧</span> {link.label}
-                              </a>
-                            ))}
-                          </div>
-                        )}
-
-                        {/* CTA buttons */}
-                        {building.ctaButtons.length > 0 && (
-                          <div className="flex flex-wrap gap-2 mt-3">
-                            {building.ctaButtons.map((btn, i) => (
-                              <button key={i} onClick={handleDisabledClick} className={`text-xs px-4 py-2 rounded-lg transition-colors opacity-80 cursor-not-allowed ${btn.style}`}>
-                                {btn.label}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Celebration footer */}
-              <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-100">
-                <p className="text-xs text-green-700"><span className="font-semibold">Every building is above the national average</span> for PD engagement. Share these wins at staff meetings and board presentations!</p>
-              </div>
-            </div>
-
-            {/* Student Performance Snapshot */}
-            <div id="student-performance" className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  <h3 className="text-lg font-bold text-[#1e2749]">Student Performance</h3>
-                  <Tooltip content="TerraNova National Percentiles for grades 3-7.">
-                    <span></span>
-                  </Tooltip>
-                </div>
-                <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded-full">2024-25 Data</span>
-              </div>
-
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 mb-4">
-                <p className="text-sm text-amber-800">
-                  <span className="font-semibold">The Gap:</span> Classroom grades average <span className="font-bold text-green-600">A (90-100%)</span>, but TerraNova scores for grades 3-6 range from <Tooltip content="50th percentile = national average. Below 50th = room for growth."><span className="font-bold text-red-500">30th-58th percentile</span></Tooltip>.
-                </p>
-              </div>
-
-              {/* Compact subject averages */}
-              <div className="grid grid-cols-3 gap-4 mb-4">
-                {[
-                  { subject: 'Reading', avg: 43, color: '#ef4444' },
-                  { subject: 'Language', avg: 48, color: '#f59e0b' },
-                  { subject: 'Math', avg: 57, color: '#3b82f6' },
-                ].map((s) => (
-                  <div key={s.subject} className="text-center">
-                    <div className="relative w-20 h-20 mx-auto mb-2">
-                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                        <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
-                        <circle cx="18" cy="18" r="15.915" fill="none" stroke={s.color} strokeWidth="3"
-                          strokeDasharray={`${s.avg}, 100`} strokeLinecap="round" />
-                      </svg>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-lg font-bold" style={{color: s.color}}>{s.avg}th</span>
-                      </div>
-                    </div>
-                    <p className="text-xs font-medium text-gray-700">{s.subject}</p>
-                    <p className="text-xs text-gray-400">Avg. percentile (Gr. 3-6)</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* 7th grade highlight */}
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-3">
-                <span className="text-green-500 text-xl">✓</span>
-                <div>
-                  <p className="text-sm font-semibold text-green-700">7th Grade: Strong across all subjects</p>
-                  <p className="text-xs text-green-600">Reading 66th · Language 65th · Math 75th percentile</p>
-                </div>
-              </div>
-
-              <button className="mt-4 text-xs text-[#4ecdc4] font-medium hover:underline"
-                onClick={() => navigateToSection('journey', 'student-performance')}>
-                See full grade-by-grade breakdown →
-              </button>
-            </div>
-
-            {/* Hub Engagement Visual Section */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                  <Monitor className="w-5 h-5 text-[#4ecdc4]" />
-                  <h3 className="text-base font-bold text-[#1e2749]">Hub Engagement</h3>
-                </div>
-                <span className="text-xs text-gray-400">Updated Jan 13, 2026</span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Donut Chart - Login Rate */}
-                <div className="flex flex-col items-center">
-                  <div className="relative w-36 h-36">
-                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                      <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
-                      <circle cx="18" cy="18" r="15.915" fill="none" stroke="#4ecdc4" strokeWidth="3"
-                        strokeDasharray="87, 100" strokeLinecap="round" />
-                    </svg>
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <Tooltip content="Industry average: 40-50%. You're nearly 2x that.">
-                        <span className="text-3xl font-bold text-[#1e2749]">87%</span>
-                      </Tooltip>
-                      <span className="text-xs text-gray-500">logged in</span>
-                    </div>
-                  </div>
-                  <div className="mt-3 text-center">
-                    <p className="text-sm font-semibold text-[#1e2749]">Hub Logins</p>
-                    <p className="text-xs text-gray-500">223 of 255 staff</p>
-                    <p className="text-xs text-[#4ecdc4] font-medium mt-1">Goal: 100% by Observation Day</p>
-                  </div>
-                </div>
-
-                {/* Vertical Bar Chart - Engagement Depth */}
-                <div className="flex flex-col">
-                  <p className="text-sm font-semibold text-[#1e2749] mb-3">Engagement Depth</p>
-                  <div className="space-y-3 flex-1">
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Completed 1+ course</span>
-                        <span className="font-semibold text-[#1e2749]">68%</span>
-                      </div>
-                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#1e2749] rounded-full" style={{width: '68%'}}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Downloaded resources</span>
-                        <span className="font-semibold text-[#38618C]">74%</span>
-                      </div>
-                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#38618C] rounded-full" style={{width: '74%'}}></div>
-                      </div>
-                    </div>
-                    <div>
-                      <div className="flex justify-between text-xs mb-1">
-                        <span className="text-gray-600">Active this month</span>
-                        <span className="font-semibold text-[#4ecdc4]">52%</span>
-                      </div>
-                      <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#4ecdc4] rounded-full" style={{width: '52%'}}></div>
-                      </div>
-                    </div>
-                  </div>
-                  <Tooltip content="Active = at least one Hub interaction in the past 30 days.">
-                    <span className="text-xs text-gray-400 mt-2">What does this mean?</span>
-                  </Tooltip>
-                </div>
-
-                {/* Building Breakdown - Mini Horizontal Bars */}
-                <div className="flex flex-col">
-                  <p className="text-sm font-semibold text-[#1e2749] mb-3">By Building</p>
-                  <div className="space-y-2 flex-1">
-                    {[
-                      { name: 'Harmony Elementary', pct: 95, count: '38/40' },
-                      { name: 'Crescendo High', pct: 91, count: '41/45' },
-                      { name: 'Rhythm Academy', pct: 88, count: '37/42' },
-                      { name: 'Motown Early Learning', pct: 85, count: '34/40' },
-                      { name: 'Motown Middle', pct: 82, count: '37/45' },
-                      { name: 'Bridges Alternative', pct: 84, count: '36/43' },
-                    ].map((school) => (
-                      <div key={school.name} className="cursor-pointer hover:bg-gray-50 rounded p-1 -mx-1 transition-colors"
-                        onClick={() => setActiveTab('schools')}>
-                        <div className="flex justify-between text-xs mb-0.5">
-                          <span className="text-gray-600 truncate">{school.name}</span>
-                          <span className="font-medium text-gray-700 ml-2">{school.pct}%</span>
-                        </div>
-                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                          <div className="h-full rounded-full transition-all"
-                            style={{width: `${school.pct}%`, backgroundColor: school.pct >= 90 ? '#4ecdc4' : school.pct >= 85 ? '#38618C' : '#f59e0b'}}></div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-xs text-[#4ecdc4] mt-2 cursor-pointer hover:underline"
-                    onClick={() => setActiveTab('schools')}>
-                    View all buildings →
-                  </p>
-                </div>
-              </div>
-              <a href="https://tdi.thinkific.com" target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-xs text-[#4ecdc4] font-medium hover:underline mt-4">
-                <Monitor className="w-3.5 h-3.5" /> Open Learning Hub →
-              </a>
-
-              {/* Hub Extras - Love Notes & Virtual Sessions */}
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <button
-                  onClick={() => toggleSection('hub-extras')}
-                  className="w-full flex items-center justify-between py-2 text-left hover:bg-gray-50 rounded-lg px-2 -mx-2 transition-colors">
-                  <div className="flex items-center gap-2">
-                    <Heart className="w-4 h-4 text-pink-500" />
-                    <span className="text-sm font-medium text-gray-600">Love Notes & Coaching Sessions</span>
-                  </div>
-                  <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${openSections['hub-extras'] ? 'rotate-180' : ''}`} />
-                </button>
-                {openSections['hub-extras'] && (
-                  <div className="grid grid-cols-2 gap-4 mt-3">
-                    <div className="bg-pink-50 rounded-lg p-4 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center">
-                        <Heart className="w-5 h-5 text-pink-500" />
-                      </div>
-                      <div>
-                        <span className="text-xl font-bold text-[#1e2749]">277</span>
-                        <p className="text-xs text-gray-500">Love Notes sent</p>
-                      </div>
-                    </div>
-                    <div className="bg-purple-50 rounded-lg p-4 flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                        <Video className="w-5 h-5 text-purple-600" />
-                      </div>
-                      <div>
-                        <span className="text-xl font-bold text-[#1e2749]">3 of 6</span>
-                        <p className="text-xs text-gray-500">Virtual sessions complete</p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Action Items - Combined Needs Attention + Recommendations */}
-            <div id="action-items-section" className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <button
-                onClick={() => toggleSection('action-items')}
-                className="w-full p-5 flex items-center justify-between hover:bg-gray-50 transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center">
-                    <AlertCircle className="w-4 h-4 text-amber-500" />
-                  </div>
-                  <div className="text-left">
-                    <p className="text-sm font-bold text-[#1e2749]">Action Items</p>
-                    <p className="text-xs text-gray-500">{needsAttentionItems.filter(item => !isComplete(item.id)).length} to complete · 1 recommendation</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-xs px-2 py-1 bg-amber-50 text-amber-600 rounded-full font-medium">
-                    2 to schedule
-                  </span>
-                  <ChevronDown className={`w-5 h-5 text-gray-400 transition-transform ${openSections['action-items'] ? 'rotate-180' : ''}`} />
-                </div>
-              </button>
-
-              {openSections['action-items'] && (
-                <div className="px-5 pb-5 space-y-3 border-t border-gray-100 pt-4">
-                  {/* Active Items */}
-                  {needsAttentionItems
-                    .filter(item => !isComplete(item.id))
-                    .map(item => (
+                  <div className="text-3xl font-bold text-[#1e2749] mb-1">{overviewData.stats.phase.name}</div>
+                  <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{overviewData.stats.phase.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.phase.sublabel}</div>
+                  {/* Phase progress dots */}
+                  <div className="mt-3 flex gap-1.5">
+                    {Array.from({ length: overviewData.stats.phase.total }).map((_, i) => (
                       <div
-                        key={item.id}
-                        className={`rounded-lg p-4 flex items-center justify-between border transition-all ${
-                          isOverdue(item.deadlineMonth, item.deadlineYear)
-                            ? 'border-red-500 bg-red-50'
-                            : 'bg-gray-50 border-gray-200'
-                        }`}
-                      >
-                        <div className="flex items-center gap-3">
-                          <Calendar className={`w-5 h-5 ${
-                            isOverdue(item.deadlineMonth, item.deadlineYear)
-                              ? 'text-red-700'
-                              : 'text-[#E07A5F]'
-                          }`} />
-                          <div>
-                            <div className="font-medium text-[#1e2749]">{item.title}</div>
-                            <div className="text-sm text-gray-500">
-                              {item.description} ·{' '}
-                              {isOverdue(item.deadlineMonth, item.deadlineYear) ? (
-                                <span className="text-red-700 font-bold">OVERDUE</span>
-                              ) : (
-                                <span className="text-[#E07A5F] font-medium">DUE BY {item.deadline}</span>
-                              )}
-                            </div>
-                            {isOverdue(item.deadlineMonth, item.deadlineYear) && (
-                              <div className="text-xs text-red-600 mt-1">
-                                Warning: Without this completed, TDI cannot ensure partnership goals are met.
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2 ml-4">
-                          <span
-                            onClick={handleDisabledClick}
-                            className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 opacity-60 cursor-not-allowed ${
-                              isOverdue(item.deadlineMonth, item.deadlineYear)
-                                ? 'bg-red-700 text-white'
-                                : 'bg-[#35A7FF] text-white'
-                            }`}
-                            title="This is an example dashboard"
-                          >
-                            <Calendar className="w-4 h-4" />
-                            {item.actionLabel}
-                          </span>
-                          <span
-                            onClick={handleDisabledClick}
-                            className="px-3 py-2 bg-gray-100 text-gray-400 text-sm font-medium rounded-lg flex items-center gap-1 opacity-50 cursor-not-allowed"
-                            title="This is an example dashboard"
-                          >
-                            <Check className="w-4 h-4" />
-                            Done
-                          </span>
+                        key={i}
+                        className={`h-1.5 flex-1 rounded-full ${i < overviewData.stats.phase.number ? 'bg-[#1e2749]' : 'bg-gray-100'}`}
+                      />
+                    ))}
+                  </div>
+                </button>
+              </div>
+
+              {/* Partnership Health Indicator */}
+              <div className="bg-white rounded-2xl px-6 py-4 shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center gap-3">
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-sm shadow-green-200" />
+                  <span className="text-sm font-bold text-[#1e2749]">Partnership Momentum:</span>
+                  <span className="text-sm font-bold text-green-600">{overviewData.health.status}</span>
+                </div>
+                <div className="hidden md:block w-px h-4 bg-gray-200" />
+                <div className="flex flex-wrap gap-x-4 gap-y-1">
+                  {overviewData.health.details.map((d, i) => (
+                    <span key={i} className="text-xs text-gray-500">{d}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* ─── ZONE 2A: DONE / IN PROGRESS / COMING SOON ─── */}
+            <div>
+              <h3 className="text-base font-bold text-[#1e2749] mb-4">Partnership Timeline</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                {/* Done */}
+                <div className="bg-green-50 rounded-2xl p-5 border border-green-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-bold text-green-700">Done</span>
+                    <span className="ml-auto text-xs text-green-600 font-medium bg-green-100 px-2 py-0.5 rounded-full">
+                      {overviewData.timeline.done.length} completed
+                    </span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {overviewData.timeline.done.map((item, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400 mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{item.date}</div>
                         </div>
                       </div>
                     ))}
+                  </div>
+                </div>
 
-                  {/* Recommendation - Folded In */}
-                  <div className="rounded-lg p-4 bg-blue-50 border border-blue-100">
-                    <div className="flex items-start gap-3">
-                      <Lightbulb className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-blue-700 mb-1">Recommendation: Dedicated Hub Time</p>
-                        <p className="text-sm text-gray-600">
-                          Districts that build in 15-30 minutes of protected Hub time during PLCs or
-                          staff meetings see <Tooltip content="Based on TDI partner data 2023-2025."><span className="font-bold text-[#1e2749]">3x higher implementation rates</span></Tooltip>.
-                          We&apos;d suggest each building designate a TDI Champion.
-                        </p>
-                        <div className="flex flex-wrap gap-2 mt-3">
-                          <button className="text-xs px-3 py-1.5 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors">
-                            Add Hub time to PLC agenda
-                          </button>
-                          <button className="text-xs px-3 py-1.5 bg-white text-blue-600 rounded-lg border border-blue-200 hover:bg-blue-100 transition-colors">
-                            Designate building TDI Champions
-                          </button>
+                {/* In Progress */}
+                <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-4 h-4 rounded-full border-2 border-amber-500 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    </div>
+                    <span className="text-sm font-bold text-amber-700">In Progress</span>
+                    <span className="ml-auto text-xs text-amber-600 font-medium bg-amber-100 px-2 py-0.5 rounded-full">
+                      {overviewData.timeline.inProgress.length} active
+                    </span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {overviewData.timeline.inProgress.map((item, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{item.detail}</div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Completed Items */}
-                  {needsAttentionItems.filter(item => isComplete(item.id)).length > 0 && (
-                    <div className="mt-4 pt-4 border-t border-gray-100">
-                      <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
-                        Completed ({needsAttentionItems.filter(item => isComplete(item.id)).length})
-                      </div>
-                      <div className="space-y-2">
-                        {needsAttentionItems
-                          .filter(item => isComplete(item.id))
-                          .map(item => (
-                            <div
-                              key={item.id}
-                              className="flex items-center justify-between p-3 bg-gray-50 rounded-lg opacity-60"
-                            >
-                              <div className="flex items-center gap-3">
-                                <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
-                                  <Check className="w-4 h-4 text-emerald-600" />
-                                </div>
-                                <span className="text-gray-500 line-through">{item.title}</span>
-                              </div>
-                              <span
-                                onClick={handleDisabledClick}
-                                className="text-xs text-gray-400 cursor-not-allowed"
-                                title="This is an example dashboard"
-                              >
-                                Undo
-                              </span>
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* District-wide Movement */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-[#4ecdc4]" />
-                  <h3 className="text-lg font-bold text-[#1e2749]">District-wide Movement</h3>
-                </div>
-                <span className="text-xs text-gray-400">Updated Feb 7, 2026</span>
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {[
-                  { icon: Mail, label: 'Newsletter', value: 197, stat: '32% higher strategy adoption', link: 'https://raehughart.substack.com' },
-                  { icon: BookOpen, label: 'Blog Readers', value: 131, stat: '2.5x more likely to try new strategies', link: 'https://raehughart.substack.com' },
-                  { icon: Headphones, label: 'Podcast', value: 78, stat: '28% higher implementation rates', link: 'https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274' },
-                  { icon: Users, label: 'Community', value: 48, stat: '45% report feeling less isolated', link: 'https://www.facebook.com/groups/tdimovement' },
-                  { icon: FileText, label: 'Resources', value: 361, stat: '3x more classroom tools used', link: 'https://tdi.thinkific.com' },
-                  { icon: GraduationCap, label: 'Courses', value: 224, stat: '65% completion vs 10% industry avg', link: 'https://tdi.thinkific.com' },
-                ].map((channel) => (
-                  <a
-                    key={channel.label}
-                    href={channel.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-[#4ecdc4]/10 hover:shadow-md hover:scale-[1.02] transition-all duration-200 border border-transparent hover:border-[#4ecdc4]/30"
-                  >
-                    <channel.icon className="w-4 h-4 text-gray-400 group-hover:text-[#4ecdc4] flex-shrink-0 transition-colors" />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-bold text-[#1e2749]">{channel.value}</p>
-                      <p className="text-xs text-gray-500 truncate">{channel.label}</p>
-                      <p className="text-xs text-[#1e2749] font-semibold mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        ↗ {channel.stat}
-                      </p>
-                    </div>
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            {/* 2026-27 Teaser - Enhanced */}
-            <div
-              className="relative bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-6 text-white cursor-pointer hover:shadow-xl transition-all hover:scale-[1.01] mt-8 overflow-hidden group"
-              onClick={() => setActiveTab('next-year')}
-            >
-              {/* Decorative elements */}
-              <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-              <div className="absolute bottom-0 left-1/2 w-24 h-24 bg-white/5 rounded-full translate-y-1/2" />
-
-              <div className="relative z-10 flex justify-between items-center">
-                <div className="max-w-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs bg-[#4ecdc4] text-[#1e2749] px-3 py-1 rounded-full font-bold uppercase tracking-wide">Phase 3: SUSTAIN</span>
-                    <span className="text-xs bg-white/20 px-3 py-1 rounded-full">2026-27</span>
-                  </div>
-                  <h3 className="text-xl font-bold">Year 3: Make the Gains Permanent</h3>
-                  <p className="text-sm opacity-90 mt-2">
-                    You&apos;ve built momentum. Now lock it in with internal coaching capacity, peer observation circles, and systems that sustain beyond the partnership.
-                  </p>
-                  <div className="flex items-center gap-4 mt-4">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                        <TrendingUp className="w-4 h-4" />
-                      </div>
-                      <span className="text-xs">72% projected adoption</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
-                        <Award className="w-4 h-4" />
-                      </div>
-                      <span className="text-xs">40% internal coaches</span>
-                    </div>
+                    ))}
                   </div>
                 </div>
-                <div className="flex flex-col items-center">
-                  <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                    <ArrowRight className="w-6 h-6 group-hover:translate-x-1 transition-transform" />
+
+                {/* Coming Soon */}
+                <div className="bg-[#e8f5f5] rounded-2xl p-5 border border-[#38618C]/15">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Calendar className="w-4 h-4 text-[#38618C]" />
+                    <span className="text-sm font-bold text-[#38618C]">Coming Soon</span>
+                    <span className="ml-auto text-xs text-[#38618C] font-medium bg-[#38618C]/10 px-2 py-0.5 rounded-full">
+                      {overviewData.timeline.comingSoon.length} ahead
+                    </span>
                   </div>
-                  <p className="text-xs opacity-70 mt-2">See Year 3 Plan</p>
+                  <div className="space-y-2.5">
+                    {overviewData.timeline.comingSoon.map((item, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#38618C]/50 mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{item.date}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* FERPA / Data Privacy Note */}
-            <div className="mt-6 p-3 bg-gray-50 rounded-lg border border-gray-100">
-              <p className="text-xs text-gray-500">
-                🔒 <span className="font-medium text-gray-600">Data Privacy:</span> In your partnership dashboard,
-                access is role-based. Superintendents see district-wide data. Principals see only their building.
-                Teacher-level data is never displayed. All data handling follows FERPA guidelines.
-              </p>
+            {/* ─── ZONE 2B: YOUR INVESTMENT, BY THE NUMBERS ─── */}
+            <div>
+              <div className="bg-[#e8f5f5] rounded-2xl p-1 border border-[#38618C]/15">
+                <div className="px-5 pt-5 pb-3">
+                  <h3 className="text-base font-bold text-[#1e2749]">Your Investment, By The Numbers</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">What this partnership delivers — in impact and value</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#38618C]/10 rounded-xl overflow-hidden">
+                  {[
+                    { value: overviewData.investment.perEducator, label: 'per educator', sub: overviewData.investment.perEducatorSublabel },
+                    { value: overviewData.investment.implementationRate, label: 'retention intent', sub: overviewData.investment.implementationSublabel },
+                    { value: overviewData.investment.coursesCompleted, label: 'avg stress score', sub: overviewData.investment.coursesCompletedSublabel },
+                    { value: overviewData.investment.retentionStat, label: 'implementation', sub: overviewData.investment.retentionSublabel },
+                  ].map((stat, i) => (
+                    <div key={i} className="bg-white px-5 py-4">
+                      <div className="text-2xl font-bold text-[#38618C] mb-0.5">{stat.value}</div>
+                      <div className="text-xs font-semibold text-[#1e2749] mb-1">{stat.label}</div>
+                      <div className="text-xs text-gray-400 leading-snug">{stat.sub}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
+
+            {/* ─── ZONE 2C: QUICK WIN COUNTER ─── */}
+            <div className="bg-[#FDF8E7] rounded-2xl p-6 border border-[#F5C542]/30 text-center">
+              <div className="text-3xl mb-2">🎉</div>
+              <div className="text-lg font-bold text-[#1e2749] mb-1">{overviewData.quickWin.line1}</div>
+              <div className="text-sm text-gray-500">{overviewData.quickWin.line2}</div>
+            </div>
+
+            {/* ─── ZONE 3: ACTIONS ─── */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {/* Your Next Steps */}
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-[#1e2749] mb-4 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-amber-500" />
+                  Your Next Steps
+                </h3>
+                <div className="space-y-3">
+                  {overviewData.actions.nextToUnlock.map((item, i) => (
+                    <div key={i} className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{item.label}</div>
+                          <div className="text-xs text-gray-500 leading-snug">{item.detail}</div>
+                        </div>
+                      </div>
+                      {item.cta && (
+                        <a
+                          href={item.ctaHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#38618C] hover:underline"
+                        >
+                          {item.cta} <ArrowRight className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                  {overviewData.actions.tdiHandling.map((item, i) => (
+                    <div key={i} className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{item.label}</div>
+                          <div className="text-xs text-gray-500 leading-snug">{item.detail}</div>
+                        </div>
+                        <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full flex-shrink-0">
+                          TDI handling
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Already In Motion */}
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-[#1e2749] mb-4 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-green-500" />
+                  Already In Motion
+                </h3>
+                <div className="space-y-3">
+                  {overviewData.actions.alreadyInMotion.map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 bg-green-50 rounded-xl p-4 border border-green-100">
+                      <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-3.5 h-3.5 text-green-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-[#1e2749]">{item.label}</div>
+                        <div className="text-xs text-gray-500">{item.date}</div>
+                      </div>
+                      <span className="ml-auto text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full flex-shrink-0">
+                        Scheduled
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
           </div>
         )}
 
