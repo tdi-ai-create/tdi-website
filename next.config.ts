@@ -13,6 +13,11 @@ const nextConfig: NextConfig = {
         destination: '/paragametools',
         permanent: true,
       },
+      {
+        source: '/Allenwood-Dashboard',
+        destination: '/allenwood-dashboard',
+        permanent: true,
+      },
     ];
   },
 };
