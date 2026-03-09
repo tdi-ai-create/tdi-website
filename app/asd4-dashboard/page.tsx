@@ -1105,6 +1105,103 @@ Thank you for setting the example. It matters more than you know.`;
     { school: 'Wesley', total: 14, returning: 11, notSure: 2, notReturning: 1, riskLevel: 'low' }
   ];
 
+  const overviewData = {
+    // ZONE 1 - Snapshot
+    stats: {
+      educatorsEnrolled: { value: 114, total: 114, label: 'Paras Enrolled', sublabel: 'All seats filled' },
+      deliverables: { completed: 5, total: 11, label: 'Deliverables', sublabel: 'completed vs. contracted' },
+      hubEngagement: { percent: 85, raw: '97/114', label: 'Hub Engagement', sublabel: 'paras logged in' },
+      phase: { name: 'IGNITE', number: 1, total: 3, label: 'Current Phase', sublabel: 'Phase 1 of 3' },
+    },
+
+    // Partnership Health — TDI sets this manually
+    health: {
+      status: 'Strong',          // Strong | Building | On Track | Needs Attention
+      statusColor: 'green',      // green | yellow | blue | red
+      details: [
+        'Hub engagement at 85% — above target',
+        '91 course completions',
+        'Move #1 implementation at 91%',
+        '1 item remaining to schedule',
+      ],
+    },
+
+    // ZONE 2A - Timeline
+    timeline: {
+      done: [
+        { label: 'Partnership kickoff — The Moves That Matter Pt. 1', date: 'Jan 5, 2026' },
+        { label: 'Executive Impact Session 1', date: 'Jan 2026' },
+        { label: 'Hub access activated — all 114 paras enrolled', date: 'Jan 2026' },
+        { label: 'Pilot group identified', date: 'Jan 2026' },
+        { label: 'The Moves That Matter Pt. 2 — Observation Day 1', date: 'Feb 13, 2026' },
+        { label: 'Virtual Session 1', date: 'Mar 2, 2026' },
+        { label: 'Observation Day 1 — with survey data collection', date: 'Mar 3, 2026' },
+      ],
+      inProgress: [
+        { label: 'Hub engagement — 97 of 114 paras active', detail: '85% and growing' },
+        { label: 'Move #1 implementation tracking', detail: '91% across pilot group' },
+        { label: 'Move #2 implementation tracking', detail: '70% across pilot group' },
+        { label: 'March survey analysis — 95/114 responded', detail: '83% response rate' },
+      ],
+      comingSoon: [
+        { label: 'Observation Day 2', date: 'Mar 19, 2026' },
+        { label: 'Virtual Session 2', date: 'Apr 6, 2026' },
+        { label: 'Executive Impact Session 2', date: 'Apr 9, 2026' },
+        { label: 'Virtual Session 3', date: 'Apr 20, 2026' },
+        { label: 'Virtual Session 4', date: 'After Apr 20 — scheduling in progress' },
+        { label: 'End-of-year impact report', date: 'May 2026' },
+      ],
+    },
+
+    // ZONE 2B - Investment value mirror (PFAB Advantage + Benefit)
+    investment: {
+      perEducator: '$299',
+      perEducatorSublabel: 'per para — less than a one-day sub',
+      implementationRate: '91%',
+      implementationSublabel: 'Move #1 implementation — vs. 10% industry avg',
+      coursesCompleted: 91,
+      coursesCompletedSublabel: 'course completions this partnership',
+      retentionStat: '71%',
+      retentionSublabel: 'of paras plan to return next year',
+    },
+
+    // ZONE 2C - Quick win counter
+    quickWin: {
+      count: 97,
+      line1: '97 paraprofessionals have logged into the TDI Learning Hub this partnership.',
+      line2: 'That\'s 97 educators actively building skills for Addison students right now.',
+    },
+
+    // ZONE 3 - Actions
+    actions: {
+      nextToUnlock: [
+        {
+          label: 'Schedule Virtual Session 4',
+          detail: 'Schedule after April 20 — final session of the partnership',
+          owner: 'partner',  // partner | tdi | both
+          cta: 'Schedule via Calendly',
+          ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+        },
+      ],
+      tdiHandling: [
+        {
+          label: 'Observation Day 2 Prep',
+          detail: 'TDI is preparing — March 19, 2026',
+        },
+        {
+          label: 'Executive Impact Session 2 Prep',
+          detail: 'TDI is preparing — April 9, 2026',
+        },
+      ],
+      alreadyInMotion: [
+        { label: 'Observation Day 2', date: 'Mar 19, 2026', status: 'scheduled' },
+        { label: 'Virtual Session 2', date: 'Apr 6, 2026', status: 'scheduled' },
+        { label: 'Executive Impact Session 2', date: 'Apr 9, 2026', status: 'scheduled' },
+        { label: 'Virtual Session 3', date: 'Apr 20, 2026', status: 'scheduled' },
+      ],
+    },
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F5F5] overflow-x-hidden">
       {/* Compact Navigation */}
@@ -1197,401 +1294,294 @@ Thank you for setting the example. It matters more than you know.`;
 
         {/* ==================== OVERVIEW TAB ==================== */}
         {activeTab === 'overview' && (
-          <div className="space-y-6">
+          <div className="space-y-8 pb-8">
 
-            {/* Section 1: Stats Grid */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
-                <div className="flex items-center gap-2 mb-1">
-                  <Users className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-xs text-gray-500 uppercase">Paras Enrolled</span>
-                  <Tooltip text="Total paraprofessionals with Learning Hub access." position="bottom" iconSize={12} />
-                </div>
-                <div className="text-2xl font-bold text-[#1e2749]">114/114</div>
-                <div className="text-xs text-[#38618C] font-medium">Hub Access</div>
-              </div>
+            {/* ─── ZONE 1: PARTNERSHIP SNAPSHOT ─── */}
+            <div className="space-y-4">
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
-                <div className="flex items-center gap-2 mb-1">
-                  <LogIn className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-xs text-gray-500 uppercase">Hub Logins</span>
-                  <Tooltip text="Percentage of enrolled paras who have logged into the Learning Hub at least once. Industry average is ~40%." position="bottom" iconSize={12} />
-                </div>
-                <div className="text-2xl font-bold text-[#1e2749]">85%</div>
-                <div className="text-xs text-[#38618C] font-medium">97/114 logged in</div>
-                <div className="text-xs text-gray-400 mt-1">Goal: 100% — Observation Day 1 is March 3</div>
-              </div>
+              {/* Stat Cards Row */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-emerald-500">
-                <div className="flex items-center gap-2 mb-1">
-                  <Trophy className="w-4 h-4 text-emerald-500" />
-                  <span className="text-xs text-gray-500 uppercase">Course Completions</span>
-                  <Tooltip text="Total courses completed by paras — each one represents strategies ready to use in classrooms." position="bottom" iconSize={12} />
-                </div>
-                <div className="text-2xl font-bold text-emerald-600">91</div>
-                <div className="text-xs text-emerald-600 font-medium">courses completed</div>
-                <div className="text-xs text-gray-400 mt-1">27+ paras exploring courses</div>
-              </div>
-
-              <div
-                onClick={() => {
-                  document.getElementById('needs-attention-section')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#E07A5F] cursor-pointer hover:shadow-md transition-all"
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
-                  <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
-                  <Tooltip text="Action items to complete for your partnership. Click to view details." position="bottom" iconSize={12} />
-                </div>
-                <div className="text-2xl font-bold text-[#E07A5F]">{needsAttentionItems.filter(item => !isComplete(item.id)).length}</div>
-                <div className="text-xs text-[#E07A5F] font-medium">Items pending</div>
-              </div>
-            </div>
-
-            {/* Current Phase - Compact Inline */}
-            <div className="flex items-center gap-3 bg-[#ffba06]/10 border border-[#ffba06]/30 rounded-lg px-4 py-2">
-              <Flame className="w-5 h-5 text-[#ffba06]" />
-              <span className="text-sm font-semibold text-[#1e2749]">Current Phase:</span>
-              <span className="text-sm font-bold text-[#ffba06]">IGNITE</span>
-              <span className="text-xs text-gray-500">(Phase 1 — Building Foundation)</span>
-            </div>
-
-            {/* HERO: Implementation Card - FULL WIDTH with Tiered Comparison */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center gap-2 mb-4">
-                <BarChart3 className="w-5 h-5 text-[#38618C]" />
-                <h3 className="text-lg font-bold text-[#1e2749]">ASD4 Implementation — After 2 Sessions</h3>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6 mb-6">
-                {/* Move #1 */}
-                <div className="bg-[#ffba06]/10 rounded-xl p-4 border border-[#ffba06]/30">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-semibold text-[#1e2749]">Move #1: Questions Instead of Telling</span>
-                    <span className="text-3xl font-bold text-[#ffba06]">91%</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-2">69 of 76 paras who attended Part 1 are implementing</p>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div className="bg-[#ffba06] h-3 rounded-full" style={{width: '91%'}}></div>
-                  </div>
-                </div>
-
-                {/* Move #2 */}
-                <div className="bg-teal-50 rounded-xl p-4 border border-teal-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-semibold text-[#1e2749]">Move #2: Feedback Formula</span>
-                    <span className="text-3xl font-bold text-teal-600">70%</span>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-2">53 of 76 paras who attended Part 1 are implementing</p>
-                  <div className="w-full bg-gray-200 rounded-full h-3">
-                    <div className="bg-teal-500 h-3 rounded-full" style={{width: '70%'}}></div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Tiered Comparison */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">How this compares:</p>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-600 w-28">Industry Avg</span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div className="bg-gray-400 h-2 rounded-full" style={{width: '10%'}}></div>
-                    </div>
-                    <span className="text-sm font-medium text-gray-500 w-12 text-right">10%</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm text-gray-600 w-28">TDI Partners</span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div className="bg-[#ffba06]/50 h-2 rounded-full" style={{width: '65%'}}></div>
-                    </div>
-                    <span className="text-sm font-medium text-[#ffba06] w-12 text-right">65%</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-sm font-semibold text-[#1e2749] w-28">ASD4 Paras</span>
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div className="bg-gradient-to-r from-[#ffba06] to-teal-500 h-2 rounded-full" style={{width: '91%'}}></div>
-                    </div>
-                    <span className="text-sm font-bold text-[#1e2749] w-12 text-right">91%</span>
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-xs text-gray-400 mt-4 text-center">Self-reported after 2 in-person sessions · 62 practice reps · Survey Feb 13, 2026</p>
-            </div>
-
-            {/* Two-Card Row: Status Indicators */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Card 1: Wins */}
-              <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-4">
-                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <CheckCircle className="w-6 h-6 text-green-600" />
-                </div>
-                <div>
-                  <p className="font-semibold text-green-800">Exec Session 1 Complete</p>
-                  <p className="text-sm text-green-600">1/2 Exec · 5 sessions scheduled · 97 paras logged in</p>
-                </div>
-              </div>
-
-              {/* Card 2: 17 Paras Remaining */}
-              <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-4">
-                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Lightbulb className="w-6 h-6 text-amber-600" />
-                </div>
-                <div>
-                  <p className="font-semibold text-amber-800">17 Paras Remaining</p>
-                  <p className="text-sm text-amber-600">Try a walkthrough at your next meeting</p>
-                </div>
-              </div>
-            </div>
-
-            {/* What Your Paras Are Saying */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center gap-2 mb-4">
-                <Quote className="w-5 h-5 text-[#38618C]" />
-                <h3 className="text-lg font-bold text-[#1e2749]">What Your Paras Are Saying</h3>
-              </div>
-              <div className="space-y-4">
-                <div className="border-l-2 border-[#38618C]/30 pl-4">
-                  <p className="text-sm text-gray-700 italic">&ldquo;It was helpful collaborating with my peers and hearing their responses to different situations.&rdquo;</p>
-                  <p className="text-xs text-gray-500 mt-1">— Lincoln Elementary</p>
-                </div>
-                <div className="border-l-2 border-[#38618C]/30 pl-4">
-                  <p className="text-sm text-gray-700 italic">&ldquo;A lot of these games are relatable to our students that we work with. It&apos;s nice to also chat and discuss these students/situations together with our co-workers. Since we don&apos;t get time to discuss or chat about work. Thank you!&rdquo;</p>
-                  <p className="text-xs text-gray-500 mt-1">— Stone Elementary</p>
-                </div>
-                <div className="border-l-2 border-[#38618C]/30 pl-4">
-                  <p className="text-sm text-gray-700 italic">&ldquo;I really enjoyed the session because you guide us how we can help our students better.&rdquo;</p>
-                  <p className="text-xs text-gray-500 mt-1">— Fullerton Elementary</p>
-                </div>
-                <div className="border-l-2 border-[#38618C]/30 pl-4">
-                  <p className="text-sm text-gray-700 italic">&ldquo;Me encanta este tipo de sesiones de gran aprendizaje y practica para luego llevarlo a cabo a los estudiantes.&rdquo;</p>
-                  <p className="text-xs text-gray-500 mt-1">I love this type of session — great learning and practice to carry out with students.</p>
-                  <p className="text-xs text-gray-500">— Lincoln Elementary</p>
-                </div>
-              </div>
-              <p className="text-xs text-gray-400 mt-4 text-center">From post-session survey · February 13, 2026</p>
-            </div>
-
-            {/* Section 2: Needs Attention */}
-            <div id="needs-attention-section" className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center gap-2 mb-5">
-                <AlertCircle className="w-5 h-5 text-[#E07A5F]" />
-                <h3 className="text-lg font-bold text-[#1e2749]">Needs Attention</h3>
-                <span className="bg-[#E07A5F]/10 text-[#E07A5F] text-xs font-medium px-2 py-0.5 rounded-full">
-                  {needsAttentionItems.filter(item => !isComplete(item.id)).length} items
-                </span>
-              </div>
-
-              {/* Priority Now Section */}
-              {needsAttentionItems.filter(item => item.priority === 'now' && !isComplete(item.id)).length > 0 && (
-                <div className="mb-4">
-                  <p className="text-xs font-semibold text-[#E07A5F] uppercase tracking-wide mb-3">
-                    Priority Now ({needsAttentionItems.filter(item => item.priority === 'now' && !isComplete(item.id)).length})
-                  </p>
-                  <div className="space-y-3">
-                    {needsAttentionItems
-                      .filter(item => item.priority === 'now' && !isComplete(item.id))
-                      .map(item => (
-                        <div
-                          key={item.id}
-                          className="p-4 rounded-xl border-l-4 border-[#E07A5F] bg-gray-50"
-                        >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-[#E07A5F]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                                <item.icon className="w-5 h-5 text-[#E07A5F]" />
-                              </div>
-                              <div>
-                                <div className="font-medium text-[#1e2749]">{item.title}</div>
-                                <p className="text-sm text-gray-500">{item.description}</p>
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <span className="text-xs text-gray-400 hidden sm:inline">RESPOND BY {item.deadline}</span>
-                              <a
-                                href={item.actionUrl}
-                                target={item.external ? '_blank' : undefined}
-                                rel={item.external ? 'noopener noreferrer' : undefined}
-                                className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 hover:bg-[#2d3a5c] transition-colors"
-                              >
-                                {item.showCalendar && <Calendar className="w-4 h-4" />}
-                                {!item.showCalendar && <Mail className="w-4 h-4" />}
-                                {item.actionLabel}
-                              </a>
-                              <button
-                                onClick={() => toggleComplete(item.id)}
-                                className="inline-flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-700 text-sm font-medium rounded-lg transition-colors"
-                                title="Mark as complete"
-                              >
-                                <Check className="w-4 h-4" />
-                                Done
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Accordion Toggle */}
-              {needsAttentionItems.filter(item => item.priority === 'upcoming' && !isComplete(item.id)).length > 0 && (
+                {/* Paras Enrolled */}
                 <button
-                  onClick={() => setShowAllItems(!showAllItems)}
-                  className="w-full flex items-center justify-center gap-2 py-3 text-sm font-medium text-[#38618C] hover:text-[#2d4a6d] transition-colors border-t border-gray-100"
+                  onClick={() => setActiveTab('progress')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
                 >
-                  <ChevronDown className={`w-4 h-4 transition-transform ${showAllItems ? 'rotate-180' : ''}`} />
-                  {showAllItems ? 'Hide Additional Items' : `View All ${needsAttentionItems.filter(item => !isComplete(item.id)).length} Items`}
+                  <div className="flex items-center justify-between mb-3">
+                    <Users className="w-5 h-5 text-[#1A6B6B]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#1A6B6B] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#1A6B6B] mb-1">
+                    {overviewData.stats.educatorsEnrolled.value}/{overviewData.stats.educatorsEnrolled.total}
+                  </div>
+                  <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{overviewData.stats.educatorsEnrolled.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.educatorsEnrolled.sublabel}</div>
                 </button>
-              )}
 
-              {/* Accordion Content - Upcoming Items */}
-              {showAllItems && needsAttentionItems.filter(item => item.priority === 'upcoming' && !isComplete(item.id)).length > 0 && (
-                <div className="space-y-3 pt-3 border-t border-gray-100">
-                  {needsAttentionItems
-                    .filter(item => item.priority === 'upcoming' && !isComplete(item.id))
-                    .map(item => (
+                {/* Deliverables */}
+                <button
+                  onClick={() => setActiveTab('partnership')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <CheckCircle className="w-5 h-5 text-[#F5C542]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#1A6B6B] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#B8860B] mb-1">
+                    {overviewData.stats.deliverables.completed}/{overviewData.stats.deliverables.total}
+                  </div>
+                  <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{overviewData.stats.deliverables.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.deliverables.sublabel}</div>
+                  {/* Mini progress bar */}
+                  <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#F5C542] rounded-full transition-all"
+                      style={{ width: `${(overviewData.stats.deliverables.completed / overviewData.stats.deliverables.total) * 100}%` }}
+                    />
+                  </div>
+                </button>
+
+                {/* Hub Engagement */}
+                <button
+                  onClick={() => setActiveTab('progress')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <BookOpen className="w-5 h-5 text-[#1A6B6B]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#1A6B6B] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#1A6B6B] mb-1">{overviewData.stats.hubEngagement.percent}%</div>
+                  <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{overviewData.stats.hubEngagement.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.hubEngagement.raw} logged in</div>
+                  {/* Mini progress bar */}
+                  <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#1A6B6B] rounded-full transition-all"
+                      style={{ width: `${overviewData.stats.hubEngagement.percent}%` }}
+                    />
+                  </div>
+                </button>
+
+                {/* Current Phase */}
+                <button
+                  onClick={() => setActiveTab('blueprint')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <Target className="w-5 h-5 text-[#1B2A4A]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#1A6B6B] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#1B2A4A] mb-1">{overviewData.stats.phase.name}</div>
+                  <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{overviewData.stats.phase.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.phase.sublabel}</div>
+                  {/* Phase progress dots */}
+                  <div className="mt-3 flex gap-1.5">
+                    {Array.from({ length: overviewData.stats.phase.total }).map((_, i) => (
                       <div
-                        key={item.id}
-                        className="flex items-center justify-between p-4 rounded-xl border-l-4 border-[#ffba06] bg-gray-50"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-[#ffba06]/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <item.icon className="w-5 h-5 text-[#ffba06]" />
-                          </div>
-                          <div>
-                            <div className="font-medium text-[#1e2749]">{item.title}</div>
-                            <p className="text-sm text-gray-500">{item.description}</p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs text-gray-400 hidden sm:inline">SCHEDULE BY {item.deadline}</span>
-                          <a
-                            href={item.actionUrl}
-                            target={item.external ? '_blank' : undefined}
-                            rel={item.external ? 'noopener noreferrer' : undefined}
-                            className="bg-[#1e2749] text-white px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 hover:bg-[#2d3a5c] transition-colors"
-                          >
-                            {item.showCalendar && <Calendar className="w-4 h-4" />}
-                            {item.actionLabel}
-                          </a>
-                          <button
-                            onClick={() => toggleComplete(item.id)}
-                            className="inline-flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-700 text-sm font-medium rounded-lg transition-colors"
-                            title="Mark as complete"
-                          >
-                            <Check className="w-4 h-4" />
-                            Done
-                          </button>
+                        key={i}
+                        className={`h-1.5 flex-1 rounded-full ${i < overviewData.stats.phase.number ? 'bg-[#1B2A4A]' : 'bg-gray-100'}`}
+                      />
+                    ))}
+                  </div>
+                </button>
+              </div>
+
+              {/* Partnership Health Indicator */}
+              <div className="bg-white rounded-2xl px-6 py-4 shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center gap-3">
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="w-2.5 h-2.5 rounded-full bg-green-500 shadow-sm shadow-green-200" />
+                  <span className="text-sm font-bold text-[#1B2A4A]">Partnership Momentum:</span>
+                  <span className="text-sm font-bold text-green-600">{overviewData.health.status}</span>
+                </div>
+                <div className="hidden md:block w-px h-4 bg-gray-200" />
+                <div className="flex flex-wrap gap-x-4 gap-y-1">
+                  {overviewData.health.details.map((d, i) => (
+                    <span key={i} className="text-xs text-gray-500">{d}</span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* ─── ZONE 2A: DONE / IN PROGRESS / COMING SOON ─── */}
+            <div>
+              <h3 className="text-base font-bold text-[#1B2A4A] mb-4">Partnership Timeline</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                {/* Done */}
+                <div className="bg-green-50 rounded-2xl p-5 border border-green-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-bold text-green-700">Done</span>
+                    <span className="ml-auto text-xs text-green-600 font-medium bg-green-100 px-2 py-0.5 rounded-full">
+                      {overviewData.timeline.done.length} completed
+                    </span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {overviewData.timeline.done.map((item, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400 mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{item.date}</div>
                         </div>
                       </div>
                     ))}
-                </div>
-              )}
-
-              {/* Completed Items */}
-              {needsAttentionItems.filter(item => isComplete(item.id)).length > 0 && (
-                <div className="mt-6 pt-4 border-t border-gray-100">
-                  <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
-                    Completed ({needsAttentionItems.filter(item => isComplete(item.id)).length})
                   </div>
-                  <div className="space-y-2">
-                    {needsAttentionItems
-                      .filter(item => isComplete(item.id))
-                      .map(item => (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg opacity-60"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
-                              <Check className="w-4 h-4 text-emerald-600" />
-                            </div>
-                            <span className="text-gray-500 line-through">{item.title}</span>
-                          </div>
-                          <button
-                            onClick={() => toggleComplete(item.id)}
-                            className="text-xs text-gray-400 hover:text-gray-600 underline"
-                          >
-                            Undo
-                          </button>
+                </div>
+
+                {/* In Progress */}
+                <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-4 h-4 rounded-full border-2 border-amber-500 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    </div>
+                    <span className="text-sm font-bold text-amber-700">In Progress</span>
+                    <span className="ml-auto text-xs text-amber-600 font-medium bg-amber-100 px-2 py-0.5 rounded-full">
+                      {overviewData.timeline.inProgress.length} active
+                    </span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {overviewData.timeline.inProgress.map((item, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{item.detail}</div>
                         </div>
-                      ))}
+                      </div>
+                    ))}
                   </div>
                 </div>
-              )}
 
-              {/* Virtual Sessions Flexibility Note */}
-              <div className="mt-4 pt-3 border-t border-gray-100">
-                <p className="text-xs text-gray-500 italic">
-                  <span className="font-medium">Note:</span> Virtual sessions are flexible — combine them back-to-back, spread them out, whatever works best for your team.
-                </p>
-              </div>
-            </div>
-
-            {/* Section 3: Recommendation Card */}
-            <div className="bg-white border-l-4 border-[#38618C] rounded-r-xl p-5 shadow-sm">
-              <div className="flex flex-col gap-4">
-                <div className="flex-1">
-                  <h3 className="text-[#1e2749] font-bold mb-2 flex items-center gap-2">
-                    <Lightbulb className="w-5 h-5 text-[#ffba06]" />
-                    Recommendation: Dedicated Hub Time
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-2">
-                    Your paras are already at <strong className="text-[#38618C]">91% implementation</strong> — well above the TDI partner average of 65% and the industry average of 10%.
-                  </p>
-                  <p className="text-gray-600 text-sm mb-3">
-                    Districts that build in 15-30 minutes of protected Hub time see these gains sustain and grow through the rest of the school year.
-                  </p>
-                  <div className="flex flex-wrap gap-4">
-                    <a
-                      href="#"
-                      className="inline-flex items-center gap-2 text-[#38618C] hover:text-[#2d4a6d] font-medium text-sm transition-colors"
-                    >
-                      View Hub Walkthrough Guide
-                      <ArrowRight className="w-4 h-4" />
-                    </a>
-                    <a
-                      href="mailto:rae@teachersdeserveit.com"
-                      className="inline-flex items-center gap-2 text-[#38618C] hover:text-[#2d4a6d] font-medium text-sm transition-colors"
-                    >
-                      Questions? Reach out to Rae →
-                    </a>
+                {/* Coming Soon */}
+                <div className="bg-[#E8F5F5] rounded-2xl p-5 border border-[#1A6B6B]/15">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Calendar className="w-4 h-4 text-[#1A6B6B]" />
+                    <span className="text-sm font-bold text-[#1A6B6B]">Coming Soon</span>
+                    <span className="ml-auto text-xs text-[#1A6B6B] font-medium bg-[#1A6B6B]/10 px-2 py-0.5 rounded-full">
+                      {overviewData.timeline.comingSoon.length} ahead
+                    </span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {overviewData.timeline.comingSoon.map((item, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#1A6B6B]/50 mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{item.date}</div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* 2026-27 Teaser */}
-            <div
-              className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-[1.01]"
-              onClick={() => handleTabClick('year2')}
-            >
-              <div className="flex justify-between items-center">
-                <div>
-                  <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Looking Ahead</span>
-                  <h3 className="text-lg font-bold mt-2">2026-27 Partnership Plan — Year 2: ACCELERATE</h3>
-                  <p className="text-sm opacity-80 mt-1">
-                    Build on your <span className="text-[#ffba06] font-medium">91% implementation rate</span> with observation-based coaching cycles, building-level TDI Champions, and expanded teacher-para collaboration training.
-                  </p>
-                  <p className="text-sm mt-2">
-                    <span className="text-[#ffba06] font-medium">72% of Year 1 TDI partners</span>
-                    <span className="opacity-70"> continue to Year 2.</span>
-                  </p>
+            {/* ─── ZONE 2B: YOUR INVESTMENT, BY THE NUMBERS ─── */}
+            <div>
+              <div className="bg-[#E8F5F5] rounded-2xl p-1 border border-[#1A6B6B]/15">
+                <div className="px-5 pt-5 pb-3">
+                  <h3 className="text-base font-bold text-[#1B2A4A]">Your Investment, By The Numbers</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">What this partnership delivers — in impact and value</p>
                 </div>
-                <div className="text-right flex flex-col items-center">
-                  <ArrowRight className="w-8 h-8" />
-                  <p className="text-xs opacity-70">See Your 2026-27 Options</p>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#1A6B6B]/10 rounded-xl overflow-hidden">
+                  {[
+                    { value: overviewData.investment.perEducator, label: 'per para', sub: overviewData.investment.perEducatorSublabel },
+                    { value: overviewData.investment.implementationRate, label: 'Move #1 implemented', sub: overviewData.investment.implementationSublabel },
+                    { value: overviewData.investment.coursesCompleted, label: 'course completions', sub: overviewData.investment.coursesCompletedSublabel },
+                    { value: overviewData.investment.retentionStat, label: 'plan to return', sub: overviewData.investment.retentionSublabel },
+                  ].map((stat, i) => (
+                    <div key={i} className="bg-white px-5 py-4">
+                      <div className="text-2xl font-bold text-[#1A6B6B] mb-0.5">{stat.value}</div>
+                      <div className="text-xs font-semibold text-[#1B2A4A] mb-1">{stat.label}</div>
+                      <div className="text-xs text-gray-400 leading-snug">{stat.sub}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {/* Partnership Period Footer */}
-            <div className="text-center text-xs text-gray-400 mt-8 pt-4 border-t border-gray-100">
-              Partnership Period: January 2026 -  May 2026 · Hub Access: Through January 2027
+            {/* ─── ZONE 2C: QUICK WIN COUNTER ─── */}
+            <div className="bg-[#FDF8E7] rounded-2xl p-6 border border-[#F5C542]/30 text-center">
+              <div className="text-3xl mb-2">🎉</div>
+              <div className="text-lg font-bold text-[#1B2A4A] mb-1">{overviewData.quickWin.line1}</div>
+              <div className="text-sm text-gray-500">{overviewData.quickWin.line2}</div>
             </div>
+
+            {/* ─── ZONE 3: ACTIONS ─── */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {/* Next to Unlock */}
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-[#1B2A4A] mb-4 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-amber-500" />
+                  Next to Unlock
+                </h3>
+                <div className="space-y-3">
+                  {overviewData.actions.nextToUnlock.map((item, i) => (
+                    <div key={i} className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{item.label}</div>
+                          <div className="text-xs text-gray-500 leading-snug">{item.detail}</div>
+                        </div>
+                        <span className="text-xs font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full flex-shrink-0">
+                          Partner action
+                        </span>
+                      </div>
+                      {item.cta && (
+                        <a
+                          href={item.ctaHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#1A6B6B] hover:underline"
+                        >
+                          {item.cta} <ArrowRight className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+                  ))}
+                  {overviewData.actions.tdiHandling.map((item, i) => (
+                    <div key={i} className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-sm font-semibold text-[#1B2A4A] mb-0.5">{item.label}</div>
+                          <div className="text-xs text-gray-500 leading-snug">{item.detail}</div>
+                        </div>
+                        <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full flex-shrink-0">
+                          TDI handling
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Already In Motion */}
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-[#1B2A4A] mb-4 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-green-500" />
+                  Already In Motion
+                </h3>
+                <div className="space-y-3">
+                  {overviewData.actions.alreadyInMotion.map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 bg-green-50 rounded-xl p-4 border border-green-100">
+                      <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-3.5 h-3.5 text-green-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-[#1B2A4A]">{item.label}</div>
+                        <div className="text-xs text-gray-500">{item.date}</div>
+                      </div>
+                      <span className="ml-auto text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full flex-shrink-0">
+                        Scheduled
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
           </div>
         )}
 
