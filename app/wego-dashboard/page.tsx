@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import {
@@ -46,8 +46,35 @@ import {
   Headphones,
   Play,
   Globe,
-  ClipboardList
+  ClipboardList,
+  Map,
+  Zap
 } from 'lucide-react';
+
+// Helper Components for Our Partnership Tab
+const CollapsibleSection = ({
+  title, icon, defaultOpen = false, children,
+}: {
+  title: string; icon: React.ReactNode; defaultOpen?: boolean; children: React.ReactNode;
+}) => {
+  const [open, setOpen] = React.useState(defaultOpen);
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+      <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors">
+        <div className="flex items-center gap-2">{icon}<span className="text-sm font-semibold text-gray-900">{title}</span></div>
+        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && <div className="px-6 pb-6 pt-2 border-t border-gray-100">{children}</div>}
+    </div>
+  );
+};
+
+const SnapshotStat = ({ label, value }: { label: string; value: string }) => (
+  <div className="bg-gray-50 rounded-lg p-3">
+    <p className="text-xs text-gray-500 mb-0.5">{label}</p>
+    <p className="text-sm font-semibold text-gray-900">{value}</p>
+  </div>
+);
 
 export default function WegoDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -211,6 +238,332 @@ export default function WegoDashboard() {
     },
   };
 
+  // ===================== OUR PARTNERSHIP TAB DATA =====================
+  const partnershipData = {
+
+    // SECTION 1 — Partnership Goal
+    goal: {
+      quote: 'Every para at West Chicago D94 walks into a classroom feeling confident, prepared, and ready to make a difference for students.',
+      theme: 'Building a culture where paraprofessionals are developed, celebrated, and retained — year after year.',
+    },
+
+    // SECTION 2 — Classroom Observations
+    observations: [
+      {
+        id: 'obs-1',
+        dayNumber: 1,
+        date: 'November 12, 2025',
+        classroomsVisited: 8,
+        loveNotesDelivered: 8,
+        aiSummary: 'Across 8 West Chicago classrooms, paras showed strong student rapport and calm presence during challenging moments — the kind of relationship-first instincts that are hard to teach and easy to build on. One standout: a para in the Step Center used multi-modal communication tools entirely on her own initiative, demonstrating the kind of intentional, student-centered practice that defines high-impact support.',
+        details: {
+          narrative: 'TDI visited 8 classrooms on November 12. The observation focus was para-student interaction quality, positioning and proximity, and initial strategy awareness. What we found: a team with real relational instincts and strong potential for growth with targeted coaching.',
+          quotes: [
+            'She positioned herself at eye level with Jayden during the reading activity — that small shift made him visibly more engaged.',
+            'You have a natural gift for creating connection. Keep using that superpower.',
+          ],
+          resources: [
+            'Hub resource referenced: The Sentence Starter Guide — Confident Communication Made Easy',
+            'Hub course referenced: Building Relationships with Reluctant Students',
+          ],
+          nextFocus: 'Observation Day 2 expanded to 11 classrooms with focus on scaffolding, wait time, and communication with lead teachers.',
+        },
+      },
+      {
+        id: 'obs-2',
+        dayNumber: 2,
+        date: 'December 3, 2025',
+        classroomsVisited: 11,
+        loveNotesDelivered: 11,
+        aiSummary: 'All 19 WEGO paras have now been observed and received personalized Love Notes. Observation Day 2 expanded coverage to 11 classrooms and revealed a team increasingly confident in their classroom presence. Paras with high Hub engagement showed the strongest instructional moves — a direct connection between learning and doing that validates the Hub-first approach.',
+        details: {
+          narrative: 'TDI returned on December 3 to complete full-team observation coverage. The focus shifted to scaffolding techniques, intentional wait time, and teacher-para communication patterns. The growth from Day 1 was visible — paras who had logged into the Hub between visits showed more deliberate, strategy-driven moves.',
+          quotes: [
+            'I had no idea how much my positioning in the room was affecting the students.',
+            'Getting a Love Note was the first time in my career someone came to watch me work and left saying something kind.',
+          ],
+          resources: [
+            'Hub course referenced: The Proximity Principle',
+            'Hub course referenced: Collaborative Support Structures',
+          ],
+          nextFocus: 'Observation Day 3 focuses on Move #2 implementation — collaborative support structures and co-teaching alignment between paras and lead teachers.',
+        },
+      },
+      {
+        id: 'obs-3',
+        dayNumber: 3,
+        date: 'February 25, 2026',
+        classroomsVisited: 2,
+        loveNotesDelivered: 2,
+        aiSummary: 'Observation Day 3 completed. Focus was on Move #2 — collaborative support and co-teaching alignment. Early data shows paras are taking more ownership of instructional decisions alongside their lead teachers.',
+        details: {
+          narrative: 'TDI completed the third and final observation day of the IGNITE phase. This visit focused specifically on how paras are integrating Move #2 strategies — collaborative positioning, shared instructional moments, and proactive communication with lead teachers.',
+          quotes: [
+            'She didn\'t wait to be told what to do. She saw the gap and filled it.',
+          ],
+          resources: [
+            'Hub course referenced: Co-Teaching That Actually Works',
+          ],
+          nextFocus: 'Partnership moves into ACCELERATE phase — deeper coaching cycles, full Hub library access, and building toward Year 2.',
+        },
+      },
+    ],
+
+    // SECTION 3 — School Snapshot (CONDITIONAL)
+    snapshot: {
+      show: true,
+      districtName: 'West Chicago Community High School District 94',
+      state: 'Illinois',
+      staffCount: 19,
+      staffType: 'Paraprofessionals',
+      buildings: null,
+      principalTheme: 'Paraprofessional development and retention',
+      context: 'WEGO D94 serves a diverse high school population with a significant paraprofessional team supporting students across special education and bilingual settings. This partnership launched in Fall 2025 with a full-team Hub enrollment and three on-site observation days in Year 1.',
+    },
+
+    // SECTION 4 — Partnership Journey
+    journey: {
+      phases: [
+        {
+          name: 'IGNITE',
+          number: 1,
+          status: 'complete',
+          deliverables: [
+            { label: 'Hub access activated — all 19 paras enrolled', complete: true },
+            { label: '100% Hub login milestone achieved', complete: true },
+            { label: 'Observation Day 1 — 8 classrooms, 8 Love Notes', complete: true },
+            { label: 'Observation Day 2 — 11 classrooms, 11 Love Notes (all 19 paras observed)', complete: true },
+            { label: 'Observation Day 3 — Move #2 focus, 2 Love Notes', complete: true },
+            { label: 'Virtual Sessions 1–3 complete', complete: true },
+            { label: '21 total Love Notes delivered across the team', complete: true },
+          ],
+        },
+        {
+          name: 'ACCELERATE',
+          number: 2,
+          status: 'current',
+          deliverables: [
+            { label: 'Move #2 implementation tracking — collaborative support structures', complete: false },
+            { label: 'Virtual Sessions 4–6', complete: false },
+            { label: 'Mid-year leadership check-in', complete: false },
+            { label: 'Full Hub library access — all courses unlocked', complete: false },
+            { label: 'Year 2 planning conversation with Juan + Megan', complete: false },
+          ],
+        },
+        {
+          name: 'SUSTAIN',
+          number: 3,
+          status: 'upcoming',
+          deliverables: [
+            { label: 'Year-end data presentation to district leadership', complete: false },
+            { label: 'Year 2 partnership design + contract renewal', complete: false },
+            { label: 'Internal TDI champion identified and supported', complete: false },
+          ],
+        },
+      ],
+    },
+
+    // SECTION 5 — Sessions + Leadership Meetings
+    sessions: {
+      // 7 milestones — well above the 4-node threshold, timeline ACTIVE
+      milestones: [
+        { date: 'Sept 2025', label: 'Contract 1 Signed', status: 'complete' },
+        { date: 'Nov 2025', label: 'Obs Day 1', status: 'complete' },
+        { date: 'Dec 2025', label: 'Contract 2 + Obs Day 2', status: 'complete' },
+        { date: 'Jan 2026', label: 'Sessions 1–3', status: 'complete' },
+        { date: 'Feb 2026', label: 'Obs Day 3', status: 'complete' },
+        { date: 'Mar 2026', label: 'You Are Here', status: 'current' },
+        { date: 'Spring 2026', label: 'ACCELERATE Phase', status: 'upcoming' },
+      ],
+      completed: [
+        {
+          type: 'Observation',
+          label: 'Observation Day 1 — 8 classrooms, 8 Love Notes',
+          date: 'November 12, 2025',
+          badge: 'Complete',
+          note: 'See Observations section for full details',
+        },
+        {
+          type: 'Observation',
+          label: 'Observation Day 2 — 11 classrooms, 11 Love Notes (all 19 paras observed)',
+          date: 'December 3, 2025',
+          badge: 'Complete',
+          note: 'See Observations section for full details',
+        },
+        {
+          type: 'Virtual Session',
+          label: 'Virtual Session 1',
+          date: 'December 2025',
+          badge: 'Complete',
+        },
+        {
+          type: 'Virtual Session',
+          label: 'Virtual Session 2',
+          date: 'January 2026',
+          badge: 'Complete',
+        },
+        {
+          type: 'Virtual Session',
+          label: 'Virtual Session 3',
+          date: 'January 2026',
+          badge: 'Complete',
+        },
+        {
+          type: 'Observation',
+          label: 'Observation Day 3 — Move #2 focus',
+          date: 'February 25, 2026',
+          badge: 'Complete',
+          note: 'See Observations section for full details',
+        },
+      ],
+      upcoming: [
+        {
+          type: 'Virtual Session',
+          label: 'Virtual Session 4',
+          date: 'To be scheduled',
+          badge: 'Pending',
+          calendlyLink: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+        },
+        {
+          type: 'Virtual Session',
+          label: 'Virtual Session 5',
+          date: 'To be scheduled',
+          badge: 'Pending',
+          calendlyLink: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+        },
+        {
+          type: 'Virtual Session',
+          label: 'Virtual Session 6',
+          date: 'To be scheduled',
+          badge: 'Pending',
+          calendlyLink: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+        },
+        {
+          type: 'Leadership Meeting',
+          label: 'Mid-Year Check-In + Year 2 Planning',
+          date: 'To be scheduled',
+          badge: 'Pending',
+          calendlyLink: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+        },
+      ],
+      leadershipMeetings: [
+        {
+          label: 'Partnership Kickoff — Contract 1 (Juan Suarez)',
+          date: 'September 2025',
+          status: 'Complete',
+        },
+        {
+          label: 'Expanded Partnership — Contract 2 (Megan Payleitner)',
+          date: 'December 2025',
+          status: 'Complete',
+        },
+      ],
+    },
+
+    // SECTION 6 — Progress Snapshot (CONDITIONAL)
+    progress: {
+      show: true,
+      implementationRate: 89,
+      implementationLabel: '17 of 19 paras actively engaging with Hub content',
+      implementationComparison: 'More than 8x the 10% industry average for PD implementation',
+      hubAccess: { active: 17, total: 19, percent: 89 },
+      selfDirected: 11,
+      coursesCompleted: 26,
+    },
+
+    // SECTION 7 — Team Pulse (CONDITIONAL)
+    // HIDDEN — no survey data collected yet
+    teamPulse: {
+      show: false,
+      surveys: [],
+    },
+
+    // SECTION 8 — What We're Learning (CONDITIONAL)
+    learning: {
+      show: true,
+      moves: [
+        {
+          moveNumber: 1,
+          moveName: 'Calm Classroom Presence',
+          implementationRate: 84,
+          note: '84% of paras observed applying Move #1 strategies — calm redirection, proximity, and student-centered language across all three observation days.',
+        },
+        {
+          moveNumber: 2,
+          moveName: 'Collaborative Support Structures',
+          implementationRate: null,
+          note: 'Move #2 tracking began at Observation Day 3. Full implementation data coming after Virtual Sessions 4–6.',
+        },
+      ],
+    },
+
+    // SECTION 9 — Staff Champions (CONDITIONAL)
+    champions: {
+      show: true,
+      highFiveInstructions: 'Recognize your most engaged paras in one click — sends a personal email directly from your inbox.',
+      staff: [
+        { name: 'C. Treu', note: '27 engaged Hub days — most active para in the district', email: 'ctreu@d94.org' },
+        { name: 'R. Talbot', note: '14 engaged Hub days', email: 'rtalbot@d94.org' },
+        { name: 'C. Castellanos', note: '10 engaged Hub days', email: 'ccastellanos@d94.org' },
+        { name: 'I. Spear', note: '9 engaged Hub days', email: 'ispear@d94.org' },
+        { name: 'C. Espino', note: '7 engaged Hub days', email: 'cespino2@d94.org' },
+      ],
+    },
+
+    // SECTION 10 — What's Resonating (CONDITIONAL)
+    resonating: {
+      show: true,
+      hubLink: 'https://teachersdeserveit.com/hub',
+      topCourses: [
+        { title: 'Paraprofessional Foundations – Understanding Your Role & Impact', engagedStaff: 13 },
+        { title: 'Supporting Students Through Their Daily Schedule', engagedStaff: 12 },
+        { title: 'Communication That Clicks', engagedStaff: 8 },
+        { title: 'Effective Small-Group & One-on-One Instruction', engagedStaff: 8 },
+        { title: 'Building Strong Teacher-Para Partnerships', engagedStaff: 8 },
+      ],
+      totalCoursesStarted: 26,
+    },
+
+    // SECTION 11 — Your Team's Top Ask (CONDITIONAL)
+    // HIDDEN — no survey data collected yet
+    topAsk: {
+      show: false,
+      topBarrier: null,
+      recommendedActions: [],
+    },
+  };
+
+  // ObservationCard component for Our Partnership tab
+  const ObservationCard = ({ obs }: { obs: typeof partnershipData.observations[0] }) => {
+    const [detailsOpen, setDetailsOpen] = React.useState(false);
+    return (
+      <div className="px-6 py-4">
+        <div className="flex items-center gap-4 mb-3">
+          <div className="flex items-center gap-1.5">
+            <CheckCircle className="w-4 h-4 text-green-500" />
+            <span className="text-sm font-semibold text-gray-900">Observation Day {obs.dayNumber}</span>
+          </div>
+          <span className="text-xs text-gray-400">{obs.date}</span>
+          <span className="text-xs text-gray-500">{obs.classroomsVisited} classrooms</span>
+          <span className="text-xs text-gray-500">{obs.loveNotesDelivered} Love Notes</span>
+        </div>
+        <p className="text-sm text-gray-700 leading-relaxed mb-3">{obs.aiSummary}</p>
+        <button onClick={() => setDetailsOpen(!detailsOpen)} className="text-xs text-teal-600 hover:text-teal-800 font-medium flex items-center gap-1 transition-colors">
+          {detailsOpen ? 'Hide details' : 'View details'}
+          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${detailsOpen ? 'rotate-180' : ''}`} />
+        </button>
+        {detailsOpen && (
+          <div className="mt-4 space-y-4 border-t border-gray-100 pt-4">
+            <div><p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Observation Narrative</p><p className="text-sm text-gray-700 leading-relaxed">{obs.details.narrative}</p></div>
+            {obs.details.quotes.length > 0 && (<div><p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">What We Heard</p>{obs.details.quotes.map((q, i) => (<blockquote key={i} className="border-l-2 border-teal-300 pl-3 text-sm text-gray-600 italic mb-2">&quot;{q}&quot;</blockquote>))}</div>)}
+            {obs.details.resources.length > 0 && (<div><p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Hub Resources Referenced</p>{obs.details.resources.map((r, i) => (<p key={i} className="text-xs text-gray-600 flex items-center gap-1.5 mb-1"><BookOpen className="w-3 h-3 text-teal-500" /> {r}</p>))}</div>)}
+            <div><p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Next Observation Focus</p><p className="text-sm text-gray-600">{obs.details.nextFocus}</p></div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F5F5] overflow-x-hidden">
       {/* Compact Navigation */}
@@ -255,11 +608,12 @@ export default function WegoDashboard() {
       </section>
 
       {/* Tab Navigation */}
-      <div className="bg-white border-b border-gray-200 sticky top-14 z-40 shadow-sm">
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-3">
           <div className="flex justify-center gap-2 flex-wrap">
             {[
               { id: 'overview', label: 'Overview', icon: Eye },
+              { id: 'ourPartnership', label: 'Our Partnership', icon: Handshake },
               { id: 'journey-progress', label: 'Journey & Progress', icon: TrendingUp },
               { id: 'blueprint', label: 'Blueprint', icon: Star },
               { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
@@ -580,6 +934,363 @@ export default function WegoDashboard() {
                 </div>
               </div>
             </div>
+
+          </div>
+        )}
+
+        {/* ==================== OUR PARTNERSHIP TAB ==================== */}
+        {activeTab === 'ourPartnership' && (
+          <div className="space-y-6 pb-12">
+
+            {/* SECTION 1 — PARTNERSHIP GOAL */}
+            <div className="bg-white rounded-xl border border-gray-200 p-8 text-center shadow-sm">
+              <div className="inline-flex items-center gap-2 bg-teal-50 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">
+                <Target className="w-3.5 h-3.5" />
+                Your Partnership Goal
+              </div>
+              <blockquote className="text-xl font-semibold text-gray-900 leading-relaxed max-w-2xl mx-auto mb-3">
+                &quot;{partnershipData.goal.quote}&quot;
+              </blockquote>
+              <p className="text-sm text-gray-500 italic">{partnershipData.goal.theme}</p>
+            </div>
+
+            {/* SECTION 2 — CLASSROOM OBSERVATIONS */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-teal-600" />
+                  <h3 className="text-sm font-semibold text-gray-900">Classroom Observations</h3>
+                </div>
+                <span className="text-xs text-gray-400">{partnershipData.observations.length} observation days complete</span>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {partnershipData.observations.map((obs) => (
+                  <ObservationCard key={obs.id} obs={obs} />
+                ))}
+              </div>
+            </div>
+
+            {/* SECTION 3 — SCHOOL SNAPSHOT */}
+            {partnershipData.snapshot.show && (
+              <CollapsibleSection
+                title="School Snapshot"
+                icon={<Building className="w-4 h-4 text-blue-600" />}
+                defaultOpen={false}
+              >
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                  <SnapshotStat label="District" value={partnershipData.snapshot.districtName} />
+                  <SnapshotStat label="State" value={partnershipData.snapshot.state} />
+                  <SnapshotStat label="Staff in Partnership" value={`${partnershipData.snapshot.staffCount} ${partnershipData.snapshot.staffType}`} />
+                </div>
+                {partnershipData.snapshot.context && (
+                  <p className="mt-4 text-sm text-gray-600 leading-relaxed">{partnershipData.snapshot.context}</p>
+                )}
+              </CollapsibleSection>
+            )}
+
+            {/* SECTION 4 — PARTNERSHIP JOURNEY */}
+            <CollapsibleSection
+              title="Your Partnership Journey"
+              icon={<Map className="w-4 h-4 text-yellow-600" />}
+              defaultOpen={false}
+            >
+              <div className="space-y-4">
+                {partnershipData.journey.phases.map((phase) => (
+                  <div
+                    key={phase.name}
+                    className={`rounded-lg border p-4 ${
+                      phase.status === 'current'
+                        ? 'border-yellow-300 bg-yellow-50'
+                        : phase.status === 'complete'
+                        ? 'border-green-200 bg-green-50'
+                        : 'border-gray-200 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors'
+                    }`}
+                    onClick={phase.status === 'upcoming' ? () => setActiveTab('blueprint') : undefined}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                          phase.status === 'current'
+                            ? 'bg-yellow-400 text-yellow-900'
+                            : phase.status === 'complete'
+                            ? 'bg-green-500 text-white'
+                            : 'bg-gray-300 text-gray-600'
+                        }`}>
+                          Phase {phase.number}
+                        </span>
+                        <span className="text-sm font-semibold text-gray-900">{phase.name}</span>
+                        {phase.status === 'current' && (
+                          <span className="text-xs text-yellow-700 font-semibold">YOU ARE HERE</span>
+                        )}
+                        {phase.status === 'complete' && (
+                          <CheckCircle className="w-3.5 h-3.5 text-green-500" />
+                        )}
+                      </div>
+                      {phase.status === 'upcoming' && (
+                        <div className="flex items-center gap-1 text-xs text-gray-400">
+                          <span>See Blueprint</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </div>
+                      )}
+                    </div>
+                    <ul className="space-y-1 mt-2">
+                      {phase.deliverables.map((d, i) => (
+                        <li key={i} className="flex items-start gap-2 text-xs text-gray-700">
+                          <span className={`mt-0.5 flex-shrink-0 ${d.complete ? 'text-green-500' : 'text-gray-300'}`}>
+                            {d.complete ? '✓' : '○'}
+                          </span>
+                          {d.label}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </CollapsibleSection>
+
+            {/* SECTION 5 — SESSIONS + LEADERSHIP MEETINGS */}
+            <CollapsibleSection
+              title="Sessions + Leadership Meetings"
+              icon={<Calendar className="w-4 h-4 text-teal-600" />}
+              defaultOpen={false}
+            >
+              {partnershipData.sessions.milestones.length >= 4 && (
+                <div className="mb-6">
+                  <div className="flex items-center gap-0 overflow-x-auto pb-2">
+                    {partnershipData.sessions.milestones.map((m, i) => (
+                      <div key={i} className="flex items-center flex-shrink-0">
+                        <div className="flex flex-col items-center">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 text-xs font-bold ${
+                            m.status === 'complete'
+                              ? 'bg-teal-600 border-teal-600 text-white'
+                              : m.status === 'current'
+                              ? 'bg-yellow-400 border-yellow-400 text-yellow-900'
+                              : 'bg-white border-gray-300 text-gray-400'
+                          }`}>
+                            {m.status === 'complete' ? '✓' : i + 1}
+                          </div>
+                          <span className="text-xs text-gray-500 mt-1 text-center max-w-16 leading-tight">{m.label}</span>
+                          <span className="text-xs text-gray-400">{m.date}</span>
+                        </div>
+                        {i < partnershipData.sessions.milestones.length - 1 && (
+                          <div className={`h-0.5 w-8 flex-shrink-0 mb-5 ${
+                            partnershipData.sessions.milestones[i + 1].status !== 'upcoming' ? 'bg-teal-400' : 'bg-gray-200'
+                          }`} />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {partnershipData.sessions.completed.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Milestones Achieved</p>
+                  <div className="space-y-2">
+                    {partnershipData.sessions.completed.map((s, i) => (
+                      <div key={i} className="flex items-start gap-3 bg-green-50 rounded-lg px-4 py-3 border border-green-100">
+                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{s.label}</p>
+                          <p className="text-xs text-gray-500">{s.date}{s.note ? ` · ${s.note}` : ''}</p>
+                        </div>
+                        <span className="ml-auto text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full flex-shrink-0">{s.badge}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {partnershipData.sessions.leadershipMeetings.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Leadership Meetings</p>
+                  <div className="space-y-2">
+                    {partnershipData.sessions.leadershipMeetings.map((m, i) => (
+                      <div key={i} className="flex items-start gap-3 bg-blue-50 rounded-lg px-4 py-3 border border-blue-100">
+                        <Users className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{m.label}</p>
+                          <p className="text-xs text-gray-500">{m.date}</p>
+                        </div>
+                        <span className="ml-auto text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full flex-shrink-0">{m.status}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {partnershipData.sessions.upcoming.length > 0 && (
+                <div>
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Coming Up</p>
+                  <div className="space-y-2">
+                    {partnershipData.sessions.upcoming.map((s, i) => (
+                      <div key={i} className="flex items-start gap-3 bg-gray-50 rounded-lg px-4 py-3 border border-gray-100">
+                        <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-gray-900">{s.label}</p>
+                          <p className="text-xs text-gray-500">{s.date}</p>
+                        </div>
+                        {s.calendlyLink ? (
+                          <a
+                            href={s.calendlyLink}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs bg-teal-600 hover:bg-teal-700 text-white px-3 py-1.5 rounded-full flex-shrink-0 transition-colors"
+                          >
+                            Schedule
+                          </a>
+                        ) : (
+                          <span className="ml-auto text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full flex-shrink-0">{s.badge}</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </CollapsibleSection>
+
+            {/* SECTION 6 — PROGRESS SNAPSHOT */}
+            {partnershipData.progress.show && (
+              <CollapsibleSection
+                title="Progress Snapshot"
+                icon={<TrendingUp className="w-4 h-4 text-amber-600" />}
+                defaultOpen={false}
+              >
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="bg-amber-50 rounded-lg p-4 border border-amber-100">
+                    <p className="text-3xl font-bold text-amber-700">{partnershipData.progress.implementationRate}%</p>
+                    <p className="text-sm text-gray-700 mt-1">{partnershipData.progress.implementationLabel}</p>
+                    <p className="text-xs text-gray-500 mt-1 italic">{partnershipData.progress.implementationComparison}</p>
+                  </div>
+                  <div className="bg-teal-50 rounded-lg p-4 border border-teal-100">
+                    <p className="text-3xl font-bold text-teal-700">{partnershipData.progress.hubAccess.percent}%</p>
+                    <p className="text-sm text-gray-700 mt-1">Hub engagement — {partnershipData.progress.hubAccess.active}/{partnershipData.progress.hubAccess.total} paras active</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                    <p className="text-xl font-bold text-gray-800">{partnershipData.progress.hubAccess.active}/{partnershipData.progress.hubAccess.total}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Hub Access</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                    <p className="text-xl font-bold text-gray-800">{partnershipData.progress.selfDirected}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Self-Directed Learners</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-lg p-3 text-center">
+                    <p className="text-xl font-bold text-gray-800">{partnershipData.progress.coursesCompleted}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Course Completions</p>
+                  </div>
+                </div>
+              </CollapsibleSection>
+            )}
+
+            {/* SECTION 7 — TEAM PULSE — HIDDEN for WEGO */}
+            {partnershipData.teamPulse.show && partnershipData.teamPulse.surveys.length > 0 && (
+              <CollapsibleSection
+                title="Team Pulse"
+                icon={<Heart className="w-4 h-4 text-purple-600" />}
+                defaultOpen={false}
+              >
+                <p className="text-sm text-gray-500">Survey data will appear here after the first check-in is collected.</p>
+              </CollapsibleSection>
+            )}
+
+            {/* SECTION 8 — WHAT WE'RE LEARNING */}
+            {partnershipData.learning.show && (
+              <CollapsibleSection
+                title="What We're Learning"
+                icon={<BookOpen className="w-4 h-4 text-indigo-600" />}
+                defaultOpen={false}
+              >
+                <div className="space-y-4">
+                  {partnershipData.learning.moves.map((move) => (
+                    <div key={move.moveNumber} className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-gray-900">Move #{move.moveNumber}: {move.moveName}</span>
+                        {move.implementationRate !== null ? (
+                          <span className="text-sm font-bold text-teal-700">{move.implementationRate}%</span>
+                        ) : (
+                          <span className="text-xs text-gray-400">Tracking in Sessions 4–6</span>
+                        )}
+                      </div>
+                      {move.implementationRate !== null && (
+                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                          <div
+                            className="bg-teal-500 h-2 rounded-full"
+                            style={{ width: `${move.implementationRate}%` }}
+                          />
+                        </div>
+                      )}
+                      <p className="text-xs text-gray-600">{move.note}</p>
+                    </div>
+                  ))}
+                </div>
+              </CollapsibleSection>
+            )}
+
+            {/* SECTION 9 — STAFF CHAMPIONS */}
+            {partnershipData.champions.show && partnershipData.champions.staff.length > 0 && (
+              <CollapsibleSection
+                title="Staff Champions"
+                icon={<Star className="w-4 h-4 text-yellow-500" />}
+                defaultOpen={false}
+              >
+                <p className="text-xs text-gray-500 mb-4 italic">{partnershipData.champions.highFiveInstructions}</p>
+                <div className="space-y-2">
+                  {partnershipData.champions.staff.map((s, i) => (
+                    <div key={i} className="flex items-center justify-between bg-yellow-50 rounded-lg px-4 py-3 border border-yellow-100">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">{s.name}</p>
+                        <p className="text-xs text-gray-500">{s.note}</p>
+                      </div>
+                      <a
+                        href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(s.email)}&su=${encodeURIComponent('A High Five From Your Admin!')}&body=${encodeURIComponent(`Hi ${s.name.split(' ')[0]},\n\nI just wanted to take a moment to recognize your dedication and the work you're putting in. TDI shared that you've been one of our most engaged learners — and it shows.\n\nKeep it up. Your students are lucky to have you.\n\nWith appreciation,`)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 text-xs font-semibold px-3 py-1.5 rounded-full transition-colors"
+                      >
+                        <Star className="w-3 h-3" /> High Five
+                      </a>
+                    </div>
+                  ))}
+                </div>
+              </CollapsibleSection>
+            )}
+
+            {/* SECTION 10 — WHAT'S RESONATING */}
+            {partnershipData.resonating.show && (
+              <CollapsibleSection
+                title="What's Resonating"
+                icon={<Zap className="w-4 h-4 text-orange-500" />}
+                defaultOpen={false}
+              >
+                <p className="text-xs text-gray-500 mb-4">{partnershipData.resonating.totalCoursesStarted} courses being actively explored across your team.{' '}
+                  <a href={partnershipData.resonating.hubLink} target="_blank" rel="noopener noreferrer" className="text-teal-600 hover:underline">View in Hub →</a>
+                </p>
+                <div className="space-y-2">
+                  {partnershipData.resonating.topCourses.map((course, i) => (
+                    <div key={i} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-gray-400 w-4">{i + 1}</span>
+                        <span className="text-sm text-gray-800">{course.title}</span>
+                      </div>
+                      <span className="text-xs text-gray-500">{course.engagedStaff} paras</span>
+                    </div>
+                  ))}
+                </div>
+              </CollapsibleSection>
+            )}
+
+            {/* SECTION 11 — TOP ASK — HIDDEN for WEGO */}
+            {partnershipData.topAsk.show && (
+              <CollapsibleSection
+                title="Your Team's Top Ask"
+                icon={<MessageSquare className="w-4 h-4 text-rose-500" />}
+                defaultOpen={false}
+              >
+                <p className="text-sm text-gray-500">Staff feedback will appear here after the first survey check-in.</p>
+              </CollapsibleSection>
+            )}
 
           </div>
         )}
