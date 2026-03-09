@@ -334,7 +334,7 @@ export default function WegoDashboard() {
             { label: 'Observation Day 1 — 8 classrooms, 8 Love Notes', complete: true },
             { label: 'Observation Day 2 — 11 classrooms, 11 Love Notes (all 19 paras observed)', complete: true },
             { label: 'Observation Day 3 — Move #2 focus, 2 Love Notes', complete: true },
-            { label: 'Virtual Sessions 1–3 complete', complete: true },
+            { label: 'In Person Check Ins 1–2 complete', complete: true },
             { label: '21 total Love Notes delivered across the team', complete: true },
           ],
         },
@@ -344,7 +344,7 @@ export default function WegoDashboard() {
           status: 'current',
           deliverables: [
             { label: 'Move #2 implementation tracking — collaborative support structures', complete: false },
-            { label: 'Virtual Sessions 4–6', complete: false },
+            { label: 'In Person Check Ins 3–5 (Mar, Apr, May)', complete: false },
             { label: 'Mid-year leadership check-in', complete: false },
             { label: 'Full Hub library access — all courses unlocked', complete: false },
             { label: 'Year 2 planning conversation with Juan + Megan', complete: false },
@@ -365,15 +365,14 @@ export default function WegoDashboard() {
 
     // SECTION 5 — Sessions + Leadership Meetings
     sessions: {
-      // 7 milestones — well above the 4-node threshold, timeline ACTIVE
+      // 6 milestones — clean timeline with key moments
       milestones: [
-        { date: 'Sept 2025', label: 'Contract 1 Signed', status: 'complete' },
+        { date: 'Oct 2025', label: 'Partnership Launched', status: 'complete' },
         { date: 'Nov 2025', label: 'Obs Day 1', status: 'complete' },
-        { date: 'Dec 2025', label: 'Contract 2 + Obs Day 2', status: 'complete' },
-        { date: 'Jan 2026', label: 'Sessions 1–3', status: 'complete' },
+        { date: 'Dec 2025', label: 'Obs Day 2', status: 'complete' },
         { date: 'Feb 2026', label: 'Obs Day 3', status: 'complete' },
         { date: 'Mar 2026', label: 'You Are Here', status: 'current' },
-        { date: 'Spring 2026', label: 'ACCELERATE Phase', status: 'upcoming' },
+        { date: 'May 2026', label: 'IGNITE Complete', status: 'upcoming' },
       ],
       completed: [
         {
@@ -384,6 +383,12 @@ export default function WegoDashboard() {
           note: 'See Observations section for full details',
         },
         {
+          type: 'In Person Check In',
+          label: 'In Person Check In 1',
+          date: 'November 17, 2025',
+          badge: 'Complete',
+        },
+        {
           type: 'Observation',
           label: 'Observation Day 2 — 11 classrooms, 11 Love Notes (all 19 paras observed)',
           date: 'December 3, 2025',
@@ -391,21 +396,9 @@ export default function WegoDashboard() {
           note: 'See Observations section for full details',
         },
         {
-          type: 'Virtual Session',
-          label: 'Virtual Session 1',
-          date: 'December 2025',
-          badge: 'Complete',
-        },
-        {
-          type: 'Virtual Session',
-          label: 'Virtual Session 2',
-          date: 'January 2026',
-          badge: 'Complete',
-        },
-        {
-          type: 'Virtual Session',
-          label: 'Virtual Session 3',
-          date: 'January 2026',
+          type: 'In Person Check In',
+          label: 'In Person Check In 2',
+          date: 'January 12, 2026',
           badge: 'Complete',
         },
         {
@@ -418,25 +411,22 @@ export default function WegoDashboard() {
       ],
       upcoming: [
         {
-          type: 'Virtual Session',
-          label: 'Virtual Session 4',
-          date: 'To be scheduled',
-          badge: 'Pending',
-          calendlyLink: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+          type: 'In Person Check In',
+          label: 'In Person Check In 3',
+          date: 'March 16, 2026',
+          badge: 'Scheduled',
         },
         {
-          type: 'Virtual Session',
-          label: 'Virtual Session 5',
-          date: 'To be scheduled',
-          badge: 'Pending',
-          calendlyLink: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+          type: 'In Person Check In',
+          label: 'In Person Check In 4',
+          date: 'April 13, 2026',
+          badge: 'Scheduled',
         },
         {
-          type: 'Virtual Session',
-          label: 'Virtual Session 6',
-          date: 'To be scheduled',
-          badge: 'Pending',
-          calendlyLink: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+          type: 'In Person Check In',
+          label: 'In Person Check In 5',
+          date: 'May 11, 2026',
+          badge: 'Scheduled',
         },
         {
           type: 'Leadership Meeting',
@@ -1055,30 +1045,34 @@ export default function WegoDashboard() {
               defaultOpen={false}
             >
               {partnershipData.sessions.milestones.length >= 4 && (
-                <div className="mb-6">
-                  <div className="flex items-center gap-0 overflow-x-auto pb-2">
-                    {partnershipData.sessions.milestones.map((m, i) => (
-                      <div key={i} className="flex items-center flex-shrink-0">
-                        <div className="flex flex-col items-center">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 text-xs font-bold ${
-                            m.status === 'complete'
-                              ? 'bg-teal-600 border-teal-600 text-white'
-                              : m.status === 'current'
-                              ? 'bg-yellow-400 border-yellow-400 text-yellow-900'
-                              : 'bg-white border-gray-300 text-gray-400'
+                <div className="mb-6 pb-6 border-b border-gray-100">
+                  <div className="relative">
+                    {/* Timeline line */}
+                    <div className="absolute top-4 left-0 right-0 h-0.5 bg-gray-200" />
+                    <div
+                      className="absolute top-4 left-0 h-0.5 bg-teal-500 transition-all"
+                      style={{
+                        width: `${(partnershipData.sessions.milestones.filter(m => m.status === 'complete').length / (partnershipData.sessions.milestones.length - 1)) * 100}%`
+                      }}
+                    />
+                    {/* Dots */}
+                    <div className="relative flex justify-between">
+                      {partnershipData.sessions.milestones.map((m, i) => (
+                        <div key={i} className="flex flex-col items-center" style={{ width: `${100 / partnershipData.sessions.milestones.length}%` }}>
+                          <span className="text-xs text-gray-400 text-center mb-1">{m.date}</span>
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center z-10 ${
+                            m.status === 'complete' ? 'bg-teal-500 text-white' :
+                            m.status === 'current' ? 'bg-white border-2 border-teal-500 text-teal-600' :
+                            'bg-white border-2 border-gray-300 text-gray-400'
                           }`}>
-                            {m.status === 'complete' ? '✓' : i + 1}
+                            {m.status === 'complete' ? <CheckCircle className="w-4 h-4" /> :
+                             m.status === 'current' ? <Star className="w-4 h-4" /> :
+                             <div className="w-2 h-2 rounded-full bg-gray-300" />}
                           </div>
-                          <span className="text-xs text-gray-500 mt-1 text-center max-w-16 leading-tight">{m.label}</span>
-                          <span className="text-xs text-gray-400">{m.date}</span>
+                          <span className="text-xs text-gray-600 text-center leading-tight mt-1">{m.label}</span>
                         </div>
-                        {i < partnershipData.sessions.milestones.length - 1 && (
-                          <div className={`h-0.5 w-8 flex-shrink-0 mb-5 ${
-                            partnershipData.sessions.milestones[i + 1].status !== 'upcoming' ? 'bg-teal-400' : 'bg-gray-200'
-                          }`} />
-                        )}
-                      </div>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
