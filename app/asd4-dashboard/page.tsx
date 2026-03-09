@@ -1063,7 +1063,7 @@ Thank you for setting the example. It matters more than you know.`;
     { id: 'blueprint', label: 'Blueprint', icon: Star },
     { id: 'year2', label: '2026-27', icon: Sparkles, badge: 'Preview' },
     { id: 'team', label: 'Team', icon: User },
-    { id: 'billing', label: 'Billing', icon: CreditCard, alert: true },
+    { id: 'billing', label: 'Billing', icon: CreditCard },
   ];
 
   // March 2, 2026 Check-In Survey Data (95 of 114 paras responded - 83%)
@@ -1176,12 +1176,10 @@ Thank you for setting the example. It matters more than you know.`;
                 className={`relative flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all whitespace-nowrap ${
                   activeTab === tab.id
                     ? 'bg-[#1e2749] text-white shadow-md'
-                    : tab.alert
-                    ? 'bg-red-50 text-red-700 border border-red-200 ring-2 ring-red-500 ring-offset-2'
                     : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
                 }`}
               >
-                <tab.icon className={`w-4 h-4 ${tab.alert && activeTab !== tab.id ? 'text-red-600' : ''}`} />
+                <tab.icon className="w-4 h-4" />
                 <span>{tab.label}</span>
                 {tab.badge && (
                   <span className="text-xs bg-[#35A7FF] text-white px-2 py-0.5 rounded-full">
@@ -4308,29 +4306,7 @@ Thank you for setting the example. It matters more than you know.`;
               </div>
             </div>
 
-            {/* Section 2: Overdue Status Banner */}
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center">
-                    <AlertCircle className="w-5 h-5 text-red-600" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-red-800">Payment Overdue</div>
-                    <div className="text-sm text-red-600">Please contact our billing team to resolve</div>
-                  </div>
-                </div>
-                <a
-                  href="mailto:Billing@Teachersdeserveit.com?subject=Payment Resolution - Addison School District 4"
-                  className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
-                >
-                  <Mail className="w-4 h-4" />
-                  Contact TDI Billing Team
-                </a>
-              </div>
-            </div>
-
-            {/* Section 3: Your Agreements (NO amounts shown) */}
+            {/* Section 2: Your Agreements (NO amounts shown) */}
             <div className="bg-white rounded-xl p-5 shadow-sm">
               <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
                 <FileText className="w-5 h-5" />
