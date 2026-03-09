@@ -461,6 +461,110 @@ export default function StPeterChanelDashboard() {
     return { bg: '#9CA3AF', text: 'white', badge: 'Locked' };
   };
 
+  const overviewData = {
+    // ZONE 1 - Snapshot
+    stats: {
+      educatorsEnrolled: { value: 28, total: 25, label: 'Staff Engaged', sublabel: '112% — above contracted seats' },
+      deliverables: { completed: 8, total: 10, label: 'Deliverables', sublabel: 'completed vs. contracted' },
+      hubEngagement: { percent: 100, raw: '28/25', label: 'Hub Engagement', sublabel: 'all contracted staff active' },
+      phase: { name: 'ACCELERATE', number: 2, total: 3, label: 'Current Phase', sublabel: 'Phase 2 of 3' },
+    },
+
+    // Partnership Health — TDI sets this manually
+    health: {
+      status: 'On Track',
+      statusColor: 'blue',   // green | blue | yellow | red
+      details: [
+        'Hub engagement at 100% — all contracted staff active',
+        'Both observations complete',
+        'Partner engaged — supporting capacity through spring',
+        '3 sessions remaining to schedule',
+      ],
+    },
+
+    // ZONE 2A - Timeline
+    timeline: {
+      done: [
+        { label: 'Partnership kickoff — Foundation phase', date: 'Fall 2025' },
+        { label: 'Hub access activated — all 25 staff enrolled', date: 'Fall 2025' },
+        { label: 'Observation Day 1 — classroom visits + Love Notes', date: 'Fall 2025' },
+        { label: 'Observation Day 2 — classroom visits + Love Notes', date: 'Winter 2025-26' },
+        { label: 'Growth Group: Instructional Design — sessions completed', date: 'Winter 2025-26' },
+        { label: 'Growth Group: Class Management — sessions completed', date: 'Winter 2025-26' },
+        { label: 'Phase 1 complete — moved to ACCELERATE', date: 'Early 2026' },
+        { label: 'Phase 2 launched — full staff implementation', date: '2026' },
+      ],
+      inProgress: [
+        { label: 'Hub engagement — 28 staff actively using the Hub', detail: '100% of contracted seats + 3 additional' },
+        { label: 'Top course: Calm Classrooms, Not Chaos', detail: '13 staff engaged' },
+        { label: 'Classroom Management Toolkit', detail: '6 staff engaged' },
+        { label: 'Communication that Clicks', detail: '5 staff engaged' },
+      ],
+      comingSoon: [
+        { label: 'Spring Leadership Recap', date: 'Due April 2026' },
+        { label: 'Virtual session — Instructional Design group', date: 'Due May 2026' },
+        { label: 'Virtual session — Class Management group', date: 'Due May 2026' },
+      ],
+    },
+
+    // ZONE 2B - Investment value mirror
+    investment: {
+      perEducator: '$446',
+      perEducatorSublabel: 'per educator — less than a one-day sub',
+      implementationRate: '100%',
+      implementationSublabel: 'hub engagement — all contracted staff active',
+      coursesCompleted: 22,
+      coursesCompletedSublabel: 'staff with tracked course engagement',
+      retentionStat: '85%',
+      retentionSublabel: 'of TDI partners continue to Year 2',
+    },
+
+    // ZONE 2C - Quick win counter
+    quickWin: {
+      count: 28,
+      line1: '28 educators are actively using the TDI Learning Hub at St. Peter Chanel.',
+      line2: 'That\'s 3 more than contracted — your staff is showing up on their own.',
+    },
+
+    // ZONE 3 - Actions
+    actions: {
+      nextToUnlock: [
+        {
+          label: 'Schedule Spring Leadership Recap',
+          detail: 'Review progress + set goals for next year — due April 2026',
+          owner: 'partner',
+          cta: 'Schedule via Calendly',
+          ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+        },
+        {
+          label: 'Schedule Virtual Session — Instructional Design Group',
+          detail: 'Included in contract — due May 2026',
+          owner: 'partner',
+          cta: 'Schedule via Calendly',
+          ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+        },
+        {
+          label: 'Schedule Virtual Session — Class Management Group',
+          detail: 'Included in contract — due May 2026',
+          owner: 'partner',
+          cta: 'Schedule via Calendly',
+          ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+        },
+      ],
+      tdiHandling: [
+        {
+          label: 'Spring Leadership Recap Prep',
+          detail: 'TDI preparing progress summary for April session',
+        },
+      ],
+      alreadyInMotion: [
+        { label: 'Both observations complete', date: 'Done', status: 'complete' },
+        { label: 'All 25 contracted seats filled', date: 'Done — plus 3 additional', status: 'complete' },
+        { label: 'Growth Groups running', date: 'Instructional Design + Class Management', status: 'scheduled' },
+      ],
+    },
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F5F5] overflow-x-hidden">
       {/* Compact Navigation */}
@@ -547,272 +651,294 @@ export default function StPeterChanelDashboard() {
         
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
-          <div className="space-y-6">
-            {/* Quick Stats */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
-                <div className="flex items-center gap-2 mb-1">
-                  <Users className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-xs text-gray-500 uppercase">Staff Enrolled</span>
-                </div>
-                <div className="text-2xl font-bold text-[#1e2749]">25/25</div>
-                <div className="text-xs text-[#38618C] font-medium">Complete</div>
-              </div>
+          <div className="space-y-8 pb-8">
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
-                <div className="flex items-center gap-2 mb-1">
-                  <Eye className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-xs text-gray-500 uppercase">Observations</span>
-                </div>
-                <div className="text-2xl font-bold text-[#1e2749]">2<span className="text-lg font-normal text-gray-400">/2</span></div>
-                <div className="text-xs text-green-600 font-medium">Complete</div>
-              </div>
+            {/* ─── ZONE 1: PARTNERSHIP SNAPSHOT ─── */}
+            <div className="space-y-4">
 
-              <div
-                onClick={() => {
-                  document.getElementById('needs-attention-section')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-                className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#E07A5F] cursor-pointer hover:shadow-md transition-all"
-              >
-                <div className="flex items-center gap-2 mb-1">
-                  <AlertCircle className="w-4 h-4 text-[#E07A5F]" />
-                  <span className="text-xs text-gray-500 uppercase">Needs Attention</span>
-                </div>
-                <div className="text-2xl font-bold text-[#E07A5F]">3</div>
-                <div className="text-xs text-[#E07A5F] font-medium">Items pending</div>
-              </div>
+              {/* Stat Cards Row */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
 
-              <div className="bg-white rounded-xl p-4 shadow-sm border-l-4 border-[#38618C]">
-                <div className="flex items-center gap-2 mb-1">
-                  <TrendingUp className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-xs text-gray-500 uppercase">Current Phase</span>
-                </div>
-                <div className="text-2xl font-bold text-[#1e2749]">Phase 2</div>
-                <div className="text-xs text-[#38618C] font-medium">ACCELERATE</div>
-              </div>
-            </div>
-
-            {/* Health Check - Goals Only */}
-            <div className="bg-white rounded-xl p-5 shadow-sm">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <Activity className="w-5 h-5 text-[#38618C]" />
-                  <span className="font-semibold text-[#1e2749]">Health Check</span>
-                </div>
-                <span className="text-xs text-gray-400">Updated Jan 13, 2026</span>
-              </div>
-
-              {/* Row 1: Partnership Goals */}
-              <div className="grid grid-cols-3 gap-4 mb-4">
-
-                {/* Hub Logins */}
-                <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">100%</div>
-                  <div className="text-xs text-gray-600 mt-1">Hub Logins</div>
-                  <div className="text-xs text-green-600 mt-1">✓ Goal Exceeded</div>
-                </div>
-
-                {/* Love Notes */}
-                <div className="text-center p-3 bg-green-50 rounded-lg">
-                  <div className="text-2xl font-bold text-green-600">25</div>
-                  <div className="text-xs text-gray-600 mt-1">Love Notes Sent</div>
-                  <div className="text-xs text-green-600 mt-1">✓ Complete</div>
-                </div>
-
-                {/* Virtual Sessions */}
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-center p-3 bg-[#E07A5F]/10 rounded-lg hover:bg-[#E07A5F]/20 transition-all cursor-pointer block"
+                {/* Staff Engaged */}
+                <button
+                  onClick={() => setActiveTab('progress')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#38618C]/20 transition-all group"
                 >
-                  <div className="text-2xl font-bold text-[#E07A5F]">0/2</div>
-                  <div className="text-xs text-gray-600 mt-1">Virtual Sessions</div>
-                  <div className="text-xs text-[#E07A5F] mt-1 font-medium hover:underline">Schedule Now →</div>
-                </a>
+                  <div className="flex items-center justify-between mb-3">
+                    <Users className="w-5 h-5 text-[#38618C]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#38618C] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#38618C] mb-1">
+                    {overviewData.stats.educatorsEnrolled.value}/{overviewData.stats.educatorsEnrolled.total}
+                  </div>
+                  <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{overviewData.stats.educatorsEnrolled.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.educatorsEnrolled.sublabel}</div>
+                </button>
 
+                {/* Deliverables */}
+                <button
+                  onClick={() => setActiveTab('blueprint')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#38618C]/20 transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <CheckCircle className="w-5 h-5 text-[#F5C542]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#38618C] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#B8860B] mb-1">
+                    {overviewData.stats.deliverables.completed}/{overviewData.stats.deliverables.total}
+                  </div>
+                  <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{overviewData.stats.deliverables.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.deliverables.sublabel}</div>
+                  {/* Mini progress bar */}
+                  <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#F5C542] rounded-full transition-all"
+                      style={{ width: `${(overviewData.stats.deliverables.completed / overviewData.stats.deliverables.total) * 100}%` }}
+                    />
+                  </div>
+                </button>
+
+                {/* Hub Engagement */}
+                <button
+                  onClick={() => setActiveTab('progress')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#38618C]/20 transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <BookOpen className="w-5 h-5 text-[#38618C]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#38618C] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#38618C] mb-1">{overviewData.stats.hubEngagement.percent}%</div>
+                  <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{overviewData.stats.hubEngagement.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.hubEngagement.raw} logged in</div>
+                  {/* Mini progress bar */}
+                  <div className="mt-3 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#38618C] rounded-full transition-all"
+                      style={{ width: `${overviewData.stats.hubEngagement.percent}%` }}
+                    />
+                  </div>
+                </button>
+
+                {/* Current Phase */}
+                <button
+                  onClick={() => setActiveTab('blueprint')}
+                  className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#38618C]/20 transition-all group"
+                >
+                  <div className="flex items-center justify-between mb-3">
+                    <Target className="w-5 h-5 text-[#1e2749]" />
+                    <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#38618C] transition-colors" />
+                  </div>
+                  <div className="text-3xl font-bold text-[#1e2749] mb-1">{overviewData.stats.phase.name}</div>
+                  <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{overviewData.stats.phase.label}</div>
+                  <div className="text-xs text-gray-500">{overviewData.stats.phase.sublabel}</div>
+                  {/* Phase progress dots */}
+                  <div className="mt-3 flex gap-1.5">
+                    {Array.from({ length: overviewData.stats.phase.total }).map((_, i) => (
+                      <div
+                        key={i}
+                        className={`h-1.5 flex-1 rounded-full ${i < overviewData.stats.phase.number ? 'bg-[#1e2749]' : 'bg-gray-100'}`}
+                      />
+                    ))}
+                  </div>
+                </button>
               </div>
 
-              {/* Divider */}
-              <div className="border-t border-gray-100 my-4"></div>
-
-              {/* Row 2: Movement Involvement */}
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <Heart className="w-4 h-4 text-[#38618C]" />
-                  <span className="text-sm font-medium text-[#1e2749]">Movement Involvement</span>
+              {/* Partnership Health Indicator */}
+              <div className="bg-white rounded-2xl px-6 py-4 shadow-sm border border-gray-100 flex flex-col md:flex-row md:items-center gap-3">
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-sm shadow-blue-200" />
+                  <span className="text-sm font-bold text-[#1e2749]">Partnership Momentum:</span>
+                  <span className="text-sm font-bold text-blue-600">{overviewData.health.status}</span>
                 </div>
-                <span className="text-xs text-gray-400">Updated Jan 14, 2026</span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
-                {/* Blog Readers */}
-                <a href="https://raehughart.substack.com" target="_blank" rel="noopener noreferrer"
-                   className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
-                  <Mail className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-[#1e2749]">9</div>
-                  <div className="text-xs text-gray-600 mt-1">Blog Readers</div>
-                </a>
-
-                {/* Podcast Listeners */}
-                <a href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274" target="_blank" rel="noopener noreferrer"
-                   className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
-                  <Headphones className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-[#1e2749]">1</div>
-                  <div className="text-xs text-gray-600 mt-1">Podcast Listeners</div>
-                </a>
-
-                {/* Community Members */}
-                <a href="https://www.facebook.com/groups/tdimovement" target="_blank" rel="noopener noreferrer"
-                   className="text-center p-3 bg-gray-50 rounded-lg hover:bg-[#35A7FF]/10 transition-all group">
-                  <Users className="w-5 h-5 text-[#38618C] group-hover:text-[#35A7FF] mx-auto mb-1" />
-                  <div className="text-lg font-bold text-[#1e2749]">2</div>
-                  <div className="text-xs text-gray-600 mt-1">Community Members</div>
-                </a>
+                <div className="hidden md:block w-px h-4 bg-gray-200" />
+                <div className="flex flex-wrap gap-x-4 gap-y-1">
+                  {overviewData.health.details.map((d, i) => (
+                    <span key={i} className="text-xs text-gray-500">{d}</span>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Needs Attention */}
-            <div id="needs-attention-section" className="bg-[#E07A5F]/5 border border-[#E07A5F]/20 rounded-xl p-5">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-[#E07A5F]" />
-                  <span className="font-semibold text-[#E07A5F] uppercase tracking-wide">Needs Attention</span>
-                </div>
-                <span className="text-sm text-[#E07A5F] bg-white px-2 py-1 rounded-full">
-                  {needsAttentionItems.filter(item => !isComplete(item.id)).length} items
-                </span>
-              </div>
+            {/* ─── ZONE 2A: DONE / IN PROGRESS / COMING SOON ─── */}
+            <div>
+              <h3 className="text-base font-bold text-[#1e2749] mb-4">Partnership Timeline</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
-              {/* Active Items */}
-              <div className="space-y-3">
-                {needsAttentionItems
-                  .filter(item => !isComplete(item.id))
-                  .map(item => (
-                    <div
-                      key={item.id}
-                      className={`rounded-lg p-4 flex items-center justify-between border transition-all ${
-                        isOverdue(item.deadlineMonth, item.deadlineYear)
-                          ? 'border-red-500 bg-red-50'
-                          : 'bg-white border-gray-100'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <Calendar className={`w-5 h-5 ${
-                          isOverdue(item.deadlineMonth, item.deadlineYear)
-                            ? 'text-red-700'
-                            : 'text-[#E07A5F]'
-                        }`} />
+                {/* Done */}
+                <div className="bg-green-50 rounded-2xl p-5 border border-green-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-sm font-bold text-green-700">Done</span>
+                    <span className="ml-auto text-xs text-green-600 font-medium bg-green-100 px-2 py-0.5 rounded-full">
+                      {overviewData.timeline.done.length} completed
+                    </span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {overviewData.timeline.done.map((item, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-400 mt-1.5 flex-shrink-0" />
                         <div>
-                          <div className="font-medium text-[#1e2749]">{item.title}</div>
-                          <div className="text-sm text-gray-500">
-                            {item.description} ·{' '}
-                            {isOverdue(item.deadlineMonth, item.deadlineYear) ? (
-                              <span className="text-red-700 font-bold">OVERDUE</span>
-                            ) : (
-                              <span className="text-[#E07A5F] font-medium">DUE BY {item.deadline}</span>
-                            )}
-                          </div>
+                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{item.date}</div>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2 ml-4">
+                    ))}
+                  </div>
+                </div>
+
+                {/* In Progress */}
+                <div className="bg-amber-50 rounded-2xl p-5 border border-amber-100">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-4 h-4 rounded-full border-2 border-amber-500 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                    </div>
+                    <span className="text-sm font-bold text-amber-700">In Progress</span>
+                    <span className="ml-auto text-xs text-amber-600 font-medium bg-amber-100 px-2 py-0.5 rounded-full">
+                      {overviewData.timeline.inProgress.length} active
+                    </span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {overviewData.timeline.inProgress.map((item, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{item.detail}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Coming Soon */}
+                <div className="bg-[#E8F5F5] rounded-2xl p-5 border border-[#38618C]/15">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Calendar className="w-4 h-4 text-[#38618C]" />
+                    <span className="text-sm font-bold text-[#38618C]">Coming Soon</span>
+                    <span className="ml-auto text-xs text-[#38618C] font-medium bg-[#38618C]/10 px-2 py-0.5 rounded-full">
+                      {overviewData.timeline.comingSoon.length} ahead
+                    </span>
+                  </div>
+                  <div className="space-y-2.5">
+                    {overviewData.timeline.comingSoon.map((item, i) => (
+                      <div key={i} className="flex gap-2.5">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#38618C]/50 mt-1.5 flex-shrink-0" />
+                        <div>
+                          <div className="text-xs font-medium text-gray-700 leading-snug">{item.label}</div>
+                          <div className="text-xs text-gray-400 mt-0.5">{item.date}</div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* ─── ZONE 2B: YOUR INVESTMENT, BY THE NUMBERS ─── */}
+            <div>
+              <div className="bg-[#E8F5F5] rounded-2xl p-1 border border-[#38618C]/15">
+                <div className="px-5 pt-5 pb-3">
+                  <h3 className="text-base font-bold text-[#1e2749]">Your Investment, By The Numbers</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">What this partnership delivers — in impact and value</p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#38618C]/10 rounded-xl overflow-hidden">
+                  {[
+                    { value: overviewData.investment.perEducator, label: 'per educator', sub: overviewData.investment.perEducatorSublabel },
+                    { value: overviewData.investment.implementationRate, label: 'hub engagement', sub: overviewData.investment.implementationSublabel },
+                    { value: overviewData.investment.coursesCompleted, label: 'staff engaged', sub: overviewData.investment.coursesCompletedSublabel },
+                    { value: overviewData.investment.retentionStat, label: 'partners return', sub: overviewData.investment.retentionSublabel },
+                  ].map((stat, i) => (
+                    <div key={i} className="bg-white px-5 py-4">
+                      <div className="text-2xl font-bold text-[#38618C] mb-0.5">{stat.value}</div>
+                      <div className="text-xs font-semibold text-[#1e2749] mb-1">{stat.label}</div>
+                      <div className="text-xs text-gray-400 leading-snug">{stat.sub}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* ─── ZONE 2C: QUICK WIN COUNTER ─── */}
+            <div className="bg-[#FDF8E7] rounded-2xl p-6 border border-[#F5C542]/30 text-center">
+              <div className="text-3xl mb-2">🎉</div>
+              <div className="text-lg font-bold text-[#1e2749] mb-1">{overviewData.quickWin.line1}</div>
+              <div className="text-sm text-gray-500">{overviewData.quickWin.line2}</div>
+            </div>
+
+            {/* ─── ZONE 3: ACTIONS ─── */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {/* Next to Unlock */}
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-[#1e2749] mb-4 flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-amber-500" />
+                  Next to Unlock
+                </h3>
+                <div className="space-y-3">
+                  {overviewData.actions.nextToUnlock.map((item, i) => (
+                    <div key={i} className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{item.label}</div>
+                          <div className="text-xs text-gray-500 leading-snug">{item.detail}</div>
+                        </div>
+                        <span className="text-xs font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full flex-shrink-0">
+                          Partner action
+                        </span>
+                      </div>
+                      {item.cta && (
                         <a
-                          href={item.actionUrl}
+                          href={item.ctaHref}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={`px-4 py-2 rounded-lg text-sm font-semibold whitespace-nowrap flex items-center gap-2 ${
-                            isOverdue(item.deadlineMonth, item.deadlineYear)
-                              ? 'bg-red-700 text-white'
-                              : 'bg-[#35A7FF] text-white'
-                          }`}
+                          className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-[#38618C] hover:underline"
                         >
-                          <Calendar className="w-4 h-4" />
-                          {item.actionLabel}
+                          {item.cta} <ArrowRight className="w-3 h-3" />
                         </a>
-                        <button
-                          onClick={() => toggleComplete(item.id)}
-                          className="px-3 py-2 bg-gray-100 hover:bg-emerald-100 text-gray-600 hover:text-emerald-700 text-sm font-medium rounded-lg transition-colors flex items-center gap-1"
-                          title="Mark as complete"
-                        >
-                          <Check className="w-4 h-4" />
-                          Done
-                        </button>
+                      )}
+                    </div>
+                  ))}
+                  {overviewData.actions.tdiHandling.map((item, i) => (
+                    <div key={i} className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{item.label}</div>
+                          <div className="text-xs text-gray-500 leading-snug">{item.detail}</div>
+                        </div>
+                        <span className="text-xs font-medium bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full flex-shrink-0">
+                          TDI handling
+                        </span>
                       </div>
                     </div>
                   ))}
+                </div>
               </div>
 
-              {/* Completed Items */}
-              {needsAttentionItems.filter(item => isComplete(item.id)).length > 0 && (
-                <div className="mt-6 pt-4 border-t border-[#E07A5F]/20">
-                  <div className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
-                    Completed ({needsAttentionItems.filter(item => isComplete(item.id)).length})
-                  </div>
-                  <div className="space-y-2">
-                    {needsAttentionItems
-                      .filter(item => isComplete(item.id))
-                      .map(item => (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between p-3 bg-white/50 rounded-lg opacity-60"
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center">
-                              <Check className="w-4 h-4 text-emerald-600" />
-                            </div>
-                            <span className="text-gray-500 line-through">{item.title}</span>
-                          </div>
-                          <button
-                            onClick={() => toggleComplete(item.id)}
-                            className="text-xs text-gray-400 hover:text-gray-600 underline"
-                          >
-                            Undo
-                          </button>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Hub Time Recommendation */}
-            <div className="bg-white border-l-4 border-[#38618C] rounded-r-xl p-5 shadow-sm">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <h3 className="text-[#1e2749] font-bold mb-2 flex items-center gap-2">
-                    <Lightbulb className="w-5 h-5 text-[#38618C]" />
-                    Recommendation: Dedicated Hub Time
-                  </h3>
-                  <p className="text-gray-600 text-sm mb-3">
-                    Schools that build in 15-30 minutes of protected time during PLCs or staff meetings see 3x higher implementation rates.
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="bg-[#F5F5F5] text-[#1e2749] px-3 py-1 rounded-full text-xs font-medium">Add Hub time to PLC agenda</span>
-                    <span className="bg-[#F5F5F5] text-[#1e2749] px-3 py-1 rounded-full text-xs font-medium">Share "Resource of the Week"</span>
-                  </div>
+              {/* Already In Motion */}
+              <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                <h3 className="text-sm font-bold text-[#1e2749] mb-4 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-green-500" />
+                  Already In Motion
+                </h3>
+                <div className="space-y-3">
+                  {overviewData.actions.alreadyInMotion.map((item, i) => (
+                    <div key={i} className="flex items-center gap-3 bg-green-50 rounded-xl p-4 border border-green-100">
+                      <div className="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-3.5 h-3.5 text-green-600" />
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-[#1e2749]">{item.label}</div>
+                        <div className="text-xs text-gray-500">{item.date}</div>
+                      </div>
+                      <span className="ml-auto text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full flex-shrink-0">
+                        {item.status === 'complete' ? 'Complete' : 'Scheduled'}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
 
-            {/* 2026-27 Teaser */}
-            <div
-              className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white cursor-pointer hover:shadow-lg transition-all hover:scale-[1.01] mt-8"
-              onClick={() => setActiveTab('next-year')}
-            >
-              <div className="flex justify-between items-center">
-                <div>
-                  <span className="text-xs bg-white/20 px-3 py-1 rounded-full">Looking Ahead</span>
-                  <h3 className="text-lg font-bold mt-2">2026-27 Partnership Plan</h3>
-                  <p className="text-sm opacity-80 mt-1">
-                    Based on your TerraNova data, we&apos;ve built a differentiation-focused plan for next year.
-                  </p>
-                </div>
-                <div className="text-right flex flex-col items-center">
-                  <span className="text-4xl">→</span>
-                  <p className="text-xs opacity-70">See the plan</p>
-                </div>
-              </div>
-            </div>
           </div>
         )}
 
