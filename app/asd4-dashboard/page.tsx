@@ -1066,9 +1066,9 @@ Thank you for setting the example. It matters more than you know.`;
     { id: 'billing', label: 'Billing', icon: CreditCard },
   ];
 
-  // March 2, 2026 Check-In Survey Data (95 of 114 paras responded - 83%)
+  // March 2, 2026 Check-In Survey Data (95 of 122 paras responded - 78%)
   const marchSurveyData = {
-    responseRate: { responded: 95, total: 114, percentage: 83 },
+    responseRate: { responded: 95, total: 122, percentage: 78 },
     confidence: {
       asking: { average: 3.92, rated4or5: 75 },
       feedback: { average: 3.71, rated4or5: 67 }
@@ -1108,9 +1108,9 @@ Thank you for setting the example. It matters more than you know.`;
   const overviewData = {
     // ZONE 1 - Snapshot
     stats: {
-      educatorsEnrolled: { value: 114, total: 114, label: 'Paras Enrolled', sublabel: 'All seats filled' },
+      educatorsEnrolled: { value: 122, total: 122, label: 'Paras Enrolled', sublabel: 'All seats filled' },
       deliverables: { completed: 5, total: 11, label: 'Deliverables', sublabel: 'completed vs. contracted' },
-      hubEngagement: { percent: 85, raw: '97/114', label: 'Hub Engagement', sublabel: 'paras logged in' },
+      hubEngagement: { percent: 100, raw: '122/122', label: 'Hub Engagement', sublabel: 'paras logged in' },
       phase: { name: 'IGNITE', number: 1, total: 3, label: 'Current Phase', sublabel: 'Phase 1 of 3' },
     },
 
@@ -1119,7 +1119,7 @@ Thank you for setting the example. It matters more than you know.`;
       status: 'Strong',          // Strong | Building | On Track | Needs Attention
       statusColor: 'green',      // green | yellow | blue | red
       details: [
-        'Hub engagement at 85% — above target',
+        'Hub engagement at 100% — all paras active',
         '91 course completions',
         'Move #1 implementation at 91%',
         '1 item remaining to schedule',
@@ -1131,17 +1131,17 @@ Thank you for setting the example. It matters more than you know.`;
       done: [
         { label: 'Partnership kickoff — The Moves That Matter Pt. 1', date: 'Jan 5, 2026' },
         { label: 'Executive Impact Session 1', date: 'Jan 2026' },
-        { label: 'Hub access activated — all 114 paras enrolled', date: 'Jan 2026' },
+        { label: 'Hub access activated — all 122 paras enrolled', date: 'Jan 2026' },
         { label: 'Pilot group identified', date: 'Jan 2026' },
         { label: 'The Moves That Matter Pt. 2 — Observation Day 1', date: 'Feb 13, 2026' },
         { label: 'Virtual Session 1', date: 'Mar 2, 2026' },
         { label: 'Observation Day 1 — with survey data collection', date: 'Mar 3, 2026' },
       ],
       inProgress: [
-        { label: 'Hub engagement — 97 of 114 paras active', detail: '85% and growing' },
+        { label: 'Hub engagement — 122 of 122 paras active', detail: '100% logged in' },
         { label: 'Move #1 implementation tracking', detail: '91% across pilot group' },
         { label: 'Move #2 implementation tracking', detail: '70% across pilot group' },
-        { label: 'March survey analysis — 95/114 responded', detail: '83% response rate' },
+        { label: 'March survey analysis — 95/122 responded', detail: '78% response rate' },
       ],
       comingSoon: [
         { label: 'Observation Day 2', date: 'Mar 19, 2026' },
@@ -1167,9 +1167,9 @@ Thank you for setting the example. It matters more than you know.`;
 
     // ZONE 2C - Quick win counter
     quickWin: {
-      count: 97,
-      line1: '97 paraprofessionals have logged into the TDI Learning Hub this partnership.',
-      line2: 'That\'s 97 educators actively building skills for Addison students right now.',
+      count: 122,
+      line1: '122 paraprofessionals have logged into the TDI Learning Hub this partnership.',
+      line2: 'That\'s 122 educators actively building skills for Addison students right now.',
     },
 
     // ZONE 3 - Actions
@@ -2955,7 +2955,7 @@ Thank you for setting the example. It matters more than you know.`;
           <div className="space-y-6">
             {/* Summary Stats - Lead with wins */}
             <div className="bg-gradient-to-r from-emerald-50 to-teal-50 rounded-xl p-4 border border-emerald-200 mb-4">
-              <div className="text-lg font-bold text-gray-900">9 schools · 114 paras · 85% logged in</div>
+              <div className="text-lg font-bold text-gray-900">9 schools · 122 paras · 100% logged in</div>
               <div className="text-sm text-emerald-600 mt-1 font-medium">Standout buildings: Ardmore (100%), Wesley (93%), Fullerton & Indian Trail (92%)</div>
             </div>
 
