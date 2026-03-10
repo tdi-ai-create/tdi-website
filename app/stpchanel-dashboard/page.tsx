@@ -2301,12 +2301,12 @@ export default function StPeterChanelDashboard() {
                   <p className="text-xs font-semibold text-gray-500 uppercase mb-3">Year 1 - IGNITE</p>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl font-bold text-[#38618C]">25</span>
+                      <span className="text-2xl font-bold text-gray-500">25</span>
                       <span className="text-gray-600">Staff</span>
                     </div>
-                    <p className="text-sm text-gray-500">Virtual Foundation</p>
+                    <p className="text-sm text-gray-500">Pilot Group</p>
                     <p className="text-sm text-gray-500">Building Trust</p>
-                    <p className="text-sm text-gray-500">Launching the Hub</p>
+                    <p className="text-sm text-gray-500">Proving Impact</p>
                   </div>
                 </div>
                 <div className="bg-gradient-to-br from-[#35A7FF]/10 to-[#38618C]/10 rounded-xl p-5 border-2 border-[#35A7FF]/30">
@@ -2316,9 +2316,9 @@ export default function StPeterChanelDashboard() {
                       <span className="text-2xl font-bold text-[#38618C]">25</span>
                       <span className="text-gray-600">Staff</span>
                     </div>
-                    <p className="text-sm text-[#38618C]">In-Person Observations</p>
-                    <p className="text-sm text-[#38618C]">Leadership Strategy Sessions</p>
-                    <p className="text-sm text-[#38618C]">Sustained Coaching</p>
+                    <p className="text-sm text-[#38618C]">Full Teaching Team</p>
+                    <p className="text-sm text-[#38618C]">Building Capacity Schoolwide</p>
+                    <p className="text-sm text-[#38618C]">Scaling Impact</p>
                   </div>
                 </div>
               </div>
@@ -2401,10 +2401,6 @@ export default function StPeterChanelDashboard() {
                       <td className="py-3 px-4 text-right font-bold text-[#38618C]">3 DAYS</td>
                     </tr>
                     <tr className="border-b border-gray-100">
-                      <td className="py-3 px-4 font-medium text-[#1e2749]">Virtual Strategy Sessions</td>
-                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">4 SESSIONS</td>
-                    </tr>
-                    <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 font-medium text-[#1e2749]">Executive Impact Sessions</td>
                       <td className="py-3 px-4 text-right font-bold text-[#38618C]">2 SESSIONS</td>
                     </tr>
@@ -2478,7 +2474,7 @@ export default function StPeterChanelDashboard() {
             <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
               <h3 className="text-xl font-bold mb-3">Why ACCELERATE?</h3>
               <p className="text-white/90">
-                Year 1 introduced your team to the Hub and virtual strategy sessions. Year 2 brings TDI on-site - real classroom observations, personalized feedback, and leadership coaching that turns professional learning into visible classroom change. Your teachers are ready to go deeper.
+                Your team completed two full observation cycles this year - 12 teachers observed, two growth groups identified, and Love Notes delivered to every classroom. St. Peter Chanel&apos;s staff showed up, engaged, and started implementing. Year 2 takes everything that&apos;s working and scales it - with a third observation cycle, books for every teacher, and executive sessions built around your school&apos;s KPIs.
               </p>
             </div>
 
@@ -2496,7 +2492,7 @@ export default function StPeterChanelDashboard() {
                     <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
                       <p className="text-xs font-bold text-amber-700 uppercase mb-1">August 2026</p>
                       <p className="font-semibold text-[#1e2749]">Executive Impact Session 1</p>
-                      <p className="text-sm text-gray-600">Set Year 2 goals, establish baselines for in-person observation cycle. Leadership alignment and KPI setting for the year ahead.</p>
+                      <p className="text-sm text-gray-600">Set Year 2 goals, establish baselines. Leadership alignment and KPI setting for the year ahead.</p>
                     </div>
                   </div>
 
@@ -2508,43 +2504,43 @@ export default function StPeterChanelDashboard() {
                     <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
                       <p className="text-xs font-bold text-[#38618C] uppercase mb-1">October 2026</p>
                       <p className="font-semibold text-[#1e2749]">Observation Day 1</p>
-                      <p className="text-sm text-gray-600">First in-person observation cycle. Personalized Love Notes for every teacher observed. Leadership debrief included.</p>
+                      <p className="text-sm text-gray-600">First observation cycle of Year 2. Personalized Love Notes for every teacher observed.</p>
                     </div>
                   </div>
 
-                  {/* January */}
-                  <div className="relative">
-                    <div className="absolute left-[-26px] w-6 h-6 rounded-full bg-[#38618C] border-2 border-white flex items-center justify-center">
-                      <Eye className="w-3 h-3 text-white" />
-                    </div>
-                    <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                      <p className="text-xs font-bold text-[#38618C] uppercase mb-1">January 2027</p>
-                      <p className="font-semibold text-[#1e2749]">Observation Day 2</p>
-                      <p className="text-sm text-gray-600">Second observation cycle - measure growth from October baseline. Updated Love Notes and classroom strategy feedback.</p>
-                    </div>
-                  </div>
-
-                  {/* March */}
-                  <div className="relative">
-                    <div className="absolute left-[-26px] w-6 h-6 rounded-full bg-[#38618C] border-2 border-white flex items-center justify-center">
-                      <Eye className="w-3 h-3 text-white" />
-                    </div>
-                    <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                      <p className="text-xs font-bold text-[#38618C] uppercase mb-1">March 2027</p>
-                      <p className="font-semibold text-[#1e2749]">Observation Day 3</p>
-                      <p className="text-sm text-gray-600">Final observation cycle - capture full-year growth data and celebrate implementation wins.</p>
-                    </div>
-                  </div>
-
-                  {/* April */}
+                  {/* December */}
                   <div className="relative">
                     <div className="absolute left-[-26px] w-6 h-6 rounded-full bg-amber-500 border-2 border-white flex items-center justify-center">
                       <Star className="w-3 h-3 text-white" />
                     </div>
                     <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
-                      <p className="text-xs font-bold text-amber-700 uppercase mb-1">April 2027</p>
+                      <p className="text-xs font-bold text-amber-700 uppercase mb-1">December 2026</p>
                       <p className="font-semibold text-[#1e2749]">Executive Impact Session 2</p>
-                      <p className="text-sm text-gray-600">Year-end impact review, celebrate growth, plan for Year 3 (SUSTAIN).</p>
+                      <p className="text-sm text-gray-600">Mid-year data review, adjust strategies, celebrate early wins.</p>
+                    </div>
+                  </div>
+
+                  {/* February */}
+                  <div className="relative">
+                    <div className="absolute left-[-26px] w-6 h-6 rounded-full bg-[#38618C] border-2 border-white flex items-center justify-center">
+                      <Eye className="w-3 h-3 text-white" />
+                    </div>
+                    <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                      <p className="text-xs font-bold text-[#38618C] uppercase mb-1">February 2027</p>
+                      <p className="font-semibold text-[#1e2749]">Observation Day 2</p>
+                      <p className="text-sm text-gray-600">Second observation cycle - measure growth from October baseline.</p>
+                    </div>
+                  </div>
+
+                  {/* April */}
+                  <div className="relative">
+                    <div className="absolute left-[-26px] w-6 h-6 rounded-full bg-[#38618C] border-2 border-white flex items-center justify-center">
+                      <Eye className="w-3 h-3 text-white" />
+                    </div>
+                    <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                      <p className="text-xs font-bold text-amber-700 uppercase mb-1">April 2027</p>
+                      <p className="font-semibold text-[#1e2749]">Observation Day 3</p>
+                      <p className="text-sm text-gray-600">Final observation cycle - capture full-year growth data.</p>
                     </div>
                   </div>
                 </div>
@@ -2590,49 +2586,21 @@ export default function StPeterChanelDashboard() {
               </div>
             </div>
 
-            {/* Section 9: Funding (SIMPLIFIED - Private School) */}
+            {/* Section 9: We Help You Fund It (SIMPLIFIED - Private School) */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h3 className="font-bold text-[#1e2749] mb-2">Your Investment</h3>
-              <p className="text-sm text-gray-600 mb-6">St. Peter Chanel&apos;s 2026-27 partnership is a straightforward investment in your team&apos;s professional growth - no federal funding applications required.</p>
+              <h3 className="font-bold text-[#1e2749] mb-2">We Help You Fund It</h3>
+              <p className="text-sm text-gray-600 mb-6">
+                TDI doesn&apos;t just provide the partnership - we help you secure the funding to make it happen. Private schools have access to a variety of foundation and community funding sources that can offset or fully cover partnership costs.
+              </p>
 
-              <div className="bg-gradient-to-br from-[#35A7FF]/10 to-[#38618C]/10 rounded-xl p-6 border-2 border-[#35A7FF]/30 mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <p className="text-xs font-semibold text-[#38618C] uppercase mb-1">Full ACCELERATE Package</p>
-                    <p className="text-3xl font-bold text-[#1e2749]">$41,075</p>
-                  </div>
-                  <div className="bg-[#38618C] text-white px-4 py-2 rounded-lg text-sm font-semibold">
-                    All-Inclusive
-                  </div>
-                </div>
-                <div className="grid md:grid-cols-2 gap-4 text-sm">
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[#38618C]" />3 Observation Days</span>
-                      <span className="text-gray-500">$27,000</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[#38618C]" />2 Executive Sessions</span>
-                      <span className="text-gray-500">$6,000</span>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex justify-between">
-                      <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[#38618C]" />25 Hub Memberships</span>
-                      <span className="text-gray-500">$7,475</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-[#38618C]" />25 Professional Books</span>
-                      <span className="text-gray-500">$600</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Analytics Suite note */}
-              <div className="bg-gray-50 rounded-lg p-4 text-center">
-                <p className="text-sm text-gray-700"><strong className="text-[#1e2749]">Analytics Suite included.</strong></p>
-                <p className="text-xs text-gray-500">Board-ready reports, accreditation docs, implementation tracking, and ROI evidence - included at every level.</p>
+              <div className="text-center">
+                <a
+                  href="/funding"
+                  className="inline-flex items-center gap-2 bg-[#38618C] hover:bg-[#2d4e70] text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                >
+                  Explore Funding Options
+                  <ArrowRight className="w-4 h-4" />
+                </a>
               </div>
             </div>
 
@@ -2648,14 +2616,15 @@ export default function StPeterChanelDashboard() {
                   </h4>
                   <ul className="space-y-2">
                     {[
-                      'Schedule all observation visits',
-                      'Coordinate travel logistics',
-                      'Deliver personalized teacher feedback',
-                      'Prepare leadership debrief materials',
-                      'Track Hub engagement analytics',
-                      'Generate board-ready reports',
-                      'Manage all invoicing',
-                      'Provide ongoing support'
+                      'Research every funding source',
+                      'Write all budget narratives',
+                      'Write all grant applications',
+                      'Prepare vendor compliance docs',
+                      'Draft all scopes of work',
+                      'Draft reference letters',
+                      'Handle all follow-up',
+                      'Manage invoicing across sources',
+                      'Track every deadline'
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
                         <Check className="w-4 h-4 text-teal-600 mt-0.5 flex-shrink-0" />
@@ -2669,12 +2638,12 @@ export default function StPeterChanelDashboard() {
                 <div className="bg-amber-50 rounded-xl p-5 border border-amber-200">
                   <h4 className="font-bold text-amber-700 mb-3 flex items-center gap-2">
                     <FileText className="w-5 h-5" />
-                    Paula Poche Does This
+                    Paula Does This
                   </h4>
                   <ul className="space-y-2">
                     {[
-                      'Confirm observation dates',
-                      'Communicate partnership to staff',
+                      'Pick a path',
+                      'Route pre-written requests',
                       'Sign the partnership agreement'
                     ].map((item, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
@@ -2683,7 +2652,7 @@ export default function StPeterChanelDashboard() {
                       </li>
                     ))}
                   </ul>
-                  <p className="text-sm text-amber-700 font-medium mt-4">That&apos;s it. We handle the rest.</p>
+                  <p className="text-sm text-amber-700 font-medium mt-4">That&apos;s it. We&apos;ve prepared everything else.</p>
                 </div>
               </div>
             </div>
