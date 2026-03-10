@@ -13,11 +13,6 @@ const nextConfig: NextConfig = {
         destination: '/paragametools',
         permanent: true,
       },
-      {
-        source: '/example-dashboard',
-        destination: '/Example-Dashboard',
-        permanent: true,
-      },
     ];
   },
 };
