@@ -2294,95 +2294,7 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
-            {/* Section 10: Pick a Starting Point - TWO OPTIONS */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h3 className="font-bold text-[#1e2749] mb-2">Pick a Starting Point</h3>
-              <p className="text-sm text-gray-600 mb-6">Two options for Year 2. Choose the scope that fits your current funding reality.</p>
-
-              <div className="grid md:grid-cols-2 gap-4 mb-6">
-                {/* Option A Card */}
-                <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="h-1 bg-teal-500"></div>
-                  <div className="p-5">
-                    <p className="text-xs text-teal-600 font-medium mb-1">Option A: Continue with Paras</p>
-                    <p className="text-2xl font-bold text-[#1e2749] mb-2">$30,876</p>
-                    <p className="text-sm text-gray-600 mb-4">Continue building on Year 1 momentum with your para team.</p>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-teal-600" />12 Hub Memberships</span>
-                        <span className="text-gray-500">$3,588</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-teal-600" />12 Professional Books</span>
-                        <span className="text-gray-500">$288</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-teal-600" />2 Virtual Coaching</span>
-                        <span className="text-gray-500">$3,000</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-teal-600" />2 Executive Sessions</span>
-                        <span className="text-gray-500">$6,000</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-teal-600" />2 Observation Days</span>
-                        <span className="text-gray-500">$18,000</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Option B Card - Recommended */}
-                <div className="bg-white border-2 border-green-300 rounded-xl overflow-hidden hover:shadow-md transition-shadow relative">
-                  <div className="absolute top-3 right-3">
-                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">Recommended</span>
-                  </div>
-                  <div className="h-1 bg-green-500"></div>
-                  <div className="p-5">
-                    <p className="text-xs text-green-600 font-medium mb-1">Option B: Expand to Full Staff</p>
-                    <p className="text-2xl font-bold text-[#1e2749] mb-2">$34,429</p>
-                    <p className="text-sm text-gray-600 mb-4">Bring every educator in the building into the partnership.</p>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-green-600" />23 Hub Memberships</span>
-                        <span className="text-gray-500">$6,877</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-green-600" />23 Professional Books</span>
-                        <span className="text-gray-500">$552</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-green-600" />2 Virtual Coaching</span>
-                        <span className="text-gray-500">$3,000</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-green-600" />2 Executive Sessions</span>
-                        <span className="text-gray-500">$6,000</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-green-600" />2 Observation Days</span>
-                        <span className="text-gray-500">$18,000</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Callout Box */}
-              <div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-lg p-4 border border-green-200">
-                <p className="text-sm text-gray-700">
-                  <strong className="text-[#1e2749]">The difference between Option A and Option B is only $3,553.</strong> For that investment, every educator in the building gets access - not just paras. TDI pursues funding for both options. Your commitment unlocks our funding team.
-                </p>
-              </div>
-
-              {/* Analytics Suite note */}
-              <div className="bg-gray-50 rounded-lg p-4 mt-4 text-center">
-                <p className="text-sm text-gray-700"><strong className="text-[#1e2749]">Analytics Suite included with every option.</strong></p>
-                <p className="text-xs text-gray-500">Board-ready reports, compliance docs, implementation tracking, and ROI evidence - included at every level.</p>
-              </div>
-            </div>
-
-            {/* Section 11: TDI Does the Work */}
+            {/* Section 10: TDI Does the Work */}
             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
               <h3 className="font-bold text-[#1e2749] mb-4 text-center">&quot;TDI Does the Work&quot;</h3>
               <div className="grid md:grid-cols-2 gap-6">
@@ -2435,7 +2347,7 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
-            {/* Section 12: Why Grants Exist */}
+            {/* Section 11: Why Grants Exist */}
             <div className="bg-blue-50 rounded-xl p-5 border border-blue-200">
               <h4 className="font-semibold text-[#1e2749] mb-2">Why Grants Exist for Schools Like Saunemin</h4>
               <p className="text-sm text-gray-700 mb-3">
@@ -2446,7 +2358,7 @@ export default function SauneminDashboard() {
               </p>
             </div>
 
-            {/* Section 13: CTA Footer Banner */}
+            {/* Section 12: CTA Footer Banner */}
             <div className="bg-[#1e2749] rounded-xl p-6 flex flex-col md:flex-row items-center justify-between gap-4">
               <div className="text-white text-center md:text-left">
                 <p className="font-semibold text-lg">Ready to bring TDI to your full team?</p>
