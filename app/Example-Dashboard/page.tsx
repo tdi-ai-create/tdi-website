@@ -1269,8 +1269,9 @@ export default function ExampleDashboard() {
                     <Target className="w-5 h-5 text-[#1e2749]" />
                     <ArrowRight className="w-3 h-3 text-gray-300 group-hover:text-[#38618C] transition-colors" />
                   </div>
-                  <div className="text-3xl font-bold text-[#1e2749] mb-1">{overviewData.stats.phase.name}</div>
-                  <div className="text-sm font-semibold text-[#1e2749] mb-0.5">{overviewData.stats.phase.label}</div>
+                  <div className="text-3xl font-bold text-[#1e2749] mb-0.5">Phase {overviewData.stats.phase.number}</div>
+                  <div className="text-sm font-semibold text-[#38618C] mb-0.5">{overviewData.stats.phase.name}</div>
+                  <div className="text-sm font-medium text-[#1e2749]">{overviewData.stats.phase.label}</div>
                   <div className="text-xs text-gray-500">{overviewData.stats.phase.sublabel}</div>
                   {/* Phase progress dots */}
                   <div className="mt-3 flex gap-1.5">
