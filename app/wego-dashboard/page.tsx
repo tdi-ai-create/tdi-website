@@ -467,7 +467,7 @@ export default function WegoDashboard() {
         { date: 'Dec 2025', label: 'Obs Day 2', status: 'complete' },
         { date: 'Feb 2026', label: 'Obs Day 3', status: 'complete' },
         { date: 'Mar 2026', label: 'You Are Here', status: 'current' },
-        { date: 'May 2026', label: 'IGNITE Complete', status: 'upcoming' },
+        { date: 'May 2026', label: 'Year 1 Celebration + Year 2 Planning', status: 'upcoming' },
       ],
       completed: [
         {
@@ -1084,15 +1084,26 @@ export default function WegoDashboard() {
           <div className="space-y-4 pb-16">
 
             {/* SECTION 1  - PARTNERSHIP GOAL */}
-            <div className="bg-white rounded-xl border border-gray-200 p-8 text-center shadow-sm">
-              <div className="inline-flex items-center gap-2 bg-teal-50 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">
-                <Target className="w-3.5 h-3.5" />
-                Your Partnership Goal
+            <div className="relative bg-gradient-to-br from-[#1e2749] to-[#2d3a6b] rounded-2xl p-8 overflow-hidden shadow-xl">
+              {/* Background decoration */}
+              <div className="absolute top-0 right-0 w-64 h-64 opacity-5 pointer-events-none">
+                <svg viewBox="0 0 200 200" fill="none">
+                  <circle cx="150" cy="50" r="100" fill="white"/>
+                  <circle cx="50" cy="150" r="80" fill="white"/>
+                </svg>
               </div>
-              <blockquote className="text-xl font-semibold text-gray-900 leading-relaxed max-w-2xl mx-auto mb-3">
-                &quot;{partnershipData.goal.quote}&quot;
-              </blockquote>
-              <p className="text-sm text-gray-500 italic">{partnershipData.goal.theme}</p>
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-1 h-8 bg-teal-400 rounded-full" />
+                  <span className="text-teal-300 text-xs font-bold uppercase tracking-widest">
+                    Your Partnership Goal
+                  </span>
+                </div>
+                <blockquote className="text-2xl font-bold text-white leading-relaxed max-w-2xl mb-4">
+                  &quot;{partnershipData.goal.quote}&quot;
+                </blockquote>
+                <p className="text-blue-200 text-sm italic">{partnershipData.goal.theme}</p>
+              </div>
             </div>
 
             {/* SECTION 2  - CLASSROOM OBSERVATIONS */}
@@ -1318,15 +1329,11 @@ export default function WegoDashboard() {
                 defaultOpen={true}
                 accent="amber"
               >
-                <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="mb-4">
                   <div className="bg-amber-50 rounded-lg p-4 border border-amber-100">
                     <p className="text-3xl font-bold text-amber-700">{partnershipData.progress.implementationRate}%</p>
                     <p className="text-sm text-gray-700 mt-1">{partnershipData.progress.implementationLabel}</p>
                     <p className="text-xs text-gray-500 mt-1 italic">{partnershipData.progress.implementationComparison}</p>
-                  </div>
-                  <div className="bg-teal-50 rounded-lg p-4 border border-teal-100">
-                    <p className="text-3xl font-bold text-teal-700">{partnershipData.progress.hubAccess.percent}%</p>
-                    <p className="text-sm text-gray-700 mt-1">Hub engagement  - {partnershipData.progress.hubAccess.active}/{partnershipData.progress.hubAccess.total} paras active</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
