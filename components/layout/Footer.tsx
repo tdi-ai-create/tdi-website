@@ -22,7 +22,7 @@ export function Footer() {
     '/stpchanel-dashboard',
     '/wego-dashboard',
     '/saunemin-dashboard',
-    '/allenwood-dashboard',
+    '/Allenwood-Dashboard',
     '/D41-dashboard',
     '/Example-Dashboard',
   ];
