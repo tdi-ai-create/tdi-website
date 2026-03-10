@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import { Tooltip } from '@/components/Tooltip';
@@ -1551,24 +1551,23 @@ Thank you for setting the example. It matters more than you know.`;
     const style = accentStyles[accent] || accentStyles.gray;
 
     return (
-      <div className={`bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden ${style.border}`}>
+      <div className={`bg-white rounded-2xl border overflow-hidden transition-all ${style.border} ${
+        open ? 'border-gray-200 shadow-md' : 'border-gray-100 shadow-sm'
+      }`}>
         <button
           onClick={() => setOpen(!open)}
-          className={`w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50/50 transition-colors ${style.headerBg}`}
+          className={`w-full flex items-center justify-between px-6 py-4 transition-colors ${
+            open ? 'bg-gray-50 border-b border-gray-100' : 'hover:bg-gray-50'
+          } ${style.headerBg}`}
         >
-          <div className="flex items-center gap-3">
-            <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${style.iconBg}`}>
-              {icon}
-            </div>
-            <span className="text-base font-semibold text-gray-900">{title}</span>
+          <div className="flex items-center gap-2.5">
+            {icon}
+            <span className="text-sm font-bold text-gray-900">{title}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-400">Click to {open ? 'collapse' : 'expand'}</span>
-            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
-          </div>
+          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
         </button>
         {open && (
-          <div className="px-6 pb-6 pt-4 border-t border-gray-100">
+          <div className="px-6 pb-6 pt-4">
             {children}
           </div>
         )}
@@ -1578,72 +1577,131 @@ Thank you for setting the example. It matters more than you know.`;
 
   const ObservationCard = ({ obs }: { obs: typeof partnershipData.observations[0] }) => {
     const [detailsOpen, setDetailsOpen] = useState(false);
+    const isDay2 = obs.dayNumber === 2;
+    const replyRate = 'repliesReceived' in obs && obs.repliesReceived
+      ? Math.round((obs.repliesReceived / obs.loveNotesDelivered) * 100)
+      : null;
+
     return (
-      <div className="px-6 py-4">
-        {/* Row header — always visible */}
-        <div className="flex items-center gap-4 mb-3 flex-wrap">
-          <div className="flex items-center gap-1.5">
-            <CheckCircle className="w-4 h-4 text-green-500" />
-            <span className="text-sm font-semibold text-gray-900">Observation Day {obs.dayNumber}</span>
+      <div className="p-6">
+        {/* Header badge + status */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-sm ${isDay2 ? 'bg-teal-600' : 'bg-[#1e2749]'}`}>
+              #{obs.dayNumber}
+            </div>
+            <div>
+              <p className="font-bold text-gray-900 text-sm">Observation Day {obs.dayNumber}</p>
+              <p className="text-xs text-gray-400">{obs.date}</p>
+            </div>
           </div>
-          <span className="text-xs text-gray-400">{obs.date}</span>
-          <span className="text-xs text-gray-500">{obs.classroomsVisited} classrooms</span>
-          <span className="text-xs text-gray-500">{obs.loveNotesDelivered} Love Notes</span>
-          {'repliesReceived' in obs && obs.repliesReceived && (
-            <span className="text-xs text-purple-600 font-medium">{obs.repliesReceived} replies received</span>
+          <span className="text-xs bg-green-100 text-green-700 font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+            <CheckCircle className="w-3 h-3" /> Complete
+          </span>
+        </div>
+
+        {/* Bold stat strip */}
+        <div className="grid grid-cols-3 gap-3 mb-4">
+          <div className="bg-teal-50 rounded-xl p-3 text-center border border-teal-100">
+            <p className="text-2xl font-bold text-teal-700">{obs.classroomsVisited}</p>
+            <p className="text-xs text-teal-600 font-medium mt-0.5">Classrooms</p>
+          </div>
+          <div className="bg-orange-50 rounded-xl p-3 text-center border border-orange-100">
+            <p className="text-2xl font-bold text-orange-600">{obs.loveNotesDelivered}</p>
+            <p className="text-xs text-orange-600 font-medium mt-0.5">Love Notes</p>
+          </div>
+          {isDay2 && replyRate !== null ? (
+            <div className="bg-green-50 rounded-xl p-3 text-center border border-green-100">
+              <p className="text-2xl font-bold text-green-700">{replyRate}%</p>
+              <p className="text-xs text-green-600 font-medium mt-0.5">Reply Rate</p>
+            </div>
+          ) : (
+            <div className="bg-amber-50 rounded-xl p-3 text-center border border-amber-100">
+              <p className="text-2xl font-bold text-amber-700">91%</p>
+              <p className="text-xs text-amber-600 font-medium mt-0.5">Move #1 Rate</p>
+            </div>
           )}
         </div>
-        {/* AI summary — always visible, no "AI" label */}
+
+        {/* AI summary */}
         <p className="text-sm text-gray-700 leading-relaxed mb-3">{obs.aiSummary}</p>
+
         {/* View details toggle */}
         <button
           onClick={() => setDetailsOpen(!detailsOpen)}
-          className="text-xs text-teal-600 hover:text-teal-800 font-medium flex items-center gap-1 transition-colors"
+          className="text-xs text-teal-600 hover:text-teal-800 font-semibold flex items-center gap-1 transition-colors"
         >
-          {detailsOpen ? 'Hide details' : 'View details'}
+          {detailsOpen ? 'Hide details' : 'View classroom details'}
           <ChevronDown className={`w-3.5 h-3.5 transition-transform ${detailsOpen ? 'rotate-180' : ''}`} />
         </button>
-        {/* Full details — only shown when toggled open */}
+
+        {/* Full details */}
         {detailsOpen && (
           <div className="mt-4 space-y-4 border-t border-gray-100 pt-4">
             <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Observation Narrative</p>
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Observation Narrative</p>
               <p className="text-sm text-gray-700 leading-relaxed">{obs.details.narrative}</p>
             </div>
+
+            {/* Quotes */}
             {obs.details.quotes.length > 0 && (
               <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">What We Heard</p>
-                {obs.details.quotes.map((q, i) => (
-                  <blockquote key={i} className="border-l-2 border-teal-300 pl-3 text-sm text-gray-600 italic mb-2">&ldquo;{q}&rdquo;</blockquote>
-                ))}
-              </div>
-            )}
-            {obs.details.resources.length > 0 && (
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Hub Resources Referenced</p>
-                {obs.details.resources.map((r, i) => (
-                  <p key={i} className="text-xs text-gray-600 flex items-center gap-1.5 mb-1">
-                    <BookOpen className="w-3 h-3 text-teal-500" /> {r}
-                  </p>
-                ))}
-              </div>
-            )}
-            {/* Coaching Themes — only shown for observations that have them */}
-            {'coachingThemes' in obs && obs.coachingThemes && obs.coachingThemes.length > 0 && (
-              <div>
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Coaching Themes from Para Replies</p>
-                <div className="space-y-3">
-                  {obs.coachingThemes.map((theme: { theme: string; insight: string }, i: number) => (
-                    <div key={i} className="bg-purple-50 rounded-lg p-3 border border-purple-100">
-                      <p className="text-sm font-medium text-purple-800 mb-1">{theme.theme}</p>
-                      <p className="text-xs text-gray-600">{theme.insight}</p>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Voices from the Field</p>
+                <div className="space-y-2">
+                  {obs.details.quotes.slice(0, 4).map((q, i) => (
+                    <div key={i} className="flex gap-3 bg-teal-50 rounded-xl p-3 border border-teal-100">
+                      <div className="w-1 bg-teal-400 rounded-full shrink-0 self-stretch" />
+                      <p className="text-sm text-gray-700 italic leading-relaxed">&ldquo;{q}&rdquo;</p>
                     </div>
                   ))}
                 </div>
               </div>
             )}
+
+            {/* Hub Resources */}
+            {obs.details.resources.length > 0 && (
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Hub Resources Referenced</p>
+                <div className="flex flex-wrap gap-2">
+                  {obs.details.resources.map((r, i) => (
+                    <span key={i} className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full flex items-center gap-1.5">
+                      <BookOpen className="w-3 h-3 text-teal-500" /> {r.replace('Hub course referenced: ', '')}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Coaching Themes — only shown for observations that have them */}
+            {'coachingThemes' in obs && obs.coachingThemes && obs.coachingThemes.length > 0 && (
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Coaching Themes from Para Replies</p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {obs.coachingThemes.map((theme: { theme: string; insight: string }, i: number) => {
+                    const colors = [
+                      'bg-orange-50 border-orange-100',
+                      'bg-teal-50 border-teal-100',
+                      'bg-purple-50 border-purple-100',
+                      'bg-amber-50 border-amber-100',
+                    ];
+                    const dotColors = ['bg-orange-400', 'bg-teal-400', 'bg-purple-400', 'bg-amber-400'];
+                    return (
+                      <div key={i} className={`rounded-xl p-4 border ${colors[i % colors.length]}`}>
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className={`w-2 h-2 rounded-full ${dotColors[i % dotColors.length]}`} />
+                          <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Theme {i + 1}</p>
+                        </div>
+                        <p className="text-sm font-bold text-gray-900 mb-1">{theme.theme}</p>
+                        <p className="text-xs text-gray-600 leading-relaxed">{theme.insight}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
             <div>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Next Observation Focus</p>
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1">Next Observation Focus</p>
               <p className="text-sm text-gray-600">{obs.details.nextFocus}</p>
             </div>
           </div>
@@ -2044,21 +2102,31 @@ Thank you for setting the example. It matters more than you know.`;
 
         {/* ==================== OUR PARTNERSHIP TAB ==================== */}
         {activeTab === 'ourPartnership' && (
-          <div className="space-y-6 pb-12">
+          <div className="space-y-4 pb-16 max-w-4xl mx-auto">
 
             {/* ─────────────────────────────────────────────
                 SECTION 1 — PARTNERSHIP GOAL
                 Always visible. No collapse toggle.
+                Dark navy gradient hero card.
             ───────────────────────────────────────────── */}
-            <div className="bg-white rounded-xl border border-gray-200 p-8 text-center shadow-sm">
-              <div className="inline-flex items-center gap-2 bg-teal-50 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">
-                <Target className="w-3.5 h-3.5" />
-                Your Partnership Goal
+            <div className="relative bg-gradient-to-br from-[#1e2749] to-[#2d3a6b] rounded-2xl p-8 overflow-hidden shadow-xl">
+              {/* Background decoration */}
+              <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
+                <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="150" cy="50" r="100" fill="white"/>
+                  <circle cx="50" cy="150" r="80" fill="white"/>
+                </svg>
               </div>
-              <blockquote className="text-xl font-semibold text-gray-900 leading-relaxed max-w-2xl mx-auto mb-3">
-                &ldquo;{partnershipData.goal.quote}&rdquo;
-              </blockquote>
-              <p className="text-sm text-gray-500 italic">{partnershipData.goal.theme}</p>
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-1 h-8 bg-teal-400 rounded-full" />
+                  <span className="text-teal-300 text-xs font-bold uppercase tracking-widest">Your Partnership Goal</span>
+                </div>
+                <blockquote className="text-2xl font-bold text-white leading-relaxed max-w-2xl mb-4">
+                  &ldquo;{partnershipData.goal.quote}&rdquo;
+                </blockquote>
+                <p className="text-blue-200 text-sm italic">{partnershipData.goal.theme}</p>
+              </div>
             </div>
 
             {/* ─────────────────────────────────────────────
@@ -2106,9 +2174,8 @@ Thank you for setting the example. It matters more than you know.`;
 
             {/* ─────────────────────────────────────────────
                 SECTION 4 — YOUR PARTNERSHIP JOURNEY
-                No dates. No years. Phase names only.
-                Future phases link to Blueprint tab.
-                Starts collapsed.
+                Horizontal phase stepper with progress.
+                Shows current phase deliverables only.
             ───────────────────────────────────────────── */}
             <CollapsibleSection
               title="Your Partnership Journey"
@@ -2116,50 +2183,71 @@ Thank you for setting the example. It matters more than you know.`;
               defaultOpen={true}
               accent="yellow"
             >
-              <div className="space-y-3">
-                {partnershipData.journey.phases.map((phase) => (
-                  <div
-                    key={phase.name}
-                    className={`rounded-lg border p-4 ${
-                      phase.status === 'current'
-                        ? 'bg-yellow-50 border-yellow-200'
-                        : phase.status === 'complete'
-                        ? 'bg-green-50 border-green-200'
-                        : 'bg-gray-50 border-gray-200 opacity-70 cursor-pointer hover:opacity-100 transition-opacity'
-                    }`}
-                    onClick={phase.status === 'upcoming' ? () => setActiveTab('blueprint') : undefined}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className={`text-xs font-bold px-2 py-0.5 rounded ${
-                          phase.status === 'current' ? 'bg-yellow-200 text-yellow-800' :
-                          phase.status === 'complete' ? 'bg-green-200 text-green-800' :
-                          'bg-gray-200 text-gray-600'
+              {/* Phase stepper — horizontal progress visual */}
+              <div className="flex items-stretch gap-0 mb-6">
+                {partnershipData.journey.phases.map((phase, i) => (
+                  <React.Fragment key={phase.name}>
+                    <div className={`flex-1 rounded-xl p-4 ${
+                      phase.status === 'current' ? 'bg-[#1e2749] text-white' :
+                      phase.status === 'complete' ? 'bg-teal-600 text-white' :
+                      'bg-gray-100 text-gray-400'
+                    }`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                          phase.status === 'current' ? 'bg-white/20 text-white' :
+                          phase.status === 'complete' ? 'bg-white/20 text-white' :
+                          'bg-gray-200 text-gray-500'
                         }`}>
                           {phase.status === 'current' ? 'YOU ARE HERE' : phase.status === 'complete' ? 'COMPLETE' : 'UPCOMING'}
                         </span>
-                        <span className="font-semibold text-gray-900">Phase {phase.number}: {phase.name}</span>
+                        <span className="text-lg font-bold opacity-50">{phase.number}</span>
                       </div>
-                      {phase.status === 'upcoming' && (
-                        <span className="text-xs text-gray-400 flex items-center gap-1">
-                          View in Blueprint <ArrowRight className="w-3 h-3" />
-                        </span>
-                      )}
+                      <p className={`font-bold text-base ${phase.status !== 'upcoming' ? 'text-white' : 'text-gray-500'}`}>{phase.name}</p>
                     </div>
-                    <ul className="space-y-1.5">
+                    {i < partnershipData.journey.phases.length - 1 && (
+                      <div className="flex items-center px-1">
+                        <ArrowRight className={`w-4 h-4 ${
+                          partnershipData.journey.phases[i].status !== 'upcoming' ? 'text-teal-500' : 'text-gray-300'
+                        }`} />
+                      </div>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+
+              {/* Current phase deliverables — checkboxes with visual progress bar */}
+              {partnershipData.journey.phases.filter(p => p.status === 'current').map(phase => {
+                const completed = phase.deliverables.filter(d => d.complete).length;
+                const total = phase.deliverables.length;
+                const pct = Math.round((completed / total) * 100);
+                return (
+                  <div key={phase.name}>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{phase.name} Deliverables</p>
+                      <span className="text-xs font-bold text-teal-700">{completed}/{total} complete</span>
+                    </div>
+                    {/* Progress bar */}
+                    <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
+                      <div
+                        className="bg-teal-500 h-2 rounded-full transition-all"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    {/* Checklist */}
+                    <ul className="space-y-2">
                       {phase.deliverables.map((d, i) => (
-                        <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                        <li key={i} className={`flex items-start gap-3 px-3 py-2 rounded-lg ${d.complete ? 'bg-green-50' : 'bg-gray-50'}`}>
                           {d.complete
                             ? <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
                             : <div className="w-4 h-4 rounded-full border-2 border-gray-300 mt-0.5 shrink-0" />
                           }
-                          {d.label}
+                          <span className={`text-sm ${d.complete ? 'text-green-800 font-medium' : 'text-gray-500'}`}>{d.label}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
-                ))}
-              </div>
+                );
+              })}
             </CollapsibleSection>
 
             {/* ─────────────────────────────────────────────
@@ -2271,29 +2359,50 @@ Thank you for setting the example. It matters more than you know.`;
               {/* Upcoming sessions */}
               {partnershipData.sessions.upcoming.length > 0 && (
                 <div>
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Upcoming</p>
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Upcoming</p>
                   <div className="space-y-2">
-                    {partnershipData.sessions.upcoming.map((s, i) => (
-                      <div key={i} className="flex items-start gap-3 bg-blue-50 rounded-lg px-4 py-3">
-                        <Calendar className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">{s.label}</p>
-                          <p className="text-xs text-gray-500">{s.date} · {s.type}</p>
+                    {partnershipData.sessions.upcoming.map((s, i) => {
+                      const isRenewal = s.label.includes('Executive Impact') || s.label.includes('Renewal') || s.label.includes('ACCELERATE');
+                      return (
+                        <div key={i} className={`flex items-start gap-3 rounded-xl px-4 py-3 border ${
+                          isRenewal
+                            ? 'bg-amber-50 border-amber-200'
+                            : 'bg-blue-50 border-blue-100'
+                        }`}>
+                          {isRenewal
+                            ? <Star className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
+                            : <Calendar className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
+                          }
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <p className={`text-sm font-bold ${isRenewal ? 'text-amber-900' : 'text-gray-900'}`}>{s.label}</p>
+                              {isRenewal && (
+                                <span className="text-xs bg-amber-200 text-amber-800 font-bold px-2 py-0.5 rounded-full">Renewal Conversation</span>
+                              )}
+                            </div>
+                            <p className={`text-xs mt-0.5 ${isRenewal ? 'text-amber-700' : 'text-gray-500'}`}>{s.date} · {s.type}</p>
+                          </div>
+                          {s.calendlyLink ? (
+                            <a
+                              href={s.calendlyLink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={`text-xs font-semibold px-3 py-1 rounded-full transition-colors whitespace-nowrap ${
+                                isRenewal
+                                  ? 'bg-amber-200 text-amber-800 hover:bg-amber-300'
+                                  : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                              }`}
+                            >
+                              Schedule
+                            </a>
+                          ) : (
+                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                              isRenewal ? 'bg-amber-200 text-amber-800' : 'bg-green-100 text-green-700'
+                            }`}>{s.badge}</span>
+                          )}
                         </div>
-                        {s.calendlyLink ? (
-                          <a
-                            href={s.calendlyLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs bg-blue-100 text-blue-700 font-medium px-2 py-0.5 rounded-full hover:bg-blue-200 transition-colors whitespace-nowrap"
-                          >
-                            Schedule
-                          </a>
-                        ) : (
-                          <span className="text-xs bg-green-100 text-green-700 font-medium px-2 py-0.5 rounded-full">{s.badge}</span>
-                        )}
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -2301,9 +2410,8 @@ Thank you for setting the example. It matters more than you know.`;
 
             {/* ─────────────────────────────────────────────
                 SECTION 6 — PROGRESS SNAPSHOT
-                CONDITIONAL: show when progress.show === true
-                (at least 1 session complete + Hub login > 50%)
-                Starts collapsed.
+                Executive-grade visual with comparison charts.
+                The most important visual section.
             ───────────────────────────────────────────── */}
             {partnershipData.progress.show && (
               <CollapsibleSection
@@ -2312,31 +2420,78 @@ Thank you for setting the example. It matters more than you know.`;
                 defaultOpen={true}
                 accent="amber"
               >
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                  <div className="bg-amber-50 rounded-lg p-4 border border-amber-100">
-                    <p className="text-3xl font-bold text-amber-700">{partnershipData.progress.implementationRate}%</p>
-                    <p className="text-sm text-gray-700 mt-1">{partnershipData.progress.implementationLabel}</p>
-                    <p className="text-xs text-gray-500 mt-1 italic">{partnershipData.progress.implementationComparison}</p>
+                {/* HERO STAT — implementation rate with industry comparison */}
+                <div className="bg-gradient-to-br from-[#1e2749] to-[#2d3a6b] rounded-2xl p-6 mb-5 text-white">
+                  <p className="text-xs font-bold uppercase tracking-widest text-blue-300 mb-1">Move #1 Implementation Rate</p>
+                  <div className="flex items-end gap-4 mb-4">
+                    <span className="text-6xl font-black text-white">{partnershipData.progress.implementationRate}%</span>
+                    <div className="pb-2">
+                      <p className="text-blue-200 text-sm font-medium">of ASD4 paras applying</p>
+                      <p className="text-blue-300 text-xs">Ask Don&apos;t Tell strategies daily</p>
+                    </div>
                   </div>
-                  <div className="bg-teal-50 rounded-lg p-4 border border-teal-100">
-                    <p className="text-3xl font-bold text-teal-700">{partnershipData.progress.hubAccess.percent}%</p>
-                    <p className="text-sm text-gray-700 mt-1">Hub engagement — {partnershipData.progress.hubAccess.active}/{partnershipData.progress.hubAccess.total} paras active</p>
+
+                  {/* Bar chart comparison — inline SVG */}
+                  <div className="space-y-3">
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-blue-200 font-medium">ASD4 Paras</span>
+                        <span className="text-xs font-bold text-teal-300">{partnershipData.progress.implementationRate}%</span>
+                      </div>
+                      <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-teal-400 rounded-full" style={{ width: `${partnershipData.progress.implementationRate}%` }} />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-blue-200 font-medium">TDI Partner Average</span>
+                        <span className="text-xs font-bold text-blue-300">65%</span>
+                      </div>
+                      <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-blue-400 rounded-full opacity-60" style={{ width: '65%' }} />
+                      </div>
+                    </div>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-xs text-blue-200 font-medium">Industry Average</span>
+                        <span className="text-xs font-bold text-gray-400">10%</span>
+                      </div>
+                      <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                        <div className="h-full bg-gray-400 rounded-full opacity-40" style={{ width: '10%' }} />
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-xs text-blue-300 mt-3 italic">ASD4 is 9× the industry average — after just 2 sessions.</p>
+                </div>
+
+                {/* 4-stat grid */}
+                <div className="grid grid-cols-2 gap-3 mb-5">
+                  <div className="bg-teal-50 rounded-xl p-4 border border-teal-100">
+                    <p className="text-3xl font-black text-teal-700">{partnershipData.progress.hubAccess.percent}%</p>
+                    <p className="text-xs text-teal-600 font-medium mt-1">Hub Login Rate</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{partnershipData.progress.hubAccess.active}/{partnershipData.progress.hubAccess.total} paras active</p>
+                  </div>
+                  <div className="bg-green-50 rounded-xl p-4 border border-green-100">
+                    <p className="text-3xl font-black text-green-700">87%</p>
+                    <p className="text-xs text-green-600 font-medium mt-1">Confidence Increase</p>
+                    <p className="text-xs text-gray-400 mt-0.5">After Virtual Session 1</p>
+                  </div>
+                  <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
+                    <p className="text-3xl font-black text-orange-700">70%</p>
+                    <p className="text-xs text-orange-600 font-medium mt-1">Move #2 Implementation</p>
+                    <p className="text-xs text-gray-400 mt-0.5">Feedback formula after 2 sessions</p>
+                  </div>
+                  <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                    <p className="text-3xl font-black text-amber-700">76%</p>
+                    <p className="text-xs text-amber-600 font-medium mt-1">Retention Outlook</p>
+                    <p className="text-xs text-gray-400 mt-0.5">Paras likely returning next year</p>
                   </div>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-gray-50 rounded-lg p-3 text-center">
-                    <p className="text-xl font-bold text-gray-800">{partnershipData.progress.hubAccess.active}/{partnershipData.progress.hubAccess.total}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">Hub Access</p>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-3 text-center">
-                    <p className="text-xl font-bold text-gray-800">{partnershipData.progress.selfDirected}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">Self-Directed Learners</p>
-                  </div>
-                  <div className="bg-gray-50 rounded-lg p-3 text-center">
-                    <p className="text-xl font-bold text-gray-800">{partnershipData.progress.coursesCompleted}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">Course Completions</p>
-                  </div>
-                </div>
+
+                {/* Survey data note */}
+                <p className="text-xs text-gray-400 text-center italic">
+                  Implementation: 81 survey respondents · Feb 13, 2026 · VS1 survey: 95 of 114 respondents · Mar 2, 2026
+                </p>
               </CollapsibleSection>
             )}
 
@@ -2354,33 +2509,34 @@ Thank you for setting the example. It matters more than you know.`;
                 accent="purple"
               >
                 {partnershipData.teamPulse.surveys.map((survey) => (
-                  <div key={survey.id} className="space-y-4">
-                    {/* Survey Header */}
-                    <div className="flex items-center justify-between">
+                  <div key={survey.id}>
+                    {/* Survey header stats */}
+                    <div className="flex items-center justify-between mb-4 pb-4 border-b border-gray-100">
                       <div>
-                        <h4 className="text-sm font-semibold text-gray-900">{survey.name}</h4>
-                        <p className="text-xs text-gray-500">{survey.date} · {survey.respondents} respondents ({survey.responseRate}% response rate)</p>
+                        <p className="text-sm font-bold text-gray-900">{survey.name}</p>
+                        <p className="text-xs text-gray-400">{survey.respondents} respondents · {survey.responseRate}% response rate</p>
                       </div>
                     </div>
 
-                    {/* Confidence Score */}
-                    <div className="bg-purple-50 rounded-lg p-4 border border-purple-100">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-700">Confidence Score</span>
-                        <span className="text-2xl font-bold text-purple-700">{survey.confidenceScore}/{survey.confidenceMax}</span>
+                    {/* 3 key stats */}
+                    <div className="grid grid-cols-3 gap-3 mb-5">
+                      <div className="bg-purple-50 rounded-xl p-3 text-center border border-purple-100">
+                        <p className="text-2xl font-black text-purple-700">{survey.confidenceScore}/{survey.confidenceMax}</p>
+                        <p className="text-xs text-purple-600 font-medium mt-1">Avg Confidence</p>
                       </div>
-                      <div className="w-full bg-purple-200 rounded-full h-2 mb-2">
-                        <div
-                          className="bg-purple-500 h-2 rounded-full"
-                          style={{ width: `${(survey.confidenceScore / survey.confidenceMax) * 100}%` }}
-                        />
+                      <div className="bg-teal-50 rounded-xl p-3 text-center border border-teal-100">
+                        <p className="text-2xl font-black text-teal-700">{survey.confidenceIncrease}%</p>
+                        <p className="text-xs text-teal-600 font-medium mt-1">Confidence Increase</p>
                       </div>
-                      <p className="text-xs text-purple-600 font-medium">↑ {survey.confidenceIncrease}% increase since partnership began</p>
+                      <div className="bg-green-50 rounded-xl p-3 text-center border border-green-100">
+                        <p className="text-2xl font-black text-green-700">76%</p>
+                        <p className="text-xs text-green-600 font-medium mt-1">Likely Returning</p>
+                      </div>
                     </div>
 
                     {/* Highlights */}
-                    <div>
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Key Highlights</p>
+                    <div className="mb-5">
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Key Highlights</p>
                       <ul className="space-y-2">
                         {survey.highlights.map((highlight, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
@@ -2394,11 +2550,11 @@ Thank you for setting the example. It matters more than you know.`;
                     {/* Open Responses */}
                     {survey.openResponses && survey.openResponses.length > 0 && (
                       <div>
-                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">What Paras Are Saying</p>
-                        <div className="space-y-2">
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">What Your Team Said</p>
+                        <div className="grid gap-3 sm:grid-cols-2">
                           {survey.openResponses.map((response, i) => (
-                            <div key={i} className="bg-gray-50 rounded-lg px-4 py-3 border-l-2 border-purple-300">
-                              <p className="text-sm text-gray-700 italic">"{response}"</p>
+                            <div key={i} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                              <p className="text-sm text-gray-700 italic leading-relaxed">&ldquo;{response}&rdquo;</p>
                             </div>
                           ))}
                         </div>
@@ -2411,9 +2567,8 @@ Thank you for setting the example. It matters more than you know.`;
 
             {/* ─────────────────────────────────────────────
                 SECTION 8 — WHAT WE'RE LEARNING
-                CONDITIONAL: show when learning.show === true
-                (post-session implementation data by Move)
-                Starts collapsed.
+                Move implementation bars with visual progress.
+                Coaching themes in 2x2 grid.
             ───────────────────────────────────────────── */}
             {partnershipData.learning.show && (
               <CollapsibleSection
@@ -2422,52 +2577,109 @@ Thank you for setting the example. It matters more than you know.`;
                 defaultOpen={true}
                 accent="indigo"
               >
-                <div className="space-y-4">
+                {/* Move implementation bars */}
+                <div className="space-y-4 mb-6">
                   {partnershipData.learning.moves.map((move) => (
-                    <div key={move.moveNumber} className="bg-gray-50 rounded-lg p-4 border border-gray-100">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-semibold text-gray-900">Move #{move.moveNumber}: {move.moveName}</span>
+                    <div key={move.moveNumber} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-7 h-7 rounded-full bg-[#1e2749] text-white text-xs font-bold flex items-center justify-center">
+                            {move.moveNumber}
+                          </div>
+                          <span className="text-sm font-bold text-gray-900">{move.moveName}</span>
+                        </div>
                         {move.implementationRate !== null ? (
-                          <span className="text-sm font-bold text-teal-700">{move.implementationRate}%</span>
+                          <span className="text-xl font-black text-teal-700">{move.implementationRate}%</span>
                         ) : (
-                          <span className="text-xs text-gray-400">Tracking at Obs Day 2</span>
+                          <span className="text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded-full">Tracking at Obs Day 3</span>
                         )}
                       </div>
                       {move.implementationRate !== null && (
-                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
+                        <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
                           <div
-                            className="bg-teal-500 h-2 rounded-full"
+                            className="bg-teal-500 h-2.5 rounded-full"
                             style={{ width: `${move.implementationRate}%` }}
                           />
                         </div>
                       )}
-                      <p className="text-xs text-gray-600">{move.note}</p>
+                      <p className="text-xs text-gray-500">{move.note}</p>
                     </div>
                   ))}
                 </div>
+
+                {/* Emerging themes section - from Observation Day 2 coaching themes */}
+                {partnershipData.observations.length > 1 && 'coachingThemes' in partnershipData.observations[1] && (
+                  <div>
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">
+                      Emerging Themes → Shaping Future Sessions
+                    </p>
+                    <div className="grid gap-3 sm:grid-cols-2">
+                      {(partnershipData.observations[1] as { coachingThemes?: Array<{ theme: string; insight: string }> }).coachingThemes?.slice(0, 4).map((theme, i) => {
+                        const colors = [
+                          'bg-orange-50 border-orange-100',
+                          'bg-teal-50 border-teal-100',
+                          'bg-purple-50 border-purple-100',
+                          'bg-amber-50 border-amber-100',
+                        ];
+                        const dotColors = ['bg-orange-400', 'bg-teal-400', 'bg-purple-400', 'bg-amber-400'];
+                        return (
+                          <div key={i} className={`rounded-xl p-4 border ${colors[i % colors.length]}`}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className={`w-2 h-2 rounded-full ${dotColors[i % dotColors.length]}`} />
+                              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Coaching Theme {i + 1}</p>
+                            </div>
+                            <p className="text-sm font-bold text-gray-900 mb-1">{theme.theme}</p>
+                            <p className="text-xs text-gray-600 leading-relaxed">{theme.insight}</p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </CollapsibleSection>
             )}
 
             {/* ─────────────────────────────────────────────
-                SECTION 9 — STAFF CHAMPIONS
+                SECTION 9 — STAFF CHAMPIONS + INTERNAL AMPLIFICATION
                 CONDITIONAL: show when champions.show === true
-                Celebration only. High Five button.
-                Names appear in celebration ONLY.
-                Starts collapsed.
+                Includes internal amplification card when present.
+                Starts collapsed (nice-to-have, not lead story).
             ───────────────────────────────────────────── */}
             {partnershipData.champions.show && partnershipData.champions.staff.length > 0 && (
               <CollapsibleSection
                 title="Staff Champions"
                 icon={<Star className="w-4 h-4 text-yellow-500" />}
-                defaultOpen={true}
+                defaultOpen={false}
                 accent="yellow"
               >
+                {/* Internal Amplification Card */}
+                {partnershipData.internalAmplification?.show && partnershipData.internalAmplification.activities.length > 0 && (
+                  <div className="mb-5 bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-5 border border-amber-200">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Zap className="w-4 h-4 text-amber-600" />
+                      <span className="text-sm font-bold text-amber-900">Internal Amplification</span>
+                    </div>
+                    <div className="space-y-3">
+                      {partnershipData.internalAmplification.activities.map((activity, i) => (
+                        <div key={i} className="bg-white/60 rounded-lg p-3 border border-amber-100">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-semibold text-amber-700 uppercase tracking-wide">{activity.type}</span>
+                            <span className="text-xs text-gray-400">{activity.date}</span>
+                          </div>
+                          <p className="text-sm font-medium text-gray-900 mb-1">{activity.description}</p>
+                          <p className="text-xs text-gray-600 italic">{activity.impact}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <p className="text-xs text-gray-500 mb-4 italic">{partnershipData.champions.highFiveInstructions}</p>
                 <div className="space-y-2">
                   {partnershipData.champions.staff.map((s, i) => (
-                    <div key={i} className="flex items-center justify-between bg-yellow-50 rounded-lg px-4 py-3 border border-yellow-100">
+                    <div key={i} className="flex items-center justify-between bg-yellow-50 rounded-xl px-4 py-3 border border-yellow-100">
                       <div>
-                        <p className="text-sm font-semibold text-gray-900">{s.name}</p>
+                        <p className="text-sm font-bold text-gray-900">{s.name}</p>
                         <p className="text-xs text-gray-500">{s.note}</p>
                       </div>
                       <a
@@ -2494,7 +2706,7 @@ Thank you for setting the example. It matters more than you know.`;
               <CollapsibleSection
                 title="What's Resonating"
                 icon={<Lightbulb className="w-4 h-4 text-orange-500" />}
-                defaultOpen={true}
+                defaultOpen={false}
                 accent="orange"
               >
                 <p className="text-xs text-gray-500 mb-4">{partnershipData.resonating.totalCoursesStarted} courses being actively explored across your team.{' '}
@@ -2525,7 +2737,7 @@ Thank you for setting the example. It matters more than you know.`;
               <CollapsibleSection
                 title="Your Team's Top Ask"
                 icon={<MessageCircle className="w-4 h-4 text-rose-500" />}
-                defaultOpen={true}
+                defaultOpen={false}
                 accent="rose"
               >
                 {/* Content populated from survey barrier data */}
@@ -2543,7 +2755,7 @@ Thank you for setting the example. It matters more than you know.`;
               <CollapsibleSection
                 title="Internal Amplification"
                 icon={<Megaphone className="w-4 h-4 text-orange-500" />}
-                defaultOpen={true}
+                defaultOpen={false}
                 accent="orange"
               >
                 <p className="text-xs text-gray-500 mb-4">Recognition and celebration activities across the district.</p>
