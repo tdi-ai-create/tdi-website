@@ -44,7 +44,8 @@ import {
   Sun,
   Sunset,
   CreditCard,
-  HelpCircle
+  HelpCircle,
+  Shield
 } from 'lucide-react';
 
 // Tooltip component
