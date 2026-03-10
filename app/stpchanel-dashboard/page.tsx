@@ -225,15 +225,19 @@ export default function StPeterChanelDashboard() {
     const isOpen = openSections[id];
 
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className={`bg-white rounded-2xl border overflow-hidden transition-all ${
+        isOpen ? 'border-gray-200 shadow-md' : 'border-gray-100 shadow-sm'
+      }`}>
         <button
           onClick={() => toggleSection(id)}
-          className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+          className={`w-full flex items-center justify-between px-6 py-4 transition-colors ${
+            isOpen ? 'bg-gray-50 border-b border-gray-100' : 'hover:bg-gray-50'
+          }`}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             {icon && <div className="text-[#38618C]">{icon}</div>}
             <div className="text-left">
-              <h3 className="font-semibold text-[#1e2749]">{title}</h3>
+              <span className="text-sm font-bold text-gray-900">{title}</span>
               {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
             </div>
           </div>
@@ -243,19 +247,15 @@ export default function StPeterChanelDashboard() {
                 {badge}
               </span>
             )}
-            {isOpen ? (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
-            ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-            )}
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </div>
         </button>
 
-        <div className={`overflow-hidden transition-all duration-200 ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className="px-4 pb-4 border-t border-gray-100">
+        {isOpen && (
+          <div className="px-6 pb-6 pt-4">
             {children}
           </div>
-        </div>
+        )}
       </div>
     );
   };
@@ -647,11 +647,11 @@ export default function StPeterChanelDashboard() {
       </div>
 
       {/* Tab Content */}
-      <div className="max-w-5xl mx-auto px-4 py-6">
-        
+      <div className="max-w-4xl mx-auto px-4 py-6">
+
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
-          <div className="space-y-8 pb-8">
+          <div className="space-y-4 pb-16">
 
             {/* ─── ZONE 1: PARTNERSHIP SNAPSHOT ─── */}
             <div className="space-y-4">
@@ -944,7 +944,7 @@ export default function StPeterChanelDashboard() {
 
         {/* OUR JOURNEY TAB */}
         {activeTab === 'journey' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Partnership Goal & Indicators */}
             <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
 
@@ -1007,9 +1007,9 @@ export default function StPeterChanelDashboard() {
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-red-500 rounded-full" style={{ width: '38%' }} />
+                        <div className="h-full bg-amber-500 rounded-full" style={{ width: '38%' }} />
                       </div>
-                      <span className="text-xs text-red-500 font-medium">38th</span>
+                      <span className="text-xs text-amber-500 font-medium">38th</span>
                     </div>
                   </div>
 
@@ -1024,9 +1024,9 @@ export default function StPeterChanelDashboard() {
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-red-500 rounded-full" style={{ width: '39%' }} />
+                        <div className="h-full bg-amber-500 rounded-full" style={{ width: '39%' }} />
                       </div>
-                      <span className="text-xs text-red-500 font-medium">39th</span>
+                      <span className="text-xs text-amber-500 font-medium">39th</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-2 bg-gray-100 rounded-full">
@@ -1041,9 +1041,9 @@ export default function StPeterChanelDashboard() {
                     <span className="text-sm font-medium">5th</span>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-red-500 rounded-full" style={{ width: '30%' }} />
+                        <div className="h-full bg-amber-500 rounded-full" style={{ width: '30%' }} />
                       </div>
-                      <span className="text-xs text-red-500 font-medium">30th ⚠️</span>
+                      <span className="text-xs text-amber-500 font-medium">30th ⚠️</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-2 bg-gray-100 rounded-full">
@@ -1064,9 +1064,9 @@ export default function StPeterChanelDashboard() {
                     <span className="text-sm font-medium">6th</span>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-red-500 rounded-full" style={{ width: '37%' }} />
+                        <div className="h-full bg-amber-500 rounded-full" style={{ width: '37%' }} />
                       </div>
-                      <span className="text-xs text-red-500 font-medium">37th</span>
+                      <span className="text-xs text-amber-500 font-medium">37th</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-2 bg-gray-100 rounded-full">
@@ -1109,7 +1109,7 @@ export default function StPeterChanelDashboard() {
                 {/* Legend */}
                 <div className="flex gap-4 mt-6 pt-4 border-t text-xs">
                   <span className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-red-500" /> Below 40th
+                    <div className="w-3 h-3 rounded-full bg-amber-500" /> Below 40th
                   </span>
                   <span className="flex items-center gap-1">
                     <div className="w-3 h-3 rounded-full bg-[#E07A5F]" /> 40th-49th
@@ -1148,7 +1148,7 @@ export default function StPeterChanelDashboard() {
               </div>
 
               {/* Indicator Bars */}
-              <div className="space-y-6">
+              <div className="space-y-4">
 
                 {/* Teacher Stress (lower is better -  bars INVERTED) */}
                 <div>
@@ -1372,14 +1372,14 @@ export default function StPeterChanelDashboard() {
 
                     {currentPhase.pending && (
                       <div>
-                        <h4 className="font-semibold text-[#E07A5F] mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
+                        <h4 className="font-semibold text-amber-600 mb-2 text-sm uppercase tracking-wide flex items-center gap-2">
                           <AlertCircle className="w-4 h-4" />
-                          Needs Attention
+                          Next to Unlock
                         </h4>
                         <ul className="space-y-1.5">
                           {currentPhase.pending.map((item, i) => (
                             <li key={i} className="flex items-start gap-2 text-gray-600 text-sm">
-                              <Calendar className="w-4 h-4 text-[#E07A5F] mt-0.5 flex-shrink-0" />
+                              <Calendar className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
                               {item}
                             </li>
                           ))}
@@ -1451,7 +1451,7 @@ export default function StPeterChanelDashboard() {
 
         {/* IMPLEMENTATION TAB */}
         {activeTab === 'implementation' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* SECTION A: Observation Timeline */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
@@ -1540,9 +1540,9 @@ export default function StPeterChanelDashboard() {
                     </div>
 
                     {/* Areas to Watch */}
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                      <p className="text-sm font-medium text-red-800 mb-2">Areas to Watch:</p>
-                      <ul className="text-sm text-red-700 space-y-1">
+                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                      <p className="text-sm font-medium text-amber-800 mb-2">Areas to Watch:</p>
+                      <ul className="text-sm text-amber-700 space-y-1">
                         <li>• <strong>Strategy implementation at 21%</strong> -  needs support</li>
                         <li>• <strong>Time constraints</strong> -  top barrier</li>
                       </ul>
@@ -2102,7 +2102,7 @@ export default function StPeterChanelDashboard() {
 
         {/* FULL BLUEPRINT TAB */}
         {activeTab === 'blueprint' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">The Full TDI Blueprint</h2>
               <p className="text-gray-600">What becomes available when we continue our partnership</p>
@@ -2127,7 +2127,7 @@ export default function StPeterChanelDashboard() {
 
         {/* 2026-27 PREVIEW TAB */}
         {activeTab === 'next-year' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
 
             {/* Header */}
             <div className="bg-gradient-to-br from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
@@ -2755,7 +2755,7 @@ export default function StPeterChanelDashboard() {
 
         {/* YOUR TDI TEAM TAB */}
         {activeTab === 'team' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your TDI Team</h2>
               <p className="text-gray-600">Your dedicated partner for this journey</p>
@@ -2861,7 +2861,7 @@ export default function StPeterChanelDashboard() {
 
         {/* BILLING TAB */}
         {activeTab === 'billing' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
 
             {/* Section 1: Thank You Banner */}
             <div className="bg-[#1e2749] rounded-xl p-4">

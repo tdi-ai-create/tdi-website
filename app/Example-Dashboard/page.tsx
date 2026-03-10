@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import {
@@ -627,15 +627,19 @@ export default function ExampleDashboard() {
     const isOpen = openSections[id];
 
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className={`bg-white rounded-2xl border overflow-hidden transition-all ${
+        isOpen ? 'border-gray-200 shadow-md' : 'border-gray-100 shadow-sm'
+      }`}>
         <button
           onClick={() => toggleSection(id)}
-          className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+          className={`w-full flex items-center justify-between px-6 py-4 transition-colors ${
+            isOpen ? 'bg-gray-50 border-b border-gray-100' : 'hover:bg-gray-50'
+          }`}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             {icon && <div className="text-[#38618C]">{icon}</div>}
             <div className="text-left">
-              <h3 className="font-semibold text-[#1e2749]">{title}</h3>
+              <span className="text-sm font-bold text-gray-900">{title}</span>
               {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
             </div>
           </div>
@@ -645,19 +649,71 @@ export default function ExampleDashboard() {
                 {badge}
               </span>
             )}
-            {isOpen ? (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
-            ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-            )}
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </div>
         </button>
 
-        <div className={`overflow-hidden transition-all duration-200 ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className="px-4 pb-4 border-t border-gray-100">
+        {isOpen && (
+          <div className="px-6 pb-6 pt-4">
             {children}
           </div>
-        </div>
+        )}
+      </div>
+    );
+  };
+
+  // CollapsibleSection Component (ASD4 style with accent colors)
+  const CollapsibleSection = ({
+    title,
+    icon,
+    defaultOpen = false,
+    accent = 'gray',
+    children,
+  }: {
+    title: string;
+    icon: React.ReactNode;
+    defaultOpen?: boolean;
+    accent?: 'teal' | 'amber' | 'green' | 'blue' | 'purple' | 'yellow' | 'rose' | 'indigo' | 'orange' | 'gray';
+    children: React.ReactNode;
+  }) => {
+    const [open, setOpen] = useState(defaultOpen);
+
+    const accentStyles: Record<string, { border: string; headerBg: string }> = {
+      teal: { border: 'border-l-4 border-l-teal-500', headerBg: 'bg-teal-50/50' },
+      amber: { border: 'border-l-4 border-l-amber-500', headerBg: 'bg-amber-50/50' },
+      green: { border: 'border-l-4 border-l-green-500', headerBg: 'bg-green-50/50' },
+      blue: { border: 'border-l-4 border-l-blue-500', headerBg: 'bg-blue-50/50' },
+      purple: { border: 'border-l-4 border-l-purple-500', headerBg: 'bg-purple-50/50' },
+      yellow: { border: 'border-l-4 border-l-yellow-500', headerBg: 'bg-yellow-50/50' },
+      rose: { border: 'border-l-4 border-l-rose-500', headerBg: 'bg-rose-50/50' },
+      indigo: { border: 'border-l-4 border-l-indigo-500', headerBg: 'bg-indigo-50/50' },
+      orange: { border: 'border-l-4 border-l-orange-500', headerBg: 'bg-orange-50/50' },
+      gray: { border: '', headerBg: 'bg-white' },
+    };
+
+    const style = accentStyles[accent] || accentStyles.gray;
+
+    return (
+      <div className={`bg-white rounded-2xl border overflow-hidden transition-all ${style.border} ${
+        open ? 'border-gray-200 shadow-md' : 'border-gray-100 shadow-sm'
+      }`}>
+        <button
+          onClick={() => setOpen(!open)}
+          className={`w-full flex items-center justify-between px-6 py-4 transition-colors ${
+            open ? 'bg-gray-50 border-b border-gray-100' : 'hover:bg-gray-50'
+          } ${style.headerBg}`}
+        >
+          <div className="flex items-center gap-2.5">
+            {icon}
+            <span className="text-sm font-bold text-gray-900">{title}</span>
+          </div>
+          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+        </button>
+        {open && (
+          <div className="px-6 pb-6 pt-4">
+            {children}
+          </div>
+        )}
       </div>
     );
   };
@@ -786,15 +842,8 @@ export default function ExampleDashboard() {
     }, 100);
   };
 
-  // Handle tab change with scroll to top
   const handleTabChange = (tab: string) => {
     setActiveTab(tab);
-    setTimeout(() => {
-      const tabContent = document.getElementById('tab-content-area');
-      if (tabContent) {
-        scrollToElement(tabContent);
-      }
-    }, 50);
   };
 
   // Due dates for each item (month, year)
@@ -954,7 +1003,7 @@ export default function ExampleDashboard() {
       statusColor: 'green',
       details: [
         '87% Hub engagement across all 6 buildings',
-        'Retention intent 9.8/10 — staff choosing to stay',
+        'Retention intent 9.8/10 - staff choosing to stay',
         'Strategy implementation 2x the national average',
         'Year 2 expansion conversations underway',
       ],
@@ -963,26 +1012,26 @@ export default function ExampleDashboard() {
     // ZONE 2A - Timeline
     timeline: {
       done: [
-        { label: 'Partnership launched — 255 staff enrolled across 6 buildings', date: 'Sep 2025' },
-        { label: 'Hub access activated — all buildings onboarded', date: 'Sep 2025' },
-        { label: 'Baseline survey complete — 255/255 staff responded (100%)', date: 'Oct 2025' },
-        { label: 'Para Pilot Observation Day — Love Notes delivered', date: 'Nov 2025' },
-        { label: 'Teacher Pilot Observation Day — Love Notes delivered', date: 'Dec 2025' },
-        { label: 'Virtual Session 1 — Para Cohort (district-wide)', date: 'Jan 2026' },
-        { label: 'Virtual Session 2 — Teacher Cohort (Harmony + Crescendo)', date: 'Feb 2026' },
-        { label: 'Mid-year leadership recap — all 6 building principals', date: 'Feb 2026' },
+        { label: 'Partnership launched - 255 staff enrolled across 6 buildings', date: 'Sep 2025' },
+        { label: 'Hub access activated - all buildings onboarded', date: 'Sep 2025' },
+        { label: 'Baseline survey complete - 255/255 staff responded (100%)', date: 'Oct 2025' },
+        { label: 'Para Pilot Observation Day - Love Notes delivered', date: 'Nov 2025' },
+        { label: 'Teacher Pilot Observation Day - Love Notes delivered', date: 'Dec 2025' },
+        { label: 'Virtual Session 1 - Para Cohort (district-wide)', date: 'Jan 2026' },
+        { label: 'Virtual Session 2 - Teacher Cohort (Harmony + Crescendo)', date: 'Feb 2026' },
+        { label: 'Mid-year leadership recap - all 6 building principals', date: 'Feb 2026' },
       ],
       inProgress: [
-        { label: 'Hub engagement — 223/255 staff active across 6 buildings', detail: '87% and growing — goal: 100% by spring obs' },
-        { label: 'Strategy implementation tracking', detail: '21% district-wide — 2x the 10% national average' },
-        { label: 'Spring observation day coordination', detail: 'Para + Teacher Pilot Groups — April 2026' },
+        { label: 'Hub engagement - 223/255 staff active across 6 buildings', detail: '87% and growing - goal: 100% by spring obs' },
+        { label: 'Strategy implementation tracking', detail: '21% district-wide - 2x the 10% national average' },
+        { label: 'Spring observation day coordination', detail: 'Para + Teacher Pilot Groups - April 2026' },
         { label: 'Year 2 district expansion planning', detail: 'Discussions underway with district leadership' },
       ],
       comingSoon: [
-        { label: 'Spring Leadership Recap — District Team', date: 'Due April 2026' },
+        { label: 'Spring Leadership Recap - District Team', date: 'Due April 2026' },
         { label: 'Virtual Session: Teacher Cohort (Harmony + Crescendo)', date: 'Due May 2026' },
         { label: 'Virtual Session: Para Cohort (District-wide)', date: 'Due May 2026' },
-        { label: 'Spring Observation Days — Para + Teacher Pilot Groups', date: 'Due April 2026' },
+        { label: 'Spring Observation Days - Para + Teacher Pilot Groups', date: 'Due April 2026' },
         { label: 'Year 2 Expansion Proposal', date: 'Spring 2026' },
       ],
     },
@@ -990,20 +1039,20 @@ export default function ExampleDashboard() {
     // ZONE 2B - Investment value mirror
     investment: {
       perEducator: '$299',
-      perEducatorSublabel: 'per educator — less than a one-day sub, district-wide',
+      perEducatorSublabel: 'per educator - less than a one-day sub, district-wide',
       implementationRate: '9.8',
-      implementationSublabel: 'out of 10 — staff retention intent (industry avg: 2-4)',
+      implementationSublabel: 'out of 10 - staff retention intent (industry avg: 2-4)',
       coursesCompleted: 6.0,
-      coursesCompletedSublabel: 'avg stress score — well below industry average of 8-9',
+      coursesCompletedSublabel: 'avg stress score - well below industry average of 8-9',
       retentionStat: '21%',
-      retentionSublabel: 'strategy implementation — 2x the 10% national average',
+      retentionSublabel: 'strategy implementation - 2x the 10% national average',
     },
 
     // ZONE 2C - Quick win counter
     quickWin: {
       count: 223,
       line1: '223 of 255 Motown District educators have logged into the TDI Learning Hub.',
-      line2: '87% engagement across 6 buildings — and growing every week.',
+      line2: '87% engagement across 6 buildings - and growing every week.',
     },
 
     // ZONE 3 - Actions
@@ -1011,21 +1060,21 @@ export default function ExampleDashboard() {
       nextToUnlock: [
         {
           label: 'Schedule Spring Leadership Recap',
-          detail: 'Review district-wide progress across all 6 buildings + set goals for 2026-27 — due April 2026',
+          detail: 'Review district-wide progress across all 6 buildings + set goals for 2026-27 - due April 2026',
           owner: 'partner',
           cta: 'Schedule via Calendly',
           ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
         },
         {
-          label: 'Schedule Virtual Session — Teacher Cohort',
-          detail: 'Harmony + Crescendo focus: differentiation strategies from recent observations — due May 2026',
+          label: 'Schedule Virtual Session - Teacher Cohort',
+          detail: 'Harmony + Crescendo focus: differentiation strategies from recent observations - due May 2026',
           owner: 'partner',
           cta: 'Schedule via Calendly',
           ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
         },
         {
-          label: 'Schedule Virtual Session — Para Cohort',
-          detail: 'District-wide focus: teacher-para collaboration from pilot group feedback — due May 2026',
+          label: 'Schedule Virtual Session - Para Cohort',
+          detail: 'District-wide focus: teacher-para collaboration from pilot group feedback - due May 2026',
           owner: 'partner',
           cta: 'Schedule via Calendly',
           ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
@@ -1033,17 +1082,17 @@ export default function ExampleDashboard() {
       ],
       tdiHandling: [
         {
-          label: 'Spring Observation Day prep — Para + Teacher Pilot Groups',
-          detail: 'TDI coordinating with building leads for classroom walk-throughs — April 2026',
+          label: 'Spring Observation Day prep - Para + Teacher Pilot Groups',
+          detail: 'TDI coordinating with building leads for classroom walk-throughs - April 2026',
         },
         {
           label: 'Year 2 district expansion proposal',
-          detail: 'TDI preparing full proposal for 2026-27 — to be presented at Spring Leadership Recap',
+          detail: 'TDI preparing full proposal for 2026-27 - to be presented at Spring Leadership Recap',
         },
       ],
       alreadyInMotion: [
         { label: 'All 6 buildings Hub-active', date: '223/255 staff engaged', status: 'scheduled' },
-        { label: 'Spring Observation Days — both cohorts', date: 'April 2026', status: 'scheduled' },
+        { label: 'Spring Observation Days - both cohorts', date: 'April 2026', status: 'scheduled' },
         { label: 'Year 2 expansion conversations', date: 'Underway with district leadership', status: 'scheduled' },
       ],
     },
@@ -1079,7 +1128,7 @@ export default function ExampleDashboard() {
       <section className="relative text-white py-6 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-[#1e2749] via-[#38618C] to-[#1e2749]" />
         
-        <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="relative max-w-4xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <h1 className="text-2xl md:text-3xl font-bold whitespace-nowrap">Motown District 360</h1>
@@ -1104,14 +1153,13 @@ export default function ExampleDashboard() {
         </div>
       </section>
 
-      {/* Tab Navigation - Shortened Labels */}
-      <div className="bg-white border-b border-gray-200 sticky top-14 z-40 shadow-sm">
-        <div className="max-w-5xl mx-auto px-4 py-3">
-          <div className="flex justify-center gap-2">
+      {/* Tab Navigation */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-4xl mx-auto px-4 py-3">
+          <div className="flex justify-center gap-2 flex-wrap">
             {[
               { id: 'overview', label: 'Overview', icon: Eye },
-              { id: 'journey', label: 'Journey', icon: TrendingUp },
-              { id: 'implementation', label: 'Progress', icon: Users },
+              { id: 'ourPartnership', label: 'Our Partnership', icon: Heart },
               { id: 'schools', label: 'Schools', icon: School },
               { id: 'blueprint', label: 'Blueprint', icon: Star },
               { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
@@ -1140,11 +1188,11 @@ export default function ExampleDashboard() {
       </div>
 
       {/* Tab Content */}
-      <div id="tab-content-area" className="max-w-5xl mx-auto px-4 py-6">
+      <div id="tab-content-area" className="max-w-4xl mx-auto px-4 py-6">
         
         {/* ==================== OVERVIEW TAB ==================== */}
         {activeTab === 'overview' && (
-          <div className="space-y-8 pb-8">
+          <div className="space-y-4 pb-16">
 
             {/* ─── ZONE 1: PARTNERSHIP SNAPSHOT ─── */}
             <div className="space-y-4">
@@ -1332,7 +1380,7 @@ export default function ExampleDashboard() {
               <div className="bg-[#e8f5f5] rounded-2xl p-1 border border-[#38618C]/15">
                 <div className="px-5 pt-5 pb-3">
                   <h3 className="text-base font-bold text-[#1e2749]">Your Investment, By The Numbers</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">What this partnership delivers — in impact and value</p>
+                  <p className="text-xs text-gray-500 mt-0.5">What this partnership delivers - in impact and value</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#38618C]/10 rounded-xl overflow-hidden">
                   {[
@@ -1432,1689 +1480,607 @@ export default function ExampleDashboard() {
           </div>
         )}
 
-        {/* OUR JOURNEY TAB */}
-        {activeTab === 'journey' && (
-          <div className="space-y-6">
-            {/* Partnership Goal & Indicators */}
-            <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
+        {/* ==================== OUR PARTNERSHIP TAB ==================== */}
+        {activeTab === 'ourPartnership' && (
+          <div className="space-y-4 pb-16">
 
-              {/* Goal Header */}
-              <div className="mb-6">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Target className="w-5 h-5 text-[#38618C]" />
-                  <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Our Shared Goal:</span>
-                  <span className="font-semibold text-[#1e2749]">Student performance aligned with state benchmarks</span>
-                </div>
-                <p className="text-sm text-gray-500 mt-1 ml-7">Established Spring 2025 · Tracked via observations, Hub data, and staff surveys</p>
+            {/* ─────────────────────────────────────────────
+                SECTION 1 - PARTNERSHIP GOAL
+                Always visible. Dark navy gradient hero card.
+            ───────────────────────────────────────────── */}
+            <div className="relative bg-gradient-to-br from-[#1e2749] to-[#2d3a6b] rounded-2xl p-8 overflow-hidden shadow-xl">
+              <div className="absolute top-0 right-0 w-64 h-64 opacity-5 pointer-events-none">
+                <svg viewBox="0 0 200 200" fill="none">
+                  <circle cx="150" cy="50" r="100" fill="white"/>
+                  <circle cx="50" cy="150" r="80" fill="white"/>
+                </svg>
               </div>
-
-              {/* Divider */}
-              <div className="border-t border-gray-200 mb-6"></div>
-
-              {/* Student Performance - Real Data */}
-              <div className="bg-white rounded-xl p-6 shadow-sm mb-6">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h3 className="font-semibold text-[#1e2749]">Student Performance</h3>
-                    <p className="text-sm text-gray-500">TerraNova National Percentiles vs Classroom Grades</p>
-                  </div>
-                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full">
-                    2024-25 Data
-                  </span>
+              <div className="relative z-10">
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="w-1 h-8 bg-teal-400 rounded-full" />
+                  <span className="text-teal-300 text-xs font-bold uppercase tracking-widest">Your Partnership Goal</span>
                 </div>
+                <blockquote className="text-2xl font-bold text-white leading-relaxed max-w-2xl mb-4">
+                  &ldquo;Student performance aligned with state benchmarks&rdquo;
+                </blockquote>
+                <p className="text-blue-200 text-sm italic">Established Spring 2025 - Tracked via observations, Hub data, and staff surveys</p>
+              </div>
+            </div>
 
-                {/* The Gap Callout */}
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 mb-6">
-                  <p className="text-sm font-medium text-amber-800">
-                    The Gap: Classroom grades average <strong>A (90-100%)</strong>, but TerraNova scores for grades 3-6 range from <strong>30th-58th percentile</strong>.
+            {/* ─────────────────────────────────────────────
+                SECTION 2 - CLASSROOM OBSERVATIONS
+                Always visible. Stats strip + AI summary visible.
+            ───────────────────────────────────────────── */}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-teal-600" />
+                  <h3 className="text-sm font-semibold text-gray-900">Classroom Observations</h3>
+                </div>
+                <span className="text-xs text-gray-400">2 observation days complete</span>
+              </div>
+              <div className="divide-y divide-gray-100">
+                {/* Observation Day 2: Teacher Pilot (Most Recent) */}
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-sm bg-teal-600">
+                        #2
+                      </div>
+                      <div>
+                        <p className="font-bold text-gray-900 text-sm">Observation Day 2: Teacher Pilot</p>
+                        <p className="text-xs text-gray-400">Motown Middle School - February 26, 2026</p>
+                      </div>
+                    </div>
+                    <span className="text-xs bg-green-100 text-green-700 font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+                      <CheckCircle className="w-3 h-3" /> Complete
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="bg-teal-50 rounded-xl p-3 text-center border border-teal-100">
+                      <p className="text-2xl font-bold text-teal-700">12</p>
+                      <p className="text-xs text-teal-600 font-medium mt-0.5">Classrooms</p>
+                    </div>
+                    <div className="bg-orange-50 rounded-xl p-3 text-center border border-orange-100">
+                      <p className="text-2xl font-bold text-orange-600">12</p>
+                      <p className="text-xs text-orange-600 font-medium mt-0.5">Love Notes</p>
+                    </div>
+                    <div className="bg-green-50 rounded-xl p-3 text-center border border-green-100">
+                      <p className="text-2xl font-bold text-green-700">187</p>
+                      <p className="text-xs text-green-600 font-medium mt-0.5">Teachers District-Wide</p>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                    Observed 12 teacher classrooms across grade levels at Motown Middle School. Teachers received personalized Love Notes highlighting their instructional strengths. Mid-year survey comparison showed significant improvement in teacher confidence and classroom management strategies.
                   </p>
+                  <Accordion
+                    id="obs-day-2-details"
+                    title="View classroom details"
+                    icon={<ChevronDown className="w-4 h-4" />}
+                  >
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm font-medium text-[#1B2A4A] mb-2">What We Did:</p>
+                        <ul className="text-sm text-gray-600 space-y-1">
+                          <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#35A7FF]" />Observed 12 teacher classrooms across grade levels</li>
+                          <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#35A7FF]" />Delivered personalized Love Notes to each teacher</li>
+                          <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#35A7FF]" />Completed mid-year survey comparison</li>
+                          <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#35A7FF]" />Refined Growth Group focus areas</li>
+                        </ul>
+                      </div>
+                      <div className="bg-[#FEF9E7] rounded-lg p-4 border-l-4 border-[#FFBA06]">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Heart className="w-4 h-4 text-[#FFBA06]" />
+                          <span className="font-semibold text-[#1B2A4A] text-sm">Love Note Highlight</span>
+                        </div>
+                        <p className="text-sm text-gray-700 italic">
+                          &quot;Ms. Carter, your wait time during questioning was exceptional today. You gave students space to think, and the quality of responses showed it. That patience is building real thinkers.&quot;
+                        </p>
+                        <p className="text-xs text-gray-500 mt-2">- Delivered to Ms. Carter, 6th Grade Math Teacher</p>
+                      </div>
+                    </div>
+                  </Accordion>
                 </div>
 
-                {/* Chart by Grade */}
-                <div className="space-y-4">
-                  {/* Header */}
-                  <div className="grid grid-cols-4 gap-4 text-xs text-gray-500 font-medium border-b pb-2">
-                    <span>Grade</span>
-                    <span>Reading</span>
-                    <span>Language</span>
-                    <span>Math</span>
+                {/* Observation Day 1: Para Pilot */}
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-sm bg-teal-600">
+                        #1
+                      </div>
+                      <div>
+                        <p className="font-bold text-gray-900 text-sm">Observation Day 1: Para Pilot</p>
+                        <p className="text-xs text-gray-400">Harmony Elementary - February 13, 2026</p>
+                      </div>
+                    </div>
+                    <span className="text-xs bg-green-100 text-green-700 font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+                      <CheckCircle className="w-3 h-3" /> Complete
+                    </span>
                   </div>
-
-                  {/* 3rd Grade - Below Average */}
-                  <div className="grid grid-cols-4 gap-4 items-center">
-                    <span className="text-sm font-medium">3rd</span>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '39%' }} />
-                      </div>
-                      <span className="text-xs text-[#E07A5F] font-medium">39th</span>
+                  <div className="grid grid-cols-3 gap-3 mb-4">
+                    <div className="bg-teal-50 rounded-xl p-3 text-center border border-teal-100">
+                      <p className="text-2xl font-bold text-teal-700">10</p>
+                      <p className="text-xs text-teal-600 font-medium mt-0.5">Classrooms</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '43%' }} />
-                      </div>
-                      <span className="text-xs text-[#E07A5F] font-medium">43rd</span>
+                    <div className="bg-orange-50 rounded-xl p-3 text-center border border-orange-100">
+                      <p className="text-2xl font-bold text-orange-600">10</p>
+                      <p className="text-xs text-orange-600 font-medium mt-0.5">Love Notes</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-red-500 rounded-full" style={{ width: '38%' }} />
-                      </div>
-                      <span className="text-xs text-red-500 font-medium">38th</span>
+                    <div className="bg-green-50 rounded-xl p-3 text-center border border-green-100">
+                      <p className="text-2xl font-bold text-green-700">68</p>
+                      <p className="text-xs text-green-600 font-medium mt-0.5">Paras District-Wide</p>
                     </div>
                   </div>
-
-                  {/* 4th Grade */}
-                  <div className="grid grid-cols-4 gap-4 items-center">
-                    <span className="text-sm font-medium">4th</span>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '43%' }} />
+                  <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                    Observed 10 para-supported classrooms at Harmony Elementary. Each para received personalized Love Notes highlighting their specific strengths in student support. Collected baseline survey data and identified growth areas for Growth Groups.
+                  </p>
+                  <Accordion
+                    id="obs-day-1-details"
+                    title="View classroom details"
+                    icon={<ChevronDown className="w-4 h-4" />}
+                  >
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm font-medium text-[#1B2A4A] mb-2">What We Did:</p>
+                        <ul className="text-sm text-gray-600 space-y-1">
+                          <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#35A7FF]" />Observed 10 para-supported classrooms</li>
+                          <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#35A7FF]" />Delivered personalized Love Notes to each para</li>
+                          <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#35A7FF]" />Collected baseline survey data</li>
+                          <li className="flex items-center gap-2"><Check className="w-4 h-4 text-[#35A7FF]" />Identified growth areas for Growth Groups</li>
+                        </ul>
                       </div>
-                      <span className="text-xs text-[#E07A5F] font-medium">43rd</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-red-500 rounded-full" style={{ width: '39%' }} />
+                      <div className="bg-[#FEF9E7] rounded-lg p-4 border-l-4 border-[#FFBA06]">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Heart className="w-4 h-4 text-[#FFBA06]" />
+                          <span className="font-semibold text-[#1B2A4A] text-sm">Love Note Highlight</span>
+                        </div>
+                        <p className="text-sm text-gray-700 italic">
+                          &quot;Marcus, the way you redirected Jaylen back to the group without missing a beat showed real skill. You kept the whole table on track while giving him exactly what he needed. That&apos;s the kind of support that changes outcomes.&quot;
+                        </p>
+                        <p className="text-xs text-gray-500 mt-2">- Delivered to Marcus T., Para at Harmony Elementary</p>
                       </div>
-                      <span className="text-xs text-red-500 font-medium">39th</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-[#35A7FF] rounded-full" style={{ width: '58%' }} />
+                      <div className="bg-[#F5F5F5] rounded-lg p-4 border-l-4 border-[#E07A5F]">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Quote className="w-4 h-4 text-[#E07A5F]" />
+                          <span className="font-semibold text-[#1B2A4A] text-sm">From the Field</span>
+                        </div>
+                        <p className="text-sm text-gray-700 italic">
+                          &quot;I&apos;ve been a para for 12 years and no one has ever watched me work and told me what I was doing right. This meant everything.&quot;
+                        </p>
+                        <p className="text-xs text-gray-500 mt-2">- Para at Harmony Elementary</p>
                       </div>
-                      <span className="text-xs text-[#35A7FF] font-medium">58th</span>
                     </div>
-                  </div>
-
-                  {/* 5th Grade - Lowest Reading */}
-                  <div className="grid grid-cols-4 gap-4 items-center">
-                    <span className="text-sm font-medium">5th</span>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-red-500 rounded-full" style={{ width: '30%' }} />
-                      </div>
-                      <span className="text-xs text-red-500 font-medium">30th</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '43%' }} />
-                      </div>
-                      <span className="text-xs text-[#E07A5F] font-medium">43rd</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-[#35A7FF] rounded-full" style={{ width: '55%' }} />
-                      </div>
-                      <span className="text-xs text-[#35A7FF] font-medium">55th</span>
-                    </div>
-                  </div>
-
-                  {/* 6th Grade */}
-                  <div className="grid grid-cols-4 gap-4 items-center">
-                    <span className="text-sm font-medium">6th</span>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-red-500 rounded-full" style={{ width: '37%' }} />
-                      </div>
-                      <span className="text-xs text-red-500 font-medium">37th</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-[#E07A5F] rounded-full" style={{ width: '48%' }} />
-                      </div>
-                      <span className="text-xs text-[#E07A5F] font-medium">48th</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-[#35A7FF] rounded-full" style={{ width: '58%' }} />
-                      </div>
-                      <span className="text-xs text-[#35A7FF] font-medium">58th</span>
-                    </div>
-                  </div>
-
-                  {/* 7th Grade - Strong */}
-                  <div className="grid grid-cols-4 gap-4 items-center bg-green-50 -mx-2 px-2 py-2 rounded-lg">
-                    <span className="text-sm font-medium text-green-700">7th ✓</span>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-green-500 rounded-full" style={{ width: '66%' }} />
-                      </div>
-                      <span className="text-xs text-green-600 font-medium">66th</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-green-500 rounded-full" style={{ width: '65%' }} />
-                      </div>
-                      <span className="text-xs text-green-600 font-medium">65th</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                        <div className="h-full bg-green-500 rounded-full" style={{ width: '75%' }} />
-                      </div>
-                      <span className="text-xs text-green-600 font-medium">75th</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Legend */}
-                <div className="flex gap-4 mt-6 pt-4 border-t text-xs">
-                  <span className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-red-500" /> Below 40th
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-[#E07A5F]" /> 40th-49th
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-[#35A7FF]" /> 50th-64th
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <div className="w-3 h-3 rounded-full bg-green-500" /> 65th+
-                  </span>
-                </div>
-
-                {/* Dr. Ford's Focus */}
-                <div className="bg-[#1e2749] text-white rounded-lg p-4 mt-4">
-                  <p className="text-sm font-medium mb-1">Dr. Ford&apos;s District Goal for Next Year:</p>
-                  <p className="text-sm opacity-90">&quot;More engaging lessons and differentiated learning in the regular classroom&quot;</p>
+                  </Accordion>
                 </div>
               </div>
+            </div>
 
-              {/* Leading Indicators Header */}
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-[#1e2749] uppercase tracking-wide">Leading Indicators</span>
-                <span className="text-xs bg-[#35A7FF]/10 text-[#35A7FF] px-3 py-1 rounded-full">
-                  Baseline: Jan 14, 2026
-                </span>
+            {/* ─────────────────────────────────────────────
+                SECTION 3 - SCHOOL / DISTRICT SNAPSHOT
+                Starts OPEN
+            ───────────────────────────────────────────── */}
+            <CollapsibleSection
+              title="District Snapshot"
+              icon={<Building className="w-4 h-4 text-blue-600" />}
+              defaultOpen={true}
+              accent="blue"
+            >
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 mb-4">
+                <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                  <p className="text-2xl font-bold text-blue-700">Motown District 360</p>
+                  <p className="text-xs text-blue-600 font-medium mt-1">District Name</p>
+                </div>
+                <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                  <p className="text-2xl font-bold text-blue-700">6</p>
+                  <p className="text-xs text-blue-600 font-medium mt-1">Buildings</p>
+                </div>
+                <div className="bg-blue-50 rounded-xl p-4 border border-blue-100">
+                  <p className="text-2xl font-bold text-blue-700">255</p>
+                  <p className="text-xs text-blue-600 font-medium mt-1">Staff Enrolled</p>
+                </div>
               </div>
-
-              {/* Leading Indicators Description */}
-              <div className="mb-6">
-                <p className="text-sm text-gray-600 mb-2">
-                  Research shows these four indicators are the strongest predictors of sustainable classroom change and student outcomes.<sup className="text-[#35A7FF]">1</sup> Each indicator is personalized to Motown District 360&apos;s goals, established during our partnership kickoff.
-                </p>
-                <p className="text-xs text-gray-400">
-                  <sup>1</sup> RAND Corporation (2025), Learning Policy Institute · Indicators selected based on your district&apos;s specific priorities
-                </p>
-              </div>
-
-              {/* Indicator Bars */}
-              <div className="space-y-6">
-
-                {/* Teacher Stress (lower is better -  bars INVERTED) */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-[#1e2749]">Teacher Stress</span>
-                    <span className="text-xs text-gray-400">Lower is better</span>
-                  </div>
-                  <div className="space-y-2">
-                    {/* Industry 8-9/10 = HIGH stress = BAD = SHORT bar */}
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '15%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">8-9/10</span>
-                    </div>
-                    {/* TDI 5-7/10 = MEDIUM stress = BETTER = LONGER bar */}
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '45%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
-                    </div>
-                    {/* Motown District 360 6.0/10 = LOW stress = BEST = LONGEST bar */}
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown District 360</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-green-500" style={{ width: '40%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-green-600 w-14 text-right">6.0/10</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Strategy Implementation (higher is better) */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-[#1e2749]">Strategy Implementation</span>
-                    <span className="text-xs text-gray-400">Higher is better</span>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '10%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">10%</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '65%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">65%</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown District 360</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#35A7FF]" style={{ width: '21%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#35A7FF] w-14 text-right">21%</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Retention Intent (higher is better) */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-[#1e2749]">Retention Intent</span>
-                    <span className="text-xs text-gray-400">Higher is better</span>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Industry Avg</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#E07A5F]" style={{ width: '30%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#E07A5F] w-14 text-right">2-4/10</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">TDI Partners</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '60%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">5-7/10</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown District 360</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-green-500" style={{ width: '98%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-green-600 w-14 text-right">9.8/10</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Grading Alignment (higher is better) */}
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-semibold text-[#1e2749]">Grading Alignment</span>
-                    <span className="text-xs text-gray-400">Higher is better</span>
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Target</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-[#38618C]" style={{ width: '100%' }}></div>
-                      </div>
-                      <span className="text-xs font-semibold text-[#38618C] w-14 text-right">100%</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs text-gray-500 w-28 flex-shrink-0">Motown District 360</span>
-                      <div className="flex-1 bg-gray-100 rounded-full h-3 overflow-hidden">
-                        <div className="h-full rounded-full bg-gray-300" style={{ width: '0%' }}></div>
-                      </div>
-                      <span className="text-xs font-medium text-gray-400 w-14 text-right">TBD</span>
-                    </div>
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Source Citation */}
-              <p className="text-xs text-gray-400 text-center mt-6 pt-4 border-t border-gray-100">
-                Industry data: RAND 2025, Learning Policy Institute · TDI data: Partner school surveys
+              <p className="text-sm text-gray-600 leading-relaxed">
+                Motown District 360 is a PreK-8 district in Michigan serving approximately 3,500 students across 6 buildings. The partnership focuses on improving student performance alignment with state benchmarks through teacher and para professional development.
               </p>
-            </div>
+            </CollapsibleSection>
 
-            {/* Partnership Event Timeline */}
-            <div id="journey-phases" className="space-y-4">
-              <div className="flex items-center justify-between mb-2">
-                <h3 className="text-lg font-bold text-[#1e2749]">Partnership Timeline</h3>
-                <span className="text-xs text-gray-500">10 complete · 6 upcoming</span>
+            {/* ─────────────────────────────────────────────
+                SECTION 4 - PARTNERSHIP JOURNEY (Phase Stepper)
+                Starts OPEN
+            ───────────────────────────────────────────── */}
+            <CollapsibleSection
+              title="Your Partnership Journey"
+              icon={<Star className="w-4 h-4 text-yellow-600" />}
+              defaultOpen={true}
+              accent="yellow"
+            >
+              {/* Phase stepper - horizontal */}
+              <div className="flex items-stretch gap-1 mb-6">
+                {phases.map((phase, i) => (
+                  <React.Fragment key={phase.name}>
+                    <div className={`flex-1 rounded-xl p-4 ${
+                      phase.isCurrent ? 'bg-[#1e2749] text-white' :
+                      phase.isComplete ? 'bg-teal-600 text-white' :
+                      'bg-gray-100 text-gray-400'
+                    }`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                          phase.isCurrent ? 'bg-white/20 text-white' :
+                          phase.isComplete ? 'bg-white/20 text-white' :
+                          'bg-gray-200 text-gray-500'
+                        }`}>
+                          {phase.isCurrent ? 'YOU ARE HERE' : phase.isComplete ? 'COMPLETE' : 'UPCOMING'}
+                        </span>
+                      </div>
+                      <p className={`font-bold text-base ${!phase.isLocked ? 'text-white' : 'text-gray-500'}`}>{phase.name}</p>
+                    </div>
+                    {i < phases.length - 1 && (
+                      <div className="flex items-center px-1">
+                        <ArrowRight className={`w-4 h-4 ${phase.isComplete ? 'text-teal-500' : 'text-gray-300'}`} />
+                      </div>
+                    )}
+                  </React.Fragment>
+                ))}
               </div>
 
-              {/* EVENT 1: District Kickoff */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button
-                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-1' ? null : 'event-1')}
-                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-green-600 text-lg">✅</span>
-                      <div>
-                        <div className="font-semibold text-[#1e2749]">District Kickoff - All 6 Buildings</div>
-                        <div className="text-sm text-gray-500">August 18, 2025</div>
-                      </div>
+              {/* Current phase deliverables with progress bar */}
+              {phases.filter(p => p.isCurrent).map(phase => {
+                const completedCount = phase.completed?.length || 0;
+                const pendingCount = phase.pending?.length || 0;
+                const total = completedCount + pendingCount;
+                const pct = total > 0 ? Math.round((completedCount / total) * 100) : 0;
+                return (
+                  <div key={phase.name}>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{phase.name} Deliverables</p>
+                      <span className="text-xs font-bold text-teal-700">{completedCount}/{total} complete</span>
                     </div>
-                    {expandedJourneyEvent === 'event-1' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+                    <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
+                      <div className="bg-teal-500 h-2 rounded-full" style={{ width: `${pct}%` }} />
+                    </div>
+                    <ul className="space-y-2">
+                      {phase.completed?.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-3 px-3 py-2 rounded-lg bg-green-50">
+                          <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                          <span className="text-sm text-green-800 font-medium">{item}</span>
+                        </li>
+                      ))}
+                      {phase.pending?.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-3 px-3 py-2 rounded-lg bg-gray-50">
+                          <div className="w-4 h-4 rounded-full border-2 border-gray-300 mt-0.5 shrink-0" />
+                          <span className="text-sm text-gray-500">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </button>
-                {expandedJourneyEvent === 'event-1' && (
-                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Happened</h4>
-                      <p className="text-sm text-gray-600">Full-day kickoff with district leadership team and building representatives from all 6 schools. Set partnership goals, introduced TDI framework, aligned on vision.</p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Key Outcomes</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Partnership goal established with Dr. Ford</li>
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Phase 1 (IGNITE) timeline mapped</li>
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Building-level TDI Champions identified</li>
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Baseline survey timeline set</li>
-                      </ul>
-                    </div>
-                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                      <p className="text-sm italic text-gray-700">&quot;When Rae asked us what we actually needed instead of telling us what we should do - that&apos;s when I knew this would be different.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">- Dr. J. Ford, Superintendent</p>
-                    </div>
-                  </div>
-                )}
-              </div>
+                );
+              })}
+            </CollapsibleSection>
 
-              {/* EVENT 2: Hub Onboarding */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button
-                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-2' ? null : 'event-2')}
-                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-green-600 text-lg">✅</span>
-                      <div>
-                        <div className="font-semibold text-[#1e2749]">Hub Onboarding - 255 Educators Enrolled</div>
-                        <div className="text-sm text-gray-500">September 8-12, 2025</div>
-                      </div>
-                    </div>
-                    {expandedJourneyEvent === 'event-2' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+            {/* ─────────────────────────────────────────────
+                SECTION 5 - SESSIONS + LEADERSHIP MEETINGS
+                Starts OPEN
+            ───────────────────────────────────────────── */}
+            <CollapsibleSection
+              title="Sessions & Leadership Meetings"
+              icon={<Calendar className="w-4 h-4 text-blue-600" />}
+              defaultOpen={true}
+              accent="blue"
+            >
+              <div className="space-y-3">
+                {/* Completed sessions */}
+                <div className="flex items-center gap-3 bg-green-50 rounded-xl p-4 border border-green-100">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
                   </div>
-                </button>
-                {expandedJourneyEvent === 'event-2' && (
-                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Happened</h4>
-                      <p className="text-sm text-gray-600">All 255 educators (187 teachers + 68 paras) enrolled in the Learning Hub. Every single person received a personalized Welcome Love Note.</p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Key Outcomes</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />255/255 accounts created</li>
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />255 Welcome Love Notes delivered</li>
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Building-level onboarding sessions held at each school</li>
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />TDI Champions trained on Hub navigation</li>
-                      </ul>
-                    </div>
-                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                      <p className="text-sm italic text-gray-700">&quot;I&apos;ve been a para for 11 years and nobody has ever sent me a personal note welcoming me to professional development. I saved it.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">- Para, Motown Early Learning Center</p>
-                    </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-[#1B2A4A]">Virtual Session 1 - Para Cohort (district-wide)</div>
+                    <div className="text-xs text-gray-500">January 2026</div>
                   </div>
-                )}
-              </div>
+                  <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Complete</span>
+                </div>
+                <div className="flex items-center gap-3 bg-green-50 rounded-xl p-4 border border-green-100">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-[#1B2A4A]">Virtual Session 2 - Teacher Cohort (Harmony + Crescendo)</div>
+                    <div className="text-xs text-gray-500">February 2026</div>
+                  </div>
+                  <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Complete</span>
+                </div>
+                <div className="flex items-center gap-3 bg-green-50 rounded-xl p-4 border border-green-100">
+                  <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-[#1B2A4A]">Mid-year Leadership Recap - all 6 building principals</div>
+                    <div className="text-xs text-gray-500">February 2026</div>
+                  </div>
+                  <span className="text-xs font-medium text-green-600 bg-green-100 px-2 py-0.5 rounded-full">Complete</span>
+                </div>
 
-              {/* EVENT 3: Baseline Survey */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button
-                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-3' ? null : 'event-3')}
-                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-green-600 text-lg">✅</span>
-                      <div>
-                        <div className="font-semibold text-[#1e2749]">Baseline Survey - 237/255 Responses (93%)</div>
-                        <div className="text-sm text-gray-500">September 22-26, 2025</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Example Data</span>
-                      {expandedJourneyEvent === 'event-3' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
-                    </div>
+                {/* Upcoming session - renewal conversation */}
+                <div className="flex items-center gap-3 bg-amber-50 rounded-xl p-4 border border-amber-200">
+                  <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center flex-shrink-0">
+                    <Star className="w-4 h-4 text-amber-600" />
                   </div>
-                </button>
-                {expandedJourneyEvent === 'event-3' && (
-                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Baseline Results</h4>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b">
-                              <th className="text-left py-2 text-gray-600">Metric</th>
-                              <th className="text-center py-2 text-gray-600">Teachers (n=174)</th>
-                              <th className="text-center py-2 text-gray-600">Paras (n=63)</th>
-                              <th className="text-center py-2 text-gray-600">Combined</th>
-                            </tr>
-                          </thead>
-                          <tbody className="text-gray-700">
-                            <tr className="border-b"><td className="py-2">Stress Level</td><td className="text-center">7.9/10</td><td className="text-center text-red-600 font-medium">8.8/10</td><td className="text-center">8.2/10</td></tr>
-                            <tr className="border-b"><td className="py-2">Strategy Implementation</td><td className="text-center">14%</td><td className="text-center">8%</td><td className="text-center">12%</td></tr>
-                            <tr className="border-b"><td className="py-2">Planning Time/Week</td><td className="text-center">10 hrs</td><td className="text-center">13 hrs</td><td className="text-center">11 hrs</td></tr>
-                            <tr className="border-b"><td className="py-2">Retention Intent</td><td className="text-center">5.8/10</td><td className="text-center text-red-600 font-medium">4.1/10</td><td className="text-center">5.2/10</td></tr>
-                            <tr><td className="py-2">Feeling Valued</td><td className="text-center">6.2/10</td><td className="text-center text-red-600 font-medium">3.9/10</td><td className="text-center">5.4/10</td></tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Stood Out</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li>• Paras reported significantly higher stress and lower feeling of being valued than teachers</li>
-                        <li>• 67% of paras said they &quot;rarely&quot; or &quot;never&quot; receive professional development</li>
-                        <li>• Teachers reported wanting more co-planning time with paras but not knowing how to structure it</li>
-                      </ul>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-[#1e2749] text-sm">Selected Open Responses</h4>
-                      <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-3" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                        <p className="text-sm italic text-gray-700">&quot;I love my students but I feel invisible to the adults in this building.&quot;</p>
-                        <p className="text-xs text-gray-500 mt-1">- Para</p>
-                      </div>
-                      <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-3" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                        <p className="text-sm italic text-gray-700">&quot;I want to use my para more effectively but no one ever taught me how.&quot;</p>
-                        <p className="text-xs text-gray-500 mt-1">- Teacher</p>
-                      </div>
-                    </div>
-                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                      <p className="text-sm italic text-gray-700">&quot;The baseline data confirmed what we suspected but had never quantified. Seeing a 3.9 out of 10 for paras feeling valued - that number changed how our principals approached the rest of the year.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">- Dr. J. Ford, Superintendent</p>
-                    </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-[#1B2A4A]">Spring Leadership Recap - District Team</div>
+                    <div className="text-xs text-gray-500">Due April 2026</div>
                   </div>
-                )}
-              </div>
+                  <span className="text-xs font-medium text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">Renewal Conversation</span>
+                </div>
 
-              {/* EVENT 4: Virtual Session 1 - Teacher Cohort */}
-              <div id="journey-sessions" className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button
-                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-4' ? null : 'event-4')}
-                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-green-600 text-lg">✅</span>
-                      <div>
-                        <div className="font-semibold text-[#1e2749]">Virtual Session 1 - Teacher Cohort Launch</div>
-                        <div className="text-sm text-gray-500">October 7, 2025</div>
-                      </div>
-                    </div>
-                    {expandedJourneyEvent === 'event-4' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+                {/* Upcoming standard sessions */}
+                <div className="flex items-center gap-3 bg-blue-50 rounded-xl p-4 border border-blue-100">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-4 h-4 text-blue-600" />
                   </div>
-                </button>
-                {expandedJourneyEvent === 'event-4' && (
-                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Happened</h4>
-                      <p className="text-sm text-gray-600">First virtual session with teacher cohort (107 teachers from across all 6 buildings). Focused on understanding baseline data, setting individual strategy goals, and introducing Hub resources.</p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Key Outcomes</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Teachers self-selected into focus areas: Differentiation (45), Engagement (35), Classroom Management (27)</li>
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Hub &quot;Getting Started&quot; course completion jumped from 12% to 67% within 48 hours</li>
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />3 teachers volunteered for pilot observation group</li>
-                      </ul>
-                    </div>
-                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                      <p className="text-sm italic text-gray-700">&quot;This was the first PD session where I didn&apos;t check my phone once. I was actually engaged.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">- Teacher, Rhythm Academy</p>
-                    </div>
+                  <div className="flex-1">
+                    <div className="text-sm font-semibold text-[#1B2A4A]">Spring Observation Days - both cohorts</div>
+                    <div className="text-xs text-gray-500">April 2026</div>
                   </div>
-                )}
+                  <span className="text-xs font-medium text-blue-600 bg-blue-100 px-2 py-0.5 rounded-full">Scheduled</span>
+                </div>
               </div>
+            </CollapsibleSection>
 
-              {/* EVENT 5: Virtual Session 2 - Para Cohort */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button
-                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-5' ? null : 'event-5')}
-                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-green-600 text-lg">✅</span>
-                      <div>
-                        <div className="font-semibold text-[#1e2749]">Virtual Session 2 - Para Cohort Launch</div>
-                        <div className="text-sm text-gray-500">October 14, 2025</div>
-                      </div>
-                    </div>
-                    {expandedJourneyEvent === 'event-5' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
+            {/* ─────────────────────────────────────────────
+                SECTION 6 - PROGRESS SNAPSHOT (Hero stat card)
+                Starts OPEN
+            ───────────────────────────────────────────── */}
+            <CollapsibleSection
+              title="Progress Snapshot"
+              icon={<TrendingUp className="w-4 h-4 text-teal-600" />}
+              defaultOpen={true}
+              accent="teal"
+            >
+              {/* Hero card with comparison bars */}
+              <div className="bg-gradient-to-br from-[#1e2749] to-[#2d3a6b] rounded-2xl p-6 mb-5 text-white">
+                <p className="text-xs font-bold uppercase tracking-widest text-blue-300 mb-1">
+                  Strategy Implementation Rate
+                </p>
+                <div className="flex items-end gap-4 mb-4">
+                  <span className="text-6xl font-black text-white">21%</span>
+                  <div className="pb-2">
+                    <p className="text-blue-200 text-sm font-medium">of Motown staff applying strategies daily</p>
+                    <p className="text-blue-300 text-xs">After just 2 sessions - building fast</p>
                   </div>
-                </button>
-                {expandedJourneyEvent === 'event-5' && (
-                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Happened</h4>
-                      <p className="text-sm text-gray-600">First virtual session with para cohort (53 paras from across 5 buildings). Focused on validating baseline data, building trust, and navigating the Hub together.</p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Key Outcomes</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Paras identified top needs: feeling valued by teachers (82%), behavior support training (71%), clearer daily expectations (64%)</li>
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Live Hub walkthrough resulted in 37 paras starting a course during the session</li>
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Emotional moment when paras realized the PD was designed specifically FOR them</li>
-                      </ul>
-                    </div>
-                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                      <p className="text-sm italic text-gray-700">&quot;I cried during the session. Not because I was sad - because someone finally asked us what WE needed.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">- Para, Harmony Elementary</p>
-                    </div>
-                  </div>
-                )}
-              </div>
+                </div>
 
-              {/* EVENT 6: Observation Day 1 - Para Pilot */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button
-                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-6' ? null : 'event-6')}
-                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-green-600 text-lg">✅</span>
-                      <div>
-                        <div className="font-semibold text-[#1e2749]">Observation Day 1 - Para Pilot at Harmony Elementary</div>
-                        <div className="text-sm text-gray-500">November 12, 2025 · 10 Classrooms · 10 Love Notes</div>
-                      </div>
-                    </div>
-                    {expandedJourneyEvent === 'event-6' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
-                  </div>
-                </button>
-                {expandedJourneyEvent === 'event-6' && (
-                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What We Did</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li>• Visited 10 classrooms across PreK-5</li>
-                        <li>• Observed para-student interactions during small group and one-on-one support</li>
-                        <li>• Delivered 10 personalized Love Notes to every para observed</li>
-                        <li>• Debrief with building principal + TDI Champion</li>
-                      </ul>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="font-semibold text-green-600 text-sm mb-2">Top Strengths</h4>
-                        <ul className="text-sm text-gray-600 space-y-1">
-                          <li>• Student rapport and relationship building (9/10)</li>
-                          <li>• Calm redirection during challenging moments (8/10)</li>
-                          <li>• Small group facilitation and engagement (7/10)</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-amber-600 text-sm mb-2">Growth Areas</h4>
-                        <ul className="text-sm text-gray-600 space-y-1">
-                          <li>• Wait time before stepping in to help</li>
-                          <li>• Data collection during small group sessions</li>
-                          <li>• Communication with lead teacher about progress</li>
-                        </ul>
-                      </div>
-                    </div>
-                    <div className="bg-[#FFFBEB] border-l-3 border-[#FFBA06] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#FFBA06'}}>
-                      <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Sample Love Note</p>
-                      <p className="text-sm italic text-gray-700">&quot;Maria, I noticed how you positioned yourself at eye level with Jayden during the reading activity - that small shift made him visibly more engaged. You have a natural gift for creating connection. Keep using that superpower!&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">- Rae Hughart, TDI</p>
-                    </div>
-                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                      <p className="text-sm italic text-gray-700">&quot;Three paras came to me after school and said it was the best day of their career. Not because anything extraordinary happened - because someone noticed them.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">- Principal, Harmony Elementary</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* EVENT 7: Observation Day 2 - Teacher Pilot */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button
-                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-7' ? null : 'event-7')}
-                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-green-600 text-lg">✅</span>
-                      <div>
-                        <div className="font-semibold text-[#1e2749]">Observation Day 2 - Teacher Pilot at Motown MS</div>
-                        <div className="text-sm text-gray-500">December 10, 2025 · 12 Classrooms · 12 Love Notes</div>
-                      </div>
-                    </div>
-                    {expandedJourneyEvent === 'event-7' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
-                  </div>
-                </button>
-                {expandedJourneyEvent === 'event-7' && (
-                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What We Did</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li>• Visited 12 classrooms across grades 6-8</li>
-                        <li>• Observed instructional strategies and teacher-para collaboration</li>
-                        <li>• Delivered 12 personalized Love Notes to every teacher observed</li>
-                        <li>• Debrief with building principal + TDI Champion</li>
-                      </ul>
-                    </div>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <h4 className="font-semibold text-green-600 text-sm mb-2">Top Strengths</h4>
-                        <ul className="text-sm text-gray-600 space-y-1">
-                          <li>• Clear learning objectives visible and referenced (11/12)</li>
-                          <li>• Strong student engagement strategies (10/12)</li>
-                          <li>• Inclusive utilization of paraprofessionals (8/12)</li>
-                        </ul>
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-amber-600 text-sm mb-2">Growth Areas</h4>
-                        <ul className="text-sm text-gray-600 space-y-1">
-                          <li>• Differentiation for diverse learners</li>
-                          <li>• Dedicated co-planning time between teachers and paras</li>
-                          <li>• Formative assessment checks</li>
-                        </ul>
-                      </div>
-                    </div>
-                    <div className="bg-[#FFFBEB] border-l-3 border-[#FFBA06] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#FFBA06'}}>
-                      <p className="text-xs text-gray-500 uppercase tracking-wide mb-2">Sample Love Note</p>
-                      <p className="text-sm italic text-gray-700">&quot;Mr. Chen, the way you seamlessly included your paraprofessional in the small group rotation was exceptional. When you handed Rosa the discussion prompts and stepped back, your students got two quality interactions instead of one. That&apos;s the kind of teacher-para collaboration that changes outcomes.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">- Rae Hughart, TDI</p>
-                    </div>
-                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                      <p className="text-sm italic text-gray-700">&quot;I&apos;ve had dozens of walkthrough observations in my career. This is the first time someone told me specifically what I did WELL instead of what I need to fix.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">- Teacher, Motown Middle School</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* EVENT 8: Virtual Session 3 - Growth Groups */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button
-                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-8' ? null : 'event-8')}
-                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-green-600 text-lg">✅</span>
-                      <div>
-                        <div className="font-semibold text-[#1e2749]">Virtual Session 3 - Growth Groups Formed from Observation Data</div>
-                        <div className="text-sm text-gray-500">January 14, 2026</div>
-                      </div>
-                    </div>
-                    {expandedJourneyEvent === 'event-8' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
-                  </div>
-                </button>
-                {expandedJourneyEvent === 'event-8' && (
-                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Happened</h4>
-                      <p className="text-sm text-gray-600">Combined session with both teacher and para cohorts. Shared observation themes (anonymized), formed Growth Groups based on common growth areas, assigned targeted Hub resources.</p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">3 Growth Groups Formed</h4>
-                      <div className="grid md:grid-cols-3 gap-3">
-                        <div className="bg-white rounded-lg p-3 border border-gray-200">
-                          <div className="font-medium text-[#1e2749] text-sm">Differentiation Strategies</div>
-                          <div className="text-xs text-gray-500">6 teachers</div>
-                        </div>
-                        <div className="bg-white rounded-lg p-3 border border-gray-200">
-                          <div className="font-medium text-[#1e2749] text-sm">Teacher-Para Collaboration</div>
-                          <div className="text-xs text-gray-500">4 teachers + 4 paras</div>
-                        </div>
-                        <div className="bg-white rounded-lg p-3 border border-gray-200">
-                          <div className="font-medium text-[#1e2749] text-sm">Classroom Management Reset</div>
-                          <div className="text-xs text-gray-500">5 teachers</div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                      <p className="text-sm italic text-gray-700">&quot;Being in a Growth Group with a para from a completely different building opened my eyes. She sees things in my teaching I never would have noticed.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">- Teacher, Crescendo High School</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* EVENT 9: Mid-Year Survey - DEFAULT EXPANDED */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button
-                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-9' ? null : 'event-9')}
-                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-green-600 text-lg">✅</span>
-                      <div>
-                        <div className="font-semibold text-[#1e2749]">Mid-Year Survey - 224/255 Responses (88%)</div>
-                        <div className="text-sm text-gray-500">January 20-24, 2026</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">↓25% Stress</span>
-                      <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full">Example Data</span>
-                      {expandedJourneyEvent === 'event-9' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
-                    </div>
-                  </div>
-                </button>
-                {expandedJourneyEvent === 'event-9' && (
-                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Mid-Year Results vs Baseline</h4>
-                      <div className="overflow-x-auto">
-                        <table className="w-full text-sm">
-                          <thead>
-                            <tr className="border-b">
-                              <th className="text-left py-2 text-gray-600">Metric</th>
-                              <th className="text-center py-2 text-gray-600">Baseline (Sept)</th>
-                              <th className="text-center py-2 text-gray-600">Mid-Year (Jan)</th>
-                              <th className="text-center py-2 text-gray-600">Change</th>
-                            </tr>
-                          </thead>
-                          <tbody className="text-gray-700">
-                            <tr className="border-b"><td className="py-2">Stress Level</td><td className="text-center">8.2/10</td><td className="text-center">6.1/10</td><td className="text-center text-green-600 font-medium">↓ 25%</td></tr>
-                            <tr className="border-b"><td className="py-2">Strategy Implementation</td><td className="text-center">12%</td><td className="text-center">48%</td><td className="text-center text-green-600 font-medium">↑ 4x</td></tr>
-                            <tr className="border-b"><td className="py-2">Planning Time/Week</td><td className="text-center">11 hrs</td><td className="text-center">7.5 hrs</td><td className="text-center text-green-600 font-medium">↓ 32%</td></tr>
-                            <tr className="border-b"><td className="py-2">Retention Intent</td><td className="text-center">5.2/10</td><td className="text-center">7.8/10</td><td className="text-center text-green-600 font-medium">↑ 50%</td></tr>
-                            <tr><td className="py-2">Feeling Valued</td><td className="text-center">5.4/10</td><td className="text-center">7.1/10</td><td className="text-center text-green-600 font-medium">↑ 31%</td></tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <p className="text-sm font-medium text-green-800">🎉 Highlight: Para &quot;Feeling Valued&quot; saw the single largest improvement - from 3.9 to 6.5 (67% increase)</p>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="font-semibold text-[#1e2749] text-sm">Selected Open Responses (Mid-Year)</h4>
-                      <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-3" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                        <p className="text-sm italic text-gray-700">&quot;The Love Note from my observation is framed on my desk. I read it when I&apos;m having a hard day.&quot;</p>
-                        <p className="text-xs text-gray-500 mt-1">- Para, Harmony Elementary</p>
-                      </div>
-                      <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-3" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                        <p className="text-sm italic text-gray-700">&quot;I&apos;m actually using strategies from the Hub in my classroom. Not because I have to - because they work.&quot;</p>
-                        <p className="text-xs text-gray-500 mt-1">- Teacher, Crescendo High School</p>
-                      </div>
-                      <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-3" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                        <p className="text-sm italic text-gray-700">&quot;I told my sister to apply for the open para position. I never would have said that in September.&quot;</p>
-                        <p className="text-xs text-gray-500 mt-1">- Para, Bridges Alternative Program</p>
-                      </div>
-                    </div>
-                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                      <p className="text-sm italic text-gray-700">&quot;The para data is what gets me. Going from 3.9 to 6.5 on feeling valued - that&apos;s not a number, that&apos;s a cultural shift in how we treat the adults in our buildings.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">- Dr. J. Ford, Superintendent</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* EVENT 10: Executive Session 1 */}
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                <button
-                  onClick={() => setExpandedJourneyEvent(expandedJourneyEvent === 'event-10' ? null : 'event-10')}
-                  className="w-full p-4 hover:bg-gray-50 transition-colors text-left"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <span className="text-green-600 text-lg">✅</span>
-                      <div>
-                        <div className="font-semibold text-[#1e2749]">Executive Session 1 - Leadership Progress Review</div>
-                        <div className="text-sm text-gray-500">February 4, 2026</div>
-                      </div>
-                    </div>
-                    {expandedJourneyEvent === 'event-10' ? <ChevronDown className="w-5 h-5 text-gray-400" /> : <ChevronRight className="w-5 h-5 text-gray-400" />}
-                  </div>
-                </button>
-                {expandedJourneyEvent === 'event-10' && (
-                  <div className="border-t border-gray-100 p-5 bg-gray-50 space-y-4">
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">What Happened</h4>
-                      <p className="text-sm text-gray-600">60-minute session with Dr. Ford and building principals. Reviewed mid-year data, celebrated wins, aligned on spring priorities.</p>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-[#1e2749] text-sm mb-2">Key Discussion Points</h4>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Reviewed all leading indicator improvements</li>
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Discussed building-level variations (ELC login rate needs attention)</li>
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Aligned on spring observation focus areas</li>
-                        <li className="flex items-start gap-2"><CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />Previewed 2026-27 partnership options</li>
-                      </ul>
-                    </div>
-                    <div className="bg-[#FDF4F0] border-l-3 border-[#E07A5F] rounded-r-lg p-4" style={{borderLeftWidth: '3px', borderLeftColor: '#E07A5F'}}>
-                      <p className="text-sm italic text-gray-700">&quot;I&apos;ve never had a PD partner sit down with my leadership team and walk us through our own data like this. You made it feel like a conversation, not a report.&quot;</p>
-                      <p className="text-xs text-gray-500 mt-2">- Dr. J. Ford, Superintendent</p>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Upcoming Events Header */}
-              <div className="flex items-center gap-3 pt-4">
-                <div className="flex-1 border-t border-gray-300"></div>
-                <span className="text-sm font-semibold text-gray-500 uppercase tracking-wide">Upcoming</span>
-                <div className="flex-1 border-t border-gray-300"></div>
-              </div>
-
-              {/* EVENT 11-16: Upcoming Events (Non-expandable) */}
-              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-400 text-lg">⬜</span>
+                {/* Comparison bars */}
+                <div className="space-y-3">
                   <div>
-                    <div className="font-semibold text-gray-600">Virtual Session 4 - Differentiation Growth Group</div>
-                    <div className="text-sm text-gray-400">March 2026 · 6 teachers from Harmony + Crescendo</div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-xs text-blue-200 font-medium">Motown District 360</span>
+                      <span className="text-xs font-bold text-teal-300">21%</span>
+                    </div>
+                    <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-teal-400 rounded-full" style={{ width: '21%' }} />
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-400 text-lg">⬜</span>
                   <div>
-                    <div className="font-semibold text-gray-600">Observation Day 3 - Para Pilot Group (Spring Cycle)</div>
-                    <div className="text-sm text-gray-400">April 2026 · Building on November observations</div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-xs text-blue-200 font-medium">TDI Partner Average</span>
+                      <span className="text-xs font-bold text-blue-300">65%</span>
+                    </div>
+                    <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-blue-400 rounded-full opacity-60" style={{ width: '65%' }} />
+                    </div>
                   </div>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-400 text-lg">⬜</span>
                   <div>
-                    <div className="font-semibold text-gray-600">Observation Day 4 - Teacher Pilot Group (Spring Cycle)</div>
-                    <div className="text-sm text-gray-400">April 2026 · Building on December observations</div>
+                    <div className="flex justify-between mb-1">
+                      <span className="text-xs text-blue-200 font-medium">Industry Average</span>
+                      <span className="text-xs font-bold text-gray-400">10%</span>
+                    </div>
+                    <div className="h-3 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-gray-400 rounded-full opacity-40" style={{ width: '10%' }} />
+                    </div>
                   </div>
                 </div>
+                <p className="text-xs text-blue-300 mt-3 italic">
+                  Already 2x the industry average - and this partnership is just getting started.
+                </p>
               </div>
 
-              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-400 text-lg">⬜</span>
-                  <div>
-                    <div className="font-semibold text-gray-600">Spring Leadership Recap with District Team</div>
-                    <div className="text-sm text-gray-400">April 2026 · Review full-year progress · set goals for 2026-27</div>
-                  </div>
+              {/* 4-stat grid */}
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                <div className="bg-teal-50 rounded-xl p-4 border border-teal-100">
+                  <p className="text-3xl font-black text-teal-700">87%</p>
+                  <p className="text-xs text-teal-600 font-medium mt-1">Hub Login Rate</p>
+                  <p className="text-xs text-gray-400 mt-0.5">223 of 255 staff active</p>
+                </div>
+                <div className="bg-green-50 rounded-xl p-4 border border-green-100">
+                  <p className="text-3xl font-black text-green-700">9.8/10</p>
+                  <p className="text-xs text-green-600 font-medium mt-1">Retention Intent</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Exceptional - above TDI average</p>
+                </div>
+                <div className="bg-purple-50 rounded-xl p-4 border border-purple-100">
+                  <p className="text-3xl font-black text-purple-700">6.0/10</p>
+                  <p className="text-xs text-purple-600 font-medium mt-1">Staff Stress Level</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Below industry avg of 8-9/10</p>
+                </div>
+                <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
+                  <p className="text-3xl font-black text-orange-700">255</p>
+                  <p className="text-xs text-orange-600 font-medium mt-1">Staff Enrolled</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Across 6 buildings</p>
+                </div>
+              </div>
+            </CollapsibleSection>
+
+            {/* ─────────────────────────────────────────────
+                SECTION 7 - TEAM PULSE
+                Starts OPEN
+            ───────────────────────────────────────────── */}
+            <CollapsibleSection
+              title="Team Pulse"
+              icon={<Activity className="w-4 h-4 text-purple-600" />}
+              defaultOpen={true}
+              accent="purple"
+            >
+              {/* 3-stat header tiles */}
+              <div className="grid grid-cols-3 gap-3 mb-5">
+                <div className="bg-purple-50 rounded-xl p-3 text-center border border-purple-100">
+                  <p className="text-2xl font-black text-purple-700">6.0/10</p>
+                  <p className="text-xs text-purple-600 font-medium mt-1">Avg Stress Level</p>
+                </div>
+                <div className="bg-teal-50 rounded-xl p-3 text-center border border-teal-100">
+                  <p className="text-2xl font-black text-teal-700">9.8/10</p>
+                  <p className="text-xs text-teal-600 font-medium mt-1">Retention Intent</p>
+                </div>
+                <div className="bg-green-50 rounded-xl p-3 text-center border border-green-100">
+                  <p className="text-2xl font-black text-green-700">21%</p>
+                  <p className="text-xs text-green-600 font-medium mt-1">Implementation Rate</p>
                 </div>
               </div>
 
-              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-400 text-lg">⬜</span>
-                  <div>
-                    <div className="font-semibold text-gray-600">Virtual Sessions 5 &amp; 6 - Teacher-Para Collaboration + Classroom Management</div>
-                    <div className="text-sm text-gray-400">May 2026 · Final Growth Group sessions</div>
-                  </div>
+              {/* Staff quotes grid */}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                  <p className="text-sm text-gray-700 italic leading-relaxed mb-2">&quot;I&apos;ve been a para for 12 years and no one has ever watched me work and told me what I was doing right. This meant everything.&quot;</p>
+                  <p className="text-xs font-semibold text-teal-600">Para at Harmony Elementary</p>
+                </div>
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                  <p className="text-sm text-gray-700 italic leading-relaxed mb-2">&quot;The Love Note I got made me realize someone actually sees the effort I put in every day.&quot;</p>
+                  <p className="text-xs font-semibold text-teal-600">Teacher at Crescendo Middle</p>
                 </div>
               </div>
+            </CollapsibleSection>
 
-              <div className="bg-gray-50 rounded-xl border border-gray-200 p-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-gray-400 text-lg">⬜</span>
-                  <div>
-                    <div className="font-semibold text-gray-600">Executive Impact Session - Annual Results &amp; 2026-27 Planning</div>
-                    <div className="text-sm text-gray-400">May 2026 · Full impact report · board presentation support</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* IMPLEMENTATION/PROGRESS TAB */}
-        {activeTab === 'implementation' && (
-          <div className="space-y-8">
-
-            {/* SECTION 1: Hub Login Goal Graphic - Always Visible */}
-            <div id="progress-hub-engagement" className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h3 className="text-xl font-bold text-[#1B2A4A]">Learning Hub Login Progress</h3>
-                  <p className="text-sm text-gray-500 mt-1">District-wide engagement tracking</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-3xl font-bold text-[#1B2A4A]">223<span className="text-lg font-normal text-gray-400">/255</span></div>
-                  <div className="text-sm text-gray-500">educators logged in</div>
-                </div>
-              </div>
-
+            {/* ─────────────────────────────────────────────
+                SECTION 8 - WHAT WE'RE LEARNING
+                Starts OPEN
+            ───────────────────────────────────────────── */}
+            <CollapsibleSection
+              title="What We&apos;re Learning"
+              icon={<Lightbulb className="w-4 h-4 text-amber-600" />}
+              defaultOpen={true}
+              accent="amber"
+            >
               <div className="space-y-4">
-                {/* Overall Progress */}
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="font-medium text-[#1B2A4A]">Overall</span>
-                    <span className="font-semibold text-green-600">87%</span>
-                  </div>
-                  <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: '87%' }}></div>
-                  </div>
-                </div>
-
-                {/* Teacher Progress */}
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="font-medium text-[#1B2A4A]">Teachers (172/187)</span>
-                    <span className="font-semibold text-green-600">92%</span>
-                  </div>
-                  <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: '92%' }}></div>
-                  </div>
-                </div>
-
-                {/* Para Progress */}
-                <div>
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="font-medium text-[#1B2A4A]">Paras (51/68)</span>
-                    <span className="font-semibold text-amber-600">75%</span>
-                  </div>
-                  <div className="h-4 bg-gray-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-amber-500 rounded-full transition-all" style={{ width: '75%' }}></div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-4 pt-4 border-t border-gray-100">
-                <div className="flex items-start gap-2">
-                  <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                  <p className="text-xs text-gray-600">
-                    <span className="font-semibold text-[#1B2A4A]">Recommendation:</span> Para login rate is below 85% goal. Consider dedicated para login time during next observation day or brief building-level check-ins.
+                <div className="bg-amber-50 rounded-lg p-4 border border-amber-100">
+                  <p className="text-sm font-medium text-amber-800 mb-2">Key Implementation Insight</p>
+                  <p className="text-sm text-gray-700 leading-relaxed">
+                    Strategy implementation is at 21% district-wide - 2x the 10% national average. Staff are applying what they&apos;re learning in the Hub, especially around classroom management and student engagement techniques.
                   </p>
                 </div>
-              </div>
-            </div>
-
-            {/* SECTION 2: Observation Timeline */}
-            <div id="progress-observations">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-xl font-bold text-[#1B2A4A]">Observation Timeline</h3>
-                <span className="text-sm text-gray-500">2 of 4 complete</span>
-              </div>
-
-              <div className="space-y-3">
-                {/* Observation Day 1: Para Pilot - Collapsed */}
-                <Accordion
-                  id="observation-day-1"
-                  title="Observation Day 1: Para Pilot"
-                  subtitle="Harmony Elementary · February 13, 2026"
-                  badge="Complete"
-                  badgeColor="bg-green-100 text-green-700"
-                  icon={<Eye className="w-5 h-5" />}
-                >
-                  <div className="pt-4 space-y-4">
-                    {/* Stats Summary */}
-                    <div className="flex gap-6 text-center py-2">
-                      <div>
-                        <div className="text-2xl font-bold text-[#1B2A4A]">10</div>
-                        <div className="text-xs text-gray-500">Classrooms</div>
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-[#35A7FF]">10</div>
-                        <div className="text-xs text-gray-500">Love Notes</div>
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-[#35A7FF]">68</div>
-                        <div className="text-xs text-gray-500">Paras District-Wide</div>
-                      </div>
-                    </div>
-
-                    {/* What We Did */}
-                    <div>
-                      <p className="text-sm font-medium text-[#1B2A4A] mb-2">What We Did:</p>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-[#35A7FF]" />
-                          Observed 10 para-supported classrooms
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-[#35A7FF]" />
-                          Delivered personalized Love Notes to each para
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-[#35A7FF]" />
-                          Collected baseline survey data
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-[#35A7FF]" />
-                          Identified growth areas for Growth Groups
-                        </li>
-                      </ul>
-                    </div>
-
-                    {/* Sample Love Note */}
-                    <div className="bg-[#FEF9E7] rounded-lg p-4 border-l-4 border-[#FFBA06]">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Heart className="w-4 h-4 text-[#FFBA06]" />
-                        <span className="font-semibold text-[#1B2A4A] text-sm">Love Note Highlight</span>
-                      </div>
-                      <p className="text-sm text-gray-700 italic">
-                        &quot;Marcus, the way you redirected Jaylen back to the group without missing a beat showed real skill. You kept the whole table on track while giving him exactly what he needed. That&apos;s the kind of support that changes outcomes.&quot;
-                      </p>
-                      <p className="text-xs text-gray-500 mt-2">- Delivered to Marcus T., Para at Harmony Elementary</p>
-                    </div>
-
-                    {/* Educator Quote */}
-                    <div className="bg-[#F5F5F5] rounded-lg p-4 border-l-4 border-[#E07A5F]">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Quote className="w-4 h-4 text-[#E07A5F]" />
-                        <span className="font-semibold text-[#1B2A4A] text-sm">From the Field</span>
-                      </div>
-                      <p className="text-sm text-gray-700 italic">
-                        &quot;I&apos;ve been a para for 12 years and no one has ever watched me work and told me what I was doing right. This meant everything.&quot;
-                      </p>
-                      <p className="text-xs text-gray-500 mt-2">- Para at Harmony Elementary</p>
-                    </div>
-                  </div>
-                </Accordion>
-
-                {/* Observation Day 2: Teacher Pilot - Most Recent */}
-                <Accordion
-                  id="observation-day-2"
-                  title="Observation Day 2: Teacher Pilot"
-                  subtitle="Motown Middle School · February 26, 2026"
-                  badge="Complete"
-                  badgeColor="bg-green-100 text-green-700"
-                  icon={<Eye className="w-5 h-5" />}
-                >
-                  <div className="pt-4 space-y-4">
-                    {/* Stats Summary */}
-                    <div className="flex gap-6 text-center py-2">
-                      <div>
-                        <div className="text-2xl font-bold text-[#1B2A4A]">12</div>
-                        <div className="text-xs text-gray-500">Classrooms</div>
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-[#35A7FF]">12</div>
-                        <div className="text-xs text-gray-500">Love Notes</div>
-                      </div>
-                      <div>
-                        <div className="text-2xl font-bold text-[#35A7FF]">187</div>
-                        <div className="text-xs text-gray-500">Teachers District-Wide</div>
-                      </div>
-                    </div>
-
-                    {/* What We Did */}
-                    <div>
-                      <p className="text-sm font-medium text-[#1B2A4A] mb-2">What We Did:</p>
-                      <ul className="text-sm text-gray-600 space-y-1">
-                        <li className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-[#35A7FF]" />
-                          Observed 12 teacher classrooms across grade levels
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-[#35A7FF]" />
-                          Delivered personalized Love Notes to each teacher
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-[#35A7FF]" />
-                          Completed mid-year survey comparison
-                        </li>
-                        <li className="flex items-center gap-2">
-                          <Check className="w-4 h-4 text-[#35A7FF]" />
-                          Refined Growth Group focus areas
-                        </li>
-                      </ul>
-                    </div>
-
-                    {/* Session Wins */}
-                    <div className="bg-green-50 rounded-lg p-4">
-                      <p className="text-sm font-medium text-green-800 mb-2">Session Wins:</p>
-                      <ul className="text-sm text-green-700 space-y-1">
-                        <li>• <strong>Stress level 5.8/10</strong> - below industry average (8-9/10)</li>
-                        <li>• <strong>Retention intent 9.2/10</strong> - strong commitment to stay</li>
-                        <li>• <strong>52% feel better</strong> than start of year</li>
-                        <li>• <strong>92% teacher Hub login</strong> achieved</li>
-                      </ul>
-                    </div>
-
-                    {/* Sample Love Note */}
-                    <div className="bg-[#FEF9E7] rounded-lg p-4 border-l-4 border-[#FFBA06]">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Heart className="w-4 h-4 text-[#FFBA06]" />
-                        <span className="font-semibold text-[#1B2A4A] text-sm">Love Note Highlight</span>
-                      </div>
-                      <p className="text-sm text-gray-700 italic">
-                        &quot;Ms. Chen, your questioning sequence during the fraction lesson was masterful. You didn&apos;t just ask &apos;does everyone understand?&apos; - you asked &apos;what would happen if...&apos; and &apos;how do you know?&apos; That&apos;s the kind of questioning that builds mathematical thinkers.&quot;
-                      </p>
-                      <p className="text-xs text-gray-500 mt-2">- Delivered to Sarah Chen, 6th Grade Math</p>
-                    </div>
-
-                    {/* Educator Quote */}
-                    <div className="bg-[#F5F5F5] rounded-lg p-4 border-l-4 border-[#E07A5F]">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Quote className="w-4 h-4 text-[#E07A5F]" />
-                        <span className="font-semibold text-[#1B2A4A] text-sm">From the Field</span>
-                      </div>
-                      <p className="text-sm text-gray-700 italic">
-                        &quot;I read my Love Note three times. Then I put it in my desk drawer where I keep things that matter. This job is hard, but knowing someone sees the effort makes it easier to keep going.&quot;
-                      </p>
-                      <p className="text-xs text-gray-500 mt-2">- 7th Grade ELA Teacher, Motown MS</p>
-                    </div>
-                  </div>
-                </Accordion>
-
-                {/* Observation Day 3: Upcoming Preview */}
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 opacity-75">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
-                      <Eye className="w-5 h-5 text-gray-400" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-semibold text-gray-600">Observation Day 3</h4>
-                        <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">Upcoming</span>
-                      </div>
-                      <p className="text-sm text-gray-500">March 2026 · Building TBD</p>
-                    </div>
-                    <div
-                      className="px-4 py-2 bg-gray-200 text-gray-500 rounded-lg text-sm font-medium cursor-not-allowed"
-                    >
-                      Not Yet Scheduled
-                    </div>
-                  </div>
-                </div>
-
-                {/* Observation Day 4: Upcoming Preview */}
-                <div className="bg-gray-50 rounded-xl p-4 border border-gray-200 opacity-75">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
-                      <Eye className="w-5 h-5 text-gray-400" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-semibold text-gray-600">Observation Day 4</h4>
-                        <span className="text-xs bg-gray-200 text-gray-600 px-2 py-0.5 rounded-full">Upcoming</span>
-                      </div>
-                      <p className="text-sm text-gray-500">April 2026 · Building TBD</p>
-                    </div>
-                    <div
-                      className="px-4 py-2 bg-gray-200 text-gray-500 rounded-lg text-sm font-medium cursor-not-allowed"
-                    >
-                      Not Yet Scheduled
-                    </div>
-                  </div>
+                <div className="bg-white rounded-lg p-4 border border-gray-200">
+                  <p className="text-sm font-medium text-[#1B2A4A] mb-2">Growth Areas Identified</p>
+                  <ul className="text-sm text-gray-600 space-y-1">
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-teal-500" />Differentiated instruction for diverse learners</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-teal-500" />Teacher-para collaboration and communication</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-teal-500" />Classroom management for high-needs students</li>
+                  </ul>
                 </div>
               </div>
-            </div>
+            </CollapsibleSection>
 
-            {/* SECTION 3: Survey Data Visualizations */}
-            <div id="progress-movement">
-              <Accordion
-                id="survey-data"
-                title="Survey Data & Leading Indicators"
-                subtitle="Baseline vs. mid-year comparison"
-                badge="Feb 2026"
-                badgeColor="bg-blue-100 text-blue-700"
-                icon={<BarChart3 className="w-5 h-5" />}
-              >
-                <div className="pt-4 space-y-6">
-                  {/* Leading Indicators Comparison */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-[#1B2A4A] mb-4">Leading Indicators: Baseline → Mid-Year</h4>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="bg-green-50 rounded-lg p-4 text-center">
-                        <p className="text-xs text-gray-500 mb-1">Stress Level</p>
-                        <div className="flex items-center justify-center gap-2">
-                          <span className="text-lg text-gray-400">7.2</span>
-                          <ArrowRight className="w-4 h-4 text-green-600" />
-                          <span className="text-2xl font-bold text-green-600">5.8</span>
-                        </div>
-                        <p className="text-xs text-green-600 mt-1">↓ 1.4 points (industry avg: 8-9)</p>
-                      </div>
-                      <div className="bg-green-50 rounded-lg p-4 text-center">
-                        <p className="text-xs text-gray-500 mb-1">Retention Intent</p>
-                        <div className="flex items-center justify-center gap-2">
-                          <span className="text-lg text-gray-400">8.1</span>
-                          <ArrowRight className="w-4 h-4 text-green-600" />
-                          <span className="text-2xl font-bold text-green-600">9.2</span>
-                        </div>
-                        <p className="text-xs text-green-600 mt-1">↑ 1.1 points</p>
-                      </div>
-                      <div className="bg-blue-50 rounded-lg p-4 text-center">
-                        <p className="text-xs text-gray-500 mb-1">Feel Supported</p>
-                        <div className="flex items-center justify-center gap-2">
-                          <span className="text-lg text-gray-400">61%</span>
-                          <ArrowRight className="w-4 h-4 text-[#35A7FF]" />
-                          <span className="text-2xl font-bold text-[#35A7FF]">78%</span>
-                        </div>
-                        <p className="text-xs text-[#35A7FF] mt-1">↑ 17 percentage points</p>
-                      </div>
-                      <div className="bg-blue-50 rounded-lg p-4 text-center">
-                        <p className="text-xs text-gray-500 mb-1">Strategy Implementation</p>
-                        <div className="flex items-center justify-center gap-2">
-                          <span className="text-lg text-gray-400">12%</span>
-                          <ArrowRight className="w-4 h-4 text-[#35A7FF]" />
-                          <span className="text-2xl font-bold text-[#35A7FF]">34%</span>
-                        </div>
-                        <p className="text-xs text-[#35A7FF] mt-1">↑ 22 percentage points</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Growth Area Distribution */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-[#1B2A4A] mb-4">Growth Area Distribution (from observations)</h4>
-                    <div className="flex items-center justify-center gap-6">
-                      <div className="relative w-32 h-32">
-                        <svg viewBox="0 0 36 36" className="w-full h-full">
-                          <path
-                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                            fill="none"
-                            stroke="#1B2A4A"
-                            strokeWidth="3"
-                            strokeDasharray="32, 100"
-                            strokeLinecap="round"
-                          />
-                          <path
-                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                            fill="none"
-                            stroke="#35A7FF"
-                            strokeWidth="3"
-                            strokeDasharray="42, 100"
-                            strokeDashoffset="-32"
-                            strokeLinecap="round"
-                          />
-                          <path
-                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                            fill="none"
-                            stroke="#E07A5F"
-                            strokeWidth="3"
-                            strokeDasharray="26, 100"
-                            strokeDashoffset="-74"
-                            strokeLinecap="round"
-                          />
-                        </svg>
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-lg font-bold text-[#1B2A4A]">19</span>
-                        </div>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-[#1B2A4A]"></div>
-                          <span className="text-sm text-gray-600">Differentiation (6)</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-[#35A7FF]"></div>
-                          <span className="text-sm text-gray-600">Teacher-Para Collaboration (8)</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-3 h-3 rounded-full bg-[#E07A5F]"></div>
-                          <span className="text-sm text-gray-600">Classroom Management (5)</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Teacher vs Para Breakdown */}
-                  <div>
-                    <h4 className="text-sm font-semibold text-[#1B2A4A] mb-4">Response Rates by Role</h4>
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div className="bg-white rounded-lg p-4 border border-gray-200">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-[#1B2A4A]">Teachers</span>
-                          <span className="text-sm text-green-600 font-semibold">94% response rate</span>
-                        </div>
-                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-green-500 rounded-full" style={{ width: '94%' }}></div>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-2">176 of 187 responded</p>
-                      </div>
-                      <div className="bg-white rounded-lg p-4 border border-gray-200">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-medium text-[#1B2A4A]">Paras</span>
-                          <span className="text-sm text-amber-600 font-semibold">79% response rate</span>
-                        </div>
-                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                          <div className="h-full bg-amber-500 rounded-full" style={{ width: '79%' }}></div>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-2">54 of 68 responded</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 border-t border-gray-100">
-                    <div className="flex items-start gap-2">
-                      <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                      <p className="text-xs text-gray-600">
-                        <span className="font-semibold text-[#1B2A4A]">Recommendation:</span> Para response rate is below 85% target. Consider paper surveys or dedicated survey time during next para-focused session.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Accordion>
-            </div>
-
-            {/* SECTION 4: Growth Groups */}
-            <div id="progress-courses">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-xl font-bold text-[#1B2A4A]">Growth Groups</h3>
-                  <p className="text-sm text-gray-500 mt-1">Formed from observation data · 19 educators across 3 groups</p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                {/* Growth Group 1: Differentiation Strategies */}
-                <Accordion
-                  id="growth-group-1"
-                  title="Differentiation Strategies"
-                  subtitle="6 members · Focus: meeting varied learner needs"
-                  badge="Active"
-                  badgeColor="bg-green-100 text-green-700"
-                  icon={<Target className="w-5 h-5" />}
-                >
-                  <div className="pt-4 space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-[#1B2A4A] mb-2">Focus Areas:</p>
-                      <ul className="text-sm text-gray-600 space-y-1 ml-4">
-                        <li>• Tiered assignments and choice boards</li>
-                        <li>• Flexible grouping strategies</li>
-                        <li>• Scaffolding for diverse learners</li>
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[#1B2A4A] mb-2">Members:</p>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Sarah Chen</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Marcus Thompson</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Lisa Park</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">David Rodriguez</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Amy Foster</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">James Wilson</span>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[#1B2A4A] mb-2">Hub Resources:</p>
-                      <p className="text-sm text-gray-600">Differentiation Deep Dive course, Choice Board Templates, Tiered Assignment Builder</p>
-                    </div>
-                  </div>
-                </Accordion>
-
-                {/* Growth Group 2: Teacher-Para Collaboration */}
-                <Accordion
-                  id="growth-group-2"
-                  title="Teacher-Para Collaboration"
-                  subtitle="8 members · Focus: maximizing para support"
-                  badge="Active"
-                  badgeColor="bg-green-100 text-green-700"
-                  icon={<Users className="w-5 h-5" />}
-                >
-                  <div className="pt-4 space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-[#1B2A4A] mb-2">Focus Areas:</p>
-                      <ul className="text-sm text-gray-600 space-y-1 ml-4">
-                        <li>• Clear role definition and communication</li>
-                        <li>• Real-time feedback between teacher and para</li>
-                        <li>• Maximizing para impact during instruction</li>
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[#1B2A4A] mb-2">Members:</p>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Rachel Kim</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Marcus T. (Para)</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Jennifer Adams</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">DeShawn Harris (Para)</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Maria Santos</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Linda Washington (Para)</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Kevin O&apos;Brien</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Tanya Moore (Para)</span>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[#1B2A4A] mb-2">Hub Resources:</p>
-                      <p className="text-sm text-gray-600">Para Partnership Playbook, Communication Templates, Feedback Protocol Cards</p>
-                    </div>
-                  </div>
-                </Accordion>
-
-                {/* Growth Group 3: Classroom Management Reset */}
-                <Accordion
-                  id="growth-group-3"
-                  title="Classroom Management Reset"
-                  subtitle="5 members · Focus: systems and routines"
-                  badge="Active"
-                  badgeColor="bg-green-100 text-green-700"
-                  icon={<RefreshCw className="w-5 h-5" />}
-                >
-                  <div className="pt-4 space-y-4">
-                    <div>
-                      <p className="text-sm font-medium text-[#1B2A4A] mb-2">Focus Areas:</p>
-                      <ul className="text-sm text-gray-600 space-y-1 ml-4">
-                        <li>• Resetting routines mid-year</li>
-                        <li>• Reducing verbal redirections</li>
-                        <li>• Building student ownership of behavior</li>
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[#1B2A4A] mb-2">Members:</p>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Michael Chang</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Brittany Lewis</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Andre Jackson</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Samantha Price</span>
-                        <span className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-sm">Carlos Mendez</span>
-                      </div>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-[#1B2A4A] mb-2">Hub Resources:</p>
-                      <p className="text-sm text-gray-600">Classroom Reset Toolkit, Routine Builders, Redirection Reduction Strategies</p>
-                    </div>
-                  </div>
-                </Accordion>
-              </div>
-            </div>
-
-            {/* SECTION 5: District Assessment Data */}
-            <div>
-              <Accordion
-                id="assessment-data"
-                title="District Assessment Data"
-                subtitle="Grade-level reading percentiles"
-                badge="Winter 2026"
-                badgeColor="bg-purple-100 text-purple-700"
-                icon={<BarChart className="w-5 h-5" />}
-              >
-                <div className="pt-4 space-y-4">
-                  <p className="text-sm text-gray-600 mb-4">
-                    District benchmark data showing grade-level reading percentiles. Partnership schools are working to move students from &quot;approaching&quot; to &quot;meeting&quot; grade-level expectations.
-                  </p>
-
-                  <div className="space-y-3">
-                    {/* Grade 3 */}
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium text-[#1B2A4A]">Grade 3</span>
-                        <span className="text-amber-600 font-semibold">62nd percentile</span>
-                      </div>
-                      <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-amber-500 rounded-full" style={{ width: '62%' }}></div>
-                      </div>
-                    </div>
-
-                    {/* Grade 4 */}
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium text-[#1B2A4A]">Grade 4</span>
-                        <span className="text-amber-600 font-semibold">58th percentile</span>
-                      </div>
-                      <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-amber-500 rounded-full" style={{ width: '58%' }}></div>
-                      </div>
-                    </div>
-
-                    {/* Grade 5 */}
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium text-[#1B2A4A]">Grade 5</span>
-                        <span className="text-green-600 font-semibold">71st percentile</span>
-                      </div>
-                      <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-green-500 rounded-full" style={{ width: '71%' }}></div>
-                      </div>
-                    </div>
-
-                    {/* Grade 6 */}
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium text-[#1B2A4A]">Grade 6</span>
-                        <span className="text-amber-600 font-semibold">55th percentile</span>
-                      </div>
-                      <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-amber-500 rounded-full" style={{ width: '55%' }}></div>
-                      </div>
-                    </div>
-
-                    {/* Grade 7 */}
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium text-[#1B2A4A]">Grade 7</span>
-                        <span className="text-amber-600 font-semibold">64th percentile</span>
-                      </div>
-                      <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-amber-500 rounded-full" style={{ width: '64%' }}></div>
-                      </div>
-                    </div>
-
-                    {/* Grade 8 */}
-                    <div>
-                      <div className="flex justify-between text-sm mb-1">
-                        <span className="font-medium text-[#1B2A4A]">Grade 8</span>
-                        <span className="text-green-600 font-semibold">68th percentile</span>
-                      </div>
-                      <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                        <div className="h-full bg-green-500 rounded-full" style={{ width: '68%' }}></div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-4 border-t border-gray-100">
-                    <div className="flex items-start gap-2">
-                      <Lightbulb className="w-4 h-4 text-[#35A7FF] mt-0.5 flex-shrink-0" />
-                      <p className="text-xs text-gray-600">
-                        <span className="font-semibold text-[#1B2A4A]">Recommendation:</span> Grade 6 transition shows typical dip. Focus Growth Group strategies on 6th grade teachers for maximum impact.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </Accordion>
-            </div>
-
-            {/* SECTION 6: Supporting Resources */}
-            <div id="progress-resources">
-              <h3 className="text-lg font-semibold text-[#1B2A4A] mb-2">Supporting Resources</h3>
-              <p className="text-gray-500 text-sm mb-4">Tools available in the Learning Hub to support implementation</p>
-
-              <div className="grid sm:grid-cols-3 gap-4">
-                {/* Differentiation Toolkit */}
-                <a
-                  href="https://tdi.thinkific.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white rounded-xl p-5 border border-gray-200 hover:border-[#35A7FF] hover:shadow-md transition-all group"
-                >
-                  <div className="w-10 h-10 bg-[#1B2A4A]/10 rounded-lg flex items-center justify-center mb-3 group-hover:bg-[#35A7FF]/10 transition-colors">
-                    <Target className="w-5 h-5 text-[#1B2A4A] group-hover:text-[#35A7FF]" />
-                  </div>
-                  <div className="font-semibold text-[#1B2A4A] mb-1">Differentiation Toolkit</div>
-                  <p className="text-xs text-gray-500 mb-3">Choice boards, tiered assignments, and flexible grouping strategies</p>
-                  <span className="text-xs text-[#35A7FF] font-medium flex items-center gap-1">
-                    Explore in Hub <ArrowRight className="w-3 h-3" />
-                  </span>
-                </a>
-
-                {/* Para Partnership */}
-                <a
-                  href="https://tdi.thinkific.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white rounded-xl p-5 border border-gray-200 hover:border-[#35A7FF] hover:shadow-md transition-all group"
-                >
-                  <div className="w-10 h-10 bg-[#1B2A4A]/10 rounded-lg flex items-center justify-center mb-3 group-hover:bg-[#35A7FF]/10 transition-colors">
-                    <Users className="w-5 h-5 text-[#1B2A4A] group-hover:text-[#35A7FF]" />
-                  </div>
-                  <div className="font-semibold text-[#1B2A4A] mb-1">Para Partnership</div>
-                  <p className="text-xs text-gray-500 mb-3">Communication templates and collaboration strategies for teacher-para teams</p>
-                  <span className="text-xs text-[#35A7FF] font-medium flex items-center gap-1">
-                    Explore in Hub <ArrowRight className="w-3 h-3" />
-                  </span>
-                </a>
-
-                {/* Classroom Reset */}
-                <a
-                  href="https://tdi.thinkific.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white rounded-xl p-5 border border-gray-200 hover:border-[#35A7FF] hover:shadow-md transition-all group"
-                >
-                  <div className="w-10 h-10 bg-[#1B2A4A]/10 rounded-lg flex items-center justify-center mb-3 group-hover:bg-[#35A7FF]/10 transition-colors">
-                    <RefreshCw className="w-5 h-5 text-[#1B2A4A] group-hover:text-[#35A7FF]" />
-                  </div>
-                  <div className="font-semibold text-[#1B2A4A] mb-1">Classroom Reset</div>
-                  <p className="text-xs text-gray-500 mb-3">Mid-year routine rebuilders and management system refreshers</p>
-                  <span className="text-xs text-[#35A7FF] font-medium flex items-center gap-1">
-                    Explore in Hub <ArrowRight className="w-3 h-3" />
-                  </span>
-                </a>
-              </div>
-
-              {/* Additional Resources */}
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <p className="text-sm font-medium text-gray-600 mb-4">More ways to grow</p>
-
-                <div className="grid sm:grid-cols-2 gap-4">
-                  {/* Weekly Blog Strategies */}
-                  <a
-                    href="https://raehughart.substack.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-white rounded-xl p-5 border border-gray-200 hover:border-[#35A7FF] hover:shadow-md transition-all group flex gap-4"
-                  >
-                    <div className="w-12 h-12 bg-[#1B2A4A]/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-[#35A7FF]/10 transition-colors">
-                      <Mail className="w-6 h-6 text-[#1B2A4A] group-hover:text-[#35A7FF]" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-[#1B2A4A] mb-1">Weekly Strategies</div>
-                      <p className="text-xs text-gray-500 mb-2">Fresh, practical ideas delivered 3x per week to your inbox</p>
-                      <span className="text-xs text-[#35A7FF] font-medium flex items-center gap-1">
-                        Subscribe on Substack <ArrowRight className="w-3 h-3" />
-                      </span>
-                    </div>
-                  </a>
-
-                  {/* Podcast */}
-                  <a
-                    href="https://podcasts.apple.com/us/podcast/sustainable-teaching-with-rae-hughart/id1792030274"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-white rounded-xl p-5 border border-gray-200 hover:border-[#35A7FF] hover:shadow-md transition-all group flex gap-4"
-                  >
-                    <div className="w-12 h-12 bg-[#1B2A4A]/10 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-[#35A7FF]/10 transition-colors">
-                      <Headphones className="w-6 h-6 text-[#1B2A4A] group-hover:text-[#35A7FF]" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-[#1B2A4A] mb-1">Sustainable Teaching Podcast</div>
-                      <p className="text-xs text-gray-500 mb-2">Real conversations about what actually works in the classroom</p>
-                      <span className="text-xs text-[#35A7FF] font-medium flex items-center gap-1">
-                        Listen now <ArrowRight className="w-3 h-3" />
-                      </span>
-                    </div>
-                  </a>
-                </div>
-              </div>
-
-              <div className="text-center mt-6">
-                <a
-                  href="https://tdi.thinkific.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-[#1B2A4A] hover:text-[#35A7FF] font-medium transition-colors"
-                >
-                  <BookOpen className="w-4 h-4" />
-                  Browse all Learning Hub resources →
-                </a>
-              </div>
-
-              <p className="text-xs text-gray-400 text-center mt-3">
-                These resources support the implementation strategies discussed in Growth Group sessions
+            {/* ─────────────────────────────────────────────
+                SECTION 9 - STAFF CHAMPIONS (Building Spotlight)
+                Starts COLLAPSED
+            ───────────────────────────────────────────── */}
+            <CollapsibleSection
+              title="Building Spotlight"
+              icon={<Trophy className="w-4 h-4 text-amber-600" />}
+              defaultOpen={false}
+              accent="amber"
+            >
+              <p className="text-sm text-gray-500 italic mb-4">
+                Recognize your most engaged buildings in one click - share these wins at your next board meeting or staff communication.
               </p>
-            </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4 border border-amber-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Trophy className="w-5 h-5 text-amber-600" />
+                    <span className="font-bold text-amber-800">Harmony Elementary</span>
+                  </div>
+                  <p className="text-sm text-amber-700">100% Hub login rate - leading the district in engagement</p>
+                </div>
+                <div className="bg-gradient-to-br from-amber-50 to-amber-100 rounded-xl p-4 border border-amber-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Trophy className="w-5 h-5 text-amber-600" />
+                    <span className="font-bold text-amber-800">Crescendo Middle</span>
+                  </div>
+                  <p className="text-sm text-amber-700">Highest implementation rate at 28% - modeling excellence</p>
+                </div>
+              </div>
+            </CollapsibleSection>
+
+            {/* ─────────────────────────────────────────────
+                SECTION 10 - WHAT'S RESONATING (Hub Engagement)
+                Starts COLLAPSED
+            ───────────────────────────────────────────── */}
+            <CollapsibleSection
+              title="What&apos;s Resonating"
+              icon={<BookOpen className="w-4 h-4 text-blue-600" />}
+              defaultOpen={false}
+              accent="blue"
+            >
+              <div className="space-y-4">
+                <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
+                  <p className="text-sm font-medium text-blue-800 mb-2">Hub Engagement: 87% Login Rate</p>
+                  <p className="text-sm text-gray-700">223 of 255 staff have logged in and are actively using the Learning Hub across all 6 buildings.</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-[#1B2A4A] mb-3">Top Courses This Month</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3 bg-white rounded-lg p-3 border border-gray-100">
+                      <span className="w-6 h-6 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-xs font-bold">1</span>
+                      <span className="text-sm text-gray-700">Classroom Management Essentials</span>
+                      <span className="ml-auto text-xs text-gray-400">142 enrollments</span>
+                    </div>
+                    <div className="flex items-center gap-3 bg-white rounded-lg p-3 border border-gray-100">
+                      <span className="w-6 h-6 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-xs font-bold">2</span>
+                      <span className="text-sm text-gray-700">Building Student Relationships</span>
+                      <span className="ml-auto text-xs text-gray-400">128 enrollments</span>
+                    </div>
+                    <div className="flex items-center gap-3 bg-white rounded-lg p-3 border border-gray-100">
+                      <span className="w-6 h-6 rounded-full bg-teal-100 text-teal-600 flex items-center justify-center text-xs font-bold">3</span>
+                      <span className="text-sm text-gray-700">Differentiated Instruction Strategies</span>
+                      <span className="ml-auto text-xs text-gray-400">97 enrollments</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </CollapsibleSection>
+
+            {/* ─────────────────────────────────────────────
+                SECTION 11 - YOUR TEAM'S TOP ASK
+                Starts COLLAPSED
+            ───────────────────────────────────────────── */}
+            <CollapsibleSection
+              title="Your Team&apos;s Top Ask"
+              icon={<MessageSquare className="w-4 h-4 text-amber-600" />}
+              defaultOpen={false}
+              accent="amber"
+            >
+              <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                <p className="text-xs font-bold text-amber-800 uppercase tracking-wide mb-2">
+                  Recommended Actions for Admin
+                </p>
+                <div className="space-y-3">
+                  <div className="bg-white rounded-lg p-3 border border-amber-200">
+                    <p className="text-sm font-medium text-[#1B2A4A] mb-1">Dedicated Hub Time</p>
+                    <p className="text-sm text-gray-600">Staff have requested dedicated time during PLCs or staff meetings to complete Hub courses together. This builds community and increases completion rates.</p>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 border border-amber-200">
+                    <p className="text-sm font-medium text-[#1B2A4A] mb-1">Para-Teacher Collaboration Time</p>
+                    <p className="text-sm text-gray-600">Both paras and teachers have expressed interest in more structured collaboration time to discuss student strategies and coordinate support.</p>
+                  </div>
+                </div>
+              </div>
+            </CollapsibleSection>
+
           </div>
         )}
+
+
 
         {/* SCHOOLS TAB */}
         {activeTab === 'schools' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* District Summary Bar */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-200 text-center">
@@ -3673,7 +2639,7 @@ export default function ExampleDashboard() {
 
         {/* FULL BLUEPRINT TAB */}
         {activeTab === 'blueprint' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">The Full TDI Blueprint</h2>
               <p className="text-gray-600">What becomes available when we continue our partnership</p>
@@ -3698,7 +2664,7 @@ export default function ExampleDashboard() {
 
         {/* 2026-27 PREVIEW TAB - OVERHAULED */}
         {activeTab === 'next-year' && (
-          <div className="space-y-8">
+          <div className="space-y-4">
 
             {/* SECTION A: Hero Banner */}
             <div className="relative bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-8 text-white overflow-hidden">
@@ -4295,7 +3261,7 @@ export default function ExampleDashboard() {
 
         {/* YOUR TDI TEAM TAB */}
         {activeTab === 'team' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your TDI Team</h2>
               <p className="text-gray-600">Your dedicated partner for this journey</p>
@@ -4409,7 +3375,7 @@ export default function ExampleDashboard() {
 
       {/* Compact Footer */}
       <footer className="bg-[#1e2749] text-white py-6 px-4">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <div>
             <div className="font-bold">Teachers Deserve It</div>
             <p className="text-white/60 text-sm">Partner Dashboard for Motown District 360</p>

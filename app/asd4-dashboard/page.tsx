@@ -81,7 +81,7 @@ export default function ASD4Dashboard() {
   const [expandedObsBuilding, setExpandedObsBuilding] = useState<string | null>('fullerton');
 
   // Needs Attention completion state with localStorage persistence
-  // Only 1 item remains in Needs Attention - Virtual Session 4
+  // Only 1 item remains in Needs Attention - Virtual Support Session 4
   const permanentlyComplete: string[] = [];
   const [completedItems, setCompletedItems] = useState<string[]>(() => {
     if (typeof window !== 'undefined') {
@@ -115,8 +115,8 @@ export default function ASD4Dashboard() {
   const needsAttentionItems = [
     {
       id: 'virtual-session-4',
-      title: 'Schedule Virtual Session 4',
-      description: 'Final coaching check-in — schedule after April 20',
+      title: 'Schedule Virtual Support Session 4',
+      description: 'Final coaching check-in  - schedule after April 20',
       deadline: 'MAY 2026',
       actionLabel: 'Book Your Session',
       actionUrl: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat',
@@ -130,7 +130,7 @@ export default function ASD4Dashboard() {
   // Completed sessions data
   const completedSessions = [
     {
-      title: "The Moves That Matter: Part 1",
+      title: "Kick-Off Training",
       date: "January 5, 2026",
       format: "In-Person",
       duration: "Multi-Hour Session",
@@ -157,20 +157,20 @@ export default function ASD4Dashboard() {
       reportLabel: "View Executive Summary Report →"
     },
     {
-      title: "The Moves That Matter: Part 2",
+      title: "Half-Day Training",
       date: "February 13, 2026",
       format: "In-Person",
       duration: "2-Hour Session",
       focusAreas: [
-        "Ask, Don't Tell — Questioning scenarios with partner role-play",
-        "Feedback That Builds Capacity — Notice. Name. Next Step. formula",
+        "Ask, Don't Tell  - Questioning scenarios with partner role-play",
+        "Feedback That Builds Capacity  - Notice. Name. Next Step. formula",
         "Game-based practice tool introduction"
       ],
       status: "complete" as const,
       practiceReps: 54
     },
     {
-      title: "Virtual Session 1",
+      title: "Virtual Support Session 1",
       date: "March 2, 2026",
       format: "Virtual",
       duration: "45-Minute Session",
@@ -182,7 +182,7 @@ export default function ASD4Dashboard() {
       status: "complete" as const
     },
     {
-      title: "Observation Day",
+      title: "Observation & Support Day",
       date: "March 3, 2026",
       format: "In-Person",
       duration: "Full Day (7:30 AM - 3:00 PM)",
@@ -215,7 +215,7 @@ export default function ASD4Dashboard() {
   // Upcoming/Scheduled sessions data
   const upcomingSessions = [
     {
-      title: "Observation Day 2",
+      title: "Observation & Support Day 2",
       date: "March 19, 2026",
       time: "Half Day",
       format: "In-Person",
@@ -227,7 +227,7 @@ export default function ASD4Dashboard() {
       status: "scheduled" as const
     },
     {
-      title: "Virtual Session 2",
+      title: "Virtual Support Session 2",
       date: "April 6, 2026",
       time: "7:30 - 8:15 AM",
       format: "Virtual",
@@ -251,7 +251,7 @@ export default function ASD4Dashboard() {
       status: "scheduled" as const
     },
     {
-      title: "Virtual Session 3 (Late Start Days Support)",
+      title: "Virtual Support Session 3 (Late Start Days)",
       date: "April 20, 2026",
       time: "7:30 - 8:15 AM",
       format: "Virtual",
@@ -264,7 +264,7 @@ export default function ASD4Dashboard() {
     }
   ];
 
-  // Observation Day Schedule - March 3, 2026
+  // Observation & Support Day Schedule - March 3, 2026
   const observationSchedule = [
     {
       school: "Fullerton",
@@ -308,7 +308,7 @@ export default function ASD4Dashboard() {
     }
   ];
 
-  // Observation Day Results - March 3, 2026
+  // Observation & Support Day Results - March 3, 2026
   const observationResults = {
     fullerton: {
       school: "Fullerton",
@@ -327,8 +327,8 @@ export default function ASD4Dashboard() {
           move: "Ask Don't Tell",
           color: "orange",
           examples: [
-            { para: "Jonnathan Roeglin", example: "Asked \"How do we make this into a fraction?\" during small group math — guiding students to think through the problem instead of giving the answer" },
-            { para: "Fatema Bakhrani", example: "Asked \"What letter is missing from 'house'?\" — direct questioning to get student thinking while re-reading worksheet directions together" },
+            { para: "Jonnathan Roeglin", example: "Asked \"How do we make this into a fraction?\" during small group math  - guiding students to think through the problem instead of giving the answer" },
+            { para: "Fatema Bakhrani", example: "Asked \"What letter is missing from 'house'?\"  - direct questioning to get student thinking while re-reading worksheet directions together" },
             { para: "Esperanza Garcia", example: "Reading directions and asking questions in Spanish to get her student thinking, not just translating answers" }
           ]
         },
@@ -336,17 +336,17 @@ export default function ASD4Dashboard() {
           move: "Feedback & Encouragement",
           color: "teal",
           examples: [
-            { para: "Kristina Orellana", example: "Encouraged a sleepy, disengaged student with repeated questions, then guided him to raise his hand and answer for the full class — building confidence, not just compliance" },
-            { para: "Kristina Orellana", example: "\"There you go!\" — positive reinforcement during counting activity, encouraging participation" }
+            { para: "Kristina Orellana", example: "Encouraged a sleepy, disengaged student with repeated questions, then guided him to raise his hand and answer for the full class  - building confidence, not just compliance" },
+            { para: "Kristina Orellana", example: "\"There you go!\"  - positive reinforcement during counting activity, encouraging participation" }
           ]
         },
         {
           move: "Positioning & Proximity",
           color: "blue",
           examples: [
-            { para: "Jonnathan Roeglin", example: "Crouching down to student level during small group work instead of standing over — sending the message \"I'm here WITH you\"" },
-            { para: "Esperanza Garcia", example: "Working in the back of the room with quiet voice — supporting her student without disrupting whole-class instruction" },
-            { para: "Kristina Orellana", example: "Sat with disengaged student in back of room rather than calling him out — proximity as a redirection tool" }
+            { para: "Jonnathan Roeglin", example: "Crouching down to student level during small group work instead of standing over  - sending the message \"I'm here WITH you\"" },
+            { para: "Esperanza Garcia", example: "Working in the back of the room with quiet voice  - supporting her student without disrupting whole-class instruction" },
+            { para: "Kristina Orellana", example: "Sat with disengaged student in back of room rather than calling him out  - proximity as a redirection tool" }
           ]
         },
         {
@@ -354,7 +354,7 @@ export default function ASD4Dashboard() {
           color: "purple",
           examples: [
             { para: "Jonnathan Roeglin", example: "Scanning the room and redirecting off-task students to keep them on track during independent work time, even while running his own small group" },
-            { para: "Esperanza Garcia", example: "Patiently redirecting a distracted student back to questions on the screen — persistence without frustration" },
+            { para: "Esperanza Garcia", example: "Patiently redirecting a distracted student back to questions on the screen  - persistence without frustration" },
             { para: "Kristina Orellana", example: "Quietly redirecting during math transition by sitting alongside the student" }
           ]
         },
@@ -362,7 +362,7 @@ export default function ASD4Dashboard() {
           move: "Teacher-Para Collaboration",
           color: "green",
           examples: [
-            { para: "Jonnathan Roeglin", example: "Positioned in back during whole-class lesson to listen, support, and interact with teacher — \"thumbs up if...\" — seamless classroom partnership" },
+            { para: "Jonnathan Roeglin", example: "Positioned in back during whole-class lesson to listen, support, and interact with teacher  - \"thumbs up if...\"  - seamless classroom partnership" },
             { para: "Kristina Orellana", example: "Checked in with classroom teacher quietly during a video to get an update without disrupting the lesson flow" }
           ]
         },
@@ -370,35 +370,35 @@ export default function ASD4Dashboard() {
           move: "Bilingual Support",
           color: "pink",
           examples: [
-            { para: "Esperanza Garcia", example: "Reading and speaking entirely in Spanish with 1:1 student in a fully Spanish classroom — meeting the student in their language to make content accessible" }
+            { para: "Esperanza Garcia", example: "Reading and speaking entirely in Spanish with 1:1 student in a fully Spanish classroom  - meeting the student in their language to make content accessible" }
           ]
         }
       ],
       hubResources: [
-        { para: "Jonnathan Roeglin", resource: "Feedback Framework Quick Reference + No-Hands-Up Help Systems*", reason: "Strong questioning already — next step is pairing questions with Notice → Name → Next Step feedback" },
+        { para: "Jonnathan Roeglin", resource: "Feedback Framework Quick Reference + No-Hands-Up Help Systems*", reason: "Strong questioning already  - next step is pairing questions with Notice → Name → Next Step feedback" },
         { para: "Esperanza Garcia", resource: "Supporting English Learners + Bilingual Reference Cards", reason: "Directly connects to the bilingual scaffolding work she's already doing" },
-        { para: "Kristina Orellana", resource: "PA Quick Wins Menu", reason: "Already doing high-impact moves naturally — quick-grab reference for more" },
-        { para: "Fatema Bakhrani", resource: "Feedback Framework Quick Reference + 'One Step at a Time' Chunking Strategy*", reason: "Good guiding questions observed — feedback formula is the natural next layer" },
+        { para: "Kristina Orellana", resource: "PA Quick Wins Menu", reason: "Already doing high-impact moves naturally  - quick-grab reference for more" },
+        { para: "Fatema Bakhrani", resource: "Feedback Framework Quick Reference + 'One Step at a Time' Chunking Strategy*", reason: "Good guiding questions observed  - feedback formula is the natural next layer" },
         { para: "Mary Dunkel", resource: "Para Quick-Start Confidence Kit", reason: "Clean starting point for Hub engagement" },
         { para: "Scott Nyquist", resource: "\"What Should I Be Doing Right Now?\" Para Guide", reason: "Practical role-affirming reference" },
         { para: "Evely Castillo", resource: "De-Escalation Strategies + Calm Response Scripts", reason: "Updated same-day after she replied requesting de-escalation support" }
       ],
       quotes: [
         { text: "I wish I could meet all my students' many needs every day.", author: "Scott Nyquist", context: "Replied 5 minutes after receiving observation follow-up email" },
-        { text: "One thing I wish was easier is helping a student de-escalate instead of escalating the situation more. I still struggle somewhat in that aspect.", author: "Evely Castillo", context: "Reached out on her own — was not formally observed but replied with a specific skill request after receiving an appreciation email", selfInitiated: true },
+        { text: "One thing I wish was easier is helping a student de-escalate instead of escalating the situation more. I still struggle somewhat in that aspect.", author: "Evely Castillo", context: "Reached out on her own  - was not formally observed but replied with a specific skill request after receiving an appreciation email", selfInitiated: true },
         { text: "Thank you for taking your time to come by and stop to observe me. Thank you for your comments and suggestions. I will take a look at the resources you shared with me.", author: "Esperanza Garcia, Fullerton (Bilingual Support)", context: "Replied next morning. Committed to exploring Hub resources." },
         { text: "I'm glad that you were able to stop by and observe. One thing I wish was easier is being able to bounce around between groups of students who all need help at the same time.", author: "Jonnathan Roeglin, Fullerton (Formally Observed)", context: "Replied next morning with a specific growth request: managing multiple groups simultaneously. Matched with No-Hands-Up Help Systems resource.", growthRequest: true },
         { text: "Could we try to maybe break the work into smaller steps to help make the student understand it better? What is an easier strategy to help them understand?", author: "Fatema Bakhrani, Fullerton (Informal Observation)", context: "Replied with a specific strategy request: chunking and scaffolding. Matched with 'One Step at a Time' chunking strategy.", growthRequest: true }
       ],
       themes: {
         strengths: [
-          "Strong questioning skills across multiple paras — Move #1 is landing",
+          "Strong questioning skills across multiple paras  - Calm Classroom Presence is landing",
           "Patience and persistence with disengaged or distracted students",
           "Natural teacher-para collaboration happening without prompting",
           "Bilingual scaffolding actively supporting EL students",
           "Paras positioning themselves intentionally (crouching, back of room, sitting alongside)"
         ],
-        growthOpportunity: "Feedback specificity — paras are encouraging (\"There you go!\") but can level up to Notice → Name → Next Step for more targeted student growth"
+        growthOpportunity: "Feedback specificity  - paras are encouraging (\"There you go!\") but can level up to Notice → Name → Next Step for more targeted student growth"
       },
       teacherHighlights: [
         { teacher: "Seidenfuss", note: "Well-paced, student-centered lesson that created real space for meaningful small group para work alongside whole-class instruction." },
@@ -541,7 +541,7 @@ export default function ASD4Dashboard() {
           move: "Ask Don't Tell",
           color: "orange",
           examples: [
-            { para: "Rose Marinelli", example: "Repeated the question rather than giving the answer during math work — \"What do we do first?\" — guiding student thinking" },
+            { para: "Rose Marinelli", example: "Repeated the question rather than giving the answer during math work  - \"What do we do first?\"  - guiding student thinking" },
             { para: "Gregoria Arredondo", example: "Asked clarifying questions during reading support to check comprehension before moving on" }
           ]
         },
@@ -549,16 +549,16 @@ export default function ASD4Dashboard() {
           move: "Feedback & Encouragement",
           color: "teal",
           examples: [
-            { para: "Rose Marinelli", example: "\"You got it!\" after student self-corrected — celebrating effort, not just accuracy" },
-            { para: "Carlos Chavez", example: "High-fives and verbal praise throughout small group math — consistent, genuine encouragement" },
-            { para: "Michelina Hawkins", example: "\"I like how you're thinking through this\" — process-focused feedback during 1:1 support" }
+            { para: "Rose Marinelli", example: "\"You got it!\" after student self-corrected  - celebrating effort, not just accuracy" },
+            { para: "Carlos Chavez", example: "High-fives and verbal praise throughout small group math  - consistent, genuine encouragement" },
+            { para: "Michelina Hawkins", example: "\"I like how you're thinking through this\"  - process-focused feedback during 1:1 support" }
           ]
         },
         {
           move: "Positioning & Proximity",
           color: "blue",
           examples: [
-            { para: "Rose Marinelli", example: "Kneeling beside student desk during independent work — at their level, not hovering" },
+            { para: "Rose Marinelli", example: "Kneeling beside student desk during independent work  - at their level, not hovering" },
             { para: "Carlos Chavez", example: "Circulating during math centers, checking in with multiple groups while staying mobile" },
             { para: "Gregoria Arredondo", example: "Positioned at small table in back corner to minimize distraction while providing support" }
           ]
@@ -567,38 +567,38 @@ export default function ASD4Dashboard() {
           move: "Redirection",
           color: "purple",
           examples: [
-            { para: "Rose Marinelli", example: "Gentle tap on desk to refocus wandering student — non-verbal, non-disruptive" },
-            { para: "Michelina Hawkins", example: "\"Let's come back to this\" when student went off-topic — calm, consistent re-engagement" }
+            { para: "Rose Marinelli", example: "Gentle tap on desk to refocus wandering student  - non-verbal, non-disruptive" },
+            { para: "Michelina Hawkins", example: "\"Let's come back to this\" when student went off-topic  - calm, consistent re-engagement" }
           ]
         },
         {
           move: "Teacher-Para Collaboration",
           color: "green",
           examples: [
-            { para: "Carlos Chavez", example: "Quick whispered check-in with teacher during transition — ensuring alignment without disrupting flow" },
-            { para: "Gregoria Arredondo", example: "Picked up seamlessly when teacher shifted to whole-class instruction — no verbal cue needed" }
+            { para: "Carlos Chavez", example: "Quick whispered check-in with teacher during transition  - ensuring alignment without disrupting flow" },
+            { para: "Gregoria Arredondo", example: "Picked up seamlessly when teacher shifted to whole-class instruction  - no verbal cue needed" }
           ]
         },
         {
           move: "Bilingual Support",
           color: "pink",
           examples: [
-            { para: "Gregoria Arredondo", example: "Clarified directions in Spanish for EL student, then switched back to English for follow-up questions — seamless code-switching" }
+            { para: "Gregoria Arredondo", example: "Clarified directions in Spanish for EL student, then switched back to English for follow-up questions  - seamless code-switching" }
           ]
         },
         {
           move: "Leading Under Pressure",
           color: "cyan",
           examples: [
-            { para: "Rose Marinelli", example: "Principal Dohman observed Rose leading a student group during an unexpected fire drill transition — calm, organized, students followed her lead without hesitation" }
+            { para: "Rose Marinelli", example: "Principal Dohman observed Rose leading a student group during an unexpected fire drill transition  - calm, organized, students followed her lead without hesitation" }
           ]
         }
       ],
       hubResources: [
-        { para: "Rose Marinelli", resource: "Feedback Framework Quick Reference", reason: "Already encouraging — next step is Notice → Name → Next Step specificity" },
-        { para: "Carlos Chavez", resource: "Small Group Facilitation Guide + Differentiated Choice Boards*", reason: "Strong circulation — formalize small group check-in strategies" },
+        { para: "Rose Marinelli", resource: "Feedback Framework Quick Reference", reason: "Already encouraging  - next step is Notice → Name → Next Step specificity" },
+        { para: "Carlos Chavez", resource: "Small Group Facilitation Guide + Differentiated Choice Boards*", reason: "Strong circulation  - formalize small group check-in strategies" },
         { para: "Gregoria Arredondo", resource: "Supporting English Learners + Bilingual Reference Cards", reason: "Connects directly to the bilingual scaffolding she's already providing" },
-        { para: "Michelina Hawkins", resource: "1:1 Student Support Toolkit", reason: "Process-focused feedback is strong — build out 1:1 repertoire" }
+        { para: "Michelina Hawkins", resource: "1:1 Student Support Toolkit", reason: "Process-focused feedback is strong  - build out 1:1 repertoire" }
       ],
       quotes: [
         { text: "They are great people and hard workers! So glad you got to visit!", author: "Kara Dohman, Principal, Lincoln Elementary", context: "Replied same day after receiving observation highlights email" },
@@ -606,13 +606,13 @@ export default function ASD4Dashboard() {
       ],
       themes: {
         strengths: [
-          "Strong questioning skills — paras guiding thinking rather than giving answers",
-          "Genuine encouragement throughout building — high-fives, verbal praise, process-focused feedback",
-          "Effective positioning — paras at student level, circulating, minimizing distraction",
-          "Seamless teacher-para collaboration — transitions happen without verbal cues",
-          "Calm leadership under pressure — Rose's fire drill moment was exceptional"
+          "Strong questioning skills  - paras guiding thinking rather than giving answers",
+          "Genuine encouragement throughout building  - high-fives, verbal praise, process-focused feedback",
+          "Effective positioning  - paras at student level, circulating, minimizing distraction",
+          "Seamless teacher-para collaboration  - transitions happen without verbal cues",
+          "Calm leadership under pressure  - Rose's fire drill moment was exceptional"
         ],
-        growthOpportunity: "Feedback specificity — transition from general praise to Notice → Name → Next Step. Some paras could also benefit from more proactive engagement with disengaged students."
+        growthOpportunity: "Feedback specificity  - transition from general praise to Notice → Name → Next Step. Some paras could also benefit from more proactive engagement with disengaged students."
       },
       teacherHighlights: [
         { teacher: "Savaglio", note: "Classroom structured to give the para real ownership of small group instruction. The reading group felt like a master class because the design trusted the para with meaningful work." },
@@ -846,7 +846,7 @@ export default function ASD4Dashboard() {
         { type: 'silver', label: 'Highest Asking Confidence (4.50)' },
         { type: 'bronze', label: 'Growing Team' },
       ],
-      note: 'Lake Park paras who responded show the highest asking confidence in the district. Login rate and survey participation need attention — a targeted walkthrough at the next staff meeting is recommended.',
+      note: 'Lake Park paras who responded show the highest asking confidence in the district. Login rate and survey participation need attention  - a targeted walkthrough at the next staff meeting is recommended.',
       paras: [
         { name: 'Alvarado, Patricia', email: 'palvarado@asd4.org', loggedIn: true },
         { name: 'Marquez, Claudia', email: 'cmarquez@asd4.org', loggedIn: true },
@@ -931,7 +931,7 @@ export default function ASD4Dashboard() {
         { type: 'gold', label: 'Most Represented (20 survey responses)' },
         { type: 'silver', label: 'Strong Confidence' },
       ],
-      note: 'ELC has the strongest feedback implementation in the district at 90%. Login rate is lower — a dedicated walkthrough session would help close the gap.',
+      note: 'ELC has the strongest feedback implementation in the district at 90%. Login rate is lower  - a dedicated walkthrough session would help close the gap.',
       paras: [
         { name: 'Katherine De La Cruz', email: 'kdelacruz@asd4.org', loggedIn: true },
         { name: 'Melanie Diaz', email: 'mdiaz@asd4.org', loggedIn: true },
@@ -1053,11 +1053,6 @@ Thank you for setting the example. It matters more than you know.`;
 
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId);
-    // Scroll to tab content area so user sees the tab they selected
-    tabContentRef.current?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
   };
 
   const tabs = [
@@ -1118,14 +1113,14 @@ Thank you for setting the example. It matters more than you know.`;
       phase: { name: 'IGNITE', number: 1, total: 3, label: 'Current Phase', sublabel: 'Phase 1 of 3' },
     },
 
-    // Partnership Health — TDI sets this manually
+    // Partnership Health  - TDI sets this manually
     health: {
       status: 'Strong',          // Strong | Building | On Track | Needs Attention
       statusColor: 'green',      // green | yellow | blue | red
       details: [
-        'Hub engagement at 100% — all paras active',
+        'Hub engagement at 100%  - all paras active',
         '91 course completions',
-        'Move #1 & #2 implementation complete',
+        'Calm Classroom Presence & Collaborative Support implementation complete',
         '1 item remaining to schedule',
       ],
     },
@@ -1133,29 +1128,29 @@ Thank you for setting the example. It matters more than you know.`;
     // ZONE 2A - Timeline
     timeline: {
       done: [
-        { label: 'Partnership kickoff — The Moves That Matter Pt. 1', date: 'Jan 5, 2026' },
+        { label: 'Kick-Off Training', date: 'Jan 5, 2026' },
         { label: 'Executive Impact Session 1', date: 'Jan 2026' },
-        { label: 'Hub access activated — all 122 paras enrolled', date: 'Jan 2026' },
+        { label: 'Hub access activated  - all 122 paras enrolled', date: 'Jan 2026' },
         { label: 'Pilot group identified', date: 'Jan 2026' },
-        { label: 'The Moves That Matter Pt. 2 — Observation Day 1', date: 'Feb 13, 2026' },
-        { label: 'Virtual Session 1', date: 'Mar 2, 2026' },
-        { label: 'Observation Day 1 — with survey data collection', date: 'Mar 3, 2026' },
-        { label: 'Move #1 implementation tracking', date: '91% across pilot group' },
-        { label: 'Move #2 implementation tracking', date: '70% across pilot group' },
-        { label: 'March survey analysis — 95/122 responded', date: '78% response rate' },
+        { label: 'Half-Day Training', date: 'Feb 13, 2026' },
+        { label: 'Virtual Support Session 1', date: 'Mar 2, 2026' },
+        { label: 'Observation & Support Day 1  - with survey data collection', date: 'Mar 3, 2026' },
+        { label: 'Calm Classroom Presence implementation tracking', date: '91% across pilot group' },
+        { label: 'Collaborative Support implementation tracking', date: '70% across pilot group' },
+        { label: 'March survey analysis  - 95/122 responded', date: '78% response rate' },
       ],
       inProgress: [
-        { label: 'Hub engagement — 122 of 122 paras active', detail: '100% logged in' },
-        { label: 'Move #1 implementation tracking', detail: '91% across pilot group' },
-        { label: 'Move #2 implementation tracking', detail: '70% across pilot group' },
-        { label: 'March survey analysis — 95/122 responded', detail: '78% response rate' },
+        { label: 'Hub engagement  - 122 of 122 paras active', detail: '100% logged in' },
+        { label: 'Calm Classroom Presence implementation tracking', detail: '91% across pilot group' },
+        { label: 'Collaborative Support implementation tracking', detail: '70% across pilot group' },
+        { label: 'March survey analysis  - 95/122 responded', detail: '78% response rate' },
       ],
       comingSoon: [
-        { label: 'Observation Day 2', date: 'Mar 19, 2026' },
-        { label: 'Virtual Session 2', date: 'Apr 6, 2026' },
+        { label: 'Observation & Support Day 2', date: 'Mar 19, 2026' },
+        { label: 'Virtual Support Session 2', date: 'Apr 6, 2026' },
         { label: 'Executive Impact Session 2', date: 'Apr 9, 2026' },
-        { label: 'Virtual Session 3', date: 'Apr 20, 2026' },
-        { label: 'Virtual Session 4', date: 'After Apr 20 — scheduling in progress' },
+        { label: 'Virtual Support Session 3', date: 'Apr 20, 2026' },
+        { label: 'Virtual Support Session 4', date: 'After Apr 20  - scheduling in progress' },
         { label: 'End-of-year impact report', date: 'May 2026' },
       ],
     },
@@ -1163,9 +1158,9 @@ Thank you for setting the example. It matters more than you know.`;
     // ZONE 2B - Investment value mirror (PFAB Advantage + Benefit)
     investment: {
       perEducator: '$299',
-      perEducatorSublabel: 'per para — less than a one-day sub',
+      perEducatorSublabel: 'per para  - less than a one-day sub',
       implementationRate: '91%',
-      implementationSublabel: 'Move #1 implementation — vs. 10% industry avg',
+      implementationSublabel: 'Calm Classroom Presence implementation  - vs. 10% industry avg',
       coursesCompleted: 91,
       coursesCompletedSublabel: 'course completions this partnership',
       retentionStat: '71%',
@@ -1183,8 +1178,8 @@ Thank you for setting the example. It matters more than you know.`;
     actions: {
       nextToUnlock: [
         {
-          label: 'Schedule Virtual Session 4',
-          detail: 'Schedule after April 20 — final session of the partnership',
+          label: 'Schedule Virtual Support Session 4',
+          detail: 'Schedule after April 20  - final session of the partnership',
           owner: 'partner',  // partner | tdi | both
           cta: 'Schedule via Calendly',
           ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
@@ -1192,32 +1187,32 @@ Thank you for setting the example. It matters more than you know.`;
       ],
       tdiHandling: [
         {
-          label: 'Observation Day 2 Prep',
-          detail: 'TDI is preparing — March 19, 2026',
+          label: 'Observation & Support Day 2 Prep',
+          detail: 'TDI is preparing  - March 19, 2026',
         },
         {
           label: 'Executive Impact Session 2 Prep',
-          detail: 'TDI is preparing — April 9, 2026',
+          detail: 'TDI is preparing  - April 9, 2026',
         },
       ],
       alreadyInMotion: [
-        { label: 'Observation Day 2', date: 'Mar 19, 2026', status: 'scheduled' },
-        { label: 'Virtual Session 2', date: 'Apr 6, 2026', status: 'scheduled' },
+        { label: 'Observation & Support Day 2', date: 'Mar 19, 2026', status: 'scheduled' },
+        { label: 'Virtual Support Session 2', date: 'Apr 6, 2026', status: 'scheduled' },
         { label: 'Executive Impact Session 2', date: 'Apr 9, 2026', status: 'scheduled' },
-        { label: 'Virtual Session 3', date: 'Apr 20, 2026', status: 'scheduled' },
+        { label: 'Virtual Support Session 3', date: 'Apr 20, 2026', status: 'scheduled' },
       ],
     },
   };
 
   const partnershipData = {
 
-    // SECTION 1 — Partnership Goal
+    // SECTION 1  - Partnership Goal
     goal: {
       quote: 'Every para in Addison School District 4 feels equipped, valued, and ready to show up fully for students.',
       theme: 'Building a district where paraprofessionals are treated as the professionals they are.',
     },
 
-    // SECTION 2 — Classroom Observations
+    // SECTION 2  - Classroom Observations
     observations: [
       {
         id: 'obs-1',
@@ -1225,18 +1220,18 @@ Thank you for setting the example. It matters more than you know.`;
         date: 'January 2026',
         classroomsVisited: 18,
         loveNotesDelivered: 18,
-        aiSummary: 'Across 18 Addison classrooms, paras were actively engaged — redirecting with calm language, using proximity support, and following student-centered cues from their teachers. One moment that stood out: a para in Building 3 used a strategy from the Hub\'s Calm Classrooms course mid-visit, entirely unprompted. 91% of observed paras are already applying Move #1 strategies in their daily practice.',
+        aiSummary: 'Across 18 Addison classrooms, paras were actively engaged  - redirecting with calm language, using proximity support, and following student-centered cues from their teachers. One moment that stood out: a para in Building 3 used a strategy from the Hub\'s Calm Classrooms course mid-visit, entirely unprompted. 91% of observed paras are already applying Calm Classroom Presence strategies in their daily practice.',
         details: {
-          narrative: 'TDI visited 18 classrooms across Addison SD4. The observation focus was Move #1 implementation — calm redirection, proactive proximity, and student relationship language. What we saw: paras who had engaged with Hub content were noticeably more confident and intentional in their practice.',
+          narrative: 'TDI visited 18 classrooms across Addison SD4. The observation focus was Calm Classroom Presence implementation  - calm redirection, proactive proximity, and student relationship language. What we saw: paras who had engaged with Hub content were noticeably more confident and intentional in their practice.',
           quotes: [
-            'She knew exactly what to do without being asked — that\'s a para who owns her role.',
+            'She knew exactly what to do without being asked  - that\'s a para who owns her role.',
             'The Love Note made her day. She read it three times.',
           ],
           resources: [
             'Hub course referenced: Calm Classrooms, Not Chaos',
             'Hub course referenced: The Proximity Principle',
           ],
-          nextFocus: 'Observation Day 2 will look for Move #2 application — collaborative support structures and co-teaching alignment.',
+          nextFocus: 'Observation & Support Day 2 will look for Collaborative Support Structures application  - co-teaching alignment and team coordination.',
         },
       },
       {
@@ -1246,9 +1241,9 @@ Thank you for setting the example. It matters more than you know.`;
         classroomsVisited: 17,
         loveNotesDelivered: 18,
         repliesReceived: 10,
-        aiSummary: 'Observation Day 2 focused on Move #2 — collaborative support structures. Across 17 classrooms, we saw paras actively coordinating with teachers, anticipating student needs, and stepping into co-teaching moments with confidence. 70% of observed paras demonstrated Move #2 strategies in action. Love Notes sparked meaningful responses — 10 paras wrote back sharing how recognition has changed how they see their role.',
+        aiSummary: 'Observation & Support Day 2 focused on Collaborative Support Structures. Across 17 classrooms, we saw paras actively coordinating with teachers, anticipating student needs, and stepping into co-teaching moments with confidence. 70% of observed paras demonstrated Collaborative Support strategies in action. Love Notes sparked meaningful responses  - 10 paras wrote back sharing how recognition has changed how they see their role.',
         details: {
-          narrative: 'TDI visited 17 classrooms during Observation Day 2. The focus shifted to Move #2 — collaborative support structures and co-teaching alignment. We saw clear growth from Observation Day 1: paras who had already mastered calm presence were now actively partnering with teachers, anticipating transitions, and supporting small groups with intention.',
+          narrative: 'TDI visited 17 classrooms during Observation & Support Day 2. The focus shifted to Collaborative Support Structures  - co-teaching alignment and team coordination. We saw clear growth from Observation & Support Day 1: paras who had already mastered calm presence were now actively partnering with teachers, anticipating transitions, and supporting small groups with intention.',
           quotes: [
             'I didn\'t realize how much I was already doing until someone wrote it down and handed it to me.',
             'This is the first time in 12 years anyone has watched me work and told me I was doing it right.',
@@ -1259,7 +1254,7 @@ Thank you for setting the example. It matters more than you know.`;
             'Hub course referenced: Communication That Clicks',
             'Hub course referenced: Small Group Magic',
           ],
-          nextFocus: 'Move #3 tracking begins in ACCELERATE phase — instructional support strategies and student relationship building.',
+          nextFocus: 'Instructional Support Strategies tracking begins in ACCELERATE phase  - student relationship building and academic engagement.',
         },
         coachingThemes: [
           {
@@ -1282,7 +1277,7 @@ Thank you for setting the example. It matters more than you know.`;
       },
     ],
 
-    // SECTION 3 — School / District Snapshot (CONDITIONAL)
+    // SECTION 3  - School / District Snapshot (CONDITIONAL)
     snapshot: {
       show: true,
       districtName: 'Addison School District 4',
@@ -1294,7 +1289,7 @@ Thank you for setting the example. It matters more than you know.`;
       context: 'ASD4 serves a diverse student population with a high proportion of students requiring para support. This partnership was initiated to professionalize the para role district-wide and reduce the revolving door of para turnover.',
     },
 
-    // SECTION 4 — Partnership Journey
+    // SECTION 4  - Partnership Journey
     journey: {
       phases: [
         {
@@ -1302,13 +1297,13 @@ Thank you for setting the example. It matters more than you know.`;
           number: 1,
           status: 'current' as 'complete' | 'current' | 'upcoming',
           deliverables: [
-            { label: 'Hub access activated — all 122 paras enrolled', complete: true },
+            { label: 'Hub access activated  - all 122 paras enrolled', complete: true },
             { label: '100% Hub login milestone achieved', complete: true },
-            { label: 'Observation Day 1 — 18 classrooms, Love Notes delivered', complete: true },
-            { label: 'Move #1 implementation tracking — 91% applying strategies', complete: true },
-            { label: 'Observation Day 2 — 17 classrooms, 18 Love Notes, 10 replies', complete: true },
-            { label: 'Move #2 implementation tracking — 70% applying strategies', complete: true },
-            { label: 'VS1 Survey complete — 95 respondents', complete: true },
+            { label: 'Observation & Support Day 1  - 18 classrooms, Love Notes delivered', complete: true },
+            { label: 'Calm Classroom Presence implementation tracking  - 91% applying strategies', complete: true },
+            { label: 'Observation & Support Day 2  - 17 classrooms, 18 Love Notes, 10 replies', complete: true },
+            { label: 'Collaborative Support implementation tracking  - 70% applying strategies', complete: true },
+            { label: 'VS1 Survey complete  - 95 respondents', complete: true },
             { label: 'IGNITE wrap-up session + transition to ACCELERATE', complete: false },
           ],
         },
@@ -1318,7 +1313,7 @@ Thank you for setting the example. It matters more than you know.`;
           status: 'upcoming' as 'complete' | 'current' | 'upcoming',
           deliverables: [
             { label: 'Deep-dive strategy coaching sessions', complete: false },
-            { label: 'Full Hub library access — all courses unlocked', complete: false },
+            { label: 'Full Hub library access  - all courses unlocked', complete: false },
             { label: 'Building-level lead para program', complete: false },
             { label: 'Mid-year survey + data review', complete: false },
           ],
@@ -1336,13 +1331,13 @@ Thank you for setting the example. It matters more than you know.`;
       ],
     },
 
-    // SECTION 5 — Sessions + Leadership Meetings
+    // SECTION 5  - Sessions + Leadership Meetings
     sessions: {
       milestones: [
         { date: 'Jan 2026', label: 'Partnership Launched', status: 'complete' as const },
         { date: 'Jan 2026', label: 'Hub Activated', status: 'complete' as const },
-        { date: 'Jan 2026', label: 'Obs Day 1', status: 'complete' as const },
-        { date: 'Mar 2026', label: 'Obs Day 2', status: 'complete' as const },
+        { date: 'Jan 2026', label: 'Obs & Support Day 1', status: 'complete' as const },
+        { date: 'Mar 2026', label: 'Obs & Support Day 2', status: 'complete' as const },
         { date: 'Mar 2026', label: 'VS1 Survey', status: 'complete' as const },
         { date: 'Mar 2026', label: 'You Are Here', status: 'current' as const },
         { date: 'May 2026', label: 'IGNITE Complete', status: 'upcoming' as const },
@@ -1350,27 +1345,27 @@ Thank you for setting the example. It matters more than you know.`;
       completed: [
         {
           type: 'Full-Day PD',
-          label: 'IGNITE Launch Day — Foundation + Hub Onboarding',
+          label: 'IGNITE Launch Day  - Foundation + Hub Onboarding',
           date: 'January 2026',
           badge: 'Complete',
         },
         {
           type: 'Observation',
-          label: 'Observation Day 1 — 18 classrooms visited',
+          label: 'Observation & Support Day 1  - 18 classrooms visited',
           date: 'January 2026',
           badge: 'Complete',
           note: 'See Observations section for full details',
         },
         {
           type: 'Observation',
-          label: 'Observation Day 2 — 17 classrooms, 10 para replies',
+          label: 'Observation & Support Day 2  - 17 classrooms, 10 para replies',
           date: 'March 3, 2026',
           badge: 'Complete',
           note: 'See Observations section for full details',
         },
         {
           type: 'Survey',
-          label: 'VS1 Voice Survey — 95 respondents',
+          label: 'VS1 Voice Survey  - 95 respondents',
           date: 'March 2026',
           badge: 'Complete',
           note: 'See Team Pulse section for highlights',
@@ -1378,8 +1373,8 @@ Thank you for setting the example. It matters more than you know.`;
       ],
       upcoming: [
         {
-          type: 'Virtual Session',
-          label: 'Move #3 Coaching Session',
+          type: 'Virtual Support Session',
+          label: 'Instructional Support Strategies Coaching',
           date: 'To be scheduled',
           badge: 'Pending',
           calendlyLink: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
@@ -1394,31 +1389,31 @@ Thank you for setting the example. It matters more than you know.`;
       ],
       leadershipMeetings: [
         {
-          label: 'Partnership Kickoff — Goals + Logistics',
+          label: 'Partnership Kickoff  - Goals + Logistics',
           date: 'January 2026',
           status: 'Complete',
         },
       ],
     },
 
-    // SECTION 6 — Progress Snapshot (CONDITIONAL)
+    // SECTION 6  - Progress Snapshot (CONDITIONAL)
     progress: {
       show: true,
       implementationRate: 91,
-      implementationLabel: '91% of paras applying Move #1 strategies',
+      implementationLabel: '91% of paras applying Calm Classroom Presence strategies',
       implementationComparison: 'More than 9x the 10% industry average for PD implementation',
       hubAccess: { active: 122, total: 122, percent: 100 },
       selfDirected: 79,
       coursesCompleted: 91,
     },
 
-    // SECTION 7 — Team Pulse (CONDITIONAL)
+    // SECTION 7  - Team Pulse (CONDITIONAL)
     teamPulse: {
       show: true,
       surveys: [
         {
           id: 'vs1',
-          name: 'VS1 — Voice Survey 1',
+          name: 'VS1  - Voice Survey 1',
           date: 'March 2026',
           respondents: 95,
           responseRate: 78,
@@ -1427,20 +1422,20 @@ Thank you for setting the example. It matters more than you know.`;
           confidenceIncrease: 87,
           highlights: [
             '87% of paras report increased confidence since partnership began',
-            '4.2/5 average confidence score — up from 2.3 baseline',
+            '4.2/5 average confidence score  - up from 2.3 baseline',
             '92% feel more valued in their role',
             '78% have applied at least one Hub strategy in the last week',
           ],
           openResponses: [
             'I finally feel like someone sees what I do every day.',
-            'The Hub courses are actually useful — not just another training to sit through.',
+            'The Hub courses are actually useful  - not just another training to sit through.',
             'My teacher and I are actually talking now. Like, really talking about students.',
           ],
         },
       ],
     },
 
-    // SECTION 8 — What We're Learning (CONDITIONAL)
+    // SECTION 8  - What We're Learning (CONDITIONAL)
     learning: {
       show: true,
       moves: [
@@ -1448,23 +1443,23 @@ Thank you for setting the example. It matters more than you know.`;
           moveNumber: 1,
           moveName: 'Calm Classroom Presence',
           implementationRate: 91 as number | null,
-          note: '91% of paras observed applying Move #1 strategies — calm redirection, proximity, and student-centered language.',
+          note: '91% of paras observed applying Calm Classroom Presence strategies  - calm redirection, proximity, and student-centered language.',
         },
         {
           moveNumber: 2,
           moveName: 'Collaborative Support Structures',
           implementationRate: 70 as number | null,
-          note: '70% of paras observed demonstrating Move #2 strategies — co-teaching coordination, anticipating transitions, and partnering with teachers intentionally.',
+          note: '70% of paras observed demonstrating Collaborative Support strategies  - co-teaching coordination, anticipating transitions, and partnering with teachers intentionally.',
         },
       ],
     },
 
-    // SECTION 9 — Staff Champions (CONDITIONAL)
+    // SECTION 9  - Staff Champions (CONDITIONAL)
     champions: {
       show: true,
-      highFiveInstructions: 'Recognize your most engaged paras in one click — sends a personal email directly from your inbox.',
+      highFiveInstructions: 'Recognize your most engaged paras in one click  - sends a personal email directly from your inbox.',
       staff: [
-        { name: 'M. Dunkel', note: '10 engaged Hub days — most active in the district', email: 'mdunkel@asd4.org' },
+        { name: 'M. Dunkel', note: '10 engaged Hub days  - most active in the district', email: 'mdunkel@asd4.org' },
         { name: 'M. Gorostieta', note: '9 engaged Hub days', email: 'mgorostieta@asd4.org' },
         { name: 'V. Castaneda', note: '5 engaged Hub days', email: 'vcastaneda@asd4.org' },
         { name: 'M. Cano', note: '5 engaged Hub days', email: 'mcano@asd4.org' },
@@ -1472,7 +1467,7 @@ Thank you for setting the example. It matters more than you know.`;
       ],
     },
 
-    // SECTION 10 — What's Resonating (CONDITIONAL)
+    // SECTION 10  - What's Resonating (CONDITIONAL)
     resonating: {
       show: true,
       hubLink: 'https://teachersdeserveit.com/hub',
@@ -1486,14 +1481,25 @@ Thank you for setting the example. It matters more than you know.`;
       totalCoursesStarted: 28,
     },
 
-    // SECTION 11 — Your Team's Top Ask (CONDITIONAL)
+    // SECTION 11  - Your Team's Top Ask (CONDITIONAL)
     topAsk: {
-      show: false,
-      topBarrier: null as string | null,
-      recommendedActions: [] as string[],
+      show: true,
+      surveyDate: 'March 2, 2026',
+      respondents: 95,
+      hubBarriers: [
+        { label: 'Dedicated time during work hours', count: 41, percent: 78 },
+        { label: 'Reminders and accountability check-ins', count: 28, percent: 53 },
+        { label: 'More variety in course topics', count: 19, percent: 36 },
+        { label: 'Already using it regularly', count: 14, percent: 27 },
+      ],
+      recommendedActions: [
+        'Consider building 10 minutes of Hub time into your next staff meeting agenda.',
+        'Ask building principals to send a brief weekly reminder with one course recommendation.',
+        'Share the leaderboard with your team - peer recognition drives return visits.',
+      ],
     },
 
-    // SECTION 12 — Internal Amplification (Documentation)
+    // SECTION 12  - Internal Amplification (Documentation)
     internalAmplification: {
       show: true,
       activities: [
@@ -1591,7 +1597,7 @@ Thank you for setting the example. It matters more than you know.`;
               #{obs.dayNumber}
             </div>
             <div>
-              <p className="font-bold text-gray-900 text-sm">Observation Day {obs.dayNumber}</p>
+              <p className="font-bold text-gray-900 text-sm">Observation & Support Day {obs.dayNumber}</p>
               <p className="text-xs text-gray-400">{obs.date}</p>
             </div>
           </div>
@@ -1618,7 +1624,7 @@ Thank you for setting the example. It matters more than you know.`;
           ) : (
             <div className="bg-amber-50 rounded-xl p-3 text-center border border-amber-100">
               <p className="text-2xl font-bold text-amber-700">91%</p>
-              <p className="text-xs text-amber-600 font-medium mt-0.5">Move #1 Rate</p>
+              <p className="text-xs text-amber-600 font-medium mt-0.5">Calm Presence Rate</p>
             </div>
           )}
         </div>
@@ -1672,7 +1678,7 @@ Thank you for setting the example. It matters more than you know.`;
               </div>
             )}
 
-            {/* Coaching Themes — only shown for observations that have them */}
+            {/* Coaching Themes  - only shown for observations that have them */}
             {'coachingThemes' in obs && obs.coachingThemes && obs.coachingThemes.length > 0 && (
               <div>
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Coaching Themes from Para Replies</p>
@@ -1997,12 +2003,12 @@ Thank you for setting the example. It matters more than you know.`;
               <div className="bg-[#E8F5F5] rounded-2xl p-1 border border-[#1A6B6B]/15">
                 <div className="px-5 pt-5 pb-3">
                   <h3 className="text-base font-bold text-[#1B2A4A]">Your Investment, By The Numbers</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">What this partnership delivers — in impact and value</p>
+                  <p className="text-xs text-gray-500 mt-0.5">What this partnership delivers  - in impact and value</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#1A6B6B]/10 rounded-xl overflow-hidden">
                   {[
                     { value: overviewData.investment.perEducator, label: 'per para', sub: overviewData.investment.perEducatorSublabel },
-                    { value: overviewData.investment.implementationRate, label: 'Move #1 implemented', sub: overviewData.investment.implementationSublabel },
+                    { value: overviewData.investment.implementationRate, label: 'Calm Presence implemented', sub: overviewData.investment.implementationSublabel },
                     { value: overviewData.investment.coursesCompleted, label: 'course completions', sub: overviewData.investment.coursesCompletedSublabel },
                     { value: overviewData.investment.retentionStat, label: 'plan to return', sub: overviewData.investment.retentionSublabel },
                   ].map((stat, i) => (
@@ -2105,7 +2111,7 @@ Thank you for setting the example. It matters more than you know.`;
           <div className="space-y-4 pb-16 max-w-4xl mx-auto">
 
             {/* ─────────────────────────────────────────────
-                SECTION 1 — PARTNERSHIP GOAL
+                SECTION 1  - PARTNERSHIP GOAL
                 Always visible. No collapse toggle.
                 Dark navy gradient hero card.
             ───────────────────────────────────────────── */}
@@ -2130,7 +2136,7 @@ Thank you for setting the example. It matters more than you know.`;
             </div>
 
             {/* ─────────────────────────────────────────────
-                SECTION 2 — CLASSROOM OBSERVATIONS
+                SECTION 2  - CLASSROOM OBSERVATIONS
                 Always visible. AI summary always shown.
                 "View details" toggle reveals full notes.
             ───────────────────────────────────────────── */}
@@ -2150,7 +2156,7 @@ Thank you for setting the example. It matters more than you know.`;
             </div>
 
             {/* ─────────────────────────────────────────────
-                SECTION 3 — SCHOOL / DISTRICT SNAPSHOT
+                SECTION 3  - SCHOOL / DISTRICT SNAPSHOT
                 CONDITIONAL: only renders if snapshot.show === true
                 Starts collapsed.
             ───────────────────────────────────────────── */}
@@ -2173,7 +2179,7 @@ Thank you for setting the example. It matters more than you know.`;
             )}
 
             {/* ─────────────────────────────────────────────
-                SECTION 4 — YOUR PARTNERSHIP JOURNEY
+                SECTION 4  - YOUR PARTNERSHIP JOURNEY
                 Horizontal phase stepper with progress.
                 Shows current phase deliverables only.
             ───────────────────────────────────────────── */}
@@ -2183,7 +2189,7 @@ Thank you for setting the example. It matters more than you know.`;
               defaultOpen={true}
               accent="yellow"
             >
-              {/* Phase stepper — horizontal progress visual */}
+              {/* Phase stepper  - horizontal progress visual */}
               <div className="flex items-stretch gap-0 mb-6">
                 {partnershipData.journey.phases.map((phase, i) => (
                   <React.Fragment key={phase.name}>
@@ -2215,7 +2221,7 @@ Thank you for setting the example. It matters more than you know.`;
                 ))}
               </div>
 
-              {/* Current phase deliverables — checkboxes with visual progress bar */}
+              {/* Current phase deliverables  - checkboxes with visual progress bar */}
               {partnershipData.journey.phases.filter(p => p.status === 'current').map(phase => {
                 const completed = phase.deliverables.filter(d => d.complete).length;
                 const total = phase.deliverables.length;
@@ -2251,7 +2257,7 @@ Thank you for setting the example. It matters more than you know.`;
             </CollapsibleSection>
 
             {/* ─────────────────────────────────────────────
-                SECTION 5 — SESSIONS + LEADERSHIP MEETINGS
+                SECTION 5  - SESSIONS + LEADERSHIP MEETINGS
                 Milestone timeline shows if milestones.length >= 4.
                 Historical dates are fine here.
                 Starts collapsed.
@@ -2262,7 +2268,7 @@ Thank you for setting the example. It matters more than you know.`;
               defaultOpen={true}
               accent="green"
             >
-              {/* Milestone Timeline — only renders when 4+ milestones */}
+              {/* Milestone Timeline  - only renders when 4+ milestones */}
               {partnershipData.sessions.milestones.length >= 4 && (
                 <div className="mb-6 pb-6 border-b border-gray-100">
                   <div className="relative">
@@ -2300,7 +2306,7 @@ Thank you for setting the example. It matters more than you know.`;
                       {partnershipData.sessions.milestones.filter(m => m.status === 'complete').map((m, i) => (
                         <div key={i} className="flex items-center gap-2 text-sm text-gray-700 mb-1">
                           <CheckCircle className="w-3.5 h-3.5 text-green-500 shrink-0" />
-                          {m.label} — {m.date}
+                          {m.label}  - {m.date}
                         </div>
                       ))}
                     </div>
@@ -2309,7 +2315,7 @@ Thank you for setting the example. It matters more than you know.`;
                       {partnershipData.sessions.milestones.filter(m => m.status === 'upcoming').map((m, i) => (
                         <div key={i} className="flex items-center gap-2 text-sm text-gray-700 mb-1">
                           <Calendar className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                          {m.label} — {m.date}
+                          {m.label}  - {m.date}
                         </div>
                       ))}
                     </div>
@@ -2409,7 +2415,7 @@ Thank you for setting the example. It matters more than you know.`;
             </CollapsibleSection>
 
             {/* ─────────────────────────────────────────────
-                SECTION 6 — PROGRESS SNAPSHOT
+                SECTION 6  - PROGRESS SNAPSHOT
                 Executive-grade visual with comparison charts.
                 The most important visual section.
             ───────────────────────────────────────────── */}
@@ -2420,9 +2426,9 @@ Thank you for setting the example. It matters more than you know.`;
                 defaultOpen={true}
                 accent="amber"
               >
-                {/* HERO STAT — implementation rate with industry comparison */}
+                {/* HERO STAT  - implementation rate with industry comparison */}
                 <div className="bg-gradient-to-br from-[#1e2749] to-[#2d3a6b] rounded-2xl p-6 mb-5 text-white">
-                  <p className="text-xs font-bold uppercase tracking-widest text-blue-300 mb-1">Move #1 Implementation Rate</p>
+                  <p className="text-xs font-bold uppercase tracking-widest text-blue-300 mb-1">Calm Classroom Presence Implementation Rate</p>
                   <div className="flex items-end gap-4 mb-4">
                     <span className="text-6xl font-black text-white">{partnershipData.progress.implementationRate}%</span>
                     <div className="pb-2">
@@ -2431,7 +2437,7 @@ Thank you for setting the example. It matters more than you know.`;
                     </div>
                   </div>
 
-                  {/* Bar chart comparison — inline SVG */}
+                  {/* Bar chart comparison  - inline SVG */}
                   <div className="space-y-3">
                     <div>
                       <div className="flex items-center justify-between mb-1">
@@ -2461,7 +2467,7 @@ Thank you for setting the example. It matters more than you know.`;
                       </div>
                     </div>
                   </div>
-                  <p className="text-xs text-blue-300 mt-3 italic">ASD4 is 9× the industry average — after just 2 sessions.</p>
+                  <p className="text-xs text-blue-300 mt-3 italic">ASD4 is 9× the industry average  - after just 2 sessions.</p>
                 </div>
 
                 {/* 4-stat grid */}
@@ -2474,11 +2480,11 @@ Thank you for setting the example. It matters more than you know.`;
                   <div className="bg-green-50 rounded-xl p-4 border border-green-100">
                     <p className="text-3xl font-black text-green-700">87%</p>
                     <p className="text-xs text-green-600 font-medium mt-1">Confidence Increase</p>
-                    <p className="text-xs text-gray-400 mt-0.5">After Virtual Session 1</p>
+                    <p className="text-xs text-gray-400 mt-0.5">After Virtual Support Session 1</p>
                   </div>
                   <div className="bg-orange-50 rounded-xl p-4 border border-orange-100">
                     <p className="text-3xl font-black text-orange-700">70%</p>
-                    <p className="text-xs text-orange-600 font-medium mt-1">Move #2 Implementation</p>
+                    <p className="text-xs text-orange-600 font-medium mt-1">Collaborative Support Implementation</p>
                     <p className="text-xs text-gray-400 mt-0.5">Feedback formula after 2 sessions</p>
                   </div>
                   <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
@@ -2496,7 +2502,7 @@ Thank you for setting the example. It matters more than you know.`;
             )}
 
             {/* ─────────────────────────────────────────────
-                SECTION 7 — TEAM PULSE
+                SECTION 7  - TEAM PULSE
                 CONDITIONAL: show when teamPulse.show === true
                 (after first survey collected)
                 Starts collapsed.
@@ -2566,7 +2572,7 @@ Thank you for setting the example. It matters more than you know.`;
             )}
 
             {/* ─────────────────────────────────────────────
-                SECTION 8 — WHAT WE'RE LEARNING
+                SECTION 8  - WHAT WE'RE LEARNING
                 Move implementation bars with visual progress.
                 Coaching themes in 2x2 grid.
             ───────────────────────────────────────────── */}
@@ -2607,7 +2613,7 @@ Thank you for setting the example. It matters more than you know.`;
                   ))}
                 </div>
 
-                {/* Emerging themes section - from Observation Day 2 coaching themes */}
+                {/* Emerging themes section - from Observation & Support Day 2 coaching themes */}
                 {partnershipData.observations.length > 1 && 'coachingThemes' in partnershipData.observations[1] && (
                   <div>
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">
@@ -2640,7 +2646,7 @@ Thank you for setting the example. It matters more than you know.`;
             )}
 
             {/* ─────────────────────────────────────────────
-                SECTION 9 — STAFF CHAMPIONS + INTERNAL AMPLIFICATION
+                SECTION 9  - STAFF CHAMPIONS + INTERNAL AMPLIFICATION
                 CONDITIONAL: show when champions.show === true
                 Includes internal amplification card when present.
                 Starts collapsed (nice-to-have, not lead story).
@@ -2683,7 +2689,7 @@ Thank you for setting the example. It matters more than you know.`;
                         <p className="text-xs text-gray-500">{s.note}</p>
                       </div>
                       <a
-                        href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(s.email)}&su=${encodeURIComponent('A High Five From Your Admin!')}&body=${encodeURIComponent(`Hi ${s.name.split(' ')[0]},\n\nI just wanted to take a moment to recognize your dedication and the work you're putting in. TDI shared that you've been one of our most engaged learners — and it shows.\n\nKeep it up. Your students are lucky to have you.\n\nWith appreciation,`)}`}
+                        href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(s.email)}&su=${encodeURIComponent('A High Five From Your Admin!')}&body=${encodeURIComponent(`Hi ${s.name.split(' ')[0]},\n\nI just wanted to take a moment to recognize your dedication and the work you're putting in. TDI shared that you've been one of our most engaged learners  - and it shows.\n\nKeep it up. Your students are lucky to have you.\n\nWith appreciation,`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-1.5 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 text-xs font-semibold px-3 py-1.5 rounded-full transition-colors"
@@ -2697,7 +2703,7 @@ Thank you for setting the example. It matters more than you know.`;
             )}
 
             {/* ─────────────────────────────────────────────
-                SECTION 10 — WHAT'S RESONATING
+                SECTION 10  - WHAT'S RESONATING
                 CONDITIONAL: show when resonating.show === true
                 (5+ courses started)
                 Links to Hub. Starts collapsed.
@@ -2727,52 +2733,62 @@ Thank you for setting the example. It matters more than you know.`;
             )}
 
             {/* ─────────────────────────────────────────────
-                SECTION 11 — YOUR TEAM'S TOP ASK
+                SECTION 11  - YOUR TEAM'S TOP ASK
                 CONDITIONAL: show when topAsk.show === true
                 (survey barriers + recommended actions)
-                Closing section — staff voice.
+                Closing section  - staff voice.
                 Starts collapsed.
             ───────────────────────────────────────────── */}
             {partnershipData.topAsk.show && (
               <CollapsibleSection
                 title="Your Team's Top Ask"
-                icon={<MessageCircle className="w-4 h-4 text-rose-500" />}
+                icon={<MessageSquare className="w-4 h-4 text-amber-600" />}
                 defaultOpen={false}
-                accent="rose"
+                accent="amber"
               >
-                {/* Content populated from survey barrier data */}
-                <p className="text-sm text-gray-500">Staff feedback will appear here after the first survey check-in.</p>
-              </CollapsibleSection>
-            )}
+                <p className="text-sm text-gray-500 mb-4">
+                  From the {partnershipData.topAsk.surveyDate} survey - {partnershipData.topAsk.respondents} paras responded
+                </p>
 
-            {/* ─────────────────────────────────────────────
-                SECTION 12 — INTERNAL AMPLIFICATION
-                CONDITIONAL: show when internalAmplification.show === true
-                Documents district-level recognition and celebration activities.
-                Starts collapsed.
-            ───────────────────────────────────────────── */}
-            {partnershipData.internalAmplification?.show && partnershipData.internalAmplification.activities.length > 0 && (
-              <CollapsibleSection
-                title="Internal Amplification"
-                icon={<Megaphone className="w-4 h-4 text-orange-500" />}
-                defaultOpen={false}
-                accent="orange"
-              >
-                <p className="text-xs text-gray-500 mb-4">Recognition and celebration activities across the district.</p>
-                <div className="space-y-3">
-                  {partnershipData.internalAmplification.activities.map((activity, i) => (
-                    <div key={i} className="bg-orange-50 rounded-lg p-4 border border-orange-100">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-semibold text-orange-700 uppercase tracking-wide">{activity.type}</span>
-                        <span className="text-xs text-gray-400">{activity.date}</span>
+                {/* Horizontal bar chart */}
+                <div className="space-y-3 mb-6">
+                  <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">
+                    What Would Help Staff Engage More with the Hub
+                  </p>
+                  {partnershipData.topAsk.hubBarriers.map((item, i) => {
+                    const colors = ['bg-amber-400', 'bg-teal-400', 'bg-blue-400', 'bg-green-400'];
+                    return (
+                      <div key={i} className="flex items-center gap-3">
+                        <span className="text-xs text-gray-600 w-48 shrink-0">{item.label}</span>
+                        <div className="flex-1 bg-gray-100 rounded-full h-2.5">
+                          <div
+                            className={`${colors[i % colors.length]} h-2.5 rounded-full`}
+                            style={{ width: `${item.percent}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-bold text-gray-500 w-8 text-right">{item.count}</span>
                       </div>
-                      <p className="text-sm font-medium text-gray-900 mb-1">{activity.description}</p>
-                      <p className="text-xs text-gray-600 italic">{activity.impact}</p>
-                    </div>
-                  ))}
+                    );
+                  })}
+                </div>
+
+                {/* Recommended Actions card */}
+                <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
+                  <p className="text-xs font-bold text-amber-800 uppercase tracking-wide mb-2">
+                    Recommended Actions for Admin
+                  </p>
+                  <ul className="space-y-1">
+                    {partnershipData.topAsk.recommendedActions.map((action, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-amber-900">
+                        <span className="text-amber-500 mt-0.5 shrink-0">•</span>
+                        {action}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </CollapsibleSection>
             )}
+
 
           </div>
         )}
@@ -2867,7 +2883,7 @@ Thank you for setting the example. It matters more than you know.`;
 
             {/* Building Spotlight Intro */}
             <div className="bg-white rounded-xl p-4 border border-gray-200">
-              <h3 className="text-lg font-bold text-gray-900">Building Spotlight — Here&apos;s What We&apos;re Noticing</h3>
+              <h3 className="text-lg font-bold text-gray-900">Building Spotlight  - Here&apos;s What We&apos;re Noticing</h3>
               <p className="text-sm text-gray-500 mt-1">Celebrating wins and sharing progress across your district</p>
             </div>
 
@@ -2875,7 +2891,7 @@ Thank you for setting the example. It matters more than you know.`;
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <div className="flex items-center gap-2 mb-4">
                 <BookOpen className="w-5 h-5 text-blue-500" />
-                <h3 className="text-lg font-bold text-gray-900">Learning Hub — Top Courses Across the District</h3>
+                <h3 className="text-lg font-bold text-gray-900">Learning Hub  - Top Courses Across the District</h3>
               </div>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
@@ -2995,14 +3011,14 @@ Thank you for setting the example. It matters more than you know.`;
                                     school.survey.asking && school.survey.asking >= 3.5 ? 'bg-gray-100 text-gray-600' :
                                     'bg-amber-100 text-amber-700'
                                   }`}>
-                                    Ask: {school.survey.asking?.toFixed(2) || '—'}
+                                    Ask: {school.survey.asking?.toFixed(2) || ' -'}
                                   </span>
                                   <span className={`px-1.5 py-0.5 rounded ${
                                     school.survey.feedback && school.survey.feedback >= 4.0 ? 'bg-emerald-100 text-emerald-700' :
                                     school.survey.feedback && school.survey.feedback >= 3.5 ? 'bg-gray-100 text-gray-600' :
                                     'bg-amber-100 text-amber-700'
                                   }`}>
-                                    Feedback: {school.survey.feedback?.toFixed(2) || '—'}
+                                    Feedback: {school.survey.feedback?.toFixed(2) || ' -'}
                                   </span>
                                 </>
                               )}
@@ -3038,13 +3054,13 @@ Thank you for setting the example. It matters more than you know.`;
                             </div>
                           )}
 
-                          {/* Observation Day Notes - Fullerton */}
+                          {/* Observation & Support Day Notes - Fullerton */}
                           {school.name === 'Fullerton' && observationResults.fullerton.status === 'complete' && (
                             <details className="py-3 border-b border-gray-100">
                               <summary className="cursor-pointer">
                                 <div className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
                                   <ClipboardList className="w-4 h-4 text-emerald-600" />
-                                  Observation Day — March 3, 2026
+                                  Observation & Support Day  - March 3, 2026
                                   <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
                                   <ChevronDown className="w-4 h-4 ml-auto transition-transform group-open:rotate-180" />
                                 </div>
@@ -3068,15 +3084,15 @@ Thank you for setting the example. It matters more than you know.`;
                                   <div className="space-y-3">
                                     <div className="bg-white border border-gray-200 rounded-lg p-3">
                                       <p className="font-semibold text-gray-900">Jonnathan Roeglin</p>
-                                      <p className="text-sm text-gray-600 mt-1">Asked &quot;How do we make this into a fraction?&quot; during small group work — guiding students to think, not giving answers. Crouched down to student level. Scanned and redirected other students while running his own group. Positioned in back during whole-class instruction to support teacher — seamless partnership.</p>
+                                      <p className="text-sm text-gray-600 mt-1">Asked &quot;How do we make this into a fraction?&quot; during small group work  - guiding students to think, not giving answers. Crouched down to student level. Scanned and redirected other students while running his own group. Positioned in back during whole-class instruction to support teacher  - seamless partnership.</p>
                                     </div>
                                     <div className="bg-white border border-gray-200 rounded-lg p-3">
                                       <p className="font-semibold text-gray-900">Esperanza Garcia <span className="text-xs font-normal text-gray-500">(Bilingual)</span></p>
-                                      <p className="text-sm text-gray-600 mt-1">Working 1:1 in Spanish with a student in a fully Spanish classroom. Quiet voice, non-disruptive. Reading directions and asking questions to get her student thinking. Patient and kind when student seemed distracted — redirected back to slides without frustration.</p>
+                                      <p className="text-sm text-gray-600 mt-1">Working 1:1 in Spanish with a student in a fully Spanish classroom. Quiet voice, non-disruptive. Reading directions and asking questions to get her student thinking. Patient and kind when student seemed distracted  - redirected back to slides without frustration.</p>
                                     </div>
                                     <div className="bg-white border border-gray-200 rounded-lg p-3">
                                       <p className="font-semibold text-gray-900">Kristina Orellana</p>
-                                      <p className="text-sm text-gray-600 mt-1">Prepped materials before the lesson. Encouraged students during counting: &quot;There you go!&quot; Checked in with teacher quietly during a video. <span className="font-medium text-emerald-700">THE MOMENT:</span> A sleepy, disengaged student — she sat with him, quietly redirected, repeated questions until he had an answer, then guided him to raise his hand and share with the full class. Building confidence.</p>
+                                      <p className="text-sm text-gray-600 mt-1">Prepped materials before the lesson. Encouraged students during counting: &quot;There you go!&quot; Checked in with teacher quietly during a video. <span className="font-medium text-emerald-700">THE MOMENT:</span> A sleepy, disengaged student  - she sat with him, quietly redirected, repeated questions until he had an answer, then guided him to raise his hand and share with the full class. Building confidence.</p>
                                     </div>
                                     <div className="bg-white border border-gray-200 rounded-lg p-3">
                                       <p className="font-semibold text-gray-900">Fatema Bakhrani <span className="text-xs font-normal text-gray-500">(Informal)</span></p>
@@ -3091,30 +3107,30 @@ Thank you for setting the example. It matters more than you know.`;
                                   <div className="space-y-3">
                                     <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
                                       <p className="text-sm italic text-gray-700">&quot;I wish I could meet all my students&apos; many needs every day.&quot;</p>
-                                      <p className="text-xs text-gray-500 mt-2">— Scott Nyquist, Fullerton</p>
+                                      <p className="text-xs text-gray-500 mt-2"> - Scott Nyquist, Fullerton</p>
                                       <p className="text-xs text-emerald-600 mt-1">Replied 5 minutes after receiving email</p>
                                     </blockquote>
                                     <blockquote className="bg-purple-50 rounded-lg p-4 border-l-4 border-purple-400">
                                       <span className="inline-block text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full mb-2">💬 Reached out on her own</span>
                                       <p className="text-sm italic text-gray-700">&quot;One thing I wish was easier is helping a student de-escalate instead of escalating the situation more. I still struggle somewhat in that aspect.&quot;</p>
-                                      <p className="text-xs text-gray-500 mt-2">— Evely Castillo, Fullerton</p>
+                                      <p className="text-xs text-gray-500 mt-2"> - Evely Castillo, Fullerton</p>
                                       <p className="text-xs text-purple-600 mt-1">Was not formally observed but reached out with a specific skill request after receiving an appreciation email. Matched with De-Escalation Strategies + Calm Response Scripts.</p>
                                     </blockquote>
                                     <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
                                       <p className="text-sm italic text-gray-700">&quot;Thank you for taking your time to come by and stop to observe me. Thank you for your comments and suggestions. I will take a look at the resources you shared with me.&quot;</p>
-                                      <p className="text-xs text-gray-500 mt-2">— Esperanza Garcia, Fullerton (Bilingual Support)</p>
+                                      <p className="text-xs text-gray-500 mt-2"> - Esperanza Garcia, Fullerton (Bilingual Support)</p>
                                       <p className="text-xs text-emerald-600 mt-1">Replied next morning. Committed to exploring Hub resources.</p>
                                     </blockquote>
                                     <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400 ring-1 ring-emerald-100">
                                       <span className="inline-block text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full mb-2">🎯 Specific growth request</span>
                                       <p className="text-sm italic text-gray-700">&quot;I&apos;m glad that you were able to stop by and observe. One thing I wish was easier is being able to bounce around between groups of students who all need help at the same time.&quot;</p>
-                                      <p className="text-xs text-gray-500 mt-2">— Jonnathan Roeglin, Fullerton</p>
+                                      <p className="text-xs text-gray-500 mt-2"> - Jonnathan Roeglin, Fullerton</p>
                                       <p className="text-xs text-emerald-600 mt-1">Replied next morning with a specific growth request: managing multiple groups simultaneously. Matched with No-Hands-Up Help Systems resource.</p>
                                     </blockquote>
                                     <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400 ring-1 ring-emerald-100">
                                       <span className="inline-block text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full mb-2">🎯 Specific growth request</span>
                                       <p className="text-sm italic text-gray-700">&quot;Could we try to maybe break the work into smaller steps to help make the student understand it better? What is an easier strategy to help them understand?&quot;</p>
-                                      <p className="text-xs text-gray-500 mt-2">— Fatema Bakhrani, Fullerton (Informal Observation)</p>
+                                      <p className="text-xs text-gray-500 mt-2"> - Fatema Bakhrani, Fullerton (Informal Observation)</p>
                                       <p className="text-xs text-emerald-600 mt-1">Replied with a specific strategy request: chunking and scaffolding. Matched with &quot;One Step at a Time&quot; chunking strategy.</p>
                                     </blockquote>
                                   </div>
@@ -3128,7 +3144,7 @@ Thank you for setting the example. It matters more than you know.`;
                                     <ul className="text-sm text-gray-700 space-y-1">
                                       <li className="flex items-start gap-1.5">
                                         <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                        Strong questioning skills (Move #1) across multiple paras
+                                        Strong questioning skills (Calm Classroom Presence) across multiple paras
                                       </li>
                                       <li className="flex items-start gap-1.5">
                                         <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
@@ -3144,13 +3160,13 @@ Thank you for setting the example. It matters more than you know.`;
                                       </li>
                                       <li className="flex items-start gap-1.5">
                                         <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                        Intentional positioning — crouching, proximity, quiet voice
+                                        Intentional positioning  - crouching, proximity, quiet voice
                                       </li>
                                     </ul>
                                   </div>
                                   <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
                                     <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Opportunity</p>
-                                    <p className="text-sm text-gray-700">Feedback specificity — paras are encouraging (&quot;There you go!&quot;) but can level up to Notice → Name → Next Step for more targeted student growth</p>
+                                    <p className="text-sm text-gray-700">Feedback specificity  - paras are encouraging (&quot;There you go!&quot;) but can level up to Notice → Name → Next Step for more targeted student growth</p>
                                   </div>
                                 </div>
 
@@ -3179,7 +3195,7 @@ Thank you for setting the example. It matters more than you know.`;
                               <summary className="cursor-pointer">
                                 <div className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
                                   <ClipboardList className="w-4 h-4 text-emerald-600" />
-                                  Observation Day — March 3, 2026
+                                  Observation & Support Day  - March 3, 2026
                                   <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
                                   <ChevronDown className="w-4 h-4 ml-auto transition-transform group-open:rotate-180" />
                                 </div>
@@ -3203,11 +3219,11 @@ Thank you for setting the example. It matters more than you know.`;
                                   <div className="space-y-3">
                                     <div className="bg-white border border-gray-200 rounded-lg p-3">
                                       <p className="font-semibold text-gray-900">Maribel Ontiveros <span className="text-xs font-normal text-gray-500">(Resource)</span></p>
-                                      <p className="text-sm text-gray-600 mt-1">Sitting WITH students during activity, not hovering. Seamlessly switching between English and Spanish to clarify directions and encourage effort. Checked in with teacher before redirecting. Paused group for a stretch when hands got tired — preventing dysregulation before it started. &quot;Oh very nice!&quot; &quot;Muy bonito!&quot;</p>
+                                      <p className="text-sm text-gray-600 mt-1">Sitting WITH students during activity, not hovering. Seamlessly switching between English and Spanish to clarify directions and encourage effort. Checked in with teacher before redirecting. Paused group for a stretch when hands got tired  - preventing dysregulation before it started. &quot;Oh very nice!&quot; &quot;Muy bonito!&quot;</p>
                                     </div>
                                     <div className="bg-white border border-gray-200 rounded-lg p-3">
                                       <p className="font-semibold text-gray-900">Mary Falco <span className="text-xs font-normal text-gray-500">(Resource)</span></p>
-                                      <p className="text-sm text-gray-600 mt-1">Jumped into literacy centers with zero downtime. &quot;See! Easy! Easy peasy lemon squeezy!&quot; Made practice feel doable. Used timer + motivating words. Actively participated during OT transition — walking, rolling the wheel WITH the student. Quiet voice in hallways.</p>
+                                      <p className="text-sm text-gray-600 mt-1">Jumped into literacy centers with zero downtime. &quot;See! Easy! Easy peasy lemon squeezy!&quot; Made practice feel doable. Used timer + motivating words. Actively participated during OT transition  - walking, rolling the wheel WITH the student. Quiet voice in hallways.</p>
                                     </div>
                                     <div className="bg-white border border-gray-200 rounded-lg p-3">
                                       <p className="font-semibold text-gray-900">Natalia Villalobos <span className="text-xs font-normal text-gray-500">(Small Group Art)</span></p>
@@ -3215,11 +3231,11 @@ Thank you for setting the example. It matters more than you know.`;
                                     </div>
                                     <div className="bg-white border border-gray-200 rounded-lg p-3">
                                       <p className="font-semibold text-gray-900">Ruby Medina <span className="text-xs font-normal text-gray-500">(Informal)</span></p>
-                                      <p className="text-sm text-gray-600 mt-1">Working closely with Angelo — intentional, individualized support. &quot;Do you want to sit over here?&quot; — choice-based redirection. Modeled painting by holding student&apos;s hand. Patient and calm throughout.</p>
+                                      <p className="text-sm text-gray-600 mt-1">Working closely with Angelo  - intentional, individualized support. &quot;Do you want to sit over here?&quot;  - choice-based redirection. Modeled painting by holding student&apos;s hand. Patient and calm throughout.</p>
                                     </div>
                                     <div className="bg-white border border-gray-200 rounded-lg p-3">
                                       <p className="font-semibold text-gray-900">Shelly Mayer <span className="text-xs font-normal text-gray-500">(Intensive Intervention)</span></p>
-                                      <p className="text-sm text-gray-600 mt-1">Comforted upset student across room: &quot;You&apos;re okay&quot; with hand hold. Noticed student connected with a book — moved to table to read together. Growth area: leading with a question before giving space with disengaged students.</p>
+                                      <p className="text-sm text-gray-600 mt-1">Comforted upset student across room: &quot;You&apos;re okay&quot; with hand hold. Noticed student connected with a book  - moved to table to read together. Growth area: leading with a question before giving space with disengaged students.</p>
                                     </div>
                                   </div>
                                 </div>
@@ -3230,18 +3246,18 @@ Thank you for setting the example. It matters more than you know.`;
                                   <div className="space-y-3">
                                     <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400">
                                       <p className="text-sm italic text-gray-700">&quot;Thank you so much for taking the time to observe me and for such kind and encouraging words. I feel appreciated and continue to give my best to help my kiddos.&quot;</p>
-                                      <p className="text-xs text-gray-500 mt-2">— Maribel Ontiveros, Lake Park (Resource)</p>
+                                      <p className="text-xs text-gray-500 mt-2"> - Maribel Ontiveros, Lake Park (Resource)</p>
                                       <p className="text-xs text-emerald-600 mt-1">Replied same day</p>
                                     </blockquote>
                                     <blockquote className="bg-purple-50 rounded-lg p-4 border-l-4 border-purple-400">
                                       <span className="inline-block text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full mb-2">💬 Unsolicited response</span>
                                       <p className="text-sm italic text-gray-700">&quot;Your message genuinely encouraged me and reminded me why this work is so important. I care deeply about meeting students where they are and helping them feel supported without being overwhelmed.&quot;</p>
-                                      <p className="text-xs text-gray-500 mt-2">— Ruby Medina, Lake Park</p>
+                                      <p className="text-xs text-gray-500 mt-2"> - Ruby Medina, Lake Park</p>
                                       <p className="text-xs text-purple-600 mt-1">Was not a scheduled observation. Saw her in action and sent an encouragement note.</p>
                                     </blockquote>
                                     <blockquote className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
                                       <p className="text-sm italic text-gray-700">&quot;Our staff is truly committed to our students and works very well together as a team. It means a great deal to have that work acknowledged.&quot;</p>
-                                      <p className="text-xs text-gray-500 mt-2">— Cristina Villalobos, Principal, Lake Park Elementary</p>
+                                      <p className="text-xs text-gray-500 mt-2"> - Cristina Villalobos, Principal, Lake Park Elementary</p>
                                       <p className="text-xs text-blue-600 mt-1">Replied same day after receiving observation highlights email</p>
                                     </blockquote>
                                   </div>
@@ -3255,7 +3271,7 @@ Thank you for setting the example. It matters more than you know.`;
                                     <ul className="text-sm text-gray-700 space-y-1">
                                       <li className="flex items-start gap-1.5">
                                         <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                        Strong bilingual support — seamless English/Spanish scaffolding
+                                        Strong bilingual support  - seamless English/Spanish scaffolding
                                       </li>
                                       <li className="flex items-start gap-1.5">
                                         <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
@@ -3263,7 +3279,7 @@ Thank you for setting the example. It matters more than you know.`;
                                       </li>
                                       <li className="flex items-start gap-1.5">
                                         <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                        Proactive behavior management — stretching, choice-based redirection, timers
+                                        Proactive behavior management  - stretching, choice-based redirection, timers
                                       </li>
                                       <li className="flex items-start gap-1.5">
                                         <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
@@ -3271,19 +3287,19 @@ Thank you for setting the example. It matters more than you know.`;
                                       </li>
                                       <li className="flex items-start gap-1.5">
                                         <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                        Clear, chunked directions — especially in Resource and small group
+                                        Clear, chunked directions  - especially in Resource and small group
                                       </li>
                                       <li className="flex items-start gap-1.5">
                                         <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                        Active engagement — paras IN it with students, not supervising
+                                        Active engagement  - paras IN it with students, not supervising
                                       </li>
                                     </ul>
                                   </div>
                                   <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
                                     <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Opportunities</p>
                                     <ul className="text-sm text-gray-700 space-y-1">
-                                      <li>→ Feedback specificity — level up from &quot;Nice job!&quot; to Notice → Name → Next Step</li>
-                                      <li>→ Initiative with disengaged students — lead with a question before giving space</li>
+                                      <li>→ Feedback specificity  - level up from &quot;Nice job!&quot; to Notice → Name → Next Step</li>
+                                      <li>→ Initiative with disengaged students  - lead with a question before giving space</li>
                                     </ul>
                                   </div>
                                 </div>
@@ -3313,7 +3329,7 @@ Thank you for setting the example. It matters more than you know.`;
                               <summary className="cursor-pointer">
                                 <div className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900">
                                   <ClipboardList className="w-4 h-4 text-emerald-600" />
-                                  Observation Day — March 3, 2026
+                                  Observation & Support Day  - March 3, 2026
                                   <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">Complete</span>
                                   <ChevronDown className="w-4 h-4 ml-auto transition-transform group-open:rotate-180" />
                                 </div>
@@ -3327,7 +3343,7 @@ Thank you for setting the example. It matters more than you know.`;
                                     <div><span className="text-gray-500">Paras Observed:</span> <span className="font-medium">4 formal</span></div>
                                     <div><span className="text-gray-500">Follow-Up Emails:</span> <span className="font-medium">4 personalized same-day</span></div>
                                     <div><span className="text-gray-500">Principal Email:</span> <span className="font-medium">Kara Dohman</span></div>
-                                    <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium text-emerald-600">2 (Kara Dohman — Principal, Carlos Chavez)</span></div>
+                                    <div><span className="text-gray-500">Same-Day Replies:</span> <span className="font-medium text-emerald-600">2 (Kara Dohman  - Principal, Carlos Chavez)</span></div>
                                   </div>
                                 </div>
 
@@ -3337,11 +3353,11 @@ Thank you for setting the example. It matters more than you know.`;
                                   <div className="space-y-3">
                                     <div className="bg-white border border-gray-200 rounded-lg p-3">
                                       <p className="font-semibold text-gray-900">Rose Marinelli <span className="text-xs font-normal text-gray-500">(w/ Valdes)</span></p>
-                                      <p className="text-sm text-gray-600 mt-1">Sitting on the floor with students during the lesson — right there with them. &quot;See, if you have a pizza...&quot; — made fractions real. Nodding along as students answered. Whispering redirections. Asked teacher about shading rule for accuracy. Got supplies during transition before students needed them. &quot;Let&apos;s work for 10 minutes, and then we can take a break. Does that sound good?&quot; <span className="italic text-gray-500">Also: her granddaughter was born later that day. She showed up fully anyway.</span></p>
+                                      <p className="text-sm text-gray-600 mt-1">Sitting on the floor with students during the lesson  - right there with them. &quot;See, if you have a pizza...&quot;  - made fractions real. Nodding along as students answered. Whispering redirections. Asked teacher about shading rule for accuracy. Got supplies during transition before students needed them. &quot;Let&apos;s work for 10 minutes, and then we can take a break. Does that sound good?&quot; <span className="italic text-gray-500">Also: her granddaughter was born later that day. She showed up fully anyway.</span></p>
                                     </div>
                                     <div className="bg-white border border-emerald-200 rounded-lg p-3 ring-1 ring-emerald-100">
                                       <p className="font-semibold text-gray-900">Carlos Chavez <span className="text-xs font-normal text-gray-500">(w/ Savaglio)</span> <span className="ml-2 text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full">⭐ STANDOUT</span></p>
-                                      <p className="text-sm text-gray-600 mt-1">Running a small reading group that felt like a real lesson. &quot;Let&apos;s read the title and make a prediction.&quot; Questions everywhere — the right kind. &quot;And then we end our sentence with a what?&quot; Validated thinking: &quot;Good idea!&quot; &quot;I like that thought!&quot; Sounded out words alongside students. Summarized sections to check understanding — a strategy many certified teachers don&apos;t do consistently. <span className="font-medium text-emerald-700">This wasn&apos;t support. This was teaching.</span></p>
+                                      <p className="text-sm text-gray-600 mt-1">Running a small reading group that felt like a real lesson. &quot;Let&apos;s read the title and make a prediction.&quot; Questions everywhere  - the right kind. &quot;And then we end our sentence with a what?&quot; Validated thinking: &quot;Good idea!&quot; &quot;I like that thought!&quot; Sounded out words alongside students. Summarized sections to check understanding  - a strategy many certified teachers don&apos;t do consistently. <span className="font-medium text-emerald-700">This wasn&apos;t support. This was teaching.</span></p>
                                     </div>
                                     <div className="bg-white border border-gray-200 rounded-lg p-3">
                                       <p className="font-semibold text-gray-900">Gregoria Arredondo <span className="text-xs font-normal text-gray-500">(Teacher in Meeting)</span></p>
@@ -3349,7 +3365,7 @@ Thank you for setting the example. It matters more than you know.`;
                                     </div>
                                     <div className="bg-white border border-gray-200 rounded-lg p-3">
                                       <p className="font-semibold text-gray-900">Michelina (Lina) Hawkins <span className="text-xs font-normal text-gray-500">(Post-Lunch)</span></p>
-                                      <p className="text-sm text-gray-600 mt-1">Returned from lunch, immediately checked in with other para for handoff. &quot;How&apos;s Alise doing? She was tired earlier.&quot; Strong rapport: &quot;6, 7? That was from last year!&quot; &quot;Who wants to sit at my table?&quot; — students chose her. Asked real questions: &quot;What do you think we should do with these?&quot; <span className="text-amber-600">Growth: anchoring strategies for whole-group redirection.</span></p>
+                                      <p className="text-sm text-gray-600 mt-1">Returned from lunch, immediately checked in with other para for handoff. &quot;How&apos;s Alise doing? She was tired earlier.&quot; Strong rapport: &quot;6, 7? That was from last year!&quot; &quot;Who wants to sit at my table?&quot;  - students chose her. Asked real questions: &quot;What do you think we should do with these?&quot; <span className="text-amber-600">Growth: anchoring strategies for whole-group redirection.</span></p>
                                     </div>
                                   </div>
                                 </div>
@@ -3360,13 +3376,13 @@ Thank you for setting the example. It matters more than you know.`;
                                   <div className="space-y-3">
                                     <blockquote className="bg-blue-50 rounded-lg p-4 border-l-4 border-blue-400">
                                       <p className="text-sm italic text-gray-700">&quot;They are great people and hard workers! So glad you got to visit!&quot;</p>
-                                      <p className="text-xs text-gray-500 mt-2">— Kara Dohman, Principal, Lincoln Elementary</p>
+                                      <p className="text-xs text-gray-500 mt-2"> - Kara Dohman, Principal, Lincoln Elementary</p>
                                       <p className="text-xs text-blue-600 mt-1">Replied same day after receiving observation highlights email</p>
                                     </blockquote>
                                     <blockquote className="bg-emerald-50 rounded-lg p-4 border-l-4 border-emerald-400 ring-1 ring-emerald-100">
                                       <span className="inline-block text-xs bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded-full mb-2">⭐ Standout Observation</span>
                                       <p className="text-sm italic text-gray-700">&quot;I would not be such a good paraeducator without the support of my coworkers and staff, Lincoln is such an amazing place!&quot;</p>
-                                      <p className="text-xs text-gray-500 mt-2">— Carlos Chavez, Lincoln</p>
+                                      <p className="text-xs text-gray-500 mt-2"> - Carlos Chavez, Lincoln</p>
                                       <p className="text-xs text-emerald-600 mt-1">Replied next morning with a specific growth request: differentiating support for students with varying needs</p>
                                     </blockquote>
                                   </div>
@@ -3380,11 +3396,11 @@ Thank you for setting the example. It matters more than you know.`;
                                     <ul className="text-sm text-gray-700 space-y-1">
                                       <li className="flex items-start gap-1.5">
                                         <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                        Strong questioning — real-world examples, predictions, comprehension checks
+                                        Strong questioning  - real-world examples, predictions, comprehension checks
                                       </li>
                                       <li className="flex items-start gap-1.5">
                                         <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                        Genuine student relationships — trust, humor, students choosing to work with paras
+                                        Genuine student relationships  - trust, humor, students choosing to work with paras
                                       </li>
                                       <li className="flex items-start gap-1.5">
                                         <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
@@ -3392,19 +3408,19 @@ Thank you for setting the example. It matters more than you know.`;
                                       </li>
                                       <li className="flex items-start gap-1.5">
                                         <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                        Positioning and proximity — sitting on floors, working alongside students
+                                        Positioning and proximity  - sitting on floors, working alongside students
                                       </li>
                                       <li className="flex items-start gap-1.5">
                                         <Check className="w-3.5 h-3.5 text-emerald-600 mt-0.5 flex-shrink-0" />
-                                        Investment in content accuracy — paras asking teachers clarifying questions
+                                        Investment in content accuracy  - paras asking teachers clarifying questions
                                       </li>
                                     </ul>
                                   </div>
                                   <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
                                     <p className="text-xs font-semibold text-amber-700 uppercase mb-1">Growth Opportunities</p>
                                     <ul className="text-sm text-gray-700 space-y-1">
-                                      <li>→ Classroom management support for paras leading rooms independently — go-to questions for whole-group redirection</li>
-                                      <li>→ Feedback specificity — ready to level up from encouragement to Notice → Name → Next Step</li>
+                                      <li>→ Classroom management support for paras leading rooms independently  - go-to questions for whole-group redirection</li>
+                                      <li>→ Feedback specificity  - ready to level up from encouragement to Notice → Name → Next Step</li>
                                     </ul>
                                   </div>
                                 </div>
@@ -3423,7 +3439,7 @@ Thank you for setting the example. It matters more than you know.`;
                                     </div>
                                     <div>
                                       <p className="font-semibold text-gray-900">Para Leadership Moment (Gillen)</p>
-                                      <p className="text-sm text-gray-600">Two paras ran the classroom independently while the teacher was in a meeting. Managed transitions, gave bilingual directions, redirected students. An enormous ask — and they stepped up.</p>
+                                      <p className="text-sm text-gray-600">Two paras ran the classroom independently while the teacher was in a meeting. Managed transitions, gave bilingual directions, redirected students. An enormous ask  - and they stepped up.</p>
                                     </div>
                                     <p className="text-xs text-gray-500 italic pt-2 border-t border-blue-100">Principal Kara Dohman emailed same-day with highlights and Staff Celebration Playbook resource.</p>
                                   </div>
@@ -3490,7 +3506,7 @@ Thank you for setting the example. It matters more than you know.`;
                                       school.survey.asking && school.survey.asking >= 3.5 ? 'bg-gray-100 text-gray-600' :
                                       'bg-amber-100 text-amber-700'
                                     }`}>
-                                      {school.survey.asking?.toFixed(2) || '—'}
+                                      {school.survey.asking?.toFixed(2) || ' -'}
                                     </span>
                                   </div>
                                   <div className="flex items-center gap-2">
@@ -3500,7 +3516,7 @@ Thank you for setting the example. It matters more than you know.`;
                                       school.survey.feedback && school.survey.feedback >= 3.5 ? 'bg-gray-100 text-gray-600' :
                                       'bg-amber-100 text-amber-700'
                                     }`}>
-                                      {school.survey.feedback?.toFixed(2) || '—'}
+                                      {school.survey.feedback?.toFixed(2) || ' -'}
                                     </span>
                                   </div>
                                 </div>
@@ -3684,11 +3700,11 @@ Thank you for setting the example. It matters more than you know.`;
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-[#38618C] flex-shrink-0 mt-0.5" />
-                      <span>2 observation days</span>
+                      <span>2 Observation & Support Days</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-[#38618C] flex-shrink-0 mt-0.5" />
-                      <span>4 virtual sessions</span>
+                      <span>4 Virtual Support Sessions</span>
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="w-4 h-4 text-[#38618C] flex-shrink-0 mt-0.5" />
@@ -4083,11 +4099,11 @@ Thank you for setting the example. It matters more than you know.`;
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
                   <p className="text-2xl font-bold text-[#1e2749]">2</p>
-                  <p className="text-xs text-gray-500">Observation Days</p>
+                  <p className="text-xs text-gray-500">Observation & Support Days</p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
                   <p className="text-2xl font-bold text-[#1e2749]">4</p>
-                  <p className="text-xs text-gray-500">Virtual Sessions</p>
+                  <p className="text-xs text-gray-500">Virtual Support Sessions</p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
                   <p className="text-2xl font-bold text-[#1e2749]">2</p>
@@ -4166,7 +4182,7 @@ Thank you for setting the example. It matters more than you know.`;
                     </span>
                   </div>
                   <div className="text-sm text-gray-600 mb-3">
-                    Includes: 2 On-Campus Observations, 4 Virtual Sessions, 2 Executive Sessions, 94 Hub Memberships
+                    Includes: 2 On-Campus Observations & Support Days, 4 Virtual Support Sessions, 2 Executive Sessions, 94 Hub Memberships
                   </div>
                   <a
                     href="https://my.anchor.sh/notification/ng-notification-z26iTfR37lyk-wqykbBVowcAkXsBr"

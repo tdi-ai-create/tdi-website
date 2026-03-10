@@ -61,14 +61,25 @@ export function SocialProofPopup() {
   // Check if Moment Mode is active (sacred space - no distractions)
   const { isMomentModeActive } = useMomentMode();
 
-  // Hide on internal team pages, creator portal, admin pages, partner pages, hub, and paragametools
+  // Hide on internal team pages, creator portal, admin pages, partner pages, hub, paragametools, and all legacy dashboard routes
+  const hiddenRoutes = [
+    '/creator-portal',
+    '/admin',
+    '/partner-setup',
+    '/partners',
+    '/hub',
+    '/paragametools',
+    '/asd4-dashboard',
+    '/stpchanel-dashboard',
+    '/wego-dashboard',
+    '/saunemin-dashboard',
+    '/Allenwood-Dashboard',
+    '/D41-dashboard',
+    '/Example-Dashboard',
+  ];
+
   const isInternalPage = pathname?.includes('dashboard-creation') ||
-    pathname?.startsWith('/creator-portal') ||
-    pathname?.startsWith('/admin') ||
-    pathname?.startsWith('/partner-setup') ||
-    pathname?.startsWith('/partners') ||
-    pathname?.startsWith('/hub') ||
-    pathname?.startsWith('/paragametools');
+    hiddenRoutes.some(route => pathname?.startsWith(route));
 
   const messagesRef = useRef<NotificationMessage[]>([]);
   const messageIndexRef = useRef(0);

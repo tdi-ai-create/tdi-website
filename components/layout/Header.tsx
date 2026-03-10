@@ -14,14 +14,25 @@ export function Header() {
   // Hide on partner setup and login pages (focused onboarding experience)
   // Hide on hub pages (Hub has its own navigation)
   // Hide on /login page (clean focused login experience)
-  if (
-    pathname?.startsWith('/creator-portal/dashboard') ||
-    pathname?.startsWith('/admin') ||
-    pathname?.startsWith('/partner-setup') ||
-    pathname?.startsWith('/partners') ||
-    pathname?.startsWith('/hub') ||
-    pathname === '/login'
-  ) {
+  // Hide on all legacy dashboard routes (partner-only pages)
+  const hiddenRoutes = [
+    '/creator-portal/dashboard',
+    '/admin',
+    '/partner-setup',
+    '/partners',
+    '/hub',
+    '/asd4-dashboard',
+    '/stpchanel-dashboard',
+    '/wego-dashboard',
+    '/saunemin-dashboard',
+    '/Allenwood-Dashboard',
+    '/D41-dashboard',
+    '/Example-Dashboard',
+  ];
+
+  const shouldHideHeader = pathname === '/login' || hiddenRoutes.some(route => pathname?.startsWith(route));
+
+  if (shouldHideHeader) {
     return null;
   }
 

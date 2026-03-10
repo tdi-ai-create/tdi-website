@@ -219,15 +219,19 @@ export default function SauneminDashboard() {
     const isOpen = openSections[id];
 
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className={`bg-white rounded-2xl border overflow-hidden transition-all ${
+        isOpen ? 'border-gray-200 shadow-md' : 'border-gray-100 shadow-sm'
+      }`}>
         <button
           onClick={() => toggleSection(id)}
-          className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+          className={`w-full flex items-center justify-between px-6 py-4 transition-colors ${
+            isOpen ? 'bg-gray-50 border-b border-gray-100' : 'hover:bg-gray-50'
+          }`}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             {icon && <div className="text-[#38618C]">{icon}</div>}
             <div className="text-left">
-              <h3 className="font-semibold text-[#1e2749]">{title}</h3>
+              <span className="text-sm font-bold text-gray-900">{title}</span>
               {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
             </div>
           </div>
@@ -237,19 +241,15 @@ export default function SauneminDashboard() {
                 {badge}
               </span>
             )}
-            {isOpen ? (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
-            ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-            )}
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </div>
         </button>
 
-        <div className={`overflow-hidden transition-all duration-200 ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className="px-4 pb-4 border-t border-gray-100">
+        {isOpen && (
+          <div className="px-6 pb-6 pt-4">
             {children}
           </div>
-        </div>
+        )}
       </div>
     );
   };
@@ -394,10 +394,8 @@ export default function SauneminDashboard() {
     { id: 'billing', label: 'Billing', icon: CreditCard },
   ];
 
-  // Tab click handler with scroll to top
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const overviewData = {
@@ -414,8 +412,8 @@ export default function SauneminDashboard() {
       status: 'On Track',
       statusColor: 'blue',
       details: [
-        '9 of 12 staff Hub activated — 75% and growing',
-        'Observation Day 1 complete — 9 Love Notes delivered',
+        '9 of 12 staff Hub activated  - 75% and growing',
+        'Observation Day 1 complete  - 9 Love Notes delivered',
         'Hub engagement directly linked to stronger classroom practice',
         'Observation Day 2 scheduled April 8',
       ],
@@ -424,19 +422,19 @@ export default function SauneminDashboard() {
     // ZONE 2A - Timeline
     timeline: {
       done: [
-        { label: 'Partnership launched — 12 staff enrolled', date: 'Fall 2025' },
-        { label: 'Hub access activated — staff onboarded', date: 'Fall 2025' },
-        { label: 'Observation Day 1 — 9 staff observed, 9 Love Notes delivered', date: 'Nov 19, 2025' },
-        { label: 'Hub-to-classroom connection confirmed — top Hub users showed strongest practice', date: 'Nov 2025' },
+        { label: 'Partnership launched  - 12 staff enrolled', date: 'Fall 2025' },
+        { label: 'Hub access activated  - staff onboarded', date: 'Fall 2025' },
+        { label: 'Observation Day 1  - 9 staff observed, 9 Love Notes delivered', date: 'Nov 19, 2025' },
+        { label: 'Hub-to-classroom connection confirmed  - top Hub users showed strongest practice', date: 'Nov 2025' },
       ],
       inProgress: [
-        { label: '9/12 staff Hub activated — 5 with tracked course activity', detail: '3 staff to support before Obs Day 2' },
-        { label: 'Obs Day 2 prep — TDI looking for Hub strategies in classroom practice', detail: 'Scheduled April 8, 2026' },
+        { label: '9/12 staff Hub activated  - 5 with tracked course activity', detail: '3 staff to support before Obs Day 2' },
+        { label: 'Obs Day 2 prep  - TDI looking for Hub strategies in classroom practice', detail: 'Scheduled April 8, 2026' },
         { label: 'Virtual session planning underway', detail: 'Coordinating with Gary Doughan' },
       ],
       comingSoon: [
         { label: 'Observation Day 2', date: 'April 8, 2026' },
-        { label: 'Virtual Session — full team', date: 'To be scheduled' },
+        { label: 'Virtual Session  - full team', date: 'To be scheduled' },
         { label: 'Spring wrap-up + next steps', date: 'Spring 2026' },
       ],
     },
@@ -444,11 +442,11 @@ export default function SauneminDashboard() {
     // ZONE 2B - Investment value mirror
     investment: {
       perEducator: '$550',
-      perEducatorSublabel: 'per staff member — Hub access + full-day PD visit + observations',
+      perEducatorSublabel: 'per staff member  - Hub access + full-day PD visit + observations',
       implementationRate: '75%',
-      implementationSublabel: 'Hub activation — 9 of 12 staff logged in',
+      implementationSublabel: 'Hub activation  - 9 of 12 staff logged in',
       coursesCompleted: 9,
-      coursesCompletedSublabel: 'personalized Love Notes delivered — every observed staff member',
+      coursesCompletedSublabel: 'personalized Love Notes delivered  - every observed staff member',
       retentionStat: '16',
       retentionSublabel: 'different courses being explored by your team',
     },
@@ -457,7 +455,7 @@ export default function SauneminDashboard() {
     quickWin: {
       count: 9,
       line1: '9 Saunemin staff members received personalized Love Notes after Observation Day 1.',
-      line2: 'Every observed educator — seen, celebrated, and connected to targeted Hub resources.',
+      line2: 'Every observed educator  - seen, celebrated, and connected to targeted Hub resources.',
     },
 
     // ZONE 3 - Actions
@@ -465,14 +463,14 @@ export default function SauneminDashboard() {
       nextToUnlock: [
         {
           label: 'Support 3 staff members not yet in the Hub',
-          detail: 'Amber, Lisa, and Dan haven\'t logged in yet — consider pairing with Sam or Haylie before Obs Day 2',
+          detail: 'Amber, Lisa, and Dan haven\'t logged in yet  - consider pairing with Sam or Haylie before Obs Day 2',
           owner: 'partner',
           cta: 'Contact TDI for support',
           ctaHref: 'mailto:rae@teachersdeserveit.com?subject=Saunemin%20Hub%20Support',
         },
         {
           label: 'Schedule Virtual Session',
-          detail: 'Included in contract — coordinate with TDI to set a date',
+          detail: 'Included in contract  - coordinate with TDI to set a date',
           owner: 'partner',
           cta: 'Schedule via Calendly',
           ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
@@ -480,7 +478,7 @@ export default function SauneminDashboard() {
       ],
       tdiHandling: [
         {
-          label: 'Observation Day 2 prep — April 8',
+          label: 'Observation Day 2 prep  - April 8',
           detail: 'TDI preparing observation focus: Hub strategies showing up in classroom practice',
         },
         {
@@ -490,7 +488,7 @@ export default function SauneminDashboard() {
       ],
       alreadyInMotion: [
         { label: 'Observation Day 2', date: 'April 8, 2026', status: 'scheduled' },
-        { label: 'Hub access active — 9 staff learning', date: 'Ongoing', status: 'scheduled' },
+        { label: 'Hub access active  - 9 staff learning', date: 'Ongoing', status: 'scheduled' },
         { label: '9 Love Notes delivered', date: 'Nov 19, 2025', status: 'complete' },
       ],
     },
@@ -500,7 +498,7 @@ export default function SauneminDashboard() {
     <div className="min-h-screen bg-[#F5F5F5]">
       {/* Compact Navbar */}
       <nav className="sticky top-0 z-50 bg-[#1e2749] text-white px-4 py-3">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
+        <div className="max-w-4xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <span className="bg-white text-[#1e2749] px-2 py-1 rounded text-xs font-extrabold tracking-wide">TDI</span>
             <span className="text-white font-semibold hidden sm:inline">Teachers Deserve It</span>
@@ -522,7 +520,7 @@ export default function SauneminDashboard() {
       <section className="relative text-white py-6 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-[#1e2749] via-[#38618C] to-[#1e2749]" />
 
-        <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="relative max-w-4xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="bg-[#35A7FF] text-white text-xs px-3 py-1 rounded-full font-medium">
@@ -553,7 +551,7 @@ export default function SauneminDashboard() {
 
       {/* Tab Navigation */}
       <div className="sticky top-[52px] z-40 bg-white border-b border-gray-200 shadow-sm">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <div className="flex overflow-x-auto scrollbar-hide">
             {tabs.map(tab => (
               <button
@@ -579,11 +577,11 @@ export default function SauneminDashboard() {
       </div>
 
       {/* Tab Content */}
-      <div className="max-w-5xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto px-4 py-6">
 
         {/* OVERVIEW TAB */}
         {activeTab === 'overview' && (
-          <div className="space-y-8 pb-8">
+          <div className="space-y-4 pb-16">
 
             {/* ─── ZONE 1: PARTNERSHIP SNAPSHOT ─── */}
             <div className="space-y-4">
@@ -771,7 +769,7 @@ export default function SauneminDashboard() {
               <div className="bg-[#E8F5F5] rounded-2xl p-1 border border-[#1A6B6B]/15">
                 <div className="px-5 pt-5 pb-3">
                   <h3 className="text-base font-bold text-[#1B2A4A]">Your Investment, By The Numbers</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">What this partnership delivers — in impact and value</p>
+                  <p className="text-xs text-gray-500 mt-0.5">What this partnership delivers  - in impact and value</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#1A6B6B]/10 rounded-xl overflow-hidden">
                   {[
@@ -876,7 +874,7 @@ export default function SauneminDashboard() {
 
         {/* OUR PARTNERSHIP TAB (merged Journey + Progress) */}
         {activeTab === 'ourPartnership' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center mb-6">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your Partnership Journey</h2>
               <p className="text-gray-600">Tracking progress through Phase 1: IGNITE</p>
@@ -894,7 +892,7 @@ export default function SauneminDashboard() {
               <p className="text-sm text-gray-500 mb-6">Research-backed metrics for measuring impact</p>
 
               {/* Indicator Grid */}
-              <div className="space-y-8">
+              <div className="space-y-4">
 
                 {/* Educator Stress (lower is better -  bars INVERTED) */}
                 <div>
@@ -1701,7 +1699,7 @@ export default function SauneminDashboard() {
 
         {/* FULL BLUEPRINT TAB */}
         {activeTab === 'blueprint' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">The Full TDI Blueprint</h2>
               <p className="text-gray-600">What becomes available when we continue our partnership</p>
@@ -1749,7 +1747,7 @@ export default function SauneminDashboard() {
 
         {/* 2026-27 PREVIEW TAB */}
         {activeTab === 'next-year' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
 
             {/* Why Year 2 Matters */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6">
@@ -2022,7 +2020,7 @@ export default function SauneminDashboard() {
 
         {/* TEAM TAB */}
         {activeTab === 'team' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your TDI Team</h2>
               <p className="text-gray-600">Your dedicated partner for this journey</p>
@@ -2131,7 +2129,7 @@ export default function SauneminDashboard() {
 
         {/* BILLING TAB */}
         {activeTab === 'billing' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
 
             {/* Section 1: Thank You Banner */}
             <div className="bg-[#1e2749] rounded-xl p-4">
@@ -2366,7 +2364,7 @@ export default function SauneminDashboard() {
 
       {/* Compact Footer */}
       <footer className="bg-[#1e2749] text-white py-4 px-4 mt-8">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             <div className="font-bold">Teachers Deserve It</div>
             <p className="text-white/60 text-sm">Partner Dashboard for Saunemin CCSD #438</p>

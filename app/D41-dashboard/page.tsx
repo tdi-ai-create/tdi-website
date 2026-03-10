@@ -103,15 +103,19 @@ export default function D41Dashboard() {
     const isOpen = openSections[id];
 
     return (
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className={`bg-white rounded-2xl border overflow-hidden transition-all ${
+        isOpen ? 'border-gray-200 shadow-md' : 'border-gray-100 shadow-sm'
+      }`}>
         <button
           onClick={() => toggleSection(id)}
-          className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+          className={`w-full flex items-center justify-between px-6 py-4 transition-colors ${
+            isOpen ? 'bg-gray-50 border-b border-gray-100' : 'hover:bg-gray-50'
+          }`}
         >
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5">
             {icon && <div className="text-[#38618C]">{icon}</div>}
             <div className="text-left">
-              <h3 className="font-semibold text-[#1e2749]">{title}</h3>
+              <span className="text-sm font-bold text-gray-900">{title}</span>
               {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
             </div>
           </div>
@@ -121,19 +125,15 @@ export default function D41Dashboard() {
                 {badge}
               </span>
             )}
-            {isOpen ? (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
-            ) : (
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-            )}
+            <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
           </div>
         </button>
 
-        <div className={`overflow-hidden transition-all duration-200 ${isOpen ? 'max-h-[2000px] opacity-100' : 'max-h-0 opacity-0'}`}>
-          <div className="px-4 pb-4 border-t border-gray-100">
+        {isOpen && (
+          <div className="px-6 pb-6 pt-4">
             {children}
           </div>
-        </div>
+        )}
       </div>
     );
   };
@@ -179,7 +179,7 @@ export default function D41Dashboard() {
       details: [
         '6 of 10 seats active and learning',
         '20 different courses being explored by your team',
-        '4 seats ready to activate — paid for and waiting',
+        '4 seats ready to activate - paid for and waiting',
         'TDI here to support whenever you need us',
       ],
     },
@@ -188,7 +188,7 @@ export default function D41Dashboard() {
     timeline: {
       done: [
         { label: '10 All-Access memberships activated', date: 'Oct 7, 2025' },
-        { label: 'Hub access live — team onboarded', date: 'Oct 2025' },
+        { label: 'Hub access live - team onboarded', date: 'Oct 2025' },
         { label: '6 members actively using the Hub', date: 'Ongoing since Jan 2026' },
         { label: '20 courses explored across your team', date: 'As of Mar 2026' },
       ],
@@ -197,8 +197,8 @@ export default function D41Dashboard() {
         { label: '4 seats ready to activate', detail: 'Reach out to TDI to assign to more staff' },
       ],
       comingSoon: [
-        { label: 'Activate your remaining 4 seats', date: 'Anytime — seats are paid for' },
-        { label: 'Membership renewal', date: 'When ready — TDI will reach out' },
+        { label: 'Activate your remaining 4 seats', date: 'Anytime - seats are paid for' },
+        { label: 'Membership renewal', date: 'When ready - TDI will reach out' },
         { label: 'Expand to full partnership', date: 'Ask TDI about IGNITE options' },
       ],
     },
@@ -206,7 +206,7 @@ export default function D41Dashboard() {
     // ZONE 2B - Investment value mirror
     investment: {
       perEducator: '$100',
-      perEducatorSublabel: 'per seat — a full year of on-demand professional learning',
+      perEducatorSublabel: 'per seat - a full year of on-demand professional learning',
       implementationRate: '20',
       implementationSublabel: 'courses your team is actively exploring',
       coursesCompleted: 6,
@@ -219,7 +219,7 @@ export default function D41Dashboard() {
     quickWin: {
       count: 20,
       line1: '20 different TDI courses are being explored by your Glen Ellyn team.',
-      line2: 'Your educators are showing up and learning — on their own schedule.',
+      line2: 'Your educators are showing up and learning - on their own schedule.',
     },
 
     // ZONE 3 - Actions
@@ -227,7 +227,7 @@ export default function D41Dashboard() {
       nextToUnlock: [
         {
           label: 'Activate your remaining 4 seats',
-          detail: 'You have 4 paid memberships ready to go — share access with more team members today',
+          detail: 'You have 4 paid memberships ready to go - share access with more team members today',
           owner: 'partner',
           cta: 'Contact TDI to assign seats',
           ctaHref: 'mailto:rae@teachersdeserveit.com?subject=D41%20Seat%20Activation',
@@ -236,11 +236,11 @@ export default function D41Dashboard() {
       tdiHandling: [
         {
           label: 'Hub content refreshed regularly',
-          detail: 'New courses and resources added — your team always has something new to explore',
+          detail: 'New courses and resources added - your team always has something new to explore',
         },
         {
           label: 'TDI available whenever you need us',
-          detail: 'Questions about usage, adding seats, or exploring a full partnership — just reach out',
+          detail: 'Questions about usage, adding seats, or exploring a full partnership - just reach out',
         },
       ],
       alreadyInMotion: [
@@ -255,7 +255,7 @@ export default function D41Dashboard() {
     <div className="min-h-screen bg-[#F5F5F5] overflow-x-hidden">
       {/* Navigation */}
       <nav className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <a href="https://teachersdeserveit.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3">
               <div className="bg-[#1e2749] text-white text-xs font-bold px-2 py-1 rounded">TDI</div>
@@ -282,7 +282,7 @@ export default function D41Dashboard() {
           className="absolute inset-0 bg-gradient-to-r from-[#1e2749] via-[#38618C] to-[#1e2749]"
         />
 
-        <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="relative max-w-4xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Glen Ellyn School District 41</h1>
             <p className="text-white/80 text-sm">Glen Ellyn, Illinois | Paraprofessional Development Partner</p>
@@ -298,7 +298,7 @@ export default function D41Dashboard() {
 
       {/* Tab Navigation */}
       <div className="bg-white border-b border-gray-200 sticky top-14 z-40 shadow-sm">
-        <div className="max-w-5xl mx-auto px-4 py-3">
+        <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex justify-center gap-2">
             {[
               { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -311,10 +311,7 @@ export default function D41Dashboard() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => {
-                  setActiveTab(tab.id);
-                  tabContentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }}
+                onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                   activeTab === tab.id
                     ? 'bg-[#1e2749] text-white shadow-md'
@@ -330,11 +327,11 @@ export default function D41Dashboard() {
       </div>
 
       {/* Tab Content */}
-      <div ref={tabContentRef} className="max-w-5xl mx-auto px-4 py-6">
+      <div ref={tabContentRef} className="max-w-4xl mx-auto px-4 py-6">
 
         {/* ==================== OVERVIEW TAB ==================== */}
         {activeTab === 'overview' && (
-          <div className="space-y-8 pb-8">
+          <div className="space-y-4 pb-16">
 
             {/* ─── ZONE 1: PARTNERSHIP SNAPSHOT ─── */}
             <div className="space-y-4">
@@ -522,7 +519,7 @@ export default function D41Dashboard() {
               <div className="bg-[#E8F5F5] rounded-2xl p-1 border border-[#1A6B6B]/15">
                 <div className="px-5 pt-5 pb-3">
                   <h3 className="text-base font-bold text-[#1B2A4A]">Your Investment, By The Numbers</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">What this membership delivers — in impact and value</p>
+                  <p className="text-xs text-gray-500 mt-0.5">What this membership delivers - in impact and value</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#1A6B6B]/10 rounded-xl overflow-hidden">
                   {[
@@ -625,7 +622,7 @@ export default function D41Dashboard() {
 
         {/* OUR PARTNERSHIP TAB (Hub-only) */}
         {activeTab === 'ourPartnership' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your Partnership Journey</h2>
               <p className="text-gray-600">Hub-only partnership: tracking seat activation and engagement</p>
@@ -765,7 +762,7 @@ export default function D41Dashboard() {
 
         {/* RESOURCES TAB */}
         {activeTab === 'resources' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Learning Hub Resources</h2>
               <p className="text-gray-600">Curated courses for paraprofessional development</p>
@@ -999,7 +996,7 @@ export default function D41Dashboard() {
 
         {/* BLUEPRINT TAB */}
         {activeTab === 'blueprint' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">The Full TDI Blueprint</h2>
               <p className="text-gray-600">What becomes available when we continue our partnership</p>
@@ -1024,7 +1021,7 @@ export default function D41Dashboard() {
 
         {/* 2026-27 TAB */}
         {activeTab === 'next-steps' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">2026-27 Partnership Options</h2>
               <p className="text-gray-600">When you&apos;re ready to add personalized coaching support</p>
@@ -1567,7 +1564,7 @@ export default function D41Dashboard() {
 
         {/* CONTACT TAB */}
         {activeTab === 'contact' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your TDI Team</h2>
               <p className="text-gray-600">Your dedicated partner for this journey</p>
@@ -1738,7 +1735,7 @@ export default function D41Dashboard() {
 
         {/* BILLING TAB */}
         {activeTab === 'billing' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
 
             {/* Section 1: Thank You Banner */}
             <div className="bg-[#1e2749] rounded-xl p-4">
@@ -1885,7 +1882,7 @@ export default function D41Dashboard() {
 
       {/* Compact Footer */}
       <footer className="bg-[#1e2749] text-white py-6 px-4">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <div>
             <div className="font-bold">Teachers Deserve It</div>
             <p className="text-white/60 text-sm">Partner Dashboard for Glen Ellyn School District 41</p>

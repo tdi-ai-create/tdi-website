@@ -224,10 +224,8 @@ export default function AllenwoodDashboard() {
     );
   };
 
-  // Scroll to top when changing tabs
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // ===================== OVERVIEW DATA =====================
@@ -245,36 +243,36 @@ export default function AllenwoodDashboard() {
       status: 'Strong',
       statusColor: 'green',
       details: [
-        'Hub engagement at 100% — all 13 teachers active',
+        'Hub engagement at 100%  - all 13 teachers active',
         '2 observations + 2 virtual sessions complete',
         '4 virtual sessions already scheduled through April',
-        'Leadership meeting held March 2 — Year 2 discussions underway',
+        'Leadership meeting held March 2  - Year 2 discussions underway',
       ],
     },
 
     // ZONE 2A - Timeline
     timeline: {
       done: [
-        { label: 'Virtual Session 1 — Hub onboarding + partnership goals', date: 'Sep 17, 2025' },
-        { label: 'Observation Day 1 — 11 classrooms, 11 Love Notes delivered', date: 'Oct 15, 2025' },
-        { label: 'Hub access activated — all 13 teachers enrolled', date: 'Fall 2025' },
+        { label: 'Virtual Session 1  - Hub onboarding + partnership goals', date: 'Sep 17, 2025' },
+        { label: 'Observation Day 1  - 11 classrooms, 11 Love Notes delivered', date: 'Oct 15, 2025' },
+        { label: 'Hub access activated  - all 13 teachers enrolled', date: 'Fall 2025' },
         { label: '100% Hub login milestone achieved', date: 'Feb 2026' },
-        { label: 'Virtual Session 2 — Hub update, tools discussion, data collection', date: 'Feb 25, 2026' },
-        { label: 'Observation Day 2 — 10 classrooms, Love Notes delivered', date: 'Feb 18, 2026' },
-        { label: 'Leadership Meeting — mid-year wins, Year 2 expansion planning', date: 'Mar 2, 2026' },
+        { label: 'Virtual Session 2  - Hub update, tools discussion, data collection', date: 'Feb 25, 2026' },
+        { label: 'Observation Day 2  - 10 classrooms, Love Notes delivered', date: 'Feb 18, 2026' },
+        { label: 'Leadership Meeting  - mid-year wins, Year 2 expansion planning', date: 'Mar 2, 2026' },
       ],
       inProgress: [
-        { label: 'Hub engagement — 13/13 teachers active', detail: '14 courses being explored, up from 4 last month' },
-        { label: 'Funding strategy discussion with Dr. Porter', detail: 'Meeting March 10 — 9AM ET' },
-        { label: 'Virtual Sessions 3-6 — TDI preparing content', detail: 'All 4 sessions confirmed through April 15' },
+        { label: 'Hub engagement  - 13/13 teachers active', detail: '14 courses being explored, up from 4 last month' },
+        { label: 'Funding strategy discussion with Dr. Porter', detail: 'Meeting March 10  - 9AM ET' },
+        { label: 'Virtual Sessions 3-6  - TDI preparing content', detail: 'All 4 sessions confirmed through April 15' },
         { label: 'Year 2 expansion conversations underway', detail: 'Discussed at March 2 leadership meeting' },
       ],
       comingSoon: [
-        { label: 'Funding Meeting with Dr. Porter', date: 'March 10, 2026 — 9AM ET (Tomorrow)' },
-        { label: 'Virtual Session 3', date: 'March 11, 2026 — 7:30PM ET' },
-        { label: 'Virtual Session 4', date: 'March 25, 2026 — 7:30PM ET' },
-        { label: 'Virtual Session 5', date: 'April 8, 2026 — 7:30PM ET' },
-        { label: 'Virtual Session 6', date: 'April 15, 2026 — 7:30PM ET' },
+        { label: 'Funding Meeting with Dr. Porter', date: 'March 10, 2026  - 9AM ET (Tomorrow)' },
+        { label: 'Virtual Session 3', date: 'March 11, 2026  - 7:30PM ET' },
+        { label: 'Virtual Session 4', date: 'March 25, 2026  - 7:30PM ET' },
+        { label: 'Virtual Session 5', date: 'April 8, 2026  - 7:30PM ET' },
+        { label: 'Virtual Session 6', date: 'April 15, 2026  - 7:30PM ET' },
         { label: 'Spring Leadership Celebration', date: 'Available through May 2026' },
       ],
     },
@@ -282,9 +280,9 @@ export default function AllenwoodDashboard() {
     // ZONE 2B - Investment value mirror
     investment: {
       perEducator: '$592',
-      perEducatorSublabel: 'per teacher — less than a one-day sub',
+      perEducatorSublabel: 'per teacher  - less than a one-day sub',
       implementationRate: '100%',
-      implementationSublabel: 'hub login rate — every teacher active',
+      implementationSublabel: 'hub login rate  - every teacher active',
       coursesCompleted: 21,
       coursesCompletedSublabel: 'classrooms received Love Notes this partnership',
       retentionStat: '4x',
@@ -295,7 +293,7 @@ export default function AllenwoodDashboard() {
     quickWin: {
       count: 21,
       line1: '21 Allenwood classrooms have received personalized Love Notes this partnership.',
-      line2: 'Every teacher observed — seen, celebrated, and growing.',
+      line2: 'Every teacher observed  - seen, celebrated, and growing.',
     },
 
     // ZONE 3 - Actions
@@ -303,14 +301,14 @@ export default function AllenwoodDashboard() {
       nextToUnlock: [
         {
           label: 'Funding Meeting with Dr. Porter',
-          detail: 'Tomorrow — March 10, 2026 at 9AM ET. Discuss funding PD for teacher expansion.',
+          detail: 'Tomorrow  - March 10, 2026 at 9AM ET. Discuss funding PD for teacher expansion.',
           owner: 'both',
-          cta: 'TDI is prepared — meeting confirmed',
+          cta: 'TDI is prepared  - meeting confirmed',
           ctaHref: '',
         },
         {
           label: 'Schedule Spring Leadership Celebration',
-          detail: 'Celebrate wins + discuss Year 2 options — complimentary, available through May 2026',
+          detail: 'Celebrate wins + discuss Year 2 options  - complimentary, available through May 2026',
           owner: 'partner',
           cta: 'Schedule via Calendly',
           ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
@@ -318,7 +316,7 @@ export default function AllenwoodDashboard() {
       ],
       tdiHandling: [
         {
-          label: 'Virtual Sessions 3-6 — TDI preparing content',
+          label: 'Virtual Sessions 3-6  - TDI preparing content',
           detail: 'All 4 sessions confirmed through April 15',
         },
         {
@@ -327,10 +325,10 @@ export default function AllenwoodDashboard() {
         },
       ],
       alreadyInMotion: [
-        { label: 'Virtual Session 3', date: 'March 11, 2026 — 7:30PM ET', status: 'scheduled' },
-        { label: 'Virtual Session 4', date: 'March 25, 2026 — 7:30PM ET', status: 'scheduled' },
-        { label: 'Virtual Session 5', date: 'April 8, 2026 — 7:30PM ET', status: 'scheduled' },
-        { label: 'Virtual Session 6', date: 'April 15, 2026 — 7:30PM ET', status: 'scheduled' },
+        { label: 'Virtual Session 3', date: 'March 11, 2026  - 7:30PM ET', status: 'scheduled' },
+        { label: 'Virtual Session 4', date: 'March 25, 2026  - 7:30PM ET', status: 'scheduled' },
+        { label: 'Virtual Session 5', date: 'April 8, 2026  - 7:30PM ET', status: 'scheduled' },
+        { label: 'Virtual Session 6', date: 'April 15, 2026  - 7:30PM ET', status: 'scheduled' },
       ],
     },
   };
@@ -363,7 +361,7 @@ export default function AllenwoodDashboard() {
       <section className="relative text-white py-6 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-[#1e2749] via-[#1e2749] to-[#38618C]" />
 
-        <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="relative max-w-4xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">Allenwood Elementary School</h1>
             <p className="text-white/80 text-sm">Camp Springs, Maryland | Partner Dashboard</p>
@@ -380,7 +378,7 @@ export default function AllenwoodDashboard() {
 
       {/* Tab Navigation - matches WEGO */}
       <div className="bg-white border-b border-gray-200 sticky top-14 z-40 shadow-sm">
-        <div className="max-w-5xl mx-auto px-4 py-3">
+        <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex justify-center gap-2 flex-wrap">
             {[
               { id: 'overview', label: 'Overview', icon: Eye },
@@ -410,10 +408,10 @@ export default function AllenwoodDashboard() {
       </div>
 
       {/* Tab Content */}
-      <div className="max-w-5xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto px-4 py-6">
         {/* ==================== OVERVIEW TAB ==================== */}
         {activeTab === 'overview' && (
-          <div className="space-y-8 pb-8">
+          <div className="space-y-4 pb-16">
 
             {/* ─── ZONE 1: PARTNERSHIP SNAPSHOT ─── */}
             <div className="space-y-4">
@@ -601,7 +599,7 @@ export default function AllenwoodDashboard() {
               <div className="bg-[#E8F5F5] rounded-2xl p-1 border border-[#1A6B6B]/15">
                 <div className="px-5 pt-5 pb-3">
                   <h3 className="text-base font-bold text-[#1B2A4A]">Your Investment, By The Numbers</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">What this partnership delivers — in impact and value</p>
+                  <p className="text-xs text-gray-500 mt-0.5">What this partnership delivers  - in impact and value</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#1A6B6B]/10 rounded-xl overflow-hidden">
                   {[
@@ -709,7 +707,7 @@ export default function AllenwoodDashboard() {
 
         {/* OUR PARTNERSHIP TAB */}
         {activeTab === 'partnership' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Jump-Scroll Navigation */}
             <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 sticky top-28 z-30">
               <div className="flex gap-2 overflow-x-auto pb-1">
@@ -778,7 +776,7 @@ export default function AllenwoodDashboard() {
                   </button>
 
                   {obsDay1Open && (
-                    <div className="p-4 pt-0 space-y-6 border-t border-gray-100">
+                    <div className="p-4 pt-0 space-y-4 border-t border-gray-100">
                       {/* What We Did */}
                       <div className="pt-4">
                         <h4 className="font-semibold text-gray-800 mb-3">What We Did</h4>
@@ -858,27 +856,27 @@ export default function AllenwoodDashboard() {
                         <div className="space-y-3">
                           <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
                             <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Within five minutes I found myself wishing I could be one of your students. You&apos;ve built a classroom where kids feel excited, safe, and seen.&quot;</p>
-                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 1</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium"> - From Observation Day 1</p>
                           </div>
                           <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
                             <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Your color-coded station system had students moving with purpose. The countdowns kept everything calm and clear. When tech glitched, you pivoted to paper without missing a beat.&quot;</p>
-                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 1</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium"> - From Observation Day 1</p>
                           </div>
                           <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
                             <p className="text-gray-700 italic text-sm leading-relaxed">&quot;The alphabet sing-and-sign moment was absolutely adorable. Your space is clearly designed for movement and engagement. It feels like a room where learning lives.&quot;</p>
-                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 1</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium"> - From Observation Day 1</p>
                           </div>
                           <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
                             <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Your call-and-response routines were easy, fun, and consistent. Students responded quickly to your calm tone and respectful redirections.&quot;</p>
-                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 1</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium"> - From Observation Day 1</p>
                           </div>
                           <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
                             <p className="text-gray-700 italic text-sm leading-relaxed">&quot;The laughter, smiles, and small celebrations showed genuine joy and connection. Your teamwork with the additional adults was seamless.&quot;</p>
-                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 1</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium"> - From Observation Day 1</p>
                           </div>
                           <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
                             <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Low voice = high control. You modeled the volume you wanted, and students mirrored you. I&apos;d want to be a student in your classroom!&quot;</p>
-                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 1</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium"> - From Observation Day 1</p>
                           </div>
                         </div>
                       </div>
@@ -954,7 +952,7 @@ export default function AllenwoodDashboard() {
                   </button>
 
                   {obsDay2Open && (
-                    <div className="p-4 pt-0 space-y-6 border-t border-gray-100">
+                    <div className="p-4 pt-0 space-y-4 border-t border-gray-100">
                       {/* What We Did */}
                       <div className="pt-4">
                         <h4 className="font-semibold text-gray-800 mb-3">What We Did</h4>
@@ -1035,27 +1033,27 @@ export default function AllenwoodDashboard() {
                         <div className="space-y-3">
                           <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
                             <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Your small group setup is working beautifully. Students moved between collab groups and whole-class work without missing a beat, and the encouragement in your voice kept the room energized. When a student asked to staple their own work, that&apos;s ownership in action.&quot;</p>
-                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 2</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium"> - From Observation Day 2</p>
                           </div>
                           <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
                             <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Your students were locked into their reading program with headphones on and focused. The problem-solving conversations happening between you and your students showed real trust - they weren&apos;t afraid to work through challenges with you right beside them.&quot;</p>
-                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 2</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium"> - From Observation Day 2</p>
                           </div>
                           <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
                             <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Your teacher voice commands attention in all the right ways. The way you chunk directions - &apos;when you&apos;re done with this, go to Dreambox&apos; - gives students a clear path forward. When you work 1:1, your scaffolding is strong and intentional. Students respond to your presence.&quot;</p>
-                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 2</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium"> - From Observation Day 2</p>
                           </div>
                           <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
                             <p className="text-gray-700 italic text-sm leading-relaxed">&quot;The movement and breathing transitions are creative and student-centered. Using video and deep breathing to reset the room shows you&apos;re thinking about the whole child - body and mind - before jumping into content. That instinct is exactly right.&quot;</p>
-                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 2</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium"> - From Observation Day 2</p>
                           </div>
                           <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
                             <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Your classroom is a space where students with unique needs feel included. We saw students engaged on the carpet and adults working together to support them. The foundation is there - and we have Hub resources that will help take your autism support strategies even further.&quot;</p>
-                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 2</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium"> - From Observation Day 2</p>
                           </div>
                           <div className="bg-amber-50 rounded-lg p-4" style={{ borderLeftWidth: '3px', borderLeftColor: '#FFBA06', borderLeftStyle: 'solid' }}>
                             <p className="text-gray-700 italic text-sm leading-relaxed">&quot;Your paras are showing up and doing the work. We saw real partnership between teachers and support staff in these classrooms. We&apos;re sending over para-specific tools from the Hub that will give your team even more strategies to support students independently.&quot;</p>
-                            <p className="text-amber-600 text-sm mt-2 font-medium">— From Observation Day 2</p>
+                            <p className="text-amber-600 text-sm mt-2 font-medium"> - From Observation Day 2</p>
                           </div>
                         </div>
                       </div>
@@ -1397,7 +1395,7 @@ export default function AllenwoodDashboard() {
                 </p>
 
                 {/* Academic Comparison Bars */}
-                <div className="space-y-6 mb-6">
+                <div className="space-y-4 mb-6">
                   {/* Math Proficiency */}
                   <div>
                     <div className="flex justify-between items-center mb-2">
@@ -1834,7 +1832,7 @@ export default function AllenwoodDashboard() {
 
         {/* BLUEPRINT TAB */}
         {activeTab === 'blueprint' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* What&apos;s Included */}
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
@@ -1869,7 +1867,7 @@ export default function AllenwoodDashboard() {
 
         {/* 2026-27 TAB */}
         {activeTab === 'next-year' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* Tab Header */}
             <div className="text-center mb-8">
               <p className="text-sm text-[#38618C] font-medium mb-2">Phase 2</p>
@@ -2087,7 +2085,7 @@ export default function AllenwoodDashboard() {
               <h3 className="font-bold text-[#1e2749] mb-6">Suggested 2026-27 Timeline</h3>
               <div className="relative pl-8">
                 <div className="absolute left-3 top-0 bottom-0 w-0.5 bg-gray-200"></div>
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {/* August */}
                   <div className="relative">
                     <div className="absolute left-[-26px] w-6 h-6 rounded-full bg-amber-500 border-2 border-white flex items-center justify-center">
@@ -2525,7 +2523,7 @@ export default function AllenwoodDashboard() {
 
         {/* TEAM TAB */}
         {activeTab === 'team' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your TDI Team</h2>
               <p className="text-gray-600">Your dedicated partner for this journey</p>
@@ -2694,7 +2692,7 @@ export default function AllenwoodDashboard() {
 
         {/* BILLING TAB */}
         {activeTab === 'billing' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
 
             {/* Section 1: Thank You Banner */}
             <div className="bg-[#1e2749] rounded-xl p-4">

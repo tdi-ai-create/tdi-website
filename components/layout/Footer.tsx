@@ -11,13 +11,25 @@ export function Footer() {
   // Hide on admin pages (has its own footer)
   // Hide on partner setup and login pages (focused onboarding experience)
   // Hide on hub pages (Hub has its own layout)
-  if (
-    pathname?.startsWith('/creator-portal/dashboard') ||
-    pathname?.startsWith('/admin') ||
-    pathname?.startsWith('/partner-setup') ||
-    pathname?.startsWith('/partners') ||
-    pathname?.startsWith('/hub')
-  ) {
+  // Hide on all legacy dashboard routes (partner-only pages with their own footer)
+  const hiddenRoutes = [
+    '/creator-portal/dashboard',
+    '/admin',
+    '/partner-setup',
+    '/partners',
+    '/hub',
+    '/asd4-dashboard',
+    '/stpchanel-dashboard',
+    '/wego-dashboard',
+    '/saunemin-dashboard',
+    '/Allenwood-Dashboard',
+    '/D41-dashboard',
+    '/Example-Dashboard',
+  ];
+
+  const shouldHideFooter = hiddenRoutes.some(route => pathname?.startsWith(route));
+
+  if (shouldHideFooter) {
     return null;
   }
 

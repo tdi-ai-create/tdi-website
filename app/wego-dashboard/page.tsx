@@ -75,18 +75,19 @@ const CollapsibleSection = ({
   const style = accentStyles[accent] || accentStyles.gray;
 
   return (
-    <div className={`bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden ${style.border}`}>
-      <button onClick={() => setOpen(!open)} className={`w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50/50 transition-colors ${style.headerBg}`}>
-        <div className="flex items-center gap-3">
-          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${style.iconBg}`}>{icon}</div>
-          <span className="text-base font-semibold text-gray-900">{title}</span>
+    <div className={`bg-white rounded-2xl border overflow-hidden transition-all ${style.border} ${
+      open ? 'border-gray-200 shadow-md' : 'border-gray-100 shadow-sm'
+    }`}>
+      <button onClick={() => setOpen(!open)} className={`w-full flex items-center justify-between px-6 py-4 transition-colors ${
+        open ? 'bg-gray-50 border-b border-gray-100' : 'hover:bg-gray-50'
+      }`}>
+        <div className="flex items-center gap-2.5">
+          {icon}
+          <span className="text-sm font-bold text-gray-900">{title}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-400">Click to {open ? 'collapse' : 'expand'}</span>
-          <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
-        </div>
+        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
-      {open && <div className="px-6 pb-6 pt-4 border-t border-gray-100">{children}</div>}
+      {open && <div className="px-6 pb-6 pt-4">{children}</div>}
     </div>
   );
 };
@@ -150,10 +151,8 @@ export default function WegoDashboard() {
     },
   ];
 
-  // Scroll to top when changing tabs
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // ===================== OVERVIEW DATA =====================
@@ -171,7 +170,7 @@ export default function WegoDashboard() {
       status: 'Strong',
       statusColor: 'green',
       details: [
-        '100% Hub login rate — all 19 PAs activated',
+        '100% Hub login rate  - all 19 PAs activated',
         '3 observation days + 3 on-site coachings complete',
         '21 personalized Love Notes delivered',
         'Year 1 Celebration + Year 2 Planning to schedule',
@@ -181,22 +180,22 @@ export default function WegoDashboard() {
     // ZONE 2A - Timeline
     timeline: {
       done: [
-        { label: 'Partnership launched — 19 PAs enrolled', date: 'Sep 25, 2025' },
-        { label: '100% Hub activation — all 19 PAs logged in', date: 'Oct 2025' },
-        { label: 'Subgroups established — 4 groups meeting every Monday', date: 'Oct 2025' },
-        { label: 'Observation Day 1 — 8 PAs observed, Love Notes delivered', date: 'Nov 12, 2025' },
-        { label: 'On-Site Coaching 1 — strategies session complete', date: 'Nov 2025' },
-        { label: 'Observation Day 2 — 11 PAs observed, Love Notes delivered', date: 'Dec 3, 2025' },
-        { label: 'On-Site Coaching 2 — strategies session complete', date: 'Dec 2025' },
-        { label: 'On-Site Coaching 3 — strategies session complete', date: 'Jan 2026' },
+        { label: 'Partnership launched  - 19 PAs enrolled', date: 'Sep 25, 2025' },
+        { label: '100% Hub activation  - all 19 PAs logged in', date: 'Oct 2025' },
+        { label: 'Subgroups established  - 4 groups meeting every Monday', date: 'Oct 2025' },
+        { label: 'Observation Day 1  - 8 PAs observed, Love Notes delivered', date: 'Nov 12, 2025' },
+        { label: 'On-Site Coaching 1  - strategies session complete', date: 'Nov 2025' },
+        { label: 'Observation Day 2  - 11 PAs observed, Love Notes delivered', date: 'Dec 3, 2025' },
+        { label: 'On-Site Coaching 2  - strategies session complete', date: 'Dec 2025' },
+        { label: 'On-Site Coaching 3  - strategies session complete', date: 'Jan 2026' },
         { label: 'Virtual Session 1 complete', date: 'Jan 2026' },
         { label: 'Virtual Session 2 complete', date: 'Feb 2026' },
-        { label: 'Observation Day 3 — 7 PAs observed, Love Notes delivered', date: 'Feb 25, 2026' },
+        { label: 'Observation Day 3  - 7 PAs observed, Love Notes delivered', date: 'Feb 25, 2026' },
       ],
       inProgress: [
-        { label: '19/19 PAs Hub activated — 16 with tracked course activity', detail: '84% engagement and growing' },
-        { label: 'Weekly subgroups running — every Monday 7:45-9AM', detail: 'EL, Self Contained, DLP, Transition (Step)' },
-        { label: 'Monthly full-group session with Rae — ongoing', detail: 'Themed discussion + implementation support' },
+        { label: '19/19 PAs Hub activated  - 16 with tracked course activity', detail: '84% engagement and growing' },
+        { label: 'Weekly subgroups running  - every Monday 7:45-9AM', detail: 'EL, Self Contained, DLP, Transition (Step)' },
+        { label: 'Monthly full-group session with Rae  - ongoing', detail: 'Themed discussion + implementation support' },
         { label: 'Year 2 teacher expansion in planning', detail: 'To be confirmed at Year 1 Celebration' },
       ],
       comingSoon: [
@@ -210,9 +209,9 @@ export default function WegoDashboard() {
     // ZONE 2B - Investment value mirror
     investment: {
       perEducator: '$842',
-      perEducatorSublabel: 'per para — obs days, coaching, Hub + weekly subgroups',
+      perEducatorSublabel: 'per para  - obs days, coaching, Hub + weekly subgroups',
       implementationRate: '100%',
-      implementationSublabel: 'Hub login rate — every PA activated',
+      implementationSublabel: 'Hub login rate  - every PA activated',
       coursesCompleted: 21,
       coursesCompletedSublabel: 'personalized Love Notes delivered across 3 observation days',
       retentionStat: '62.5%',
@@ -223,7 +222,7 @@ export default function WegoDashboard() {
     quickWin: {
       count: 21,
       line1: '21 personalized Love Notes delivered to WEGO paraprofessionals across 3 observation days.',
-      line2: 'Every PA observed — seen, celebrated, and connected to targeted Hub resources.',
+      line2: 'Every PA observed  - seen, celebrated, and connected to targeted Hub resources.',
     },
 
     // ZONE 3 - Actions
@@ -231,7 +230,7 @@ export default function WegoDashboard() {
       nextToUnlock: [
         {
           label: 'Schedule Year 1 Celebration + Year 2 Planning',
-          detail: 'Review full-year wins + plan 2026-27 teacher expansion — schedule by April 2026',
+          detail: 'Review full-year wins + plan 2026-27 teacher expansion  - schedule by April 2026',
           owner: 'partner',
           cta: 'Schedule via Calendly',
           ctaHref: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
@@ -239,15 +238,15 @@ export default function WegoDashboard() {
       ],
       tdiHandling: [
         {
-          label: 'Virtual Sessions 4-6 — TDI preparing content',
-          detail: 'March 16, April 13, May 11 — all confirmed',
+          label: 'Virtual Sessions 4-6  - TDI preparing content',
+          detail: 'March 16, April 13, May 11  - all confirmed',
         },
         {
           label: 'Year 2 teacher expansion proposal',
-          detail: 'TDI preparing — to be presented at Year 1 Celebration',
+          detail: 'TDI preparing  - to be presented at Year 1 Celebration',
         },
         {
-          label: 'Weekly subgroup facilitation — ongoing',
+          label: 'Weekly subgroup facilitation  - ongoing',
           detail: 'Every Monday 7:45-9AM through end of year',
         },
       ],
@@ -255,7 +254,7 @@ export default function WegoDashboard() {
         { label: 'Virtual Session 4', date: 'March 16, 2026', status: 'scheduled' },
         { label: 'Virtual Session 5', date: 'April 13, 2026', status: 'scheduled' },
         { label: 'Virtual Session 6 (Final)', date: 'May 11, 2026', status: 'scheduled' },
-        { label: 'Weekly subgroups — 4 groups every Monday', date: 'Ongoing through Jun 2026', status: 'scheduled' },
+        { label: 'Weekly subgroups  - 4 groups every Monday', date: 'Ongoing through Jun 2026', status: 'scheduled' },
       ],
     },
   };
@@ -263,13 +262,13 @@ export default function WegoDashboard() {
   // ===================== OUR PARTNERSHIP TAB DATA =====================
   const partnershipData = {
 
-    // SECTION 1 — Partnership Goal
+    // SECTION 1  - Partnership Goal
     goal: {
       quote: 'Every para at West Chicago D94 walks into a classroom feeling confident, prepared, and ready to make a difference for students.',
-      theme: 'Building a culture where paraprofessionals are developed, celebrated, and retained — year after year.',
+      theme: 'Building a culture where paraprofessionals are developed, celebrated, and retained  - year after year.',
     },
 
-    // SECTION 2 — Classroom Observations
+    // SECTION 2  - Classroom Observations
     observations: [
       {
         id: 'obs-1',
@@ -277,15 +276,15 @@ export default function WegoDashboard() {
         date: 'November 12, 2025',
         classroomsVisited: 8,
         loveNotesDelivered: 8,
-        aiSummary: 'Across 8 West Chicago classrooms, paras showed strong student rapport and calm presence during challenging moments — the kind of relationship-first instincts that are hard to teach and easy to build on. One standout: a para in the Step Center used multi-modal communication tools entirely on her own initiative, demonstrating the kind of intentional, student-centered practice that defines high-impact support.',
+        aiSummary: 'Across 8 West Chicago classrooms, paras showed strong student rapport and calm presence during challenging moments  - the kind of relationship-first instincts that are hard to teach and easy to build on. One standout: a para in the Step Center used multi-modal communication tools entirely on her own initiative, demonstrating the kind of intentional, student-centered practice that defines high-impact support.',
         details: {
           narrative: 'TDI visited 8 classrooms on November 12. The observation focus was para-student interaction quality, positioning and proximity, and initial strategy awareness. What we found: a team with real relational instincts and strong potential for growth with targeted coaching.',
           quotes: [
-            'She positioned herself at eye level with Jayden during the reading activity — that small shift made him visibly more engaged.',
+            'She positioned herself at eye level with Jayden during the reading activity  - that small shift made him visibly more engaged.',
             'You have a natural gift for creating connection. Keep using that superpower.',
           ],
           resources: [
-            'Hub resource referenced: The Sentence Starter Guide — Confident Communication Made Easy',
+            'Hub resource referenced: The Sentence Starter Guide  - Confident Communication Made Easy',
             'Hub course referenced: Building Relationships with Reluctant Students',
           ],
           nextFocus: 'Observation Day 2 expanded to 11 classrooms with focus on scaffolding, wait time, and communication with lead teachers.',
@@ -297,9 +296,9 @@ export default function WegoDashboard() {
         date: 'December 3, 2025',
         classroomsVisited: 11,
         loveNotesDelivered: 11,
-        aiSummary: 'All 19 WEGO paras have now been observed and received personalized Love Notes. Observation Day 2 expanded coverage to 11 classrooms and revealed a team increasingly confident in their classroom presence. Paras with high Hub engagement showed the strongest instructional moves — a direct connection between learning and doing that validates the Hub-first approach.',
+        aiSummary: 'All 19 WEGO paras have now been observed and received personalized Love Notes. Observation Day 2 expanded coverage to 11 classrooms and revealed a team increasingly confident in their classroom presence. Paras with high Hub engagement showed the strongest instructional moves  - a direct connection between learning and doing that validates the Hub-first approach.',
         details: {
-          narrative: 'TDI returned on December 3 to complete full-team observation coverage. The focus shifted to scaffolding techniques, intentional wait time, and teacher-para communication patterns. The growth from Day 1 was visible — paras who had logged into the Hub between visits showed more deliberate, strategy-driven moves.',
+          narrative: 'TDI returned on December 3 to complete full-team observation coverage. The focus shifted to scaffolding techniques, intentional wait time, and teacher-para communication patterns. The growth from Day 1 was visible  - paras who had logged into the Hub between visits showed more deliberate, strategy-driven moves.',
           quotes: [
             'I had no idea how much my positioning in the room was affecting the students.',
             'Getting a Love Note was the first time in my career someone came to watch me work and left saying something kind.',
@@ -308,7 +307,7 @@ export default function WegoDashboard() {
             'Hub course referenced: The Proximity Principle',
             'Hub course referenced: Collaborative Support Structures',
           ],
-          nextFocus: 'Observation Day 3 focuses on Move #2 implementation — collaborative support structures and co-teaching alignment between paras and lead teachers.',
+          nextFocus: 'Observation Day 3 focuses on Move #2 implementation  - collaborative support structures and co-teaching alignment between paras and lead teachers.',
         },
       },
       {
@@ -317,21 +316,21 @@ export default function WegoDashboard() {
         date: 'February 25, 2026',
         classroomsVisited: 2,
         loveNotesDelivered: 2,
-        aiSummary: 'Observation Day 3 completed. Focus was on Move #2 — collaborative support and co-teaching alignment. Early data shows paras are taking more ownership of instructional decisions alongside their lead teachers.',
+        aiSummary: 'Observation Day 3 completed. Focus was on Move #2  - collaborative support and co-teaching alignment. Early data shows paras are taking more ownership of instructional decisions alongside their lead teachers.',
         details: {
-          narrative: 'TDI completed the third and final observation day of the IGNITE phase. This visit focused specifically on how paras are integrating Move #2 strategies — collaborative positioning, shared instructional moments, and proactive communication with lead teachers.',
+          narrative: 'TDI completed the third and final observation day of the IGNITE phase. This visit focused specifically on how paras are integrating Move #2 strategies  - collaborative positioning, shared instructional moments, and proactive communication with lead teachers.',
           quotes: [
             'She didn\'t wait to be told what to do. She saw the gap and filled it.',
           ],
           resources: [
             'Hub course referenced: Co-Teaching That Actually Works',
           ],
-          nextFocus: 'Partnership moves into ACCELERATE phase — deeper coaching cycles, full Hub library access, and building toward Year 2.',
+          nextFocus: 'Partnership moves into ACCELERATE phase  - deeper coaching cycles, full Hub library access, and building toward Year 2.',
         },
       },
     ],
 
-    // SECTION 3 — School Snapshot (CONDITIONAL)
+    // SECTION 3  - School Snapshot (CONDITIONAL)
     snapshot: {
       show: true,
       districtName: 'West Chicago Community High School District 94',
@@ -343,7 +342,7 @@ export default function WegoDashboard() {
       context: 'WEGO D94 serves a diverse high school population with a significant paraprofessional team supporting students across special education and bilingual settings. This partnership launched in Fall 2025 with a full-team Hub enrollment and three on-site observation days in Year 1.',
     },
 
-    // SECTION 4 — Partnership Journey
+    // SECTION 4  - Partnership Journey
     journey: {
       phases: [
         {
@@ -351,11 +350,11 @@ export default function WegoDashboard() {
           number: 1,
           status: 'complete',
           deliverables: [
-            { label: 'Hub access activated — all 19 paras enrolled', complete: true },
+            { label: 'Hub access activated  - all 19 paras enrolled', complete: true },
             { label: '100% Hub login milestone achieved', complete: true },
-            { label: 'Observation Day 1 — 8 classrooms, 8 Love Notes', complete: true },
-            { label: 'Observation Day 2 — 11 classrooms, 11 Love Notes (all 19 paras observed)', complete: true },
-            { label: 'Observation Day 3 — Move #2 focus, 2 Love Notes', complete: true },
+            { label: 'Observation Day 1  - 8 classrooms, 8 Love Notes', complete: true },
+            { label: 'Observation Day 2  - 11 classrooms, 11 Love Notes (all 19 paras observed)', complete: true },
+            { label: 'Observation Day 3  - Move #2 focus, 2 Love Notes', complete: true },
             { label: 'In Person Check Ins 1–2 complete', complete: true },
             { label: '21 total Love Notes delivered across the team', complete: true },
           ],
@@ -365,10 +364,10 @@ export default function WegoDashboard() {
           number: 2,
           status: 'current',
           deliverables: [
-            { label: 'Move #2 implementation tracking — collaborative support structures', complete: false },
+            { label: 'Move #2 implementation tracking  - collaborative support structures', complete: false },
             { label: 'In Person Check Ins 3–5 (Mar, Apr, May)', complete: false },
             { label: 'Mid-year leadership check-in', complete: false },
-            { label: 'Full Hub library access — all courses unlocked', complete: false },
+            { label: 'Full Hub library access  - all courses unlocked', complete: false },
             { label: 'Year 2 planning conversation with Juan + Megan', complete: false },
           ],
         },
@@ -385,9 +384,9 @@ export default function WegoDashboard() {
       ],
     },
 
-    // SECTION 5 — Sessions + Leadership Meetings
+    // SECTION 5  - Sessions + Leadership Meetings
     sessions: {
-      // 6 milestones — clean timeline with key moments
+      // 6 milestones  - clean timeline with key moments
       milestones: [
         { date: 'Oct 2025', label: 'Partnership Launched', status: 'complete' },
         { date: 'Nov 2025', label: 'Obs Day 1', status: 'complete' },
@@ -399,7 +398,7 @@ export default function WegoDashboard() {
       completed: [
         {
           type: 'Observation',
-          label: 'Observation Day 1 — 8 classrooms, 8 Love Notes',
+          label: 'Observation Day 1  - 8 classrooms, 8 Love Notes',
           date: 'November 12, 2025',
           badge: 'Complete',
           note: 'See Observations section for full details',
@@ -412,7 +411,7 @@ export default function WegoDashboard() {
         },
         {
           type: 'Observation',
-          label: 'Observation Day 2 — 11 classrooms, 11 Love Notes (all 19 paras observed)',
+          label: 'Observation Day 2  - 11 classrooms, 11 Love Notes (all 19 paras observed)',
           date: 'December 3, 2025',
           badge: 'Complete',
           note: 'See Observations section for full details',
@@ -425,7 +424,7 @@ export default function WegoDashboard() {
         },
         {
           type: 'Observation',
-          label: 'Observation Day 3 — Move #2 focus',
+          label: 'Observation Day 3  - Move #2 focus',
           date: 'February 25, 2026',
           badge: 'Complete',
           note: 'See Observations section for full details',
@@ -460,19 +459,19 @@ export default function WegoDashboard() {
       ],
       leadershipMeetings: [
         {
-          label: 'Partnership Kickoff — Contract 1 (Juan Suarez)',
+          label: 'Partnership Kickoff  - Contract 1 (Juan Suarez)',
           date: 'September 2025',
           status: 'Complete',
         },
         {
-          label: 'Expanded Partnership — Contract 2 (Megan Payleitner)',
+          label: 'Expanded Partnership  - Contract 2 (Megan Payleitner)',
           date: 'December 2025',
           status: 'Complete',
         },
       ],
     },
 
-    // SECTION 6 — Progress Snapshot (CONDITIONAL)
+    // SECTION 6  - Progress Snapshot (CONDITIONAL)
     progress: {
       show: true,
       implementationRate: 89,
@@ -483,14 +482,14 @@ export default function WegoDashboard() {
       coursesCompleted: 26,
     },
 
-    // SECTION 7 — Team Pulse (CONDITIONAL)
-    // HIDDEN — no survey data collected yet
+    // SECTION 7  - Team Pulse (CONDITIONAL)
+    // HIDDEN  - no survey data collected yet
     teamPulse: {
       show: false,
       surveys: [],
     },
 
-    // SECTION 8 — What We're Learning (CONDITIONAL)
+    // SECTION 8  - What We're Learning (CONDITIONAL)
     learning: {
       show: true,
       moves: [
@@ -498,7 +497,7 @@ export default function WegoDashboard() {
           moveNumber: 1,
           moveName: 'Calm Classroom Presence',
           implementationRate: 84,
-          note: '84% of paras observed applying Move #1 strategies — calm redirection, proximity, and student-centered language across all three observation days.',
+          note: '84% of paras observed applying Move #1 strategies  - calm redirection, proximity, and student-centered language across all three observation days.',
         },
         {
           moveNumber: 2,
@@ -509,12 +508,12 @@ export default function WegoDashboard() {
       ],
     },
 
-    // SECTION 9 — Staff Champions (CONDITIONAL)
+    // SECTION 9  - Staff Champions (CONDITIONAL)
     champions: {
       show: true,
-      highFiveInstructions: 'Recognize your most engaged paras in one click — sends a personal email directly from your inbox.',
+      highFiveInstructions: 'Recognize your most engaged paras in one click  - sends a personal email directly from your inbox.',
       staff: [
-        { name: 'C. Treu', note: '27 engaged Hub days — most active para in the district', email: 'ctreu@d94.org' },
+        { name: 'C. Treu', note: '27 engaged Hub days  - most active para in the district', email: 'ctreu@d94.org' },
         { name: 'R. Talbot', note: '14 engaged Hub days', email: 'rtalbot@d94.org' },
         { name: 'C. Castellanos', note: '10 engaged Hub days', email: 'ccastellanos@d94.org' },
         { name: 'I. Spear', note: '9 engaged Hub days', email: 'ispear@d94.org' },
@@ -522,7 +521,7 @@ export default function WegoDashboard() {
       ],
     },
 
-    // SECTION 10 — What's Resonating (CONDITIONAL)
+    // SECTION 10  - What's Resonating (CONDITIONAL)
     resonating: {
       show: true,
       hubLink: 'https://teachersdeserveit.com/hub',
@@ -536,8 +535,8 @@ export default function WegoDashboard() {
       totalCoursesStarted: 26,
     },
 
-    // SECTION 11 — Your Team's Top Ask (CONDITIONAL)
-    // HIDDEN — no survey data collected yet
+    // SECTION 11  - Your Team's Top Ask (CONDITIONAL)
+    // HIDDEN  - no survey data collected yet
     topAsk: {
       show: false,
       topBarrier: null,
@@ -604,7 +603,7 @@ export default function WegoDashboard() {
       <section className="relative text-white py-6 px-4 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-[#1e2749] via-[#1e2749] to-[#38618C]" />
 
-        <div className="relative max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="relative max-w-4xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold">WEGO High School<br />District 94</h1>
             <p className="text-white/80 text-sm">West Chicago, Illinois | Partner Dashboard</p>
@@ -621,7 +620,7 @@ export default function WegoDashboard() {
 
       {/* Tab Navigation */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-5xl mx-auto px-4 py-3">
+        <div className="max-w-4xl mx-auto px-4 py-3">
           <div className="flex justify-center gap-2 flex-wrap">
             {[
               { id: 'overview', label: 'Overview', icon: Eye },
@@ -654,11 +653,11 @@ export default function WegoDashboard() {
       </div>
 
       {/* Tab Content */}
-      <div className="max-w-5xl mx-auto px-4 py-6">
+      <div className="max-w-4xl mx-auto px-4 py-6">
 
         {/* ==================== OVERVIEW TAB ==================== */}
         {activeTab === 'overview' && (
-          <div className="space-y-8 pb-8">
+          <div className="space-y-4 pb-16">
 
             {/* ─── ZONE 1: PARTNERSHIP SNAPSHOT ─── */}
             <div className="space-y-4">
@@ -846,7 +845,7 @@ export default function WegoDashboard() {
               <div className="bg-[#E8F5F5] rounded-2xl p-1 border border-[#1A6B6B]/15">
                 <div className="px-5 pt-5 pb-3">
                   <h3 className="text-base font-bold text-[#1B2A4A]">Your Investment, By The Numbers</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">What this partnership delivers — in impact and value</p>
+                  <p className="text-xs text-gray-500 mt-0.5">What this partnership delivers  - in impact and value</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-[#1A6B6B]/10 rounded-xl overflow-hidden">
                   {[
@@ -951,9 +950,9 @@ export default function WegoDashboard() {
 
         {/* ==================== OUR PARTNERSHIP TAB ==================== */}
         {activeTab === 'ourPartnership' && (
-          <div className="space-y-6 pb-12">
+          <div className="space-y-4 pb-16">
 
-            {/* SECTION 1 — PARTNERSHIP GOAL */}
+            {/* SECTION 1  - PARTNERSHIP GOAL */}
             <div className="bg-white rounded-xl border border-gray-200 p-8 text-center shadow-sm">
               <div className="inline-flex items-center gap-2 bg-teal-50 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full mb-4">
                 <Target className="w-3.5 h-3.5" />
@@ -965,7 +964,7 @@ export default function WegoDashboard() {
               <p className="text-sm text-gray-500 italic">{partnershipData.goal.theme}</p>
             </div>
 
-            {/* SECTION 2 — CLASSROOM OBSERVATIONS */}
+            {/* SECTION 2  - CLASSROOM OBSERVATIONS */}
             <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
               <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -981,7 +980,7 @@ export default function WegoDashboard() {
               </div>
             </div>
 
-            {/* SECTION 3 — SCHOOL SNAPSHOT */}
+            {/* SECTION 3  - SCHOOL SNAPSHOT */}
             {partnershipData.snapshot.show && (
               <CollapsibleSection
                 title="School Snapshot"
@@ -1000,7 +999,7 @@ export default function WegoDashboard() {
               </CollapsibleSection>
             )}
 
-            {/* SECTION 4 — PARTNERSHIP JOURNEY */}
+            {/* SECTION 4  - PARTNERSHIP JOURNEY */}
             <CollapsibleSection
               title="Your Partnership Journey"
               icon={<Map className="w-4 h-4 text-yellow-600" />}
@@ -1061,7 +1060,7 @@ export default function WegoDashboard() {
               </div>
             </CollapsibleSection>
 
-            {/* SECTION 5 — SESSIONS + LEADERSHIP MEETINGS */}
+            {/* SECTION 5  - SESSIONS + LEADERSHIP MEETINGS */}
             <CollapsibleSection
               title="Sessions + Leadership Meetings"
               icon={<Calendar className="w-4 h-4 text-teal-600" />}
@@ -1167,7 +1166,7 @@ export default function WegoDashboard() {
               )}
             </CollapsibleSection>
 
-            {/* SECTION 6 — PROGRESS SNAPSHOT */}
+            {/* SECTION 6  - PROGRESS SNAPSHOT */}
             {partnershipData.progress.show && (
               <CollapsibleSection
                 title="Progress Snapshot"
@@ -1183,7 +1182,7 @@ export default function WegoDashboard() {
                   </div>
                   <div className="bg-teal-50 rounded-lg p-4 border border-teal-100">
                     <p className="text-3xl font-bold text-teal-700">{partnershipData.progress.hubAccess.percent}%</p>
-                    <p className="text-sm text-gray-700 mt-1">Hub engagement — {partnershipData.progress.hubAccess.active}/{partnershipData.progress.hubAccess.total} paras active</p>
+                    <p className="text-sm text-gray-700 mt-1">Hub engagement  - {partnershipData.progress.hubAccess.active}/{partnershipData.progress.hubAccess.total} paras active</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3">
@@ -1203,7 +1202,7 @@ export default function WegoDashboard() {
               </CollapsibleSection>
             )}
 
-            {/* SECTION 7 — TEAM PULSE — HIDDEN for WEGO */}
+            {/* SECTION 7  - TEAM PULSE  - HIDDEN for WEGO */}
             {partnershipData.teamPulse.show && partnershipData.teamPulse.surveys.length > 0 && (
               <CollapsibleSection
                 title="Team Pulse"
@@ -1215,7 +1214,7 @@ export default function WegoDashboard() {
               </CollapsibleSection>
             )}
 
-            {/* SECTION 8 — WHAT WE'RE LEARNING */}
+            {/* SECTION 8  - WHAT WE'RE LEARNING */}
             {partnershipData.learning.show && (
               <CollapsibleSection
                 title="What We're Learning"
@@ -1249,7 +1248,7 @@ export default function WegoDashboard() {
               </CollapsibleSection>
             )}
 
-            {/* SECTION 9 — STAFF CHAMPIONS */}
+            {/* SECTION 9  - STAFF CHAMPIONS */}
             {partnershipData.champions.show && partnershipData.champions.staff.length > 0 && (
               <CollapsibleSection
                 title="Staff Champions"
@@ -1266,7 +1265,7 @@ export default function WegoDashboard() {
                         <p className="text-xs text-gray-500">{s.note}</p>
                       </div>
                       <a
-                        href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(s.email)}&su=${encodeURIComponent('A High Five From Your Admin!')}&body=${encodeURIComponent(`Hi ${s.name.split(' ')[0]},\n\nI just wanted to take a moment to recognize your dedication and the work you're putting in. TDI shared that you've been one of our most engaged learners — and it shows.\n\nKeep it up. Your students are lucky to have you.\n\nWith appreciation,`)}`}
+                        href={`https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(s.email)}&su=${encodeURIComponent('A High Five From Your Admin!')}&body=${encodeURIComponent(`Hi ${s.name.split(' ')[0]},\n\nI just wanted to take a moment to recognize your dedication and the work you're putting in. TDI shared that you've been one of our most engaged learners  - and it shows.\n\nKeep it up. Your students are lucky to have you.\n\nWith appreciation,`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="flex items-center gap-1.5 bg-yellow-400 hover:bg-yellow-500 text-yellow-900 text-xs font-semibold px-3 py-1.5 rounded-full transition-colors"
@@ -1279,7 +1278,7 @@ export default function WegoDashboard() {
               </CollapsibleSection>
             )}
 
-            {/* SECTION 10 — WHAT'S RESONATING */}
+            {/* SECTION 10  - WHAT'S RESONATING */}
             {partnershipData.resonating.show && (
               <CollapsibleSection
                 title="What's Resonating"
@@ -1304,7 +1303,7 @@ export default function WegoDashboard() {
               </CollapsibleSection>
             )}
 
-            {/* SECTION 11 — TOP ASK — HIDDEN for WEGO */}
+            {/* SECTION 11  - TOP ASK  - HIDDEN for WEGO */}
             {partnershipData.topAsk.show && (
               <CollapsibleSection
                 title="Your Team's Top Ask"
@@ -1321,14 +1320,14 @@ export default function WegoDashboard() {
 
         {/* BLUEPRINT TAB */}
         {activeTab === 'blueprint' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <HowWePartnerTabs />
           </div>
         )}
 
         {/* 2026-27 TAB */}
         {activeTab === 'next-year' && (
-          <div className="space-y-8">
+          <div className="space-y-4">
             {/* Hero Statement */}
             <div className="text-center mb-6">
               <span className="inline-block bg-[#35A7FF]/10 text-[#35A7FF] text-xs font-medium px-3 py-1 rounded-full mb-3">
@@ -1885,7 +1884,7 @@ export default function WegoDashboard() {
 
         {/* TEAM TAB */}
         {activeTab === 'team' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div className="text-center">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your TDI Team</h2>
               <p className="text-gray-600">Your dedicated partner for this journey</p>
@@ -2026,7 +2025,7 @@ export default function WegoDashboard() {
 
         {/* BILLING TAB */}
         {activeTab === 'billing' && (
-          <div className="space-y-6">
+          <div className="space-y-4">
 
             {/* Section 1: Thank You Banner */}
             <div className="bg-[#1e2749] rounded-xl p-4">
@@ -2204,7 +2203,7 @@ export default function WegoDashboard() {
 
       {/* Compact Footer */}
       <footer className="bg-[#1e2749] text-white py-6 px-4">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
+        <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
           <div>
             <div className="font-bold">Teachers Deserve It</div>
             <p className="text-white/60 text-sm">Partner Dashboard for West Chicago D94</p>
