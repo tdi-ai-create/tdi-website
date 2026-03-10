@@ -276,19 +276,46 @@ export default function WegoDashboard() {
         date: 'November 12, 2025',
         classroomsVisited: 8,
         loveNotesDelivered: 8,
-        aiSummary: 'Across 8 West Chicago classrooms, paras showed strong student rapport and calm presence during challenging moments  - the kind of relationship-first instincts that are hard to teach and easy to build on. One standout: a para in the Step Center used multi-modal communication tools entirely on her own initiative, demonstrating the kind of intentional, student-centered practice that defines high-impact support.',
+        aiSummary: 'TDI visited 8 classrooms during Observation & Support Day 1. The focus was establishing baseline - understanding how WEGO paras show up in their daily work. What stood out immediately: strong student relationships across the board, PAs actively circulating rather than remaining stationary, and quiet respectful redirects that kept instruction flowing. One classroom stood out - Lizz Nieto and her teacher\'s co-teaching partnership, including use of sign language and AR tools, showed what deep teacher-PA collaboration looks like in practice. Love Notes were sent to every observed PA within 24 hours.',
         details: {
-          narrative: 'TDI visited 8 classrooms on November 12. The observation focus was para-student interaction quality, positioning and proximity, and initial strategy awareness. What we found: a team with real relational instincts and strong potential for growth with targeted coaching.',
+          narrative: 'TDI visited 8 classrooms during Observation & Support Day 1. The focus was establishing baseline - understanding how WEGO paras show up in their daily work. What stood out immediately: strong student relationships across the board, PAs actively circulating rather than remaining stationary, and quiet respectful redirects that kept instruction flowing. One classroom stood out - Lizz Nieto and her teacher\'s co-teaching partnership, including use of sign language and AR tools, showed what deep teacher-PA collaboration looks like in practice. Love Notes were sent to every observed PA within 24 hours.',
           quotes: [
-            'She positioned herself at eye level with Jayden during the reading activity  - that small shift made him visibly more engaged.',
+            'I didn\'t realize how much I was already doing until someone wrote it down and handed it to me.',
+            'This is the first time in 12 years anyone has watched me work and told me I was doing it right.',
+            'The Love Note is on my fridge. My kids read it every morning.',
+            'She positioned herself at eye level with Jayden during the reading activity - that small shift made him visibly more engaged.',
             'You have a natural gift for creating connection. Keep using that superpower.',
           ],
           resources: [
-            'Hub resource referenced: The Sentence Starter Guide  - Confident Communication Made Easy',
-            'Hub course referenced: Building Relationships with Reluctant Students',
+            'Building Strong Teacher-Para Partnerships',
+            'Calm Classrooms, Not Chaos',
+            'The Proximity Principle',
+            'Communication That Clicks',
           ],
-          nextFocus: 'Observation Day 2 expanded to 11 classrooms with focus on scaffolding, wait time, and communication with lead teachers.',
+          nextFocus: 'Observation & Support Day 2 will focus on collaborative support structures - how paras coordinate with teachers before, during, and after class.',
         },
+        coachingThemes: [
+          {
+            color: 'bg-orange-400',
+            title: 'Recognition matters',
+            description: 'Multiple paras shared this was the first time their work had been formally acknowledged. Love Notes are being saved, shared with families, and displayed.',
+          },
+          {
+            color: 'bg-teal-400',
+            title: 'Confidence is growing',
+            description: 'Paras reported feeling more confident speaking up in team meetings and suggesting strategies after seeing their approaches validated in writing.',
+          },
+          {
+            color: 'bg-purple-400',
+            title: 'Hub content is sticking',
+            description: 'Several paras referenced specific courses by name during informal conversations. "Calm Classrooms" and "The Proximity Principle" were mentioned most often.',
+          },
+          {
+            color: 'bg-amber-400',
+            title: 'Shift to educator mindset',
+            description: 'One para shared: "I always knew I was helping, but now I feel like I\'m actually teaching." The shift from "helper" to "educator" identity is emerging.',
+          },
+        ],
       },
       {
         id: 'obs-2',
@@ -296,37 +323,84 @@ export default function WegoDashboard() {
         date: 'December 3, 2025',
         classroomsVisited: 11,
         loveNotesDelivered: 11,
-        aiSummary: 'All 19 WEGO paras have now been observed and received personalized Love Notes. Observation Day 2 expanded coverage to 11 classrooms and revealed a team increasingly confident in their classroom presence. Paras with high Hub engagement showed the strongest instructional moves  - a direct connection between learning and doing that validates the Hub-first approach.',
+        aiSummary: 'TDI returned for Observation & Support Day 2, visiting 11 classrooms and completing observations of all 19 WEGO paras. The focus shifted to collaborative support structures - watching how paras and teachers coordinate in real time. All 19 paras observed across Days 1 and 2. 21 Love Notes delivered across the full team.',
         details: {
-          narrative: 'TDI returned on December 3 to complete full-team observation coverage. The focus shifted to scaffolding techniques, intentional wait time, and teacher-para communication patterns. The growth from Day 1 was visible  - paras who had logged into the Hub between visits showed more deliberate, strategy-driven moves.',
+          narrative: 'TDI returned for Observation & Support Day 2, visiting 11 classrooms and completing observations of all 19 WEGO paras. The focus shifted to collaborative support structures - watching how paras and teachers coordinate in real time. All 19 paras observed across Days 1 and 2. 21 Love Notes delivered across the full team.',
           quotes: [
             'I had no idea how much my positioning in the room was affecting the students.',
             'Getting a Love Note was the first time in my career someone came to watch me work and left saying something kind.',
           ],
           resources: [
-            'Hub course referenced: The Proximity Principle',
-            'Hub course referenced: Building Strong Teacher-Para Partnerships',
+            'Co-Teaching Playbook',
+            'Communication That Clicks',
+            'Small Group Magic',
           ],
-          nextFocus: 'Observation Day 3 focuses on collaborative support structures and co-teaching alignment between paras and lead teachers.',
+          nextFocus: 'Observation & Support Day 3 will track Collaborative Support Structures implementation - measuring how strategies from Days 1 and 2 are taking hold.',
         },
+        coachingThemes: [
+          {
+            color: 'bg-orange-400',
+            title: 'Teacher-PA coordination strengthening',
+            description: 'Paras are increasingly communicating with lead teachers before and during class, asking clarifying questions and offering suggestions.',
+          },
+          {
+            color: 'bg-teal-400',
+            title: 'Small group confidence building',
+            description: 'Multiple paras demonstrated comfort leading small group instruction independently, with clear purpose and appropriate pacing.',
+          },
+          {
+            color: 'bg-purple-400',
+            title: 'Proactive anticipation of student needs',
+            description: 'Paras are reading the room and moving to support students before being directed - a sign of growing instructional awareness.',
+          },
+          {
+            color: 'bg-amber-400',
+            title: 'Love Notes driving reflection',
+            description: 'Paras reported re-reading their Love Notes and thinking about the specific strategies that were highlighted.',
+          },
+        ],
       },
       {
         id: 'obs-3',
         dayNumber: 3,
         date: 'February 25, 2026',
-        classroomsVisited: 2,
+        classroomsVisited: 7,
         loveNotesDelivered: 2,
-        aiSummary: 'Observation Day 3 completed. Focus was on collaborative support and co-teaching alignment. Early data shows paras are taking more ownership of instructional decisions alongside their lead teachers.',
+        aiSummary: 'TDI\'s third and final observation day at WEGO focused on Collaborative Support Structures - watching whether the strategies from Love Notes and coaching sessions were showing up in classrooms. The answer: yes. Paras who had engaged with Hub content were noticeably more confident and intentional in their practice, actively partnering with teachers, anticipating transitions, and supporting small groups with purpose.',
         details: {
-          narrative: 'TDI completed the third and final observation day of the IGNITE phase. This visit focused specifically on how paras are integrating collaborative strategies  - collaborative positioning, shared instructional moments, and proactive communication with lead teachers.',
+          narrative: 'TDI\'s third and final observation day at WEGO focused on Collaborative Support Structures - watching whether the strategies from Love Notes and coaching sessions were showing up in classrooms. The answer: yes. Paras who had engaged with Hub content were noticeably more confident and intentional in their practice, actively partnering with teachers, anticipating transitions, and supporting small groups with purpose. Claudia Castellanos demonstrated advanced questioning techniques mid-lesson, entirely unprompted. Curt Treu\'s quiet, calm presence during a complex co-teaching moment showed what a skilled PA looks like when operating at full strength.',
           quotes: [
             'She didn\'t wait to be told what to do. She saw the gap and filled it.',
           ],
           resources: [
-            'Hub course referenced: Co-Teaching That Actually Works',
+            'Effective Small-Group & One-on-One Instruction',
+            'Supporting Students Through Their Daily Schedule',
+            'Paraprofessional Foundations',
           ],
-          nextFocus: 'Partnership moves into ACCELERATE phase  - deeper coaching cycles, full Hub library access, and building toward Year 2.',
+          nextFocus: 'All 3 contracted observation days are complete. Year 2 planning will determine whether additional observation support is included.',
         },
+        coachingThemes: [
+          {
+            color: 'bg-teal-400',
+            title: 'Implementation is visible',
+            description: 'Paras with higher Hub engagement consistently showed stronger instructional moves. The connection between learning and classroom practice is closing.',
+          },
+          {
+            color: 'bg-orange-400',
+            title: 'Advanced questioning emerging',
+            description: 'Claudia asked "why" and "where did you get that?" mid-lesson - evidence of deep comprehension support, not just task management.',
+          },
+          {
+            color: 'bg-purple-400',
+            title: 'Confidence at year\'s end',
+            description: 'Paras are taking ownership of instructional moments - leading slides, co-teaching, supporting small groups with intention rather than just presence.',
+          },
+          {
+            color: 'bg-amber-400',
+            title: 'Content gaps identified',
+            description: 'SLIFE/literacy support and inclusive life skills strategies are the two biggest gaps in existing PA resources. Both have been flagged for Hub development.',
+          },
+        ],
       },
     ],
 
@@ -563,15 +637,69 @@ export default function WegoDashboard() {
         </div>
         <p className="text-sm text-gray-700 leading-relaxed mb-3">{obs.aiSummary}</p>
         <button onClick={() => setDetailsOpen(!detailsOpen)} className="text-xs text-teal-600 hover:text-teal-800 font-medium flex items-center gap-1 transition-colors">
-          {detailsOpen ? 'Hide details' : 'View details'}
+          {detailsOpen ? 'Hide classroom details' : 'View classroom details'}
           <ChevronDown className={`w-3.5 h-3.5 transition-transform ${detailsOpen ? 'rotate-180' : ''}`} />
         </button>
         {detailsOpen && (
-          <div className="mt-4 space-y-4 border-t border-gray-100 pt-4">
-            <div><p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Observation Narrative</p><p className="text-sm text-gray-700 leading-relaxed">{obs.details.narrative}</p></div>
-            {obs.details.quotes.length > 0 && (<div><p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">What We Heard</p>{obs.details.quotes.map((q, i) => (<blockquote key={i} className="border-l-2 border-teal-300 pl-3 text-sm text-gray-600 italic mb-2">&quot;{q}&quot;</blockquote>))}</div>)}
-            {obs.details.resources.length > 0 && (<div><p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Hub Resources Referenced</p>{obs.details.resources.map((r, i) => (<p key={i} className="text-xs text-gray-600 flex items-center gap-1.5 mb-1"><BookOpen className="w-3 h-3 text-teal-500" /> {r}</p>))}</div>)}
-            <div><p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Next Observation Focus</p><p className="text-sm text-gray-600">{obs.details.nextFocus}</p></div>
+          <div className="mt-4 space-y-5 border-t border-gray-100 pt-4">
+            {/* Summary / Narrative */}
+            <p className="text-sm text-gray-700 leading-relaxed">{obs.details.narrative}</p>
+
+            {/* Voices from the Field */}
+            {obs.details.quotes.length > 0 && (
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Voices from the Field</p>
+                <div className="space-y-2">
+                  {obs.details.quotes.map((q, i) => (
+                    <div key={i} className="bg-teal-50 border-l-4 border-teal-400 rounded-r-xl px-4 py-3">
+                      <p className="text-sm text-gray-700 italic">&ldquo;{q}&rdquo;</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Hub Resources Referenced */}
+            {obs.details.resources.length > 0 && (
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Hub Resources Referenced</p>
+                <div className="flex flex-wrap gap-2">
+                  {obs.details.resources.map((r, i) => (
+                    <span key={i} className="flex items-center gap-1.5 text-xs bg-gray-100 text-gray-600 font-medium px-3 py-1.5 rounded-full border border-gray-200">
+                      <BookOpen className="w-3 h-3" />
+                      {r}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Coaching Themes */}
+            {obs.coachingThemes && obs.coachingThemes.length > 0 && (
+              <div>
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-3">Coaching Themes from Para Replies</p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {obs.coachingThemes.map((t, i) => (
+                    <div key={i} className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                      <div className="flex items-center gap-2 mb-1">
+                        <div className={`w-2 h-2 rounded-full ${t.color}`} />
+                        <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Theme {i + 1}</p>
+                      </div>
+                      <p className="text-sm font-bold text-gray-900 mb-1">{t.title}</p>
+                      <p className="text-xs text-gray-500 leading-relaxed">{t.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Next Observation Focus */}
+            {obs.details.nextFocus && (
+              <div className="bg-blue-50 rounded-xl px-4 py-3 border border-blue-100">
+                <p className="text-xs font-bold text-blue-700 uppercase tracking-wide mb-1">Next Observation Focus</p>
+                <p className="text-sm text-blue-800">{obs.details.nextFocus}</p>
+              </div>
+            )}
           </div>
         )}
       </div>
