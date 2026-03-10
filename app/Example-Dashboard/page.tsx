@@ -3025,28 +3025,116 @@ export default function ExampleDashboard() {
                 </div>
               </div>
 
-              {/* Also Included */}
-              <div className="mt-6 pt-6 border-t border-gray-100">
-                <p className="text-sm font-medium text-gray-500 mb-3">Also Included:</p>
-                <div className="flex flex-wrap gap-3">
-                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                    <Video className="w-3.5 h-3.5" /> 4 Virtual Strategy Sessions
-                  </span>
-                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                    <Heart className="w-3.5 h-3.5" /> Weekly Love Notes
-                  </span>
-                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                    <Monitor className="w-3.5 h-3.5" /> Leadership Dashboard
-                  </span>
-                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                    <Megaphone className="w-3.5 h-3.5" /> Direct Line to Rae
-                  </span>
-                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                    <BookOpen className="w-3.5 h-3.5" /> Full Resource Library
-                  </span>
-                  <span className="text-xs bg-gray-100 text-gray-600 px-3 py-1.5 rounded-full flex items-center gap-1.5">
-                    <Award className="w-3.5 h-3.5" /> Year-End Celebration
-                  </span>
+            </div>
+
+            {/* SECTION: Included With Every Service (Standard Table) */}
+            <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
+              <h3 className="font-bold text-[#1e2749] mb-4">Included With Every Service</h3>
+              <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200 bg-gray-50">
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">SERVICE</th>
+                      <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">INCLUDED</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 font-medium text-[#1e2749]">Learning Hub Membership</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">255 STAFF</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 font-medium text-[#1e2749]">In-Person Observation Days</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">2 DAYS</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 font-medium text-[#1e2749]">Virtual Strategy Sessions</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">4 SESSIONS</td>
+                    </tr>
+                    <tr className="border-b border-gray-200">
+                      <td className="py-3 px-4 font-medium text-[#1e2749]">Executive Impact Sessions</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">4 SESSIONS</td>
+                    </tr>
+                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Implementation & Compliance Analytics</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Access to On-Demand Request Pipeline</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                    </tr>
+                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Access to Global Solution Tools</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Network News & Updates</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                    </tr>
+                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Funding Pipeline</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Expert Research & Professional Network</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Certified Strategic Trainer</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* SECTION: TDI Does the Work (Two-Column) */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h3 className="font-bold text-[#1e2749] mb-4 flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-[#4ecdc4]" />
+                TDI Does the Work
+              </h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* TDI Handles */}
+                <div className="bg-teal-50 rounded-lg p-5 border border-teal-200">
+                  <h4 className="font-semibold text-[#1e2749] mb-3">TDI Handles Everything:</h4>
+                  <ul className="space-y-2 text-sm text-gray-700">
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-teal-600" />Research every funding source</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-teal-600" />Write all budget narratives</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-teal-600" />Write all grant applications</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-teal-600" />Prepare vendor compliance docs</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-teal-600" />Draft all scopes of work</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-teal-600" />Draft reference letters</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-teal-600" />Handle all follow-up</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-teal-600" />Manage invoicing across sources</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-teal-600" />Track every deadline</li>
+                    <li className="flex items-center gap-2"><Check className="w-4 h-4 text-teal-600" />Build board-ready presentations with your actual impact data</li>
+                  </ul>
+                </div>
+                {/* Dr. Ford Does This */}
+                <div className="bg-amber-50 rounded-lg p-5 border border-amber-200">
+                  <h4 className="font-semibold text-[#1e2749] mb-3">Dr. Ford Does This:</h4>
+                  <ul className="space-y-3 text-sm text-gray-700">
+                    <li className="flex items-start gap-2">
+                      <div className="w-6 h-6 bg-amber-200 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-amber-700 font-bold text-xs">1</span>
+                      </div>
+                      <span>Pick a path</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-6 h-6 bg-amber-200 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-amber-700 font-bold text-xs">2</span>
+                      </div>
+                      <span>Route pre-written requests</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <div className="w-6 h-6 bg-amber-200 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <span className="text-amber-700 font-bold text-xs">3</span>
+                      </div>
+                      <span>Sign the partnership agreement</span>
+                    </li>
+                  </ul>
+                  <p className="text-sm text-amber-700 font-medium mt-4">That&apos;s it. We&apos;ve prepared everything else.</p>
                 </div>
               </div>
             </div>
@@ -3135,57 +3223,59 @@ export default function ExampleDashboard() {
 
             </div>
 
-            {/* SECTION F: Mid-Page CTA */}
-            <div className="bg-white rounded-2xl p-6 shadow-sm border border-[#4ecdc4]/30">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-[#4ecdc4]/10 rounded-full flex items-center justify-center">
-                    <Users className="w-6 h-6 text-[#4ecdc4]" />
-                  </div>
-                  <div>
-                    <p className="text-lg font-bold text-[#1e2749]">Questions about Year 3?</p>
-                    <p className="text-sm text-gray-600">Talk with your TDI partner to explore what SUSTAIN looks like for Motown.</p>
-                  </div>
+            {/* SECTION: Why Grants Exist for Districts Like Motown */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h3 className="font-bold text-[#1e2749] mb-4">Why Grants Exist for Districts Like Motown</h3>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <p className="text-sm text-gray-600 mb-4">Federal and state funding was built for exactly this moment.</p>
+                  <p className="text-sm text-gray-700 mb-4">
+                    Districts with multi-year PD partnerships, measurable retention data, and documented educator wellness outcomes are the strongest grant candidates in the state.
+                  </p>
+                  <p className="text-sm font-semibold text-[#1e2749]">Motown District 360 has all three.</p>
                 </div>
-                <div className="flex items-center gap-3">
-                  <span
-                    onClick={handleDisabledClick}
-                    title="This is an example dashboard"
-                    className="inline-flex items-center gap-2 bg-[#4ecdc4] text-[#1e2749] px-6 py-3 rounded-lg font-semibold opacity-60 cursor-not-allowed"
-                  >
-                    <Calendar className="w-5 h-5" />
-                    Schedule a Call
-                  </span>
-                  <a
-                    href="/calculator"
-                    className="inline-flex items-center gap-2 border border-[#4ecdc4] text-[#1e2749] px-4 py-3 rounded-lg font-medium hover:bg-[#4ecdc4]/10 transition-colors"
-                  >
-                    <Calculator className="w-4 h-4" />
-                    ROI Calculator
-                  </a>
+                <div className="bg-[#4ecdc4]/10 rounded-lg p-5 border border-[#4ecdc4]/30">
+                  <ul className="space-y-3 text-sm text-gray-700">
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-[#4ecdc4] mt-0.5 flex-shrink-0" />
+                      <span><strong>Title II-A</strong> supports sustained, structured professional development at scale.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-[#4ecdc4] mt-0.5 flex-shrink-0" />
+                      <span><strong>ESSA funding</strong> rewards districts investing in long-term educator capacity.</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-[#4ecdc4] mt-0.5 flex-shrink-0" />
+                      <span><strong>TDI pursues every available path</strong> - so Dr. Ford doesn&apos;t have to.</span>
+                    </li>
+                  </ul>
                 </div>
+              </div>
+              <div className="mt-6 p-4 bg-amber-50 rounded-lg border border-amber-200">
+                <p className="text-sm text-amber-800 font-medium">We Find the Funding. You Focus on Teaching.</p>
+                <a
+                  href="/funding"
+                  className="inline-flex items-center gap-1 text-sm text-amber-700 font-medium hover:underline mt-2"
+                >
+                  Explore Funding Options →
+                </a>
               </div>
             </div>
 
-            {/* SECTION G: Renewal CTA */}
+            {/* SECTION: Renewal CTA (Tightened Single-CTA) */}
             <div className="relative bg-gradient-to-br from-[#1e2749] via-[#38618C] to-[#4ecdc4] rounded-2xl p-8 text-white overflow-hidden">
               {/* Decorative */}
               <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
 
               <div className="relative z-10 text-center max-w-2xl mx-auto">
-                <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full mb-4">
-                  <Sparkles className="w-4 h-4" />
-                  <span className="text-sm font-medium">Ready for Year 3?</span>
-                </div>
-
-                <h3 className="text-2xl md:text-3xl font-bold mb-4">
-                  Let&apos;s Make These Gains Permanent
+                <h3 className="text-2xl md:text-3xl font-bold mb-3">
+                  Ready to Make These Gains Permanent?
                 </h3>
                 <p className="text-lg opacity-90 mb-6">
-                  Your district has built incredible momentum. Year 3 is where we lock it in - building the internal capacity to sustain this transformation for years to come.
+                  Year 3 is where everything TDI built with Motown becomes culture. Let&apos;s lock it in.
                 </p>
 
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+                <div className="flex flex-col items-center gap-3 mb-4">
                   <span
                     onClick={handleDisabledClick}
                     className="inline-flex items-center gap-2 bg-white text-[#1e2749] px-8 py-4 rounded-xl font-bold text-lg opacity-60 cursor-not-allowed"
@@ -3193,25 +3283,15 @@ export default function ExampleDashboard() {
                   >
                     <Calendar className="w-5 h-5" />
                     Schedule Renewal Conversation
+                    <ArrowRight className="w-5 h-5" />
                   </span>
                   <a
                     href="/calculator"
-                    className="inline-flex items-center gap-2 bg-transparent border-2 border-white/50 text-white px-6 py-3 rounded-xl font-medium hover:bg-white/10 transition-colors"
+                    className="text-sm text-white/80 hover:text-white hover:underline transition-colors"
                   >
-                    <Calculator className="w-5 h-5" />
-                    See ROI Calculator
-                  </a>
-                  <a
-                    href="/funding"
-                    className="text-xs px-6 py-2.5 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
-                  >
-                    Explore Funding Options →
+                    See ROI Calculator →
                   </a>
                 </div>
-
-                <p className="text-sm opacity-70 italic">
-                  Available in active partnerships - your TDI partner will reach out to schedule
-                </p>
               </div>
 
               {/* Trust Indicators */}
@@ -3227,27 +3307,6 @@ export default function ExampleDashboard() {
                 <div>
                   <p className="text-2xl font-bold">100%</p>
                   <p className="text-xs opacity-70">Satisfaction Score</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Board Presentation Offer */}
-            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-6">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <FileText className="w-6 h-6 text-amber-600" />
-                </div>
-                <div>
-                  <h4 className="font-bold text-amber-900 text-lg mb-1">Need Help Making the Case?</h4>
-                  <p className="text-amber-800 text-sm mb-3">
-                    We&apos;ll help you build a board presentation with your actual impact data, cost analysis, and recommended next steps. Your success is our pitch.
-                  </p>
-                  <a
-                    href="/calculator"
-                    className="inline-flex items-center gap-2 text-amber-700 font-semibold hover:underline text-sm"
-                  >
-                    Explore Our Impact Calculator →
-                  </a>
                 </div>
               </div>
             </div>
