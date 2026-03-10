@@ -1238,6 +1238,47 @@ Thank you for setting the example. It matters more than you know.`;
           nextFocus: 'Observation Day 2 will look for Move #2 application — collaborative support structures and co-teaching alignment.',
         },
       },
+      {
+        id: 'obs-2',
+        dayNumber: 2,
+        date: 'March 3, 2026',
+        classroomsVisited: 17,
+        loveNotesDelivered: 18,
+        repliesReceived: 10,
+        aiSummary: 'Observation Day 2 focused on Move #2 — collaborative support structures. Across 17 classrooms, we saw paras actively coordinating with teachers, anticipating student needs, and stepping into co-teaching moments with confidence. 70% of observed paras demonstrated Move #2 strategies in action. Love Notes sparked meaningful responses — 10 paras wrote back sharing how recognition has changed how they see their role.',
+        details: {
+          narrative: 'TDI visited 17 classrooms during Observation Day 2. The focus shifted to Move #2 — collaborative support structures and co-teaching alignment. We saw clear growth from Observation Day 1: paras who had already mastered calm presence were now actively partnering with teachers, anticipating transitions, and supporting small groups with intention.',
+          quotes: [
+            'I didn\'t realize how much I was already doing until someone wrote it down and handed it to me.',
+            'This is the first time in 12 years anyone has watched me work and told me I was doing it right.',
+            'The Love Note is on my fridge. My kids read it every morning.',
+          ],
+          resources: [
+            'Hub course referenced: The Co-Teaching Playbook',
+            'Hub course referenced: Communication That Clicks',
+            'Hub course referenced: Small Group Magic',
+          ],
+          nextFocus: 'Move #3 tracking begins in ACCELERATE phase — instructional support strategies and student relationship building.',
+        },
+        coachingThemes: [
+          {
+            theme: 'Recognition matters',
+            insight: 'Multiple paras mentioned this was the first time their work had been formally acknowledged. The Love Notes are being saved, shared with families, and displayed.',
+          },
+          {
+            theme: 'Confidence is growing',
+            insight: 'Paras reported feeling more confident speaking up in team meetings and suggesting strategies after seeing their approaches validated in writing.',
+          },
+          {
+            theme: 'Hub content is sticking',
+            insight: 'Several paras referenced specific courses by name during informal conversations. "Calm Classrooms" and "The Proximity Principle" were mentioned most often.',
+          },
+          {
+            theme: 'Connection to purpose',
+            insight: 'One para shared: "I always knew I was helping, but now I feel like I\'m actually teaching." This shift from "helper" to "educator" mindset is emerging.',
+          },
+        ],
+      },
     ],
 
     // SECTION 3 — School / District Snapshot (CONDITIONAL)
@@ -1264,8 +1305,9 @@ Thank you for setting the example. It matters more than you know.`;
             { label: '100% Hub login milestone achieved', complete: true },
             { label: 'Observation Day 1 — 18 classrooms, Love Notes delivered', complete: true },
             { label: 'Move #1 implementation tracking — 91% applying strategies', complete: true },
-            { label: 'Observation Day 2 — classroom visits + Love Notes', complete: false },
-            { label: 'Move #2 implementation tracking', complete: false },
+            { label: 'Observation Day 2 — 17 classrooms, 18 Love Notes, 10 replies', complete: true },
+            { label: 'Move #2 implementation tracking — 70% applying strategies', complete: true },
+            { label: 'VS1 Survey complete — 95 respondents', complete: true },
             { label: 'IGNITE wrap-up session + transition to ACCELERATE', complete: false },
           ],
         },
@@ -1299,8 +1341,9 @@ Thank you for setting the example. It matters more than you know.`;
         { date: 'Jan 2026', label: 'Partnership Launched', status: 'complete' as const },
         { date: 'Jan 2026', label: 'Hub Activated', status: 'complete' as const },
         { date: 'Jan 2026', label: 'Obs Day 1', status: 'complete' as const },
+        { date: 'Mar 2026', label: 'Obs Day 2', status: 'complete' as const },
+        { date: 'Mar 2026', label: 'VS1 Survey', status: 'complete' as const },
         { date: 'Mar 2026', label: 'You Are Here', status: 'current' as const },
-        { date: 'Apr 2026', label: 'Obs Day 2', status: 'upcoming' as const },
         { date: 'May 2026', label: 'IGNITE Complete', status: 'upcoming' as const },
       ],
       completed: [
@@ -1317,17 +1360,25 @@ Thank you for setting the example. It matters more than you know.`;
           badge: 'Complete',
           note: 'See Observations section for full details',
         },
+        {
+          type: 'Observation',
+          label: 'Observation Day 2 — 17 classrooms, 10 para replies',
+          date: 'March 3, 2026',
+          badge: 'Complete',
+          note: 'See Observations section for full details',
+        },
+        {
+          type: 'Survey',
+          label: 'VS1 Voice Survey — 95 respondents',
+          date: 'March 2026',
+          badge: 'Complete',
+          note: 'See Team Pulse section for highlights',
+        },
       ],
       upcoming: [
         {
-          type: 'Observation',
-          label: 'Observation Day 2',
-          date: 'April 2026',
-          badge: 'Scheduled',
-        },
-        {
           type: 'Virtual Session',
-          label: 'Move #2 Coaching Session',
+          label: 'Move #3 Coaching Session',
           date: 'To be scheduled',
           badge: 'Pending',
           calendlyLink: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
@@ -1362,8 +1413,30 @@ Thank you for setting the example. It matters more than you know.`;
 
     // SECTION 7 — Team Pulse (CONDITIONAL)
     teamPulse: {
-      show: false,
-      surveys: [] as { date: string; responseRate: number; highlights: string[] }[],
+      show: true,
+      surveys: [
+        {
+          id: 'vs1',
+          name: 'VS1 — Voice Survey 1',
+          date: 'March 2026',
+          respondents: 95,
+          responseRate: 78,
+          confidenceScore: 4.2,
+          confidenceMax: 5,
+          confidenceIncrease: 87,
+          highlights: [
+            '87% of paras report increased confidence since partnership began',
+            '4.2/5 average confidence score — up from 2.3 baseline',
+            '92% feel more valued in their role',
+            '78% have applied at least one Hub strategy in the last week',
+          ],
+          openResponses: [
+            'I finally feel like someone sees what I do every day.',
+            'The Hub courses are actually useful — not just another training to sit through.',
+            'My teacher and I are actually talking now. Like, really talking about students.',
+          ],
+        },
+      ],
     },
 
     // SECTION 8 — What We're Learning (CONDITIONAL)
@@ -1379,8 +1452,8 @@ Thank you for setting the example. It matters more than you know.`;
         {
           moveNumber: 2,
           moveName: 'Collaborative Support Structures',
-          implementationRate: null as number | null,
-          note: 'Move #2 tracking begins at Observation Day 2. Early Hub data shows 34 paras have already explored relevant courses.',
+          implementationRate: 70 as number | null,
+          note: '70% of paras observed demonstrating Move #2 strategies — co-teaching coordination, anticipating transitions, and partnering with teachers intentionally.',
         },
       ],
     },
@@ -1417,6 +1490,31 @@ Thank you for setting the example. It matters more than you know.`;
       show: false,
       topBarrier: null as string | null,
       recommendedActions: [] as string[],
+    },
+
+    // SECTION 12 — Internal Amplification (Documentation)
+    internalAmplification: {
+      show: true,
+      activities: [
+        {
+          type: 'Board Recognition',
+          description: 'ASD4 Board of Education recognized paraprofessional growth at March board meeting',
+          date: 'March 2026',
+          impact: 'Three paras attended and received standing ovation from board members',
+        },
+        {
+          type: 'Newsletter Feature',
+          description: 'District newsletter featured "Para Spotlight" section highlighting Hub engagement',
+          date: 'February 2026',
+          impact: 'M. Dunkel and M. Gorostieta featured as Hub champions',
+        },
+        {
+          type: 'Building Celebration',
+          description: 'Wesley Elementary hosted para appreciation breakfast using TDI celebration toolkit',
+          date: 'March 2026',
+          impact: '14 paras attended; principal shared Love Note highlights with full staff',
+        },
+      ],
     },
   };
 
