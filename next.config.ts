@@ -18,6 +18,11 @@ const nextConfig: NextConfig = {
         destination: '/allenwood-dashboard',
         permanent: true,
       },
+      {
+        source: '/example-dashboard',
+        destination: '/Example-Dashboard',
+        permanent: true,
+      },
     ];
   },
 };

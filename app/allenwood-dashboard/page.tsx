@@ -467,9 +467,9 @@ export default function AllenwoodDashboard() {
               { id: 'overview', label: 'Overview', icon: Eye },
               { id: 'partnership', label: 'Our Partnership', icon: Heart },
               { id: 'blueprint', label: 'Blueprint', icon: Star },
-              { id: 'next-year', label: 'Next Year', icon: Sparkles, glow: true },
+              { id: 'next-year', label: '2026-27 Preview', icon: Sparkles, glow: true },
               { id: 'team', label: 'Team', icon: User },
-              { id: 'billing', label: 'Contract Details', icon: CreditCard },
+              { id: 'billing', label: 'Billing', icon: CreditCard },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -890,13 +890,28 @@ export default function AllenwoodDashboard() {
 
             {/* SECTION 1: Our Goal */}
             <div id="our-goal" className="scroll-mt-36">
-              <div className="bg-white rounded-xl p-8 shadow-sm border border-gray-100 text-center">
-                <p className="text-xl md:text-2xl text-[#1e2749] font-medium leading-relaxed max-w-3xl mx-auto">
-                  &quot;Equip Allenwood teachers with practical strategies and resources to build calm, connected classrooms where every student - including those with autism, special needs, and multilingual learners - feels supported and seen.&quot;
-                </p>
-                <p className="text-gray-500 text-sm mt-4">
-                  Aligned to Dr. Porter&apos;s 2025-26 theme: <span className="text-amber-600 font-medium">Together We Will Rise</span>
-                </p>
+              <div className="relative bg-gradient-to-br from-[#1e2749] to-[#2d3a6b] rounded-2xl p-8 overflow-hidden shadow-xl">
+                {/* Background decoration */}
+                <div className="absolute top-0 right-0 w-64 h-64 opacity-5 pointer-events-none">
+                  <svg viewBox="0 0 200 200" fill="none">
+                    <circle cx="150" cy="50" r="100" fill="white"/>
+                    <circle cx="50" cy="150" r="80" fill="white"/>
+                  </svg>
+                </div>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-1 h-8 bg-teal-400 rounded-full" />
+                    <span className="text-teal-300 text-xs font-bold uppercase tracking-widest">
+                      Your Partnership Goal
+                    </span>
+                  </div>
+                  <blockquote className="text-2xl font-bold text-white leading-relaxed max-w-2xl mb-4">
+                    &quot;Equip Allenwood teachers with practical strategies and resources to build calm, connected classrooms where every student - including those with autism, special needs, and multilingual learners - feels supported and seen.&quot;
+                  </blockquote>
+                  <p className="text-blue-200 text-sm italic">
+                    Aligned to Dr. Porter&apos;s 2025-26 theme: Together We Will Rise
+                  </p>
+                </div>
               </div>
             </div>
 
