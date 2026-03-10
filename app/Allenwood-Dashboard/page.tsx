@@ -1799,7 +1799,7 @@ export default function AllenwoodDashboard() {
                       <ul className="space-y-2 text-sm text-gray-500">
                         <li className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full border border-gray-400 flex-shrink-0"></div>
-                          <span>Expand to full staff (68 educators)</span>
+                          <span>Expand to full staff (75 educators)</span>
                         </li>
                         <li className="flex items-center gap-2">
                           <div className="w-3 h-3 rounded-full border border-gray-400 flex-shrink-0"></div>
@@ -2044,7 +2044,7 @@ export default function AllenwoodDashboard() {
             <div className="text-center mb-8">
               <p className="text-sm text-[#38618C] font-medium mb-2">Phase 2</p>
               <h2 className="text-3xl font-bold text-[#1e2749] mb-2">ACCELERATE</h2>
-              <p className="text-lg text-gray-600">From Pilot to Full Staff - 68 Teachers &amp; Paraprofessionals</p>
+              <p className="text-lg text-gray-600">From Pilot to Full Staff - 75 Teachers &amp; Paraprofessionals</p>
               <p className="text-sm text-gray-500 mt-2">Your pilot team of 13 proved the model works. Year 2 brings the entire Allenwood teaching team and paraprofessional staff into the TDI partnership.</p>
             </div>
 
@@ -2068,7 +2068,7 @@ export default function AllenwoodDashboard() {
                   <p className="text-xs font-semibold text-[#38618C] uppercase mb-3">Year 2 - ACCELERATE</p>
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-2xl font-bold text-[#38618C]">68</span>
+                      <span className="text-2xl font-bold text-[#38618C]">75</span>
                       <span className="text-gray-600">Staff</span>
                     </div>
                     <p className="text-sm text-[#38618C]">Full Teaching Team + Paras</p>
@@ -2089,7 +2089,7 @@ export default function AllenwoodDashboard() {
                     <BookOpen className="w-5 h-5 text-[#38618C]" />
                     <span className="font-semibold text-[#1e2749]">Learning Hub Membership</span>
                   </div>
-                  <p className="text-2xl font-bold text-[#38618C] mb-2">68 Staff Members</p>
+                  <p className="text-2xl font-bold text-[#38618C] mb-2">75 Staff Members</p>
                   <p className="text-sm text-gray-600 mb-3">Full access to TDI&apos;s research-backed resource library - targeted, actionable tools teachers and paras can use immediately.</p>
                   <p className="text-xs text-teal-600 font-medium flex items-center gap-1">
                     <BarChart3 className="w-3 h-3" /> Includes Analytics Suite
@@ -2141,7 +2141,7 @@ export default function AllenwoodDashboard() {
                     <BookOpen className="w-5 h-5 text-[#38618C]" />
                     <span className="font-semibold text-[#1e2749]">Professional Books</span>
                   </div>
-                  <p className="text-2xl font-bold text-[#38618C] mb-2">68 Copies - One for Every Staff Member</p>
+                  <p className="text-2xl font-bold text-[#38618C] mb-2">75 Copies - One for Every Staff Member</p>
                   <p className="text-sm text-gray-600">Teachers Deserve It - the foundational text for building a school culture that puts educators first. Written by Rae Hughart &amp; Adam Welcome.</p>
                 </div>
               </div>
@@ -2162,7 +2162,7 @@ export default function AllenwoodDashboard() {
                     {/* Primary Services - Bold */}
                     <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 font-medium text-[#1e2749]">Learning Hub Membership</td>
-                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">68 STAFF</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">75 STAFF</td>
                     </tr>
                     <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 font-medium text-[#1e2749]">In-Person Observation Days</td>
@@ -2178,7 +2178,7 @@ export default function AllenwoodDashboard() {
                     </tr>
                     <tr className="border-b border-gray-200">
                       <td className="py-3 px-4 font-medium text-[#1e2749]">Professional Books</td>
-                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">68 COPIES</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">75 COPIES</td>
                     </tr>
                     {/* Included Services - Lighter */}
                     <tr className="border-b border-gray-100 bg-gray-50/50">
@@ -2248,7 +2248,7 @@ export default function AllenwoodDashboard() {
             <div className="bg-gradient-to-r from-[#1e2749] to-[#38618C] rounded-xl p-6 text-white">
               <h3 className="text-xl font-bold mb-3">Why ACCELERATE?</h3>
               <p className="text-white/90">
-                Your pilot team has achieved 100% Hub login rate, your first course completion, and activity across 14 different courses. Imagine that momentum multiplied across all 68 staff members - with embedded coaching, observation cycles, and implementation support built in from day one.
+                Your pilot team has achieved 100% Hub login rate, your first course completion, and activity across 14 different courses. Imagine that momentum multiplied across all 75 staff members - with embedded coaching, observation cycles, and implementation support built in from day one.
               </p>
             </div>
 
@@ -2266,7 +2266,7 @@ export default function AllenwoodDashboard() {
                     <div className="bg-amber-50 rounded-lg p-4 border border-amber-200">
                       <p className="text-xs font-bold text-amber-700 uppercase mb-1">August 2026</p>
                       <p className="font-semibold text-[#1e2749]">Executive Impact Session 1</p>
-                      <p className="text-sm text-gray-600">Set Year 2 goals, onboard full 68-person team, establish baselines. Leadership alignment and KPI setting for the year ahead.</p>
+                      <p className="text-sm text-gray-600">Set Year 2 goals, onboard full 75-person team, establish baselines. Leadership alignment and KPI setting for the year ahead.</p>
                     </div>
                   </div>
 
@@ -2399,7 +2399,7 @@ export default function AllenwoodDashboard() {
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
                   <Check className="w-5 h-5 text-emerald-600 mb-2" />
-                  <p className="text-sm text-gray-700">68 staff actively using the Hub with targeted course pathways</p>
+                  <p className="text-sm text-gray-700">75 staff actively using the Hub with targeted course pathways</p>
                 </div>
                 <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-200">
                   <Check className="w-5 h-5 text-emerald-600 mb-2" />
@@ -2456,7 +2456,7 @@ export default function AllenwoodDashboard() {
                     <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Fastest</span>
                   </div>
                   <h4 className="font-bold text-[#1e2749] mb-2">Path A: Single Source</h4>
-                  <p className="text-sm text-gray-600">One request, one approval. Full amount through a single district source (Title I or Title II-A). TDI writes the complete budget narrative. Dr. Porter routes the request.</p>
+                  <p className="text-sm text-gray-600">Title II-A funding only (single application - could fully fund the Master Service Agreement). TDI writes the complete budget narrative. Dr. Porter routes the request.</p>
                 </div>
 
                 {/* Path B */}
@@ -2466,7 +2466,7 @@ export default function AllenwoodDashboard() {
                     <span className="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full font-medium">Less Risk</span>
                   </div>
                   <h4 className="font-bold text-[#1e2749] mb-2">Path B: Strategic Split</h4>
-                  <p className="text-sm text-gray-600">Spread across 4 federal funding streams. Smaller asks per source, well-justified and compliance-aligned. Sources: IDEA/CEIS, Title II-A, Title I, Community Schools. TDI writes all 4 budget narratives.</p>
+                  <p className="text-sm text-gray-600">Spread across 3 federal funding streams. Smaller asks per source, well-justified and compliance-aligned. Sources: IDEA/CEIS, Title II-A, Community Schools. TDI writes all 3 budget narratives.</p>
                 </div>
 
                 {/* Path C */}
@@ -2530,7 +2530,7 @@ export default function AllenwoodDashboard() {
                       </div>
                     </div>
                     <div className="bg-teal-50 rounded-lg p-3 mt-4 text-xs text-teal-700">
-                      TDI pursues the remaining <strong>$53,765</strong> through grants and community funding.
+                      TDI pursues the remaining <strong>$56,026</strong> through grants and community funding.
                     </div>
                   </div>
                 </div>
@@ -2540,16 +2540,16 @@ export default function AllenwoodDashboard() {
                   <div className="h-1 bg-blue-500"></div>
                   <div className="p-5">
                     <p className="text-xs text-blue-600 font-medium mb-1">Expand the Reach</p>
-                    <p className="text-2xl font-bold text-[#1e2749] mb-2">$21,964</p>
+                    <p className="text-2xl font-bold text-[#1e2749] mb-2">$24,225</p>
                     <p className="text-sm text-gray-600 mb-4">Get every staff member on the Hub with books to match.</p>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-blue-600" />68 Hub Memberships</span>
-                        <span className="text-gray-500">$20,332</span>
+                        <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-blue-600" />75 Hub Memberships</span>
+                        <span className="text-gray-500">$22,425</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-blue-600" />68 Professional Books</span>
-                        <span className="text-gray-500">$1,632</span>
+                        <span className="flex items-center gap-1.5"><Check className="w-3.5 h-3.5 text-blue-600" />75 Professional Books</span>
+                        <span className="text-gray-500">$1,800</span>
                       </div>
                     </div>
                     <div className="bg-blue-50 rounded-lg p-3 mt-4 text-xs text-blue-700">
@@ -2588,7 +2588,7 @@ export default function AllenwoodDashboard() {
                       </div>
                     </div>
                     <div className="bg-purple-50 rounded-lg p-3 mt-4 text-xs text-purple-700">
-                      TDI pursues the remaining <strong>$32,765</strong> through grants and community funding.
+                      TDI pursues the remaining <strong>$35,026</strong> through grants and community funding.
                     </div>
                   </div>
                 </div>
@@ -2604,9 +2604,9 @@ export default function AllenwoodDashboard() {
               <div className="bg-green-50 rounded-lg p-4 border border-green-200">
                 <div className="flex items-center gap-2 mb-2">
                   <Sparkles className="w-5 h-5 text-green-600" />
-                  <span className="font-bold text-green-800">Full ACCELERATE Plan: $63,964</span>
+                  <span className="font-bold text-green-800">Full ACCELERATE Plan: $66,225</span>
                 </div>
-                <p className="text-sm text-gray-600 mb-2">68 Hub memberships + 3 observation days + 4 virtual sessions + 3 executive sessions + 68 books</p>
+                <p className="text-sm text-gray-600 mb-2">75 Hub memberships + 3 observation days + 4 virtual sessions + 3 executive sessions + 75 books</p>
                 <p className="text-xs text-green-700">No matter where you start, TDI works toward the full plan. Your commitment unlocks our funding team.</p>
               </div>
             </div>
@@ -2908,22 +2908,47 @@ export default function AllenwoodDashboard() {
 
               <div className="space-y-4">
 
-                {/* Agreement Card */}
+                {/* Minimum Service Agreement */}
                 <div className="border border-gray-200 rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
                     <div>
-                      <div className="font-medium text-[#1e2749]">Partnership Services</div>
-                      <div className="text-sm text-gray-500">Signed July 3, 2025</div>
+                      <div className="font-medium text-[#1e2749]">Minimum Service Agreement</div>
+                      <div className="text-sm text-gray-500">Baseline commitment - no funding required</div>
                     </div>
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-800">
-                      Unpaid
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-teal-100 text-teal-800">
+                      $10,199
                     </span>
                   </div>
                   <div className="text-sm text-gray-600 mb-3">
-                    Includes: 10 All Access Hub Memberships, 2 Full-Day PD Visits, 6 Virtual Coaching Sessions
+                    Includes: 13 All-Access Hub Memberships, 13 Books, 2 Virtual Coaching Sessions, 1 Executive Impact Session
                   </div>
                   <a
-                    href="https://my.anchor.sh/notification/ng-notification-LvCb8ZqiOfc-iYOG3HcaPuFzkMef"
+                    href="https://my.anchor.sh/notification/z26z33iZmZe9-LGnnaxxgo6bCea5M"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-sm text-[#35A7FF] hover:underline"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    View Agreement & Invoice Details
+                  </a>
+                </div>
+
+                {/* Master Service Agreement */}
+                <div className="border border-blue-200 rounded-lg p-4 bg-blue-50/50">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <div className="font-medium text-[#1e2749]">Master Service Agreement</div>
+                      <div className="text-sm text-gray-500">Full ACCELERATE plan - contingent on funding secured by TDI</div>
+                    </div>
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
+                      $66,225
+                    </span>
+                  </div>
+                  <div className="text-sm text-gray-600 mb-3">
+                    Includes: 75 All-Access Hub Memberships, 75 Books, 3 Executive Impact Sessions, 4 Virtual Coaching Sessions, 3 In-Person Observation Support Days
+                  </div>
+                  <a
+                    href="https://my.anchor.sh/notification/z26z38IkafSq-glTEZhm44MpfhTWL"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 text-sm text-[#35A7FF] hover:underline"
