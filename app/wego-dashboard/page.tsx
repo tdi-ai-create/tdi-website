@@ -161,7 +161,7 @@ export default function WegoDashboard() {
     stats: {
       educatorsEnrolled: { value: 19, total: 19, label: 'Paras Enrolled', sublabel: '100% Hub login rate' },
       deliverables: { completed: 11, total: 13, label: 'Deliverables', sublabel: 'completed vs. contracted' },
-      hubEngagement: { percent: 84, raw: '16/19', label: 'Hub Engagement', sublabel: '16 PAs with tracked activity' },
+      hubEngagement: { percent: 89, raw: '17/19', label: 'Hub Engagement', sublabel: '17 PAs with tracked activity' },
       phase: { name: 'IGNITE', number: 1, total: 3, label: 'Current Phase', sublabel: 'Phase 1 of 3' },
     },
 
@@ -193,7 +193,7 @@ export default function WegoDashboard() {
         { label: 'Observation Day 3  - 7 PAs observed, Love Notes delivered', date: 'Feb 25, 2026' },
       ],
       inProgress: [
-        { label: '19/19 PAs Hub activated  - 16 with tracked course activity', detail: '84% engagement and growing' },
+        { label: '19/19 PAs Hub activated  - 17 with tracked course activity', detail: '89% engagement and growing' },
         { label: 'Weekly subgroups running  - every Monday 7:45-9AM', detail: 'EL, Self Contained, DLP, Transition (Step)' },
         { label: 'Monthly full-group session with Rae  - ongoing', detail: 'Themed discussion + implementation support' },
         { label: 'Year 2 teacher expansion in planning', detail: 'To be confirmed at Year 1 Celebration' },
@@ -305,9 +305,9 @@ export default function WegoDashboard() {
           ],
           resources: [
             'Hub course referenced: The Proximity Principle',
-            'Hub course referenced: Collaborative Support Structures',
+            'Hub course referenced: Building Strong Teacher-Para Partnerships',
           ],
-          nextFocus: 'Observation Day 3 focuses on Move #2 implementation  - collaborative support structures and co-teaching alignment between paras and lead teachers.',
+          nextFocus: 'Observation Day 3 focuses on collaborative support structures and co-teaching alignment between paras and lead teachers.',
         },
       },
       {
@@ -316,9 +316,9 @@ export default function WegoDashboard() {
         date: 'February 25, 2026',
         classroomsVisited: 2,
         loveNotesDelivered: 2,
-        aiSummary: 'Observation Day 3 completed. Focus was on Move #2  - collaborative support and co-teaching alignment. Early data shows paras are taking more ownership of instructional decisions alongside their lead teachers.',
+        aiSummary: 'Observation Day 3 completed. Focus was on collaborative support and co-teaching alignment. Early data shows paras are taking more ownership of instructional decisions alongside their lead teachers.',
         details: {
-          narrative: 'TDI completed the third and final observation day of the IGNITE phase. This visit focused specifically on how paras are integrating Move #2 strategies  - collaborative positioning, shared instructional moments, and proactive communication with lead teachers.',
+          narrative: 'TDI completed the third and final observation day of the IGNITE phase. This visit focused specifically on how paras are integrating collaborative strategies  - collaborative positioning, shared instructional moments, and proactive communication with lead teachers.',
           quotes: [
             'She didn\'t wait to be told what to do. She saw the gap and filled it.',
           ],
@@ -354,7 +354,7 @@ export default function WegoDashboard() {
             { label: '100% Hub login milestone achieved', complete: true },
             { label: 'Observation Day 1  - 8 classrooms, 8 Love Notes', complete: true },
             { label: 'Observation Day 2  - 11 classrooms, 11 Love Notes (all 19 paras observed)', complete: true },
-            { label: 'Observation Day 3  - Move #2 focus, 2 Love Notes', complete: true },
+            { label: 'Observation Day 3  - 2 Love Notes', complete: true },
             { label: 'In Person Check Ins 1–2 complete', complete: true },
             { label: '21 total Love Notes delivered across the team', complete: true },
           ],
@@ -364,7 +364,7 @@ export default function WegoDashboard() {
           number: 2,
           status: 'current',
           deliverables: [
-            { label: 'Move #2 implementation tracking  - collaborative support structures', complete: false },
+            { label: 'Collaborative support structures tracking', complete: false },
             { label: 'In Person Check Ins 3–5 (Mar, Apr, May)', complete: false },
             { label: 'Mid-year leadership check-in', complete: false },
             { label: 'Full Hub library access  - all courses unlocked', complete: false },
@@ -424,7 +424,7 @@ export default function WegoDashboard() {
         },
         {
           type: 'Observation',
-          label: 'Observation Day 3  - Move #2 focus',
+          label: 'Observation Day 3',
           date: 'February 25, 2026',
           badge: 'Complete',
           note: 'See Observations section for full details',
@@ -492,18 +492,21 @@ export default function WegoDashboard() {
     // SECTION 8  - What We're Learning (CONDITIONAL)
     learning: {
       show: true,
-      moves: [
+      topCourses: [
         {
-          moveNumber: 1,
-          moveName: 'Calm Classroom Presence',
-          implementationRate: 84,
-          note: '84% of paras observed applying Move #1 strategies  - calm redirection, proximity, and student-centered language across all three observation days.',
+          title: 'Paraprofessional Foundations - Understanding Your Role & Impact',
+          engagedStaff: 13,
+          note: 'Most popular course  - 13 of 17 active paras have started this foundational module.',
         },
         {
-          moveNumber: 2,
-          moveName: 'Collaborative Support Structures',
-          implementationRate: null,
-          note: 'Move #2 tracking began at Observation Day 3. Full implementation data coming after Virtual Sessions 4–6.',
+          title: 'Supporting Students Through Their Daily Schedule',
+          engagedStaff: 12,
+          note: '12 paras engaging with routines and transitions strategies.',
+        },
+        {
+          title: 'Communication That Clicks',
+          engagedStaff: 8,
+          note: '8 paras building confidence in professional communication.',
         },
       ],
     },
@@ -1222,26 +1225,14 @@ export default function WegoDashboard() {
                 defaultOpen={true}
                 accent="indigo"
               >
-                <div className="space-y-4">
-                  {partnershipData.learning.moves.map((move) => (
-                    <div key={move.moveNumber} className="bg-gray-50 rounded-lg p-4 border border-gray-100">
+                <div className="space-y-3">
+                  {partnershipData.learning.topCourses.map((course, i) => (
+                    <div key={i} className="bg-gray-50 rounded-lg p-4 border border-gray-100">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-semibold text-gray-900">Move #{move.moveNumber}: {move.moveName}</span>
-                        {move.implementationRate !== null ? (
-                          <span className="text-sm font-bold text-teal-700">{move.implementationRate}%</span>
-                        ) : (
-                          <span className="text-xs text-gray-400">Tracking in Sessions 4–6</span>
-                        )}
+                        <span className="text-sm font-semibold text-gray-900">{course.title}</span>
+                        <span className="text-sm font-bold text-teal-700">{course.engagedStaff} engaged</span>
                       </div>
-                      {move.implementationRate !== null && (
-                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                          <div
-                            className="bg-teal-500 h-2 rounded-full"
-                            style={{ width: `${move.implementationRate}%` }}
-                          />
-                        </div>
-                      )}
-                      <p className="text-xs text-gray-600">{move.note}</p>
+                      <p className="text-xs text-gray-600">{course.note}</p>
                     </div>
                   ))}
                 </div>

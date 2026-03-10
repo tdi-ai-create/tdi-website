@@ -1217,33 +1217,13 @@ Thank you for setting the example. It matters more than you know.`;
       {
         id: 'obs-1',
         dayNumber: 1,
-        date: 'January 2026',
-        classroomsVisited: 18,
-        loveNotesDelivered: 18,
-        aiSummary: 'Across 18 Addison classrooms, paras were actively engaged  - redirecting with calm language, using proximity support, and following student-centered cues from their teachers. One moment that stood out: a para in Building 3 used a strategy from the Hub\'s Calm Classrooms course mid-visit, entirely unprompted. 91% of observed paras are already applying Calm Classroom Presence strategies in their daily practice.',
-        details: {
-          narrative: 'TDI visited 18 classrooms across Addison SD4. The observation focus was Calm Classroom Presence implementation  - calm redirection, proactive proximity, and student relationship language. What we saw: paras who had engaged with Hub content were noticeably more confident and intentional in their practice.',
-          quotes: [
-            'She knew exactly what to do without being asked  - that\'s a para who owns her role.',
-            'The Love Note made her day. She read it three times.',
-          ],
-          resources: [
-            'Hub course referenced: Calm Classrooms, Not Chaos',
-            'Hub course referenced: The Proximity Principle',
-          ],
-          nextFocus: 'Observation & Support Day 2 will look for Collaborative Support Structures application  - co-teaching alignment and team coordination.',
-        },
-      },
-      {
-        id: 'obs-2',
-        dayNumber: 2,
         date: 'March 3, 2026',
         classroomsVisited: 17,
         loveNotesDelivered: 18,
         repliesReceived: 10,
-        aiSummary: 'Observation & Support Day 2 focused on Collaborative Support Structures. Across 17 classrooms, we saw paras actively coordinating with teachers, anticipating student needs, and stepping into co-teaching moments with confidence. 70% of observed paras demonstrated Collaborative Support strategies in action. Love Notes sparked meaningful responses  - 10 paras wrote back sharing how recognition has changed how they see their role.',
+        aiSummary: 'Observation & Support Day 1 focused on Collaborative Support Structures. Across 17 classrooms, we saw paras actively coordinating with teachers, anticipating student needs, and stepping into co-teaching moments with confidence. 70% of observed paras demonstrated Collaborative Support strategies in action. Love Notes sparked meaningful responses  - 10 paras wrote back sharing how recognition has changed how they see their role.',
         details: {
-          narrative: 'TDI visited 17 classrooms during Observation & Support Day 2. The focus shifted to Collaborative Support Structures  - co-teaching alignment and team coordination. We saw clear growth from Observation & Support Day 1: paras who had already mastered calm presence were now actively partnering with teachers, anticipating transitions, and supporting small groups with intention.',
+          narrative: 'TDI visited 17 classrooms during Observation & Support Day 1. The focus was Collaborative Support Structures  - co-teaching alignment and team coordination. Paras who had engaged with Hub content were noticeably more confident and intentional in their practice, actively partnering with teachers, anticipating transitions, and supporting small groups with intention.',
           quotes: [
             'I didn\'t realize how much I was already doing until someone wrote it down and handed it to me.',
             'This is the first time in 12 years anyone has watched me work and told me I was doing it right.',
@@ -1254,7 +1234,7 @@ Thank you for setting the example. It matters more than you know.`;
             'Hub course referenced: Communication That Clicks',
             'Hub course referenced: Small Group Magic',
           ],
-          nextFocus: 'Instructional Support Strategies tracking begins in ACCELERATE phase  - student relationship building and academic engagement.',
+          nextFocus: 'Observation & Support Day 2 will continue tracking Collaborative Support Structures and begin Instructional Support Strategies observation.',
         },
         coachingThemes: [
           {
@@ -1299,11 +1279,11 @@ Thank you for setting the example. It matters more than you know.`;
           deliverables: [
             { label: 'Hub access activated  - all 122 paras enrolled', complete: true },
             { label: '100% Hub login milestone achieved', complete: true },
-            { label: 'Observation & Support Day 1  - 18 classrooms, Love Notes delivered', complete: true },
-            { label: 'Calm Classroom Presence implementation tracking  - 91% applying strategies', complete: true },
-            { label: 'Observation & Support Day 2  - 17 classrooms, 18 Love Notes, 10 replies', complete: true },
+            { label: 'The Moves That Matter Training  - strategy foundations', complete: true },
+            { label: 'Observation & Support Day 1  - 17 classrooms, 18 Love Notes, 10 replies', complete: true },
             { label: 'Collaborative Support implementation tracking  - 70% applying strategies', complete: true },
             { label: 'VS1 Survey complete  - 95 respondents', complete: true },
+            { label: 'Observation & Support Day 2  - scheduled Mar 19', complete: false },
             { label: 'IGNITE wrap-up session + transition to ACCELERATE', complete: false },
           ],
         },
@@ -1336,8 +1316,8 @@ Thank you for setting the example. It matters more than you know.`;
       milestones: [
         { date: 'Jan 2026', label: 'Partnership Launched', status: 'complete' as const },
         { date: 'Jan 2026', label: 'Hub Activated', status: 'complete' as const },
-        { date: 'Jan 2026', label: 'Obs & Support Day 1', status: 'complete' as const },
-        { date: 'Mar 2026', label: 'Obs & Support Day 2', status: 'complete' as const },
+        { date: 'Jan 2026', label: 'The Moves Training', status: 'complete' as const },
+        { date: 'Mar 2026', label: 'Obs & Support Day 1', status: 'complete' as const },
         { date: 'Mar 2026', label: 'VS1 Survey', status: 'complete' as const },
         { date: 'Mar 2026', label: 'You Are Here', status: 'current' as const },
         { date: 'May 2026', label: 'IGNITE Complete', status: 'upcoming' as const },
@@ -1350,15 +1330,14 @@ Thank you for setting the example. It matters more than you know.`;
           badge: 'Complete',
         },
         {
-          type: 'Observation',
-          label: 'Observation & Support Day 1  - 18 classrooms visited',
+          type: 'Full-Day PD',
+          label: 'The Moves That Matter Pt. 1 & Pt. 2  - Strategy Training',
           date: 'January 2026',
           badge: 'Complete',
-          note: 'See Observations section for full details',
         },
         {
           type: 'Observation',
-          label: 'Observation & Support Day 2  - 17 classrooms, 10 para replies',
+          label: 'Observation & Support Day 1  - 17 classrooms, 10 para replies',
           date: 'March 3, 2026',
           badge: 'Complete',
           note: 'See Observations section for full details',
@@ -1373,18 +1352,40 @@ Thank you for setting the example. It matters more than you know.`;
       ],
       upcoming: [
         {
+          type: 'Observation',
+          label: 'Observation & Support Day 2',
+          date: 'Mar 19, 2026',
+          status: 'scheduled' as const,
+        },
+        {
           type: 'Virtual Support Session',
-          label: 'Instructional Support Strategies Coaching',
-          date: 'To be scheduled',
-          badge: 'Pending',
-          calendlyLink: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+          label: 'Virtual Support Session 2',
+          date: 'Apr 6, 2026',
+          status: 'scheduled' as const,
         },
         {
           type: 'Leadership Meeting',
-          label: 'IGNITE Wrap-Up + ACCELERATE Planning',
+          label: 'Executive Impact Session 2',
+          date: 'Apr 9, 2026',
+          status: 'scheduled' as const,
+        },
+        {
+          type: 'Virtual Support Session',
+          label: 'Virtual Support Session 3',
+          date: 'Apr 20, 2026',
+          status: 'scheduled' as const,
+        },
+        {
+          type: 'Virtual Support Session',
+          label: 'Virtual Support Session 4',
+          date: 'After Apr 20',
+          status: 'scheduling' as const,
+        },
+        {
+          type: 'Leadership Meeting',
+          label: 'End-of-year Impact Report',
           date: 'May 2026',
-          badge: 'Pending',
-          calendlyLink: 'https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone',
+          status: 'coming-soon' as const,
         },
       ],
       leadershipMeetings: [
@@ -2153,6 +2154,22 @@ Thank you for setting the example. It matters more than you know.`;
                   <ObservationCard key={obs.id} obs={obs} />
                 ))}
               </div>
+              {/* Upcoming Observation Day 2 */}
+              <div className="px-6 py-4 border-t border-gray-100">
+                <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-blue-50 border border-blue-100">
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center font-bold text-white text-sm bg-blue-500">
+                    #2
+                  </div>
+                  <div className="flex-1">
+                    <p className="font-bold text-gray-900 text-sm">Observation & Support Day 2</p>
+                    <p className="text-xs text-gray-400">March 19, 2026 · Half-day · Schools TBD</p>
+                  </div>
+                  <span className="text-xs bg-blue-100 text-blue-700 font-semibold px-3 py-1 rounded-full flex items-center gap-1">
+                    <Calendar className="w-3 h-3" /> Scheduled
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mt-2 ml-1">Half-day observation - specific classrooms and buildings to be confirmed closer to date.</p>
+              </div>
             </div>
 
             {/* ─────────────────────────────────────────────
@@ -2312,12 +2329,53 @@ Thank you for setting the example. It matters more than you know.`;
                     </div>
                     <div>
                       <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Coming Up</p>
-                      {partnershipData.sessions.milestones.filter(m => m.status === 'upcoming').map((m, i) => (
-                        <div key={i} className="flex items-center gap-2 text-sm text-gray-700 mb-1">
-                          <Calendar className="w-3.5 h-3.5 text-blue-400 shrink-0" />
-                          {m.label}  - {m.date}
-                        </div>
-                      ))}
+                      <div className="space-y-2">
+                        {partnershipData.sessions.upcoming.map((s, i) => {
+                          const isLeadership = s.type === 'Leadership Meeting';
+                          const isScheduling = s.status === 'scheduling' || s.status === 'coming-soon';
+                          return (
+                            <div key={i} className={`flex items-center gap-3 px-3 py-2 rounded-lg ${
+                              isScheduling
+                                ? 'bg-gray-50 border border-gray-200'
+                                : isLeadership
+                                  ? 'bg-amber-50 border border-amber-200'
+                                  : 'bg-blue-50 border border-blue-100'
+                            }`}>
+                              <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                                isScheduling
+                                  ? 'border-gray-300'
+                                  : isLeadership
+                                    ? 'border-amber-400'
+                                    : 'border-blue-400'
+                              }`}>
+                                {isScheduling
+                                  ? <Clock className="w-4 h-4 text-gray-400" />
+                                  : isLeadership
+                                    ? <Star className="w-4 h-4 text-amber-500" />
+                                    : <Calendar className="w-4 h-4 text-blue-500" />
+                                }
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className={`text-sm font-semibold ${isScheduling ? 'text-gray-600' : 'text-gray-800'}`}>{s.label}</p>
+                                <p className={`text-xs ${
+                                  isScheduling ? 'text-gray-400' : isLeadership ? 'text-amber-700 font-medium' : 'text-blue-600 font-medium'
+                                }`}>
+                                  {s.date}{!isScheduling && ' · Scheduled'}
+                                  {s.status === 'scheduling' && ' · Scheduling in progress'}
+                                  {s.status === 'coming-soon' && ' · Coming soon'}
+                                </p>
+                              </div>
+                              {!isScheduling && (
+                                <span className={`text-xs px-2 py-0.5 rounded-full font-semibold shrink-0 ${
+                                  isLeadership ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
+                                }`}>
+                                  {isLeadership ? 'Leadership' : 'Scheduled'}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -2368,43 +2426,46 @@ Thank you for setting the example. It matters more than you know.`;
                   <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Upcoming</p>
                   <div className="space-y-2">
                     {partnershipData.sessions.upcoming.map((s, i) => {
-                      const isRenewal = s.label.includes('Executive Impact') || s.label.includes('Renewal') || s.label.includes('ACCELERATE');
+                      const isLeadership = s.type === 'Leadership Meeting';
+                      const isScheduling = s.status === 'scheduling' || s.status === 'coming-soon';
                       return (
-                        <div key={i} className={`flex items-start gap-3 rounded-xl px-4 py-3 border ${
-                          isRenewal
-                            ? 'bg-amber-50 border-amber-200'
-                            : 'bg-blue-50 border-blue-100'
+                        <div key={i} className={`flex items-center gap-3 rounded-xl px-4 py-3 border ${
+                          isScheduling
+                            ? 'bg-gray-50 border-gray-200'
+                            : isLeadership
+                              ? 'bg-amber-50 border-amber-200'
+                              : 'bg-blue-50 border-blue-100'
                         }`}>
-                          {isRenewal
-                            ? <Star className="w-4 h-4 text-amber-600 mt-0.5 shrink-0" />
-                            : <Calendar className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
-                          }
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <p className={`text-sm font-bold ${isRenewal ? 'text-amber-900' : 'text-gray-900'}`}>{s.label}</p>
-                              {isRenewal && (
-                                <span className="text-xs bg-amber-200 text-amber-800 font-bold px-2 py-0.5 rounded-full">Renewal Conversation</span>
-                              )}
-                            </div>
-                            <p className={`text-xs mt-0.5 ${isRenewal ? 'text-amber-700' : 'text-gray-500'}`}>{s.date} · {s.type}</p>
+                          <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                            isScheduling
+                              ? 'border-gray-300'
+                              : isLeadership
+                                ? 'border-amber-400'
+                                : 'border-blue-400'
+                          }`}>
+                            {isScheduling
+                              ? <Clock className="w-4 h-4 text-gray-400" />
+                              : isLeadership
+                                ? <Star className="w-4 h-4 text-amber-500" />
+                                : <Calendar className="w-4 h-4 text-blue-500" />
+                            }
                           </div>
-                          {s.calendlyLink ? (
-                            <a
-                              href={s.calendlyLink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className={`text-xs font-semibold px-3 py-1 rounded-full transition-colors whitespace-nowrap ${
-                                isRenewal
-                                  ? 'bg-amber-200 text-amber-800 hover:bg-amber-300'
-                                  : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
-                              }`}
-                            >
-                              Schedule
-                            </a>
-                          ) : (
-                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
-                              isRenewal ? 'bg-amber-200 text-amber-800' : 'bg-green-100 text-green-700'
-                            }`}>{s.badge}</span>
+                          <div className="flex-1">
+                            <p className={`text-sm font-semibold ${isScheduling ? 'text-gray-600' : 'text-gray-800'}`}>{s.label}</p>
+                            <p className={`text-xs ${
+                              isScheduling ? 'text-gray-400' : isLeadership ? 'text-amber-700 font-medium' : 'text-blue-600 font-medium'
+                            }`}>
+                              {s.date} · {s.type}
+                              {s.status === 'scheduling' && ' · Scheduling in progress'}
+                              {s.status === 'coming-soon' && ' · Coming soon'}
+                            </p>
+                          </div>
+                          {!isScheduling && (
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-semibold shrink-0 ${
+                              isLeadership ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'
+                            }`}>
+                              {isLeadership ? 'Leadership' : 'Scheduled'}
+                            </span>
                           )}
                         </div>
                       );
