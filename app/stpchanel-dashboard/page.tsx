@@ -2315,6 +2315,10 @@ export default function StPeterChanelDashboard() {
                       <td className="py-3 px-4 text-right font-bold text-[#38618C]">3 DAYS</td>
                     </tr>
                     <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 font-medium text-[#1e2749]">Virtual Strategy Sessions</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">4 SESSIONS</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
                       <td className="py-3 px-4 font-medium text-[#1e2749]">Executive Impact Sessions</td>
                       <td className="py-3 px-4 text-right font-bold text-[#38618C]">2 SESSIONS</td>
                     </tr>
