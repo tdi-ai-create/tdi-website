@@ -364,10 +364,10 @@ export default function WegoDashboard() {
           number: 2,
           status: 'current',
           deliverables: [
-            { label: 'Collaborative Support Structures implementation tracking', complete: false },
+            { label: 'Collaborative Support Structures implementation tracking', complete: true },
             { label: 'In Person Check Ins 3–5 (Mar, Apr, May)', complete: false },
-            { label: 'Mid-year leadership check-in', complete: false },
-            { label: 'Full Hub library access  - all courses unlocked', complete: false },
+            { label: 'Mid-year leadership check-in', complete: true },
+            { label: 'Full Hub library access  - all courses unlocked', complete: true },
             { label: 'Year 2 planning conversation with Juan + Megan', complete: false },
           ],
         },
