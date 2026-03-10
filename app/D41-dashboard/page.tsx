@@ -302,7 +302,7 @@ export default function D41Dashboard() {
           <div className="flex justify-center gap-2">
             {[
               { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-              { id: 'progress', label: 'Progress', icon: TrendingUp },
+              { id: 'ourPartnership', label: 'Our Partnership', icon: Heart },
               { id: 'resources', label: 'Resources', icon: BookOpen },
               { id: 'blueprint', label: 'Blueprint', icon: Map },
               { id: 'next-steps', label: '2026-27', icon: Calendar },
@@ -344,7 +344,7 @@ export default function D41Dashboard() {
 
                 {/* Seats Active */}
                 <button
-                  onClick={() => setActiveTab('progress')}
+                  onClick={() => setActiveTab('ourPartnership')}
                   className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
                 >
                   <div className="flex items-center justify-between mb-3">
@@ -383,7 +383,7 @@ export default function D41Dashboard() {
 
                 {/* Seat Utilization */}
                 <button
-                  onClick={() => setActiveTab('progress')}
+                  onClick={() => setActiveTab('ourPartnership')}
                   className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
                 >
                   <div className="flex items-center justify-between mb-3">
@@ -623,12 +623,12 @@ export default function D41Dashboard() {
           </div>
         )}
 
-        {/* PROGRESS TAB */}
-        {activeTab === 'progress' && (
+        {/* OUR PARTNERSHIP TAB (Hub-only) */}
+        {activeTab === 'ourPartnership' && (
           <div className="space-y-6">
             <div className="text-center">
-              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Team Progress</h2>
-              <p className="text-gray-600">Hub engagement for your paraprofessional team</p>
+              <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your Partnership Journey</h2>
+              <p className="text-gray-600">Hub-only partnership: tracking seat activation and engagement</p>
             </div>
 
             {/* Celebration Card */}

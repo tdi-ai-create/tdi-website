@@ -1659,6 +1659,7 @@ export default function SauneminDashboard() {
                 </div>
               </div>
             </Accordion>
+            </div>
 
             {/* Blog & Weekly Resources Promotion */}
             <div className="bg-[#1e2749] rounded-xl p-5 text-white">
