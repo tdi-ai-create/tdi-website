@@ -54,7 +54,8 @@ import {
   LayoutDashboard,
   Map,
   CreditCard,
-  HelpCircle
+  HelpCircle,
+  Puzzle
 } from 'lucide-react';
 
 // Tooltip component
