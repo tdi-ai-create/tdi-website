@@ -64,7 +64,8 @@ import {
   CalendarClock,
   Map,
   Zap,
-  MessageSquare
+  MessageSquare,
+  Megaphone
 } from 'lucide-react';
 
 export default function ASD4Dashboard() {
@@ -1588,6 +1589,9 @@ Thank you for setting the example. It matters more than you know.`;
           <span className="text-xs text-gray-400">{obs.date}</span>
           <span className="text-xs text-gray-500">{obs.classroomsVisited} classrooms</span>
           <span className="text-xs text-gray-500">{obs.loveNotesDelivered} Love Notes</span>
+          {'repliesReceived' in obs && obs.repliesReceived && (
+            <span className="text-xs text-purple-600 font-medium">{obs.repliesReceived} replies received</span>
+          )}
         </div>
         {/* AI summary — always visible, no "AI" label */}
         <p className="text-sm text-gray-700 leading-relaxed mb-3">{obs.aiSummary}</p>
@@ -1622,6 +1626,20 @@ Thank you for setting the example. It matters more than you know.`;
                     <BookOpen className="w-3 h-3 text-teal-500" /> {r}
                   </p>
                 ))}
+              </div>
+            )}
+            {/* Coaching Themes — only shown for observations that have them */}
+            {'coachingThemes' in obs && obs.coachingThemes && obs.coachingThemes.length > 0 && (
+              <div>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Coaching Themes from Para Replies</p>
+                <div className="space-y-3">
+                  {obs.coachingThemes.map((theme: { theme: string; insight: string }, i: number) => (
+                    <div key={i} className="bg-purple-50 rounded-lg p-3 border border-purple-100">
+                      <p className="text-sm font-medium text-purple-800 mb-1">{theme.theme}</p>
+                      <p className="text-xs text-gray-600">{theme.insight}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
             <div>
@@ -2335,8 +2353,59 @@ Thank you for setting the example. It matters more than you know.`;
                 defaultOpen={true}
                 accent="purple"
               >
-                {/* Survey cards rendered here when data exists */}
-                <p className="text-sm text-gray-500">Survey data will appear here after the first check-in is collected.</p>
+                {partnershipData.teamPulse.surveys.map((survey) => (
+                  <div key={survey.id} className="space-y-4">
+                    {/* Survey Header */}
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="text-sm font-semibold text-gray-900">{survey.name}</h4>
+                        <p className="text-xs text-gray-500">{survey.date} · {survey.respondents} respondents ({survey.responseRate}% response rate)</p>
+                      </div>
+                    </div>
+
+                    {/* Confidence Score */}
+                    <div className="bg-purple-50 rounded-lg p-4 border border-purple-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-gray-700">Confidence Score</span>
+                        <span className="text-2xl font-bold text-purple-700">{survey.confidenceScore}/{survey.confidenceMax}</span>
+                      </div>
+                      <div className="w-full bg-purple-200 rounded-full h-2 mb-2">
+                        <div
+                          className="bg-purple-500 h-2 rounded-full"
+                          style={{ width: `${(survey.confidenceScore / survey.confidenceMax) * 100}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-purple-600 font-medium">↑ {survey.confidenceIncrease}% increase since partnership began</p>
+                    </div>
+
+                    {/* Highlights */}
+                    <div>
+                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Key Highlights</p>
+                      <ul className="space-y-2">
+                        {survey.highlights.map((highlight, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                            <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                            {highlight}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    {/* Open Responses */}
+                    {survey.openResponses && survey.openResponses.length > 0 && (
+                      <div>
+                        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">What Paras Are Saying</p>
+                        <div className="space-y-2">
+                          {survey.openResponses.map((response, i) => (
+                            <div key={i} className="bg-gray-50 rounded-lg px-4 py-3 border-l-2 border-purple-300">
+                              <p className="text-sm text-gray-700 italic">"{response}"</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
               </CollapsibleSection>
             )}
 
@@ -2461,6 +2530,35 @@ Thank you for setting the example. It matters more than you know.`;
               >
                 {/* Content populated from survey barrier data */}
                 <p className="text-sm text-gray-500">Staff feedback will appear here after the first survey check-in.</p>
+              </CollapsibleSection>
+            )}
+
+            {/* ─────────────────────────────────────────────
+                SECTION 12 — INTERNAL AMPLIFICATION
+                CONDITIONAL: show when internalAmplification.show === true
+                Documents district-level recognition and celebration activities.
+                Starts collapsed.
+            ───────────────────────────────────────────── */}
+            {partnershipData.internalAmplification?.show && partnershipData.internalAmplification.activities.length > 0 && (
+              <CollapsibleSection
+                title="Internal Amplification"
+                icon={<Megaphone className="w-4 h-4 text-orange-500" />}
+                defaultOpen={true}
+                accent="orange"
+              >
+                <p className="text-xs text-gray-500 mb-4">Recognition and celebration activities across the district.</p>
+                <div className="space-y-3">
+                  {partnershipData.internalAmplification.activities.map((activity, i) => (
+                    <div key={i} className="bg-orange-50 rounded-lg p-4 border border-orange-100">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-semibold text-orange-700 uppercase tracking-wide">{activity.type}</span>
+                        <span className="text-xs text-gray-400">{activity.date}</span>
+                      </div>
+                      <p className="text-sm font-medium text-gray-900 mb-1">{activity.description}</p>
+                      <p className="text-xs text-gray-600 italic">{activity.impact}</p>
+                    </div>
+                  ))}
+                </div>
               </CollapsibleSection>
             )}
 
