@@ -226,8 +226,8 @@ export default function TCCSDashboard() {
                   <Video className="w-4 h-4" />
                   Sessions
                 </div>
-                <div className="text-2xl font-bold text-[#1e2749]">2/5</div>
-                <div className="text-xs text-[#35A7FF] font-medium">3 Remaining</div>
+                <div className="text-2xl font-bold text-[#1e2749]">3/4</div>
+                <div className="text-xs text-[#35A7FF] font-medium">1 Remaining</div>
               </div>
               <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                 <div className="flex items-center gap-2 text-gray-500 text-sm mb-1">
@@ -306,48 +306,31 @@ export default function TCCSDashboard() {
               </h3>
 
               <div className="space-y-4">
-                {/* Session 3: March Confirmation */}
-                <div className="flex items-center justify-between p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                  <div>
-                    <p className="font-medium text-gray-800">Session 3: Spring Follow-Up</p>
-                    <p className="text-sm text-gray-500">March 13, 2026 · Date needs confirmation</p>
+                {/* Session 3: Complete */}
+                <div className="flex items-center justify-between p-4 bg-green-50 border border-green-200 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-600" />
+                    <div>
+                      <p className="font-medium text-gray-800">Session 3: Spring Follow-Up</p>
+                      <p className="text-sm text-gray-500">March 13, 2026 · Complete</p>
+                    </div>
                   </div>
-                  <a
-                    href="mailto:rae@teachersdeserveit.com?subject=TCCS%20March%20Session%20-%20Let's%20Finalize%20Our%20Plan"
-                    className="px-4 py-2 bg-[#38618C] hover:bg-[#2d4e73] text-white rounded-lg text-sm font-medium transition-colors"
-                  >
-                    Email Rae to Confirm
-                  </a>
+                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                    Complete
+                  </span>
                 </div>
 
-                {/* Virtual Session */}
-                <div className="flex items-center justify-between p-4 bg-white border border-gray-200 rounded-lg">
-                  <div>
-                    <p className="font-medium text-gray-800">Virtual Session</p>
-                    <p className="text-sm text-gray-500">45 min · Included in contract</p>
-                  </div>
-                  <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-4 py-2 border border-[#1e2749] text-[#1e2749] rounded-lg text-sm font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
-                  >
-                    <Calendar className="w-4 h-4" />
-                    Schedule
-                  </a>
-                </div>
-
-                {/* Complimentary Spring Session (Bonus) */}
-                <div className="flex items-center justify-between p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+                {/* Session 4: Complimentary Spring Session - Active CTA */}
+                <div className="flex items-center justify-between p-4 bg-emerald-50 border-2 border-emerald-300 rounded-lg">
                   <div className="flex items-start gap-3">
                     <Gift className="w-5 h-5 text-emerald-600 mt-0.5" />
                     <div>
-                      <p className="font-medium text-gray-800">Complimentary Spring Session</p>
-                      <p className="text-sm text-gray-500">45 min bonus session -  on us! · Schedule by April 2026</p>
+                      <p className="font-medium text-gray-800">Session 4: Complimentary Spring Session</p>
+                      <p className="text-sm text-gray-500">45 min bonus session - on us! · Schedule by April 2026</p>
                     </div>
                   </div>
                   <a
-                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
+                    href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
@@ -364,9 +347,9 @@ export default function TCCSDashboard() {
               <div className="flex items-start gap-3">
                 <Lightbulb className="w-6 h-6 text-[#ffba06] flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-bold mb-2">What&apos;s Coming in March</h3>
+                  <h3 className="font-bold mb-2">One More Session to Go!</h3>
                   <p className="text-white/90 text-sm">
-                    During your March session, we&apos;ll collect baseline survey data from Beth and James. This quick survey will help us measure growth and tailor support for the rest of the year and beyond.
+                    You have one complimentary bonus session remaining - schedule it by April 2026. Use it for extra coaching, growth planning, or to discuss 2026-27 expansion opportunities.
                   </p>
                 </div>
               </div>
@@ -553,9 +536,9 @@ export default function TCCSDashboard() {
               </div>
 
               {/* Survey Note */}
-              <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                <p className="text-sm text-amber-800">
-                  <strong>Survey Coming:</strong> During our March virtual session, Beth and James will complete a brief survey to establish baseline metrics. We&apos;ll update this dashboard with real data.
+              <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-sm text-green-800">
+                  <strong>Survey Completed:</strong> Beth and James completed their baseline survey during the March session. We&apos;ll update this dashboard with real data as it&apos;s processed.
                 </p>
               </div>
 
@@ -634,34 +617,38 @@ export default function TCCSDashboard() {
                   id="session-3"
                   title="Session 3: Spring Follow-Up, Q&A & Growth Planning"
                   subtitle="Mar 13, 2026 • 60 minutes"
-                  badge="Needs Confirmation"
-                  badgeColor="bg-amber-100 text-amber-700"
-                  icon={<Clock className="w-5 h-5 text-amber-500" />}
+                  badge="Complete"
+                  badgeColor="bg-green-100 text-green-700"
+                  icon={<CheckCircle className="w-5 h-5 text-green-500" />}
                 >
                   <div className="space-y-3">
                     <p className="text-gray-600">Spring session to review growth and plan for 2026-27.</p>
-                    <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
-                      <p className="text-sm font-medium text-amber-800">Session Agenda:</p>
-                      <ul className="text-sm text-amber-700 mt-2 space-y-1">
-                        <li>• Complete baseline survey for Beth and James</li>
-                        <li>• Review pilot year accomplishments</li>
-                        <li>• Discuss 2026-27 expansion opportunities</li>
-                        <li>• Q&A and growth planning</li>
+                    <div className="p-3 bg-gray-50 rounded-lg">
+                      <p className="text-sm font-medium text-[#1e2749]">Key Outcomes:</p>
+                      <ul className="text-sm text-gray-600 mt-2 space-y-1">
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          Completed baseline survey for Beth and James
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          Reviewed pilot year accomplishments
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          Discussed 2026-27 expansion opportunities
+                        </li>
+                        <li className="flex items-start gap-2">
+                          <Check className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                          Set growth planning goals for remainder of year
+                        </li>
                       </ul>
                     </div>
-                    <p className="text-xs text-amber-600">Date is on hold -  needs confirmation</p>
-                    <a
-                      href="mailto:rae@teachersdeserveit.com?subject=TCCS%20March%20Session%20-%20Let's%20Finalize%20Our%20Plan"
-                      className="inline-flex items-center gap-2 bg-[#35A7FF] hover:bg-[#2896ee] text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-                    >
-                      <Mail className="w-4 h-4" />
-                      Email Rae to Confirm
-                    </a>
                   </div>
                 </Accordion>
 
                 {/* Session 4 - Bonus */}
-                <div className="border border-green-200 rounded-lg overflow-hidden bg-green-50">
+                <div className="border-2 border-green-300 rounded-lg overflow-hidden bg-green-50">
                   <div className="px-4 py-3 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <Gift className="w-5 h-5 text-green-600" />
@@ -669,16 +656,17 @@ export default function TCCSDashboard() {
                         <div className="flex items-center gap-2">
                           <span className="font-semibold text-[#1e2749]">Session 4: Complimentary Spring Session</span>
                           <span className="text-xs bg-green-600 text-white px-1.5 py-0.5 rounded font-medium">BONUS</span>
+                          <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium">UP NEXT</span>
                         </div>
                         <p className="text-sm text-gray-500">By April 2026 • 45 minutes</p>
                       </div>
                     </div>
                   </div>
                   <div className="p-4 border-t border-green-200 bg-white">
-                    <p className="text-gray-600 mb-3">A complimentary 45-minute bonus session -  on us! Use it for extra coaching, planning, or questions.</p>
+                    <p className="text-gray-600 mb-3">A complimentary 45-minute bonus session - on us! Use it for extra coaching, planning, or questions.</p>
                     <p className="text-xs text-green-700 mb-3">Schedule by April 2026</p>
                     <a
-                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat"
+                      href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -989,33 +977,67 @@ export default function TCCSDashboard() {
               </div>
             </div>
 
-            {/* What IGNITE Includes */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h3 className="text-lg font-bold text-[#1e2749] mb-4">What IGNITE Phase Includes</h3>
-              <div className="grid md:grid-cols-2 gap-3">
-                {[
-                  'On-site observation day(s)',
-                  'Personalized observation notes (Love Notes)',
-                  'Staff baseline survey',
-                  'Growth group formation',
-                  'Full Hub access for all enrolled staff',
-                  'Virtual coaching sessions',
-                  'Teachers Deserve It book for participants'
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-center gap-2 p-2">
-                    <CheckCircle className="w-4 h-4 text-[#35A7FF] flex-shrink-0" />
-                    <span className="text-sm text-[#1e2749]">{item}</span>
-                  </div>
-                ))}
+            {/* IGNITE Services Table */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h3 className="text-lg font-bold text-[#1e2749] mb-4">IGNITE Phase Services</h3>
+              <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200 bg-gray-50">
+                      <th className="text-left py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Service</th>
+                      <th className="text-right py-3 px-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Included</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Primary Services */}
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 font-medium text-[#1e2749]">All-Access Hub Memberships</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">10 STAFF</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 font-medium text-[#1e2749]">Virtual Coaching Sessions</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">3 SESSIONS</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 font-medium text-[#1e2749]">Executive Impact Session</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">1 SESSION</td>
+                    </tr>
+                    <tr className="border-b border-gray-200">
+                      <td className="py-3 px-4 font-medium text-[#1e2749]">Teachers Deserve It Book</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">10 BOOKS</td>
+                    </tr>
+                    {/* Included Services */}
+                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Implementation &amp; Compliance Analytics</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-[#38618C]">INCLUDED</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Access to On-Demand Request Pipeline</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-[#38618C]">INCLUDED</td>
+                    </tr>
+                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Access to Global Solution Tools</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-[#38618C]">INCLUDED</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Network News &amp; Updates</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-[#38618C]">INCLUDED</td>
+                    </tr>
+                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Funding Pipeline</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-[#38618C]">INCLUDED</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Expert Research &amp; Professional Network</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-[#38618C]">INCLUDED</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Certified Strategic Trainer</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-[#38618C]">INCLUDED</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
-            </div>
-
-            {/* Investment Preview */}
-            <div className="bg-[#38618C]/5 border border-[#38618C]/20 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-[#1e2749] mb-2">Investment Preview</h3>
-              <p className="text-gray-600">
-                Let&apos;s discuss what an expanded partnership could look like for TCCS. We&apos;ll build a plan that fits your budget and goals.
-              </p>
             </div>
 
             {/* Funding Support CTA */}
@@ -1047,12 +1069,15 @@ export default function TCCSDashboard() {
             {/* CTA */}
             <div className="text-center">
               <a
-                href="mailto:rae@teachersdeserveit.com?subject=TCCS%202026-27%20Partnership%20Discussion"
-                className="inline-flex items-center gap-2 bg-[#1e2749] hover:bg-[#2d3a5c] text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-[#38618C] hover:bg-[#2d4e73] text-white px-6 py-3 rounded-lg font-semibold transition-colors"
               >
-                <Mail className="w-5 h-5" />
-                Let&apos;s Plan Your 2026-27 Partnership
+                <Calendar className="w-5 h-5" />
+                Let&apos;s Talk About Next Year
               </a>
+              <p className="text-sm text-gray-500 italic mt-3">Partnerships for 2026-27 are being finalized now.</p>
             </div>
           </div>
         )}
