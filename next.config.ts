@@ -14,11 +14,6 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
-        source: '/Allenwood-Dashboard',
-        destination: '/allenwood-dashboard',
-        permanent: true,
-      },
-      {
         source: '/example-dashboard',
         destination: '/Example-Dashboard',
         permanent: true,
