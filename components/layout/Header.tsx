@@ -25,7 +25,7 @@ export function Header() {
     '/stpchanel-dashboard',
     '/wego-dashboard',
     '/saunemin-dashboard',
-    '/Allenwood-Dashboard',
+    '/allenwood-dashboard',
     '/D41-dashboard',
     '/Example-Dashboard',
   ];
