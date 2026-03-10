@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { HowWePartnerTabs } from '@/components/HowWePartnerTabs';
 import {
@@ -58,6 +58,47 @@ import {
   Sprout,
   Puzzle
 } from 'lucide-react';
+
+// CollapsibleSection component
+const CollapsibleSection = ({
+  title, icon, defaultOpen = false, accent = 'gray', children,
+}: {
+  title: string; icon: React.ReactNode; defaultOpen?: boolean; accent?: 'teal' | 'amber' | 'green' | 'blue' | 'purple' | 'yellow' | 'rose' | 'indigo' | 'orange' | 'gray'; children: React.ReactNode;
+}) => {
+  const [open, setOpen] = React.useState(defaultOpen);
+
+  const accentStyles: Record<string, { border: string; headerBg: string; iconBg: string }> = {
+    teal: { border: 'border-l-4 border-l-teal-500', headerBg: 'bg-teal-50/50', iconBg: 'bg-teal-100' },
+    amber: { border: 'border-l-4 border-l-amber-500', headerBg: 'bg-amber-50/50', iconBg: 'bg-amber-100' },
+    green: { border: 'border-l-4 border-l-green-500', headerBg: 'bg-green-50/50', iconBg: 'bg-green-100' },
+    blue: { border: 'border-l-4 border-l-blue-500', headerBg: 'bg-blue-50/50', iconBg: 'bg-blue-100' },
+    purple: { border: 'border-l-4 border-l-purple-500', headerBg: 'bg-purple-50/50', iconBg: 'bg-purple-100' },
+    yellow: { border: 'border-l-4 border-l-yellow-500', headerBg: 'bg-yellow-50/50', iconBg: 'bg-yellow-100' },
+    rose: { border: 'border-l-4 border-l-rose-500', headerBg: 'bg-rose-50/50', iconBg: 'bg-rose-100' },
+    indigo: { border: 'border-l-4 border-l-indigo-500', headerBg: 'bg-indigo-50/50', iconBg: 'bg-indigo-100' },
+    orange: { border: 'border-l-4 border-l-orange-500', headerBg: 'bg-orange-50/50', iconBg: 'bg-orange-100' },
+    gray: { border: '', headerBg: 'bg-white', iconBg: 'bg-gray-100' },
+  };
+
+  const style = accentStyles[accent] || accentStyles.gray;
+
+  return (
+    <div className={`bg-white rounded-2xl border overflow-hidden transition-all ${style.border} ${
+      open ? 'border-gray-200 shadow-md' : 'border-gray-100 shadow-sm'
+    }`}>
+      <button onClick={() => setOpen(!open)} className={`w-full flex items-center justify-between px-6 py-4 transition-colors ${
+        open ? 'bg-gray-50 border-b border-gray-100' : 'hover:bg-gray-50'
+      }`}>
+        <div className="flex items-center gap-2.5">
+          {icon}
+          <span className="text-sm font-bold text-gray-900">{title}</span>
+        </div>
+        <ChevronDown className={`w-4 h-4 text-gray-400 transition-transform ${open ? 'rotate-180' : ''}`} />
+      </button>
+      {open && <div className="px-6 pb-6 pt-4">{children}</div>}
+    </div>
+  );
+};
 
 export default function AllenwoodDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -226,6 +267,48 @@ export default function AllenwoodDashboard() {
 
   const handleTabChange = (tabId: string) => {
     setActiveTab(tabId);
+  };
+
+  // Partnership Journey - Standard format for horizontal stepper
+  const partnershipJourney = {
+    phases: [
+      {
+        name: 'IGNITE',
+        number: 1,
+        status: 'current' as 'complete' | 'current' | 'upcoming',
+        deliverables: [
+          { label: 'Hub access activated - all 13 teachers enrolled', complete: true },
+          { label: '100% Hub login milestone achieved', complete: true },
+          { label: 'Observation Day 1 - 11 classrooms, 11 Love Notes', complete: true },
+          { label: 'Observation Day 2 - 11 classrooms, 11 Love Notes', complete: true },
+          { label: 'Virtual Support Session 1', complete: true },
+          { label: 'Virtual Support Session 2', complete: true },
+          { label: 'Virtual Support Session 3', complete: false },
+          { label: 'Year-end leadership recap', complete: false },
+        ],
+      },
+      {
+        name: 'ACCELERATE',
+        number: 2,
+        status: 'upcoming' as 'complete' | 'current' | 'upcoming',
+        deliverables: [
+          { label: 'Full Hub library access - all courses unlocked', complete: false },
+          { label: 'Deep-dive strategy coaching sessions', complete: false },
+          { label: 'Mid-year survey + data review', complete: false },
+          { label: 'Building-level lead teacher program', complete: false },
+        ],
+      },
+      {
+        name: 'SUSTAIN',
+        number: 3,
+        status: 'upcoming' as 'complete' | 'current' | 'upcoming',
+        deliverables: [
+          { label: 'Year-end data presentation to leadership', complete: false },
+          { label: 'Year 2 partnership design + contract renewal', complete: false },
+          { label: 'Internal TDI champion identified and supported', complete: false },
+        ],
+      },
+    ],
   };
 
   // ===================== OVERVIEW DATA =====================
@@ -730,6 +813,80 @@ export default function AllenwoodDashboard() {
                 ))}
               </div>
             </div>
+
+            {/* Your Partnership Journey - Horizontal Phase Stepper */}
+            <CollapsibleSection
+              title="Your Partnership Journey"
+              icon={<Star className="w-4 h-4 text-yellow-600" />}
+              defaultOpen={true}
+              accent="yellow"
+            >
+              {/* Phase stepper - horizontal progress visual */}
+              <div className="flex items-stretch gap-0 mb-6">
+                {partnershipJourney.phases.map((phase, i) => (
+                  <React.Fragment key={phase.name}>
+                    <div className={`flex-1 rounded-xl p-4 ${
+                      phase.status === 'current' ? 'bg-[#1e2749] text-white' :
+                      phase.status === 'complete' ? 'bg-teal-600 text-white' :
+                      'bg-gray-100 text-gray-400'
+                    }`}>
+                      <div className="flex items-center justify-between mb-2">
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                          phase.status === 'current' ? 'bg-white/20 text-white' :
+                          phase.status === 'complete' ? 'bg-white/20 text-white' :
+                          'bg-gray-200 text-gray-500'
+                        }`}>
+                          {phase.status === 'current' ? 'YOU ARE HERE' : phase.status === 'complete' ? 'COMPLETE' : 'UPCOMING'}
+                        </span>
+                        <span className="text-lg font-bold opacity-50">{phase.number}</span>
+                      </div>
+                      <p className={`font-bold text-base ${phase.status !== 'upcoming' ? 'text-white' : 'text-gray-500'}`}>{phase.name}</p>
+                    </div>
+                    {i < partnershipJourney.phases.length - 1 && (
+                      <div className="flex items-center px-1">
+                        <ArrowRight className={`w-4 h-4 ${
+                          partnershipJourney.phases[i].status !== 'upcoming' ? 'text-teal-500' : 'text-gray-300'
+                        }`} />
+                      </div>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+
+              {/* Current phase deliverables - checkboxes with visual progress bar */}
+              {partnershipJourney.phases.filter(p => p.status === 'current').map(phase => {
+                const completed = phase.deliverables.filter(d => d.complete).length;
+                const total = phase.deliverables.length;
+                const pct = Math.round((completed / total) * 100);
+                return (
+                  <div key={phase.name}>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{phase.name} Deliverables</p>
+                      <span className="text-xs font-bold text-teal-700">{completed}/{total} complete</span>
+                    </div>
+                    {/* Progress bar */}
+                    <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
+                      <div
+                        className="bg-teal-500 h-2 rounded-full transition-all"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    {/* Checklist */}
+                    <ul className="space-y-2">
+                      {phase.deliverables.map((d, i) => (
+                        <li key={i} className={`flex items-start gap-3 px-3 py-2 rounded-lg ${d.complete ? 'bg-green-50' : 'bg-gray-50'}`}>
+                          {d.complete
+                            ? <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                            : <div className="w-4 h-4 rounded-full border-2 border-gray-300 mt-0.5 shrink-0" />
+                          }
+                          <span className={`text-sm ${d.complete ? 'text-green-800 font-medium' : 'text-gray-500'}`}>{d.label}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </CollapsibleSection>
 
             {/* SECTION 1: Our Goal */}
             <div id="our-goal" className="scroll-mt-36">

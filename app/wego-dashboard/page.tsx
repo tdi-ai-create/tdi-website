@@ -364,7 +364,7 @@ export default function WegoDashboard() {
           number: 2,
           status: 'current',
           deliverables: [
-            { label: 'Collaborative support structures tracking', complete: false },
+            { label: 'Collaborative Support Structures implementation tracking', complete: false },
             { label: 'In Person Check Ins 3–5 (Mar, Apr, May)', complete: false },
             { label: 'Mid-year leadership check-in', complete: false },
             { label: 'Full Hub library access  - all courses unlocked', complete: false },
@@ -1005,62 +1005,75 @@ export default function WegoDashboard() {
             {/* SECTION 4  - PARTNERSHIP JOURNEY */}
             <CollapsibleSection
               title="Your Partnership Journey"
-              icon={<Map className="w-4 h-4 text-yellow-600" />}
+              icon={<Star className="w-4 h-4 text-yellow-600" />}
               defaultOpen={true}
               accent="yellow"
             >
-              <div className="space-y-4">
-                {partnershipData.journey.phases.map((phase) => (
-                  <div
-                    key={phase.name}
-                    className={`rounded-lg border p-4 ${
-                      phase.status === 'current'
-                        ? 'border-yellow-300 bg-yellow-50'
-                        : phase.status === 'complete'
-                        ? 'border-green-200 bg-green-50'
-                        : 'border-gray-200 bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors'
-                    }`}
-                    onClick={phase.status === 'upcoming' ? () => setActiveTab('blueprint') : undefined}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
+              {/* Phase stepper - horizontal progress visual */}
+              <div className="flex items-stretch gap-0 mb-6">
+                {partnershipData.journey.phases.map((phase, i) => (
+                  <React.Fragment key={phase.name}>
+                    <div className={`flex-1 rounded-xl p-4 ${
+                      phase.status === 'current' ? 'bg-[#1e2749] text-white' :
+                      phase.status === 'complete' ? 'bg-teal-600 text-white' :
+                      'bg-gray-100 text-gray-400'
+                    }`}>
+                      <div className="flex items-center justify-between mb-2">
                         <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
-                          phase.status === 'current'
-                            ? 'bg-yellow-400 text-yellow-900'
-                            : phase.status === 'complete'
-                            ? 'bg-green-500 text-white'
-                            : 'bg-gray-300 text-gray-600'
+                          phase.status === 'current' ? 'bg-white/20 text-white' :
+                          phase.status === 'complete' ? 'bg-white/20 text-white' :
+                          'bg-gray-200 text-gray-500'
                         }`}>
-                          Phase {phase.number}
+                          {phase.status === 'current' ? 'YOU ARE HERE' : phase.status === 'complete' ? 'COMPLETE' : 'UPCOMING'}
                         </span>
-                        <span className="text-sm font-semibold text-gray-900">{phase.name}</span>
-                        {phase.status === 'current' && (
-                          <span className="text-xs text-yellow-700 font-semibold">YOU ARE HERE</span>
-                        )}
-                        {phase.status === 'complete' && (
-                          <CheckCircle className="w-3.5 h-3.5 text-green-500" />
-                        )}
+                        <span className="text-lg font-bold opacity-50">{phase.number}</span>
                       </div>
-                      {phase.status === 'upcoming' && (
-                        <div className="flex items-center gap-1 text-xs text-gray-400">
-                          <span>See Blueprint</span>
-                          <ArrowRight className="w-3 h-3" />
-                        </div>
-                      )}
+                      <p className={`font-bold text-base ${phase.status !== 'upcoming' ? 'text-white' : 'text-gray-500'}`}>{phase.name}</p>
                     </div>
-                    <ul className="space-y-1 mt-2">
+                    {i < partnershipData.journey.phases.length - 1 && (
+                      <div className="flex items-center px-1">
+                        <ArrowRight className={`w-4 h-4 ${
+                          partnershipData.journey.phases[i].status !== 'upcoming' ? 'text-teal-500' : 'text-gray-300'
+                        }`} />
+                      </div>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+
+              {/* Current phase deliverables - checkboxes with visual progress bar */}
+              {partnershipData.journey.phases.filter(p => p.status === 'current').map(phase => {
+                const completed = phase.deliverables.filter(d => d.complete).length;
+                const total = phase.deliverables.length;
+                const pct = Math.round((completed / total) * 100);
+                return (
+                  <div key={phase.name}>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">{phase.name} Deliverables</p>
+                      <span className="text-xs font-bold text-teal-700">{completed}/{total} complete</span>
+                    </div>
+                    {/* Progress bar */}
+                    <div className="w-full bg-gray-100 rounded-full h-2 mb-4">
+                      <div
+                        className="bg-teal-500 h-2 rounded-full transition-all"
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                    {/* Checklist */}
+                    <ul className="space-y-2">
                       {phase.deliverables.map((d, i) => (
-                        <li key={i} className="flex items-start gap-2 text-xs text-gray-700">
-                          <span className={`mt-0.5 flex-shrink-0 ${d.complete ? 'text-green-500' : 'text-gray-300'}`}>
-                            {d.complete ? '✓' : '○'}
-                          </span>
-                          {d.label}
+                        <li key={i} className={`flex items-start gap-3 px-3 py-2 rounded-lg ${d.complete ? 'bg-green-50' : 'bg-gray-50'}`}>
+                          {d.complete
+                            ? <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 shrink-0" />
+                            : <div className="w-4 h-4 rounded-full border-2 border-gray-300 mt-0.5 shrink-0" />
+                          }
+                          <span className={`text-sm ${d.complete ? 'text-green-800 font-medium' : 'text-gray-500'}`}>{d.label}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
-                ))}
-              </div>
+                );
+              })}
             </CollapsibleSection>
 
             {/* SECTION 5  - SESSIONS + LEADERSHIP MEETINGS */}
