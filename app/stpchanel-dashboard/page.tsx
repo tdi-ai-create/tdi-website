@@ -2285,206 +2285,91 @@ export default function StPeterChanelDashboard() {
         {activeTab === 'next-year' && (
           <div className="space-y-6">
 
-            {/* SECTION 1: HERO BANNER */}
-            <div className="bg-[#1e2749] rounded-xl p-8 text-white">
-              <h2 className="text-2xl md:text-3xl font-bold mb-4">Year 2 is Where It All Comes Together</h2>
-              <p className="text-lg opacity-90 leading-relaxed max-w-3xl">
-                You&apos;ve built the foundation. Your teachers know TDI, they trust the process, and they&apos;ve started implementing. Next year, we deepen that work — together.
+            {/* Header */}
+            <div className="text-center mb-2">
+              <h2 className="text-2xl font-bold text-[#1e2749] mb-2">Your 2026-27 Partnership</h2>
+              <span className="inline-flex items-center gap-2 bg-gradient-to-r from-[#38618C] to-[#1e2749] text-white text-sm font-medium px-4 py-2 rounded-full">
+                Phase: ACCELERATE — Full Staff
+              </span>
+            </div>
+
+            {/* ===== Full Service Table (Allenwood Style) ===== */}
+            <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
+              <h3 className="font-bold text-[#1e2749] mb-4">Included With Every Service</h3>
+              <div className="bg-white rounded-lg overflow-hidden border border-gray-200">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200 bg-gray-50">
+                      <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">SERVICE</th>
+                      <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">INCLUDED</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {/* Primary Services - Bold */}
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 font-medium text-[#1e2749]">Learning Hub Membership</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">25 STAFF</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 font-medium text-[#1e2749]">In-Person Observation Days</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">3 DAYS</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-3 px-4 font-medium text-[#1e2749]">Executive Impact Sessions</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">2 SESSIONS</td>
+                    </tr>
+                    <tr className="border-b border-gray-200">
+                      <td className="py-3 px-4 font-medium text-[#1e2749]">Professional Books</td>
+                      <td className="py-3 px-4 text-right font-bold text-[#38618C]">25 COPIES</td>
+                    </tr>
+                    {/* Included Services - Lighter */}
+                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Implementation &amp; Compliance Analytics</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Access to On-Demand Request Pipeline</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                    </tr>
+                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Access to Global Solution Tools</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Network News &amp; Updates</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                    </tr>
+                    <tr className="border-b border-gray-100 bg-gray-50/50">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Funding Pipeline</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                    </tr>
+                    <tr className="border-b border-gray-100">
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Expert Research &amp; Professional Network</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                    </tr>
+                    <tr>
+                      <td className="py-2.5 px-4 text-sm text-gray-600">Certified Strategic Trainer</td>
+                      <td className="py-2.5 px-4 text-right text-sm font-medium text-emerald-600">INCLUDED</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* CTA */}
+            <div className="text-center">
+              <a
+                href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-[#1A6B6B] hover:bg-[#155858] text-white px-8 py-3 rounded-lg font-semibold transition-colors"
+              >
+                <Calendar className="w-5 h-5" />
+                Let&apos;s Talk About Next Year
+              </a>
+              <p className="text-sm text-gray-500 italic mt-4">
+                Contracts are being finalized now for the 2026-27 school year.
               </p>
-              <div className="mt-6">
-                <span className="inline-flex items-center gap-2 bg-gradient-to-r from-[#1A6B6B] to-[#F5C542] text-white text-sm font-medium px-4 py-2 rounded-full">
-                  Phase: ACCELERATE — Full Staff
-                </span>
-              </div>
-            </div>
-
-            {/* SECTION 2: WHAT'S ALREADY WORKING */}
-            <div>
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="bg-gray-100 rounded-xl p-5 text-center">
-                  <p className="text-3xl font-bold text-[#1e2749]">Active</p>
-                  <p className="text-sm text-gray-600 mt-1">Hub Logins</p>
-                  <p className="text-xs text-gray-500 mt-2">Teachers Engaged</p>
-                </div>
-                <div className="bg-gray-100 rounded-xl p-5 text-center">
-                  <p className="text-3xl font-bold text-[#1e2749]">12</p>
-                  <p className="text-sm text-gray-600 mt-1">Love Notes Delivered</p>
-                  <p className="text-xs text-gray-500 mt-2">Personal Feedback Moments</p>
-                </div>
-                <div className="bg-gray-100 rounded-xl p-5 text-center">
-                  <p className="text-3xl font-bold text-[#1e2749]">1 of 2</p>
-                  <p className="text-sm text-gray-600 mt-1">Observations Complete</p>
-                  <p className="text-xs text-gray-500 mt-2">In-Person Visits</p>
-                </div>
-              </div>
-              <p className="text-sm text-gray-500 italic text-center mt-4">Year 2 builds directly on this foundation.</p>
-            </div>
-
-            {/* SECTION 3: WHAT YEAR 2 INCLUDES */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-              <h3 className="text-lg font-semibold text-[#1e2749] mb-6">Your 2026-27 Partnership — What&apos;s Included</h3>
-
-              <div className="grid md:grid-cols-2 gap-x-8 gap-y-4">
-                {/* Paid Items - Bold */}
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <School className="w-5 h-5 text-[#1e2749] mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="font-semibold text-[#1e2749]">3 In-Person Observation Visits</p>
-                      <p className="text-sm text-gray-500">travel included</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Users className="w-5 h-5 text-[#1e2749] mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="font-semibold text-[#1e2749]">2 Executive Sessions</p>
-                      <p className="text-sm text-gray-500">KPI planning + leadership alignment</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <Laptop className="w-5 h-5 text-[#1e2749] mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="font-semibold text-[#1e2749]">25 Learning Hub Memberships</p>
-                      <p className="text-sm text-gray-500">full year, all resources</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <BookOpen className="w-5 h-5 text-[#1e2749] mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p className="font-semibold text-[#1e2749]">25 TDI Books</p>
-                      <p className="text-sm text-gray-500">Teachers Deserve It — one per staff member</p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Included Items - Teal Checkmarks */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-[#1A6B6B] flex-shrink-0" />
-                    <p className="text-gray-700">Implementation & Compliance Analytics Dashboard</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-[#1A6B6B] flex-shrink-0" />
-                    <p className="text-gray-700">Access to On-Demand Request Pipeline</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-[#1A6B6B] flex-shrink-0" />
-                    <p className="text-gray-700">Access to Global Solution Tools</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-[#1A6B6B] flex-shrink-0" />
-                    <p className="text-gray-700">Network News & Updates</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-[#1A6B6B] flex-shrink-0" />
-                    <p className="text-gray-700">Funding Pipeline Access</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-[#1A6B6B] flex-shrink-0" />
-                    <p className="text-gray-700">Expert Research & Professional Network</p>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-[#1A6B6B] flex-shrink-0" />
-                    <p className="text-gray-700">Certified Strategic Trainer</p>
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-sm text-gray-500 italic mt-6">
-                Your dashboard is included with every TDI partnership — updated in real time throughout the year.
-              </p>
-            </div>
-
-            {/* SECTION 4: SEPTEMBER KICK-OFF VISIT */}
-            <div className="bg-[#F5C542] rounded-xl p-6">
-              <div className="flex items-start gap-3">
-                <Calendar className="w-6 h-6 text-[#1e2749] mt-1 flex-shrink-0" />
-                <div>
-                  <h3 className="text-lg font-semibold text-[#1e2749] mb-3">September Kick-Off Visit — The Year 2 Difference</h3>
-                  <p className="text-[#1e2749] leading-relaxed">
-                    One of the biggest shifts in Year 2 partnerships is starting together — not catching up mid-year. Your September visit gets every teacher aligned, energized, and implementing from week one.
-                  </p>
-                  <p className="text-[#1e2749] font-medium mt-4">
-                    No ramp-up time. No confusion. Just momentum.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* SECTION 5: RESEARCH CALLOUT BANNER */}
-            <div className="bg-[#1A6B6B]/10 rounded-xl p-6 text-center">
-              <p className="text-2xl font-bold text-[#1e2749] mb-4">
-                65% of TDI partner teachers implement new strategies within 30 days
-              </p>
-              <p className="text-lg text-gray-600 mb-6">
-                vs. the 10% industry average for traditional PD.
-              </p>
-              <blockquote className="max-w-2xl mx-auto">
-                <p className="text-gray-700 italic">
-                  &quot;TDI didn&apos;t just give us a workshop — they gave us a system. Our teachers are implementing strategies months later, and we have the data to prove it.&quot;
-                </p>
-                <footer className="text-sm text-gray-500 mt-3">— TDI Partner School Leader</footer>
-              </blockquote>
-            </div>
-
-            {/* SECTION 6: INVESTMENT SUMMARY CARD */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-[#1e2749] mb-6">2026-27 Partnership Investment</h3>
-
-              <div className="space-y-4">
-                <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                  <span className="text-gray-700 font-medium">In-Person Visits</span>
-                  <span className="text-gray-600">3 full days (travel included)</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                  <span className="text-gray-700 font-medium">Executive Sessions</span>
-                  <span className="text-gray-600">2 strategic planning sessions</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                  <span className="text-gray-700 font-medium">Learning Hub</span>
-                  <span className="text-gray-600">25 memberships — full year access</span>
-                </div>
-                <div className="flex justify-between items-center py-3 border-b border-gray-100">
-                  <span className="text-gray-700 font-medium">TDI Book</span>
-                  <span className="text-gray-600">25 copies for your staff</span>
-                </div>
-                <div className="flex justify-between items-center py-3">
-                  <span className="text-gray-700 font-medium">Dashboard & Analytics</span>
-                  <span className="text-gray-600">Included — always on</span>
-                </div>
-              </div>
-
-              <div className="mt-8 text-center">
-                <a
-                  href="https://calendly.com/rae-teachersdeserveit/teachers-deserve-it-chat-clone"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-[#1A6B6B] hover:bg-[#155858] text-white px-8 py-3 rounded-lg font-semibold transition-colors"
-                >
-                  <Calendar className="w-5 h-5" />
-                  Let&apos;s Talk About Next Year
-                </a>
-                <p className="text-sm text-gray-500 mt-4">
-                  Contracts are being finalized now for the 2026-27 school year. Reach out to reserve your partnership dates.
-                </p>
-              </div>
-            </div>
-
-            {/* SECTION 7: RAE'S PERSONAL NOTE */}
-            <div className="bg-[#FFFBF5] rounded-xl p-6 border border-amber-100">
-              <h3 className="text-lg font-semibold text-[#1e2749] mb-4">A Note from Rae</h3>
-              <div className="space-y-4 text-gray-700 leading-relaxed">
-                <p>
-                  Paula — what you&apos;ve built at St. Peter Chanel this year is real. Your teachers are showing up, and I&apos;ve seen it firsthand in the classroom.
-                </p>
-                <p>
-                  Year 2 is about taking everything we&apos;ve started and making it stick — so that next June, your team doesn&apos;t just survive the spring, they lead it.
-                </p>
-                <p>
-                  I&apos;d love to talk through what next year looks like for your school. Let&apos;s make it your best year yet.
-                </p>
-              </div>
-              <p className="text-[#1e2749] font-medium mt-6">— Rae</p>
             </div>
 
           </div>
