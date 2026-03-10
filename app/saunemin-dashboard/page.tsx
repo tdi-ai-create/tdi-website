@@ -387,8 +387,7 @@ export default function SauneminDashboard() {
   // Tab configuration (removed 2025-26 tab - redundant with other content)
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Eye },
-    { id: 'journey', label: 'Journey', icon: TrendingUp },
-    { id: 'progress', label: 'Progress', icon: Users },
+    { id: 'ourPartnership', label: 'Our Partnership', icon: Heart },
     { id: 'blueprint', label: 'Blueprint', icon: Star },
     { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
     { id: 'team', label: 'Team', icon: User },
@@ -594,7 +593,7 @@ export default function SauneminDashboard() {
 
                 {/* Staff Active */}
                 <button
-                  onClick={() => setActiveTab('progress')}
+                  onClick={() => setActiveTab('ourPartnership')}
                   className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
                 >
                   <div className="flex items-center justify-between mb-3">
@@ -633,7 +632,7 @@ export default function SauneminDashboard() {
 
                 {/* Hub Engagement */}
                 <button
-                  onClick={() => setActiveTab('progress')}
+                  onClick={() => setActiveTab('ourPartnership')}
                   className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#1A6B6B]/20 transition-all group"
                 >
                   <div className="flex items-center justify-between mb-3">
@@ -875,8 +874,8 @@ export default function SauneminDashboard() {
           </div>
         )}
 
-        {/* JOURNEY TAB */}
-        {activeTab === 'journey' && (
+        {/* OUR PARTNERSHIP TAB (merged Journey + Progress) */}
+        {activeTab === 'ourPartnership' && (
           <div className="space-y-6">
             <div className="text-center mb-6">
               <h2 className="text-xl font-bold text-[#1e2749] mb-2">Your Partnership Journey</h2>
@@ -1297,17 +1296,13 @@ export default function SauneminDashboard() {
                 </div>
               </div>
             </div>
-          </div>
-        )}
-
-        {/* PROGRESS TAB */}
-        {activeTab === 'progress' && (
-          <div className="space-y-6">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-xl font-bold text-[#1e2749]">Implementation Progress</h2>
-                <p className="text-gray-600 text-sm">Tracking observations, hub engagement, and love notes</p>
-              </div>
+            {/* IMPLEMENTATION PROGRESS SECTION (merged from Progress tab) */}
+            <div className="border-t border-gray-200 pt-6 mt-6">
+              <div className="flex justify-between items-center mb-4">
+                <div>
+                  <h3 className="text-lg font-bold text-[#1e2749]">Implementation Progress</h3>
+                  <p className="text-gray-600 text-sm">Tracking observations, hub engagement, and love notes</p>
+                </div>
               <SectionControls prefix="observation" />
             </div>
 
