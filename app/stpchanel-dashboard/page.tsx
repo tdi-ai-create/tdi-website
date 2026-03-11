@@ -23,6 +23,9 @@ import {
   MessageSquare,
   Award,
   Phone,
+  LayoutDashboard,
+  Rocket,
+  UserCircle,
   Mail,
   MapPin,
   Building,
@@ -699,12 +702,12 @@ export default function StPeterChanelDashboard() {
         <div className="max-w-5xl mx-auto px-4 py-3">
           <div className="flex justify-center gap-2">
             {[
-              { id: 'overview', label: 'Overview', icon: Eye },
+              { id: 'overview', label: 'Overview', icon: LayoutDashboard },
               { id: 'journey', label: 'Journey', icon: TrendingUp },
-              { id: 'implementation', label: 'Progress', icon: Users },
+              { id: 'progress', label: 'Progress', icon: Users },
               { id: 'blueprint', label: 'Blueprint', icon: Star },
-              { id: 'next-year', label: '2026-27', icon: Sparkles, badge: 'Preview' },
-              { id: 'team', label: 'Team', icon: User },
+              { id: '2026-27', label: '2026-27', icon: Rocket, badge: 'Preview' },
+              { id: 'team', label: 'Team', icon: UserCircle },
               { id: 'billing', label: 'Billing', icon: CreditCard },
             ].map((tab) => (
               <button
@@ -1606,8 +1609,8 @@ export default function StPeterChanelDashboard() {
           </div>
         )}
 
-        {/* IMPLEMENTATION TAB */}
-        {activeTab === 'implementation' && (
+        {/* PROGRESS TAB */}
+        {activeTab === 'progress' && (
           <div className="space-y-4">
             {/* SECTION A: Observation Timeline */}
             <div className="mb-8">
@@ -2283,7 +2286,7 @@ export default function StPeterChanelDashboard() {
         )}
 
         {/* 2026-27 TAB */}
-        {activeTab === 'next-year' && (
+        {activeTab === '2026-27' && (
           <div className="space-y-4">
             {/* Section 1: Phase Hero */}
             <div className="text-center mb-8">
