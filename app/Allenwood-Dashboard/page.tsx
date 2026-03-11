@@ -814,6 +814,33 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
+            {/* SECTION 1: Our Goal */}
+            <div id="our-goal" className="scroll-mt-36">
+              <div className="relative bg-gradient-to-br from-[#1e2749] to-[#2d3a6b] rounded-2xl p-8 overflow-hidden shadow-xl">
+                {/* Background decoration */}
+                <div className="absolute top-0 right-0 w-64 h-64 opacity-5 pointer-events-none">
+                  <svg viewBox="0 0 200 200" fill="none">
+                    <circle cx="150" cy="50" r="100" fill="white"/>
+                    <circle cx="50" cy="150" r="80" fill="white"/>
+                  </svg>
+                </div>
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-1 h-8 bg-teal-400 rounded-full" />
+                    <span className="text-teal-300 text-xs font-bold uppercase tracking-widest">
+                      Your Partnership Goal
+                    </span>
+                  </div>
+                  <blockquote className="text-2xl font-bold text-white leading-relaxed max-w-2xl mb-4">
+                    &quot;Equip Allenwood teachers with practical strategies and resources to build calm, connected classrooms where every student - including those with autism, special needs, and multilingual learners - feels supported and seen.&quot;
+                  </blockquote>
+                  <p className="text-blue-200 text-sm italic">
+                    Aligned to Dr. Porter&apos;s 2025-26 theme: Together We Will Rise
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Your Partnership Journey - Horizontal Phase Stepper */}
             <CollapsibleSection
               title="Your Partnership Journey"
@@ -888,31 +915,29 @@ export default function AllenwoodDashboard() {
               })}
             </CollapsibleSection>
 
-            {/* SECTION 1: Our Goal */}
-            <div id="our-goal" className="scroll-mt-36">
-              <div className="relative bg-gradient-to-br from-[#1e2749] to-[#2d3a6b] rounded-2xl p-8 overflow-hidden shadow-xl">
-                {/* Background decoration */}
-                <div className="absolute top-0 right-0 w-64 h-64 opacity-5 pointer-events-none">
-                  <svg viewBox="0 0 200 200" fill="none">
-                    <circle cx="150" cy="50" r="100" fill="white"/>
-                    <circle cx="50" cy="150" r="80" fill="white"/>
-                  </svg>
+            {/* What Success Looks Like */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <h3 className="font-bold text-[#1e2749] text-lg mb-4 flex items-center gap-2">
+                <Target className="w-5 h-5 text-green-600" />
+                What Success Looks Like
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="bg-green-50 rounded-lg p-4 border border-green-100">
+                  <p className="text-gray-800 font-medium">Pilot teachers report increased confidence in classroom strategies</p>
                 </div>
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="w-1 h-8 bg-teal-400 rounded-full" />
-                    <span className="text-teal-300 text-xs font-bold uppercase tracking-widest">
-                      Your Partnership Goal
-                    </span>
-                  </div>
-                  <blockquote className="text-2xl font-bold text-white leading-relaxed max-w-2xl mb-4">
-                    &quot;Equip Allenwood teachers with practical strategies and resources to build calm, connected classrooms where every student - including those with autism, special needs, and multilingual learners - feels supported and seen.&quot;
-                  </blockquote>
-                  <p className="text-blue-200 text-sm italic">
-                    Aligned to Dr. Porter&apos;s 2025-26 theme: Together We Will Rise
-                  </p>
+                <div className="bg-green-50 rounded-lg p-4 border border-green-100">
+                  <p className="text-gray-800 font-medium">Measurable improvement in feeling supported by admin and peers</p>
+                </div>
+                <div className="bg-green-50 rounded-lg p-4 border border-green-100">
+                  <p className="text-gray-800 font-medium">Reduced stress levels compared to baseline</p>
+                </div>
+                <div className="bg-green-50 rounded-lg p-4 border border-green-100">
+                  <p className="text-gray-800 font-medium">Clear implementation of Hub strategies observed in classrooms</p>
                 </div>
               </div>
+              <p className="text-sm text-gray-500 text-center">
+                These targets will be measured through the TDI Educator Survey, classroom observations, and Hub engagement data.
+              </p>
             </div>
 
             {/* SECTION 2: Observations - Navy Band */}
@@ -1342,108 +1367,22 @@ export default function AllenwoodDashboard() {
               </div>
             </div>
 
-            {/* Virtual Sessions - Completed */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <CheckCircle className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-[#1e2749]">2 Virtual Sessions Completed</h4>
-                    <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
-                      <Check className="w-3 h-3" />
-                      Complete
-                    </span>
-                  </div>
-                  <div className="space-y-3">
-                    <div className="border-b border-gray-100 pb-3">
-                      <p className="text-sm text-gray-600 mb-1">
-                        <span className="font-medium">September 17, 2025</span>
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Welcome &amp; onboarding session for new teachers - introduced the TDI Learning Hub and partnership goals.
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">
-                        <span className="font-medium">February 25, 2026</span>
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Updated what&apos;s new in the hub, fostered discussion around tools, and collected data to support teacher growth.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Leadership Meeting - Completed */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Users className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-[#1e2749]">Leadership Meeting</h4>
-                    <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
-                      <Check className="w-3 h-3" />
-                      Complete
-                    </span>
-                  </div>
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">
-                      <span className="font-medium">March 2, 2026</span> · With Dr. Porter &amp; Allenwood Leadership
-                    </p>
-                    <p className="text-sm text-gray-500">
-                      Reviewed mid-year wins, discussed partnership progress, and planned for Year 2 expansion.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Virtual Sessions - Confirmed Dates */}
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-[#38618C] rounded-lg flex items-center justify-center flex-shrink-0">
-                  <MessageCircle className="w-5 h-5 text-white" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold text-[#1e2749]">4 Virtual Sessions Scheduled</h4>
-                    <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
-                      <Check className="w-3 h-3" />
-                      Confirmed
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-2">
-                    All sessions at <span className="font-medium">6:30 PM CT / 7:30 PM ET</span>
-                  </p>
-                  <p className="text-sm text-gray-500 mb-4">
-                    Each session: Update what&apos;s new in the hub, foster discussion around tools, and collect data to support teacher growth.
-                  </p>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">1</div>
-                      <span className="text-gray-700 font-medium">March 11, 2026</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">2</div>
-                      <span className="text-gray-700 font-medium">March 25, 2026</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">3</div>
-                      <span className="text-gray-700 font-medium">April 8, 2026</span>
-                    </div>
-                    <div className="flex items-center gap-3 text-sm">
-                      <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">4</div>
-                      <span className="text-gray-700 font-medium">April 15, 2026</span>
-                    </div>
-                  </div>
-                </div>
+            {/* What We've Learned Together */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6" style={{ borderLeftWidth: '3px', borderLeftColor: '#0ea5a0', borderLeftStyle: 'solid' }}>
+              <h3 className="font-bold text-[#1e2749] text-lg mb-4">What We&apos;ve Learned Together</h3>
+              <div className="space-y-4 text-gray-700">
+                <p>
+                  During our observation, we saw incredible classroom practices - calm environments, strong routines, and teachers who genuinely care. The foundation is there.
+                </p>
+                <p>
+                  Here&apos;s what we&apos;ve noticed across schools like Allenwood: when staff are told to &quot;explore the Hub during planning time,&quot; that time gets consumed by the urgent - grading, emails, copies, putting out fires.
+                </p>
+                <p className="font-medium text-gray-800">
+                  Meaningful PD happens when there&apos;s protected time with a specific resource in mind.
+                </p>
+                <p>
+                  The good news? Even 15 minutes with a targeted course or download can create immediate classroom impact.
+                </p>
               </div>
             </div>
 
@@ -1677,25 +1616,6 @@ export default function AllenwoodDashboard() {
 
             {/* SECTION 5: What's Ahead */}
             <div id="whats-ahead" className="scroll-mt-36">
-              {/* What We've Learned Together */}
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6" style={{ borderLeftWidth: '3px', borderLeftColor: '#0ea5a0', borderLeftStyle: 'solid' }}>
-                <h3 className="font-bold text-[#1e2749] text-lg mb-4">What We&apos;ve Learned Together</h3>
-                <div className="space-y-4 text-gray-700">
-                  <p>
-                    During our observation, we saw incredible classroom practices - calm environments, strong routines, and teachers who genuinely care. The foundation is there.
-                  </p>
-                  <p>
-                    Here&apos;s what we&apos;ve noticed across schools like Allenwood: when staff are told to &quot;explore the Hub during planning time,&quot; that time gets consumed by the urgent - grading, emails, copies, putting out fires.
-                  </p>
-                  <p className="font-medium text-gray-800">
-                    Meaningful PD happens when there&apos;s protected time with a specific resource in mind.
-                  </p>
-                  <p>
-                    The good news? Even 15 minutes with a targeted course or download can create immediate classroom impact.
-                  </p>
-                </div>
-              </div>
-
               {/* Upcoming Leadership Meetings */}
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mb-6">
                 <h3 className="font-bold text-[#1e2749] text-lg mb-4 flex items-center gap-2">
@@ -1845,29 +1765,83 @@ export default function AllenwoodDashboard() {
                 </div>
               </div>
 
-              {/* What Success Looks Like */}
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-                <h3 className="font-bold text-[#1e2749] text-lg mb-4 flex items-center gap-2">
-                  <Target className="w-5 h-5 text-green-600" />
-                  What Success Looks Like
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                  <div className="bg-green-50 rounded-lg p-4 border border-green-100">
-                    <p className="text-gray-800 font-medium">Pilot teachers report increased confidence in classroom strategies</p>
+              {/* Virtual Sessions - Completed */}
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-5 h-5 text-white" />
                   </div>
-                  <div className="bg-green-50 rounded-lg p-4 border border-green-100">
-                    <p className="text-gray-800 font-medium">Measurable improvement in feeling supported by admin and peers</p>
-                  </div>
-                  <div className="bg-green-50 rounded-lg p-4 border border-green-100">
-                    <p className="text-gray-800 font-medium">Reduced stress levels compared to baseline</p>
-                  </div>
-                  <div className="bg-green-50 rounded-lg p-4 border border-green-100">
-                    <p className="text-gray-800 font-medium">Clear implementation of Hub strategies observed in classrooms</p>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold text-[#1e2749]">2 Virtual Sessions Completed</h4>
+                      <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
+                        <Check className="w-3 h-3" />
+                        Complete
+                      </span>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="border-b border-gray-100 pb-3">
+                        <p className="text-sm text-gray-600 mb-1">
+                          <span className="font-medium">September 17, 2025</span>
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Welcome &amp; onboarding session for new teachers - introduced the TDI Learning Hub and partnership goals.
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-600 mb-1">
+                          <span className="font-medium">February 25, 2026</span>
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          Updated what&apos;s new in the hub, fostered discussion around tools, and collected data to support teacher growth.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-                <p className="text-sm text-gray-500 text-center">
-                  These targets will be measured through the TDI Educator Survey, classroom observations, and Hub engagement data.
-                </p>
+              </div>
+
+              {/* Virtual Sessions - Confirmed Dates */}
+              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 mt-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-[#38618C] rounded-lg flex items-center justify-center flex-shrink-0">
+                    <MessageCircle className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-semibold text-[#1e2749]">4 Virtual Sessions Scheduled</h4>
+                      <span className="text-xs bg-emerald-500 text-white px-2 py-1 rounded-full flex items-center gap-1">
+                        <Check className="w-3 h-3" />
+                        Confirmed
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">
+                      All sessions at <span className="font-medium">6:30 PM CT / 7:30 PM ET</span>
+                    </p>
+                    <p className="text-sm text-gray-500 mb-4">
+                      Each session: Update what&apos;s new in the hub, foster discussion around tools, and collect data to support teacher growth.
+                    </p>
+
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3 text-sm">
+                        <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">1</div>
+                        <span className="text-gray-700 font-medium">March 11, 2026</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-sm">
+                        <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">2</div>
+                        <span className="text-gray-700 font-medium">March 25, 2026</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-sm">
+                        <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">3</div>
+                        <span className="text-gray-700 font-medium">April 8, 2026</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-sm">
+                        <div className="w-6 h-6 bg-emerald-100 rounded-full flex items-center justify-center text-xs font-bold text-emerald-700">4</div>
+                        <span className="text-gray-700 font-medium">April 15, 2026</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
