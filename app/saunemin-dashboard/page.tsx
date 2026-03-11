@@ -1307,44 +1307,6 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
-            {/* Observation Summary */}
-            <div className="bg-white rounded-xl p-5 shadow-sm">
-              <h3 className="font-semibold text-[#1e2749] mb-4 flex items-center gap-2">
-                <Eye className="w-5 h-5 text-[#38618C]" />
-                Observation Highlights - November 19, 2025
-              </h3>
-
-              <div className="space-y-4">
-                {/* What We Celebrated */}
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <h4 className="font-medium text-green-800 mb-2 flex items-center gap-2">
-                    <Star className="w-4 h-4" />
-                    What We Celebrated
-                  </h4>
-                  <ul className="space-y-2 text-sm text-green-700">
-                    <li>• Strong staff relationships across the building</li>
-                    <li>• <strong>Sam Woodcock:</strong> Incredible rapport with students - lots of jokes, trust, and genuine connection</li>
-                    <li>• <strong>Chris Logan:</strong> Gets down on the floor with PreK students and models learning alongside them</li>
-                    <li>• <strong>Cindy Palen:</strong> Patient, structured, works at students' pace with excellent phonics instruction</li>
-                    <li>• <strong>Lisa Heiser:</strong> Fantastic PreK classroom with movement, manipulatives, and student leadership opportunities</li>
-                    <li>• Seamless collaboration between educators</li>
-                  </ul>
-                </div>
-
-                {/* Where We're Growing */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h4 className="font-medium text-blue-800 mb-2 flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4" />
-                    Where We&apos;re Growing
-                  </h4>
-                  <ul className="space-y-2 text-sm text-blue-700">
-                    <li>• Hub access currently limited to paras only (teachers don&apos;t have accounts yet)</li>
-                    <li>• Dedicated PD time for paras to explore resources</li>
-                    <li>• Moving from completion to implementation evidence</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
             {/* IMPLEMENTATION PROGRESS SECTION (merged from Progress tab) */}
             <div className="border-t border-gray-200 pt-6 mt-6">
               <div className="flex justify-between items-center mb-4">
@@ -1499,6 +1461,19 @@ export default function SauneminDashboard() {
               </div>
             </div>
 
+            {/* Where We're Growing */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <h4 className="font-medium text-blue-800 mb-2 flex items-center gap-2">
+                <TrendingUp className="w-4 h-4" />
+                Where We&apos;re Growing
+              </h4>
+              <ul className="space-y-2 text-sm text-blue-700">
+                <li>• Hub access currently limited to paras only (teachers don&apos;t have accounts yet)</li>
+                <li>• Dedicated PD time for paras to explore resources</li>
+                <li>• Moving from completion to implementation evidence</li>
+              </ul>
+            </div>
+
             {/* Learning Hub Data Context Note */}
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
@@ -1509,59 +1484,6 @@ export default function SauneminDashboard() {
                     Hub logins are one indicator we track to understand tool engagement, but they don&apos;t tell the whole story. What matters most is whether strategies from the Hub are showing up in classroom practice -  that&apos;s what we look for during observation days.
                   </p>
                 </div>
-              </div>
-            </div>
-
-            {/* Hub Engagement Visual - Donut Chart */}
-            <div className="bg-white rounded-xl p-5 shadow-sm border border-gray-100 mb-6">
-              <h4 className="font-semibold text-[#1e2749] mb-4">Hub Engagement at a Glance</h4>
-
-              <div className="flex items-center gap-8">
-                {/* Donut Chart */}
-                <div className="relative w-32 h-32">
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                    {/* Background circle */}
-                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="#e5e7eb" strokeWidth="3" />
-                    {/* Progress circle - 75% = 75 stroke-dasharray */}
-                    <circle cx="18" cy="18" r="15.915" fill="none" stroke="#38618C" strokeWidth="3"
-                      strokeDasharray="75, 100" strokeLinecap="round" />
-                  </svg>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-2xl font-bold text-[#1e2749]">75%</span>
-                    <span className="text-xs text-gray-500">Active</span>
-                  </div>
-                </div>
-
-                {/* Legend */}
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-[#38618C]" />
-                    <span className="text-sm text-gray-600">Active Users (9)</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full bg-gray-200" />
-                    <span className="text-sm text-gray-600">Need Support (3)</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Non-Active Users Recommendation */}
-            <div className="bg-white border-l-4 border-[#E07A5F] rounded-r-xl p-5 shadow-sm mb-6">
-              <div className="flex items-center gap-2 mb-2">
-                <Lightbulb className="w-5 h-5 text-[#E07A5F]" />
-                <h3 className="font-semibold text-[#1e2749]">Recommendation: Support Non-Active Users</h3>
-              </div>
-              <p className="text-sm text-gray-600 mb-3">
-                <strong>Amber, Lisa, and Dan</strong> haven&apos;t logged into the Hub yet. Consider pairing them with power users like Sam or Haylie, or scheduling a dedicated Hub exploration session during PD time.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1 text-xs bg-[#E07A5F]/10 text-[#E07A5F] px-2 py-1 rounded-full">
-                  <Users className="w-3 h-3" /> Pair with power users
-                </span>
-                <span className="inline-flex items-center gap-1 text-xs bg-[#E07A5F]/10 text-[#E07A5F] px-2 py-1 rounded-full">
-                  <Clock className="w-3 h-3" /> Schedule PD Hub time
-                </span>
               </div>
             </div>
 
@@ -1640,6 +1562,25 @@ export default function SauneminDashboard() {
                 </div>
               </div>
             </Accordion>
+
+            {/* Recommendation: Support Non-Active Users */}
+            <div className="bg-white border-l-4 border-[#E07A5F] rounded-r-xl p-5 shadow-sm mb-6">
+              <div className="flex items-center gap-2 mb-2">
+                <Lightbulb className="w-5 h-5 text-[#E07A5F]" />
+                <h3 className="font-semibold text-[#1e2749]">Recommendation: Support Non-Active Users</h3>
+              </div>
+              <p className="text-sm text-gray-600 mb-3">
+                <strong>Amber, Lisa, and Dan</strong> haven&apos;t logged into the Hub yet. Consider pairing them with power users like Sam or Haylie, or scheduling a dedicated Hub exploration session during PD time.
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <span className="inline-flex items-center gap-1 text-xs bg-[#E07A5F]/10 text-[#E07A5F] px-2 py-1 rounded-full">
+                  <Users className="w-3 h-3" /> Pair with power users
+                </span>
+                <span className="inline-flex items-center gap-1 text-xs bg-[#E07A5F]/10 text-[#E07A5F] px-2 py-1 rounded-full">
+                  <Clock className="w-3 h-3" /> Schedule PD Hub time
+                </span>
+              </div>
+            </div>
 
             {/* Recommended Resources Section */}
             <div className="bg-gradient-to-r from-[#38618C] to-[#35A7FF] rounded-xl p-5 text-white mb-6">
