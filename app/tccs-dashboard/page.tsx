@@ -252,14 +252,14 @@ export default function TCCSDashboard() {
                   <div className="text-xs text-green-600 mt-1">Both staff members active</div>
                 </div>
                 <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
-                  <div className="text-sm text-blue-700 font-medium">Total Sign-ins</div>
+                  <div className="text-sm text-blue-700 font-medium">Engaged Days</div>
                   <div className="text-xl font-bold text-blue-800">4</div>
                   <div className="text-xs text-blue-600 mt-1">Beth: 3 | James: 1</div>
                 </div>
                 <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
-                  <div className="text-sm text-purple-700 font-medium">Courses Accessed</div>
-                  <div className="text-xl font-bold text-purple-800">32 each</div>
-                  <div className="text-xs text-purple-600 mt-1">Full para library available</div>
+                  <div className="text-sm text-purple-700 font-medium">Courses Touched</div>
+                  <div className="text-xl font-bold text-purple-800">13 total</div>
+                  <div className="text-xs text-purple-600 mt-1">Beth: 11 | James: 2</div>
                 </div>
               </div>
             </div>
@@ -690,14 +690,18 @@ export default function TCCSDashboard() {
                 <Activity className="w-5 h-5 text-[#38618C]" />
                 Hub Engagement Details
               </h2>
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="grid md:grid-cols-3 gap-4">
                 <div className="p-4 bg-green-50 rounded-lg border border-green-100">
                   <div className="text-3xl font-bold text-green-700">100%</div>
                   <div className="text-sm text-green-600">Staff Logged In (2/2)</div>
                 </div>
                 <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
                   <div className="text-3xl font-bold text-blue-700">4</div>
-                  <div className="text-sm text-blue-600">Total Sign-ins</div>
+                  <div className="text-sm text-blue-600">Engaged Days Total</div>
+                </div>
+                <div className="p-4 bg-purple-50 rounded-lg border border-purple-100">
+                  <div className="text-3xl font-bold text-purple-700">13</div>
+                  <div className="text-sm text-purple-600">Courses Touched</div>
                 </div>
               </div>
             </div>
@@ -726,14 +730,14 @@ export default function TCCSDashboard() {
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div className="p-3 bg-gray-50 rounded-lg">
                     <div className="text-xl font-bold text-[#1e2749]">3</div>
-                    <div className="text-xs text-gray-500">Hub Logins</div>
+                    <div className="text-xs text-gray-500">Engaged Days</div>
                   </div>
                   <div className="p-3 bg-gray-50 rounded-lg">
-                    <div className="text-xl font-bold text-[#1e2749]">32</div>
-                    <div className="text-xs text-gray-500">Courses Enrolled</div>
+                    <div className="text-xl font-bold text-[#1e2749]">11</div>
+                    <div className="text-xs text-gray-500">Courses Touched</div>
                   </div>
                   <div className="p-3 bg-gray-50 rounded-lg">
-                    <div className="text-xl font-bold text-[#1e2749]">Jan 2</div>
+                    <div className="text-xl font-bold text-[#1e2749]">Jan 25</div>
                     <div className="text-xs text-gray-500">Last Active</div>
                   </div>
                 </div>
@@ -755,25 +759,36 @@ export default function TCCSDashboard() {
                       <p className="text-sm text-gray-500">Para-Educator</p>
                     </div>
                   </div>
-                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-medium">Active</span>
+                  <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full font-medium">Inactive</span>
                 </div>
                 <div className="grid grid-cols-3 gap-4 text-center">
                   <div className="p-3 bg-gray-50 rounded-lg">
                     <div className="text-xl font-bold text-[#1e2749]">1</div>
-                    <div className="text-xs text-gray-500">Hub Logins</div>
+                    <div className="text-xs text-gray-500">Engaged Day</div>
                   </div>
                   <div className="p-3 bg-gray-50 rounded-lg">
-                    <div className="text-xl font-bold text-[#1e2749]">32</div>
-                    <div className="text-xs text-gray-500">Courses Enrolled</div>
+                    <div className="text-xl font-bold text-[#1e2749]">2</div>
+                    <div className="text-xs text-gray-500">Courses Touched</div>
                   </div>
                   <div className="p-3 bg-gray-50 rounded-lg">
-                    <div className="text-xl font-bold text-[#1e2749]">Jan 2</div>
+                    <div className="text-xl font-bold text-[#1e2749]">Dec 28</div>
                     <div className="text-xs text-gray-500">Last Active</div>
                   </div>
                 </div>
                 <div className="mt-3 text-xs text-gray-500">
                   <Mail className="w-3 h-3 inline mr-1" />
                   jaguerra@tidioutecharter.com
+                </div>
+              </div>
+            </div>
+
+            {/* Engagement Gap Note */}
+            <div className="bg-amber-50 rounded-xl p-4 border border-amber-200">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm text-amber-800 font-medium">No Hub activity since late January 2026</p>
+                  <p className="text-xs text-amber-700 mt-1">Last activity: Beth on Jan 25, 2026 · James on Dec 28, 2025</p>
                 </div>
               </div>
             </div>
