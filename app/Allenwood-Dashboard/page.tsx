@@ -2401,7 +2401,7 @@ export default function AllenwoodDashboard() {
 
               {/* Funding Strategy PDF Download */}
               <a
-                href="https://drive.google.com/file/d/1_rR1XcjNsnHYFMC6ZrKdSiSL2E_ADRu-/view?usp=sharing"
+                href="https://drive.google.com/file/d/1fvTj6pLvOHKPPeAhiNxyPefvPhJKuWXK/view?usp=sharing"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block bg-gray-50 border border-gray-200 rounded-xl p-4 hover:bg-gray-100 transition-colors group mb-6"
