@@ -704,7 +704,6 @@ export default function StPeterChanelDashboard() {
             {[
               { id: 'overview', label: 'Overview', icon: LayoutDashboard },
               { id: 'journey', label: 'Journey', icon: TrendingUp },
-              { id: 'progress', label: 'Progress', icon: Users },
               { id: 'blueprint', label: 'Blueprint', icon: Star },
               { id: '2026-27', label: '2026-27', icon: Rocket, badge: 'Preview' },
               { id: 'team', label: 'Team', icon: UserCircle },
@@ -747,7 +746,7 @@ export default function StPeterChanelDashboard() {
 
                 {/* Staff Engaged */}
                 <button
-                  onClick={() => setActiveTab('progress')}
+                  onClick={() => setActiveTab('journey')}
                   className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#38618C]/20 transition-all group"
                 >
                   <div className="flex items-center justify-between mb-3">
@@ -786,7 +785,7 @@ export default function StPeterChanelDashboard() {
 
                 {/* Hub Engagement */}
                 <button
-                  onClick={() => setActiveTab('progress')}
+                  onClick={() => setActiveTab('journey')}
                   className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 text-left hover:shadow-md hover:border-[#38618C]/20 transition-all group"
                 >
                   <div className="flex items-center justify-between mb-3">
@@ -1606,13 +1605,8 @@ export default function StPeterChanelDashboard() {
                 </div>
               </div>
             </div>
-          </div>
-        )}
 
-        {/* PROGRESS TAB */}
-        {activeTab === 'progress' && (
-          <div className="space-y-4">
-            {/* SECTION A: Observation Timeline */}
+            {/* SECTION A: Observation Timeline (from Progress) */}
             <div className="mb-8">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xl font-bold text-[#1e2749]">Observation Timeline</h3>
