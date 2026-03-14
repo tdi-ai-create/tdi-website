@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import { fetchDashboardData } from '@/lib/dashboard/fetchDashboardData'
+import { getServiceSupabase } from '@/lib/supabase'
 import { DashboardHeader } from '@/components/dashboard/shared/DashboardHeader'
 import { StatCards } from '@/components/dashboard/shared/StatCards'
 import { MomentumBar } from '@/components/dashboard/shared/MomentumBar'
@@ -8,6 +9,7 @@ import { InvestmentNumbers } from '@/components/dashboard/shared/InvestmentNumbe
 import { LoveNotesCallout } from '@/components/dashboard/shared/LoveNotesCallout'
 import { LeadingIndicators } from '@/components/dashboard/shared/LeadingIndicators'
 import { ExampleBanner } from '@/components/dashboard/shared/ExampleBanner'
+import { SectionHighlight } from '@/components/dashboard/shared/SectionHighlight'
 
 interface PageProps {
   params: Promise<{ slug: string }>
@@ -22,6 +24,16 @@ export default async function PartnerDashboardPage({ params }: PageProps) {
   }
 
   const { partnership, organization, timelineEvents, metrics, defaults } = data
+
+  // Fetch section highlights
+  const supabase = getServiceSupabase()
+  const { data: highlightsData } = await supabase
+    .from('section_highlights')
+    .select('*')
+    .eq('partnership_id', partnership.id)
+    .eq('is_active', true)
+
+  const highlights = highlightsData || []
 
   // Get latest metrics snapshot
   const latestMetrics = metrics[0] || {}
@@ -55,65 +67,77 @@ export default async function PartnerDashboardPage({ params }: PageProps) {
         )}
 
         {/* Stat Cards */}
-        <section className="mb-8">
-          <StatCards
-            staffEnrolled={partnership.staff_enrolled}
-            hubLoginPct={latestMetrics.hub_login_pct}
-            observationsUsed={partnership.observation_days_used || 0}
-            observationsTotal={partnership.observation_days_contracted || 6}
-            virtualUsed={partnership.virtual_sessions_used || 0}
-            virtualTotal={partnership.virtual_sessions_contracted || 4}
-            executiveUsed={partnership.exec_sessions_used || 0}
-            executiveTotal={partnership.exec_sessions_contracted || 2}
-            phase={partnership.current_phase || 'IGNITE'}
-            defaults={defaults}
-          />
-        </section>
+        <SectionHighlight sectionKey="stat_cards" highlights={highlights}>
+          <section className="mb-8">
+            <StatCards
+              staffEnrolled={partnership.staff_enrolled}
+              hubLoginPct={latestMetrics.hub_login_pct}
+              observationsUsed={partnership.observation_days_used || 0}
+              observationsTotal={partnership.observation_days_contracted || 6}
+              virtualUsed={partnership.virtual_sessions_used || 0}
+              virtualTotal={partnership.virtual_sessions_contracted || 4}
+              executiveUsed={partnership.exec_sessions_used || 0}
+              executiveTotal={partnership.exec_sessions_contracted || 2}
+              phase={partnership.current_phase || 'IGNITE'}
+              defaults={defaults}
+            />
+          </section>
+        </SectionHighlight>
 
         {/* Momentum Bar */}
-        <section className="mb-8">
-          <MomentumBar
-            status={latestMetrics.momentum_status}
-            detail={latestMetrics.momentum_detail}
-            defaults={defaults}
-          />
-        </section>
+        <SectionHighlight sectionKey="momentum" highlights={highlights}>
+          <section className="mb-8">
+            <MomentumBar
+              status={latestMetrics.momentum_status}
+              detail={latestMetrics.momentum_detail}
+              defaults={defaults}
+            />
+          </section>
+        </SectionHighlight>
 
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Left Column */}
           <div className="space-y-8">
             {/* Partnership Timeline */}
-            <PartnershipTimeline events={timelineEvents} />
+            <SectionHighlight sectionKey="timeline" highlights={highlights}>
+              <PartnershipTimeline events={timelineEvents} />
+            </SectionHighlight>
 
             {/* Love Notes */}
-            <LoveNotesCallout
-              loveNotesCount={latestMetrics.love_notes_count}
-              schoolName={partnership.name || organization.name || 'your'}
-              observationDays={completedObservations}
-              defaults={defaults}
-            />
+            <SectionHighlight sectionKey="love_notes" highlights={highlights}>
+              <LoveNotesCallout
+                loveNotesCount={latestMetrics.love_notes_count}
+                schoolName={partnership.name || organization.name || 'your'}
+                observationDays={completedObservations}
+                defaults={defaults}
+              />
+            </SectionHighlight>
           </div>
 
           {/* Right Column */}
           <div className="space-y-8">
             {/* Investment Numbers */}
-            <InvestmentNumbers
-              costPerEducator={latestMetrics.cost_per_educator}
-              hubLoginPct={latestMetrics.hub_login_pct}
-              loveNotesCount={latestMetrics.love_notes_count}
-              highEngagementPct={latestMetrics.high_engagement_pct}
-              perEducatorNote={latestMetrics.per_educator_value_note}
-              defaults={defaults}
-            />
+            <SectionHighlight sectionKey="investment" highlights={highlights}>
+              <InvestmentNumbers
+                costPerEducator={latestMetrics.cost_per_educator}
+                hubLoginPct={latestMetrics.hub_login_pct}
+                loveNotesCount={latestMetrics.love_notes_count}
+                highEngagementPct={latestMetrics.high_engagement_pct}
+                perEducatorNote={latestMetrics.per_educator_value_note}
+                defaults={defaults}
+              />
+            </SectionHighlight>
 
             {/* Leading Indicators */}
-            <LeadingIndicators
-              teacherStress={partnership.teacher_stress_score || latestMetrics.teacher_stress}
-              strategyImplementation={latestMetrics.strategy_implementation}
-              retentionIntent={latestMetrics.retention_intent}
-              defaults={defaults}
-            />
+            <SectionHighlight sectionKey="leading_indicators" highlights={highlights}>
+              <LeadingIndicators
+                teacherStress={partnership.teacher_stress_score || latestMetrics.teacher_stress}
+                strategyImplementation={latestMetrics.strategy_implementation}
+                retentionIntent={latestMetrics.retention_intent}
+                defaults={defaults}
+              />
+            </SectionHighlight>
           </div>
         </div>
 

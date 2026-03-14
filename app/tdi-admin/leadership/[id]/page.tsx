@@ -16,6 +16,8 @@ import { ServiceTracker } from '@/components/dashboard/admin/ServiceTracker'
 import { InlineEditField } from '@/components/dashboard/admin/InlineEditField'
 import { FileUploadZone } from '@/components/dashboard/admin/FileUploadZone'
 import { AIExtractModal } from '@/components/dashboard/admin/AIExtractModal'
+import { HighlightControls } from '@/components/dashboard/admin/HighlightControls'
+import { SectionHighlight } from '@/components/dashboard/shared/SectionHighlight'
 import { STATIC_DEFAULTS } from '@/lib/dashboard/dashboardDefaults'
 import { ArrowLeft, Loader2, Building2, Upload } from 'lucide-react'
 
@@ -51,6 +53,10 @@ export default function AdminPartnershipDetailPage() {
   const [actionItems, setActionItems] = useState<any[]>([])
   const [defaults, setDefaults] = useState<Record<string, string>>(STATIC_DEFAULTS)
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
+  const [highlights, setHighlights] = useState<any[]>([])
+
+  // Highlight controls modal state
+  const [editingHighlight, setEditingHighlight] = useState<string | null>(null)
 
   // AI Extract modal state
   const [extractModal, setExtractModal] = useState<{
@@ -78,7 +84,7 @@ export default function AdminPartnershipDetailPage() {
 
     setLoading(true)
     try {
-      const [pRes, tRes, aRes, dRes, fRes] = await Promise.all([
+      const [pRes, tRes, aRes, dRes, fRes, hRes] = await Promise.all([
         fetch(`/api/tdi-admin/leadership/${partnershipId}`, {
           headers: { 'x-user-email': userEmail },
         }),
@@ -90,6 +96,9 @@ export default function AdminPartnershipDetailPage() {
         }),
         fetch('/api/dashboard-defaults'),
         fetch(`/api/tdi-admin/leadership/${partnershipId}/upload`, {
+          headers: { 'x-user-email': userEmail },
+        }),
+        fetch(`/api/tdi-admin/leadership/${partnershipId}/highlights`, {
           headers: { 'x-user-email': userEmail },
         }),
       ])
@@ -121,6 +130,11 @@ export default function AdminPartnershipDetailPage() {
       if (fRes.ok) {
         const fData = await fRes.json()
         setUploadedFiles(fData.files || [])
+      }
+
+      if (hRes.ok) {
+        const hData = await hRes.json()
+        setHighlights(hData.highlights || [])
       }
     } finally {
       setLoading(false)
@@ -332,26 +346,48 @@ export default function AdminPartnershipDetailPage() {
           onEditToggle={() => setEditMode(!editMode)}
         />
 
+        {/* Edit Mode Banner */}
+        {editMode && (
+          <div className="flex items-center gap-2 mb-4 p-3 bg-violet-50 rounded-xl border border-violet-200">
+            <span className="text-xs text-violet-700 font-semibold">* Edit Mode:</span>
+            <span className="text-xs text-violet-600">Click the * button on any section to add highlights, callouts, or NEW badges</span>
+          </div>
+        )}
+
         {/* Stat Cards */}
-        <StatCards
-          staffEnrolled={partnership.staff_enrolled}
-          hubLoginPct={partnership.hub_login_pct}
-          observationsUsed={partnership.observation_days_used || 0}
-          observationsTotal={partnership.observation_days_total || 6}
-          virtualUsed={partnership.virtual_sessions_used || 0}
-          virtualTotal={partnership.virtual_sessions_total || 4}
-          executiveUsed={partnership.executive_sessions_used || 0}
-          executiveTotal={partnership.executive_sessions_total || 2}
-          phase={phase}
-          defaults={defaults}
-        />
+        <SectionHighlight
+          sectionKey="stat_cards"
+          highlights={highlights}
+          isAdminView={editMode}
+          onEdit={(key) => setEditingHighlight(key)}
+        >
+          <StatCards
+            staffEnrolled={partnership.staff_enrolled}
+            hubLoginPct={partnership.hub_login_pct}
+            observationsUsed={partnership.observation_days_used || 0}
+            observationsTotal={partnership.observation_days_total || 6}
+            virtualUsed={partnership.virtual_sessions_used || 0}
+            virtualTotal={partnership.virtual_sessions_total || 4}
+            executiveUsed={partnership.executive_sessions_used || 0}
+            executiveTotal={partnership.executive_sessions_total || 2}
+            phase={phase}
+            defaults={defaults}
+          />
+        </SectionHighlight>
 
         {/* Momentum Bar */}
-        <MomentumBar
-          status={partnership.momentum_status}
-          detail={partnership.momentum_detail}
-          defaults={defaults}
-        />
+        <SectionHighlight
+          sectionKey="momentum"
+          highlights={highlights}
+          isAdminView={editMode}
+          onEdit={(key) => setEditingHighlight(key)}
+        >
+          <MomentumBar
+            status={partnership.momentum_status}
+            detail={partnership.momentum_detail}
+            defaults={defaults}
+          />
+        </SectionHighlight>
 
         {/* Edit mode - momentum fields */}
         {editMode && (
@@ -394,13 +430,20 @@ export default function AdminPartnershipDetailPage() {
         )}
 
         {/* Partnership Timeline */}
-        <PartnershipTimeline
-          events={timelineEvents}
+        <SectionHighlight
+          sectionKey="timeline"
+          highlights={highlights}
           isAdminView={editMode}
-          onAddEvent={() => setAddEventOpen(true)}
-          onDeleteEvent={handleDeleteEvent}
-          onMoveEvent={handleMoveEvent}
-        />
+          onEdit={(key) => setEditingHighlight(key)}
+        >
+          <PartnershipTimeline
+            events={timelineEvents}
+            isAdminView={editMode}
+            onAddEvent={() => setAddEventOpen(true)}
+            onDeleteEvent={handleDeleteEvent}
+            onMoveEvent={handleMoveEvent}
+          />
+        </SectionHighlight>
 
         {/* Add Event Modal */}
         {addEventOpen && (
@@ -481,70 +524,98 @@ export default function AdminPartnershipDetailPage() {
         )}
 
         {/* Investment Numbers */}
-        <InvestmentNumbers
-          costPerEducator={partnership.cost_per_educator}
-          hubLoginPct={partnership.hub_login_pct}
-          loveNotesCount={partnership.love_notes_count}
-          highEngagementPct={partnership.high_engagement_pct}
-          perEducatorNote={partnership.per_educator_value_note}
-          defaults={defaults}
-        />
+        <SectionHighlight
+          sectionKey="investment"
+          highlights={highlights}
+          isAdminView={editMode}
+          onEdit={(key) => setEditingHighlight(key)}
+        >
+          <InvestmentNumbers
+            costPerEducator={partnership.cost_per_educator}
+            hubLoginPct={partnership.hub_login_pct}
+            loveNotesCount={partnership.love_notes_count}
+            highEngagementPct={partnership.high_engagement_pct}
+            perEducatorNote={partnership.per_educator_value_note}
+            defaults={defaults}
+          />
+        </SectionHighlight>
 
         {/* Love Notes Callout */}
-        <LoveNotesCallout
-          loveNotesCount={partnership.love_notes_count}
-          schoolName={schoolName}
-          observationDays={observationsDone || 1}
-          defaults={defaults}
-        />
+        <SectionHighlight
+          sectionKey="love_notes"
+          highlights={highlights}
+          isAdminView={editMode}
+          onEdit={(key) => setEditingHighlight(key)}
+        >
+          <LoveNotesCallout
+            loveNotesCount={partnership.love_notes_count}
+            schoolName={schoolName}
+            observationDays={observationsDone || 1}
+            defaults={defaults}
+          />
+        </SectionHighlight>
 
         {/* Leading Indicators */}
-        <LeadingIndicators
-          teacherStress={partnership.teacher_stress_score}
-          strategyImplementation={partnership.strategy_implementation_pct}
-          retentionIntent={partnership.retention_intent_score}
-          defaults={defaults}
-        />
+        <SectionHighlight
+          sectionKey="leading_indicators"
+          highlights={highlights}
+          isAdminView={editMode}
+          onEdit={(key) => setEditingHighlight(key)}
+        >
+          <LeadingIndicators
+            teacherStress={partnership.teacher_stress_score}
+            strategyImplementation={partnership.strategy_implementation_pct}
+            retentionIntent={partnership.retention_intent_score}
+            defaults={defaults}
+          />
+        </SectionHighlight>
 
         {/* ADMIN ONLY: Service Delivery Tracking */}
-        <div
-          className="bg-white rounded-xl border border-gray-100 p-6 mb-4"
-          style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
+        <SectionHighlight
+          sectionKey="service_delivery"
+          highlights={highlights}
+          isAdminView={editMode}
+          onEdit={(key) => setEditingHighlight(key)}
         >
-          <div className="flex items-center gap-2 mb-5">
-            <div className="w-2 h-2 rounded-full bg-violet-500" />
-            <h2 className="text-base font-semibold text-gray-900">Service Delivery Tracking</h2>
-            <span className="ml-auto text-xs bg-violet-50 text-violet-700 px-2 py-0.5 rounded-full font-semibold">
-              Admin Only
-            </span>
+          <div
+            className="bg-white rounded-xl border border-gray-100 p-6 mb-4"
+            style={{ boxShadow: '0 1px 4px rgba(0,0,0,0.03)' }}
+          >
+            <div className="flex items-center gap-2 mb-5">
+              <div className="w-2 h-2 rounded-full bg-violet-500" />
+              <h2 className="text-base font-semibold text-gray-900">Service Delivery Tracking</h2>
+              <span className="ml-auto text-xs bg-violet-50 text-violet-700 px-2 py-0.5 rounded-full font-semibold">
+                Admin Only
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <ServiceTracker
+                partnershipId={partnershipId}
+                label="Observation Days"
+                used={partnership.observation_days_used || 0}
+                total={partnership.observation_days_total || 6}
+                field="observation_days_used"
+                color="#2D7D78"
+              />
+              <ServiceTracker
+                partnershipId={partnershipId}
+                label="Virtual Sessions"
+                used={partnership.virtual_sessions_used || 0}
+                total={partnership.virtual_sessions_total || 4}
+                field="virtual_sessions_used"
+                color="#8B5CF6"
+              />
+              <ServiceTracker
+                partnershipId={partnershipId}
+                label="Executive Sessions"
+                used={partnership.executive_sessions_used || 0}
+                total={partnership.executive_sessions_total || 2}
+                field="executive_sessions_used"
+                color="#D97706"
+              />
+            </div>
           </div>
-          <div className="grid grid-cols-3 gap-4">
-            <ServiceTracker
-              partnershipId={partnershipId}
-              label="Observation Days"
-              used={partnership.observation_days_used || 0}
-              total={partnership.observation_days_total || 6}
-              field="observation_days_used"
-              color="#2D7D78"
-            />
-            <ServiceTracker
-              partnershipId={partnershipId}
-              label="Virtual Sessions"
-              used={partnership.virtual_sessions_used || 0}
-              total={partnership.virtual_sessions_total || 4}
-              field="virtual_sessions_used"
-              color="#8B5CF6"
-            />
-            <ServiceTracker
-              partnershipId={partnershipId}
-              label="Executive Sessions"
-              used={partnership.executive_sessions_used || 0}
-              total={partnership.executive_sessions_total || 2}
-              field="executive_sessions_used"
-              color="#D97706"
-            />
-          </div>
-        </div>
+        </SectionHighlight>
 
         {/* ADMIN ONLY: Data Upload Panel - visible in edit mode */}
         {editMode && (
@@ -624,6 +695,19 @@ export default function AdminPartnershipDetailPage() {
             userEmail={userEmail}
             onClose={() => setExtractModal({ open: false, fileId: '', filename: '' })}
             onApply={handleApplyExtracted}
+          />
+        )}
+
+        {/* Highlight Controls Modal */}
+        {editingHighlight && (
+          <HighlightControls
+            partnershipId={partnershipId}
+            sectionKey={editingHighlight}
+            sectionLabel={editingHighlight}
+            highlights={highlights}
+            userEmail={userEmail}
+            onUpdate={setHighlights}
+            onClose={() => setEditingHighlight(null)}
           />
         )}
 
