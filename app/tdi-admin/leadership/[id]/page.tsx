@@ -5,43 +5,36 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useTDIAdmin } from '@/lib/tdi-admin/context';
 import { hasAnySectionPermission } from '@/lib/tdi-admin/permissions';
-import { PORTAL_THEMES } from '@/lib/tdi-admin/theme';
-
-// Leadership theme colors
-const theme = PORTAL_THEMES.leadership;
+import {
+  StatCard,
+  TimelineEvent,
+  TimelineEventData,
+  ServiceTracker,
+  InvestmentStat,
+  DataUploadField,
+  LEGACY_COLORS,
+} from '@/components/tdi-admin/leadership';
 import {
   ArrowLeft,
   Building2,
   School,
   Loader2,
   ExternalLink,
-  Check,
-  X,
-  Plus,
-  Edit2,
-  Save,
-  ChevronDown,
-  ChevronUp,
-  Activity,
-  Mail,
-  Copy,
   Users,
   Calendar,
-  Clock,
-  AlertCircle,
   BarChart3,
+  CheckCircle,
+  Clock,
   CalendarPlus,
-  ListTodo,
+  Edit2,
+  X,
+  Plus,
+  TrendingUp,
+  Sparkles,
+  Heart,
+  Award,
   FileText,
-  Trash2,
-  Download,
 } from 'lucide-react';
-import {
-  getMetricStatus,
-  statusColors as metricStatusColors,
-  statusLabels as metricStatusLabels,
-  formatMetricValue,
-} from '@/lib/metric-thresholds';
 
 // Types
 interface Partnership {
@@ -60,11 +53,17 @@ interface Partnership {
   virtual_sessions_used?: number;
   executive_sessions_total: number;
   executive_sessions_used?: number;
-  invite_token: string;
-  invite_sent_at: string | null;
-  invite_accepted_at: string | null;
+  staff_enrolled?: number;
+  hub_login_pct?: number;
+  momentum_status?: string;
+  momentum_detail?: string;
+  cost_per_educator?: number;
+  love_notes_count?: number;
+  high_engagement_pct?: number;
+  data_updated_at?: string;
   status: 'invited' | 'setup_in_progress' | 'active' | 'paused' | 'completed';
   created_at: string;
+  legacy_dashboard_url?: string;
 }
 
 interface Organization {
@@ -73,116 +72,22 @@ interface Organization {
   org_type: string;
   address_city?: string;
   address_state?: string;
-  partnership_goal?: string | null;
-  success_targets?: string[] | null;
 }
-
-interface ActionItem {
-  id: string;
-  title: string;
-  description?: string;
-  category: string;
-  priority: string;
-  status: 'pending' | 'in_progress' | 'completed' | 'paused';
-  due_date?: string;
-  completed_at?: string;
-  paused_at?: string;
-  paused_reason?: string;
-}
-
-interface ActivityLogEntry {
-  id: string;
-  action: string;
-  details: Record<string, unknown>;
-  created_at: string;
-}
-
-interface MetricSnapshot {
-  id: string;
-  metric_name: string;
-  metric_value: number;
-  snapshot_date: string;
-  building_id?: string;
-  source?: string;
-}
-
-interface StaffMember {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  role?: string;
-  role_title?: string;
-  building_id?: string;
-  hub_enrolled?: boolean;
-  buildings?: { name: string } | null;
-}
-
-// Status badge colors
-const statusColors: Record<string, string> = {
-  invited: 'bg-gray-100 text-gray-600 border-gray-200',
-  setup_in_progress: 'bg-amber-100 text-amber-700 border-amber-200',
-  active: 'bg-green-100 text-green-700 border-green-200',
-  paused: 'bg-orange-100 text-orange-700 border-orange-200',
-  completed: 'bg-blue-100 text-blue-700 border-blue-200',
-};
-
-const statusLabels: Record<string, string> = {
-  invited: 'Invited',
-  setup_in_progress: 'Setup In Progress',
-  active: 'Active',
-  paused: 'Paused',
-  completed: 'Completed',
-};
 
 // Phase badge colors
-const phaseColors: Record<string, string> = {
-  IGNITE: 'bg-amber-100 text-amber-700',
-  ACCELERATE: 'bg-teal-100 text-teal-700',
-  SUSTAIN: 'bg-green-100 text-green-700',
+const phaseColors: Record<string, { bg: string; text: string; label: string }> = {
+  IGNITE: { bg: 'bg-amber-500', text: 'text-white', label: 'Year 1: IGNITE' },
+  ACCELERATE: { bg: 'bg-teal-500', text: 'text-white', label: 'Year 2: ACCELERATE' },
+  SUSTAIN: { bg: 'bg-green-500', text: 'text-white', label: 'Year 3: SUSTAIN' },
 };
 
-// Metric types
-const METRIC_TYPES = [
-  { value: 'hub_login_pct', label: 'Hub Login %' },
-  { value: 'courses_avg', label: 'Avg Courses Completed' },
-  { value: 'avg_stress', label: 'Avg Stress Level' },
-  { value: 'implementation_pct', label: 'Implementation %' },
-];
-
-// Helper function for relative time
-function getRelativeTime(dateStr: string): string {
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diffInMs = now.getTime() - date.getTime();
-  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
-
-  if (diffInDays === 0) return 'Today';
-  if (diffInDays === 1) return 'Yesterday';
-  if (diffInDays < 7) return `${diffInDays}d ago`;
-  if (diffInDays < 30) return `${Math.floor(diffInDays / 7)}w ago`;
-  return `${Math.floor(diffInDays / 30)}mo ago`;
-}
-
-// Format action for display
-function formatAction(action: string): string {
-  const actionLabels: Record<string, string> = {
-    invite_generated: 'Invite Generated',
-    invite_accepted: 'Invite Accepted',
-    intake_completed: 'Intake Completed',
-    staff_uploaded: 'Staff Uploaded',
-    action_item_completed: 'Action Item Completed',
-    action_item_paused: 'Action Item Paused',
-    action_item_created: 'Action Item Created',
-    action_item_updated: 'Action Item Updated',
-    partnership_updated: 'Partnership Updated',
-    metric_recorded: 'Metric Recorded',
-    observation_day_completed: 'Observation Day',
-    virtual_session_completed: 'Virtual Session',
-    executive_session_completed: 'Executive Session',
-  };
-  return actionLabels[action] || action.replace(/_/g, ' ');
-}
+// Momentum status colors
+const momentumColors: Record<string, string> = {
+  'Building': LEGACY_COLORS.amber,
+  'Growing': LEGACY_COLORS.teal,
+  'Thriving': LEGACY_COLORS.green,
+  'Needs Attention': '#DC2626',
+};
 
 export default function PartnershipDetailPage() {
   const router = useRouter();
@@ -193,19 +98,19 @@ export default function PartnershipDetailPage() {
   // Data state
   const [partnership, setPartnership] = useState<Partnership | null>(null);
   const [organization, setOrganization] = useState<Organization | null>(null);
-  const [actionItems, setActionItems] = useState<ActionItem[]>([]);
-  const [activityLog, setActivityLog] = useState<ActivityLogEntry[]>([]);
-  const [metricSnapshots, setMetricSnapshots] = useState<MetricSnapshot[]>([]);
+  const [timelineEvents, setTimelineEvents] = useState<TimelineEventData[]>([]);
   const [staffCount, setStaffCount] = useState(0);
-  const [staffMembers, setStaffMembers] = useState<StaffMember[]>([]);
 
   // UI state
   const [isLoading, setIsLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [editForm, setEditForm] = useState<Partial<Partnership>>({});
-  const [showActivityLog, setShowActivityLog] = useState(false);
-  const [copiedLink, setCopiedLink] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [showAddEvent, setShowAddEvent] = useState(false);
+  const [newEvent, setNewEvent] = useState({
+    event_title: '',
+    event_date: '',
+    event_type: 'milestone',
+    status: 'upcoming',
+  });
 
   const hasAccess = isOwner || hasAnySectionPermission(permissions, 'leadership');
 
@@ -224,11 +129,7 @@ export default function PartnershipDetailPage() {
         if (data.success) {
           setPartnership(data.partnership);
           setOrganization(data.organization);
-          setActionItems(data.actionItems || []);
-          setActivityLog(data.activityLog || []);
-          setMetricSnapshots(data.metricSnapshots || []);
           setStaffCount(data.staffCount || 0);
-          setStaffMembers(data.staff || []);
         }
       } else if (response.status === 404) {
         router.push('/tdi-admin/leadership');
@@ -240,75 +141,132 @@ export default function PartnershipDetailPage() {
     }
   }, [partnershipId, router, teamMember?.email]);
 
+  const loadTimeline = useCallback(async () => {
+    if (!teamMember?.email) return;
+
+    try {
+      const response = await fetch(`/api/tdi-admin/leadership/${partnershipId}/timeline`, {
+        headers: {
+          'x-user-email': teamMember.email,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setTimelineEvents(data.events || []);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load timeline:', error);
+    }
+  }, [partnershipId, teamMember?.email]);
+
   useEffect(() => {
     if (hasAccess) {
       loadPartnership();
+      loadTimeline();
     }
-  }, [hasAccess, loadPartnership]);
+  }, [hasAccess, loadPartnership, loadTimeline]);
 
-  // Download staff roster as CSV
-  const downloadStaffCSV = () => {
-    const orgName = organization?.name || partnership?.contact_name || 'partnership';
-    const headers = ['Name', 'Email', 'Role', 'Building', 'Hub Status'];
-    const rows = staffMembers.map((s) => [
-      `${s.first_name} ${s.last_name}`,
-      s.email,
-      s.role_title || s.role || '',
-      s.buildings?.name || '',
-      s.hub_enrolled ? 'Logged in' : 'Not yet',
-    ]);
+  // Save field update
+  const handleFieldSave = async (field: string, value: string | number) => {
+    if (!teamMember?.email) return;
 
-    const csv = [headers, ...rows]
-      .map((row) => row.map((cell) => `"${cell}"`).join(','))
-      .join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${orgName.replace(/[^a-z0-9]/gi, '-').toLowerCase()}-staff-roster.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleSavePartnership = async () => {
-    if (!teamMember?.email || !partnership) return;
-
-    setIsSaving(true);
     try {
-      const response = await fetch(`/api/admin/partnerships/${partnershipId}`, {
-        method: 'PUT',
+      const response = await fetch(`/api/tdi-admin/leadership/${partnershipId}/update`, {
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
           'x-user-email': teamMember.email,
         },
-        body: JSON.stringify(editForm),
+        body: JSON.stringify({ field, value }),
       });
 
-      const data = await response.json();
-      if (data.success) {
-        setPartnership({ ...partnership, ...editForm });
-        setIsEditing(false);
-        setEditForm({});
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.partnership) {
+          setPartnership(data.partnership);
+        }
       }
     } catch (error) {
-      console.error('Error saving partnership:', error);
-    } finally {
-      setIsSaving(false);
+      console.error('Failed to save field:', error);
     }
   };
 
-  const copyInviteLink = async () => {
-    if (!partnership) return;
-    const url = `${window.location.origin}/partner-setup/${partnership.invite_token}`;
-    await navigator.clipboard.writeText(url);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 3000);
+  // Add timeline event
+  const handleAddEvent = async () => {
+    if (!teamMember?.email || !newEvent.event_title) return;
+
+    try {
+      const response = await fetch(`/api/tdi-admin/leadership/${partnershipId}/timeline`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-email': teamMember.email,
+        },
+        body: JSON.stringify(newEvent),
+      });
+
+      if (response.ok) {
+        await loadTimeline();
+        setShowAddEvent(false);
+        setNewEvent({ event_title: '', event_date: '', event_type: 'milestone', status: 'upcoming' });
+      }
+    } catch (error) {
+      console.error('Failed to add event:', error);
+    }
   };
 
-  // Get latest metric values
-  const getLatestMetric = (metricName: string) => {
-    const metric = metricSnapshots.find((m) => m.metric_name === metricName);
-    return metric?.metric_value ?? null;
+  // Update timeline event
+  const handleUpdateEvent = async (eventId: string, updates: Partial<TimelineEventData>) => {
+    if (!teamMember?.email) return;
+
+    try {
+      const response = await fetch(`/api/tdi-admin/leadership/${partnershipId}/timeline`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-email': teamMember.email,
+        },
+        body: JSON.stringify({ event_id: eventId, ...updates }),
+      });
+
+      if (response.ok) {
+        await loadTimeline();
+      }
+    } catch (error) {
+      console.error('Failed to update event:', error);
+    }
+  };
+
+  // Delete timeline event
+  const handleDeleteEvent = async (eventId: string) => {
+    if (!teamMember?.email) return;
+
+    try {
+      const response = await fetch(
+        `/api/tdi-admin/leadership/${partnershipId}/timeline?event_id=${eventId}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'x-user-email': teamMember.email,
+          },
+        }
+      );
+
+      if (response.ok) {
+        await loadTimeline();
+      }
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+    }
+  };
+
+  // Mark service complete
+  const handleServiceComplete = async (field: string, used: number, total: number) => {
+    const newUsed = Math.min(used + 1, total);
+    await handleFieldSave(field, newUsed);
   };
 
   if (!hasAccess) {
@@ -321,34 +279,16 @@ export default function PartnershipDetailPage() {
           >
             <Building2 size={32} style={{ color: '#DC2626' }} />
           </div>
-          <h1
-            className="font-bold mb-3"
-            style={{
-              fontFamily: "'Source Serif 4', Georgia, serif",
-              fontSize: '24px',
-              color: '#2B3A67',
-            }}
-          >
+          <h1 className="font-bold mb-3 text-2xl" style={{ color: LEGACY_COLORS.navy }}>
             Access Restricted
           </h1>
-          <p
-            className="mb-6"
-            style={{
-              fontFamily: "'DM Sans', sans-serif",
-              fontSize: '15px',
-              color: '#6B7280',
-            }}
-          >
+          <p className="mb-6 text-gray-500">
             You don&apos;t have permission to view this partnership.
           </p>
           <Link
             href="/tdi-admin/leadership"
             className="inline-block px-6 py-3 rounded-lg font-medium transition-colors"
-            style={{
-              backgroundColor: theme.accent,
-              color: '#2B3A67',
-              fontFamily: "'DM Sans', sans-serif",
-            }}
+            style={{ backgroundColor: LEGACY_COLORS.gold, color: LEGACY_COLORS.navy }}
           >
             Back to Dashboard
           </Link>
@@ -360,710 +300,536 @@ export default function PartnershipDetailPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: LEGACY_COLORS.amber }} />
       </div>
     );
   }
 
   if (!partnership) {
     return (
-      <div className="p-4 md:p-8 max-w-4xl mx-auto">
-        <div className="text-center py-16">
-          <AlertCircle className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-          <p className="text-gray-600">Partnership not found</p>
-          <Link
-            href="/tdi-admin/leadership"
-            className="inline-block mt-4 text-amber-600 hover:underline"
-          >
-            Back to Dashboard
-          </Link>
-        </div>
+      <div className="p-4 md:p-8 max-w-4xl mx-auto text-center py-16">
+        <p className="text-gray-600">Partnership not found</p>
+        <Link href="/tdi-admin/leadership" className="inline-block mt-4 text-amber-600 hover:underline">
+          Back to Dashboard
+        </Link>
       </div>
     );
   }
 
   const orgName = organization?.name || partnership.contact_name;
+  const phase = phaseColors[partnership.contract_phase] || phaseColors.IGNITE;
+
+  // Calculate deliverables used
+  const totalDeliverables =
+    partnership.observation_days_total +
+    partnership.virtual_sessions_total +
+    partnership.executive_sessions_total;
+  const usedDeliverables =
+    (partnership.observation_days_used || 0) +
+    (partnership.virtual_sessions_used || 0) +
+    (partnership.executive_sessions_used || 0);
+
+  // Group timeline events by status
+  const completedEvents = timelineEvents.filter((e) => e.status === 'completed');
+  const inProgressEvents = timelineEvents.filter((e) => e.status === 'in_progress');
+  const upcomingEvents = timelineEvents.filter((e) => e.status === 'upcoming');
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-8">
+    <div className="min-h-screen bg-gray-50">
       {/* Back Link */}
-      <Link
-        href="/tdi-admin/leadership"
-        className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
-        style={{ fontFamily: "'DM Sans', sans-serif" }}
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to Leadership Dashboard
-      </Link>
+      <div className="max-w-[1400px] mx-auto px-4 md:px-6 pt-6">
+        <Link
+          href="/tdi-admin/leadership"
+          className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 text-sm"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Leadership Dashboard
+        </Link>
+      </div>
 
-      {/* Quick Info Header */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="flex items-center gap-4">
-            <div
-              className={`w-14 h-14 rounded-full flex items-center justify-center ${
-                partnership.partnership_type === 'district'
-                  ? 'bg-purple-100 text-purple-600'
-                  : 'bg-blue-100 text-blue-600'
-              }`}
-            >
-              {partnership.partnership_type === 'district' ? (
-                <Building2 className="w-7 h-7" />
-              ) : (
-                <School className="w-7 h-7" />
-              )}
-            </div>
-            <div>
-              <h1
-                className="text-2xl font-bold"
-                style={{
-                  fontFamily: "'Source Serif 4', Georgia, serif",
-                  color: '#2B3A67',
-                }}
-              >
-                {orgName}
-              </h1>
-              <div className="flex items-center gap-2 mt-1">
-                <span
-                  className={`inline-flex text-xs px-2 py-1 rounded-full border ${
-                    statusColors[partnership.status]
-                  }`}
-                >
-                  {statusLabels[partnership.status]}
-                </span>
-                <span
-                  className={`inline-flex text-xs px-2 py-1 rounded-full font-medium ${
-                    phaseColors[partnership.contract_phase]
-                  }`}
-                >
-                  {partnership.contract_phase}
-                </span>
-                <span className="text-sm text-gray-500">
-                  {staffCount} educator{staffCount !== 1 ? 's' : ''}
-                </span>
+      {/* Navy Gradient Header */}
+      <div
+        className="mt-4 mx-4 md:mx-6 rounded-2xl p-6 md:p-8"
+        style={{
+          background: `linear-gradient(135deg, ${LEGACY_COLORS.navy} 0%, ${LEGACY_COLORS.navyMid} 100%)`,
+        }}
+      >
+        <div className="max-w-[1400px] mx-auto">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-full bg-white/10 flex items-center justify-center">
+                {partnership.partnership_type === 'district' ? (
+                  <Building2 className="w-7 h-7 text-white" />
+                ) : (
+                  <School className="w-7 h-7 text-white" />
+                )}
+              </div>
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold text-white">{orgName}</h1>
+                <div className="flex items-center gap-3 mt-2">
+                  <span className={`px-3 py-1 rounded-full text-sm font-semibold ${phase.bg} ${phase.text}`}>
+                    {phase.label}
+                  </span>
+                  {organization?.address_city && organization?.address_state && (
+                    <span className="text-white/70 text-sm">
+                      {organization.address_city}, {organization.address_state}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="flex flex-wrap gap-2">
-            {partnership.status === 'invited' && (
+            <div className="flex flex-wrap gap-2">
+              {partnership.legacy_dashboard_url && (
+                <a
+                  href={partnership.legacy_dashboard_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-white/10 text-white hover:bg-white/20"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Legacy Dashboard
+                </a>
+              )}
+              {partnership.slug && partnership.status === 'active' && (
+                <Link
+                  href={`/partners/${partnership.slug}-dashboard`}
+                  target="_blank"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                  style={{ backgroundColor: LEGACY_COLORS.gold, color: LEGACY_COLORS.navy }}
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Partner Dashboard
+                </Link>
+              )}
               <button
-                onClick={copyInviteLink}
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                  copiedLink
-                    ? 'bg-green-100 text-green-700'
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                onClick={() => setEditMode(!editMode)}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                  editMode ? 'bg-violet-500 text-white' : 'bg-white/10 text-white hover:bg-white/20'
                 }`}
               >
-                {copiedLink ? (
-                  <>
-                    <Check className="w-4 h-4" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4" />
-                    Copy Invite Link
-                  </>
-                )}
+                {editMode ? <X className="w-4 h-4" /> : <Edit2 className="w-4 h-4" />}
+                {editMode ? 'Exit Edit' : 'Edit Mode'}
               </button>
-            )}
-            {partnership.slug && partnership.status === 'active' && (
-              <Link
-                href={`/partners/${partnership.slug}-dashboard`}
-                target="_blank"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
-                style={{ backgroundColor: theme.accent, color: '#2B3A67' }}
-              >
-                <ExternalLink className="w-4 h-4" />
-                View Dashboard
-              </Link>
-            )}
-            <button
-              onClick={() => {
-                setEditForm(partnership);
-                setIsEditing(true);
-              }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-            >
-              <Edit2 className="w-4 h-4" />
-              Edit
-            </button>
+            </div>
           </div>
-        </div>
-
-        {/* Quick Metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-100">
-          {METRIC_TYPES.map((metric) => {
-            const value = getLatestMetric(metric.value);
-            const status = getMetricStatus(metric.value, value);
-            return (
-              <div key={metric.value} className="text-center">
-                <p className="text-xs text-gray-500 mb-1">{metric.label}</p>
-                <p
-                  className="text-lg font-bold"
-                  style={{ color: metricStatusColors[status] }}
-                >
-                  {formatMetricValue(metric.value, value)}
-                </p>
-                <p
-                  className="text-xs"
-                  style={{ color: metricStatusColors[status] }}
-                >
-                  {metricStatusLabels[status]}
-                </p>
-              </div>
-            );
-          })}
         </div>
       </div>
 
-      {/* Edit Partnership Form */}
-      {isEditing && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2
-              className="text-lg font-semibold"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                color: '#2B3A67',
-              }}
-            >
-              Edit Partnership
-            </h2>
-            <button
-              onClick={() => {
-                setIsEditing(false);
-                setEditForm({});
-              }}
-              className="text-gray-400 hover:text-gray-600"
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+      {/* Main Content */}
+      <div className="max-w-[1400px] mx-auto px-4 md:px-6 py-8">
+        {/* 4 Stat Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <StatCard
+            icon={<Users className="w-6 h-6" />}
+            value={partnership.staff_enrolled || staffCount}
+            label="Staff Enrolled"
+            sublabel="in TDI Hub"
+            color={LEGACY_COLORS.teal}
+            editMode={editMode}
+            onEdit={(v) => handleFieldSave('staff_enrolled', parseInt(v) || 0)}
+          />
+          <StatCard
+            icon={<Calendar className="w-6 h-6" />}
+            value={`${usedDeliverables}/${totalDeliverables}`}
+            label="Deliverables"
+            sublabel="completed"
+            color={LEGACY_COLORS.amber}
+            progress={totalDeliverables > 0 ? (usedDeliverables / totalDeliverables) * 100 : 0}
+          />
+          <StatCard
+            icon={<BarChart3 className="w-6 h-6" />}
+            value={`${partnership.hub_login_pct || 0}%`}
+            label="Hub Engagement"
+            sublabel="login rate"
+            color={LEGACY_COLORS.blue}
+            editMode={editMode}
+            onEdit={(v) => handleFieldSave('hub_login_pct', parseFloat(v) || 0)}
+          />
+          <StatCard
+            icon={<Award className="w-6 h-6" />}
+            value={partnership.contract_phase}
+            label="Current Phase"
+            sublabel={`${partnership.contract_start ? new Date(partnership.contract_start).getFullYear() : 'TBD'}-${partnership.contract_end ? new Date(partnership.contract_end).getFullYear() : 'TBD'}`}
+            color={LEGACY_COLORS.violet}
+          />
+        </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Contact Name
-              </label>
-              <input
-                type="text"
-                value={editForm.contact_name || ''}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, contact_name: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Contact Email
-              </label>
-              <input
-                type="email"
-                value={editForm.contact_email || ''}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, contact_email: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Status
-              </label>
-              <select
-                value={editForm.status || ''}
-                onChange={(e) =>
-                  setEditForm({
-                    ...editForm,
-                    status: e.target.value as Partnership['status'],
-                  })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none"
+        {/* Partnership Momentum Bar */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div
+                className="w-12 h-12 rounded-full flex items-center justify-center"
+                style={{ backgroundColor: `${momentumColors[partnership.momentum_status || 'Building']}20` }}
               >
-                <option value="invited">Invited</option>
-                <option value="setup_in_progress">Setup In Progress</option>
-                <option value="active">Active</option>
-                <option value="paused">Paused</option>
-                <option value="completed">Completed</option>
-              </select>
+                <TrendingUp
+                  className="w-6 h-6"
+                  style={{ color: momentumColors[partnership.momentum_status || 'Building'] }}
+                />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold" style={{ color: LEGACY_COLORS.navy }}>
+                  Partnership Momentum
+                </h3>
+                <p className="text-sm text-gray-500">
+                  {partnership.momentum_detail || 'Making steady progress on implementation goals'}
+                </p>
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phase
-              </label>
-              <select
-                value={editForm.contract_phase || ''}
-                onChange={(e) =>
-                  setEditForm({
-                    ...editForm,
-                    contract_phase: e.target.value as Partnership['contract_phase'],
-                  })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none"
-              >
-                <option value="IGNITE">IGNITE</option>
-                <option value="ACCELERATE">ACCELERATE</option>
-                <option value="SUSTAIN">SUSTAIN</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Contract Start
-              </label>
-              <input
-                type="date"
-                value={editForm.contract_start || ''}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, contract_start: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Contract End
-              </label>
-              <input
-                type="date"
-                value={editForm.contract_end || ''}
-                onChange={(e) =>
-                  setEditForm({ ...editForm, contract_end: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-400 focus:border-transparent outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-100">
-            <button
-              onClick={() => {
-                setIsEditing(false);
-                setEditForm({});
-              }}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleSavePartnership}
-              disabled={isSaving}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-white transition-colors disabled:opacity-50"
-              style={{ backgroundColor: '#2B3A67' }}
-            >
-              {isSaving ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Saving...
-                </>
+            <div className="flex items-center gap-3">
+              {editMode ? (
+                <select
+                  value={partnership.momentum_status || 'Building'}
+                  onChange={(e) => handleFieldSave('momentum_status', e.target.value)}
+                  className="px-4 py-2 border border-gray-200 rounded-lg text-sm"
+                >
+                  <option value="Building">Building</option>
+                  <option value="Growing">Growing</option>
+                  <option value="Thriving">Thriving</option>
+                  <option value="Needs Attention">Needs Attention</option>
+                </select>
               ) : (
-                <>
-                  <Save className="w-4 h-4" />
-                  Save Changes
-                </>
+                <span
+                  className="px-4 py-2 rounded-full text-sm font-semibold"
+                  style={{
+                    backgroundColor: `${momentumColors[partnership.momentum_status || 'Building']}20`,
+                    color: momentumColors[partnership.momentum_status || 'Building'],
+                  }}
+                >
+                  {partnership.momentum_status || 'Building'}
+                </span>
               )}
-            </button>
+            </div>
           </div>
         </div>
-      )}
 
-      {/* Main Content Grid */}
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* Left Column - Main Content */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Service Usage */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2
-              className="text-lg font-semibold mb-4"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                color: '#2B3A67',
-              }}
-            >
-              Service Usage
+        {/* Partnership Timeline - 3 Columns */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold" style={{ color: LEGACY_COLORS.navy }}>
+              Partnership Timeline
             </h2>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>
-                  {partnership.observation_days_used || 0} /{' '}
-                  {partnership.observation_days_total}
-                </p>
-                <p className="text-sm text-gray-500">Observation Days</p>
-              </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>
-                  {partnership.virtual_sessions_used || 0} /{' '}
-                  {partnership.virtual_sessions_total}
-                </p>
-                <p className="text-sm text-gray-500">Virtual Sessions</p>
-              </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <p className="text-2xl font-bold" style={{ color: '#2B3A67' }}>
-                  {partnership.executive_sessions_used || 0} /{' '}
-                  {partnership.executive_sessions_total}
-                </p>
-                <p className="text-sm text-gray-500">Executive Sessions</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Staff Roster */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2
-                className="text-lg font-semibold"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  color: '#2B3A67',
-                }}
-              >
-                Staff Roster
-                <span className="ml-2 text-sm font-normal text-gray-500">
-                  ({staffCount} educator{staffCount !== 1 ? 's' : ''})
-                </span>
-              </h2>
-              {staffMembers.length > 0 && (
-                <button
-                  onClick={downloadStaffCSV}
-                  className="inline-flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg transition-colors"
-                  style={{ backgroundColor: '#2B3A67', color: 'white' }}
-                >
-                  <Download className="w-3 h-3" />
-                  Download CSV
-                </button>
-              )}
-            </div>
-
-            {staffMembers.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">
-                No staff members added yet
-              </p>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">
-                        Name
-                      </th>
-                      <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">
-                        Email
-                      </th>
-                      <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">
-                        Role
-                      </th>
-                      <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">
-                        Building
-                      </th>
-                      <th className="text-left py-2 px-3 text-xs font-medium text-gray-500">
-                        Hub Status
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {staffMembers.slice(0, 10).map((staff) => (
-                      <tr key={staff.id} className="border-b border-gray-100">
-                        <td className="py-2 px-3">
-                          {staff.first_name} {staff.last_name}
-                        </td>
-                        <td className="py-2 px-3 text-gray-600">{staff.email}</td>
-                        <td className="py-2 px-3">
-                          {staff.role_title || staff.role ? (
-                            <span className="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-700">
-                              {staff.role_title || staff.role}
-                            </span>
-                          ) : (
-                            <span className="text-gray-400">-</span>
-                          )}
-                        </td>
-                        <td className="py-2 px-3 text-gray-600">
-                          {staff.buildings?.name || '-'}
-                        </td>
-                        <td className="py-2 px-3">
-                          <span
-                            className={`flex items-center gap-1 text-xs ${
-                              staff.hub_enrolled ? 'text-teal-600' : 'text-gray-400'
-                            }`}
-                          >
-                            <span
-                              className={`w-2 h-2 rounded-full ${
-                                staff.hub_enrolled ? 'bg-teal-500' : 'bg-gray-300'
-                              }`}
-                            />
-                            {staff.hub_enrolled ? 'Logged in' : 'Not yet'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                {staffMembers.length > 10 && (
-                  <p className="text-sm text-gray-500 text-center py-3 border-t border-gray-100">
-                    Showing 10 of {staffMembers.length} staff members
-                  </p>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Action Items */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2
-                className="text-lg font-semibold"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  color: '#2B3A67',
-                }}
-              >
-                Action Items
-              </h2>
-              <Link
-                href={`/admin/partnerships/${partnershipId}`}
-                className="inline-flex items-center gap-1 text-sm text-amber-600 hover:underline"
+            {editMode && (
+              <button
+                onClick={() => setShowAddEvent(true)}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium bg-violet-100 text-violet-700 hover:bg-violet-200 transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                Manage in Full Admin
-              </Link>
-            </div>
-
-            {actionItems.length === 0 ? (
-              <p className="text-gray-500 text-center py-8">No action items yet</p>
-            ) : (
-              <div className="space-y-3">
-                {actionItems.slice(0, 5).map((item) => (
-                  <div
-                    key={item.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg border ${
-                      item.status === 'completed'
-                        ? 'bg-green-50 border-green-200'
-                        : item.status === 'paused'
-                        ? 'bg-gray-50 border-gray-200'
-                        : 'bg-white border-gray-200'
-                    }`}
-                  >
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        item.status === 'completed'
-                          ? 'bg-green-100 text-green-600'
-                          : item.status === 'paused'
-                          ? 'bg-gray-200 text-gray-500'
-                          : item.priority === 'high'
-                          ? 'bg-red-100 text-red-600'
-                          : 'bg-amber-100 text-amber-600'
-                      }`}
-                    >
-                      {item.status === 'completed' ? (
-                        <Check className="w-4 h-4" />
-                      ) : (
-                        <ListTodo className="w-4 h-4" />
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p
-                        className={`font-medium ${
-                          item.status === 'completed'
-                            ? 'line-through text-gray-500'
-                            : ''
-                        }`}
-                        style={{ color: item.status === 'completed' ? undefined : '#2B3A67' }}
-                      >
-                        {item.title}
-                      </p>
-                      <div className="flex items-center gap-2 text-xs text-gray-500">
-                        <span className="capitalize">{item.category}</span>
-                        {item.due_date && (
-                          <>
-                            <span>•</span>
-                            <span>Due {new Date(item.due_date).toLocaleDateString()}</span>
-                          </>
-                        )}
-                      </div>
-                    </div>
-                    <span
-                      className={`text-xs px-2 py-1 rounded-full ${
-                        item.status === 'completed'
-                          ? 'bg-green-100 text-green-700'
-                          : item.status === 'paused'
-                          ? 'bg-gray-100 text-gray-600'
-                          : item.status === 'in_progress'
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'bg-amber-100 text-amber-700'
-                      }`}
-                    >
-                      {item.status.replace('_', ' ')}
-                    </span>
-                  </div>
-                ))}
-                {actionItems.length > 5 && (
-                  <Link
-                    href={`/admin/partnerships/${partnershipId}`}
-                    className="block text-center text-sm text-amber-600 hover:underline py-2"
-                  >
-                    View all {actionItems.length} action items
-                  </Link>
-                )}
-              </div>
+                Add Event
+              </button>
             )}
           </div>
-        </div>
 
-        {/* Right Column - Activity Log & Info */}
-        <div className="space-y-6">
-          {/* Partnership Info */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2
-              className="text-lg font-semibold mb-4"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                color: '#2B3A67',
-              }}
-            >
-              Partnership Info
-            </h2>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-500">Contact</span>
-                <span style={{ color: '#2B3A67' }}>{partnership.contact_name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Email</span>
-                <span className="truncate ml-4" style={{ color: '#2B3A67' }}>
-                  {partnership.contact_email}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Type</span>
-                <span className="capitalize" style={{ color: '#2B3A67' }}>
-                  {partnership.partnership_type}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-500">Created</span>
-                <span style={{ color: '#2B3A67' }}>
-                  {new Date(partnership.created_at).toLocaleDateString()}
-                </span>
-              </div>
-              {partnership.contract_start && (
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Contract Start</span>
-                  <span style={{ color: '#2B3A67' }}>
-                    {new Date(partnership.contract_start).toLocaleDateString()}
-                  </span>
+          {/* Add Event Form */}
+          {showAddEvent && (
+            <div className="mb-6 p-4 border border-violet-200 rounded-lg bg-violet-50">
+              <div className="grid md:grid-cols-4 gap-3">
+                <input
+                  type="text"
+                  placeholder="Event title..."
+                  value={newEvent.event_title}
+                  onChange={(e) => setNewEvent({ ...newEvent, event_title: e.target.value })}
+                  className="px-3 py-2 text-sm border border-violet-200 rounded-lg bg-white"
+                />
+                <input
+                  type="date"
+                  value={newEvent.event_date}
+                  onChange={(e) => setNewEvent({ ...newEvent, event_date: e.target.value })}
+                  className="px-3 py-2 text-sm border border-violet-200 rounded-lg bg-white"
+                />
+                <select
+                  value={newEvent.status}
+                  onChange={(e) => setNewEvent({ ...newEvent, status: e.target.value })}
+                  className="px-3 py-2 text-sm border border-violet-200 rounded-lg bg-white"
+                >
+                  <option value="upcoming">Upcoming</option>
+                  <option value="in_progress">In Progress</option>
+                  <option value="completed">Completed</option>
+                </select>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleAddEvent}
+                    className="flex-1 px-3 py-2 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700"
+                  >
+                    Add
+                  </button>
+                  <button
+                    onClick={() => setShowAddEvent(false)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
                 </div>
-              )}
-              {partnership.contract_end && (
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Contract End</span>
-                  <span style={{ color: '#2B3A67' }}>
-                    {new Date(partnership.contract_end).toLocaleDateString()}
-                  </span>
-                </div>
-              )}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Recent Metrics */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2
-              className="text-lg font-semibold mb-4"
-              style={{
-                fontFamily: "'DM Sans', sans-serif",
-                color: '#2B3A67',
-              }}
-            >
-              Recent Metrics
-            </h2>
-
-            {metricSnapshots.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">No metrics recorded yet</p>
-            ) : (
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Done Column */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <CheckCircle className="w-5 h-5" style={{ color: LEGACY_COLORS.green }} />
+                <h3 className="font-semibold text-sm" style={{ color: LEGACY_COLORS.green }}>
+                  Done ({completedEvents.length})
+                </h3>
+              </div>
               <div className="space-y-2">
-                {metricSnapshots.slice(0, 5).map((metric) => {
-                  const status = getMetricStatus(metric.metric_name, metric.metric_value);
-                  return (
-                    <div
-                      key={metric.id}
-                      className="flex items-center justify-between py-2 border-b border-gray-50 last:border-0"
-                    >
-                      <div>
-                        <p className="text-sm font-medium" style={{ color: '#2B3A67' }}>
-                          {METRIC_TYPES.find((m) => m.value === metric.metric_name)
-                            ?.label || metric.metric_name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {new Date(metric.snapshot_date).toLocaleDateString()}
-                        </p>
-                      </div>
-                      <span
-                        className="text-sm font-bold"
-                        style={{ color: metricStatusColors[status] }}
-                      >
-                        {formatMetricValue(metric.metric_name, metric.metric_value)}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Activity Log */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <button
-              onClick={() => setShowActivityLog(!showActivityLog)}
-              className="w-full flex items-center justify-between"
-            >
-              <h2
-                className="text-lg font-semibold"
-                style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  color: '#2B3A67',
-                }}
-              >
-                Activity Log
-              </h2>
-              {showActivityLog ? (
-                <ChevronUp className="w-5 h-5 text-gray-400" />
-              ) : (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
-              )}
-            </button>
-
-            {showActivityLog && (
-              <div className="mt-4 space-y-3">
-                {activityLog.length === 0 ? (
-                  <p className="text-gray-500 text-center py-4">No activity yet</p>
+                {completedEvents.length === 0 ? (
+                  <p className="text-sm text-gray-400 text-center py-4">No completed events</p>
                 ) : (
-                  activityLog.slice(0, 10).map((entry) => (
-                    <div
-                      key={entry.id}
-                      className="flex items-start gap-3 py-2 border-b border-gray-50 last:border-0"
-                    >
-                      <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-                        <Activity className="w-4 h-4 text-gray-500" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium" style={{ color: '#2B3A67' }}>
-                          {formatAction(entry.action)}
-                        </p>
-                        {typeof entry.details?.title === 'string' &&
-                          entry.details.title && (
-                            <p className="text-xs text-gray-600 truncate">
-                              {entry.details.title}
-                            </p>
-                          )}
-                        <p className="text-xs text-gray-400">
-                          {getRelativeTime(entry.created_at)}
-                        </p>
-                      </div>
-                    </div>
+                  completedEvents.map((event) => (
+                    <TimelineEvent
+                      key={event.id}
+                      event={event}
+                      editMode={editMode}
+                      onUpdate={(updates) => handleUpdateEvent(event.id, updates)}
+                      onDelete={() => handleDeleteEvent(event.id)}
+                    />
                   ))
                 )}
               </div>
+            </div>
+
+            {/* In Progress Column */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <Clock className="w-5 h-5" style={{ color: LEGACY_COLORS.amber }} />
+                <h3 className="font-semibold text-sm" style={{ color: LEGACY_COLORS.amber }}>
+                  In Progress ({inProgressEvents.length})
+                </h3>
+              </div>
+              <div className="space-y-2">
+                {inProgressEvents.length === 0 ? (
+                  <p className="text-sm text-gray-400 text-center py-4">Nothing in progress</p>
+                ) : (
+                  inProgressEvents.map((event) => (
+                    <TimelineEvent
+                      key={event.id}
+                      event={event}
+                      editMode={editMode}
+                      onUpdate={(updates) => handleUpdateEvent(event.id, updates)}
+                      onDelete={() => handleDeleteEvent(event.id)}
+                    />
+                  ))
+                )}
+              </div>
+            </div>
+
+            {/* Coming Soon Column */}
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <CalendarPlus className="w-5 h-5" style={{ color: LEGACY_COLORS.blue }} />
+                <h3 className="font-semibold text-sm" style={{ color: LEGACY_COLORS.blue }}>
+                  Coming Soon ({upcomingEvents.length})
+                </h3>
+              </div>
+              <div className="space-y-2">
+                {upcomingEvents.length === 0 ? (
+                  <p className="text-sm text-gray-400 text-center py-4">No upcoming events</p>
+                ) : (
+                  upcomingEvents.map((event) => (
+                    <TimelineEvent
+                      key={event.id}
+                      event={event}
+                      editMode={editMode}
+                      onUpdate={(updates) => handleUpdateEvent(event.id, updates)}
+                      onDelete={() => handleDeleteEvent(event.id)}
+                    />
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Investment By The Numbers */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+          <h2 className="text-lg font-semibold mb-6" style={{ color: LEGACY_COLORS.navy }}>
+            Investment By The Numbers
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <InvestmentStat
+              value={partnership.cost_per_educator || 0}
+              label="Cost Per Educator"
+              sublabel="Investment efficiency"
+              prefix="$"
+              editMode={editMode}
+              onEdit={(v) => handleFieldSave('cost_per_educator', parseFloat(v) || 0)}
+            />
+            <InvestmentStat
+              value={partnership.love_notes_count || 0}
+              label="Love Notes"
+              sublabel="Positive feedback collected"
+              editMode={editMode}
+              onEdit={(v) => handleFieldSave('love_notes_count', parseInt(v) || 0)}
+            />
+            <InvestmentStat
+              value={`${partnership.high_engagement_pct || 0}%`}
+              label="High Engagement"
+              sublabel="Staff actively using TDI Hub"
+              editMode={editMode}
+              onEdit={(v) => handleFieldSave('high_engagement_pct', parseFloat(v.replace('%', '')) || 0)}
+            />
+            <InvestmentStat
+              value={staffCount}
+              label="Total Educators"
+              sublabel="Staff in partnership"
+            />
+          </div>
+        </div>
+
+        {/* Service Delivery Tracking - Admin Only */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+          <h2 className="text-lg font-semibold mb-6" style={{ color: LEGACY_COLORS.navy }}>
+            Service Delivery Tracking
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            <ServiceTracker
+              label="Observation Days"
+              used={partnership.observation_days_used || 0}
+              total={partnership.observation_days_total}
+              color={LEGACY_COLORS.teal}
+              editMode={editMode}
+              onMarkComplete={() =>
+                handleServiceComplete(
+                  'observation_days_used',
+                  partnership.observation_days_used || 0,
+                  partnership.observation_days_total
+                )
+              }
+            />
+            <ServiceTracker
+              label="Virtual Sessions"
+              used={partnership.virtual_sessions_used || 0}
+              total={partnership.virtual_sessions_total}
+              color={LEGACY_COLORS.blue}
+              editMode={editMode}
+              onMarkComplete={() =>
+                handleServiceComplete(
+                  'virtual_sessions_used',
+                  partnership.virtual_sessions_used || 0,
+                  partnership.virtual_sessions_total
+                )
+              }
+            />
+            <ServiceTracker
+              label="Executive Sessions"
+              used={partnership.executive_sessions_used || 0}
+              total={partnership.executive_sessions_total}
+              color={LEGACY_COLORS.violet}
+              editMode={editMode}
+              onMarkComplete={() =>
+                handleServiceComplete(
+                  'executive_sessions_used',
+                  partnership.executive_sessions_used || 0,
+                  partnership.executive_sessions_total
+                )
+              }
+            />
+          </div>
+        </div>
+
+        {/* Data Upload Controls - Admin Only, Edit Mode */}
+        {editMode && (
+          <div className="bg-violet-50 rounded-xl border-2 border-violet-200 border-dashed p-6">
+            <div className="flex items-center gap-2 mb-6">
+              <Sparkles className="w-5 h-5 text-violet-600" />
+              <h2 className="text-lg font-semibold text-violet-800">Admin Data Controls</h2>
+            </div>
+            <div className="grid md:grid-cols-3 gap-6">
+              <DataUploadField
+                label="Staff Enrolled"
+                field="staff_enrolled"
+                type="number"
+                value={partnership.staff_enrolled}
+                onSave={handleFieldSave}
+              />
+              <DataUploadField
+                label="Hub Login %"
+                field="hub_login_pct"
+                type="number"
+                value={partnership.hub_login_pct}
+                unit="%"
+                onSave={handleFieldSave}
+              />
+              <DataUploadField
+                label="Momentum Status"
+                field="momentum_status"
+                type="select"
+                value={partnership.momentum_status}
+                options={['Building', 'Growing', 'Thriving', 'Needs Attention']}
+                onSave={handleFieldSave}
+              />
+              <DataUploadField
+                label="Cost Per Educator"
+                field="cost_per_educator"
+                type="number"
+                value={partnership.cost_per_educator}
+                unit="$"
+                onSave={handleFieldSave}
+              />
+              <DataUploadField
+                label="Love Notes Count"
+                field="love_notes_count"
+                type="number"
+                value={partnership.love_notes_count}
+                onSave={handleFieldSave}
+              />
+              <DataUploadField
+                label="High Engagement %"
+                field="high_engagement_pct"
+                type="number"
+                value={partnership.high_engagement_pct}
+                unit="%"
+                onSave={handleFieldSave}
+              />
+              <DataUploadField
+                label="Momentum Detail"
+                field="momentum_detail"
+                type="text"
+                value={partnership.momentum_detail}
+                onSave={handleFieldSave}
+              />
+              <DataUploadField
+                label="Contract Start"
+                field="contract_start"
+                type="date"
+                value={partnership.contract_start}
+                onSave={handleFieldSave}
+              />
+              <DataUploadField
+                label="Contract End"
+                field="contract_end"
+                type="date"
+                value={partnership.contract_end}
+                onSave={handleFieldSave}
+              />
+            </div>
+
+            {partnership.data_updated_at && (
+              <p className="text-xs text-violet-500 mt-4">
+                Last data update: {new Date(partnership.data_updated_at).toLocaleString()}
+              </p>
             )}
+          </div>
+        )}
+
+        {/* Partnership Info Footer */}
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <div className="flex flex-wrap gap-6 text-sm text-gray-500">
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              <span>Contact: {partnership.contact_name}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Heart className="w-4 h-4" />
+              <span>Email: {partnership.contact_email}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              <span>Created: {new Date(partnership.created_at).toLocaleDateString()}</span>
+            </div>
           </div>
         </div>
       </div>
